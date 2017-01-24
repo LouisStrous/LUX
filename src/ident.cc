@@ -520,7 +520,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   char const* name;
   Scalar	number;
   int32_t	i, j, n, m;
-  pointer	ptr;
+  Pointer	ptr;
   listElem	*sptr;
   enumElem	*eptr;
   extractSec	*sec;

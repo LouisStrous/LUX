@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  /* parameters for the current image */
  int32_t	nx, ny;
  static	int32_t result_sym;
- static pointer q1;
+ static Pointer q1;
  uint8_t	*base;
  /*------------------------------------------------------------------------- */
 METHODDEF void input_init (compress_info_ptr cinfo)

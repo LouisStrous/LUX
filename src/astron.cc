@@ -781,7 +781,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
   int32_t result, input_elem_per_date, output_elem_per_date, iq;
   int32_t *dims = NULL, ndim = 0;
   loopInfo tgtinfo, srcinfo;
-  pointer src, tgt;
+  Pointer src, tgt;
   /* enum Calendar_order fromorder, toorder; */
   enum Calendar fromcalendar, tocalendar;
   enum Calendar_timescale fromtime, totime;
@@ -1203,7 +1203,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
   Symboltype type, outtype;
   char	isFree = 0, *line;
   char const** monthNames;
-  pointer	data, JD;
+  Pointer	data, JD;
   double	day;
 
   fromcalendar = extractbits(internalMode, CAL_CALENDAR_BASE,
@@ -2254,7 +2254,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
    degrees.  LS 2004may03*/
 {
   double JDfrom, JDto, alpha, delta;
-  pointer src, tgt;
+  Pointer src, tgt;
   loopInfo srcinfo, tgtinfo;
   int32_t n, result, done;
   Symboltype outtype;
@@ -2414,7 +2414,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
   int32_t n, result, done;
   double equinox, alpha, delta;
   loopInfo srcinfo, tgtinfo;
-  pointer src, tgt;
+  Pointer src, tgt;
   int32_t vocal;
 
   if (narg > 1) {
@@ -2567,7 +2567,7 @@ int32_t lux_constellationname(int32_t narg, int32_t ps[])
  */
 {
   int32_t result, n, nc;
-  pointer src;
+  Pointer src;
   char **tgt;
 
   if (numerical(ps[0], NULL, NULL, &n, &src) == LUX_ERROR)
@@ -4225,7 +4225,7 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
    LS 2004may30
 */
   loopInfo srcinfo, tgtinfo;
-  pointer src, tgt;
+  Pointer src, tgt;
   int32_t result, from, to;
   double pos[2], ceps, seps, epsilon, equinox;
 

@@ -45,7 +45,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
    1D arrays.   LS 10nov92 16sep98 22mar99 */
 {
   loopInfo	trgtinfo;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   int32_t	*dims, ndim, i, offset[2*MAX_DIMS], doff, daxes, nelem;
 
   switch (symbol_class(ps[0])) {
@@ -287,7 +287,7 @@ int32_t lux_smap(int32_t narg, int32_t ps[])
  /* convert type (and class) to a string */
 {
   register int32_t n;
-  register pointer q1,q3;
+  register Pointer q1,q3;
   int32_t	nsym, nd, j, n1;
   int32_t	result_sym, size;
 
@@ -390,7 +390,7 @@ int32_t lux_cdmap(int32_t narg, int32_t ps[])
 int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
                 /* general part for map routines */
 {
-  register pointer q1,q3;
+  register Pointer q1,q3;
   int32_t	nsym, nd, n, nn;
   int32_t	result_sym;
   Symboltype type;
@@ -493,7 +493,7 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
  elements intact otherwise.  LS 11jan99 */
 {
   loopInfo	srcinfo, trgtinfo;
-  pointer	src, trgt, src2, trgt2, center;
+  Pointer	src, trgt, src2, trgt2, center;
   Scalar	value;
   int32_t	result, stride, i, iq, w, n, inplace;
 
@@ -974,7 +974,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
   Symboltype type;
   Symbolclass class_id;
   int16_t	*ap;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   wideScalar	value, item;
   uint8_t	subsc_type[MAX_DIMS], sum[MAX_DIMS];
   listElem	*le;
@@ -2016,7 +2016,7 @@ int32_t string_sub(int32_t narg, int32_t ps[])
   /* this is a subset of cases for arrays since strings are 1-D */
   int32_t	iq, n, result_sym, ns, nsym, i;
   char	*p, *q;
-  pointer p2;
+  Pointer p2;
 
   if (narg != 1)		/* only one subscript allowed */
     return cerror(N_STR_DIMS_OVR, 0);
@@ -2245,7 +2245,7 @@ int32_t lux_dimen(int32_t narg, int32_t ps[])
 /* specified, then all dimensions are returned.  LS 19may98 */
 {
   int32_t	nAxes, iq, *out, i, ndim, *dims;
-  pointer	axes;
+  Pointer	axes;
 
   if (narg > 1) {		/* have <axes> */
     if (!symbolIsNumerical(ps[1]))
@@ -2506,7 +2506,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
     LS 22feb93 */
 /* allow concatenation of LISTs and STRUCTs LS 7feb95 */
 {
-  pointer q1,q2;
+  Pointer q1,q2;
   int32_t	nd, j, i, dim[MAX_DIMS], nundef = 0;
   int32_t	iq, nsym, mq, topnd = 0, sflag = 0, n, nq;
   Symboltype toptype = LUX_INT8;
@@ -2971,7 +2971,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
     stride[MAX_DIMS], index, tally[MAX_DIMS], step[2][MAX_DIMS];
   float	*coord[MAX_DIMS], d[MAX_DIMS];
   Scalar	value, cvalue;
-  pointer	src, out;
+  Pointer	src, out;
 
   class_id = (Symbolclass) symbol_class(ps[narg]); /* class of target symbol */
   switch (class_id) {
@@ -3166,7 +3166,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-int32_t extractNumerical(pointer src, pointer trgt, Symboltype type,
+int32_t extractNumerical(Pointer src, Pointer trgt, Symboltype type,
                          int32_t ndim, int32_t *dims, int32_t *coords,
                          int32_t nAxes, int32_t *axes)
 {
@@ -3198,7 +3198,7 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
 {
   int32_t	nd, result, temp, iq, i;
   loopInfo	srcinfo, trgtinfo;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_ARR, ps[0]);

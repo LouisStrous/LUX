@@ -1183,7 +1183,7 @@ int32_t lux_projectmap(int32_t narg, int32_t ps[])
 /* can be shifted over <xmap>,<ymap> elements, measured from the lower */
 /* left of the projection.  LS 9feb2001 */
 {
-  pointer	src, trgt;
+  Pointer	src, trgt;
   int32_t	imx, imy, xmap, ymap, result, dims[2], i, j, index, stride, sx, sy,
     u2, v2, nx, ny;
   double h, delta, angle, mag, c, s, bigdelta, c1, c2, c3, c4, c5, c6, c7,

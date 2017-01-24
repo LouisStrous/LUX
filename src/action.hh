@@ -60,13 +60,13 @@ int32_t 	dereferenceScalPointer(int32_t), scalar_scratch(Symboltype),
   lux_float(int32_t, int32_t []), lux_long(int32_t, int32_t []), lux_byte(int32_t , int32_t []), lux_int64(int32_t, int32_t []),
   lux_word(int32_t, int32_t []), lux_double(int32_t, int32_t []), lux_cfloat(int32_t, int32_t []),
   luxerror(char const *, int32_t, ...), cerror(int32_t, int32_t, ...), copyEvalSym(int32_t),
-  getNumerical(int32_t, Symboltype, int32_t *, pointer *, char, int32_t *, pointer *),
+  getNumerical(int32_t, Symboltype, int32_t *, Pointer *, char, int32_t *, Pointer *),
   strccmp(char const *, char const *), eval(int32_t), evals(int32_t), lux_cdouble(int32_t, int32_t []),
   strncasecmp_p(char *, char *, int32_t), strcasecmp_p(char *, char *),
   stringpointer(char *, int32_t), routineContext(int32_t), lux_string(int32_t, int32_t []),
-  getSimpleNumerical(int32_t, pointer *, int32_t *), double_arg_stat(int32_t, double *),
-  numerical(int32_t, int32_t **, int32_t *, int32_t *, pointer *),
-  numerical_or_string(int32_t, int32_t **, int32_t *, int32_t *, pointer *),
+  getSimpleNumerical(int32_t, Pointer *, int32_t *), double_arg_stat(int32_t, double *),
+  numerical(int32_t, int32_t **, int32_t *, int32_t *, Pointer *),
+  numerical_or_string(int32_t, int32_t **, int32_t *, int32_t *, Pointer *),
   findName(char const *, hashTableEntry **, int32_t), to_scalar(int32_t, Symboltype),
   to_scratch_array(int32_t, Symboltype, int32_t, int32_t *), get_dims(int32_t *, int32_t *, int32_t *),
   listNumElements(int32_t), lux_zero(int32_t, int32_t []),
@@ -91,35 +91,35 @@ int32_t approximately_equal_z(doubleComplex, doubleComplex, double),
   essentially_equal_z_f(floatComplex, floatComplex, float);
 
 int32_t	standardLoop(int32_t, int32_t, int32_t, Symboltype, loopInfo *,
-                     pointer *, int32_t *, loopInfo *, pointer *),
-  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, pointer *, int32_t,
+                     Pointer *, int32_t *, loopInfo *, Pointer *),
+  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, Pointer *, int32_t,
                 int32_t const*, int32_t, int32_t const*, Symboltype, int32_t,
-                int32_t*, loopInfo*, pointer*),
+                int32_t*, loopInfo*, Pointer*),
   standardLoop0(int32_t, int32_t, int32_t *, int32_t, Symboltype,
-                loopInfo *, pointer *, int32_t *, loopInfo *, pointer *),
-  advanceLoop(loopInfo *, pointer *),
+                loopInfo *, Pointer *, int32_t *, loopInfo *, Pointer *),
+  advanceLoop(loopInfo *, Pointer *),
   nextLoop(loopInfo *),
   nextLoops(loopInfo *, loopInfo *),
   prepareDiagonals(int32_t, loopInfo *, int32_t, int32_t **, int32_t **, int32_t **, int32_t **),
   moveLoop(loopInfo *, int32_t, int32_t),
-  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, pointer *, int32_t, int32_t const *,
+  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, Pointer *, int32_t, int32_t const *,
                 int32_t, int32_t const *, Symboltype, int32_t, int32_t *, loopInfo *,
-                pointer *),
+                Pointer *),
   loopIsAtStart(loopInfo const *), setAxes(loopInfo *, int32_t, int32_t *, int32_t),
-  standard_args(int32_t, int32_t [], char const *, pointer **, loopInfo **);
+  standard_args(int32_t, int32_t [], char const *, Pointer **, loopInfo **);
 
 void	subdataLoop(int32_t *, loopInfo *), addVerify(char *, char),
   *seekFacts(int32_t symbol, int32_t type, int32_t flag),
   *setFacts(int32_t symbol, int32_t type, int32_t flag),
-  deleteFacts(int32_t symbol, int32_t type), returnLoop(loopInfo *, pointer *, int32_t),
+  deleteFacts(int32_t symbol, int32_t type), returnLoop(loopInfo *, Pointer *, int32_t),
   setAxisMode(loopInfo *, int32_t mode),
-  standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t, int32_t *, pointer *,
+  standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t, int32_t *, Pointer *,
 		       loopInfo *);
 void convertWidePointer(wideScalar *, int32_t, int32_t);
 
 void	newStack(int32_t), push(int32_t), deleteStack(void);
 int32_t	pop(void);
-        
+
 #if HAVE_LIBX11
 int32_t	setup_x(void);
 #endif
@@ -142,7 +142,7 @@ const csplineInfo empty_cubic_spline(void);
 
 void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims, 
                         Symboltype type, int32_t naxes, int32_t const *axes,
-                        pointer *data, int32_t mode),
+                        Pointer *data, int32_t mode),
   rearrangeDimensionLoop(loopInfo *), endian(void *, int32_t, int32_t),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, int32_t);
 

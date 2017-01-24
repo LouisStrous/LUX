@@ -129,7 +129,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
 {
   int32_t tally[MAX_DIMS], step[MAX_DIMS], *dims, done = 0, n, i, done2, done3,
   	ndim, type, *axes, naxes, result_sym = 0, size, iq, iStep[MAX_DIMS];
-  pointer	src, trgt;
+  Pointer	src, trgt;
   int32_t	*exponent, nexponent, j, k, *temp, outdims[MAX_DIMS],
 	in[MAX_DIMS], *index, nIndex, offset;
   double	value, factor, weight, bigweight, *bigweights;
@@ -357,7 +357,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
   return result_sym;
 }
 /*---------------------------------------------------------*/
-pointer	multiCompData;
+Pointer	multiCompData;
 int32_t	multiCompNPoints, multiCompNCoord, multiCompType;
 int32_t multiCompare(const void *arg1, const void *arg2)
 /* comparison function for use with lux_tolookup.  LS 9nov95 */
@@ -480,12 +480,12 @@ int32_t lux_tolookup(int32_t narg, int32_t ps[])
   return 1;
 }
 /*---------------------------------------------------------*/
-pointer	src;
+Pointer	src;
 Symboltype type;
 int32_t mcmp(const void *x1, const void *x2)
 /* auxilliary for lux_medianfilter */
 {
-  extern pointer	src;
+  extern Pointer	src;
   Scalar	d1, d2;
 
   switch (type)
@@ -551,8 +551,8 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
     *offset, i, j;
   float	order;
   loopInfo	srcinfo, trgtinfo, tmpinfo, tmpinfo2;
-  pointer	trgt, tmpsrc, tmptrgt;
   /* we use a global pointer src */
+  Pointer	trgt, tmpsrc, tmptrgt;
 
   if (!ps[1])			/* no <data> */
     return luxerror("Need data array", 0);
@@ -704,8 +704,8 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
   int32_t	output, med, nelem, i;
   float	order;
   loopInfo	srcinfo, trgtinfo;
-  pointer	trgt, tmp, tmp0;
   /* we use a global pointer src */
+  Pointer	trgt, tmp, tmp0;
 
   if (!ps[1])			/* no <data> */
     return luxerror("Need data array", 0);
@@ -820,7 +820,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
   Symboltype	type;
   int32_t	n, result, i, offset1, offset2, stride,	w1, j, ww, loop, iq, three=3,
     nWidth;
-  pointer	src, trgt, width;
+  Pointer	src, trgt, width;
   Scalar	value;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1107,7 +1107,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
   Symboltype	type;
   int32_t n, result, i, offset1, offset2, stride, w1, j, ww, loop,
     iq, three=3, nWidth;
-  pointer	src, trgt, width;
+  Pointer	src, trgt, width;
   Scalar	value;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1395,7 +1395,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   int32_t	iq, *dims, ndim, i, result, done;
   float	*center, temp, temptot, zerocenter[MAX_DIMS], *stretch,
 	onestretch[MAX_DIMS];
-  pointer	trgt;
+  Pointer	trgt;
   loopInfo	trgtinfo;
 
   iq = lux_long(1, &ps[0]);	/* DIMS */
@@ -1487,7 +1487,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
     LS 14apr97 - 15apr97 */
 {
   Symboltype	maxType;
-  pointer	xData, yData;
+  Pointer	xData, yData;
   int32_t	nx, ny, *listData, *indexData,
     n, *temp, nTemp, iq, nnTemp, noMatch, ix, i, match, *base, step,
     *reallocbase, nMatch, *number, j;
@@ -1700,7 +1700,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
   LS 7may97 6sep2000 */
 {
   int32_t	axesSym, offset, i, step, j, distSym, iq, *ptr;
-  pointer	src, trgt, shift, src0, trgt0, blank;
+  Pointer	src, trgt, shift, src0, trgt0, blank;
   char	*tmp, *tmp0 = NULL;
   loopInfo	srcinfo, trgtinfo;
   int32_t	lux_indgen(int32_t, int32_t []);
@@ -2003,7 +2003,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 {
   int32_t	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok,
 	*diagonal, nDiagonal, nDoDim, index, subgrid, ready, done;
-  pointer	src, trgt, trgt0, srcl, srcr, trgt00;
+  Pointer	src, trgt, trgt0, srcl, srcr, trgt00;
   float	*grad, *grad2, *hessian, value;
   loopInfo	srcinfo, trgtinfo;
 
@@ -2559,7 +2559,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 */
 {
   int32_t	nData, nSrc, nTrgt, type, low, mid, high, ps1, ps2;
-  pointer	data, src, trgt;
+  Pointer	data, src, trgt;
   Scalar	v;
 
   ps1 = (symbol_type(ps[1]) == symbol_type(ps[0]))? ps[1]:
@@ -2778,7 +2778,7 @@ Theory:
   float	onef = 1.0;
   double	oned = 1.0, errv, f, chi2;
   Scalar	value;
-  pointer	px, py, pl, pr, p1, p2, pw, pc, err, chisq;
+  Pointer	px, py, pl, pr, p1, p2, pw, pc, err, chisq;
   int32_t	f_decomp(float *, int32_t, int32_t), d_decomp(double *, int32_t, int32_t),
     f_solve(float *, float *, int32_t, int32_t),
     d_solve(double *, double *, int32_t, int32_t);
@@ -3106,7 +3106,7 @@ Theory:
   float	onef = 1.0;
   double oned = 1.0, chi2, f, errv, fwhm, norm;
   Scalar	value;
-  pointer	px, py, pl, pr, p2, pw, pc, err, chisq, pk;
+  Pointer	px, py, pl, pr, p2, pw, pc, err, chisq, pk;
   loopInfo	xinfo, yinfo, p2info, winfo;
 
   if (isComplexType(symbol_type(ps[0])))
@@ -3464,7 +3464,7 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
 {
   int32_t	n, result;
   Scalar	value;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   loopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 1? ps[1]: 0,

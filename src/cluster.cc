@@ -150,7 +150,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 	useIndex, iterate, *changed, *changedOld, vocal, ordered,
 	gotPhantom, recluster, quick, record, curChanged;
   Symboltype	indexType;
-  pointer	clusterNumber;
+  Pointer	clusterNumber;
   FILE	*file;
   int32_t	nDistCal = 0, allDistCal = 0;
 

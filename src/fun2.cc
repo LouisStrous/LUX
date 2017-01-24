@@ -59,7 +59,7 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
   the result has the same type as <x>.  axis & order extension by LS 26nov92
   implementation of 1D double-precision case LS 11feb2007 */
 {
- register pointer q1,q2,p;
+ register Pointer q1,q2,p;
  int32_t	result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
  int32_t	xdims[8], order, size;
  array	*h;
@@ -153,7 +153,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
   int32_t	type, offset, *indx, i, size, result, nElem, indices2,
     haveWeights, shift;
   Symboltype outType;
-  pointer	src, trgt, sum, weights, hist;
+  Pointer	src, trgt, sum, weights, hist;
   Scalar	temp;
   extern Scalar	lastmin, lastmax;
   int32_t	minmax(int32_t *, int32_t, int32_t);
@@ -864,7 +864,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 /* LS 2011-04-15 */
 {
   int32_t	result, n, i, done, n2, save[MAX_DIMS], haveWeights;
-  pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
+  Pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
   double	xmean, ymean, xtemp, ytemp, cov, nn;
   loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
   Symboltype outtype;
@@ -1483,7 +1483,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 /* LS 19 July 2000 */
 {
   int32_t	result, n, i, done, n2, save[MAX_DIMS], haveWeights;
-  pointer	src, trgt, src0, trgt0, weight, weight0;
+  Pointer	src, trgt, src0, trgt0, weight, weight0;
   double	mean, sdev, temp, nn;
   doubleComplex	cmean;
   loopInfo	srcinfo, trgtinfo, winfo;
@@ -2128,7 +2128,7 @@ int32_t lux_swab(int32_t narg, int32_t ps[])
 /*this is a subroutine and swaps the input symbol (not a copy) */
 {
   int32_t	iq, n, nd, j;
-  pointer q1;
+  Pointer q1;
   array	*h;
   int32_t	swapb(char *, int32_t);
 
@@ -2185,7 +2185,7 @@ int32_t lux_esmooth(int32_t narg, int32_t ps[])
   Symboltype type, outtype;
   float	damping, width;
   array	*h;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   Scalar	sum, weight;
   extern float	float_arg(int32_t);
 
@@ -2424,7 +2424,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
   extern	int32_t scrat[];
   float	sum, *pt3, wq, sumg, xq;
   int32_t	n, nWidth;
-  pointer	src, trgt, widths, gkern, pt1;
+  Pointer	src, trgt, widths, gkern, pt1;
   int32_t	j, n2, ng, i2, i, ik, id, k;
   int32_t	iq, nx, mem = 0, dgkern;
   float	width, gsum;
@@ -3612,7 +3612,7 @@ int32_t lux_string(int32_t narg, int32_t ps[])
   Scalar	value;
   char	*p;
   int32_t	result, n, nel;
-  pointer	q;
+  Pointer	q;
   extern char	*fmt_integer, *fmt_float;
 
   if (narg > 1)			/* FSTRING */
@@ -3695,7 +3695,7 @@ int32_t lux_strlen(int32_t narg, int32_t ps[])/*strlen function */
 /* length, not counting null; duplicates num_elem but insists on string */
 {
   int32_t	result_sym, *l, n;
-  pointer	p;
+  Pointer	p;
 
   switch (symbol_class(ps[0])) {
     case LUX_STRING:
@@ -3725,7 +3725,7 @@ int32_t lux_decomp(int32_t narg, int32_t ps[])/*decomp routine */
 {
   int32_t	iq, nd, nx;
   array	*h;
-  pointer q1;
+  Pointer q1;
   int32_t	lux_replace(int32_t, int32_t);
 
 if ( narg != 1 ) return cerror(WRNG_N_ARG, 0);
@@ -3756,7 +3756,7 @@ int32_t lux_dsolve(int32_t narg, int32_t ps[]) /*decomp routine */
 {
 int32_t	iq, jq, nd, nx, toptype, j, outer;
 array	*h;
-pointer q1, q2;
+Pointer q1, q2;
 if ( narg != 2 ) return cerror(WRNG_N_ARG, 0);
 iq = ps[0];				/*the lu decomp matrix */
 CK_ARR(iq, 1);
@@ -3801,13 +3801,13 @@ int32_t lux_pit(int32_t narg, int32_t ps[])	/*pit function */
 			/* polynomial fit, CALL IS C=PIT([X],Y,[NPOW])*/
 {
   double	*a, *fbase, *cfbase;
-  pointer qxbase,qybase;
+  Pointer qxbase,qybase;
   int32_t	npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
   int32_t	j;
   Symboltype toptype;
   array	*h;
   int32_t	setxpit(Symboltype, int32_t),
-    clux_pit(pointer *, pointer *, int32_t, int32_t, double *, double *, double *,
+    clux_pit(Pointer *, Pointer *, int32_t, int32_t, double *, double *, double *,
 	     int32_t, int32_t);
 
 /* depending on # of nargs, we may have to default x or npow, narg=2 case
@@ -3877,12 +3877,12 @@ Free(a);  Free(fbase);
 return cfsym;
 }
 /*------------------------------------------------------------------------- */
-int32_t clux_pit(pointer *qxbase, pointer *qybase, int32_t nxq, int32_t npow, double *a,
+int32_t clux_pit(Pointer *qxbase, Pointer *qybase, int32_t nxq, int32_t npow, double *a,
 	     double *cfbase, double *fbase, int32_t toptype, int32_t outerx)
 /* internal routine used by lux_pit, lux_trend, and lux_detrend */
 {
 double	sum, *f, *cf;
-pointer qx,qy;
+Pointer qx,qy;
 int32_t	i, n, ib, ie, k;
 cf = cfbase;	f = fbase;	qy.l = qybase->l;  qx.l = qxbase->l;
 switch (toptype) {
@@ -3942,7 +3942,7 @@ int32_t setxpit(Symboltype type, int32_t n) /* used by several routines to set u
 			/*consisting of {0,1/n,2/n,...,(n-1)/n} */
 			/* type must be 3 or 4 */
 {
-  register pointer qx;
+  register Pointer qx;
   register float	del;
   register double	ddel;
   int32_t	nsym, nx;
@@ -3975,12 +3975,12 @@ int32_t lux_trend(int32_t narg, int32_t ps[]) /*trend function */
 {
   register double	*a;
   double	*fbase, *cfbase;
-  pointer qxbase,qybase,qzbase;
+  Pointer qxbase,qybase,qzbase;
   int32_t	npow, symx, symy, nd, nxq, outer;
   int32_t	result_sym;
   Symboltype toptype;
-  int32_t	clux_poly(double *cfbase, pointer *qxbase, int32_t nxq, int32_t npow,
-		  pointer *qzbase, int32_t toptype);
+  int32_t	clux_poly(double *cfbase, Pointer *qxbase, int32_t nxq, int32_t npow,
+		  Pointer *qzbase, int32_t toptype);
 
   /* second argument is optional, default is linear fit (npow = 1) */
   npow = 1;
@@ -4063,12 +4063,12 @@ int32_t lux_trend(int32_t narg, int32_t ps[]) /*trend function */
   return result_sym;
 }
 /*------------------------------------------------------------------------- */
-int32_t clux_poly(double *cfbase, pointer *qxbase, int32_t nxq, int32_t npow,
-	      pointer *qzbase, int32_t toptype)
+int32_t clux_poly(double *cfbase, Pointer *qxbase, int32_t nxq, int32_t npow,
+	      Pointer *qzbase, int32_t toptype)
 /* internal routine used by lux_trend, and lux_detrend */
 {
 double	sum, *cf, xq;
-pointer qz,qx;
+Pointer qz,qx;
 int32_t	n, m;
 cf = cfbase;	qz.l = qzbase->l;  qx.l = qxbase->l;
 switch (toptype) {
@@ -4105,7 +4105,7 @@ int32_t lux_poly(int32_t narg, int32_t ps[])
 {
   int32_t result, ndata, ncoeff, datasym, coeffsym, i;
   Symboltype outtype;
-  pointer data, tgt, coeff;
+  Pointer data, tgt, coeff;
 
   if (!symbolIsNumerical(ps[0])
       || !isNumericalType(symbol_type(ps[0])))
@@ -4235,7 +4235,7 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkern
 {
   int32_t	nx, n2, dataindex, kernelindex, di, ki, npoints, ncalc, np, i, stride;
   float	sum, norm;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   src.v = srcinfo->data->v;
   trgt.v = trgtinfo->data->v;
@@ -4891,7 +4891,7 @@ int32_t lux_ksmooth(int32_t narg, int32_t ps[])
 /* y = KSMOOTH(x, kernel [, axis] [, /BALANCED]) */
 {
   loopInfo	srcinfo, trgtinfo;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   int32_t	result, iq, nkernel;
   float	*kernel;
 
@@ -4933,7 +4933,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
   Symboltype type, outtype;
   double	meanx, meany, kx, ky, pxy, tempx, tempy;
   doubleComplex	cmeanx, cmeany, cpxy, ctempx, ctempy;
-  pointer	src1, src2, src1save, src2save, trgt;
+  Pointer	src1, src2, src1save, src2save, trgt;
   loopInfo	srcinfo1, srcinfo2, trgtinfo;
 
   if (!symbolIsNumericalArray(ps[0]))

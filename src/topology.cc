@@ -38,7 +38,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
    Y = SEGMENT(x [, sign]) */
 {
   loopInfo	srcinfo, trgtinfo;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   Scalar	value;
   int32_t	nx, ny, n, result, sign;
 
@@ -286,7 +286,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 {
   int32_t	result, sign, degree, n, i, *offset, k, j, ok, *edge, nok;
   Scalar	value;
-  pointer	src, trgt, srcl, srcr;
+  Pointer	src, trgt, srcl, srcr;
   loopInfo	srcinfo, trgtinfo;
 
   /* gather info about ps[0] and prepare a return symbol */
@@ -563,7 +563,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
    LS 9nov98 */
 {
   loopInfo	srcinfo, trgtinfo;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   double	*angle, s, c, a;
   Scalar	value;
   int32_t	nx, ny, n, result, sign, class_id;
@@ -857,7 +857,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
    counterclockwise from the positive x-axis).  LS 9nov98 */
 {
   loopInfo	srcinfo, trgtinfo;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   double	*angle, s, c, a;
   Scalar	value;
   int32_t	nx, ny, n, result, sign, class_id;
@@ -1392,7 +1392,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
     i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, *edge;
   int32_t	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
-  pointer	src;
+  Pointer	src;
   loopInfo	srcinfo;
 
   if (!symbolIsNumericalArray(ps[0])) /* not a numerical array */
@@ -1641,7 +1641,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
   int32_t	stride, type;
   int32_t	rcoords[8][2] = { { 1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 },
 			  { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 } };
-  pointer	dataptr0, dataptr, dataptr2;
+  Pointer	dataptr0, dataptr, dataptr2;
 
   nx = array_dims(ps[0])[0];	/* width */
   ny = array_dims(ps[0])[1];	/* height */
@@ -2105,7 +2105,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     i, *rcoord, *offset, j, nStack, **stack, **stack0, areaNumber,
     direction, stride, maximum, type, *edge;
   int32_t	*ptr0, *ptr, *ptrend, **stackend, *ptr1, onEdge, ix, ix2, *ptr2;
-  pointer	src, dataptr0, dataptr, dataptr2;
+  Pointer	src, dataptr0, dataptr, dataptr2;
   loopInfo	srcinfo;
 
   if (!symbolIsNumericalArray(ps[0])) /* not a numerical array */
@@ -2754,7 +2754,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
 {
   int32_t	result, mode, n, i, j, k, *offsets, *rcoords, edge = 0,
     mini, loc[3], nel, label = 0, sign, maxi = 0;
-  pointer	src, trgt, trgt0;
+  Pointer	src, trgt, trgt0;
   Scalar	min[3], max[3];
   extern struct boundsStruct	bounds;
   loopInfo	srcinfo, trgtinfo;
@@ -4274,7 +4274,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   int32_t	result, sign, n, i, *offset, k, j, nElem, edge,
 	*diagonal, nDiagonal, n1, n2, nDoDim, i1, i2, n0, haveThreshold;
   double	zero = 0.0;
-  pointer	src, trgt, srcl, srcr, t;
+  Pointer	src, trgt, srcl, srcr, t;
   loopInfo	srcinfo, trgtinfo;
 
   /* gather info about ps[0] and prepare a return symbol */
@@ -4820,7 +4820,7 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
  lie within the polyhon defined by points <lx,ly>.  LS 24nov98 */
 {
   int32_t	n, np, result, iq, type, *trgt, temptype, i, count, *trgt0, j;
-  pointer	x, y, lx, ly;
+  Pointer	x, y, lx, ly;
   Scalar	thisx, thisy, yc;
 
   if (!symbolIsNumericalArray(ps[0]))

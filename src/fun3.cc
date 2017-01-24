@@ -49,7 +49,7 @@ extern int32_t	scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
   histmin, histmax, fftdp, lastmax_sym, lastmin_sym, errno;
 extern Scalar	lastmin, lastmax;
 static	int32_t	nold = 0, fftdpold, mqold;
-static pointer	work;
+static Pointer	work;
 int32_t	minmax(int32_t *, int32_t, int32_t), neutral(void *, int32_t);
 void	zerobytes(void *, int32_t), zap(int32_t);
 int32_t	simple_scale(void *, int32_t, int32_t, void *);
@@ -73,7 +73,7 @@ int32_t evalString(char *expr, int32_t nmax)
  int32_t	result, n, temp, size;
  Symboltype type;
  void	translateLine(void), convertScalar(Scalar *, int32_t, Symboltype);
- pointer	p;
+ Pointer	p;
  Scalar	s;
  extern char	*currentChar;
  extern int32_t	tempSym;
@@ -205,7 +205,7 @@ int32_t lux_tense(int32_t narg, int32_t ps[])			/* tense function */
 {
   int32_t	i, iq, len[3], n, result_sym, nf;
   double	sigma, der_left, der_right, *st, *yf;
-  pointer p[3];
+  Pointer p[3];
   array	*h;
   int32_t	curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 	   double *yp, double *temp, double *sigma, double *xf, double *yf,
@@ -259,7 +259,7 @@ int32_t lux_tense_curve(int32_t narg, int32_t ps[])/* tense_curve function */
 */
   int32_t	i, iq, len[3], n, result_sym, dim[2], nf;
   double	sigma, der_left, der_right, *st, *yf, *xf;
-  pointer p[3];
+  Pointer p[3];
   array	*h;
   int32_t	kurv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 	   double *xp, double *yp, double *temp, double *sigma, double *t,
@@ -313,7 +313,7 @@ int32_t lux_tense_loop(int32_t narg, int32_t ps[])/* tense_loop function */
     */
   int32_t	i, iq, len[3], n, result_sym, dim[2], nf;
   double	sigma, *st, *yf, *xf;
-  pointer p[3];
+  Pointer p[3];
   array	*h;
   int32_t kurvp1_(int32_t *n, double *x, double *y, double *xp, double *yp,
 	      double *temp, double *sigma, double *t, double *xs, double *ys,
@@ -354,7 +354,7 @@ int32_t lux_sc(int32_t narg, int32_t ps[])	/* sc routine */
 {
   int32_t	iq, nd, outer, n, mq, dim[MAX_DIMS], jq, nn;
   Symboltype type;
-  pointer	q1,q2,q3;
+  Pointer	q1,q2,q3;
   int32_t	ezffti(int32_t *n, float *wsave), ezfftid(int32_t *n, double *wsave),
     ezfftf(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave),
     ezfftfd(int32_t *n, double *r, double *azero, double *a, double *b,
@@ -644,7 +644,7 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
 /*------------------------------------------------------------------------- */
 int32_t lux_fft_expand(int32_t narg, int32_t ps[])
 {
-  pointer *ptrs;
+  Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
@@ -687,7 +687,7 @@ int32_t lux_real(int32_t narg, int32_t ps[])
 {
   int32_t	iq, result, n;
   Symboltype outtype;
-  pointer	value, trgt;
+  Pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -736,7 +736,7 @@ int32_t lux_imaginary(int32_t narg, int32_t ps[])
 {
   int32_t	iq, result, n;
   Symboltype outtype;
-  pointer	value, trgt;
+  Pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -785,7 +785,7 @@ int32_t lux_arg(int32_t narg, int32_t ps[])
 {
   int32_t	iq, result, type, n;
   Symboltype outtype;
-  pointer	value, trgt;
+  Pointer	value, trgt;
 
   if (!symbolIsNumerical(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -907,7 +907,7 @@ int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
 {
   int32_t	iq, n, mq, j, jq, result, step, ndist;
   Symboltype type;
-  pointer	src, trgt, work, tmp, otmp, src0, trgt0, dist,
+  Pointer	src, trgt, work, tmp, otmp, src0, trgt0, dist,
     sines, cosines;
   Scalar	v, factor;
   int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
@@ -1121,7 +1121,7 @@ int32_t lux_power(int32_t narg, int32_t ps[])
 {
   int32_t	iq, n, mq, j, jq, outDims[MAX_DIMS], result, step;
   Symboltype type;
-  pointer	src, trgt, work, tmp, otmp, src0, trgt0;
+  Pointer	src, trgt, work, tmp, otmp, src0, trgt0;
   Scalar	factor;
   int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
     rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
@@ -1265,7 +1265,7 @@ int32_t lux_scb(int32_t narg, int32_t ps[])	/* scb routine */
 {
   int32_t	iq, nd, outer, nx, n, mq, dim[8], j, jq, outer2, nx2;
   Symboltype type;
-  pointer	q1,q2,q3;
+  Pointer	q1,q2,q3;
   int32_t	ezffti(int32_t *n, float *wsave), ezfftid(int32_t *n, double *wsave),
     ezfftb(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave),
     ezfftbd(int32_t *n, double *r, double *azero, double *a, double *b,
@@ -1401,7 +1401,7 @@ int32_t lux_histr(int32_t narg, int32_t ps[]) /* histr function */
   int32_t	iq, n, nd, j, type, size, nRepeat;
   float	sum, fac;
   array	*h;
-  pointer q1, q2;
+  Pointer q1, q2;
   int32_t	lux_hist(int32_t, int32_t []);
 
 					/* first get a normal histogram */
@@ -1460,7 +1460,7 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
 {
   int32_t	nStore, nValue, nData, *value, *freq, x, y, result;
   char	*avalue, *afreq;
-  pointer	src;
+  Pointer	src;
   int32_t	findint(int32_t, int32_t *, int32_t);
 
   if (numerical(ps[0], NULL, NULL, &nData, &src) == LUX_ERROR)
@@ -1556,7 +1556,7 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) /* histogram function */
   	ndim, axis, one = 1, size;
   Symboltype type;
   array	*h;
-  pointer q1, q2;
+  Pointer q1, q2;
   int32_t	lux_zero(int32_t, int32_t []);
   void convertWidePointer(wideScalar *, int32_t, int32_t);
 
@@ -1669,7 +1669,7 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
 {
   int32_t	iq, n, nc, cnt, *p, typec, result_sym;
   Symboltype type;
-  pointer q1, q2, q3;
+  Pointer q1, q2, q3;
 
   iq = ps[0];
   if (iq < 0)
@@ -2048,7 +2048,7 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
   int32_t	nIndx, offset, *indx, i, result, size, nElem, indices2;
   Symboltype type;
   char	*any;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   extern Scalar	lastmin, lastmax;
 
   src.l = (int32_t*) array_data(source);
@@ -2450,7 +2450,7 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
 {
   int32_t	mode, minloc, maxloc, n, result, n1;
   loopInfo	srcinfo, trgtinfo;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   Scalar	min, max;
   double	value;
   extern Scalar	lastmin, lastmax;
@@ -2767,7 +2767,7 @@ int32_t lux_maxloc(int32_t narg, int32_t ps[])
 return maxormin(narg, ps, 2);
 }
 /*------------------------------------------------------------------------- */
-void scale(pointer data, uint8_t type, int32_t size, double datalow, double datahigh,
+void scale(Pointer data, uint8_t type, int32_t size, double datalow, double datahigh,
 	   void *dest, double trgtlow, double trgthigh)
 /* returns a copy of the data at <data>, linearly transformed such that
  <datalow> maps to <trgtlow> and <datahigh> to <trgthigh>.  Data that falls
@@ -2777,7 +2777,7 @@ void scale(pointer data, uint8_t type, int32_t size, double datalow, double data
 {
   double	drange, dfac, doff;
   float	ffac, foff;
-  pointer	trgt;
+  Pointer	trgt;
 #if HAVE_LIBX11
   extern int32_t	colorIndexType;
 #else
@@ -3103,7 +3103,7 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
 {
   int32_t	iq, type, result_sym, n, oldScalemin, oldScalemax;
   Scalar	min, max;
-  register	pointer q1, q2;
+  register	Pointer q1, q2;
   double	sd, qd;
 #if HAVE_LIBX11
   extern double	zoom_clo, zoom_chi;
@@ -3201,7 +3201,7 @@ int32_t lux_scalerange(int32_t narg, int32_t ps[])
 {
   int32_t	iq, type, result_sym, n, oldScalemin, oldScalemax;
   Scalar	min, max;
-  register	pointer q1, q2;
+  register	Pointer q1, q2;
   double	sd, qd, logrey, higrey;
 #if HAVE_LIBX11
   extern double	zoom_clo, zoom_chi;
@@ -3294,7 +3294,7 @@ int32_t lux_scalerange(int32_t narg, int32_t ps[])
 int32_t minmax(int32_t *p, int32_t n, int32_t type)
 /* finds the min and max (and their locations) for an array */
 {
-  pointer q;
+  Pointer q;
   Scalar	min, max;
 /* pointers on OSF machines are bigger than ints, so casts from pointers */
 /* to ints must be avoided!  thus, changed  minloc, maxloc  from int32_t to */
@@ -3416,7 +3416,7 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 /* this means we don't need to check for over and under flow */
 /* assumes <p2> is of type <colorIndexType>.  LS 23mar99 */
 {
-  register	pointer q1, q2;
+  register	Pointer q1, q2;
   register	Scalar	range, min;
   register	int32_t	xq;
   register	float	fq;
@@ -3594,7 +3594,7 @@ int32_t neutral(void *p, int32_t n)
 /* fills an array of type <colorIndexType> with (scalemax-scalemin)/2 */
 {
   int32_t	xq;
-  pointer	pp;
+  Pointer	pp;
 #if HAVE_LIBX11
   extern int32_t	colorIndexType;
 #else
@@ -3655,7 +3655,7 @@ int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
 /* LS 9may98; redone using GSL 2009sep27 */
 {
   int32_t	n;
-  pointer xin, yin;
+  Pointer xin, yin;
   double *x, *y;
 
   const gsl_interp_type *interp_type;
@@ -4005,7 +4005,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
   static char	haveTable = '\0';
   static csplineInfo	cspl = { NULL, NULL, NULL, NULL };
   int32_t	xNewSym, xTabSym, yTabSym, size, oldType, result_sym;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   int32_t	lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   /* first check on all the arguments */
@@ -4093,7 +4093,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
   int32_t	iq, dims[MAX_DIMS], ndim, step, pos, i, mode;
   double	thisextpos, thisext, x1, x2;
   loopInfo	yinfo;
-  pointer	y, x, minpos, min, maxpos, max, rightedge, ptr, q;
+  Pointer	y, x, minpos, min, maxpos, max, rightedge, ptr, q;
   csplineInfo	cspl = { NULL, NULL, NULL, NULL };
 
   if (!symbolIsNumericalArray(ps[0]))
@@ -4441,7 +4441,7 @@ int32_t lux_extract_bits(int32_t narg, int32_t ps[])/* get a bit field from data
 int32_t extract_bits(int32_t narg, int32_t ps[], int32_t *value)/* internal routine */
 {
   int32_t	n, start, width, iq, j, sign_flag, type;
-  pointer	q;
+  Pointer	q;
   
   iq = ps[0];
   if (numerical(iq, NULL, NULL, &n, &q) == LUX_ERROR)

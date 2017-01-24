@@ -26,7 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define SCALAR_LEFT	2
 #define SCALAR_RIGHT	3
 int32_t evalBinOp(int32_t lhs, int32_t rhs,
-	      int32_t (*function)(pointer, pointer, pointer))
+	      int32_t (*function)(Pointer, Pointer, Pointer))
 /* supports "implicit dimensions", i.e. dimensions which are 1 in one of */
 /* the operands and non-1 in the other.  The smaller operand is repeated */
 /* as needed to service all elements of the larger operand. */

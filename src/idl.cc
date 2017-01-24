@@ -35,7 +35,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
   void	endian(void *, int32_t, int32_t);
   int32_t	installString(char const*);
   Scalar	value;
-  pointer	pp, data;
+  Pointer	pp, data;
 
   if (!symbol_class(ps[0]) == LUX_STRING)
     return cerror(NEED_STR, ps[0]);
@@ -240,7 +240,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
   FILE	*fp;
   void	endian(void *, int32_t, int32_t);
   Scalar	value;
-  pointer	pp, data;
+  Pointer	pp, data;
 
   if (!symbol_class(ps[1]) == LUX_STRING)
     return cerror(NEED_STR, ps[1]);

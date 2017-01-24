@@ -50,11 +50,11 @@ extern Window	menu_win[], win[];
 extern int32_t	ht[], wd[];
 extern int32_t	fontwidth;
 
-int32_t	extractNumerical(pointer, pointer, Symboltype, int32_t, int32_t *, int32_t *, int32_t, int32_t *),
+int32_t	extractNumerical(Pointer, Pointer, Symboltype, int32_t, int32_t *, int32_t *, int32_t, int32_t *),
   lux_xerase(int32_t, int32_t []);
 void	paint_pane(int32_t, int32_t, int32_t), delete_menu(int32_t);
 /*--------------------------------------------------------------------------*/
-void value_string(char *trgt, pointer image, int32_t type, int32_t indx)
+void value_string(char *trgt, Pointer image, int32_t type, int32_t indx)
 {
   switch (type) {
     case LUX_INT8:
@@ -98,7 +98,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   extern Scalar	lastmin, lastmax;
   int32_t	createMenu(int32_t num, int32_t x, int32_t y, int32_t nItem, char **item),
     menu_setup(void), lux_xport(int32_t, int32_t []),
-    tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+    tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
 	  float y1, float y2, float sx, float sy, int32_t wid, float *mag,
 	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2),
     threecolors(float *, int32_t);
@@ -109,7 +109,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   Symboltype type;
   int32_t	minmax(int32_t *data, int32_t nelem, int32_t type);
   float	x1, x2, y1, y2, dx, dy, z, colorRange = 1.0;
-  pointer	data, image, bitmapdata1, bitmap1, bitmapdata2,
+  Pointer	data, image, bitmapdata1, bitmap1, bitmapdata2,
     bitmap2;
   char	**zoomText;
   char const* text[] = {
@@ -963,11 +963,11 @@ int32_t tvzoom(int32_t narg, int32_t ps[])
   int32_t	coords[4], offset, sx, sy, i, stride, step[2];
   Symboltype type;
   extern int32_t	last_wid;
-  int32_t	tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+  int32_t	tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
 	      float y1, float y2, float sx, float sy, int32_t wid, float *mag,
 	      int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
 
-  pointer	data, image, bitmapdata, bitmap;
+  Pointer	data, image, bitmapdata, bitmap;
   float	x1, x2, y1, y2;
 
   if (numerical(ps[0], &dims, &ndim, NULL, &data) < 0)

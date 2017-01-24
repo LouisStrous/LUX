@@ -182,7 +182,7 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
 /* requested number of bytes is read (or an error occurs) */
 {
   int32_t	fd, nbr, iq, n, type, nread, cur;
-  pointer q1;
+  Pointer q1;
   
   if ( (fd = tape_setup(narg,ps)) < 0)
     return LUX_ERROR;
@@ -222,7 +222,7 @@ int32_t lux_tapwrt(int32_t narg, int32_t ps[]) /* read tape record */
  {
  int32_t	fd, nbr, iq, j, nd, n, type;
  array	*h;
- pointer q1;
+ Pointer q1;
  if ( (fd = tape_setup(narg,ps)) < 0) return -1;
 				 /* get the size of the input array to load */
  iq = ps[1];
@@ -255,7 +255,7 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])			/* write tape record */
 {
  int32_t	fd, nbr, iq, j, nd, n, recsize, nb, ic, offset, len, type;
  array	*h;
- pointer q1;
+ Pointer q1;
 #if !WORDS_BIGENDIAN
  char	*p;
 #endif
@@ -318,7 +318,7 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
  */
 {
  int32_t	fd, nbr, iq, n, recsize, nb, ic, offset, len, type;
- pointer q1;
+ Pointer q1;
 #if !WORDS_BIGENDIAN
  char	*p;
 #endif

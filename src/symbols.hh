@@ -51,7 +51,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define complex_array_size(symbol) /* int32_t */((symbol_memory(symbol) - sizeof(array))/lux_type_size[complex_array_type(symbol)])
 #define complex_array_type(symbol) /* uint8_t */(sym[symbol].type)
 #define complex_scalar_type(symbol) /* uint8_t */(sym[symbol].type)
-#define complex_scalar_data(symbol) /* pointer */sym[symbol].spec.dpointer
+#define complex_scalar_data(symbol) /* Pointer */sym[symbol].spec.dpointer
 #define complex_scalar_memory(symbol) /* int32_t */(sym[symbol].spec.general.bstore)
 #define deferred_routine_filename(symbol) /* char * */(sym[symbol].spec.name.ptr)
 #define do_while_body(symbol)	/* int16_t */(sym[symbol].spec.evb.args[0])
@@ -151,7 +151,7 @@ int32_t	file_map_size(int32_t symbol);
 #define routine_statements(symbol) /* int16_t * */(routine_parameters(symbol) + routine_num_parameters(symbol))
 #define routine_has_extended_param(symbol) /* uint8_t */(sym[symbol].spec.routine.extend)
 #define run_block_number(symbol) /* int16_t */(sym[symbol].xx)
-#define scal_ptr_pointer(symbol) /* pointer */(sym[symbol].spec.dpointer)
+#define scal_ptr_pointer(symbol) /* Pointer */(sym[symbol].spec.dpointer)
 #define scal_ptr_type(symbol)	/* uint8_t */(sym[symbol].type)
 #define scalar_type(symbol)	/* uint8_t */(sym[symbol].type)
 #define scalar_value(symbol)	/* Scalar */(sym[symbol].spec.scalar)

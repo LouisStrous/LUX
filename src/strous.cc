@@ -53,7 +53,7 @@ int32_t lux_distr(int32_t narg, int32_t ps[])
  int32_t	iq, ntarget, i, n, *bin, nout = 0;
  Symboltype targettype;
  array	*h, *h2;
- pointer	target, value;
+ Pointer	target, value;
 
  iq = *ps++;				/* target */
  CK_ARR(iq, 1);
@@ -146,7 +146,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
   int32_t	iq, i, n, nd, nd2, range, result_sym,
 	minmax(int32_t *, int32_t, int32_t);
   Symboltype type, type2;
-  pointer arg1, arg2, res;
+  Pointer arg1, arg2, res;
   int32_t	lux_zero(int32_t, int32_t []);
   void convertWidePointer(wideScalar *, int32_t, int32_t);
 
@@ -526,7 +526,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
    LS 1apr94 */
 {
   array	*h, *har;
-  pointer	ar, base, key, off, indx, theKey, theOff;
+  Pointer	ar, base, key, off, indx, theKey, theOff;
   char	repeat = 0;
   int32_t	mode = 0, result, i, index = 0, offset, nRepeat;
   int32_t	iq, nar, noff, nkey, class_id, n, step, loop;
@@ -671,7 +671,7 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
 /* FIND2(array, key) */
 {
   int32_t *data_dims, data_dim_count, data_count, keys_count, result, type;
-  pointer data, keys, target;
+  Pointer data, keys, target;
   int32_t i, j;
 
   if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count, &data) < 0)
@@ -863,7 +863,7 @@ int32_t lux_endian(int32_t narg, int32_t ps[])
 /* added support for scalars.  LS 10oct97 */
 {
  int32_t	iq, n, type;
- pointer	q;
+ Pointer	q;
 
  iq = ps[0];
  switch (symbol_class(iq)) {
@@ -899,7 +899,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
   DIFFER).
   LS 24nov92 */
 {
-  pointer	src, trgt, order;
+  Pointer	src, trgt, order;
   int32_t	result, nOrder, loop, o, ww, stride, offset1, offset3,
     w1, one = 1, iq, n, i, old, circular;
   Symboltype type;
@@ -1196,7 +1196,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
   int32_t	axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
     i1, i2, i, step, widthNDim, *widthDim, axis;
   float	weight;
-  pointer	src, trgt, width, width0;
+  Pointer	src, trgt, width, width0;
   Scalar	sum;
   loopInfo	srcinfo, trgtinfo;
 
@@ -1786,7 +1786,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
   Symboltype	type;
   int32_t	n, result, i, offset, stride, nWidth, w1, w2, ww, loop, three=3, norm,
     iq, jq;
-  pointer	src, trgt, width;
+  Pointer	src, trgt, width;
   Scalar	value;
   loopInfo	srcinfo, trgtinfo;
   int32_t mode;
@@ -2357,10 +2357,10 @@ int32_t lux_runcum(int32_t narg, int32_t ps[])
 { return smooth(narg, ps, 1); }
 /*----------------------------------------------------------------------*/
 static int32_t	pcmp_type;
-static pointer	pcmp_ptr;
+static Pointer	pcmp_ptr;
 int32_t pcmp(const void *arg1, const void *arg2)
 {
-  extern pointer	pcmp_ptr;
+  extern Pointer	pcmp_ptr;
   extern int32_t	pcmp_type;
   Scalar	d1, d2;
 
@@ -2395,7 +2395,7 @@ int32_t pcmp(const void *arg1, const void *arg2)
 /*----------------------------------------------------------------------*/
 int32_t pcmp2(const void *arg1, const void *arg2)
 {
-  extern pointer	pcmp_ptr;
+  extern Pointer	pcmp_ptr;
   extern int32_t	pcmp_type;
   Scalar	d1, d2;
 
@@ -2434,7 +2434,7 @@ int32_t lux_match(int32_t narg, int32_t ps[])
    LS 14apr97 */
 {
  int32_t	nTarget, nSet, iq, step, *ptr, i, *p;
- pointer	target, set, result;
+ Pointer	target, set, result;
  Symboltype	maxType;
 
  if (getSimpleNumerical(ps[0], &target, &nTarget) < 0)
@@ -2489,7 +2489,7 @@ int32_t lux_not(int32_t narg, int32_t ps[])
 {
  int32_t	iq, i, type;
  array	*h;
- register pointer	arg, result;
+ register Pointer	arg, result;
 
  iq = ps[0];
  GET_NUMERICAL(arg, narg);
@@ -2528,7 +2528,7 @@ int32_t lux_table(int32_t narg, int32_t ps[])
  int32_t	symx, symy, symf, nTable, nOut, nRepeat, ix, n1,
 	symr, i, nsymx, nsymy, nsymf, nLoop, n2;
  array	*hx, *hy, *hf, *hMax, *hr;
- pointer	x, y, xf, r, ox, oy, of, nx, ny;
+ Pointer	x, y, xf, r, ox, oy, of, nx, ny;
  Symboltype topType;
  Scalar	grad;
  int32_t	lux_table2d(int32_t, int32_t []);
@@ -2698,7 +2698,7 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
  int32_t	symx, symy, symf, symi, nTable, nIndex, nRepeat, ix,
 	symr, i, nsymx, nsymy, nsymf, nsymi, nx, ny, iTable;
  array	*hx, *hy, *hf, *hi;
- pointer	x, y, xf, xi, r, ox, oy, of, nf, oi, ni;
+ Pointer	x, y, xf, xi, r, ox, oy, of, nf, oi, ni;
  Symboltype topType;
  Scalar	grad, table;
 
@@ -3109,7 +3109,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
  char		count[MAX_DIMS], *fname, filemap = 0, ready, edge;
  float		*grad, *grad2, *hessian, *hessian2, x, v;
  Scalar		value, nextValue;
- pointer	data, trgt, extr;
+ Pointer	data, trgt, extr;
  FILE		*fp;
 
 		/* treat arguments */
@@ -3928,7 +3928,7 @@ int32_t lux_zinv(int32_t narg, int32_t ps[])
 {
  int32_t	result, iq, n;
  Symboltype topType;
- pointer	data, target;
+ Pointer	data, target;
  double	value;
 
  iq = *ps;
@@ -4043,7 +4043,7 @@ int32_t lux_bsmooth(int32_t narg, int32_t ps[])
   int32_t	iq, axis, result_sym, *dims, ndim, xdims[MAX_DIMS],
 	width, i, n, tally[MAX_DIMS], step[MAX_DIMS], m, done, j, k, stride;
   Symboltype outtype, type;
-  pointer	src, trgt, src0, trgt0;
+  Pointer	src, trgt, src0, trgt0;
   float	fwidth;
 
   if (narg > 2)

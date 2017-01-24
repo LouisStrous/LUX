@@ -647,7 +647,7 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
 {
   int32_t	num, i;
   char	string_array = 0, **item, *text;
-  pointer	ptr;
+  Pointer	ptr;
 
   num = int_arg(ps[0]);
   if (narg == 2

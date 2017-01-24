@@ -259,7 +259,7 @@ int32_t to_scratch_array(int32_t n, Symboltype type, int32_t ndim, int32_t dims[
  size_t	size, i;
  float	fsize;
  array	*h;
- pointer	ptr;
+ Pointer	ptr;
 
  if (isStringType(type))
    type = LUX_STRING_ARRAY;
@@ -392,7 +392,7 @@ int32_t dereferenceScalPointer(int32_t nsym)
 {
  int32_t	n;
  Symboltype type;
- pointer	ptr;
+ Pointer	ptr;
 
  type = scal_ptr_type(nsym);
  if (type == LUX_TEMP_STRING)
@@ -690,7 +690,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
 {
  int32_t	iq, result, n, temp, size, type;
  int32_t	value;
- pointer	src, trgt;
+ Pointer	src, trgt;
 
  iq = *ps;
  if (!symbolIsNumerical(iq)	/* not numerical */
@@ -808,7 +808,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
 {
  int32_t	iq, result, n, temp, size, type;
  int32_t	value;
- pointer	src, trgt;
+ Pointer	src, trgt;
 
  iq = *ps;
  if (!symbolIsNumerical(iq)	/* not numerical */
@@ -957,7 +957,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
   int32_t	iq, n, size, srcstep, trgtstep, temp, result;
   Symboltype type;
   char	do_realloc = 0;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   Scalar	value;
   extern char	*fmt_integer, *fmt_float, *fmt_complex;
   void	read_a_number(char **, Scalar *, Symboltype *);
@@ -2065,7 +2065,7 @@ int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t *dims)
 {                                /*redefine a symbol i to an array */
   int32_t   mq, j;
   array	*h;
-  pointer	p;
+  Pointer	p;
 
   if (ndim > MAX_DIMS)
     return cerror(N_DIMS_OVR, 0);
@@ -2398,7 +2398,7 @@ int32_t lux_rfix(int32_t narg, int32_t ps[])
  integer if necessary */
 {
  int32_t	nsym, type, size, *trgt, i, result;
- pointer	src;
+ Pointer	src;
  double	temp;
  array	*h;
 
@@ -2733,8 +2733,8 @@ int32_t (*lux_converts[])(int32_t, int32_t []) = {
   lux_byte, lux_word, lux_long, lux_int64, lux_float, lux_double, lux_string,
   lux_string, lux_string, lux_cfloat, lux_cdouble
 };
-int32_t getNumerical(int32_t iq, Symboltype minType, int32_t *n, pointer *src, char mode,
-		 int32_t *result, pointer *trgt)
+int32_t getNumerical(int32_t iq, Symboltype minType, int32_t *n, Pointer *src, char mode,
+		 int32_t *result, Pointer *trgt)
 /* gets pointer to and size of the data in numerical argument <iq>.
    returns pointer in <*src>, number of elements in <*n>.
 
@@ -2806,9 +2806,9 @@ int32_t getNumerical(int32_t iq, Symboltype minType, int32_t *n, pointer *src, c
       return cerror(ILL_CLASS, iq);
   }
   return 1;
-}  
+}
 /*-------------------------------------------------------------------------*/
-int32_t getSimpleNumerical(int32_t iq, pointer *data, int32_t *nelem)
+int32_t getSimpleNumerical(int32_t iq, Pointer *data, int32_t *nelem)
 /* returns pointer in <*data> to data in symbol <iq>, and in <*nelem> the
    number of data elements, and 1 as function return value, if <iq>
    is of numerical type.  Otherwise, returns -1 as function value, 0 in

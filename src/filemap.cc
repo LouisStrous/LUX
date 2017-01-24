@@ -106,7 +106,7 @@ int32_t cdblfarr(int32_t narg, int32_t ps[])
 /* Create a LUX_CDOUBLE file array (file map) */
 { return filemap(LUX_CDOUBLE, narg, ps); }
 /*-------------------------------------------------------------------------*/
-int32_t lux_i_file_output(FILE *fp, pointer q, int32_t assoctype,
+int32_t lux_i_file_output(FILE *fp, Pointer q, int32_t assoctype,
  int32_t offsym, int32_t dsize, int32_t fsize, int32_t baseOffset)
 /* use a file array as a guide to writing into a file, and an
  index array as a guide to the positions where to write */
@@ -161,7 +161,7 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
  int32_t    i, dattype, assoctype, ystep[MAX_DIMS], rstep[MAX_DIMS],
 	tally[MAX_DIMS], done;
  int32_t    efile, n, *step, baseOffset;
- pointer       q;
+ Pointer       q;
  FILE   *fp;
  char	*fname;
 

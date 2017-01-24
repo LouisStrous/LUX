@@ -448,7 +448,7 @@ int32_t lux_randomb(int32_t narg, int32_t ps[])
 /* is either a 0 or a 1. LS 21jul98 */
 {
   int32_t	dims[MAX_DIMS], ndim, iq, result, n;
-  pointer p;
+  Pointer p;
 
   if (*ps) 			/* seed */
     currentBitSeed = int_arg(*ps); /* install new seed */
@@ -497,7 +497,7 @@ int32_t lux_randoml(int32_t narg, int32_t ps[])
 /* over all representable numbers.  LS 27aug2000 */
 {
   int32_t	dims[MAX_DIMS], ndim, iq, result, n;
-  pointer	p;
+  Pointer	p;
   Symboltype	type;
 
   if (*ps) 			/* seed */

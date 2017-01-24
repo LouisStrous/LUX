@@ -39,7 +39,7 @@ extern	int32_t	lastmin_sym, lastmax_sym;
 extern	float	callig_xb, callig_yb;
 		 /* some common variables */
 array	*h;
-pointer q1, q2, q3, q4;
+Pointer q1, q2, q3, q4;
 int32_t	tkplot(float x, float y, int32_t lineStyle, int32_t symStyle),
 	tkplot_clip(float x, float y, int32_t lineStyle, int32_t symStyle),
 	callig(char *, float, float, float, float, int32_t, int32_t),

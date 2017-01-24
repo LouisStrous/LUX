@@ -1110,10 +1110,10 @@ int32_t reverseYImage(int32_t iq)
 /*------------------------------------------------------------------------*/
 int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
 {
-  pointer	data;
+  Pointer	data;
   int32_t	type, nx, ny, wid;
   float	x, y;
-  int32_t	tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+  int32_t	tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
 	  float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
 	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
 
@@ -1186,7 +1186,7 @@ int32_t lux_xtvraw(int32_t narg, int32_t ps[])
   return lux_xtv_general(narg, ps, TV_RAW);
 }
 /*------------------------------------------------------------------------*/
-int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
 	  float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
 	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2)
 /* display data in a window. */
@@ -1205,7 +1205,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 	  the green, and (*,*,2) the blue value for each pixel. */
 /* it is assumed here that the arguments are consistent! */
 {
-  pointer	image, image0;
+  Pointer	image, image0;
   int32_t	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
     iq, sx, sy, bpp, s;
   Scalar	min, max, value, factor, offset;
@@ -3329,7 +3329,7 @@ int32_t tvraw(pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 /* maps color indices to pixel values */
 {
-  pointer	p, q;
+  Pointer	p, q;
   int32_t	n, iq, bpp;
   Symboltype type;
   extern int32_t	bits_per_pixel;
@@ -3937,7 +3937,7 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
  /* read from an X window or pixmap and create a uint8_t array */
   int32_t  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh;
   Symboltype type;
- pointer    ptr;
+ Pointer    ptr;
  Drawable        *src;
  int32_t	lux_zerof(int32_t, int32_t *);
  extern int32_t	bits_per_pixel;
@@ -4113,7 +4113,7 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
   double	ts, tc;
   struct timeval	tp;
   struct timezone	tzp;
-  pointer	data;
+  Pointer	data;
 
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(NEED_ARR, ps[0]);
@@ -4189,7 +4189,7 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
 {
   XEvent	event;
   int32_t	wid, i, type, nx, ny;
-  pointer	ptr;
+  Pointer	ptr;
 
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(NEED_ARR, ps[0]);
@@ -4457,7 +4457,7 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
   int32_t	iq, nx, ny, mode, i, wid;
   float	fx, fy;
   uint8_t	*bitmap1, *bitmap2;
-  pointer	data;
+  Pointer	data;
   int32_t	coordTrf(float *, float *, int32_t, int32_t);
 
   if (!symbolIsNumericalArray(ps[0]) /* <image> */

@@ -30,15 +30,15 @@ typedef struct {
   int32_t *nx;
   int32_t *ny;
   int32_t type;
-  pointer data;
-  pointer *levels;
+  Pointer data;
+  Pointer *levels;
 } *Pyramid;
 
 int32_t lux_laplace2d(int32_t narg, int32_t ps[])
 /* LAPLACE(img) calculates the Laplacian of 2D <img> */
 {
   int32_t img, nx, ny, result, i, j;
-  pointer src, tgt;
+  Pointer src, tgt;
 
   img = ps[0];
   if (!symbolIsRealArray(img))
@@ -144,7 +144,7 @@ int32_t lux_laplace2d(int32_t narg, int32_t ps[])
   return result;
 }
 
-int32_t gauss_seidel_2d2o(pointer b, pointer x, Scalar sx, Scalar sy,
+int32_t gauss_seidel_2d2o(Pointer b, Pointer x, Scalar sx, Scalar sy,
                           int32_t type, int32_t nx, int32_t ny)
 {
   int32_t i, j;
@@ -255,11 +255,11 @@ int32_t gauss_seidel_2d2o(pointer b, pointer x, Scalar sx, Scalar sy,
   return 0;
 }
 
-void restrict2(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny,
-               Scalar sx, Scalar sy, int32_t do_residual, pointer tgt)
+void restrict2(Pointer b, Pointer x, int32_t type, int32_t nx, int32_t ny,
+               Scalar sx, Scalar sy, int32_t do_residual, Pointer tgt)
 {
   int32_t i, j, nx2, ny2;
-  pointer r0, r;		/* nx+2 by 3 elements */
+  Pointer r0, r;		/* nx+2 by 3 elements */
 
   nx2 = nx/2;
   ny2 = ny/2;
@@ -423,13 +423,13 @@ void restrict2(pointer b, pointer x, int32_t type, int32_t nx, int32_t ny,
   }
 }
 
-void restrict_residual(pointer b, pointer x, int32_t type, int32_t nx,
-                       int32_t ny, Scalar sx, Scalar sy, pointer tgt)
+void restrict_residual(Pointer b, Pointer x, int32_t type, int32_t nx,
+                       int32_t ny, Scalar sx, Scalar sy, Pointer tgt)
 {
   restrict2(b, x, type, nx, ny, sx, sy, 1, tgt);
 }
 
-void restrict(pointer x, int32_t type, int32_t nx, int32_t ny, pointer tgt)
+void restrict(Pointer x, int32_t type, int32_t nx, int32_t ny, Pointer tgt)
 {
   Scalar dummy;
 
@@ -441,7 +441,7 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
 {
   int32_t img, result = LUX_ERROR, nx, ny, nx2, ny2, nlevel, i, nelem;
   Symboltype type;
-  pointer src, tgt;
+  Pointer src, tgt;
   Pyramid pyramid;
 
   img = ps[0];
@@ -478,7 +478,7 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
     pyramid->data.d = (double*) calloc(nelem, sizeof(*pyramid->data.d));
     break;
   }
-  pyramid->levels = (pointer*) calloc(nlevel, sizeof(*pyramid->levels));
+  pyramid->levels = (Pointer*) calloc(nlevel, sizeof(*pyramid->levels));
   if (!pyramid->nx || !pyramid->ny || !pyramid->data.f || !pyramid->levels) {
     result = cerror(ALLOC_ERR, 0);
     goto free_pyramid;

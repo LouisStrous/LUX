@@ -938,7 +938,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 {
   int32_t	nx, ny, n, result;
   Symboltype type;
-  pointer	data, out;
+  Pointer	data, out;
 
   if (!symbolIsNumericalArray(ps[0]) /* not a numerical array */
       || array_num_dims(ps[0]) != 2) /* or isn't two-dimensionsal */
@@ -1077,7 +1077,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 {
   int32_t	nx, ny, result, n;
   Symboltype type;
-  pointer	data, out;
+  Pointer	data, out;
   char	zeroedge;
 
   if (!symbolIsNumericalArray(ps[0]) /* not a numerical array */

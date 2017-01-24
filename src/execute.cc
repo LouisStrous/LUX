@@ -106,7 +106,7 @@ int32_t copyToSym(int32_t target, int32_t source)
 /* puts a copy of <source> (including any embedded symbols) in <target> */
 {
   int32_t	size, i;
-  pointer	optr, ptr;
+  Pointer	optr, ptr;
   char	zapIt = 0;
   listElem	*eptr, *oeptr;
   int32_t	copySym(int32_t);
@@ -1353,7 +1353,7 @@ int32_t usr_routine(int32_t symbol)
 int32_t lux_for(int32_t nsym)
 /* executes LUX FOR-statement */
 {
- pointer	counter;
+ Pointer	counter;
  Scalar		start, inc, end;
  int32_t	n, temp, action;
  Symboltype hiType, st;
@@ -2368,7 +2368,7 @@ int32_t insert(int32_t narg, int32_t ps[])
 	*index[MAX_DIMS], *iptr, j, n, class_id, srcNdim, *srcDims, srcNelem,
 	srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
 	tstep[MAX_DIMS], offset, onestep, unit, combineType;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   wideScalar	value;
   char	*name;
   FILE	*fp;
@@ -3754,7 +3754,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
     tstep[MAX_DIMS], offset, onestep, unit, combineType, narg,
     oldInternalMode, *ps2, srcMult;
   int16_t	*ps;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   wideScalar	value;
   char	*name, keepps2;
   FILE	*fp;
@@ -5221,7 +5221,7 @@ int32_t lux_test(int32_t narg, int32_t ps[])
 {
   int32_t	n, value, *edge, i, *offset;
   loopInfo	info;
-  pointer	src;
+  Pointer	src;
 
   if (symbol_type(ps[0]) != LUX_INT32)
     return luxerror("Accepts only LONG arrays", ps[0]);

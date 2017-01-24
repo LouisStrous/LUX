@@ -164,7 +164,7 @@ int32_t lux_lic(int32_t narg, int32_t ps[])
     gaussian, iq0, di;
   float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws;
-  pointer	src, trgt, src0;
+  Pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */

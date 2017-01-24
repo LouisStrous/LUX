@@ -654,7 +654,7 @@ gsl_vector *gsl_vector_from_lux_symbol(int32_t iq, int32_t axis)
 {
   gsl_vector *v;
   int32_t ndim, *dims, nelem, i;
-  pointer data;
+  Pointer data;
 
   iq = lux_double(1, &iq);
   if (numerical(iq, &dims, &ndim, &nelem, &data) < 0
@@ -684,7 +684,7 @@ gsl_vector *gsl_vector_from_lux_symbol(int32_t iq, int32_t axis)
 double fit2_func(const gsl_vector *a, void *p)
 {
   lux_func_if *afif = (lux_func_if *) p;
-  pointer par = lux_func_if_get_param_data(afif, 0);
+  Pointer par = lux_func_if_get_param_data(afif, 0);
   memcpy(par.d, a->data, a->size*sizeof(double));
   double result = lux_func_if_call(afif);
   if (isnan(result))

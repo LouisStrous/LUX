@@ -543,7 +543,7 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
   int32_t	i, iq, mq, n;
   extern int32_t	nFixed;
   char	*p;
-  pointer	q;
+  Pointer	q;
   extern int32_t	scrat[];
   FILE	*fp;
 
@@ -677,7 +677,7 @@ int32_t lux_onef(int32_t narg, int32_t ps[])
 /* ONE(x) returns copy of numerical <x> with all elements equal to 1 */
 /* LS 7apr98 */
 {
-  pointer	p;
+  Pointer	p;
   int32_t	n, iq;
 
   iq = ps[0];
@@ -745,7 +745,7 @@ int32_t lux_one(int32_t narg, int32_t ps[])
 /* replaces all values in numerical array ps[0] by ones. */
 /* LS 7apr98 */
 {
-  pointer	p;
+  Pointer	p;
   int32_t	n, iq;
 
   while (narg--) {
@@ -892,7 +892,7 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 /* if called as function: INDGEN(<tgt> [, <axis>])
    if called as subroutine: INDGEN, <tgt> [, <axis>] */
 {
-  pointer	src, trgt;
+  Pointer	src, trgt;
   int32_t	result;
   loopInfo	srcinfo, trgtinfo;
 
@@ -972,7 +972,7 @@ int32_t lux_neg_func(int32_t narg, int32_t ps[])
      /*take the negative of something */
 {
   int32_t	n, result;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   /* check that <*ps> is numerical, return number of elements in <n>,
      pointer in <src>.  Also generate a garbage clone of <*ps> with
@@ -1026,7 +1026,7 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
      /* if IEEE function isnan is available.  LS 28jun97 */
 {
   int32_t	n, result, iq, *trgt;
-  pointer	src;
+  Pointer	src;
   floatComplex	*trgtc;
 
   iq = *ps;
@@ -1100,7 +1100,7 @@ int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
 {
   int32_t	size, result, valueSym;
   Scalar	value;
-  pointer	data, trgt;
+  Pointer	data, trgt;
 
   valueSym = ps[0];
   if (valueSym && !symbolIsRealScalar(valueSym))
@@ -1193,7 +1193,7 @@ int32_t lux_abs(int32_t narg, int32_t ps[])
 /*take the absolute value of something */
 {
   int32_t	n, result, iq;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   iq = *ps;
   switch (symbol_class(iq)) {
@@ -1298,7 +1298,7 @@ int32_t lux_complexsquare(int32_t narg, int32_t ps[])
    LS 2005dec18 */
 {
   int32_t	n, result, iq;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   iq = *ps;
   switch (symbol_class(iq)) {
@@ -1423,7 +1423,7 @@ int32_t lux_conjugate(int32_t narg, int32_t ps[])
 /* LS 31jul98 */
 {
   int32_t	result, n;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   if (!symbolIsNumerical(*ps))
     return cerror(ILL_CLASS, *ps);
@@ -1477,7 +1477,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   int32_t	type, offset, *indx, i, size, result, nElem, indices2,
     haveWeights, p, psign, pp, nbase, j;
   Symboltype outType;
-  pointer	src, trgt, sum, weights, hist;
+  Pointer	src, trgt, sum, weights, hist;
   Scalar	temp, value;
   floatComplex	tempcf, valuecf;
   doubleComplex	tempcd, valuecd;
@@ -3420,7 +3420,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
   doubleComplex	sumcd, tempcd, valuecd;
   float	temp2f;
   double	temp2d;
-  pointer	src, trgt, weights;
+  Pointer	src, trgt, weights;
   loopInfo	srcinfo, trgtinfo, winfo;
 
 #if DEBUG_VOCAL
@@ -5712,7 +5712,7 @@ int32_t math_funcs(int32_t nsym, int32_t code)
      /*general program for floating point functions */
 {
   int32_t	n, result, type, out_type;
-  pointer	trgt, src;
+  Pointer	trgt, src;
   doubleComplex	value;
 
   errno = 0;			/* or "old" errors might get reported */
@@ -5810,7 +5810,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
 {
   int32_t	n1, n2, nelem, i, result_sym, type1, type2;
   Symboltype out_type;
-  pointer	src1, src2, trgt;
+  Pointer	src1, src2, trgt;
   double	value;
 
   errno = 0;
@@ -6219,7 +6219,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
 {
   int32_t	n1, n2, nelem, i, result_sym, type1, type2, valuei;
   Symboltype out_type;
-  pointer	src1, src2, trgt;
+  Pointer	src1, src2, trgt;
   double	valued;
 
   errno = 0;
@@ -6628,7 +6628,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
 {
   int32_t	n1, n2, n3, iq, n, step1, step2, step3;
   Symboltype type1, type2, type3, type;
-  pointer	src1, src2, src3, trgt;
+  Pointer	src1, src2, src3, trgt;
   double	val1, val2, val3, val;
 
   errno = 0;

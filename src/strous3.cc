@@ -57,7 +57,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   int32_t	result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
   double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
-  pointer	src, trgt, level, ptr, rightedge, left, width, x;
+  Pointer	src, trgt, level, ptr, rightedge, left, width, x;
   csplineInfo	cspl;
   loopInfo	srcinfo;
 
@@ -444,7 +444,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 /* LS 2009-08-09 */
 {
   int32_t	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
-  pointer	src, level;
+  Pointer	src, level;
   csplineInfo	cspl;
   loopInfo	srcinfo;
   Bytestack b;
@@ -673,7 +673,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   char	*file, *key, *key2, *scr, mustclose, ok;
   int32_t	n, n2, i, evalString(char *, int32_t), ptr, iq, i0;
   Symboltype type;
-  pointer	p;
+  Pointer	p;
   Scalar	value;
   FILE	*fp;
   void	read_a_number(char **buf, Scalar *value, Symboltype *type);
@@ -1013,7 +1013,7 @@ LS 9nov98 */
     gaussian, iq0, di, straight;
   float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
-  pointer	src, trgt, src0;
+  Pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
@@ -1332,7 +1332,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
     gaussian, iq0, di, straight;
   float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
-  pointer	src, trgt, src0;
+  Pointer	src, trgt, src0;
   loopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
@@ -1669,7 +1669,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     ngrid, dv;
   Symboltype type;
   float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
-  pointer	gx, gy, vx0, vy0, ox, oy;
+  Pointer	gx, gy, vx0, vy0, ox, oy;
   int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   /* we treat all arguments. */
@@ -2171,7 +2171,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
   apply enhancements from both the low and high ends; /NOSYMMETRIC
   means to enhance only from the low end.  LS 2006jun15 */
 {
-  pointer src, tgt;
+  Pointer src, tgt;
   int32_t ndim, *dims, nhist, *hist, nelem, i, result;
   float target, part;
   float a, b;
@@ -2245,7 +2245,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
 /*--------------------------------------------------------------------*/
 int32_t lux_hamming(int32_t narg, int32_t ps[]) {
   int32_t nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
-  pointer src, src2, tgt;
+  Pointer src, src2, tgt;
 
   if (!symbolIsNumerical(ps[0]))
     return luxerror("Need a numerical argument", ps[0]);
@@ -2560,7 +2560,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
   if (narg > 1 && !symbolIsInteger(ps[1]))
     return cerror(NEED_INT_ARG, ps[1]);
 
-  pointer* ptrs;
+  Pointer* ptrs;
   loopInfo* infos;
   int32_t iq;
   if (symbolIsInteger(ps[0])) {
@@ -2645,7 +2645,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
   if (narg > 1 && !symbolIsInteger(ps[1]))
     return cerror(NEED_INT_ARG, ps[1]);
 
-  pointer* ptrs;
+  Pointer* ptrs;
   loopInfo* infos;
   int32_t iq;
   int32_t level;

@@ -197,7 +197,7 @@ BIND(iauC2txy, v_dT8dp3_iDaT5rDp3p3q_0zzz1T5, f, c2txy, 5, 5, 0)
 int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
 {
   double djm0, djm;
-  pointer *ptrs;
+  Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
@@ -263,7 +263,7 @@ REGISTER(iauCal2jd, f, cal2jd, 1, 1, 0);
    ([year, month, day]) */
 int32_t lux_iauDat(int32_t narg, int32_t ps[])
 {
-  pointer *ptrs;
+  Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
@@ -409,7 +409,7 @@ BIND(iauEpb, d_dd_iLarDq_0z_1, f, epb, 1, 1, 0)
    (e.g., 1957.3). */
 int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
 {
-  pointer *ptrs;
+  Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
@@ -438,7 +438,7 @@ BIND(iauEpj, d_dd_iLarDq_0z_1, f, epj, 1, 1, 0)
    (e.g., 1957.3). */
 int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
 {
-  pointer *ptrs;
+  Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 

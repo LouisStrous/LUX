@@ -93,7 +93,7 @@ int32_t checkOneSymbol(int32_t symbol, int32_t limit)
   struct allocItem	*ap;
   extractSec	*eptr;
   int32_t	n, i;
-  pointer	pp;
+  Pointer	pp;
 
   regular = 0;			/* default: not a regular symbol */
   ok = 1;
@@ -675,7 +675,7 @@ int32_t addressToSymbol(void *address)
 {
   int32_t	iq, symbol = -1, i, n, j;
   array	*h;
-  pointer	ptr;
+  Pointer	ptr;
 
   for (iq = NAMED_START; iq < NAMED_END; iq++) {
     switch (symbol_class(iq)) {

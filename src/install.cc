@@ -1301,7 +1301,7 @@ void undefine(int32_t symbol)
   char	hasMem = 0;
   int32_t	n, k, oldZapContext, i;
   int16_t	*ptr;
-  pointer	p2;
+  Pointer	p2;
   listElem	*p;
   extractSec	*eptr, *eptr0;
   extern int32_t	tempSym;
@@ -2085,7 +2085,7 @@ int32_t newSymbol(Symbolclass kind, ...)
   extern char	reportBody, ignoreSymbols, compileOnly;
   extractSec	*eptr;
   int16_t	*ptr;
-  pointer	p;
+  Pointer	p;
 #if YYDEBUG
   extern int32_t	yydebug;
 #endif
@@ -3411,7 +3411,7 @@ void fixedValue(char const* name, Symboltype type, ...)
 /* install a numerical constant */
 {
  int32_t	n, iq;
- pointer	p;
+ Pointer	p;
  va_list	ap;
 
  va_start(ap, type);
@@ -3920,7 +3920,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
 /* returns scalar value of nsym, converted to proper type, in target */
 {
  int32_t		n;
- pointer	ptr;
+ Pointer	ptr;
 
  n = scalar_type(nsym);
  ptr.b = &scalar_value(nsym).b;
@@ -5098,7 +5098,7 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
    covered by the data in <symbol>. */
 {
   int32_t	n, ns, nb;
-  pointer	p;
+  Pointer	p;
   listElem	*l;
 
   switch (symbol_class(symbol)) {
@@ -5258,7 +5258,7 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
 */
 {
   int32_t	result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
-  pointer	data;
+  Pointer	data;
   structElem	*se;
 
   if (structSize(ps[0], &nstruct, &size) == LUX_ERROR) /* check

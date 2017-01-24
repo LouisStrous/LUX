@@ -426,7 +426,7 @@ union wideScalar {
   char **sp;
 };
 
-union pointer {
+union Pointer {
   uint8_t *b;
   int16_t *w;
   int32_t *l;
@@ -593,7 +593,7 @@ typedef struct symTableEntryStruct {
     struct { preExtract *ptr; int32_t bstore; } preExtract;
     struct { void       *ptr; int32_t bstore; } general;
     struct { structPtr  *ptr; int32_t bstore; } structPtr;
-    pointer     dpointer;
+    Pointer     dpointer;
     struct { int16_t args[4]; } evb;
     struct { uint16_t args[4]; } uevb;
     struct { uint8_t narg; char **keys; uint8_t extend; uint16_t nstmnt;
@@ -638,7 +638,7 @@ struct loopInfo {
   /// example, if the data type is LUX_DOUBLE, then the current data
   /// element is at `data->d`.  Gets updated as appropriate when the
   /// axes are traversed.
-  pointer *data;
+  Pointer *data;
 
   /// The start of the data.  Remains constant when the axes are
   /// traversed.
@@ -724,7 +724,7 @@ typedef struct {
 
 
 /* for Dick's stuff */
-#define types_ptr       pointer
+#define types_ptr       Pointer
 #define ahead           arrayStruct
 #define sym_desc        symTableEntryStruct
 #define class8_to_1(x)  dereferenceScalPointer(x)

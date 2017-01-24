@@ -687,7 +687,7 @@ int32_t lux_format_set(int32_t narg, int32_t ps[])
   char	*string, *fmt;
   int32_t	n, iq = 0;
   extern formatInfo	theFormat;
-  pointer	p;
+  Pointer	p;
 
   if (narg) {
     if (symbol_class(ps[0]) != LUX_STRING)
@@ -797,7 +797,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
   int32_t	i, n, j;
   int32_t	Sprintf_tok(char *, ...);
   char	*nextformat(char *, int32_t);
-  pointer	ptr;
+  Pointer	ptr;
   listElem	*sptr;
 
   symbol = transfer(symbol);
@@ -1220,7 +1220,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
 {
   char	*fmt, *thefmt, *save, haveTrailer, dofreefmt, *newfmt, *ptr;
   int32_t	iq, n, nn, iq0;
-  pointer	p;
+  Pointer	p;
   extern formatInfo	theFormat;
   int32_t	Sprintf(char *, char *, ...);
 
@@ -2226,7 +2226,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
   Symboltype type;
   char	*p;
   Scalar	value;
-  pointer	pp;
+  Pointer	pp;
 
   index_cnt = 0;		/* keep track of the number of read elements */
   for (i = 0; i < narg; i++) {	/* loop over all arguments */
@@ -2534,7 +2534,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
   int32_t	string2, pr, i, len, nout = 0;
   Symboltype type;
   double	d, k, f, d2;
-  pointer	trgt;
+  Pointer	trgt;
   void	**ptr2;
   static char	*keyboard = NULL;
   extern formatInfo	theFormat;
@@ -2930,7 +2930,7 @@ int32_t lux_assoc_input(int32_t narg, int32_t ps[])
   int32_t	off[8], outdims[8], axes[8], *out;
   int32_t	len, nsym, baseOffset;
   Symboltype type;
-  pointer	q;
+  Pointer	q;
   array	*h;
   FILE	*fp;
   char	warn = 0;
@@ -3068,7 +3068,7 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
  int32_t	ddat, *dat, dfile, *file, lun, daxes, *axes, doff, *off, offset;
  int32_t	i, dattype, assoctype, ystep[8], rstep[8], tally[8], done;
  int32_t	efile, n, *step, baseOffset;
- pointer	q;
+ Pointer	q;
  array	*h;
  FILE	*fp;
 
@@ -3409,7 +3409,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) /* fzread subroutine */
   Symboltype type;
   char	*p, *name;
   fzHead	*fh;
-  pointer q1;
+  Pointer q1;
   FILE	*fin;
   int32_t	anadecrunch(uint8_t *, int16_t [], int32_t, int32_t, int32_t),
 	anadecrunch8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t),
@@ -3599,7 +3599,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) /* fzwrite subroutine 
   char const	*p, *name;
   char* safename;
   fzHead	*fh;
-  pointer q1, q2;
+  Pointer q1, q2;
   FILE	*fout;
   static char const* safeFile = "Safe_file";
 					 /* first arg. must be an array */
@@ -3783,7 +3783,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  int32_t	iq, n, nd, j, type, i, mq, nx, ny, limit, sz;
  char	*name, *p;
  fzHead	*fh;
- pointer q1, q2;
+ Pointer q1, q2;
  union { int32_t i;  uint8_t b[4];} lmap;
  FILE	*fout;
 					 /* first arg. must be an array */
@@ -4003,7 +4003,7 @@ int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
 {
  int32_t	lun, n, iq, i;
  FILE	*fp;
- pointer	p;
+ Pointer	p;
  array	*h;
  char	str, *q;
 
@@ -4059,7 +4059,7 @@ int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
 {
  int32_t	lun, n, iq, i;
  FILE	*fp;
- pointer	p;
+ Pointer	p;
  array	*h;
  char	str, *q;
 
@@ -4132,7 +4132,7 @@ int32_t ok_for_astore(int32_t iq)
 void astore_one(FILE *fp, int32_t iq)
 {
   int32_t n, sz, i;
-  pointer p;
+  Pointer p;
 
   fwrite(&sym[iq], sizeof(symTableEntry), 1, fp); /* the symbol */
   switch (symbol_class(iq)) {
@@ -4242,7 +4242,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
 {
   int16_t hash, context;
   int32_t line, exec, n, j;
-  pointer p;
+  Pointer p;
 
   hash = sym[iq].xx;		/* save because they'll be overwritten */
   line = sym[iq].line;
@@ -5562,7 +5562,7 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 			      float blank, float targetblank, int32_t type0,
 			      int32_t type)
 {
-  pointer	p, q;
+  Pointer	p, q;
 
   if ((bscale && bscale != 1.0) || bzero) {
     /* we must adjust the values for BSCALE, BZERO, and BLANK */
@@ -5845,7 +5845,7 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
   Symboltype type;
   float	bscale = 0.0, bzero = 0.0, blank = FLT_MAX, min, max;
   char	*block, usescrat, *curblock, runlength;
-  pointer	p;
+  Pointer	p;
 
   /* header structure:
 
@@ -6864,7 +6864,7 @@ int32_t lux_fits_write_general(int32_t narg, int32_t ps[], int32_t func)
   void	*data, *out;
   int32_t	*dims, ndim, headertype, nheader, slice, nlines, n, type,
     nx, ny, limit, bitpix[] = {8,16,32,-32,-64}, i, size;
-  pointer	header;
+  Pointer	header;
   FILE	*fp;
 
   if (!symbolIsNumericalArray(ps[0]) || symbolIsComplexArray(ps[0]))

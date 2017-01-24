@@ -480,7 +480,7 @@ int32_t draw(int32_t ic)
 {
   int32_t	nvec, offset, ll0 = 0, mode, iq, ix, iy, gap;
   short	is1, is2;
-  pointer p;
+  Pointer p;
   extern char	callig_update;	/* added 4oct93 LS (see file plots.c) */
 
   if (isprint(ic) == 0)

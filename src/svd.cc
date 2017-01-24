@@ -116,7 +116,7 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
 {
   int32_t	iq, nRow, nCol, *d, n;
   double	*a, *z;
-  pointer	src;
+  Pointer	src;
 
 /*  void SVD(double *W, double *Z, int32_t nRow, int32_t nCol) */
 

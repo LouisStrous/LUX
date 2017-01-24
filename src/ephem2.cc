@@ -105,7 +105,7 @@ int32_t lux_solar_physical(int32_t narg, int32_t ps[], int32_t select)
 /* LS < 1998 */
 {
   int32_t	n, result;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   /* get copy of ps[0] upgraded to LUX_FLOAT if necessary, return pointer
      in <src>, number of elements in <n>.  Also create garbage clone of

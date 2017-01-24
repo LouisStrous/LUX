@@ -68,7 +68,7 @@ int32_t lux_gridmatch(int32_t narg, int32_t ps[])/* gridmatch function */
  int32_t	result_sym, nc, i1, i2, j1, j2, dx2, dy2, mode;
  int32_t	*gx, *gy;
  float	*out, *gwx, *gwy;
- pointer p1, p2;
+ Pointer p1, p2;
 
  /* <m1> must be a 2D numerical array */
  if (!symbolIsNumericalArray(ps[0])) 
@@ -328,7 +328,7 @@ float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_
 	     int32_t idx, int32_t idy, float *gx, float *gy)
 /* finds weighted average of array m over the block defined */
 {
-  pointer p;
+  Pointer p;
   int32_t	nxc, nxd, nyc, nyd, i, j, jj;
   float	sum, sumg, sumx, sumgx;
 
@@ -394,7 +394,7 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
 	    float bs)
 {
   int32_t     nxc, nxd, nyc, nyd, nx, ny;
-  register	pointer   m1p, m2p;
+  register	Pointer   m1p, m2p;
   register        float   *p1, *p2, *ps;
   register        float   sum, sumx, t, ndmx2;
   register        int32_t     i, j;
@@ -591,7 +591,7 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])/* stretch function */
   float	xd, yd, xinc, yinc, y, x, xs, dy, dy1;
   float	dx, dx1, dx0, dx2, dx3, dx4, fn, fm, xq;
   float	w1, w2, w3, w4, xl, yl, c1, c2, c3, c4, b1, b2, b3, b4;
-  pointer base, out, bb;
+  Pointer base, out, bb;
   float	*jpbase, *jbase, *xgbase;
   Symboltype type;
 
@@ -971,7 +971,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) /* expand funct
   float	zc1, zc2, z00, z01, z10, z11, xq;
   float	stepx, stepy, yrun, xrun, xbase, q, p, fn;
   array	*h;
-  pointer base, jbase, out, jout, nlast;
+  Pointer base, jbase, out, jout, nlast;
 				/* first argument must be a 2-D array */
   CK_ARR(iq, 1);
   type = sym[iq].type;
@@ -1186,7 +1186,7 @@ static int32_t regridtypeflag, stretchmark_flag,
   nm1, mm1, nm2, mm2, n;
 static Symboltype regrid_type;
 static float	fnm1, fnm5, fmm1, fmm5, xl, yl;
-static pointer	base, out;
+static Pointer	base, out;
 int32_t regrid_common(int32_t, int32_t []);
 
 void bicubic_f(void)	/* internal routine for single pixel */
@@ -1200,9 +1200,9 @@ void bicubic_f(void)	/* internal routine for single pixel */
 */
  int32_t	i1, i2, i3, i4, j1, j2, j3, j4, iq;
  float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
- pointer bb;
  /* the location is in xl, yl; base is the pointer to array; out is
  pointer to output; both are unions */
+ Pointer bb;
  i2 = (int32_t) xl;		j2 = (int32_t) yl;
  if ( i2 >= 1 && i2 < nm2 ) {		/* normal interior */
 	 dx0 = xl - i2; i1 = i2 - 1; i2 = 1; i3 = 2; i4 = 3;	 }
@@ -1331,7 +1331,7 @@ void bicubic_fc()	/* internal routine for single pixel */
      in the call or other adjustments made */
   int32_t	i1, i2, i3, i4, j1, j2, j3, j4, iq;
   float	c1, c2, c3, c4, b1, b2, b3, b4, dx0, dx1, dx2, dx3, dx4, xq;
-  pointer bb;
+  Pointer bb;
 
   /* the location is in xl, yl; base is the pointer to array; out is
      pointer to output; both are unions */
@@ -1567,7 +1567,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])/* with branches for type */
   int32_t	i, j, ind;
   float	fn, fm, yrun, ax, bx, cx, dx, ay, by, cy, dy, xq, beta, xinc, yinc,
     xl0, yl0;
-  pointer xgbase, ygbase, jpbase, jbase, ipbase;
+  Pointer xgbase, ygbase, jpbase, jbase, ipbase;
 				 /* first argument must be a 2-D array */
   iq = ps[0];			 /* <data> */
   if (!symbolIsNumericalArray(iq))
@@ -1851,7 +1851,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
 {
   int32_t	iq, nFac, *factors, outDims[MAX_DIMS], i,
     n, offset, div[MAX_DIMS], range[2*MAX_DIMS], nel;
-  pointer	src, trgt;
+  Pointer	src, trgt;
   char	allAxes;
   Scalar	sum;
   loopInfo	srcinfo, trgtinfo, tmpinfo;
@@ -2063,7 +2063,7 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) /* compress function */
   float	xq, fac;
   double	dq, dfac;
   array	*h;
-  pointer q1, q2, p, base;
+  Pointer q1, q2, p, base;
 
   iq = ps[0];
   CK_ARR(iq, 1);
@@ -2164,7 +2164,7 @@ int32_t lux_sort(int32_t narg, int32_t ps[])
 {
   int32_t	iq, result_sym, n, nloop, step;
   Symboltype type;
-  pointer	p;
+  Pointer	p;
   char	sortType;
 
   /* SGI cc does not accept combination of (int32_t, uint8_t *) and (int32_t, int16_t *) */
@@ -2306,7 +2306,7 @@ int32_t lux_index(int32_t narg, int32_t ps[])
  /* uses heap sort only */
 {
   int32_t	iq, type, result_sym, n, nloop, step1, step2, nloop2;
-  pointer	p, q;
+  Pointer	p, q;
   void invertPermutation(int32_t *, int32_t);
   void indexx_b(int32_t, uint8_t*, int32_t*);
   void indexx_w(int32_t, int16_t*, int32_t*);
@@ -2969,7 +2969,7 @@ int32_t compress4(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *
 }
 /*------------------------------------------------------------------------- */
 void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
-		   pointer base, pointer out, int32_t type)
+		   Pointer base, Pointer out, int32_t type)
  /* internal routine for shift in one direction */
 {
   int32_t	i1, i2, i3, i4, k;
@@ -3281,8 +3281,8 @@ int32_t lux_shift3(int32_t narg, int32_t ps[])	/* shift3, bicubic image shift */
 {
   int32_t	nx, ny, iq, nd, n, nb, result_sym;
   float	dx, dy;
-  pointer	base, out;
-  void	shift_bicubic(float, int32_t, int32_t, int32_t, int32_t, pointer, pointer, int32_t);
+  Pointer	base, out;
+  void	shift_bicubic(float, int32_t, int32_t, int32_t, int32_t, Pointer, Pointer, int32_t);
 
   iq = ps[0];
   if (!symbolIsNumericalArray(iq))
@@ -3337,7 +3337,7 @@ void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
 /* source array. */
 /* LS 4 August 2000 */
 {
-  pointer	src, trgt;
+  Pointer	src, trgt;
   int32_t	ix, iy, i;
   float	px1, px2, px3, px4, py1, py2, py3, py4, bx, by, ax, ay;
 
@@ -3438,7 +3438,7 @@ int32_t lux_regridls(int32_t narg, int32_t ps[])
     step;
   Symboltype type;
   float	xsrc, ysrc, *gridx, *gridy, sx, sy, tx, ty, stx, sty, xsrc0, ysrc0;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   /* <data> */
   if (!symbolIsRealArray(ps[0])
@@ -3649,7 +3649,7 @@ int32_t lux_bigger235(int32_t narg, int32_t ps[])
   return result;
 }
 /*-------------------------------------------------------------------------*/
-int32_t single_fft(pointer data, int32_t n, int32_t type, int32_t back)
+int32_t single_fft(Pointer data, int32_t n, int32_t type, int32_t back)
 /* type = LUX_FLOAT or LUX_DOUBLE */
 {
   int32_t gsl_fft(double *, size_t, size_t);
@@ -3678,7 +3678,7 @@ int32_t lux_cartesian_to_polar(int32_t narg, int32_t ps[])
   int32_t	nx, ny, result, dims[2], r, rmax, n, az, step, i;
   Symboltype type;
   float	x0, y0, x, y, daz;
-  pointer	src, trgt;
+  Pointer	src, trgt;
 
   /* <x> */
   if (!symbolIsNumericalArray(ps[0]) || array_num_dims(ps[0]) != 2)
@@ -3750,8 +3750,8 @@ int32_t lux_polar_to_cartesian(int32_t narg, int32_t ps[])
   int32_t	nx, ny, result, dims[2], step, ix, iy;
   Symboltype type;
   float	x0, y0, daz, dx, dy, az, r;
-  pointer	src, trgt;
-  int32_t	single_fft(pointer src, int32_t n, int32_t type, int32_t backwards);
+  Pointer	src, trgt;
+  int32_t	single_fft(Pointer src, int32_t n, int32_t type, int32_t backwards);
 
   /* <x> */
   if (!symbolIsNumericalArray(ps[0]) || array_num_dims(ps[0]) != 2)

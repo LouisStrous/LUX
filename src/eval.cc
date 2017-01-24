@@ -50,9 +50,9 @@ static int32_t      lhs,            /* the current left-hand side operand */
 static Symboltype topType,        /* the data type of the result */
                 lhsType,        /* the data type of the LHS */
                 rhsType;        /* the data type of the RHS */
-static pointer  lp,             /* pointer to the LHS values */
-                rp,             /* pointer to the RHS values */
-                tp;             /* pointer to the result values */
+static Pointer  lp,             /* Pointer to the LHS values */
+                rp,             /* Pointer to the RHS values */
+                tp;             /* Pointer to the result values */
 
 int32_t     internal_routine(int32_t, internalRoutine *), /* interal routine call */
         usr_routine(int32_t);       /* user routine call */
@@ -2920,7 +2920,7 @@ void lux_add_sa(void)
      /* lux_add_as() */
 {
  Symboltype temp;
- pointer tempp;
+ Pointer tempp;
 
  temp = lhsType;
  lhsType = rhsType;
@@ -4918,7 +4918,7 @@ void lux_mul_sa(void)
      /* lux_mul_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -11907,7 +11907,7 @@ void lux_max_sa(void)
      /* lux_max_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -13388,7 +13388,7 @@ void lux_min_sa(void)
      /* lux_max_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -14167,7 +14167,7 @@ void lux_eq_sa(void)
      /* so we swap LHS and RHS and pass on to lux_eq_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;
   lhsType = rhsType;
@@ -16766,7 +16766,7 @@ void lux_lt(void)
      /* of greater-than, so we swap LHS and RHS and pass on to lux_gt() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16780,7 +16780,7 @@ void lux_lt_as(void)
      /* mirror image of lux_gt_as(), so swap LHS and RHS and use that */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16794,7 +16794,7 @@ void lux_lt_sa(void)
      /* image of lux_gt_sa() so we swap LHS and RHS and use that */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16808,7 +16808,7 @@ void lux_le(void)
      /* swap operands and use that */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16822,7 +16822,7 @@ void lux_le_as(void)
      /* lux_ge_sa() so swap operands and use that */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -16836,7 +16836,7 @@ void lux_le_sa(void)
      /* lux_ge_sa() so swap operands and use that */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -17603,7 +17603,7 @@ void lux_ne_sa(void)
      /* commutative, so swap operands and use lux_ne_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -17811,7 +17811,7 @@ void lux_and_sa(void)
      /* so swap operands and use lux_and_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -18019,7 +18019,7 @@ void lux_or_sa(void)
      /* so swap operands and use lux_or_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -18227,7 +18227,7 @@ void lux_xor_sa(void)
      /* so swap operands and use lux_xor_as() */
 {
   Symboltype temp;
-  pointer tempp;
+  Pointer tempp;
 
   temp = lhsType;  lhsType = rhsType;  rhsType = temp;
   tempp = lp;  lp = rp;  rp = tempp;
@@ -19237,7 +19237,7 @@ int32_t evalExtractRhs(int32_t symbol)
   int16_t  *wptr;
   extractSec    *eptr;
   char  **sptr;
-  pointer       p, q, r;
+  Pointer       p, q, r;
   extern int32_t    d_r_sym, r_d_sym;
   structElem    *se;
   structPtr     *spe;

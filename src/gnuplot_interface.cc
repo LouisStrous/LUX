@@ -154,7 +154,7 @@ int32_t lux_gnuplot(int32_t narg, int32_t ps[])
   }
 
   if (num_data) {
-    pointer *data;
+    Pointer *data;
     loopInfo *info;
 
     if (standard_args(num_data, ps, "i^*;i^&?", &data, &info) < 0)
@@ -208,7 +208,7 @@ REGISTER(gnuplot, s, gplot, 1, 3, "::command");
 
 int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
                                std::string gnuplot_command_fmt) {
-  pointer *data;
+  Pointer *data;
   loopInfo *info;
 
   if (standard_args(narg, ps, "i>B>1,>1", &data, &info) < 0)

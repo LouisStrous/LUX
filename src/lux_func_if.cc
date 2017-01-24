@@ -29,8 +29,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
   lux_func_if *afif = lux_func_if_alloc("MYFUNC", 2);
   lux_func_if_set_param(afif, 0, par0);
   lux_func_if_set_param(afif, 1, par1);
-  pointer p0 = lux_func_if_get_param_data(afif, 0);
-  pointer p1 = lux_func_if_get_param_data(afif, 1);
+  Pointer p0 = lux_func_if_get_param_data(afif, 0);
+  Pointer p1 = lux_func_if_get_param_data(afif, 1);
 
   lux_func_if_call(afif);
 
@@ -50,7 +50,7 @@ lux_func_if * lux_func_if_alloc(char const * const name, size_t num_params)
   afif->num_params = num_params;
   if (num_params) {
     afif->param_syms = (int16_t*) calloc(num_params, sizeof(int16_t));
-    afif->param_data = (pointer*) calloc(num_params, sizeof(pointer));
+    afif->param_data = (Pointer*) calloc(num_params, sizeof(Pointer));
     if (!afif->param_syms || !afif->param_data)
       goto error;
   }
@@ -97,11 +97,11 @@ int32_t lux_func_if_get_param_sym(lux_func_if *afif, size_t index)
   return afif->param_syms[index];
 }
 
-pointer lux_func_if_get_param_data(lux_func_if *afif, size_t index)
+Pointer lux_func_if_get_param_data(lux_func_if *afif, size_t index)
 {
   if (index >= afif->num_params) {
     errno = EDOM;
-    pointer p;
+    Pointer p;
     p.v = NULL;
     return p;
   }

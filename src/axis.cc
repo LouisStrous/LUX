@@ -2181,25 +2181,26 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
         || (param_ix < narg && ps[param_ix])) {
       for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0, ref_dims_ix = 0;
            pspec_dims_ix < pspec->num_dims_spec; pspec_dims_ix++) {
+        int src_dim_size = (src_dims_ix < num_src_dims? src_dims[src_dims_ix]: 0);
         switch (dims_spec[pspec_dims_ix].type) {
         case DS_EXACT: /* an input parameter must have the exact
                           specified dimension */
         case DS_ATLEAST: // or at least the specified size
           if (pspec->logical_type == PS_INPUT) {
             if (dims_spec[pspec_dims_ix].type == DS_EXACT
-                && src_dims[src_dims_ix] != dims_spec[pspec_dims_ix].size_add) {
+                && src_dim_size != dims_spec[pspec_dims_ix].size_add) {
               returnSym = luxerror("Expected size %d for dimension %d "
                                    "but found %d", ps[param_ix],
                                    dims_spec[pspec_dims_ix].size_add,
-                                   src_dims_ix, src_dims[src_dims_ix]);
+                                   src_dims_ix, src_dim_size);
               goto error;
             }
             else if (dims_spec[pspec_dims_ix].type == DS_ATLEAST
-                && src_dims[src_dims_ix] < dims_spec[pspec_dims_ix].size_add) {
+                && src_dim_size < dims_spec[pspec_dims_ix].size_add) {
               returnSym = luxerror("Expected at least size %d for dimension %d "
                                    "but found %d", ps[param_ix],
                                    dims_spec[pspec_dims_ix].size_add,
-                                   src_dims_ix, src_dims[src_dims_ix]);
+                                   src_dims_ix, src_dim_size);
               goto error;
             }
           }
@@ -2220,10 +2221,10 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
           d = dims_spec[pspec_dims_ix].size_add;
           switch (pspec->logical_type) {
           case PS_INPUT:
-            if (src_dims[src_dims_ix] != d) {
+            if (src_dim_size != d) {
               returnSym = luxerror("Expected size %d for dimension %d "
                                    "but found %d", ps[param_ix],
-                                   d, src_dims_ix, src_dims[src_dims_ix]);
+                                   d, src_dims_ix, src_dim_size);
               goto error;
             }
             src_dims_ix++;
@@ -2264,8 +2265,14 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, pointer **ptr
           ref_dims_ix++;
           break;
         case DS_ACCEPT:         /* copy from input */
-          tgt_dims[tgt_dims_ix++] = src_dims[src_dims_ix++];
-          ref_dims_ix++;
+          if (src_dims_ix >= num_src_dims) {
+            returnSym = luxerror("Cannot copy non-existent dimension %d",
+                                 ps[param_ix], src_dims_ix);
+            goto error;
+          } else {
+            tgt_dims[tgt_dims_ix++] = src_dims[src_dims_ix++];
+            ref_dims_ix++;
+          }
           break;
         default:
           returnSym = luxerror("Dimension specification type %d "

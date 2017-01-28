@@ -19,6 +19,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* File symbols.h */
 /* Macro definitions that specify various parts of LUX symbols */
+
+#include <cstdint>              // for int32_t
+
 #define array_data(symbol)	/* void * */ ((void *) (array_header(symbol) + 1))
 #define array_dims(symbol)	/* int32_t * */ ((int32_t *)(array_header(symbol)->dims))
 #define array_facts(symbol)	/* arrayFacts */ (array_header(symbol)->facts)

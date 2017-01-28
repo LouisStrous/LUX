@@ -854,6 +854,8 @@ Internal Functions and Subroutines
 * gamma::                       Gamma function
 * gc2gd::                       Geodetic from geocentric coordinates
 * gc2gde::                      Geodetic from geocentric coordinates and ellipsoid
+* gcommand::
+* gcontour::                    Contour plot via gnuplot
 * gd2gc::                       Geocentric from geodetic coordinates
 * gd2gce::                      Geocentric from geodetic coordinates and ellipsoid
 * ge::                          Greater-than-or-equal-to
@@ -871,7 +873,8 @@ Internal Functions and Subroutines
 * gmst00::                      Greenwich mean sidereal time, IAU 2000
 * gmst06::                      Greenwich mean sidereal time, IAU 2006
 * gmst82::                      Greenwich mean sidereal time, IAU 1982
-* gnuplot::                     Plot through gnuplot
+* gplot::                       Plot via gnuplot
+* gplot3d::                     3D plot via gnuplot
 * gridmatch::                   Determine displacements between two images
 * gsmooth::                     Gaussian smoothing
 * gst00a::                      Greenwich apparent sidereal time, IAU 2000
@@ -880,6 +883,7 @@ Internal Functions and Subroutines
 * gst06a::                      Greenwich apparent sidereal time, IAU 2000/2006
 * gst94::                       Greenwich apparent sidereal time, IAU 1982/1994
 * gt::                          Greater-than
+* gtv::
 * h2fk5::                       Hipparcos to FK5 J2000.0 star positions
 * hairs::                       User-selected position
 * help::                        Help
@@ -4784,7 +4788,7 @@ yields @code{'file-second-007'}.  The two arguments @code{'second'} and
 @code{7} must be enclosed in curly braces.
 
 @c ------------------------------------------------------------------
-@node Multiple Subscripts, Fractional Subscripts, Lists of Subscripts, Subscripts
+@node Multiple Subscripts,  , Lists of Subscripts, Subscripts
 @comment  node-name,  next,  previous,  up
 @subsubsection Multiple Subscripts
 
@@ -9227,7 +9231,7 @@ and also using the @code{help} command from inside LUX.
 @end enumerate
 
 @c ------------------------------------------------------------------
-@node Environment, History, Installing LUX, Top
+@node Environment, gnu Free Documentation License, Installing LUX, Top
 @comment  node-name,  next,  previous,  up
 @chapter The LUX Environment
 
@@ -12110,6 +12114,8 @@ arguments.
 * gamma::                       Gamma function
 * gc2gd::                       Geodetic from geocentric coordinates
 * gc2gde::                      Geodetic from geocentric coordinates and ellipsoid
+* gcommand::
+* gcontour::                    Contour plot via gnuplot
 * gd2gc::                       Geocentric from geodetic coordinates
 * gd2gce::                      Geocentric from geodetic coordinates and ellipsoid
 * ge::                          Greater-than-or-equal-to
@@ -12127,7 +12133,8 @@ arguments.
 * gmst00::                      Greenwich mean sidereal time, IAU 2000
 * gmst06::                      Greenwich mean sidereal time, IAU 2006
 * gmst82::                      Greenwich mean sidereal time, IAU 1982
-* gnuplot::                     Plot through gnuplot
+* gplot::                       Plot via gnuplot
+* gplot3d::                     3D plot via gnuplot
 * gridmatch::                   Determine displacements between two images
 * gsmooth::                     Gaussian smoothing
 * gst00a::                      Greenwich apparent sidereal time, IAU 2000
@@ -12136,6 +12143,7 @@ arguments.
 * gst06a::                      Greenwich apparent sidereal time, IAU 2000/2006
 * gst94::                       Greenwich apparent sidereal time, IAU 1982/1994
 * gt::                          Greater-than
+* gtv::
 * h2fk5::                       Hipparcos to FK5 J2000.0 star positions
 * hairs::                       User-selected position
 * help::                        Help
@@ -19357,7 +19365,7 @@ See also: @ref{igamma}, @ref{beta}
 @findex gc2gd
 
 @code{gc2gd(@var{ellid}, @var{xyz})}
- 
+
 [SOFA] Returns geodetic coordinates (eastward longitude in radians,
 northward latitude in radians, height above the ellipsoid in meters)
 corresponding to geocentric coordinates @code{@var{xyz}} (in meters)
@@ -19369,7 +19377,7 @@ The result has the same dimensions as @code{@var{xyz}}.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gc2gde, gd2gc, gc2gd, Internal Routines
+@node gc2gde, gcommand, gc2gd, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gc2gde
 @findex gc2gde
@@ -19389,7 +19397,32 @@ element.  The result has the same dimensions as @code{@var{xyz}}.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gd2gc, gd2gce, gc2gde, Internal Routines
+@node gcommand, gcontour, gc2gde, Internal Routines
+@subsection gcommand
+@findex gcommand
+
+@code{gcommand, @code{@var{command}}}
+
+Sends the @code{@var{command}} text to the gnuplot program.
+
+@c -------------------------------------
+@node gcontour, gd2gc, gcommand, Internal Routines
+@subsection gcontour
+@findex gcontour
+
+@code{gcontour, @code{@var{x} [, /equalxy, /image]}}
+
+Displays a contour plot of 2D data set @code{@var{x}} via the
+gnuplot program.
+
+@code{/equalxy} says to give the plot the same aspect ratio as the
+dimensions of @code{@var{x}}.
+
+@code{/image} says to display @code{@var{x}} as an image with the
+contours on top.
+
+@c -------------------------------------
+@node gd2gc, gd2gce, gcontour, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gd2gc
 @findex gd2gc
@@ -19681,13 +19714,13 @@ dimensions, and the result has those same dimensions, too.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gmst82, gnuplot, gmst06, Internal Routines
+@node gmst82, gplot, gmst06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gmst82
 @findex gmst82
 
 @code{gmst82(@var{jdut})}
- 
+
 [SOFA] Returns Greenwich mean sidereal time in radians for the given
 UT1 Julian Date @code{@var{jdut}}, according to the IAU 1982 model.
 The result has the same dimensions as @code{@var{jdut}}.
@@ -19695,29 +19728,14 @@ The result has the same dimensions as @code{@var{jdut}}.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gnuplot, gridmatch, gmst82, Internal Routines
-@subsection gnuplot
-@findex gnuplot
+@node gplot, gplot3d, gmst82, Internal Routines
+@subsection gplot
+@findex gplot
 
-@code{gnuplot[[,@var{x}],@var{y}][,command=@var{command}}
+@code{gplot[,@var{x}],@var{y}}
 
 Plots @code{@var{y}} versus @code{@var{x}} through the external
 "gnuplot" program, if that program is available.
-
-One gnuplot process is created for the LUX session.  All calls to the
-@code{gnuplot} command in a particular LUX session interact with that
-same gnuplot process.
-
-Each call of @code{gnuplot} sends a gnuplot command to the gnuplot
-process, followed by the relevant contents of the data variables.  The
-gnuplot command to send is taken from the optional
-@code{@var{command}}.  If it is not specified, then @code{plot '-'
-notitle with lines;} is sent.
-
-@code{@var{x}} and @code{@var{y}} are optional.  If none are specified
-but @code{@var{command}} is specified, then only that command is sent.
-This way you can send gnuplot commands that don't involve LUX
-variables.
 
 If only one of @code{@var{x}} and @code{@var{y}} are specified, then
 it is interpreted as @code{@var{y}} and provides the y coordinates of
@@ -19727,7 +19745,23 @@ the x coordinates are taken from @code{@var{x}} and the y coordinates
 are taken from @code{@var{y}}.
 
 @c -------------------------------------
-@node gridmatch, gsmooth, gnuplot, Internal Routines
+@node gplot3d, gridmatch, gplot, Internal Routines
+@subsection gplot3d
+@findex gplot3d
+
+@code{gplot3d[, @code{@var{x}}, @code{@var{y}}], @code{@var{z}}}
+
+Displays a 3D plot of 2D data set @code{@var{z}} via the gnuplot
+program.
+
+If @code{@var{x}} and @code{@var{y}} are specified, then they provide
+the x and y coordinates for the columns and rows of @code{@var{z}}.
+They must be 1D data sets, with @code{@var{x}} having as many elements
+as the first dimension of @code{@var{z}}, and @code{@var{y}} having as
+many elements as the second dimension of @code{@var{z}}.
+
+@c -------------------------------------
+@node gridmatch, gsmooth, gplot3d, Internal Routines
 @subsection gridmatch
 @findex gridmatch
 
@@ -19877,7 +19911,7 @@ resolutions.  The result has the same dimensions as @code{@var{jdut}}.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gt, h2fk5, gst94, Internal Routines
+@node gt, gtv, gst94, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gt
 @findex gt
@@ -19894,7 +19928,17 @@ set.
 See also: @ref{ne}, @ref{eq}, @ref{ge}, @ref{lt}, @ref{le}
 
 @c -------------------------------------
-@node h2fk5, hairs, gt, Internal Routines
+@node gtv, h2fk5, gt, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection gtv
+@findex gtv
+
+@code{gtv, @var{x}}
+
+Displays the image @code{@var{x}} through the gnuplot program.
+
+@c -------------------------------------
+@node h2fk5, hairs, gtv, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection h2fk5
 @findex h2fk5

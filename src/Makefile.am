@@ -29,6 +29,8 @@ nonbind_sources = \
 	Bytestack.hh\
 	Ellipsoid.cc\
 	Ellipsoid.hh\
+	GnuPlot.cc\
+	GnuPlot.hh\
 	Rotate3d.cc\
 	Rotate3d.hh\
 	SSFC.cc\

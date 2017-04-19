@@ -33,6 +33,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/stat.h>
 #include <limits.h>
 #include <stdarg.h>
+#include <time.h>               // for difftime
 #include "action.hh"
 #include "install.hh"
 #include "format.hh"
@@ -1193,6 +1194,78 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
 	  for (i = w1; i < ww; i++) { /* right edge */
 	    *trgt.d = 0;	/* zeros */
 	    trgt.d += stride;
+	  }
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	break;
+      case LUX_CFLOAT:
+	do {
+	  /* do the left edge */
+	  if (o > 0 || old) {
+	    if (circular)
+	      for (i = 0; i < w1 - old; i++) {
+		trgt.cf->real = src.cf->real - src.cf[offset3].real;
+		trgt.cf->imaginary = src.cf->imaginary - src.cf[offset3].imaginary;
+		trgt.cf += stride;
+	      }
+	    else
+	      for (i = 0; i < w1 - old; i++) {
+		trgt.cf->real = trgt.cf->imaginary = 0;	/* zeros */
+		trgt.cf += stride;
+	      }
+	    src.cf -= offset1;
+	  } else
+	    for (i = 0; i < ww; i++) {
+	      trgt.cf->real = src.cf->real; /* original values */
+	      trgt.cf->imaginary = src.cf->imaginary; /* original values */
+	      trgt.cf += stride;
+	      src.cf += stride;
+	    }
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	    trgt.cf->real = src.cf->real - src.cf[offset1].real;
+	    trgt.cf->imaginary = src.cf->imaginary - src.cf[offset1].imaginary;
+	    src.cf += stride;
+	    trgt.cf += stride;
+	  }
+	  for (i = w1; i < ww; i++) { /* right edge */
+	    trgt.cf->real = trgt.cf->imaginary = 0;	/* zeros */
+	    trgt.cf += stride;
+	  }
+	} while (advanceLoop(&trgtinfo, &trgt),
+		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+	break;
+    case LUX_CDOUBLE:
+	do {
+	  /* do the left edge */
+	  if (o > 0 || old) {
+	    if (circular)
+	      for (i = 0; i < w1 - old; i++) {
+		trgt.cd->real = src.cd->real - src.cd[offset3].real;
+		trgt.cd->imaginary = src.cd->imaginary - src.cd[offset3].imaginary;
+		trgt.cd += stride;
+	      }
+	    else
+	      for (i = 0; i < w1 - old; i++) {
+		trgt.cd->real = trgt.cd->imaginary = 0;	/* zeros */
+		trgt.cd += stride;
+	      }
+	    src.cd -= offset1;
+	  } else
+	    for (i = 0; i < ww; i++) {
+	      trgt.cd->real = src.cd->real; /* original values */
+	      trgt.cd->imaginary = src.cd->imaginary; /* original values */
+	      trgt.cd += stride;
+	      src.cd += stride;
+	    }
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	    trgt.cd->real = src.cd->real - src.cd[offset1].real;
+	    trgt.cd->imaginary = src.cd->imaginary - src.cd[offset1].imaginary;
+	    src.cd += stride;
+	    trgt.cd += stride;
+	  }
+	  for (i = w1; i < ww; i++) { /* right edge */
+	    trgt.cd->real = trgt.cd->imaginary = 0;	/* zeros */
+	    trgt.cd += stride;
 	  }
 	} while (advanceLoop(&trgtinfo, &trgt),
 		 advanceLoop(&srcinfo, &src) < srcinfo.rndim);

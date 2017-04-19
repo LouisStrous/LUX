@@ -24589,6 +24589,13 @@ equivalent to @code{roll(x,[1,2,0])} and @code{x(>2,>0,>1)}.
 @subsection root3
 @findex root3
 
+@code{@var{r} = root3(@var{a}, @var{b}, @var{c})}
+
+Returns the real roots of the third-degree polynomial equation
+@code{x^3 + a*x^2 + b*x + c = 0}.  The number of such roots is between
+1 and 3, inclusive.  Multiple coinciding roots are all returned
+separately.
+
 @c -------------------------------------
 @node runcum, runmax, root3, Internal Routines
 @subsection runcum

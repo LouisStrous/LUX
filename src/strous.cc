@@ -770,6 +770,17 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
   return result;
 }
 /*------------------------------------------------------------------------- */
+int timespec_diff(struct timespec* two, struct timespec* one)
+{
+  if (two->tv_nsec >= one->tv_nsec) {
+    return ((double) (two->tv_nsec - one->tv_nsec))/1e9
+      + difftime(two->tv_sec, one->tv_sec);
+  } else {
+    return -((double) (one->tv_nsec - two->tv_nsec))/1e9
+      + difftime(two->tv_sec, one->tv_sec);
+  }
+}
+/*------------------------------------------------------------------------- */
 #include <errno.h>
 int32_t lux_help(int32_t narg, int32_t ps[])
 {
@@ -778,9 +789,18 @@ int32_t lux_help(int32_t narg, int32_t ps[])
   char topic2[300];
   if (strlen(topic) > 270)
     return luxerror("Help topic is too long: '%s'", 0, topic);
+  // "info" returns the same value regardless of whether the topic
+  // could be found, so we cannot use the return value to tell if the
+  // topic was found.  Instead look at the time taken by the call: If
+  // the topic was found, then the user spends some time reading the
+  // text, which makes the info call take much longer than when the
+  // topic is not available and cannot be displayed.
+  struct timespec start_time, end_time;
+  timespec_get(&start_time, TIME_UTC);
   sprintf(cmd, "info --file lux --node=\"%s\" 2>/dev/null", topic);
-  int result = system(cmd);
-  if (result) {
+  system(cmd);
+  timespec_get(&end_time, TIME_UTC);
+  if (timespec_diff(&end_time, &start_time) < 1) {
     /* could not find the topic; try uppercase instead */
     strcpy(topic2, topic);
     char *p = topic2;
@@ -790,20 +810,24 @@ int32_t lux_help(int32_t narg, int32_t ps[])
     }
     if (strcmp(topic, topic2)) { /* topic wasn't uppercase already */
       sprintf(cmd, "info --file lux --node=\"%s\" 2>/dev/null", topic2);
-      result = system(cmd);
+      system(cmd);
     }
   }
-  if (result) {
+  timespec_get(&end_time, TIME_UTC);
+  if (timespec_diff(&end_time, &start_time) < 1) {
     /* could not find the topic; try an index search */
     sprintf(cmd, "info --file lux --index-search=\"%s\" 2>/dev/null", topic);
-    result = system(cmd);
+    system(cmd);
   }
-  if (result && strcmp(topic, topic2)) {
+  timespec_get(&end_time, TIME_UTC);
+  if (timespec_diff(&end_time, &start_time) < 1
+      && strcmp(topic, topic2)) {
     /* try uppercase */
     sprintf(cmd, "info --file lux --index-search=\"%s\" 2>/dev/null", topic2);
-    result = system(cmd);
+    system(cmd);
   }
-  if (result) {
+  timespec_get(&end_time, TIME_UTC);
+  if (timespec_diff(&end_time, &start_time) < 1) {
     /* could not find the topic in the manual; look for a user-defined
        subroutine or function */
     FILE *fp = openPathFile(topic, FIND_SUBR | FIND_LOWER); /* seek user-defined subroutine */
@@ -821,10 +845,9 @@ int32_t lux_help(int32_t narg, int32_t ps[])
         printw(line + 1);
       resetPager();
       fclose(fp);
-      result = 0;
     }
   }
-  return result? LUX_ERROR: LUX_OK;
+  return LUX_OK;
 }
 /*------------------------------------------------------------------------- */
 void endian(void *pp, int32_t n, int32_t type)

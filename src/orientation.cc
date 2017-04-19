@@ -26,6 +26,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include "action.hh"
 
+#include <gsl/gsl_poly.h>
+
 int32_t	lux_replace(int32_t, int32_t);
 /*--------------------------------------------------------------------*/
 #define SQRT3	1.7320508075688772935
@@ -601,35 +603,19 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
   return 1;
 }
 
+// r = root3(a,b,c)
+//
+// returns the real roots of x^3 + a x^2 + b x + c = 0,
 int32_t lux_root3(int32_t narg, int32_t ps[])
 {
-  float	c0, c1, c2, q, r, s, c, ang, *p;
-  int32_t	iq;
-
-  c0 = float_arg(*ps++);
-  c1 = float_arg(*ps++);
-  c2 = float_arg(*ps);
-  r = (c1*c2 - 3*c0)/6 - c2*c2*c2/27;
-  q = c2*c2/9 - c1/3;
-  s = q*q*q - r*r;
-  if (s < 0)
-  { puts("orientation3d - complex conjugate roots from a symmetric real matrix??");
-    printf("s = %g\n", s);
-    puts("setting s to 0.");
-    s = 0; }
-  ang = atan2(sqrt(s),r)/3;
-  q = sqrt(q);
-  r = c2/3;
-  s = sin(ang);
-  c = sqrt(1 - s*s);		/* cosine, always > 0 */
-  c0 = 2*q*c - r;
-  r = -q*c - r;  q = q*s*SQRT3;
-  c1 = r + q;
-  c2 = r - q;
-  iq = 3;
-  iq = array_scratch(LUX_FLOAT, 1, &iq);
-  p = (float *) LPTR(HEAD(iq));
-  *p++ = c0;  *p++ = c1;  *p++ = c2;
+  double a = double_arg(*ps++);
+  double b = double_arg(*ps++);
+  double c = double_arg(*ps);
+  double x[3];
+  int n = gsl_poly_solve_cubic(a, b, c, &x[0], &x[1], &x[2]);
+  int iq = array_scratch(LUX_DOUBLE, 1, &n);
+  double* p = (double *) array_data(iq);
+  memcpy(p, x, n*sizeof(double));
   return iq;
 }
 /*--------------------------------------------------------------------*/

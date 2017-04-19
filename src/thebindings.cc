@@ -1736,6 +1736,9 @@ void register_the_bindings()
   int32_t lux_diagonal_matrix(int32_t, int32_t []);
   register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 1, NULL);
 
+  int32_t lux_setnan(int32_t, int32_t []);
+  register_lux_f(lux_setnan, "setnan", 2, 2, NULL);
+
   int32_t lux_indgen_s(int32_t, int32_t []);
   register_lux_s(lux_indgen_s, "indgen", 1, 2, "*");
 

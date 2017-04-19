@@ -818,73 +818,139 @@ int32_t lux_one(int32_t narg, int32_t ps[])
 /*------------------------------------------------------------------------- */
 int32_t lux_zerof(int32_t narg, int32_t ps[])
 /* function version,  x = LUX_ZERO(y)
-   create array x of same type and size as y and set all elements to zero */
-{
-  int32_t	iq, mq;
-  char	*p;
+   create array x of same type and size as y and set all elements to zero
 
-  iq = ps[0];
-  switch (symbol_class(iq)) {
-    case LUX_SCALAR: case LUX_CSCALAR: /*scalar case */
-      /*need an output symbol, are we already a temp ? */
-      if (isFreeTemp(iq))
-	result_sym = iq;
-      else
-	result_sym = scalar_scratch(scalar_type(iq));
-      switch (scalar_type(iq)) {
-	case LUX_INT8:
-	  scalar_value(result_sym).b = 0;
-	  break;
-	case LUX_INT16:
-	  scalar_value(result_sym).w = 0;
-	  break;
-	case LUX_INT32:
-	  scalar_value(result_sym).l = 0;
-	  break;
-	case LUX_INT64:
-	  scalar_value(result_sym).q = 0;
-	  break;
-	case LUX_FLOAT:
-	  scalar_value(result_sym).f = 0;
-	  break;
-	case LUX_DOUBLE:
-	  scalar_value(result_sym).d = 0;
-	  break;
-	case LUX_CFLOAT:
-	  complex_scalar_data(result_sym).cf->real = 0.0;
-	  complex_scalar_data(result_sym).cf->imaginary = 0.0;
-	  break;
-	case LUX_CDOUBLE:
-	  complex_scalar_data(result_sym).cd->real = 0.0;
-	  complex_scalar_data(result_sym).cd->imaginary = 0.0;
-	  break;
+   x = zero(y,mask)
+
+   Returns a version of y where all elements are set to 0 for which
+   the mask is nonzero.
+*/
+{
+  StandardArguments standard_args;
+  int32_t iq;
+  Pointer *data;
+  loopInfo *info;
+
+  if ((iq = standard_args.set(narg, ps, "i*;i&?;r&", &data, &info)) < 0)
+    return LUX_ERROR;
+
+  if (narg == 1) {
+    memset(&data[2].b[0], '\0', info[2].nelem*info[0].stride);
+  } else {
+    do {
+      bool mask;
+      switch (info[1].type) {
+      case LUX_INT8:
+        mask = (*data[1].b != 0);
+        break;
+      case LUX_INT16:
+        mask = (*data[1].w != 0);
+        break;
+      case LUX_INT32:
+        mask = (*data[1].l != 0);
+        break;
+      case LUX_INT64:
+        mask = (*data[1].q != 0);
+        break;
+      case LUX_FLOAT:
+        mask = (*data[1].f != 0);
+        break;
+      case LUX_DOUBLE:
+        mask = (*data[1].d != 0);
+        break;
+      case LUX_CFLOAT:
+        mask = (data[1].cf->real != 0 || data[1].cf->imaginary != 0);
+        break;
+      case LUX_CDOUBLE:
+        mask = (data[1].cd->real != 0 || data[1].cd->imaginary != 0);
+        break;
+      default:
+        return cerror(ILL_TYPE, ps[1]);
       }
-      return result_sym;	/*end of scalar case */
-    case LUX_ARRAY: case LUX_CARRAY: /*array case */
-      /* need an output symbol, are we already a temp ? */
-      if (isFreeTemp(iq))
-	result_sym = iq;
-      else
-	result_sym = array_clone(iq, array_type(iq));
-      /* try to zero quickly */
-      mq = array_size(result_sym)*lux_type_size[array_type(iq)];
-      /* mq should now be the # of bytes in the array, get start */
-      p = (char*) array_data(result_sym);
-      zerobytes(p, mq);
-      return result_sym;
-    case LUX_STRING:		/* string case */
-      mq = string_size(iq);
-      result_sym = string_scratch(mq);
-      p = string_value(result_sym);
-      mq--;
-      while (mq--) 
-	*p++ = ' ';
-      *p = '\0';		/* but null terminate it */
-      return result_sym;
-    default:
-      return cerror(ILL_CLASS, iq);
+      if (mask) {
+        memset(&data[2].b[0], '\0', info[2].stride);
+      } else {
+        memcpy(&data[2].b[0], &data[0].b[0], info[2].stride);
+      }
+    } while (advanceLoop(&info[0], &data[0]),
+             advanceLoop(&info[1], &data[1]),
+             advanceLoop(&info[2], &data[2]) < info[0].rndim);
   }
+  return iq;
 }
+/*------------------------------------------------------------------------- */
+// <y> = setnan(<x>, <mask>)
+//
+// returns a copy of <x> with all elements for which the <mask> is
+// non-zero set equal to NaN.  If <x> is of an integer type, then the
+// copy is promoted to type FLOAT.
+int32_t lux_setnan(int32_t narg, int32_t ps[])
+{
+  StandardArguments standard_args;
+  int32_t iq;
+  Pointer* data;
+  loopInfo* info;
+
+  if ((iq = standard_args.set(narg, ps, "i^*;i&;r>F^&", &data, &info)) < 0)
+    return iq;
+
+  size_t nelem = info[0].nelem;
+  while (nelem--) {
+    bool mask;
+    switch (info[1].type) {
+    case LUX_INT8:
+      mask = *data[1].b != 0;
+      break;
+    case LUX_INT16:
+      mask = *data[1].w != 0;
+      break;
+    case LUX_INT32:
+      mask = *data[1].l != 0;
+      break;
+    case LUX_INT64:
+      mask = *data[1].q != 0;
+      break;
+    case LUX_FLOAT:
+      mask = *data[1].f != 0;
+      break;
+    case LUX_DOUBLE:
+      mask = *data[1].d != 0;
+      break;
+    }
+    data[1].b += info[1].stride;
+    Scalar value;
+    if (mask) {
+      switch (info[2].type) {   // is at least FLOAT
+      case LUX_FLOAT:
+        value.f = -sqrt(-1);    // NaN
+        break;
+      case LUX_DOUBLE:
+        value.d = -sqrt(-1);    // NaN
+        break;
+      }
+    } else {
+      switch (info[0].type) {   // is at least FLOAT
+      case LUX_FLOAT:
+        value.f = *data[0].f;
+        break;
+      case LUX_DOUBLE:
+        value.d = *data[0].d;
+        break;
+      }
+    }
+    data[0].b += info[0].stride;
+    switch (info[2].type) {
+    case LUX_FLOAT:
+      *data[2].f++ = value.f;
+      break;
+    case LUX_DOUBLE:
+      *data[2].d++ = value.d;
+      break;
+    }
+  }
+  return iq;
+}
+REGISTER(setnan, f, setnan, 2, 2, NULL);
 /*------------------------------------------------------------------------- */
 int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 /* fills array elements with their element index or with the value of

@@ -1125,6 +1125,7 @@ Internal Functions and Subroutines
 * setenv::                      Set an environment variable
 * setfg::                       Set the foreground color
 * setforeground::               Set the foreground color
+* setnan::                      Markk values as Not-a-Number
 * sgn::                         The signum function: the sign of data
 * shift::                       Circular integer shift of an array
 * shift3::                      Bicubic interpolation shift of an array
@@ -12386,6 +12387,7 @@ arguments.
 * setenv::                      Set an environment variable
 * setfg::                       Set the foreground color
 * setforeground::               Set the foreground color
+* setnan::                      Mark values as Not-a-Number
 * sgn::                         The signum function: the sign of data
 * shift::                       Circular integer shift of an array
 * shift3::                      Bicubic interpolation shift of an array
@@ -25482,7 +25484,7 @@ Alias: @ref{setforeground}
 See also: @ref{setbackground}, @ref{Incidental Colors}
 
 @c -------------------------------------
-@node setforeground, sgn, setfg, Internal Routines
+@node setforeground, setnan, setfg, Internal Routines
 @subsection setforeground
 @findex setforeground
 
@@ -25499,7 +25501,18 @@ Alias: @ref{setfg}
 See also: @ref{setbackground}, @ref{Incidental Colors}
 
 @c -------------------------------------
-@node sgn, shift, setforeground, Internal Routines
+@node setnan, sgn, setforeground, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection setnan
+@findex setnan
+
+@code{setnan(@var{x}, @var{mask})}
+
+Returns a copy of @code{@var{x}} in which those elements are set equal
+to NaN (not a number) for which @code{@var{mask}} is not zero.
+
+@c -------------------------------------
+@node sgn, shift, setnan, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection sgn
 @findex sgn
@@ -30039,13 +30052,16 @@ See also: @ref{delete}, @ref{pointer}
 
 @code{zero, @var{var1} [, @var{var2}, @dots{}]}
 
-@code{zero(@var{var})}
+@code{zero(@var{var} [, @code{@var{mask}}])}
 
 The subroutine form fills the specified variables with zeroes.  The
-function form returns a zeroed copy of @code{@var{var}}.  Scalars and
-arrays (both real and complex), strings, and file maps are supported for
-both the subroutine and function forms, except that file maps are not
-supported by the function form.
+function form returns a copy of @code{@var{var}} that is zeroed
+wherever @code{@var{mask}} is non-zero, or everywhere if no
+@code{@var{mask}} is specified.
+
+The subroutine processes scalars and arrays (both real and complex),
+strings, and file maps.  The function processes numerical scalars and
+arrays.
 
 @c -------------------------------------
 @node zeroifnotdefined, zeronans, zero, Internal Routines

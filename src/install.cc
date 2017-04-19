@@ -1288,7 +1288,7 @@ internalRoutine function_table[] = {
   { "xtwindow",	1, 1, lux_xtwindow, 0 }, /* motif.c */
 #endif
 #endif
-  { "zero", 	1, 1, lux_zerof, "*" }, /* fun1.c */
+  { "zero", 	1, 2, lux_zerof, "*" }, /* fun1.c */
   { "zeronans",	1, 2, lux_zapnan_f, "*%1%value" }, /* fun1.c */
   { "zinv",	1, 1, lux_zinv, "*" }, /* strous.c */
 };

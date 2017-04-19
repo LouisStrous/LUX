@@ -20711,11 +20711,21 @@ See also: @ref{jpegread}, @ref{fcwrite}, @ref{fzwrite}, @ref{gifwrite}
 @subsection kepler
 @findex kepler
 
-@code{@var{nu} = kepler(@var{m}, @var{e})}
+@code{@var{out} = kepler(@var{in}, @var{e} [, /meananomaly,
+/perifocalanomaly] [, /trueanomaly, /eccentricanomaly, /tau]}
 
-Solves Kepler's equation to return the true anomaly @code{@var{nu}}
-given the mean anomaly @code{@var{m}} and eccentricity @code{@var{e}},
-which may have any values.
+Solves Kepler's equation.  @code{@var{e}} is the eccentricity of the
+orbit.  @code{@var{in}} is the input quantity, which is the mean
+anomaly by default or when @code{/meananomaly} is specified, or is the
+perifocal anomaly when @code{/perifocalanomaly} is specified.  The
+perifocal anomaly is similar to the mean anomaly, but is based on the
+perifocal distance instead of the length of the semimajor axis of the
+orbit.
+
+The returned value is the true anomaly by default or when
+@code{/trueanomaly} is specified, or is the eccentric anomaly when
+@code{/eccentricanomaly} is specified, or is the tangent of half of
+the true anomaly when @code{/tau} is specified.
 
 @c -------------------------------------
 @node ksmooth, le, kepler, Internal Routines

@@ -72,6 +72,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    since 0 UT on 1 January 1970.
 */
 
+#include <limits>
+
 #include <assert.h>
 #include <ctype.h>
 #include <float.h>
@@ -3258,136 +3260,22 @@ void kepler(double m, double e, double v_factor, double *v, double *rf)
 /*--------------------------------------------------------------------------*/
 /** \brief Solves Kepler's equation.
 
-    \param[in] M - the mean anomaly, in radians.  Its value is unrestricted.
-    \param[in] e - the eccentricity.  Its value is unrestricted.
-    \return the eccentric anomaly, in radians.
+    \param[in] M is the mean (if (internalMode & 1) == 0) or perifocal
+    anomaly (if (internalMode & 1) == 1), in radians.  Its value is
+    unrestricted.
+
+    \param[in] e is the eccentricity.  Its value is unrestricted.
+
+    \return the true (if (internalMode & 6) == 0) or eccentric (if
+    (internalMode & 6) == 2) anomaly, in radians, or the tangent of
+    half of the true anomaly (if (internalMode & 6 == 4)).
 
     Kepler's equation is <tt>E = M + e*sin(E)</tt>, which we need to
     solve for \c E, given \c M and \c e.
 
-    The solution is found through iteration.  Each iteration yields a
-    correction to the previous one.  When the magnitude of the double
-    precision correction is less than \c FLT_EPSILON and no longer
-    decreases, then the solution is assumed to have been found.
-
-    The number of needed iterations and the needed CPU time depend on
-    the initial estimate.  I've tested several algorithms for the
-    initial estimate of the eccentric anomaly \c E for the elliptical
-    case (|\p e| < 1):
-
-    1. <tt>E = M</tt>
-    2. <tt>E = π</tt>
-    3. <tt>E = M + e*(1 + ½e²)*√M*√(2π - M)/(2√π)</tt>
-    4. <tt>E = M + e*(1 + ⅕e²)*√M*√(2π - M)/(2√π)</tt>
-    5. <tt>E = M (|M-π|≤eπ) ∨ E = π (|M-π|>eπ)</tt>
-
-    The 3rd through 5th algorithms were devised by Louis Strous.  In
-    all of these cases, the mean anomaly \c M is first reduced to the
-    interval from 0 to 2π.
-
-    I determined the CPU time taken by 1 million calls of this
-    function (limited to calculating the eccentric anomaly only), with
-    each of the algorithms for the initial estimate, for all
-    eccentricities \p e from 0 to 0.99 in steps of 0.01, and for all
-    mean anomalies \p M from 0 to 1.98π in steps of 0.02π.
-
-    Once the eccentric anomaly \c E has been found, then the residual
-    error can be calculated from
-
-    <tt>Δ = E - e*sin(E) - M</tt>
-
-    These residuals were visually indistinguishable from each other
-    for all five algorithms.  Their maximum magnitude was 1.8e-10 in
-    these tests.
-
-    The minimum, maximum, average, and standard deviation of the CPU
-    time (in ns) per call of this function were, for the various
-    algorithms:
-
-    Alg.   Min   Max  Mean  Median St.Dev.
-    1 (M)   60 42323   478    451   656
-    2 (π)   27  2034   416    395   115
-    3 (S½)  72   923   415    398    95
-    4 (S⅕)  74   984   416    402    92
-    5 (1∨2) 24  1056   391    372   117
-
-    The CPU time was usually especially low or high for <tt>M mod ½π =
-    0</tt> and/or for <tt>e = 0</tt>.  The statistics excluding those
-    cases were:
-
-    Alg.   Min   Max  Mean  Median St.Dev.
-    1 (M)  158 42323   476    450   667
-    2 (π)  189  1172   423    397   101
-    3 (S½) 189   923   420    399    84
-    4 (S⅕) 191   984   421    402    80
-    5 (1∨2)157   879   396    373    96
-
-    Algorithm 1 performs worst for \c e just below 1 and <tt>M</tt>
-    near 0 and 2π.
-
-    Algorithm 2 performs worst for \c e just below 1 and <tt>M =
-    0</tt>, and for <tt>|M - ½πe| = 0</tt>.
-
-    Algorithms 3 - 5 have no regions of <tt>e</tt>-<tt>M</tt> space
-    where they perform particularly bad.
-
-    I've chosen to use algorithm 5, which gave the lowest average and
-    median CPU times in these tests.
-
-*/
-double kepler_v(double M, double e)
-{
-  double	E, de, p, f;
-  static double prev_e = 0, prev_f = 1;
-
-  e = fabs(e);
-  if (e == prev_e) {
-    f = prev_f;
-  } else {
-    f = sqrt(abs((1+e)/(1-e)));
-    prev_f = f;
-    prev_e = e;
-  }
-  if (e < 1) {     /* elliptical orbit */
-    M = fmod(M, TWOPI);        /* between -π and +π */
-    double l = e*M_PI;
-    double d = M - M_PI;
-    if (d > l || d < -l)
-      E = M;
-    else
-      E = M_PI;
-    double prev_fde, fde;
-    fde = 2*M_PI;
-    do {
-      p = 1 - e*cos(E);
-      prev_fde = fde;
-      de = (M + e*sin(E) - E)/p;
-      E += de;
-      fde = fabs(de);
-    } while (fde && (fde < prev_fde || fde > FLT_EPSILON));
-    return 2*atan(f*tan(E/2));  /* true anomaly */
-  } else if (fabs(e) > 1) {	/* hyperbolic orbit */
-    E = M/e;
-    do {
-      p = E;
-      E = asinh((M + E)/e);
-    } while (E != p);
-    return 2*atan(f*tanh(E/2));
-  } else {			/* parabolic orbit */
-    E = M/2;
-    e = cbrt(E + sqrt(E*E + 1));
-    p = e - 1.0/e;
-    return 2*atan(p);
-  }
-}
-BIND(kepler_v, d_dd_iDaDbrDq_01_2, f, kepler, 2, 2, NULL);
-/*--------------------------------------------------------------------------*/
-/** \brief Solves Kepler's equation
-
-    \param[in] Mq - the perifocal anomaly, in radians.  Its value is
-                    unrestricted.
-    \param[in] e - the eccentricity.  Its value is unrestricted
-    \return tan(nu/2) where nu is the true anomaly.
+    The solution is found through iteration (except when e == 1).
+    Each iteration yields a correction to the previous one, until the
+    relative precision cannot improve anymore.
 
     The perifocal anomaly is the mean anomaly in the circular orbit
     that touches the real orbit in its perifocus.
@@ -3411,294 +3299,110 @@ BIND(kepler_v, d_dd_iDaDbrDq_01_2, f, kepler, 2, 2, NULL);
     perifocus hardly depends on the eccentricity.  This fits well with
     the observation that it is difficult to tell elliptical and
     hyperbolic near-parabolic orbits apart.
- */
-double kepler_q(double Mq, double e)
-{
-  double f, delta32, delta;
-  static double prev_e = 0, prev_f = 1, prev_delta32 = 1, prev_delta = 1;
-  int begin_approx_ID = (internalMode & 15);
-  int requested_return_ID = internalMode/16;
 
+*/
+double kepler_v(double M, double e)
+{
+  double	E, de, p, f;
+  static double prev_e = 0, prev_f = 1;
+
+  if (isnan(M) || isnan(e))
+    return M;
   e = fabs(e);
+  if (e == 0) {                 // circular orbit
+    // then mean anomaly = perifocal anomaly = eccentric anomaly = true anomaly
+    if ((internalMode & 6) == 4) // output is tau (tangent of half of
+                                 // true anomaly)
+      return tan(M/2);
+    else                        // output is true or eccentric anomaly
+      return fasmod(M, TWOPI);
+  } else if (e == 1) {          // parabolic orbit
+    // for parabolic orbits, mean anomaly and eccentric anomaly are
+    // not defined.
+    if ((internalMode & 1) == 0 // input is mean anomaly
+        || (internalMode & 6) == 2) // output is eccentric anomaly
+      return std::numeric_limits<double>::quiet_NaN(); // cannot compute
+    else {
+      // if we get here then the input is perifocal anomaly and the
+      // requested output is true anomaly or tau (= tangent of half of
+      // the true anomaly)
+      double W = sqrt(9./8.)*M;
+      double u = cbrt(W + sqrt(W*W + 1));
+      double tau = u - 1/u;
+      if (internalMode & 4)     // output is tau
+        return tau;
+      else                      // output is true anomaly
+        return 2*atan(tau);
+    }
+  }
+  // if we get here then we're calculating for a non-parabolic orbit
   if (e == prev_e) {
     f = prev_f;
-    delta32 = prev_delta32;
-    delta = prev_delta;
   } else {
-    if (e != 1) {
-      delta = fabs(1 - e);
-      f = sqrt((1 + e)/delta);
-      delta32 = pow(delta, 1.5);
-      prev_f = f;
-      prev_delta32 = delta32;
-      prev_delta = delta;
-    } /* else f, delta32,delta are not used so their value is immaterial */
+    f = sqrt(fabs((1+e)/(1-e)));
+    prev_f = f;
     prev_e = e;
   }
-  if (e < 1) {     /* elliptical orbit */
-    /* M = √(γ/a³) = √(γ(1-e)³/q³) = (1-e)^(3/2) Mq */
-    double M = delta32*Mq;
-    M = fmod(M, TWOPI);        /* between 0 and +2π */
-    double E;
-    switch (begin_approx_ID) {
-    case 1:                     /* for small Mq */
-      E = M/delta;
-      break;
-    case 2:                     /* for medium Mq, for near-parabolic orbit */
-      E = cbrt(6*M);
-      break;
-    case 3:                     /* for large Mq */
-      E = copysign(log1p(2*fabs(M)/e), M);
-      break;
-    case 4:                     /* parabolic approximation */
-      {
-        Mq = M/delta32;
-        double W = 0.75*M_SQRT2*Mq;
-        double u = cbrt(W + sqrt(W*W + 1));
-        double t = u - 1.0/u;   /* estimate for tan ½ν */
-        E = 2*atan(t/f);        /* f*tan(½E) = tan(½ν) */
-      }
-      break;
-    case 5:                    /* near-parabolic approximation */
-      {
-        Mq = M/delta32;
-        Mq *= (1 - delta/4);
-        double W = 0.75*M_SQRT2*Mq;
-        double u = cbrt(W + sqrt(W*W + 1));
-        double t = u - 1.0/u;
-        E = 2*atan(t/f);
-      }
-      break;
-    case 6:                     /* first-order approximation, for small e */
-      E = M + e*sin(M);
-      break;
-    case 7:                     /* zeroth-order approximation, for small e */
-      E = M;
-      break;
-    case 8:                     /* Louis Strous suggestion */
-      E = M + e*(1 + e*e*0.5)*sqrt(M)*sqrt(TWOPI - M)*M_2_SQRTPI/4;
-      break;
-    case 9:                     /* Louis Strous suggestion */
-      E = M + e*(1 + e*e*0.2)*sqrt(M)*sqrt(TWOPI - M)*M_2_SQRTPI/4;
-      break;
-    case 10:
-      // invented by LS
-      {
-        if (e == 0) {
-          E = M;
-        } else {
-          double ze = 1/e;
-          double W = 3*Mq*ze;
-          double u = cbrt(W + sqrt(W*W + 8*ze*ze*ze));
-          double t = u - 2/(e*u);
-          E = sqrt(delta)*t;
-        }
-      }
-      break;
-    default:
-      {
-        double s1 = M/delta;
-        double s2 = cbrt(6*M);
-        if (fabs(s1) < fabs(s2))
-          E = s1;
-        else
-          E = s2;
-      }
-      break;
+  double srd = sqrt(fabs(1-e));
+  double isrd = 1/srd;
+
+  double Mq;                    // perifocal anomaly
+  if (internalMode & 1) {       // input is perifocal anomaly
+    Mq = M;
+    M *= srd*srd*srd;           // from perifocal to mean anomaly
+  }                             // otherwise the input is mean anomaly
+  if (e < 1) {                  // elliptical orbit
+    M = fasmod(M, TWOPI);       // between -π and +π
+  }
+  Mq = M*isrd*isrd*isrd;
+
+  // calculate initial estimate based on small anomaly
+  double P = 2/e;
+  double Q = 3*Mq/e;
+  double u = cbrt(Q + sqrt(Q*Q + P*P*P));
+  double Eq = u - P/u;
+  E = Eq*srd;
+
+  if (e > 1) {                  // hyperbolic orbit
+    double Eh = asinh(M/e); // initial estimate based on large anomaly
+    if (fabs(Eh) < 0.53*fabs(e*sinh(E) - E - M))
+      E = Eh;
+    // otherwise we use the initial estimate based on small anomaly
+  }
+
+  double dE, B;
+  do {
+    double s, c, d;
+    if (e < 1) {                  // elliptic orbit
+      sincos(E, &s, &c);
+      s *= e;                     // e sin(E)
+      c = 1 - e*c;                // 1 - e cos(E)
+      d = E - s - M;
+    } else {                      // hyperbolic orbit
+      s = e*sinh(E);              // e sinh(E)
+      c = e*cosh(E) - 1;          // e cosh(E) - 1
+      d = s - E - M;
     }
-    double prev_ad;
-    double ad = HUGE_VAL;
-    double count = 0;
-    double prev_d;
-    double d = HUGE_VAL;
-    double prev_run_sdev;
-    double run_sdev = HUGE_VAL;
-    double chaos_count = 0;
-    double prev_aE = HUGE_VAL;
-    do {
-      double p = 1 - e*cos(E);
-      prev_ad = ad;
-      prev_d = d;
-      prev_run_sdev = run_sdev;
-      prev_aE = fabs(E);
-      d = (M + e*sin(E) - E)/p;
-      E += d;
-      run_sdev = prev_d*prev_d + prev_d*d + d*d;
-      if (run_sdev > prev_run_sdev)
-        ++chaos_count;
-      ++count;
-      ad = fabs(d);
-      /* Stop if the correction == 0.  Stop if the correction exceeds
-         the previous correction in magnitude and is smaller than
-         1e-7*E.  Stop if the correction exceeds the previous correction
-         in magnitude and we've had more than 10 iterations.
-         Otherwise continue.  Stop if
-         ad == 0 ∨ (ad ≥ prev_ad && ad ≤ 1e-7) ∨ (ad ≥ prev_ad && count ≥ 10)
-         I.e., stop if
-         ad == 0 ∨ (ad ≥ prev_ad ∧ (ad ≤ 1e-7 ∨ count ≥ 10))
-         I.e., continue if
-         (ad != 0 ∧ (ad < prev_ad ∨ (ad > 1e-7 ∧ count < 10)))
-         */
-    } while (ad && (ad < prev_ad || (ad > 1e-7 && count < 10)));
-    if (ad >= 1e-7*prev_aE && count >= 10 && ad)  /* unable to solve */
-      switch (requested_return_ID) {
-      case 0:                   /* value */
-        return NAN;
-      case 1:                   /* count */
-        return INFTY;
-      case 2:                   /* chaos count */
-        return chaos_count;
-      default:                  /* E */
-        return NAN;
-      }
+    B = fabs(2*std::numeric_limits<double>::epsilon()*E*c/s);
+    dE = d/c;
+    E -= dE;
+  } while (dE*dE >= B);
+
+  if (internalMode & 2)
+    return E;                   // output is eccentric anomaly
+  else {
+    double tau;
+    if (e > 1)
+      tau = f*tanh(E/2);
     else
-      switch (requested_return_ID) {
-      case 0:                   /* value */
-        return f*tan(E/2);
-      case 1:                   /* count */
-        return count;
-      case 2:                   /* chaos count */
-        return chaos_count;
-      default:                  /* E */
-        return E;
-      }
-  } else if (e > 1) {	/* hyperbolic orbit */;
-    /* M = √(γ/|a|³) = √(γ(e-1)³/q³) = (e-1)^(3/2) Mq */
-    /* ∆H = (e sinh H - H - M)/(1 - e cosh H)
-       = (M + H - e sinh H)/(e cosh H - 1)
-       = ((M + H)/(e cosh H) - tanh H)/(1 - 1/(e cosh H)) */
-    double M = delta32*Mq;
-    double H;
-    switch (begin_approx_ID) {
-    case 1:                     /* for small Mq */
-      H = M/delta;
-      break;
-    case 2:                     /* for medium Mq, near parabolic */
-      H = cbrt(6*M);
-      break;
-    case 3:                     /* for large Mq */
-      H = copysign(log1p(2*fabs(M)/e), M);
-      break;
-    case 4:                     /* parabolic approximation */
-      {
-        double l = 4/(3*delta32);
-        if (fabs(Mq) > fabs(l))
-          Mq = l;
-        double W = 0.75*M_SQRT2*Mq;
-        double u = cbrt(W + sqrt(W*W + 1));
-        double t = u - 1.0/u;   /* tan ½ν */
-        /* for a hyperbola, |tan ½ν| cannot exceed f */
-        t /= f;
-        if (fabs(t) >= 1)
-          t = copysign(1 - DBL_EPSILON, t); /* so H is not ±∞ */
-        H = 2*atanh(t);
-      }
-      break;
-    case 5:                     /* near-parabolic approximation */
-      {
-        Mq *= (1 + delta/4);
-        double l = 4/(3*delta32);
-        if (fabs(Mq) > fabs(l))
-          Mq = l;
-        double W = 0.75*M_SQRT2*Mq;
-        double u = cbrt(W + sqrt(W*W + 1));
-        double t = u - 1.0/u;   /* tan ½ν */
-        /* for a hyperbola, |tan ½ν| cannot exceed f */
-        t /= f;
-        if (fabs(t) >= 1)
-          t = copysign(1 - DBL_EPSILON, t); /* so H is not ±∞ */
-        H = 2*atanh(t);
-      }
-      break;
-    case 6:
-      H = asinh((M + M/delta)/e);   /* first-order approximation */
-      break;
-    case 10:
-      // invented by LS
-      {
-        if (e == 0) {
-          H = M;
-        } else {
-          double ze = 1/e;
-          double W = 3*Mq*ze;
-          double u = cbrt(W + sqrt(W*W + 8*ze*ze*ze));
-          double t = u - 2/(e*u);
-          H = sqrt(delta)*t;
-        }
-      }
-      break;
-    default:
-      if (fabs(M) < 3*e) {
-        double s1 = M/delta;
-        double s2 = cbrt(6*M);
-        if (fabs(s1) < fabs(s2))
-          H = s1;
-        else
-          H = s2;
-      } else {
-        H = copysign(log1p(2*fabs(M)/e), M);
-      }
-      break;
-    }
-    double prev_ad;
-    double ad = HUGE_VAL;
-    double count = 0;
-    double prev_d;
-    double d = HUGE_VAL;
-    double prev_run_sdev;
-    double run_sdev = HUGE_VAL;
-    double prev_aH = HUGE_VAL;
-    double chaos_count = 0;
-    do {
-      double p = (M + H)/e;
-      prev_ad = ad;
-      prev_d = d;
-      prev_aH = fabs(H);
-      prev_run_sdev = run_sdev;
-      d = (asinh(p) - H)/(1 - 1/(e*sqrt(1 + p*p)));
-      H += d;
-      run_sdev = prev_d*prev_d + prev_d*d + d*d;
-      if (run_sdev > prev_run_sdev)
-        ++chaos_count;
-      ++count;
-      ad = fabs(d);
-    } while (ad && (ad < prev_ad || (ad > 1e-7 && count < 10)));
-    if (ad >= 1e-7*prev_aH && count >= 10 && ad) /* unable to solve */
-      switch (requested_return_ID) {
-      case 0:                   /* value */
-        return NAN;
-      case 1:                   /* count */
-        return INFTY;
-      case 2:                   /* chaos count */
-        return chaos_count;
-      default:                  /* H */
-        return NAN;
-      }
+      tau = f*tan(E/2);
+    if (internalMode & 4)       // output is tau
+      return tau;
     else
-      switch (requested_return_ID) {
-      case 0:                   /* value */
-        return f*tanh(H/2);
-      case 1:                   /* count */
-        return count;
-      case 2:                   /* chaos count */
-        return chaos_count;
-      case 3:                   /* H */
-        return H;
-      }
-  } else {			/* parabolic orbit */
-    double W = 0.75*M_SQRT2*Mq;
-    double u = cbrt(W + sqrt(W*W + 1));
-    switch (requested_return_ID) {
-    case 0:                     /* value */
-      return u - 1.0/u;
-    case 1:                     /* count */
-      return 1;
-    default:                    /* chaos_count, E */
-      return 0;
-    }
+      return 2*atan(tau);       // output is true anomaly
   }
 }
-BIND(kepler_q, d_dd_iDaDbrDq_01_2, f, keplerq, 2, 2, "");
+BIND(kepler_v, d_dd_iDaDbrDq_01_2, f, kepler, 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau");
 /*--------------------------------------------------------------------------*/
 double interpolate_angle(double a1, double a2, double f)
      /* interpolates between angles <a1> and <a2> (measured in

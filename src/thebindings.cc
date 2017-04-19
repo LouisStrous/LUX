@@ -1304,14 +1304,6 @@ int32_t lux_kepler_v_f(int32_t narg, int32_t ps[]) {
   return result;
 }
 
-int32_t lux_kepler_q_f(int32_t narg, int32_t ps[]) {
-  double kepler_q(double, double);
-  int32_t result = lux_d_dd_iDaDbrDq_01_2_f_(narg, ps, kepler_q);
-  if (result < 0)
-    luxerror("Error in keplerq", 0);
-  return result;
-}
-
 int32_t lux_runord_d_f(int32_t narg, int32_t ps[]) {
   int32_t runord_d(double *, int32_t, int32_t, int32_t, double *);
   int32_t result = lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(narg, ps, runord_d);
@@ -1699,9 +1691,7 @@ void register_the_bindings()
 
   register_lux_f(lux_esmooth_symmetric_f, "esmooth2", 1, 2, NULL);
 
-  register_lux_f(lux_kepler_v_f, "kepler", 2, 2, NULL);
-
-  register_lux_f(lux_kepler_q_f, "keplerq", 2, 2, "");
+  register_lux_f(lux_kepler_v_f, "kepler", 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau");
 
   register_lux_f(lux_runord_d_f, "runord", 3, 3, NULL);
 

@@ -23,6 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <limits>
 #include <sys/types.h>
 #include <malloc.h>
 #include <stdio.h>
@@ -2604,20 +2605,30 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
       break;
     case LUX_FLOAT:
       do {
-	/* take first value as initial values */
-	memcpy(&min, src.f, srcinfo.stride);
-	memcpy(&max, src.f, srcinfo.stride);
+        min.f = std::numeric_limits<float>::infinity();
+        max.f = -std::numeric_limits<float>::infinity();
 	minloc = maxloc = src.f - (float *) srcinfo.data0;
 	do {
 	  if (*src.f > max.f) {
 	    max.f = *src.f;
 	    maxloc = src.f - (float *) srcinfo.data0;
-	  } else if (*src.f < min.f) {
+	  }
+          if (*src.f < min.f) {
 	    min.f = *src.f;
 	    minloc = src.f - (float *) srcinfo.data0;
 	  }
 	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
-	switch (code) {
+        if (max.f < min.f) {    // all values were NaNs
+          switch (code) {
+          case 0: case 1:
+            *trgt.f++ = std::numeric_limits<float>::quiet_NaN();
+            break;
+          case 2: case 3:
+            *trgt.l++ = -1;
+            break;
+          }
+        } else {
+          switch (code) {
 	  case 0:		/* max value */
 	    *trgt.f++ = max.f;
 	    break;
@@ -2630,25 +2641,36 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
 	  case 3:		/* min location */
 	    *trgt.l++ = minloc;
 	    break;
-	}
+          }
+        }
       } while (n < srcinfo.rndim);
       break;
     case LUX_DOUBLE:
       do {
-	/* take first value as initial values */
-	memcpy(&min, src.d, srcinfo.stride);
-	memcpy(&max, src.d, srcinfo.stride);
+        min.d = std::numeric_limits<double>::infinity();
+        max.d = -std::numeric_limits<double>::infinity();
 	minloc = maxloc = src.d - (double *) srcinfo.data0;
 	do {
 	  if (*src.d > max.d) {
 	    max.d = *src.d;
 	    maxloc = src.d - (double *) srcinfo.data0;
-	  } else if (*src.d < min.d) {
+          }
+          if (*src.d < min.d) {
 	    min.d = *src.d;
 	    minloc = src.d - (double *) srcinfo.data0;
 	  }
 	} while ((n = advanceLoop(&srcinfo, &src)) < n1);
-	switch (code) {
+        if (max.d < min.d) {    // all values were NaNs
+          switch (code) {
+          case 0: case 1:
+            *trgt.d++ = std::numeric_limits<double>::quiet_NaN();
+            break;
+          case 2: case 3:
+            *trgt.l++ = -1;
+            break;
+          }
+        } else {
+          switch (code) {
 	  case 0:		/* max value */
 	    *trgt.d++ = max.d;
 	    break;
@@ -2661,7 +2683,8 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
 	  case 3:		/* min location */
 	    *trgt.l++ = minloc;
 	    break;
-	}
+          }
+        }
       } while (n < srcinfo.rndim);
       break;
     case LUX_CFLOAT:

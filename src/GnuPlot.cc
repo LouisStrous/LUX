@@ -29,34 +29,64 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>             // for cout
 #include <sstream>              // for ostringstream
 #include <string>
+#include <vector>
 
 GnuPlot::GnuPlot()
+  : m_datablock_count(0)
 {
   m_pipe = popen("gnuplot", "w");
   if (!m_pipe)
     luxerror("Unable to start 'gnuplot'", 0);
+  m_verbosity = 0;
 }
 
 GnuPlot::~GnuPlot()
 {
+  if (m_verbosity > 0) {
+    puts("Closing gnuplot");
+  }
   if (m_pipe) {
     pclose(m_pipe);
+    m_pipe = 0;
   }
   data_remove();
+}
+
+GnuPlot&
+GnuPlot::operator=(const GnuPlot& src) {
+  m_pipe = src.m_pipe;
+  return *this;
+}
+
+int
+GnuPlot::set_verbosity(int value) {
+  int old = m_verbosity;
+  m_verbosity = value;
+  return old;
 }
 
 void
 GnuPlot::sendf(const char* format, ...)
 {
   if (m_pipe) {
-    va_list ap;
-
     char buf[1024];
+    va_list ap;
 
     va_start(ap, format);
     vsnprintf(buf, sizeof(buf), format, ap);
     va_end(ap);
-    printf("Sending to gnuplot: '%s'\n", strcmp(buf, "\n")? buf: "<newline>");
+    if (m_verbosity) {
+      size_t n = strlen(buf);
+      if (buf[n] == '\n') {
+        if (n == 1) {
+          puts("Sending to gnuplot: <newline>");
+        } else {
+          printf("Sending to gnuplot: X '%.*s'\n", n - 1, buf);
+        }
+      } else {
+        printf("Sending to gnuplot: '%s'\n", buf);
+      }
+    }
     fputs(buf, m_pipe);
   }
 }
@@ -65,11 +95,6 @@ void
 GnuPlot::write(void* data, size_t size)
 {
   if (m_pipe) {
-    unsigned char* datac = (unsigned char*) data;
-    printf("Sending %d bytes to gnuplot:\n", size);
-    for (int i = 0; i < size; ++i)
-      printf(" %02x", datac[i]);
-    putchar('\n');
     fwrite(data, 1, size, m_pipe);
   }
 }
@@ -77,7 +102,6 @@ GnuPlot::write(void* data, size_t size)
 void
 GnuPlot::flush()
 {
-  puts("Flushing pipe to gnuplot");
   fflush(m_pipe);
 }
 
@@ -102,7 +126,6 @@ GnuPlot::data_remove()
   if (!m_data_file_name.empty()) {
     if (m_data_ofstream.is_open())
       m_data_ofstream.close();
-    std::cout << "Removing file " << m_data_file_name << std::endl;
     if (std::remove(m_data_file_name.c_str())) {
       std::cout << "Unable to delete file " << m_data_file_name << std::endl;
     }
@@ -151,4 +174,78 @@ GnuPlot::initialize_data_file(void)
     return true;
   } else
     return false;
+}
+
+void
+GnuPlot::remember_for_current_datablock(const char* format, ...)
+{
+  char buf[1024];
+  va_list ap;
+
+  uint32_t index = current_datablock_index();
+  if (index > 0) {
+    va_start(ap, format);
+    vsnprintf(buf, sizeof(buf), format, ap);
+    va_end(ap);
+    std::string text = std::string(buf);
+    while (m_datablock_plot_elements.size() < index)
+      m_datablock_plot_elements.push_back("");
+    m_datablock_plot_elements[index - 1] = text;
+  }
+}
+
+std::string
+GnuPlot::construct_plot_or_splot_command(std::string head) const
+{
+  std::ostringstream oss;
+
+  oss << head << " ";
+  bool first = true;
+  uint32_t index = 1;
+  for (auto it = m_datablock_plot_elements.cbegin();
+       it != m_datablock_plot_elements.cend(); ++it) {
+    if (!first) {
+      oss << ", ";
+    } else {
+      first = false;
+    }
+    oss << "$LUX" << index << " " << *it;
+    ++index;
+  }
+  return oss.str();
+}
+
+std::string
+GnuPlot::construct_plot_command() const
+{
+  return construct_plot_or_splot_command("plot");
+}
+
+std::string
+GnuPlot::construct_splot_command() const
+{
+  return construct_plot_or_splot_command("splot");
+}
+
+uint32_t
+GnuPlot::current_datablock_index() const
+{
+  return m_datablock_count;
+}
+
+uint32_t
+GnuPlot::next_available_datablock_index()
+{
+  return ++m_datablock_count;
+}
+
+void
+GnuPlot::discard_datablocks()
+{
+  if (m_pipe) {
+    while (m_datablock_count > 0) {
+      sendf("undefine %d;\n", m_datablock_count--);
+    }
+  }
+  m_datablock_plot_elements = DatablockBackendCollection();
 }

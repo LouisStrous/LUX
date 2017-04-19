@@ -30,6 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdint>              // for int32_t
 #include <fstream>              // for ofstream
 #include <string>
+#include <vector>
 
 /// A class that provides an interface for writing information to the
 /// external "gnuplot" program.  The interface is based on gnuplot
@@ -43,6 +44,9 @@ public:
   /// process started by the constructor.  Removes any remaining
   /// temporary data files.
   ~GnuPlot();
+
+  /// Assignment.
+  GnuPlot& operator=(const GnuPlot& src);
 
   /// Sends formatted information to the "gnuplot" program.  Don't
   /// forget to #flush when the command is complete.
@@ -85,9 +89,56 @@ public:
   /// \returns the corresponding gnuplot data type
   static char const* gnuplot_type(Symboltype lux_type);
 
+  /// Returns the next available datablock index.  The first returned
+  /// index is 1, and the index is incremented for each call.  It gets
+  /// reset by #discard_datablocks.
+  ///
+  /// The LUX \c gplot command uses datablocks with names equal to
+  /// '$LUX' followed by the datablock index.
+  uint32_t next_available_datablock_index();
+
+  /// Returns the current datablock index, or 0 if none has been
+  /// reserved yet through a call to #next_available_datablock_index
+  /// since the creation of this instance or since the last call to
+  /// #discard_datablocks.
+  uint32_t current_datablock_index() const;
+
+  /// Construct formatted text and remember the text for the current
+  /// datablock.
+  ///
+  /// \param format is a printf-style format string.
+  ///
+  /// \param ... represents any number of data values.  They get
+  /// formatted according to the format string.
+  void remember_for_current_datablock(const char* format, ...);
+
+  /// Construct a gnuplot 'plot' command based on the remembered data
+  /// blocks.
+  std::string construct_plot_command() const;
+
+  /// Construct a gnuplot 'splot' command for a line plot based on the
+  /// remembered data blocks.
+  std::string construct_splot_command() const;
+
+  /// Issues gnuplot commands to discard the remembered '$LUX'
+  /// datablocks, forgets the gnuplot commands associated with that
+  /// datablock, and resets the index.
+  void discard_datablocks();
+
+  /// Sets the verbosity level.  Currently only 0 and non-0 are
+  /// distinguished.
+  ///
+  /// \param value is the new verbosity level.
+  ///
+  /// \returns the previous verbosity level.
+  int set_verbosity(int value);
+
 private:
   /// Initialize a temporary data file, if needed.
   bool initialize_data_file(void);
+
+  /// Construct a plot or splot command.
+  std::string construct_plot_or_splot_command(std::string head) const;
 
   /// A file pointer for the pipe to the "gnuplot" program.
   FILE* m_pipe;
@@ -98,6 +149,16 @@ private:
   /// The name of the current temporary data file, or "" if there
   /// isn't one.
   std::string m_data_file_name;
+
+  /// The number of data blocks in use for gnuplot's 'plot' command.
+  uint32_t m_datablock_count;
+
+  /// The verbosity level
+  int m_verbosity;
+
+  typedef std::vector<std::string> DatablockBackendCollection;
+
+  DatablockBackendCollection m_datablock_plot_elements;
 };
 
 #endif

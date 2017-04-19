@@ -854,7 +854,7 @@ Internal Functions and Subroutines
 * gamma::                       Gamma function
 * gc2gd::                       Geodetic from geocentric coordinates
 * gc2gde::                      Geodetic from geocentric coordinates and ellipsoid
-* gcommand::
+* gcommand::                    Send a gnuplot command to gnuplot
 * gcontour::                    Contour plot via gnuplot
 * gd2gc::                       Geocentric from geodetic coordinates
 * gd2gce::                      Geocentric from geodetic coordinates and ellipsoid
@@ -873,6 +873,7 @@ Internal Functions and Subroutines
 * gmst00::                      Greenwich mean sidereal time, IAU 2000
 * gmst06::                      Greenwich mean sidereal time, IAU 2006
 * gmst82::                      Greenwich mean sidereal time, IAU 1982
+* goplot::                      Overplot via gnuplot
 * gplot::                       Plot via gnuplot
 * gplot3d::                     3D plot via gnuplot
 * gridmatch::                   Determine displacements between two images
@@ -883,7 +884,7 @@ Internal Functions and Subroutines
 * gst06a::                      Greenwich apparent sidereal time, IAU 2000/2006
 * gst94::                       Greenwich apparent sidereal time, IAU 1982/1994
 * gt::                          Greater-than
-* gtv::
+* gtv::                         Display an image via gnuplot
 * h2fk5::                       Hipparcos to FK5 J2000.0 star positions
 * hairs::                       User-selected position
 * help::                        Help
@@ -4788,7 +4789,7 @@ yields @code{'file-second-007'}.  The two arguments @code{'second'} and
 @code{7} must be enclosed in curly braces.
 
 @c ------------------------------------------------------------------
-@node Multiple Subscripts,  , Lists of Subscripts, Subscripts
+@node Multiple Subscripts, Fractional Subscripts, Lists of Subscripts, Subscripts
 @comment  node-name,  next,  previous,  up
 @subsubsection Multiple Subscripts
 
@@ -9231,7 +9232,7 @@ and also using the @code{help} command from inside LUX.
 @end enumerate
 
 @c ------------------------------------------------------------------
-@node Environment, gnu Free Documentation License, Installing LUX, Top
+@node Environment, History, Installing LUX, Top
 @comment  node-name,  next,  previous,  up
 @chapter The LUX Environment
 
@@ -12114,7 +12115,7 @@ arguments.
 * gamma::                       Gamma function
 * gc2gd::                       Geodetic from geocentric coordinates
 * gc2gde::                      Geodetic from geocentric coordinates and ellipsoid
-* gcommand::
+* gcommand::                    Send a gnuplot command to gnuplot
 * gcontour::                    Contour plot via gnuplot
 * gd2gc::                       Geocentric from geodetic coordinates
 * gd2gce::                      Geocentric from geodetic coordinates and ellipsoid
@@ -12133,6 +12134,7 @@ arguments.
 * gmst00::                      Greenwich mean sidereal time, IAU 2000
 * gmst06::                      Greenwich mean sidereal time, IAU 2006
 * gmst82::                      Greenwich mean sidereal time, IAU 1982
+* goplot::                      Overplot via gnuplot
 * gplot::                       Plot via gnuplot
 * gplot3d::                     3D plot via gnuplot
 * gridmatch::                   Determine displacements between two images
@@ -12143,7 +12145,7 @@ arguments.
 * gst06a::                      Greenwich apparent sidereal time, IAU 2000/2006
 * gst94::                       Greenwich apparent sidereal time, IAU 1982/1994
 * gt::                          Greater-than
-* gtv::
+* gtv::                         Display an image via gnuplot
 * h2fk5::                       Hipparcos to FK5 J2000.0 star positions
 * hairs::                       User-selected position
 * help::                        Help
@@ -19714,7 +19716,7 @@ dimensions, and the result has those same dimensions, too.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gmst82, gplot, gmst06, Internal Routines
+@node gmst82, goplot, gmst06, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gmst82
 @findex gmst82
@@ -19728,13 +19730,14 @@ The result has the same dimensions as @code{@var{jdut}}.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gplot, gplot3d, gmst82, Internal Routines
-@subsection gplot
-@findex gplot
+@node goplot, gplot, gmst82, Internal Routines
+@subsection goplot
+@findex goplot
 
-@code{gplot[,@var{x}],@var{y}}
+@code{goplot[,@var{x}],@var{y}[,dashtype=@var{dashtype},legend=@var{legend}]}
 
-Plots @code{@var{y}} versus @code{@var{x}} through the external
+Adds the graph of @code{@var{y}} versus @code{@var{x}} to the previous
+plot created using @code{gplot} or @code{goplot}, through the external
 "gnuplot" program, if that program is available.
 
 If only one of @code{@var{x}} and @code{@var{y}} are specified, then
@@ -19744,12 +19747,69 @@ specified, then they must have the same dimensional structure.  Then
 the x coordinates are taken from @code{@var{x}} and the y coordinates
 are taken from @code{@var{y}}.
 
+@code{@var{dashtype}} is a non-negative integer that selects the kind
+of dashes to use to draw the lines.
+
+@code{@var{legend}} specifies the text with which to identify the
+graph in the legend in the plot.
+
+@c -------------------------------------
+@node gplot, gplot3d, goplot, Internal Routines
+@subsection gplot
+@findex gplot
+
+@code{gplot[,@var{x}],@var{y}[,@var{z}]
+        [,dashtype=@var{dashtype}]
+        [,xtitle=@var{xtitle},ytitle=@var{ytitle},ztitle=@var{ztitle}]
+        [,title=@var{title}]
+        [,legend=@var{legend}]
+        [,/lii,/loi,/lio,/loo]
+        [,/liii,/loii,/lioi,/looi,/liio,/loio,/lioo,/looo]}
+
+Plots @code{@var{y}} versus @code{@var{x}}, or @code{@var{z}} versus
+@code{@var{x}} and @code{@var{y}} through the external "gnuplot"
+program, if that program is available.
+
+If only one of @code{@var{x}}, @code{@var{y}}, @code{@var{z}} are
+specified, then it is interpreted as @code{@var{y}} and provides the y
+coordinates of the data points to plot, with default x coordinates.
+If @code{@var{x}} and @code{@var{y}} are specified, then they must
+have the same dimensional structure.  Then the x coordinates are taken
+from @code{@var{x}} and the y coordinates are taken from
+@code{@var{y}}.  If @code{@var{x}}, @code{@var{y}}, and @code{@var{z}}
+are specified, then all three must have the same dimensional structure
+and provide the x, y, and z coordinates of the points to plot.
+
+@code{@var{dashtype}} is a non-negative integer that selects the kind
+of dashes to use to draw the lines.
+
+@code{@var{xtitle}} provides the title for the x axis.
+
+@code{@var{ytitle}} provides the title for the y axis.
+
+@code{@var{ztitle}} provides the title for the y axis.
+
+@code{@var{title}} provides the main title, displayed above the plot.
+
+@code{@var{legend}} specifies the text with which to identify the
+graph in the legend in the plot.
+
+Mode parameters @code{/lii /loi /lio /loo} specify whether the x and y
+axes are linear (@code{i}) or logarithmic (@code{o}) for the x (first
+@code{i} or @code{o}) and y (second @code{i} or @code{o}) axes.  Mode
+parameters @code{/liii /loii /lioi /looi /liio /loio /lioo /looo}
+similarly specify for the x, y, and z axes.
+
 @c -------------------------------------
 @node gplot3d, gridmatch, gplot, Internal Routines
 @subsection gplot3d
 @findex gplot3d
 
-@code{gplot3d[, @code{@var{x}}, @code{@var{y}}], @code{@var{z}}}
+@code{gplot3d[, @code{@var{x}}, @code{@var{y}}], @code{@var{z}}
+  [,xtitle=@var{xtitle},ytitle=@var{ytitle},ztitle=@var{ztitle},title=@var{title}]
+  [,rotx=@var{rotx},roty=@var{roty}]
+  [,contours=@var{contours}][,/flat]
+  [,/lii,/lio,/loi,/loo]}
 
 Displays a 3D plot of 2D data set @code{@var{z}} via the gnuplot
 program.
@@ -19759,6 +19819,35 @@ the x and y coordinates for the columns and rows of @code{@var{z}}.
 They must be 1D data sets, with @code{@var{x}} having as many elements
 as the first dimension of @code{@var{z}}, and @code{@var{y}} having as
 many elements as the second dimension of @code{@var{z}}.
+
+@code{@var{xtitle}} is the title for the x axis.
+
+@code{@var{ytitle}} is the title for the y axis.
+
+@code{@var{ztitle}} is the title for the z axis.
+
+@code{@var{title}} is the main title, displayed above the plot.
+
+@code{@var{rotx}} is the rotation angle (in degrees) around the x
+axis.
+
+@code{@var{rotz}} is the rotation angle (in degrees) around the z axis
+(after applying the rotation around the x axis, if any).
+
+@code{@var{contours}} specifies contour levels.  If
+@code{@var{contours}} is a scalar equal to integer 1 (e.g.,
+@code{/contours}), then it says to show automatically selected
+contours.  Otherwise, if @code{@var{contours}} is a real scalar, then
+it specifies the desired number of contours to display, but the levels
+are selected automatically.  Otherwise, if @code{@var{contours}} is an
+array, then it specifies the contour levels to use.
+
+@code{/flat} requests an orthographic view from above; i.e., a flat
+image.
+
+@code{/lii} requests linear x and y axes; @code{/loi} requests
+logarithmic x and linear y axes; @code{/lio} requests linear x and
+logarithmic y axes; @code{/loo} requests logarithmic x and y axes.
 
 @c -------------------------------------
 @node gridmatch, gsmooth, gplot3d, Internal Routines

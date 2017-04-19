@@ -1742,17 +1742,20 @@ void register_the_bindings()
   int32_t lux_randome(int32_t, int32_t []);
   register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
 
-  int32_t lux_gnuplot_command(int32_t, int32_t []);
-  register_lux_s(lux_gnuplot_command, "gcommand", 1, 1, NULL);
+  int32_t lux_gcommand(int32_t, int32_t []);
+  register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
 
-  int32_t lux_gnuplot(int32_t, int32_t []);
-  register_lux_s(lux_gnuplot, "gplot", 1, 2, NULL);
+  int32_t lux_gplot(int32_t, int32_t []);
+  register_lux_s(lux_gplot, "gplot", 1, 9, ":::style:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+
+  int32_t lux_goplot(int32_t, int32_t []);
+  register_lux_s(lux_goplot, "goplot", 1, 5, ":::style:legend");
 
   int32_t lux_gnutv(int32_t, int32_t []);
   register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);
 
   int32_t lux_gnuplot3d(int32_t, int32_t []);
-  register_lux_s(lux_gnuplot3d, "gplot3d", 1, 3, NULL);
+  register_lux_s(lux_gnuplot3d, "gplot3d", 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo");
 
   int32_t lux_gnucontour(int32_t, int32_t []);
   register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");

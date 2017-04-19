@@ -631,7 +631,7 @@ int32_t matchKey(int16_t index, char **keys, int32_t *var)
        return *var;
      }
      else if (l > 2 && !strncmp(key + 2, theKey, l - 2)
-	      && !strncmp(key, "NO", 2)) {
+	      && !strncmp(key, "no", 2)) {
        if (modeKey) {
          if (negate)
            internalMode |= theMode;
@@ -647,7 +647,7 @@ int32_t matchKey(int16_t index, char **keys, int32_t *var)
        indx++;
    }
  }
- if (!strcmp(key, "MODE")) 
+ if (!strcmp(key, "MODE"))
    return *var = MODEKEY;
  return *var = NOKEY;
 }

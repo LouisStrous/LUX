@@ -1910,8 +1910,6 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
   Symboltype common_type = LUX_NO_SYMBOLTYPE;
 
   for (int param_ix = 0; param_ix < num_param_specs; ++param_ix) {
-    if (param_ix >= narg)
-      break;
     param_spec* pspec = &param_specs[param_ix];
     if (pspec->common_type) {
       int32_t iq = ps[param_ix];
@@ -1927,7 +1925,7 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
               && type != pspec->data_type))
         type = pspec->data_type;
       if (common_type == LUX_NO_SYMBOLTYPE
-          || type < common_type)
+          || type > common_type)
         common_type = type;
     }
   }
@@ -2029,7 +2027,9 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     and further processing is based on that copy.  For output
     parameters, an array is created with the indicate type, unless ‘>’
     is specified and the reference parameter has a greater type, in
-    which case that type is used.
+    which case that type is used.  If no explicit type is specified
+    for an output parameter, then it gets the type of the reference
+    parameter.
 
     For the reference parameter \c ref-par:
     - If absent, then 0 is taken for it (i.e., the first parameter).
@@ -2369,7 +2369,8 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
         else if ((pspec->data_type_limit == PS_LOWER_LIMIT
                   && type < pspec->data_type)
                  || (pspec->data_type_limit == PS_EXACT
-                     && type != pspec->data_type))
+                     && type != pspec->data_type
+                     && pspec->data_type != LUX_NO_SYMBOLTYPE))
           type = pspec->data_type;
         iq = lux_convert(1, &iq, type, 1);
         break;
@@ -2445,9 +2446,6 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
 	  }
 	  tgt_dims_ix = k;
 	}
-        /* get rid of trailing dimensions equal to 1 */
-        while (tgt_dims_ix > 0 && tgt_dims[tgt_dims_ix - 1] == 1)
-          tgt_dims_ix--;
         if (param_ix == num_in_out_params) {      /* a return parameter */
           if (ref_param >= 0
               && pspec->data_type_limit == PS_LOWER_LIMIT) {
@@ -2455,8 +2453,11 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
             type = symbol_type(iq);
             if (type < pspec->data_type)
               type = pspec->data_type;
-          } else
+          } else if (pspec->data_type != LUX_NO_SYMBOLTYPE) {
             type = pspec->data_type;
+          } else {
+            type = symbol_type(ps[ref_param]);
+          }
           if (pspec->common_type
               && common_type != LUX_NO_SYMBOLTYPE)
             type = common_type;

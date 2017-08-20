@@ -31,6 +31,8 @@ nonbind_sources = \
 	Ellipsoid.hh\
 	GnuPlot.cc\
 	GnuPlot.hh\
+	MonotoneInterpolation.cc\
+	MonotoneInterpolation.hh\
 	Rotate3d.cc\
 	Rotate3d.hh\
 	SSFC.cc\

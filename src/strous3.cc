@@ -34,6 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "SSFC.hh"
 #include <numeric>
 #include <functional>
+#include "MonotoneInterpolation.hh"
 
 /*---------------------------------------------------------------------*/
 int32_t lux_bisect(int32_t narg, int32_t ps[])
@@ -648,6 +649,48 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   
   return result;
 }
+//----------------------------------------------------------------
+// MONOTONEINTERPOLATE(x,y,xnew[,/NONE,/CIRCLE,/SQUARE,/WIDE])
+int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
+{
+  Pointer *ptrs;
+  loopInfo* infos;
+  int32_t iq = standard_args(narg, ps, "i>D*;i>D&;i>D*;rD[2]&",
+                             &ptrs, &infos);
+  if (iq < 0)
+    return LUX_ERROR;
+
+  MonotoneInterpolation::MonotoneMethodSelection method;
+  switch (internalMode) {
+  case 1:
+    method = MonotoneInterpolation::MonotoneMethodSelection::NONE;
+    break;
+  case 2:
+    method = MonotoneInterpolation::MonotoneMethodSelection::CIRCLE;
+    break;
+  case 4:
+    method = MonotoneInterpolation::MonotoneMethodSelection::SQUARE;
+    break;
+  case 8:
+    method = MonotoneInterpolation::MonotoneMethodSelection::WIDE;
+    break;
+  default:
+    method = MonotoneInterpolation::MonotoneMethodSelection::FULL;
+    break;
+  }
+
+  MonotoneInterpolation mi(infos[0].nelem, ptrs[0].d, ptrs[1].d, method);
+
+  size_t nelem = infos[2].nelem;
+  while (nelem--) {
+    *ptrs[3].d++ = mi.interpolate(*ptrs[2].d++);
+  }
+
+  free(ptrs);
+  free(infos);
+  return iq;
+}
+REGISTER(monotone_interpolation, f, monotoneinterpolate, 3, 3, "1none:2circle:4square:8wide:16full");
 /*--------------------------------------------------------------------------*/
 #ifdef WORDS_BIGENDIAN
 #define SYNCH_OK	0xaaaa5555

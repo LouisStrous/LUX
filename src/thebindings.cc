@@ -1693,6 +1693,9 @@ void register_the_bindings()
 
   register_lux_f(lux_kepler_v_f, "kepler", 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau");
 
+  int32_t lux_monotone_interpolation(int32_t, int32_t []);
+  register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");
+
   register_lux_f(lux_runord_d_f, "runord", 3, 3, NULL);
 
   register_lux_f(lux_runmax_d_f, "RUNMAX", 2, 2, NULL);

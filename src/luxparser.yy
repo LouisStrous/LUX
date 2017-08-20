@@ -1487,11 +1487,6 @@ int32_t yylex(YYSTYPE *lvalp)
       *currentChar = '\0';      /* temporary string end */
       *lvalp = string_scratch(currentChar - p);
       strcpy(string_value(*lvalp), p);
-      p = string_value(*lvalp);
-      while (*p) {
-        *p = toupper(*p);
-        p++;
-      }
       *currentChar = c;
       return TOK_STRUCTTAG;
     } else if (currentChar[1] == '.' && currentChar[2] == '.') { /* ellipsis */

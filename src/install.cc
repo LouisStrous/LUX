@@ -4857,11 +4857,6 @@ int32_t lux_breakpoint(int32_t narg, int32_t ps[])
 	    breakpoint[curBreakpoint].status = BP_DEFINED | BP_ENABLED;
 	    if (internalMode & 8) {
 	      breakpoint[curBreakpoint].status |= BP_VARIABLE;
-	      p = breakpoint[curBreakpoint].name;
-	      while (*p) {
-		*p = toupper(*p);
-		p++;
-	      }
 	    }
 	    nBreakpoint++;
 	    break;

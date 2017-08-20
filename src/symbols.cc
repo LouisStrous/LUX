@@ -2244,16 +2244,11 @@ int32_t show_routine(internalRoutine *table, int32_t tableLength, int32_t narg, 
  if (internalMode & 1)		/* /PARAMETERS */
  { if (symbol_class(*ps) != LUX_STRING)
      return cerror(NEED_STR, *ps);
-   p = name = strsave(string_arg(*ps));
-   while (*p)
-   { *p = toupper(*p);
-     p++; }
+   name = string_arg(*ps);
    i = findInternalName(name, table == subroutine? 1: 0);
    if (i < 0)
    { printf("Internal subroutine %s not found.\n", name);
-     Free(name);
      return 1; }
-   Free(name);
    printf("%s %s, (%1d:%1d) arguments\n",
 	  table == subroutine? "subroutine": "function",
 	  table[i].name, table[i].minArg, table[i].maxArg);
@@ -2273,16 +2268,12 @@ int32_t show_routine(internalRoutine *table, int32_t tableLength, int32_t narg, 
      putchar('\n'); }
    return 1; }
  if (narg) chars = string_arg(*ps); else chars = NULL;
- if (chars)
- { chars = strsave(chars);
-   for (p = chars; *p; p++) *p = toupper(*p); }
  for (i = 0; i < tableLength; i++)
  { if (!chars || strstr(table[i].name, chars))
    { printf("%-16s", table[i].name);
      if (++nOut % nLine == 0) putchar('\n'); }
  }
  if (nOut % nLine) putchar('\n');
- Free(chars);
  return 1;
 }
 /*-----------------------------------------------------*/
@@ -2564,7 +2555,7 @@ int32_t namevar(int32_t symbol, int32_t safe)
   for (name = line; *name; name++)
   { if (!isalnum((uint8_t) *name))
     return luxerror("Illegal symbol name: %s", symbol, name);
-    *name = toupper(*name); }
+  }
   safe = safe & 3;
   context = (safe >= 2)? 0: curContext;
   iq = lookForVarName(line, context); /* seek symbol */
@@ -2853,8 +2844,8 @@ int32_t lux_pointer(int32_t narg, int32_t ps[])
 /* named variable.  LS 11feb97 */
 {
   int32_t	iq;
-  char	*name, *name2, *p;
-  
+  char	*name, *p;
+
   if (ps[0] >= TEMPS_START)
     return luxerror("Intended pointer is not a named variable", ps[0]);
   if (symbol_class(ps[0]) != LUX_POINTER)
@@ -2867,16 +2858,11 @@ int32_t lux_pointer(int32_t narg, int32_t ps[])
   { if (symbol_class(iq) != LUX_STRING)
       return cerror(NEED_STR, ps[1]);
     name = string_arg(iq);
-    p = name2 = strsave(name);
-    while (*p)
-    { *p = toupper(*p);		/* uppercase variable name */
-      p++; }
   }
   switch (internalMode & 11)
   { case 8:
-      iq = findName(name2, varHashTable,
+      iq = findName(name, varHashTable,
 		    (internalMode & 8)? 0: curContext);
-      Free(name2);
       if (iq < 0)
 	return LUX_ERROR;
     case 0:			/* variable */
@@ -2887,8 +2873,7 @@ int32_t lux_pointer(int32_t narg, int32_t ps[])
     case 1:			/* function */
     case 2:			/* subroutine */
       if (internalMode & 4)	/* /INTERNAL */
-      { iq = findInternalName(name2, (internalMode & 1)? 0: 1);
-	Free(name2);
+      { iq = findInternalName(name, (internalMode & 1)? 0: 1);
 	if (iq < 0)
 	  return LUX_ERROR;
 	symbol_class(ps[0]) = LUX_FUNC_PTR;
@@ -2897,9 +2882,8 @@ int32_t lux_pointer(int32_t narg, int32_t ps[])
                                              LUX_SUBROUTINE);
       }
       else
-      { iq = findName(name2, internalMode == 1? funcHashTable: subrHashTable,
+      { iq = findName(name, internalMode == 1? funcHashTable: subrHashTable,
 		      0);
-	Free(name2);
 	if (iq < 0)		/* some error occurred */
 	  return iq;
 	symbol_class(ps[0]) = LUX_FUNC_PTR;
@@ -2935,47 +2919,36 @@ int32_t stringpointer(char *name, int32_t type)
   int32_t	n;
   char	*p;
 
-  ALLOCATE(p, strlen(name) + 1, char);
-  strcpy(p, name);
-  name = p;
-  for (; *p; p++)
-    *p = toupper(*p);		/* make sure it is all upper case */
   if (type & SP_VAR)
   { n = lookForName(name, varHashTable, curContext);
     if (n >= 0)
     { type = SP_VAR;
-      Free(name);
       return n; }
   }
   if (type & SP_USER_FUNC)
   { n = lookForName(name, funcHashTable, 0);
     if (n >= 0)
     { type = SP_USER_FUNC;
-      Free(name);
       return n; }
   }
   if (type & SP_INT_FUNC)
   { n = findInternalName(name, 0);
     if (n >= 0)
     { type = SP_INT_FUNC;
-      Free(name);
       return n; }
   }
   if (type & SP_USER_SUBR)
   { n = lookForName(name, subrHashTable, 0);
     if (n >= 0)
     { type = SP_USER_SUBR;
-      Free(name);
       return n; }
   }
   if (type & SP_INT_SUBR)
   { n = findInternalName(name, 1);
     if (n >= 0)
     { type = SP_INT_SUBR;
-      Free(name);
       return n; }
   }
-  Free(name);
   return -1;			/* not found */
 }
 /*-------------------------------------------------------------------------*/

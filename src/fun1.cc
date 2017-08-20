@@ -321,12 +321,6 @@ int32_t lux_show(int32_t narg, int32_t ps[])
     case LUX_STRING:
 						/* more interesting */
       s = string_value(iq);
-      s2 = strsave(s);
-      s = s2;
-      while (*s2) {
-	*s2 = toupper((int32_t) *s2);
-	s2++;
-      }
       for (i = 0; i < NSYM; i++) {
 	/* get the name */
 	char const *cp = varName(i);
@@ -335,7 +329,6 @@ int32_t lux_show(int32_t narg, int32_t ps[])
 	    break;
 	}
       }
-      free(s);
       if (i != NSYM)
 	return LUX_ERROR;
       else

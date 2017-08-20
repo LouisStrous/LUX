@@ -148,7 +148,7 @@ int32_t lux_eval(int32_t narg, int32_t ps[])
 {
   int32_t	nmax, result;
   char	*expr, *p1, *p2, *p3, c;
-  
+
   if (symbol_class(*ps) != LUX_STRING)
     return *ps;
   if (narg > 1) {		/* read numbers */
@@ -172,15 +172,6 @@ int32_t lux_eval(int32_t narg, int32_t ps[])
     while (*p3 && isWhiteSpace((int32_t) *p3))
       p3++;
     if (!*p3) {			/* found an identifier and whitespace */
-      c = *p2;			/* save */
-      *p2 = '\0';		/* temporary end */
-      p1 = strsave(p1);		/* make a copy we can modify */
-      *p2 = c;			/* restore */
-      p2 = p1;
-      while (*p2) {		/* transform to upper case */
-	*p2 = toupper(*p2);
-	p2++;
-      }
       if (curContext > 0	/* we're inside some subroutine or function */
 	  && *p1 != '$'
 	  && *p1 != '#'
@@ -193,7 +184,7 @@ int32_t lux_eval(int32_t narg, int32_t ps[])
       if (result != LUX_ERROR)
 	return result;
     }
-  } 
+  }
   result = evalString(expr, nmax);
   if (result > 0 && !isFreeTemp(result))
     result = copySym(result);

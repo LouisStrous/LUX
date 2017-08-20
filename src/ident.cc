@@ -2542,18 +2542,14 @@ int32_t lux_list(int32_t narg, int32_t ps[])
  or of the routine with the given name.  */
 {
   int32_t	symbol;
-  char	*name, *p;
+  char	*name;
 
   switch (symbol_class(ps[0])) {
     case LUX_SCALAR:
       symbol = int_arg(ps[0]);
       break;
     case LUX_STRING:
-      name = p = strsave(string_value(ps[0]));
-      while (*p) {
-	*p = toupper(*p);
-	p++;
-      }
+      name = string_value(ps[0]);
       symbol = lookForName(name, varHashTable, 0);
       if (symbol < 0)
 	symbol = lookForName(name, subrHashTable, 0);

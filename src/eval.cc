@@ -19412,21 +19412,15 @@ int32_t evalLhs(int32_t symbol)
           && eptr->number == 1) { /* and a single subscript */
         n = eval(*eptr->ptr.w); /* the subscript */
         if (symbol_class(n) == LUX_STRING) { /* it's a string */
-          name = p = strsave(string_value(n)); /* the name */
-          while (*p) {          /* make all uppercase */
-            *p = toupper(*p);
-            p++;
-          }
+          name = string_value(n); /* the name */
           target = findTarget(name, &kind, 1); /* seek the name */
           if (target == LUX_ERROR) /* none found */
             target = findVarName(name, curContext);
           if (target == LUX_ERROR) { /* some error */
             luxerror("No variable or function with name %s", 0,
                   name);
-            free(name);
             return LUX_ERROR;
           }
-          free(name);           /* don't need this one anymore */
           if (kind == LUX_INT_FUNC)
             return luxerror("Cannot insert into an internal function", target);
           depth--;

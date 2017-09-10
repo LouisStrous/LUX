@@ -917,7 +917,7 @@ internalRoutine function_table[] = {
     ":::weights:*0sample:1population:2keepdims:4double" }, /* fun2.c */
   { "crosscorr", 2, 3, lux_crosscorr, 0 }, /* fun2.c */
   { "crunch",	3, 3, lux_crunch_f, 0 }, /* crunch.c */
-  { "cspline",	0, 5, lux_cubic_spline, /* fun3.c */ "1keep:2periodic:4akima:8getderivative" },
+  { "cspline",	0, 6, lux_cubic_spline, /* fun3.c */ "1keep:2periodic:4akima:8getderivative:16getintegral" },
   { "cspline_find", 2, 4, lux_cspline_find, ":::axis:index" }, /* strous3.c */
   { "ctop",	1, 3, lux_cartesian_to_polar, 0 }, /* fun4.c */
   { "date_from_tai", 1, 2, lux_date_from_tai, 0 }, /* ephem.c */

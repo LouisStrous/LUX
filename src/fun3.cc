@@ -3832,6 +3832,55 @@ double cspline_derivative(double x, csplineInfo *cspl)
   return gsl_spline_eval_deriv(cspl->spline, x, cspl->acc);
 }
 /*------------------------------------------------------------------------- */
+double integrate_linear(double a, double b,
+                        double x1, double y1, double x2, double y2)
+// Returns the integral between x = <a> and x = <b> of the straight
+// line passing through (<x1>, <y1>) and (<x2>, <y2>).  <x1> must not
+// be equal to <x2>.  LS 2017-09-08
+{
+  double d = b - a;
+  double s = (a + b)/2;
+  return d*((x1 - s)*y2 + (s - x2)*y1)/(x1 - x2);
+}
+/*------------------------------------------------------------------------- */
+double cspline_integral(double x1, double x2, csplineInfo *cspl)
+// returns the integral of a cubic spline between positions <x1> and
+// <x2>.  Assumes that the required information about the spline is
+// available in <cspl> (installed with cubic_spline_tables).  LS
+// 2017-09-08
+{
+  gsl_spline *s = cspl->spline;
+  double result = 0;
+  if (x1 < s->x[0]) {
+    // begin before first datapoint
+    if (x2 < s->x[0]) {
+      // entire interval is before first datapoint
+      return integrate_linear(x1, x2,
+                              s->x[0], s->y[0], s->x[1], s->y[1]);
+    } else {
+      // calculate the part before the first datapoint
+      result = integrate_linear(x1, s->x[0],
+                                s->x[0], s->y[0], s->x[1], s->y[1]);
+      x1 = s->x[0]; // for the calculation of the spline part
+    }
+  }
+  int32_t n = s->size;
+  if (x2 > s->x[n - 1]) {
+    // end after last datapoint
+    if (x1 > s->x[n - 1]) {
+      // entire interval is after last datapoint
+      return integrate_linear(x1, x2,
+                              s->x[n-2], s->y[n-2], s->x[n-1], s->y[n-1]);
+    } else {
+      // calculate the part after the last datapoint
+      result += integrate_linear(s->x[n-1], x2,
+                                 s->x[n-2], s->y[n-2], s->x[n-1], s->y[n-1]);
+      x2 = s->x[n-1]; // for the calculation of the spline part
+    }
+  }
+  return result + gsl_spline_eval_integ(cspl->spline, x1, x2, cspl->acc);
+}
+/*------------------------------------------------------------------------- */
 void cspline_value_and_derivative(double x, double *v, double *d,
 				  csplineInfo *cspl)
 /* returns interpolated value and derivative using cubic splines. LS 9may98 */
@@ -3995,14 +4044,19 @@ void find_cspline_extremes(double x1, double x2, double *minpos, double *min,
 /*------------------------------------------------------------------------- */
 int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 /* Cubic spline interpolation along the first dimension of an array.
-   ynew = CSPLINE(xtab, ytab [, xnew] [, /KEEP, /PERIODIC, /GETDERIVATIVE])
-     interpolates in the table of <ytab> versus <xtab> (must be in
-     ascending order without duplicates) at positions <xnew>.  /KEEP
-     signals retention of <xtab>, <ytab>, and the derived second
-     derivatives for use in subsequent interpolations from the same
-     table.  /GETDERIVATIVE indicates that the first derivative rather
-     than the value of the spline at the indicated positions should be
-     returned.  /PERIODIC indicates that the data is periodic.
+   ynew = CSPLINE(xtab, ytab [, xnew [, xnew2]]
+          [, /KEEP, /PERIODIC, /GETDERIVATIVE, /GETINTEGRAL])
+     Interpolates in the table of <ytab> versus <xtab> (must be in
+     ascending order without duplicates).  If <xnew> but not <xnew2>
+     is specified, then returns the value interpolated at <xnew>.  If
+     both <xnew> and <xnew2> are specified, then returns the value
+     integrated between <xnew> and <xnew2>.  /KEEP signals retention
+     of <xtab>, <ytab>, and the derived second derivatives for use in
+     subsequent interpolations from the same table.  /GETDERIVATIVE
+     indicates that the first derivative rather than the value of the
+     spline at the indicated positions should be returned.
+     /GETINTEGRAL indicates that the integral should be returned.
+     /PERIODIC indicates that the data is periodic.
    ynew = CSPLINE(xnew)
      Interpolates at positions <xnew> in the table specified last in a
      call to CSPLINE, in which the /KEEP switch must have been specified.
@@ -4010,6 +4064,14 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
      Returns the interpolated first derivative at positions <xnew> in
      the table specified last in a call to CSPLINE, in which the /KEEP
      switch must have been specified.
+   ynew = CSPLINE(xnew, /GETINTEGRAL)
+     Integrates between the first datapoint and <xnew> in the table
+     specified last in a call to CSPLINE, in which the /KEEP switch
+     must have been specified.
+   ynew = CSPLINE(xnew, xnew2, /GETINTEGRAL)
+     Integrates between <xnew> and <xnew2> in the table specified last
+     in a call to CSPLINE, in which the /KEEP switch must have been
+     specified.
    ynew = CSPLINE()
      Clear the table that was retained in a call to CSPLINE employing the
      /KEEP switch.  (In case the table is real big and you want to get
@@ -4018,8 +4080,8 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 {
   static char	haveTable = '\0';
   static csplineInfo	cspl = { NULL, NULL, NULL, NULL };
-  int32_t	xNewSym, xTabSym, yTabSym, size, oldType, result_sym;
-  Pointer	src, trgt;
+  int32_t	xNewSym, xNew2Sym, xTabSym, yTabSym, size, oldType, result_sym;
+  Pointer	src, src2, trgt;
   int32_t	lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   /* first check on all the arguments */
@@ -4028,13 +4090,34 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
     return 1;
   }
 
-  xTabSym = yTabSym = xNewSym = 0;
-  if (narg >= 2) {		/* have <xtab> and <ytab> */
+  xTabSym = yTabSym = xNewSym = xNew2Sym = 0;
+  switch (narg) {
+  case 0:
+    break;
+  case 1:
+    xNewSym = *ps++;
+    break;
+  case 2:
+    if (internalMode & 16) {     // have /getintegral
+      xNewSym = *ps++;
+      xNew2Sym = *ps++;
+    } else {
+      xTabSym = *ps++;
+      yTabSym = *ps++;
+    }
+    break;
+  case 3:
     xTabSym = *ps++;
     yTabSym = *ps++;
-  }
-  if (narg % 2 == 1)		/* have <xnew> */
     xNewSym = *ps++;
+    break;
+  case 4:
+    xTabSym = *ps++;
+    yTabSym = *ps++;
+    xNewSym = *ps++;
+    xNew2Sym = *ps++;
+    break;
+  }
 
   if (xNewSym && !haveTable && !xTabSym)
     return luxerror("Need table to interpolate from", xNewSym);
@@ -4044,6 +4127,8 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
     return cerror(NEED_ARR, yTabSym);
   if (xTabSym && array_size(xTabSym) != array_size(yTabSym))
     return cerror(INCMP_ARR, yTabSym);
+  if (xNewSym && xNew2Sym && array_size(xNewSym) != array_size(xNew2Sym))
+    return cerror(INCMP_ARR, xNew2Sym);
 
   if (xTabSym) {		/* install new table */
     if (cubic_spline_tables(array_data(xTabSym), array_type(xTabSym), 1,
@@ -4082,10 +4167,39 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
       default:
 	result_sym = cerror(ILL_TYPE, xNewSym);
     }
+    if (xNew2Sym) {                // do integration
+      switch (symbol_class(xNewSym)) {
+      case LUX_SCAL_PTR:
+	xNew2Sym = dereferenceScalPointer(xNew2Sym); /* fall-thru */
+      case LUX_SCALAR:
+        xNew2Sym = lux_convert(1, &xNew2Sym, LUX_DOUBLE, 1);
+	src2.b = &scalar_value(xNew2Sym).b;
+	break;
+      case LUX_ARRAY:
+        xNew2Sym = lux_convert(1, &xNew2Sym, LUX_DOUBLE, 1);
+        src2.b = (uint8_t *) array_data(xNew2Sym);
+	break;
+      default:
+	result_sym = cerror(ILL_TYPE, xNew2Sym);
+      }
+      if (xNewSym == LUX_ERROR)
+        result_sym = LUX_ERROR;
+      else
+        internalMode |= 16;
+    }
     if (result_sym != LUX_ERROR) { /* no error */
-      if (internalMode & 8) 	/* return the interpolated derivative */
+      if (internalMode & 8) { 	/* return the interpolated derivative */
 	while (size--)
 	  *trgt.d++ = cspline_derivative(*src.d++, &cspl);
+      } else if (internalMode & 16) { // return the integral
+        if (xNew2Sym) {
+          while (size--)
+            *trgt.d++ = cspline_integral(*src.d++, *src2.d++, &cspl);
+        } else {
+          while (size--)
+            *trgt.d++ = cspline_integral(cspl.x[0], *src.d++, &cspl);
+        }
+      }
       else			/* return the interpolated value */
 	while (size--)
 	  *trgt.d++ = cspline_value(*src.d++, &cspl);

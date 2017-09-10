@@ -32,9 +32,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <stdio.h>
 
-#define mallocsizeof(type) (((type)*) malloc(sizeof(type)))
-#define callocsizeof(count, type) (((type)*) calloc(count, sizeof(type)))
-#define reallocsizeof(ptr, type) (((type)*) realloc(ptr, sizeof(type))
+#define malloctype(T) (T*) malloc(sizeof(T))
+#define calloctype(count, T) (T*) calloc(count, sizeof(T))
+#define realloctype(ptr, T) (T*) realloc(ptr, sizeof(T))
 
 /* tLine code */
 #define TRANS_FIXED_STRING      1

@@ -15988,39 +15988,52 @@ See also: @ref{!crunch_bits}, @ref{!crunch_bpp}, @ref{!crunch_slice}
 @subsection cspline
 @findex cspline
 
-@code{cspline( [ @var{xtab}, @var{ytab}] [, @var{xnew}] [, /keep,
-/periodic, /getderivative])}
+@code{cspline( [ @var{xtab}, @var{ytab}] [, @var{xnew} [, @var{xnew2}]
+] [, /keep, /periodic, /akima, /getderivative, /getintegral])}
 
-Interpolates (using natural cubic splines) in the table of
-@code{@var{ytab}} versus @code{@var{xtab}} (must be in ascending order
-with no duplicates) at positions @code{@var{xnew}}.  @code{/keep}
-signals retention of @code{@var{xtab}}, @code{@var{ytab}}, and the
-derived second derivatives for use in subsequent interpolations from
-the same table.  By default, the interpolated value at the indicated
-positions is returned, but if @code{/getderivative} is specified, then
-the first derivative at the indicated positions is returned instead.
-@code{/periodic} indicates that the data is periodic.  In that case
-the first and last @code{@var{ytab}} values must be equal, or else a
+Interpolates using splines.
+
+@code{cspline()} clears the installed table of x and y coordinates.
+
+@code{cspline(@var{xtab}, @var{ytab}, /keep)} installs a new table of
+x and y coordinates to interpolate in.  @code{@var{xtab}} and
+@code{@var{ytab}} must have the same number of elements.  The elements
+of @code{@var{xtab}} must be in ascending order with no duplicates.
+Because of @code{/keep}, the table is remembered for future use.
+
+If @code{/periodic} is specified, then the data is periodic.  Then the
+first and last @code{@var{ytab}} values must be equal, or else a
 discontinuity shows up.
 
-@code{cspline(@var{xtab}, @var{ytab} [, /periodic, /getderivative])}
-prepares internal tables for subsequent interpolations with
-@code{cspline(@var{xnew} [, /getderivative])}.  The internal table is
-retained as if @code{/keep} had been specified.
+If @code{/akima} is specified, then Akima splines are used instead of
+cubic splines.
 
-@code{cspline(@var{xnew} [, /getderivative])} interpolates at positions
-@code{@var{xnew}} in the retained table, and generates an error if no
-table is yet available.  If @code{/getderivative} is specified here but
-was not specified when the table was installed, then the extra
-auxilliary information is calculated on the fly rather than looked up in
-the table: evaluation of the derivative is therefore fastest if
-@code{/getderivative} is specified when the table is installed.
+@code{cspline(@var{xtab}, @var{ytab}, @var{xnew})} interpolates at x
+coordinates @code{@var{xnew}} in the table defined by
+@code{@var{xtab}} and @code{@var{ytab}}.  @code{@var{xnew}} may be a
+scalar or an array.  If @code{/keep} is specified, too, then the table
+is remembered for future use.
 
-@code{cspline()} clears the internal table that was retained.  (In case
-the table is real big and you want to get rid of it.)
+@code{cspline(@var{xnew})} interpolates at x coordinates
+@code{@var{xnew}} in the table installed earlier.
 
-See also: @ref{cspline_extr}, @ref{polate}, @ref{table}, @ref{tense},
-@ref{tense_curve}, @ref{tense_loop}
+If @code{/getderivative} is specified, then instead of the value the
+derivative is returned.
+
+@code{cspline(@var{xtab}, @var{ytab}, @var{a}, @var{b}, /getintegral)}
+and @code{cspline(@var{xtab}, @var{ytab}, @var{a}, @var{b})} and
+@code{cspline(@var{a}, @var{b}, /getintegral)} return the integral of
+the interpolated curve between x coordinates @code{@var{a}} and
+@code{@var{b}}.  @code{@var{a}} and @code{@var{b}} must have the same
+number of elements.
+
+@code{cspline(@var{xtab}, @var{ytab}, @var{xnew}, /getintegral)} and
+@code{csplne(@var{xnew}, /getintegral)} return the integral of the
+interpolated curve between the smallest x coordinate in the table and
+@code{@var{xnew}}.
+
+See also: @ref{cspline_extr}, @ref{cspline_find}, @ref{polate},
+@ref{table}, @ref{tense}, @ref{tense_curve}, @ref{tense_loop}
 
 @c -------------------------------------
 @node cspline_extr, cspline_find, cspline, Internal Routines

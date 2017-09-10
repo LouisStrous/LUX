@@ -1,6 +1,6 @@
 /* This is file bindings.cc.
 
-Copyright 2013-2014 Louis Strous
+Copyright 2013-2017 Louis Strous
 
 This file is part of LUX.
 
@@ -26,46 +26,112 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     functions is built up as follows:
 
     \verbatim
-    <name> = ‘lux_’<returntype>‘_’<paramtypes>‘_’<stdargspec>‘_’<ptrspec>‘_’<sf>‘_’
+    'lux_<returntype>_<paramtypes>_<stdargspec>_<ptrspec>_<sf>_'
     \endverbatim
 
-    where
-    - \c <returntype> = an encoding of the return type of the bound C
-      function.
-    - \c <paramtypes> = concatenated encoding of the parameter types
-      of the bound C function.
-    - \c <stdargspec> = an encoding of the arguments type
-      specification in the most elaborate call to standard_args() for
-      this binding.  The encoding is obtained from the arguments type
-      specification by:
-      - removing ‘>’, ‘;’, and all but the first ‘i’, all but the
-        first ‘o’, and all but the first ‘r’
-      - changing ‘&’ to ‘q’, ‘+’ to ‘p’, ‘-’ to ‘m’, ‘*’ to ‘a’
-      - changing ‘[...]’ to ‘c’, ‘{...}’ to ‘x’
-      A repeat of a particular unit (from a variable type
-      specification like ‘D’ to up to but not including the next one;
-      for a repeat count of at least 3, or if the abbreviated version
-      is shorter than the full version) is indicated by appending ‘T’
-      and the repeat count.  For example, ‘DqDqDqDq’ gets abbreviated
-      to ‘DqT4’.
-    - <ptrspec> = the concatenation of the pointer index that is used
-      for each of the bound function's parameters.  If the bound
-      function's return value is stored using a pointer/info index,
-      then that pointer index is concatenated at the end, after ‘_’.
-      If a particular bound function's parameter does not depend on a
-      pointer/info index, then ‘z’ is specified for it.  3 or more
-      adjacent indices are replaced by <first-index>‘T’<last-index>.
-    - <sf> = ‘s’ if the binding is to an LUX function, ‘s’ if to an
-      LUX subroutine.
+    A descriptive suffix may be appended to disambiguate names for
+    binding functions that would otherwise be equal.
 
-    For the encodings in \c <returntype> and \c <paramtypes>, \c void
-    is encoded as ‘v’, \c double as ‘d’, \c int32_t as ‘i’, <tt>double
-    *</tt> as ‘dp’, <tt>double (*)[3][4]</tt> as ‘dp34’.  The encoding
-    ‘sd’ refers to three adjacent parameters <tt>double *data, size_t
-    count, size_t stride</tt> that describe a \c double vector slice.
-    A repeat of a particular parameter type (for a repeat count of at
+    \par returntype
+
+    \c <returntype> is an encoding of the return type of the bound C
+    function.  \c void is encoded as `v`, \c double as `d`, \c int32_t
+    as `i`, <tt>double*</tt> as `dp`, <tt>double (*)[3][4]</tt> as
+    `dp34`.
+
+    So,
+
+    \verbatim
+    lux_d_X_X_X_X_
+    \endverbatim
+
+    binds a C function that returns a \c double.
+
+    \par paramtypes
+
+    \c <paramtypes> is the concatenated encoding of the parameter
+    types of the bound C function.  The encoding is the same as for \c
+    <returntype>, with the following extensions: Encoding `sd` refers
+    to three adjacent parameters <tt>double* data, size_t count,
+    size_t stride</tt> that describe a \c double vector slice.  A
+    repeat of a particular parameter type (for a repeat count of at
     least 3) is indicated by appending \c T and the repeat count.  For
-    example, <tt>double, double, double</tt> is encoded as ‘dT3’.
+    example, <tt>double, double, double</tt> is encoded as `dT3`.
+
+    So,
+
+    \verbatim
+    lux_d_dT3i_X_X_X_
+    \endverbatim
+
+    binds a C function that takes three \c double arguments and an \c
+    int32_t argument and returns a \c double.
+
+    \par stdargspec
+
+    \c <stdargspec> is an encoding of the arguments type specification
+    in the most elaborate call to standard_args() for this binding.
+    The encoding is obtained from the arguments type specification by:
+    - removing `>`, `;`, and all but the first `i`, all but the first
+      `o`, and all but the first `r` (but not what's after those later
+      `i` or `o` or `r`).
+    - changing `&` to `q`, `+` to `p`, `-` to `m`, `*` to `a`.
+    - changing `[...]` to `c`, `{...}` to `x`.
+    - changing `#` to `o`.
+
+    A repeat of a particular unit (from a variable type specification
+    like `D` up to but not including the next one; for a repeat count
+    of at least 3, or if the abbreviated version is shorter than the
+    full version) is indicated by appending `T` and the repeat count.
+    For example, `DqDqDqDq` gets abbreviated to `DqT4`.
+
+    Multiple standard_args() format specifications can lead to the
+    same \c <stdargspec>.
+
+    So,
+
+    \verbatim
+    lux_d_dT3i_iD3rDq_X_X_
+    \endverbatim
+
+    may be for a LUX function that takes a one-dimensional
+    three-element array and a scalar for arguments and returns a
+    one-dimensional three-element `double` array.
+
+    \par ptrspec
+
+    \c <ptrspec> is the concatenation of the pointer index that is
+    used for each of the bound function's parameters.  If the bound
+    function's return value is stored using a pointer/info index, then
+    that pointer index is concatenated at the end, after `_`.  If a
+    particular bound function's parameter does not depend on a
+    pointer/info index, then `z` is specified for it.  3 or more
+    adjacent indices are replaced by `<first-index>T<last-index>`.
+
+    So,
+
+    \verbatim
+    lux_d_dT3i_iD3rDq_0001_2_X_
+    \endverbatim
+
+    indicates that the first three arguments to the bound C function
+    are associated with the \c stdargspec format's argument with index
+    0 (i.e., the first one), the next argument to the bound C function
+    is associated with index 1, and the bound C function's return
+    value is associated with index 2.
+
+    \par sf
+
+    \c <sf> is `s` if the binding is to a LUX function, or `s` if to a
+    LUX subroutine.
+
+    So,
+
+    \verbatim
+    lux_d_dT3i_iD3rDq_0001_2_f_
+    \endverbatim
+
+    binds the C function to a LUX function.
 
 */
 #include "luxdefs.hh"
@@ -78,12 +144,139 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 extern int32_t internalMode;
 
-int32_t standard_args(int32_t, int32_t [], char const *, Pointer **, loopInfo **);
+int32_t standard_args(int32_t, int32_t [], char const *, Pointer **,
+                      loopInfo **);
 int32_t setAxes(loopInfo *, int32_t, int32_t *, int32_t);
 int32_t advanceLoop(loopInfo *, Pointer *);
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 
+/** Register a LUX function so it can be used in LUX programs.
+
+ \param [in] f points to the C function that corresponds to the LUX
+ function.
+
+ \param [in] name points to the name of the LUX function.
+
+ \param [in] min_arg is the minimum number of arguments (excluding
+ the `mode` argument) that the LUX function requires.
+
+ \param [in] max_arg is the maximum number of arguments (excluding
+ the `mode` argument) that the LUX function requires.
+
+ \param [in] spec points to the specification of the keywords of
+ the LUX function.
+
+ The keyword string syntax is schematically as follows:
+
+ \verbatim
+ [*][+][-][|<defaultmode>|][%<offset>%][<key1>][:<key2>]...
+ \endverbatim
+
+ All components are optional.
+
+ `*` indicates that the function generally yields a result that has
+ the same number of elements as the (first) argument and that each
+ element of the result depends only on the corresponding element of
+ the argument.  Inclusion of a `*` may improve memory efficiency.
+
+ `+` indicates that the usual argument evaluation before they are
+ passed to tbe selected routine is suppressed.
+
+ `-` indicates that arguments of class `LUX_UNUSED` should be removed
+ instead of being converted to class `LUX_UNDEFINED`, so that it is as
+ if the user didn't specify them.
+
+ The `<defaultmode>` is the integer default value of global C variable
+ `internalMode` before the mode keywords are treated.
+
+ The `<offset>` is the argument offset of the first non-keyword
+ argument and defaults to 0.  This is convenient when a routine has a
+ variable number of ordinary arguments plus a fixed number of optional
+ arguments.  In this way, the optional arguments can be put in fixed
+ positions before the variable number of ordinary arguments, which
+ simplifies the argument treatment.
+
+ For example, with specification
+
+ \verbatim
+ %1%special
+ \endverbatim
+
+ the ordinary arguments (not identified in the call by a keyword) are
+ placed in the final arguments list starting at position 1 instead of
+ the default position 0, so the only way to get a value into position
+ 0 is by using the `special` keyword.
+
+ The syntax if individual keyword specifications is either of the
+ following:
+
+ \verbatim
+ [<number>[$]]<name>
+ [#]<name>
+ \endverbatim
+
+ The `<name>` is the name of the keyword.
+
+ If the keyword has no number in front of it, then it allows a regular
+ argument to be defined by name.  The value specified for the keyword
+ in a call to the function is entered into the final arguments list at
+ the position indicated by the position of the key in the defining key
+ list.
+
+ For example, if specification
+
+ \verbatim
+ first:second
+ \endverbatim
+
+ is associated with LUX function `foo`, then `foo(second=5,first=3)`
+ and `foo(second=5,3)` are equivalent to `foo(3,5)`, and
+ `foo(second=5)` calls the function with the second parameter set to
+ `5` and the first parameter not set at all.
+
+ Keywords with a number in front of them are mode keywords.  If such a
+ keyword is specified in a call of the LUX function or subroutine,
+ then the associated number is merged into global C variable
+ `internalMode` using the logical "or" operator, or gets removed from
+ `internalMode` if the keyword is specified preceded by `no`.
+
+ For example, with specification
+
+ \verbatim
+ 8up:16left
+ \endverbatim
+
+ for LUX function `foo`, `foo(23,/up)` sets `internalMode` to 8, and
+ `foo(23,/up,/left)` sets `internalMode` to 24.  Both calls pass 23
+ into the function as the first and only argument.
+
+ With specification
+
+ \verbatim
+ |8|8up:16left
+ \endverbatim
+
+ `internalMode` is preset to 8, so `foo(23,/up)` leaves `internalMode`
+ the same, and `foo(23,/noup)` sets `internalMode` to 0, and
+ `foo(23,/left)` sets `internalMode` to 24.
+
+ If the number is followed by a dollar sign (`$`), then the keyword
+ value is also entered into the arguments list passed into the C
+ function.
+
+ With specification
+
+ \verbatim
+ 8up:16$left
+ \endverbatim
+
+ the call `foo(23,/left)` sets `internalMode` to 16 and passes
+ arguments 16 and 23 into the function.
+
+ A hash sign `#` before the keyword name says to suppress evaluation
+ of the value before it is passed into the LUX function.
+*/
 void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name,
                     int32_t min_arg, int32_t max_arg, char const* spec)
 {
@@ -101,6 +294,24 @@ void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name,
   obstack_grow(registered_functions, &ir, sizeof(ir));
 }
 /*-----------------------------------------------------------------------*/
+/** Register a LUX function so it can be used in LUX programs.
+
+ \param [in] f points to the C function that corresponds to the LUX
+ function.
+
+ \param [in] name points to the name of the LUX function.
+
+ \param [in] min_arg is the minimum number of arguments (excluding
+ the `mode` argument) that the LUX function requires.
+
+ \param [in] max_arg is the maximum number of arguments (excluding
+ the `mode` argument) that the LUX function requires.
+
+ \param [in] spec points to the specification of the keywords of
+ the LUX function.
+
+ The keywords specification format is the same as for register_lux_f().
+*/
 void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name,
                     int32_t min_arg, int32_t max_arg, char const* spec)
 {
@@ -118,38 +329,57 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name,
   obstack_grow(registered_subroutines, &ir, sizeof(ir));
 }
 /*-----------------------------------------------------------------------*/
-/** Bind a C function \p f to a LUX function with 3 scalar
-    at-least-double input parameters and a scalar double return
-    parameter prefixing two dimensions equal to 3.  Function \p f is
-    called once.
+/** Bind a C function to a LUX function.
 
-    Standard arguments <tt>"i>D;i>D;i>D;rD+3,+3"</tt>.
+    The C function accepts three `double` values and a pointer to an
+    array of 3 `double` values and returns `void`.
+
+    The LUX function requires three numerical scalar or array
+    arguments (converted to `double`) with the same dimensions and
+    returns a `double` array with the same dimensions as the input
+    arguments but with dimensions 3 and 3 prefixed.
+
+    Standard arguments format <tt>"iD*;iD&;iD&;rD+3,+3"</tt>.
 
     @param [in] narg number of symbols in \p ps
     @param [in] ps array of argument symbols
     @param [in] f pointer to C function to bind
     @return the symbol containing the result of the function call
+
+    \todo Check if advancing through the return value works OK if the
+    first argument has more than one element.
  */
-int32_t lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double (*)[3]))
+int32_t lux_v_dT3dp3_iDaDqDqrDp3p3_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double (*)[3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D;i>D;i>D;rD+3,+3", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;rD+3,+3",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
-  f(*ptrs[0].d, *ptrs[1].d, *ptrs[2].d, (double (*)[3]) ptrs[3].d);
+  do {
+    f(*ptrs[0].d, *ptrs[1].d, *ptrs[2].d, (double (*)[3]) ptrs[3].d);
+  } while (advanceLoop(&infos[0], &ptrs[3]),
+           advanceLoop(&infos[1], &ptrs[2]),
+           advanceLoop(&infos[2], &ptrs[1]),
+           advanceLoop(&infos[3], &ptrs[0]) < infos[0].rndim);
   free(ptrs);
   free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-/** Bind C function \p f to a LUX function with one scalar int32_t input
-    parameter, one double array input parameter with 3 elements in its
-    first dimension and arbitrary other dimensions, and a double
-    return symbol with the same dimensions as the 2nd input parameter.
+/** Bind a C function to a LUX function.
 
-    Standard arguments <tt>"iL1;i>D3*;rD[-]&"</tt>
+    The C function accepts an `int32_t` and four pointers to `double`
+    and returns an `int32_t`.
+
+    The LUX function requires a single-element input value (converted
+    to `int32`), and an array (converted to `double`) with dimensions
+    3 and any, and returns a `double` array with the same dimensions
+    as the second argument.
+
+    Standard arguments format <tt>"iL;iD3*;rD[-]"</tt>
 
     Function \p f is called once per 3 elements of both the 2nd input
     parameter and the return symbol.
@@ -165,7 +395,7 @@ int32_t lux_i_idpT4_iL1D3arDcq_0T222_f_(int32_t narg, int32_t ps[], int32_t (*f)
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "iL1;i>D3*;rD[-]&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iL;iD3*;rD[-]", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[1].nelem/3;
   while (nelem--) {

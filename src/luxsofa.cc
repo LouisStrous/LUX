@@ -797,7 +797,7 @@ BIND(iauNum06a, v_dddp3_iDarDp3p3q_0z1, f, num06a, 1, 1, 0)
 
    Returns the matrix of nutation based on the mean obliquity of the
    date <epsa> and the nutation components <dpsi> and <deps>. */
-BIND(iauNumat, v_dT3dp3_iDT3rDp3p3_0T3, f, numat, 3, 3, 0)
+BIND(iauNumat, v_dT3dp3_iDaDqDqrDp3p3_0T3, f, numat, 3, 3, 0)
 /*-----------------------------------------------------------------------*/
 /* nut00a, <jd>, <dpsi>, <deps>
 

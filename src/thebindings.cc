@@ -618,7 +618,7 @@ int32_t lux_iauNum06a_f(int32_t narg, int32_t ps[]) {
 
 int32_t lux_iauNumat_f(int32_t narg, int32_t ps[]) {
   void iauNumat(double, double, double, double (*)[3]);
-  int32_t result = lux_v_dT3dp3_iDT3rDp3p3_0T3_f_(narg, ps, iauNumat);
+  int32_t result = lux_v_dT3dp3_iDaDqDqrDp3p3_0T3_f_(narg, ps, iauNumat);
   if (result < 0)
     luxerror("Error in numat", 0);
   return result;

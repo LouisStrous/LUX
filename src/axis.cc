@@ -1960,40 +1960,381 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
 
     \return the return symbol, or -1 if an error occurred.
 
-    The standard format is schematically as follows, where something
-    between quotes ‘’ stands for that literal character, something
-    between non-literal square brackets [] is optional, something
-    between non-literal curly braces {} is a group of alternatives, a
-    non-literal pipe symbol | separates alternatives, and a
-    non-literal asterisk * indicates repetition zero or more times:
+    \par Introduction
+
+    The standard format can look rather daunting.  It has several
+    tasks:
+
+    1. Specify which of the parameters are input parameters, output
+       parameters, or return parameters.
+
+    2. Specify which of the parameters are optional.
+
+    3. Specify the data types of the input, output, and return
+       parameter that are made available to the back-end (through the
+       `ptrs` parameter of `standard_args`).  These data types may
+       depend on the type of an earlier parameter.
+
+    4. Specify the expectations for the dimensions of the input
+       parameters, and specify the dimensions of the output parameters
+       and the return value.  These may depend on the dimensions of an
+       earlier parameter, but may have dimensions added or removed
+       relative to that other parameter.  The removed dimensions may
+       be explicit ones or may be identified by the contents (not the
+       dimensions) of another parameter (the axis parameter).
+
+    \par Parameter Types
+
+    The specification parts for different parameters are separated by
+    semicolons (`;`).  The specification for each parameter begins
+    with a letter that identifies the parameter type.
+
+    An input parameter (`i`) is an existing named or unnamed LUX
+    symbol whose contents are going to be processed.
+
+    An output parameter (`o`) is an existing named LUX symbol that
+    will be reshaped to receive output.  Its previous contents are
+    lost.  It must be a named symbol, because otherwise the user
+    couldn't access the contents afterwards.
+
+    A return parameter (`r`) is a new unnamed LUX symbol that gets
+    created to act as the return value of a LUX function.  There can
+    be at most one return parameter in a specification.
 
     \verbatim
-    <format> = <param-spec>[;<param-spec>]*
-    <param-spec> = {‘i’|‘o’|‘r’}[<type-spec>][<dims-spec>][‘?’]
-    <type-spec> = {{[‘>’]{‘B’|‘W’|‘L’|'Q'|‘F’|‘D’}}|‘S’}['^']
-    <dims-spec> = [‘[’<ref-par>‘]’][‘{’<axis-par>‘}’]
-                  <dim-spec>[,<dim-spec>]*[‘*’|‘&’|'#']
-    <dim-spec> = [{‘+’NUMBER|‘-’|‘-’NUMBER|‘=’|‘=’NUMBER|‘:’}]*
+    i;r
+    \endverbatim
+
+    The above specification says that the first parameter is an input
+    parameter and the second one is a return parameter.
+
+    No dimensions are specified for the input parameter, so it must
+    contain exactly one value (be either a scalar or an array with one
+    element).  No dimensions or type are specified for the return
+    parameter, so it gets the same as its <em>reference
+    parameter</em>, which by default is the first parameter.  A
+    corresponding call to a fictitous LUX function `foo` might be `y =
+    foo(3)`.
+
+    \verbatim
+    i;i;o;o
+    \endverbatim
+
+    The above specification says that the first two parameters are
+    single-element input parameters, and the next two are output
+    parameters with the same data type and dimensions as the first
+    parameter.  An example call is `foo,3,5,x,y`.
+
+    \par Reference Parameter
+
+    A reference parameter can be indicated for all but the first
+    parameter.  Some missing information (like a data type or a
+    dimension) may be copied from the reference parameter.  The
+    reference parameter is indicated by a number or a minus sign (`-`)
+    between square brackets (`[]`) just after the parameter data type
+    (described later), which itself follows the parameter type.  A
+    number indicates a particular parameter (0 indicates the first
+    one), and a minus sign indicates the parameter preceding the
+    current one.  If no reference parameter is explicitly given, then
+    the first parameter is the reference parameter.  The reference
+    parameter must have a smaller index than the current parameter.
+
+    \verbatim
+    i;i;o[1]
+    \endverbatim
+
+    says that the output parameter's reference parameter is the one
+    with index 1 (i.e., the 2nd parameter).  The output parameter gets
+    the same type and dimensions as the second parameter.
+
+    \verbatim
+    i;i;o[-]
+    \endverbatim
+
+    has the same effect as the previous specification.  Now the output
+    parameter's reference parameter is the parameter preceding the
+    output parameter, which is the 2nd parameter as before.
+
+    \par Optional Parameters
+
+    An input or output parameter specification that has a question
+    mark (`?`) at its very end means that that parameter is optional.
+    A return parameter cannot be optional.
+
+    \verbatim
+    i;i?;r
+    \endverbatim
+
+    says that the second parameter is optional, so does not have to be
+    specified.  Example calls are `y = foo(3,5)` but also `y =
+    foo(3)`.
+
+    \par Parameter Data Types
+
+    Parameter data types may be specified for any parameter,
+    immediately after the parameter type.  Explicit parameter data
+    types are indicated by one of the letters `B W L Q F D S`
+    corresponding to `int8` through `int64`, `float`, `double`, and
+    `string`, respectively.
+
+    An output or return parameter for which an explicit data type is
+    specified gets set to that data type.
+
+    An explicit data type for an input parameter does't say what data
+    type the argument must have, but defines what data type is made
+    available to the back-end.  If an input argument's data type is
+    equal to the corresponding explicit input parameter's data type,
+    then a pointer to that argument's data is made available.  If an
+    input argument's data type differs from the corresponding explicit
+    input parameter's data type, then a copy of the argument is
+    created and converted to the explicit data type, and a pointer to
+    that copy's data is made available instead.
+
+    \verbatim
+    iF;rL
+    \endverbatim
+
+    says that the first argument must be a single-element argument and
+    that a `float` copy is made available for processing, if the
+    argument isn't `float` already.  Also, a single-element `int32`
+    return value is created and made available for receiving output.
+
+    If the explicit data type is numeric (i.e., not `S`) and is
+    preceded by a greater-than sign (`>`), then the data type is a
+    minimum.  If the data type that would have applied if no explicit
+    data type were given is less than the minimum, then that minimum
+    is used instead.
+
+    \verbatim
+    i>L;r
+    \endverbatim
+
+    says that if the data type of the first argument is less than
+    `int32`, then an `int32` copy is made available instead.  No
+    explicit data type is given for the return parameter, so it gets
+    the same as its reference parameter, which by default is the first
+    parameter.  So the data type of the return parameter is equal to
+    that of the first parameter, which is at least `int32`.
+
+    \verbatim
+    i>L;r>F
+    \endverbatim
+
+    is like the previous case, but now the return parameter has a
+    minimum data type of `float`.  If the input parameter type is at
+    least `float`, then the return parameter gets the same type as the
+    input parameter.  If the input parameter type is less than
+    `float`, then an `int32` version of the input is made available,
+    and the return parameter is of type `float`.  If the input
+    parameter type is at least `float`, then the return value gets the
+    same type as the input parameter.
+
+    If the data type specifications for more than one numerical
+    parameter are followed by a caret (`^`), then all of those
+    parameters get the same data type, which is equal to the greatest
+    data type among them that would have applied if no carets had been
+    specified.
+
+    \verbatim
+    i>L^;i>L^;iW;r^
+    \endverbatim
+
+    says that the first two input parameters and the return value get
+    the same data type applied, which is the greatest one among them
+    that would have applied if there were no carets.  So, if the first
+    parameter is an `int64` and the second one is a `float`, then the
+    parameters made available to the back-end have data types `float`,
+    `float`, `int16`, and `float`, respectively.
+
+    \par Parameter Dimensions
+
+    Expectations for the dimensions of input parameters can be
+    specified, and also how to determine the dimensions of output and
+    return parameters.
+
+    At its simplest, the dimensions are specified in a comma-separated
+    list after the data type.
+
+    \verbatim
+    iF3,6;rD3
+    \endverbatim
+
+    says that the input parameter must be an array of 3 by 6 elements,
+    of which a `float` version is made available to the back-end, and
+    that the return value is a one-dimensional `double` array of 3
+    elements.
+
+    A greater-than sign (`>`) before a dimension number means that the
+    dimension must be at least as great as the number.
+
+    \verbatim
+    i>7*
+    \endverbatim
+
+    says that the first dimension must be at least 7, and the other
+    dimensions are unrestricted.
+
+    For input parameters, a colon (`:`) means to accept the current
+    dimension.
+
+    \verbatim
+    i:,4,:
+    \endverbatim
+
+    says that the input parameter must have 3 dimensions of which the
+    2nd one is equal to 4.
+
+    Dimensions for output parameters and the return value can be
+    copied from the reference parameter.  An equals sign (`=`) means
+    that the corresponding dimension of the reference parameter is
+    copied.  If a number follows the equals sign immediately, then it
+    says what the dimension of the reference parameter must be.  A
+    minus sign (`-`) means that the corresponding dimension of the
+    reference parameter is skipped.  A plus sign (`+`) followed by a
+    number means that, relative to the reference parameter, a
+    dimension equal to that number is inserted.
+
+    \verbatim
+    i7,3,2;o=,=
+    \endverbatim
+
+    says that the output parameter is an array of 7 by 3 elements.
+
+    \verbatim
+    i7,3,2;o=,-,=
+    \endverbatim
+
+    says that the output parameter is an array of 7 by 2 elements,
+    because the 3 was skipped.
+
+    \verbatim
+    i7,3,2;o=,+5,=
+    \endverbatim
+
+    says that the output parameter is an array of 7 by 5 by 3
+    elements.
+
+    \verbatim
+    i7,3,2;o=,5,=
+    \endverbatim
+
+    says that the output parameter is an array of 7 by 5 by 2
+    elements.
+
+    \verbatim
+    i7,3,2;o=2
+    \endverbatim
+
+    produces an error because the output parameter's specification
+    says that the first dimension of its reference parameter (which is
+    the first parameter) should be equal to 2, but the first
+    parameter's specification says that its first dimension should be
+    equal to 7, and those cannot both be true.
+
+    An asterisk (`*`) at the end of the dimensions list for an input
+    parameter says that the remaining dimensions are unrestricted.
+
+    \verbatim
+    iF3*;i*
+    \endverbatim
+
+    says that the first dimension of the first input parameter must be
+    equal to 3 but that any following dimensions are unrestricted, so,
+    for example, a one-dimensional array of 3 elements is accepted,
+    and also an array of 3 by 5 elements, or 3 by 1 by 17 elements.
+    The second input parameter has no restrictions on its dimensions,
+    so a scalar is acceptable, and also any array.
+
+    An ampersand (`&`) at the end of the dimensions list for any
+    parameter says that the remaining dimensions must be equal to the
+    dimensions of the reference parameter.
+
+    \verbatim
+    i*;rD6&
+    \endverbatim
+
+    says that the input parameter may have any data type and
+    dimensions and that the return value is a `double` array with
+    dimension 6 followed by the dimensions of the reference parameter,
+    which by default is the first parameter.  So, if the input
+    argument is an array of 3 by 2 elements, then the return value is
+    an array of 6 by 3 by 2 elements.
+
+    A hash sign (`#`) at the end of the dimensions specification means
+    that the element count of an input parameter must either be equal
+    to 1 or else to the element count of the reference parameter.
+
+    \verbatim
+    i3,3,3;i#;r&
+    \endverbatim
+
+    says that the second input parameter must either have exactly one
+    element or else must have the same number of elements as the
+    reference parameter (the first parameter), i.e., 27.  The
+    dimensions do not need to be the same, as long as the element
+    count matches, so it is OK if the second input parameter has a
+    single dimension equal to 27, or is a 9 by 3 array, or a 3 by 3 by
+    1 by 3 array.
+
+    \par Axis Parameters
+
+    Some LUX functions and subroutines specify an <em>axis
+    parameter</em>, which says along which dimensions of the main data
+    to apply the operation.  If the operation produces one value
+    (e.g., the minimum value) when running along the indicated axes,
+    then the result should have the same dimensions as the main data
+    except that the dimensions specified in the axis parameter should
+    be omitted.  This is achieved by specifying the axis parameter's
+    index between curly braces (`{}`) just before the specification of
+    the dimensions, and just after the specification of the reference
+    parameter, if any.
+
+    \verbatim
+    iD*;iL*;rD{1}
+    \endverbatim
+
+    says that parameter 1 (i.e., the 2nd parameter) is the axis
+    parameter for the return value.  If the function is called like `y
+    = foo(x,[1,2])` and `x` is an array of 4 by 100 by 200 by 3
+    elements, then `y` is an array of 4 by 3 elements.
+
+    \par Complete Syntax
+
+    All in all, the standard format is schematically as follows, where
+    something between quotes (<tt>''</tt>) stands for that literal
+    character, something between non-literal square brackets (`[]`) is
+    optional, something between non-literal curly braces (`{}`) is a
+    group of alternatives, a non-literal pipe symbol (`|`) separates
+    alternatives, and a non-literal asterisk (`*`) indicates
+    repetition zero or more times:
+
+    \verbatim
+      <format> = <param-spec>[;<param-spec>]*
+      <param-spec> = {'i'|'o'|'r'}[<type-spec>][<dims-spec>]['?']
+      <type-spec> = {{['>']{'B'|'W'|'L'|'Q'|'F'|'D'}}|'S'}['^']
+      <dims-spec> = ['['<ref-par>']']['{'<axis-par>'}']
+                    <dim-spec>[,<dim-spec>]*['*'|'&'|'#']
+      <dim-spec> = [{['+'|'-'|'=']NUMBER|'-'|'='|':'}]*
     \endverbatim
 
     In words,
     - the format consists of one or more parameter specifications
-      separated by semicolons ‘;’.
-    - each parameter specification begins with an ‘i’, ‘o’, or ‘r’,
-      optionally followed by a question mark ‘?’, followed by a type
-      specification and a dimensions specification.
-    - a type specification consists of an ‘S', or else of an optional
-      greater-than sign ‘>’ followed by one of ‘B’, ‘W’, ‘L’, 'Q',
-      ‘F’, or ‘D’.  Optionally, a '^' follows.
+      separated by semicolons `;`.
+    - each parameter specification begins with an `i`, `o`, or `r`,
+      followed by a type specification and a dimensions specification,
+      optionally followed by a question mark `?`.
+    - a type specification consists of an `S`, or else of an optional
+      greater-than sign `>` followed by one of `B`, `W`, `L`, `Q`,
+      `F`, or `D`.  Optionally, a `^` follows.
     - a dimensions specification consists of a optional reference
-      parameter number between square brackets ‘[]’, followed by an
-      optional axis parameter number between curly braces ‘{}’,
+      parameter number between square brackets `[]`, followed by an
+      optional axis parameter number between curly braces `{}`,
       followed by one or more dimension specifications separated by
-      commas ‘,’, optionally followed by an asterisk ‘*’ or ampersand
-      ‘&’ or hash symbol '#'.
-    - a dimension specification consists of a minus sign ‘-’, an
-      equals sign ‘=’, a colon ‘:’, or a number preceded by a plus
-      sign ‘+’, a minus sign ‘-’, or an equals sign ‘=’; followed by
+      commas `,`, optionally followed by an asterisk `*` or ampersand
+      `&` or hash symbol `#`.
+    - a dimension specification consists of a minus sign `-`, an
+      equals sign `=`, a colon `:`, or a number preceded by a plus
+      sign `+`, a minus sign `-`, or an equals sign `=`; followed by
       any number of additional instances of the preceding.
 
     Some of the characteristics of a parameter may depend on those of
@@ -2003,31 +2344,31 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     specification.
 
     For the parameter specification \c param-spec:
-    - ‘i’ = input parameter.
-    - ‘o’ = output parameter.  An error is declared if this is not a
+    - `i` = input parameter.
+    - `o` = output parameter.  An error is declared if this is not a
       named parameter.
-    - ‘r’ = return value.  For functions, there must be exactly one of
+    - `r` = return value.  For functions, there must be exactly one of
       these in the parameters specification.  Subroutines must not
       have one of these.
-    - ‘?’ = optional parameter.
+    - `?` = optional parameter.
 
     For the type specification \c type-spec:
-    - ‘>’ = the type should be at least equal to the indicated type.
-    - ‘B’ = LUX_INT8
-    - ‘W’ = LUX_INT16
-    - ‘L’ = LUX_INT32
-    - 'Q' = LUX_INT64
-    - ‘F’ = LUX_FLOAT
-    - ‘D’ = LUX_DOUBLE
-    - ‘S’ = LUX_STRING
-    - '^' = all numerical parameters marked like this get the same
+    - `>` = the type should be at least equal to the indicated type.
+    - `B` = LUX_INT8
+    - `W` = LUX_INT16
+    - `L` = LUX_INT32
+    - `Q` = LUX_INT64
+    - `F` = LUX_FLOAT
+    - `D` = LUX_DOUBLE
+    - `S` = LUX_STRING
+    - `^` = all numerical parameters marked like this get the same
       data type, which is the greatest numerical data type among them
-      that would have applied if no '^' had been specified.
+      that would have applied if no `^` had been specified.
 
     For input parameters, a copy is created with the indicated
     (minimum) type if the input parameter does not meet the condition,
     and further processing is based on that copy.  For output
-    parameters, an array is created with the indicate type, unless ‘>’
+    parameters, an array is created with the indicate type, unless `>`
     is specified and the reference parameter has a greater type, in
     which case that type is used.  If no explicit type is specified
     for an output parameter, then it gets the type of the reference
@@ -2036,14 +2377,14 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     For the reference parameter \c ref-par:
     - If absent, then 0 is taken for it (i.e., the first parameter).
     - If a number, then the indicated parameter is taken for it.
-    - If ‘-’, then the previous parameter is taken for it.
+    - If `-`, then the previous parameter is taken for it.
 
     For the axis parameter \c axis-par:
     - The specified parameter is expected to indicate one or more
       unique axes to remove from the current parameter, which must be
-      of type ‘r’ or ‘o’.
+      of type `r` or `o`.
     - If a number, then the indicated parameter is taken for it.
-    - If ‘-’, then the previous parameter is taken for it.
+    - If `-`, then the previous parameter is taken for it.
 
     The removal of dimensions is done, and the axis numbers apply,
     only after all the other dimension specifications have been
@@ -2053,27 +2394,27 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     - NUMBER = the current dimension has the specified size.  For
       input parameters, an error is declared if the dimension does not
       have the specified size.
-    - '>'NUMBER = the current dimension has at least the specified
+    - `>`NUMBER = the current dimension has at least the specified
       size.  For input parameters, an error is declared if the
       dimension does not have at least the specified size.
-    - ‘+’NUMBER = for output or return parameters, a new dimension with
+    - `+`NUMBER = for output or return parameters, a new dimension with
       the specified size is inserted here.
-    - ‘=’ = for output or return parameters, the current dimension is
+    - `=` = for output or return parameters, the current dimension is
       taken from the reference parameter.
-    - ‘=’NUMBER = for output or return parameters, the current dimension
+    - `=`NUMBER = for output or return parameters, the current dimension
       is taken from the reference parameter, and must be equal to the
       specified number.  An error is declared if the reference
       parameter's dimension does not have the indicated size
-    - ‘-’ = the corresponding dimension from the reference parameter is
+    - `-` = the corresponding dimension from the reference parameter is
       skipped.
-    - ‘:’ = for input parameters, accept the current dimension.
-    - ‘&’ = the remaining dimensions must be equal to those of the
+    - `:` = for input parameters, accept the current dimension.
+    - `&` = the remaining dimensions must be equal to those of the
       reference parameter.
-    - '#' = the element count must be equal to 1 or to that of the
+    - `#` = the element count must be equal to 1 or to that of the
       reference parameter.
-    - ‘*’ = the remaining dimensions are unrestricted.
+    - `*` = the remaining dimensions are unrestricted.
 
-    Both a ‘+’NUMBER and a ‘-’NUMBER may be given in the same
+    Both a `+`NUMBER and a `-`NUMBER may be given in the same
     dimension specification \c dim_spec.
   */
 int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptrs,
@@ -2111,7 +2452,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
     if (infos)
       *infos = NULL;
     return luxerror("Standard arguments specification asks for between %d and %d input/output arguments but %d are specified (%s)", 0, nmin, num_in_out_params, narg, fmt);
-  }
+  } // end if (narg < nmin || narg > num_in_out_params)
   if (ptrs)
     *ptrs = (Pointer*) malloc(psl->num_param_specs*sizeof(Pointer));
   if (infos)
@@ -2141,7 +2482,8 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
         numerical(ps[param_ix], &src_dims, &num_src_dims, NULL, NULL) < 0) {
       src_dims = NULL;
       num_src_dims = 0;
-    }
+    } // end if (param_ix == num_in_out_params || ...)
+
     int32_t ref_param = pspec->ref_par;
     if (ref_param < 0)
       ref_param = (param_ix? param_ix - 1: 0);
@@ -2153,11 +2495,12 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
          we must get the information from its *final* value */
       switch (psl->param_specs[ref_param].logical_type) {
       case PS_INPUT:
-        if (numerical(ps[ref_param], &ref_dims, &num_ref_dims, NULL, NULL) < 0) {
+        if (numerical(ps[ref_param], &ref_dims, &num_ref_dims, NULL, NULL)
+            < 0) {
           returnSym = luxerror("Reference parameter %d must be an array",
                                ps[param_ix], ref_param + 1);
           goto error;
-        }
+        } // end if (numerical(ps[ref_param], ...) < 0)
         break;
       case PS_OUTPUT: case PS_RETURN:
         if (!final[ref_param]) {
@@ -2165,25 +2508,28 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                "parameter %d for parameter %d", 0,
                                ref_param + 1, param_ix + 1);
           goto error;
-        }
+        } // end if (!final[ref_param])
         if (numerical(final[ref_param], &ref_dims, &num_ref_dims, NULL, NULL)
             < 0) {
           returnSym = luxerror("Reference parameter %d must be an array",
                                final[param_ix], ref_param + 1);
           goto error;
-        }
+        } // end if (numerical(final[ref_param], ...) < 0)
         break;
-      }
+      } // end switch (psl->param_specs[ref_param].logical_type)
       prev_ref_param = ref_param;
     } else if (!param_ix) {
       ref_dims = NULL;
       num_ref_dims = 0;
-    }
+    } // end if (param_ix > 0 ...) else if (!param_ix)
+
     if (!pspec->is_optional || param_ix == num_in_out_params
         || (param_ix < narg && ps[param_ix])) {
-      for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0, ref_dims_ix = 0;
+      for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0,
+             ref_dims_ix = 0;
            pspec_dims_ix < pspec->num_dims_spec; pspec_dims_ix++) {
-        int src_dim_size = (src_dims_ix < num_src_dims? src_dims[src_dims_ix]: 0);
+        int src_dim_size = (src_dims_ix < num_src_dims? src_dims[src_dims_ix]:
+                            0);
         switch (dims_spec[pspec_dims_ix].type) {
         case DS_EXACT: /* an input parameter must have the exact
                           specified dimension */
@@ -2204,8 +2550,8 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                    dims_spec[pspec_dims_ix].size_add,
                                    src_dims_ix, src_dim_size);
               goto error;
-            }
-          }
+            } // end if (dims_spec[pspec_dims_ix].type == DS_EXACT ...) else if
+          } // end if (pspec->logical_type == PS_INPUT)
           /* the target gets the exact specified dimension */
           tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
           src_dims_ix++;
@@ -2213,9 +2559,12 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
           break;
         case DS_COPY_REF:       /* copy from reference */
           if (src_dims_ix >= num_ref_dims) {
-            returnSym = luxerror("Requested copying dimension %d from the reference parameter which has only %d dimensions", ps[param_ix], src_dims_ix, num_ref_dims);
+            returnSym = luxerror("Requested copying dimension %d from the "
+                                 "reference parameter which has only %d "
+                                 "dimensions", ps[param_ix], src_dims_ix,
+                                 num_ref_dims);
             goto error;
-          }
+          } // end if (src_dims_ix >= num_ref_dims)
           tgt_dims[tgt_dims_ix++] = ref_dims[ref_dims_ix++];
           src_dims_ix++;
           break;
@@ -2228,14 +2577,14 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                    "but found %d", ps[param_ix],
                                    d, src_dims_ix, src_dim_size);
               goto error;
-            }
+            } // end if (src_dim_size != d)
             src_dims_ix++;
             tgt_dims[tgt_dims_ix++] = d;
             break;
           case PS_OUTPUT: case PS_RETURN:
             tgt_dims[tgt_dims_ix++] = d;
             break;
-          }
+          } // end switch (pspec->logical_type)
           break;
         case DS_REMOVE: case DS_ADD_REMOVE:
           switch (pspec->logical_type) {
@@ -2247,7 +2596,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                      "but found %d", ps[param_ix],
                                      d, ref_dims_ix, ref_dims[ref_dims_ix]);
                 goto error;
-              }
+              } // end if (d && ref_dims[ref_dims_ix] != d)
             }
             break;
           case PS_OUTPUT: case PS_RETURN:
@@ -2258,12 +2607,12 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                      "but found %d", ps[param_ix],
                                      d, ref_dims_ix, ref_dims[ref_dims_ix]);
                 goto error;
-              }
+              } // end if (d && ref_dims[ref_dims_ix] != d)
             }
             if (dims_spec[pspec_dims_ix].type == DS_ADD_REMOVE)
               tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
             break;
-          }
+          } // end switch (pspec->logical_type)
           ref_dims_ix++;
           break;
         case DS_ACCEPT:         /* copy from input */
@@ -2274,7 +2623,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
           } else {
             tgt_dims[tgt_dims_ix++] = src_dims[src_dims_ix++];
             ref_dims_ix++;
-          }
+          } // end if (src_dims_ix >= num_src_dims) else
           break;
         default:
           returnSym = luxerror("Dimension specification type %d "
@@ -2282,8 +2631,9 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                dims_spec[pspec_dims_ix].type);
           goto error;
           break;
-        }
-      }
+        } // end switch (dims_spec[pspec_dims_ix].type)
+      } // end for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0,...)
+
       switch (pspec->logical_type) {
       case PS_INPUT:
         switch (pspec->remaining_dims) {
@@ -2296,7 +2646,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                    num_ref_dims + src_dims_ix - ref_dims_ix,
                                    num_src_dims);
               goto error;
-            }
+            } // end if (expect != num_src_dims)
             int32_t i, j;
             for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
               if (ref_dims[i] != src_dims[j]) {
@@ -2304,14 +2654,14 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                      "but found %d", ps[param_ix], i + 1,
                                      ref_dims[i], src_dims[j]);
                 goto error;
-              }
+              } // end if (ref_dims[i] != src_dims[j])
           } else {
             returnSym = luxerror("Dimensions of parameter %d required to be "
                                  "equal to those of the reference, but no "
                                  "reference is available",
                                  ps[param_ix], param_ix + 1);
             goto error;
-          }
+          } // end if (ref_dims && ref_dims_ix < num_ref_dims) else
           break;
         case PS_ONE_OR_EQUAL_TO_REFERENCE:
           if (ref_dims && ref_dims_ix < num_ref_dims) {
@@ -2322,7 +2672,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                    num_ref_dims + src_dims_ix - ref_dims_ix,
                                    num_src_dims);
               goto error;
-            }
+            } // end if (expect != num_src_dims)
             int32_t i, j;
             for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
               if (src_dims[j] != 1 && ref_dims[i] != src_dims[j]) {
@@ -2331,18 +2681,18 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                        "but found %d", ps[param_ix], i + 1,
                                        ref_dims[i], src_dims[j]);
                 else
-                  returnSym = luxerror("Expected dimension %d equal to 1 or %d "
-                                       "but found %d", ps[param_ix], i + 1,
+                  returnSym = luxerror("Expected dimension %d equal to 1 or "
+                                       "%d but found %d", ps[param_ix], i + 1,
                                        ref_dims[i], src_dims[j]);
                 goto error;
-              }
+              } // end if (src_dims[j] != 1 && ref_dims[i] != src_dims[j])
           } else {
             returnSym = luxerror("Dimensions of parameter %d required to be "
                                  "equal to those of the reference, but no "
                                  "reference is available",
                                  ps[param_ix], param_ix + 1);
             goto error;
-          }
+          } // end if (ref_dims && ref_dims_ix < num_ref_dims) else
           break;
         case PS_ARBITRARY:
           break;
@@ -2356,14 +2706,16 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
               goto error;
             } else
               src_dims_ix++;
-          }
+          } // end if (!pspec_dims_ix)
           if (src_dims_ix < num_src_dims) {
-            returnSym = luxerror("Specification (parameter %d) says %d dimensions but source has %d dimensions",
-                                 ps[param_ix], param_ix, src_dims_ix, num_src_dims);
+            returnSym = luxerror("Specification (parameter %d) says %d "
+                                 "dimensions but source has %d dimensions",
+                                 ps[param_ix], param_ix, src_dims_ix,
+                                 num_src_dims);
             goto error;
-          }
+          } // end if (src_dims_ix < num_src_dims)
           break;
-        }
+        } // end switch (pspec->remaining_dims)
         iq = ps[param_ix];
         type = symbol_type(iq);
         if (pspec->common_type)
@@ -2378,24 +2730,25 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
         break;
       case PS_OUTPUT: case PS_RETURN:
         switch (pspec->remaining_dims) {
+        case PS_ABSENT:
+          break;
         case PS_EQUAL_TO_REFERENCE:
           if (ref_dims_ix < num_ref_dims) {
             /* append remaining dimensions from reference parameter*/
             size_t e = num_ref_dims - ref_dims_ix;
-            memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix, e*sizeof(int32_t));
+            memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix,
+                   e*sizeof(int32_t));
             tgt_dims_ix += e;
             src_dims_ix += e;
             ref_dims_ix += e;
-          }
+          } // end if (ref_dims_ix < num_ref_dims)
           break;
         case PS_ARBITRARY:
           returnSym = luxerror("'Arbitrary' remaining dimensions makes no "
                                "sense for an output or return parameter "
                                " (number %d)", 0, param_ix + 1);
           goto error;
-        case PS_ABSENT:
-          break;
-        }
+        } // end switch (pspec->remaining_dims)
 	if (pspec->axis_par > -2) {
 	  /* We have an axis parameter specified for this one. */
 	  int32_t axis_param = pspec->axis_par;
@@ -2406,25 +2759,25 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
 	    returnSym = luxerror("Axis parameter %d for parameter %d is "
 				 "out of bounds", 0, axis_param, param_ix + 1);
 	    goto error;
-	  }
+	  } // end if (axis_param < 0 || axis_param >= narg)
 	  if (axis_param == param_ix) {
 	    returnSym = luxerror("Parameter %d cannot be its own axis"
 				 " parameter", 0, param_ix + 1);
 	    goto error;
-	  }
+	  } // end if (axis_param == param_ix)
 	  if (!final[axis_param]) {
 	    returnSym = luxerror("Illegal forward output/return axis "
 				 "parameter %d for parameter %d", 0,
 				 axis_param + 1, param_ix + 1);
 	    goto error;
-	  }
+	  } // end if (!final[axis_param])
 	  int32_t aq = ps[axis_param];
 	  if (!symbolIsNumerical(aq)) {
 	    returnSym = luxerror("Axis parameter %d is not numerical for"
 				 " parameter %d", 0,
 				 axis_param + 1, param_ix + 1);
 	    goto error;
-	  }
+	  } // end if (!symbolIsNumerical(aq))
 	  aq = lux_long(1, &aq);
 	  int32_t nAxes;
 	  Pointer axes;
@@ -2436,18 +2789,18 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
 				   " parameter %d", 0,
 				   axes.l[j], param_ix + 1);
 	      goto error;
-	    }
+	    } // end if (axes.l[j] < 0 || axes.l[j] >= tgt_dims_ix)
 	    tgt_dims[axes.l[j]] = 0; /* flags removal.  Note: no check for
 				      duplicate axes */
-	  }
+	  } // end for (j = 0; j < nAxes; j++)
 	  int32_t k;
 	  /* remove flagged dimensions */
 	  for (j = k = 0; j < tgt_dims_ix; j++) {
 	    if (tgt_dims[j])
 	      tgt_dims[k++] = tgt_dims[j];
-	  }
+	  } // end for (j = k = 0; j < tgt_dims_ix; j++)
 	  tgt_dims_ix = k;
-	}
+	} // end if (pspec->axis_par > -2)
         if (param_ix == num_in_out_params) {      /* a return parameter */
           if (ref_param >= 0
               && pspec->data_type_limit == PS_LOWER_LIMIT) {
@@ -2459,7 +2812,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
             type = pspec->data_type;
           } else {
             type = symbol_type(ps[ref_param]);
-          }
+          } // end if (ref_param >= 0 ...) else
           if (pspec->common_type
               && common_type != LUX_NO_SYMBOLTYPE)
             type = common_type;
@@ -2467,35 +2820,38 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
 	    iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
 	  else
 	    iq = returnSym = scalar_scratch(type);
-        } else {
+        } else { // if (param_ix == num_in_out_params) else
+          // not a return parameter, so an output parameter
           iq = ps[param_ix];
           type = symbol_type(iq);
           if (symbol_class(iq) == LUX_UNUSED
               || ((pspec->data_type_limit == PS_LOWER_LIMIT
                    && type < pspec->data_type)
                   || (pspec->data_type_limit == PS_EXACT
+                      && pspec->data_type != LUX_NO_SYMBOLTYPE
                       && type != pspec->data_type)))
             type = pspec->data_type;
 	  if (tgt_dims_ix)
 	    redef_array(iq, type, tgt_dims_ix, tgt_dims);
 	  else
 	    redef_scalar(iq, type, NULL);
-        }
+        } // end if (param_ix == num_in_out_params) else
         break;
-      }
+      } // end switch (pspec->logical_type)
       final[param_ix] = iq;
       standardLoop(iq, 0, SL_ALLAXES, symbol_type(iq), &li, &p, NULL, NULL, NULL);
       if (infos)
         (*infos)[param_ix] = li;
       if (ptrs)
         (*ptrs)[param_ix] = p;
-    } else {
+    } else { // if (!pspec->is_optional || ...) else
       if (infos)
         memset(&(*infos)[param_ix], 0, sizeof(loopInfo));
       if (ptrs)
         (*ptrs)[param_ix].v = NULL;
-    }
-  }
+    } // end if (!pspec->is_optional || ...) else
+
+  } // end for (param_ix = 0; param_ix < psl->num_param_specs; param_ix++)
 
   free_param_spec_list(psl);
   obstack_free(&o, NULL);

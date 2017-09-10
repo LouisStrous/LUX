@@ -203,7 +203,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
              "set offsets graph 0.05, graph 0.05, graph 0.05, graph 0.05; "
              "set tics; ");
 
-    extern float plims[];
+    extern double plims[];
 
     if (plims[0] != plims[1])
       gp->sendf("set xrange [%f:%f]\n", plims[0], plims[1]);
@@ -246,18 +246,18 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
     ++eps;
   }
 
-  // transform the coordinates to type float
+  // transform the coordinates to type double
   int32_t myps[3];
   int32_t ndata = 0;
   for (int32_t i = 0; i < 3 && i < narg; ++i) {
     if (ps[i]) {
-      myps[i] = lux_float(1, &ps[i]);
+      myps[i] = lux_double(1, &ps[i]);
       ++ndata;
     } else
       break;
   }
 
-  if (standard_args.set(ndata, myps, "iF*;iF&?;iF&?", &data, &info) < 0)
+  if (standard_args.set(ndata, myps, "iD*;iD&?;iD&?", &data, &info) < 0)
     return LUX_ERROR;
 
   // send the data to a gnuplot data block
@@ -265,17 +265,17 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
   switch (ndata) {
   case 1:
     for (int i = 0; i < info[0].nelem; ++i) {
-      gp->sendf("%g\n", *data[0].f++);
+      gp->sendf("%.10g\n", *data[0].d++);
     }
     break;
   case 2:
     for (int i = 0; i < info[0].nelem; ++i) {
-      gp->sendf("%g %g\n", *data[0].f++, *data[1].f++);
+      gp->sendf("%.10g %.10g\n", *data[0].d++, *data[1].d++);
     }
     break;
   case 3:
     for (int i = 0; i < info[0].nelem; ++i) {
-      gp->sendf("%g %g %g\n", *data[0].f++, *data[1].f++, *data[2].f++);
+      gp->sendf("%.10g %.10g %.10g\n", *data[0].d++, *data[1].d++, *data[2].d++);
     }
     break;
   }
@@ -533,13 +533,13 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
   } else
     gp->sendf("set title\n");
 
-  float angle_x = 60;
-  float angle_z = 30;
+  double angle_x = 60;
+  double angle_z = 30;
 
   if (enarg) {
     if (*eps) {                 // rotx
       if (symbolIsRealScalar(*eps)) {
-        angle_x = fmodf(float_arg(*eps), 180);
+        angle_x = fmodf(double_arg(*eps), 180);
         if (angle_x < 0)
           angle_x += 180;
       } else
@@ -552,7 +552,7 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
   if (enarg) {
     if (*eps) {                 // rotz
       if (symbolIsRealScalar(*eps)) {
-        angle_z = fmodf(float_arg(*eps), 360);
+        angle_z = fmodf(double_arg(*eps), 360);
         if (angle_z < 0)
           angle_z += 360;
       } else
@@ -587,7 +587,7 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
       if (!done) {
         int32_t contours_count;
         Pointer contours;
-        int32_t iq = lux_float(1, eps);
+        int32_t iq = lux_double(1, eps);
         if (numerical(iq, NULL, NULL, &contours_count, &contours) < 0)
           return LUX_ERROR;
         gp->sendf("set contour surface; set cntrparam levels discrete ");
@@ -644,8 +644,8 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
       int32_t myps[3];
 
       for (int i = 0; i < ndata; ++i)
-        myps[i] = lux_float(1, &ps[i]);
-      if (standard_args.set(ndata, myps, "iF*;iF*;iF>1,*", &data, &info) < 0)
+        myps[i] = lux_double(1, &ps[i]);
+      if (standard_args.set(ndata, myps, "iD*;iD*;iD>1,*", &data, &info) < 0)
         return LUX_ERROR;
 
       if (info[0].ndim < 1 || info[0].ndim > 2)
@@ -691,17 +691,17 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
           if (tmp.is_open()) {
             // std::cout << "Writing to " << gp->data_file_name() << std::endl;
             // write the number of columns
-            float n = info[2].dims[0];
+            double n = info[2].dims[0];
             tmp.write((char*) &n, sizeof(n));
             // write the x coordinates
-            tmp.write((char*) &data[0].f[0], info[2].dims[0]*sizeof(data[0].f[0]));
+            tmp.write((char*) &data[0].d[0], info[2].dims[0]*sizeof(data[0].d[0]));
 
             // treat all rows
-            char* z = (char*) &data[2].f[0];
-            size_t size = info[2].dims[0]*sizeof(data[2].f[0]);
+            char* z = (char*) &data[2].d[0];
+            size_t size = info[2].dims[0]*sizeof(data[2].d[0]);
             for (int i = 0; i < info[2].dims[1]; ++i) {
               // write the y coordinate
-              tmp.write((char*) &data[1].f[i], sizeof(data[1].f[i]));
+              tmp.write((char*) &data[1].d[i], sizeof(data[1].d[i]));
               // write the row of z coordinates
               tmp.write(z, size);
               z += size;
@@ -780,8 +780,8 @@ REGISTER(gnucontour, s, gcontour, 1, 1, ":1equalxy:2image");
   set contour base|surface|both  => draw contours
   set hidden3d  => hidden line removal
 
-  plot '-' binary array=(30) format="%float" with lines; => y only
-  plot '-' binary record=(30) format="%float" using 1:2 with lines => x and y
+  plot '-' binary array=(30) format="%double" with lines; => y only
+  plot '-' binary record=(30) format="%double" using 1:2 with lines => x and y
 
   splot '-' binary array=(30,40) with lines  => 3D wire mesh plot
   splot '-' binary array=(30,40) with image  => flat projected image

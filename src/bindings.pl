@@ -44,7 +44,10 @@ foreach my $file (@files) {
       @data = split /\s*,\s*/, $1;
       my $f = "lux_$data[1]_$data[2]_";
       my $declare = $expected_types{$f};
-      print "NOT FOUND: $f\n" if not $declare;
+      if (not $declare) {
+        print "NOT FOUND: $f from line $. in $file\n";
+        exit(1);
+      }
       $declare =~ s/\(.*?\)/$data[0]/;
       print $ofh <<EOD;
 int32_t lux_$data[0]_$data[2](int32_t narg, int32_t ps[]) {

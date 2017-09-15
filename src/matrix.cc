@@ -91,7 +91,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   tdims[1] = dims1[1];
 
   standard_redef_array(iq, LUX_DOUBLE, tndim, tdims, 0, NULL,
-		       &ptrs[2], &infos[2]);
+                       infos[2].mode, &ptrs[2], &infos[2]);
   free(tdims);
   setAxes(&infos[0], 2, NULL, SL_EACHBLOCK);
   setAxes(&infos[1], 2, NULL, SL_EACHBLOCK);
@@ -260,17 +260,17 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   if (infos[0].dims[0] <= infos[0].dims[1]) {
     dims[1] = dims[0];		/* # columns */
     standard_redef_array(ps[2], LUX_DOUBLE, infos[0].ndim - 1, dims + 1,
-			 0, NULL, &ptrs[2], &infos[2]); /* S (vector) */
+			 0, NULL, infos[2].mode, &ptrs[2], &infos[2]); /* S (vector) */
     standard_redef_array(ps[3], LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
-			 &ptrs[3], &infos[3]); /* Vt */
+			 infos[3].mode, &ptrs[3], &infos[3]); /* Vt */
   } else {
     standard_redef_array(ps[3], LUX_DOUBLE, infos[0].ndim, infos[0].dims,
-			 0, NULL, &ptrs[3], &infos[3]); /* Vt */
+			 0, NULL, infos[3].mode, &ptrs[3], &infos[3]); /* Vt */
     dims[0] = dims[1];					/* # rows */
     standard_redef_array(ps[2], LUX_DOUBLE, infos[0].ndim - 1, dims + 1,
-			 0, NULL, &ptrs[2], &infos[2]); /* S (vector) */
+			 0, NULL, infos[2].mode, &ptrs[2], &infos[2]); /* S (vector) */
     standard_redef_array(ps[1], LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
-			 &ptrs[1], &infos[1]);
+			 infos[1].mode, &ptrs[1], &infos[1]);
   }
   setAxes(&infos[0], 2, NULL, SL_EACHBLOCK);
   setAxes(&infos[1], 1, NULL, SL_EACHBLOCK);
@@ -333,7 +333,7 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
   dims[1] = infos[0].dims[0];
   memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
   standard_redef_array(iq, LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
-		       &ptrs[1], &infos[1]);
+		       infos[1].mode, &ptrs[1], &infos[1]);
   dims[0] = 0;
   dims[1] = 1;
   setAxes(&infos[0], 2, dims, SL_EACHBLOCK);
@@ -363,7 +363,8 @@ int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   int32_t dims[2];
   dims[0] = dims[1] = infos[0].nelem;
-  standard_redef_array(iq, LUX_DOUBLE, 2, dims, 0, NULL, &ptrs[1], &infos[1]);
+  standard_redef_array(iq, LUX_DOUBLE, 2, dims, 0, NULL, infos[1].mode,
+                       &ptrs[1], &infos[1]);
   lux_zero(1, &iq);
   int32_t i;
   for (i = 0; i < infos[0].nelem; i++)

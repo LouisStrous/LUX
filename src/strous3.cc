@@ -2468,19 +2468,19 @@ int32_t runord_d(double *data, int32_t n, int32_t width, int32_t ord, double *re
   free(temp);
   return 0;
 }
-BIND(runord_d, i_dpiT3dp_iDaiLiLrDq_00T3, f, runord, 3, 3, NULL);
+BIND(runord_d, i_dpiT3dp_iaiirq_00T3, f, runord, 3, 3, NULL);
 /*--------------------------------------------------------------------*/
 int32_t runmax_d(double *data, int32_t n, int32_t width, double *result)
 {
   return runord_d(data, n, width, width - 1, result);
 }
-BIND(runmax_d, i_dpiidp_iDaLrDq_00T2, f, RUNMAX, 2, 2, NULL);
+BIND(runmax_d, i_dpiidp_iairq_00T2, f, RUNMAX, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
 int32_t runmin_d(double *data, int32_t n, int32_t width, double *result)
 {
   return runord_d(data, n, width, 0, result);
 }
-BIND(runmin_d, i_dpiidp_iDaLrDq_00T2, f, RUNMIN, 2, 2, NULL);
+BIND(runmin_d, i_dpiidp_iairq_00T2, f, RUNMIN, 2, 2, NULL);
 /*--------------------------------------------------------------------*/
 /*
   Returns <x> such that <x> = <cur> (mod <period) and
@@ -2513,7 +2513,7 @@ int32_t unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
   }
   return 0;
 }
-BIND(unmod_slice_d, i_sdddsd_iDaLDDrDq_000T333, f, unmod, 2, 4, ":axis:period:average");
+BIND(unmod_slice_d, i_sdddsd_iaiiirq_000T333, f, unmod, 2, 4, ":axis:period:average");
 /*--------------------------------------------------------------------*/
 double hypot_stride(double *data, size_t count, size_t stride)
 {
@@ -2524,7 +2524,7 @@ double hypot_stride(double *data, size_t count, size_t stride)
   }
   return result;
 }
-BIND(hypot_stride, d_sd_iDaLarDxq_000_2, f, hypot, 1, 2, ":axis");
+BIND(hypot_stride, d_sd_iaiarxq_000_2, f, hypot, 1, 2, ":axis");
 /*--------------------------------------------------------------------*/
 int32_t approximately_equal(double a, double b, double eps)
 {

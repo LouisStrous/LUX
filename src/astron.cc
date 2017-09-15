@@ -3402,7 +3402,7 @@ double kepler_v(double M, double e)
       return 2*atan(tau);       // output is true anomaly
   }
 }
-BIND(kepler_v, d_dd_iDaDbrDq_01_2, f, kepler, 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau");
+BIND(kepler_v, d_dd_iaibrq_01_2, f, kepler, 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau");
 /*--------------------------------------------------------------------------*/
 double interpolate_angle(double a1, double a2, double f)
      /* interpolates between angles <a1> and <a2> (measured in

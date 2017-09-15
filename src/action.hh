@@ -114,8 +114,8 @@ void	subdataLoop(int32_t *, loopInfo *), addVerify(char *, char),
   *setFacts(int32_t symbol, int32_t type, int32_t flag),
   deleteFacts(int32_t symbol, int32_t type), returnLoop(loopInfo *, Pointer *, int32_t),
   setAxisMode(loopInfo *, int32_t mode),
-  standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t, int32_t *, Pointer *,
-		       loopInfo *);
+  standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t,
+                       int32_t *, int32_t, Pointer *, loopInfo *);
 void convertWidePointer(wideScalar *, int32_t, int32_t);
 
 void	newStack(int32_t), push(int32_t), deleteStack(void);
@@ -141,10 +141,12 @@ void	clearToPopTempVariable(int32_t), pushTempVariable(int32_t), printw(char con
 
 const csplineInfo empty_cubic_spline(void);
 
-void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims, 
+int setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims,
                         Symboltype type, int32_t naxes, int32_t const *axes,
-                        Pointer *data, int32_t mode),
-  rearrangeDimensionLoop(loopInfo *), endian(void *, int32_t, int32_t),
+                       Pointer *data, int32_t mode);
+
+void endian(void *, int32_t, int32_t),
+  rearrangeDimensionLoop(loopInfo*),
   rearrangeEdgeLoop(loopInfo *, loopInfo *, int32_t);
 
 float	float_arg(int32_t);

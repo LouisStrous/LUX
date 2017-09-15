@@ -524,8 +524,8 @@ int32_t gsl_fft(double *data, size_t n, size_t stride)
   }
   return result;
 }
-BIND(gsl_fft, i_sd_iDaLarDq_000, f, fft, 1, 2, "1allaxes:2amplitudes");
-BIND(gsl_fft, i_sd_iDaLa_000, s, fft, 1, 2, "1allaxes:2amplitudes");
+BIND(gsl_fft, i_sd_iaiarq_000, f, fft, 1, 2, "1allaxes:2amplitudes");
+BIND(gsl_fft, i_sd_iaia_000, s, fft, 1, 2, "1allaxes:2amplitudes");
 /*------------------------------------------------------------------------- */
 int32_t gsl_fft_back(double *data, size_t n, size_t stride)
 {
@@ -551,8 +551,8 @@ int32_t gsl_fft_back(double *data, size_t n, size_t stride)
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
-BIND(gsl_fft_back, i_sd_iDaLarDq_000, f, fftb, 1, 2, "1allaxes:2amplitudes");
-BIND(gsl_fft_back, i_sd_iDaLa_000, s, fftb, 1, 2, "1allaxes:2amplitudes");
+BIND(gsl_fft_back, i_sd_iaiarq_000, f, fftb, 1, 2, "1allaxes:2amplitudes");
+BIND(gsl_fft_back, i_sd_iaia_000, s, fftb, 1, 2, "1allaxes:2amplitudes");
 /*------------------------------------------------------------------------- */
 int32_t hilbert(double *data, size_t n, size_t stride)
 {
@@ -571,8 +571,8 @@ int32_t hilbert(double *data, size_t n, size_t stride)
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
 }
-BIND(hilbert, i_sd_iDaLarDq_000, f, hilbert, 1, 2, "1allaxes");
-BIND(hilbert, i_sd_iDaLa_000, s, hilbert, 1, 2, "1allaxes");
+BIND(hilbert, i_sd_iaiarq_000, f, hilbert, 1, 2, "1allaxes");
+BIND(hilbert, i_sd_iaia_000, s, hilbert, 1, 2, "1allaxes");
 /*------------------------------------------------------------------------- */
 int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
 		   double *tdata, size_t tcount, size_t tstride)
@@ -653,7 +653,7 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   memcpy(dims, infos[0].dims, ndim*sizeof(int32_t));
   dims[0] = (int32_t) (dims[0]*factor + 0.5);
   standard_redef_array(iq, LUX_DOUBLE, ndim, dims, 0, NULL,
-		       &ptrs[2], &infos[2]);
+                       infos[2].mode, &ptrs[2], &infos[2]);
   free(dims);
   setAxes(&infos[0], 1, NULL, SL_EACHBLOCK);
   setAxes(&infos[2], 1, NULL, SL_EACHBLOCK);

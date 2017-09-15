@@ -19,11 +19,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /** \file
-  Functions and macros for binding LUX functions
-    and subroutines to C (library) functions.
+
+    Functions and macros for binding LUX functions and subroutines to
+    C (library) functions.
 
     This file defines many binding functions.  The name of a binding
-    functions is built up as follows:
+    function is built up as follows:
 
     \verbatim
     'lux_<returntype>_<paramtypes>_<stdargspec>_<ptrspec>_<sf>_'
@@ -36,8 +37,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
     \c <returntype> is an encoding of the return type of the bound C
     function.  \c void is encoded as `v`, \c double as `d`, \c int32_t
-    as `i`, <tt>double*</tt> as `dp`, <tt>double (*)[3][4]</tt> as
-    `dp34`.
+    as `i`.  A points to a type gets a `p` appended, so a `double *`
+    is encoded as `dp`.  A pointer to a `double` array of 3 by 2
+    elements is encoded as `dp32`.
 
     So,
 
@@ -72,18 +74,22 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     \c <stdargspec> is an encoding of the arguments type specification
     in the most elaborate call to standard_args() for this binding.
     The encoding is obtained from the arguments type specification by:
-    - removing `>`, `;`, and all but the first `i`, all but the first
-      `o`, and all but the first `r` (but not what's after those later
-      `i` or `o` or `r`).
-    - changing `&` to `q`, `+` to `p`, `-` to `m`, `*` to `a`.
+
+    - removing `;`, `?`, and all data type specifications (including
+      `>`).
+
+    - changing `&` to `q`, `+` to `p`, `-` to `m`, `*` to `a`, `=` to
+      `k`.
+
     - changing `[...]` to `c`, `{...}` to `x`.
+
     - changing `#` to `o`.
 
-    A repeat of a particular unit (from a variable type specification
-    like `D` up to but not including the next one; for a repeat count
-    of at least 3, or if the abbreviated version is shorter than the
-    full version) is indicated by appending `T` and the repeat count.
-    For example, `DqDqDqDq` gets abbreviated to `DqT4`.
+    A repeat of a particular unit (from a `i`/`o`/`r` up to but not
+    including the next one; for a repeat count of at least 3, or if
+    the abbreviated version is shorter than the full version) is
+    indicated by appending `T` and the repeat count.  For example,
+    `iqiqiqiq` gets abbreviated to `iqT4`.
 
     Multiple standard_args() format specifications can lead to the
     same \c <stdargspec>.
@@ -91,7 +97,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     So,
 
     \verbatim
-    lux_d_dT3i_iD3rDq_X_X_
+    lux_d_dT3i_i3rq_X_X_
     \endverbatim
 
     may be for a LUX function that takes a one-dimensional
@@ -111,7 +117,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     So,
 
     \verbatim
-    lux_d_dT3i_iD3rDq_0001_2_X_
+    lux_d_dT3i_i3rq_0001_2_X_
     \endverbatim
 
     indicates that the first three arguments to the bound C function
@@ -128,26 +134,24 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     So,
 
     \verbatim
-    lux_d_dT3i_iD3rDq_0001_2_f_
+    lux_d_dT3i_i3rq_0001_2_f_
     \endverbatim
 
     binds the C function to a LUX function.
 
 */
 #include "luxdefs.hh"
+#include "action.hh"
 #include "error.hh"
 #include <math.h>
 #include <obstack.h>
 #include "bindings.hh"
+
+/** Define which memory allocation routine to use for obstacks. */
 #define obstack_chunk_alloc malloc
+
+/** Define which memory freeing routine to use for obstacks. */
 #define obstack_chunk_free free
-
-extern int32_t internalMode;
-
-int32_t standard_args(int32_t, int32_t [], char const *, Pointer **,
-                      loopInfo **);
-int32_t setAxes(loopInfo *, int32_t, int32_t *, int32_t);
-int32_t advanceLoop(loopInfo *, Pointer *);
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 
@@ -329,8 +333,39 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name,
   obstack_grow(registered_subroutines, &ir, sizeof(ir));
 }
 /*-----------------------------------------------------------------------*/
+/** Bind a C pointer-count-stride function to a LUX function of type
+    `iD*;rD&` or `iD*;iL*;rD&`, or subroutine of type `iD*` or
+    `iD*;iL*`.
+
+    The LUX function or subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.  For the subroutine, this argument is modified, so is an
+    output argument, too, and must be a named variable.
+
+    2. optionally, an input scalar or array of arbitrary dimensions,
+    converted to `int32` and treated as an axis parameter.
+
+    The mode argument `/allaxes` (`internalMode & 1`) is equivalent to
+    setting the second argument equal to an array listing all axes of
+    the first argument.
+
+    The LUX function returns a `double` value with the same dimensions
+    as the input argument.  It first copies the first argument to the
+    return value, and then acts as if the LUX subroutine were called
+    on the copy and the second argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i0.dims[0], i0.step[0]);
+    advance(i0);
+    \endverbatim
+
+ */
 int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride), int32_t isfunction)
-/* copy input to output, apply function to output, go through each axis separately */
+/* copy input to output, apply function to output, go through each
+   axis separately */
 {
   Pointer *ptrs, ptrs0, ptrsr;
   loopInfo *infos;
@@ -339,7 +374,8 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
 
   switch (narg) {
   case 1:                       /* source */
-    if ((iq = standard_args(narg, ps, isfunction? "i>D*;rD&": "i>D*", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, isfunction? "iD*;rD&": "iD*",
+                            &ptrs, &infos)) < 0)
       return LUX_ERROR;
     axes = oneaxis;
     naxes = 1;
@@ -351,7 +387,8 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
       iret = 0;
     break;
   case 2:                       /* source, axes */
-    if ((iq = standard_args(narg, ps, isfunction? "i>D*;iL*;rD&": "i>D*;iL*", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, isfunction? "iD*;iL*;rD&":
+                            "iD*;iL*", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     axes = ptrs[1].l;
     naxes = infos[1].nelem;
@@ -380,6 +417,8 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
 
   ptrs0 = ptrs[0];
   if (isfunction) {
+    // copy input to output, then we can treat the function case as
+    // the subroutine case
     memcpy(ptrs[iret].d, ptrs[0].d, infos[0].nelem*sizeof(double));
     ptrsr = ptrs[iret];
   }
@@ -403,34 +442,128 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[], int32_t (*f)(double
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dT4_iDaDarDq_0011_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
+double call_split_times(double t1, double t2,
+                        double(*f)(double, double, double, double))
+{
+  double uta, utb, tta, ttb;
+  uta = floor(t1);
+  utb = t1 - uta;
+  tta = floor(t2);
+  ttb = t2 - ttb;
+  return f(uta, utb, tta, ttb);
+}
+/*-----------------------------------------------------------------------*/
+/** Bind a C function to a LUX function of type `iD*;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an input argument with the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is schematically called like this:
+
+    \verbatim
+    *r++ = f(*i0++, *i1++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dT4_iaiqrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
-    double uta, utb, tta, ttb;
-    uta = floor(*ptrs[0].d);
-    utb = *ptrs[0].d++ - uta;
-    tta = floor(*ptrs[1].d);
-    ttb = *ptrs[1].d++ - tta;
-    *ptrs[2].d++ = f(uta, utb, tta, ttb);
+    *ptrs[2].d++ = call_split_times(*ptrs[0].d++, *ptrs[1].d++, f);
   }
   free(ptrs);
   free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dT4_iDaT4rDq_0T3_4_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
+/** Bind a C function to a LUX function of type `iD*;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an input argument with the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is schematically called like this:
+
+    \verbatim
+    *r++ = f(*i0++, *i1++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dd_iaiqrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;rD&", &ptrs, &infos)) < 0)
+    return LUX_ERROR;
+  while (infos[0].nelem--) {
+    *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d++);
+  }
+  free(ptrs);
+  free(infos);
+  return iq;
+}
+/*-----------------------------------------------------------------------*/
+/** Bind a C function to a LUX function of type `iD*;iD&;iD&;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions , converted to
+    `double`.
+
+    2. four more input arguments with the same dimensions as the first
+    one, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is schematically called like this:
+
+    \verbatim
+    *r++ = f(*i0++, *i1++, *i2++, *i3++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dT4_iaiqT3rq_0T3_4_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
+{
+  Pointer *ptrs;
+  loopInfo *infos;
+  int32_t iq;
+
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     *ptrs[4].d++ = f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++);
@@ -439,30 +572,54 @@ int32_t lux_d_dT4_iDaT4rDq_0T3_4_f_(int32_t narg, int32_t ps[], double (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double))
+/** Bind a C function to a LUX function of type `i>L*;iD&;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32` if its type is less than that.
+
+    2. two more input arguments with the same dimensions as the first
+    one, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is schematically called like this:
+
+    \verbatim
+    *r++ = f(*i0++, *i1++, *i2++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dT3_iaiqiqrq_012_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>L*;i>D*;i>D*;r>D&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>L*;iD&;iD&;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[1].nelem--)
-      *ptrs[3].d++ = f((double) *ptrs[0].l++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
+      *ptrs[3].d++ = f((double) *ptrs[0].l++, *ptrs[1].d++, *ptrs[2].d++);
     break;
   case LUX_INT64:
     while (infos[1].nelem--)
-      *ptrs[3].d++ = f((double) *ptrs[0].q++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
+      *ptrs[3].d++ = f((double) *ptrs[0].q++, *ptrs[1].d++, *ptrs[2].d++);
     break;
   case LUX_FLOAT:
     while (infos[1].nelem--)
-      *ptrs[3].d++ = f((double) *ptrs[0].f++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
+      *ptrs[3].d++ = f((double) *ptrs[0].f++, *ptrs[1].d++, *ptrs[2].d++);
     break;
   case LUX_DOUBLE:
     while (infos[1].nelem--)
-      *ptrs[3].d++ = f(*ptrs[0].d++, 0.0, *ptrs[1].d++, *ptrs[2].d++);
+      *ptrs[3].d++ = f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++);
     break;
   default:
     break;
@@ -472,13 +629,46 @@ int32_t lux_d_dT4_iLaDaDarDq_0z12_f_(int32_t narg, int32_t ps[], double (*f)(dou
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double (*)[3]))
+/** Bind a C function to a LUX function of type `iD*;iD&;iD+3,+3&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an input argument with the same dimensions as the first one,
+    converted to `double`.
+
+    3. an input array with the same dimensions as the first one, but
+    with two dimensions equal to 3 prefixed, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is schematically called like this:
+
+    \verbatim
+    *r++ = f(floor(*i0), *i0 - floor(*i0),
+             floor(*i1), *i1 - floor(*i1),
+             i2)
+    i0++;
+    i1++;
+    i2 += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D+3,+3*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD+3,+3&;rD&", &ptrs, &infos))
+      < 0)
     return LUX_ERROR;
   double (*rnpb)[3] = (double (*)[3]) ptrs[2].d;
   while (infos[0].nelem--) {
@@ -495,13 +685,36 @@ int32_t lux_d_dT4dp3_iDaDaDp3p3arDq_00112_3_f_(int32_t narg, int32_t ps[], doubl
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double, double))
+/** Bind a C function to a LUX function of type `i>L*;iD;iD;iD;iD;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32` if it is less than that.
+
+    2. four input scalars, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is schematically called like this:
+
+    \verbatim
+    *r++ = f(*i0++, 0, *i1, *i2, *i3, *i4)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dT6_iaiT4rq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f)(double, double, double, double, double, double))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>L*;i>D*;i>D1;i>D1;i>D1;r>D&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>L*;iD;iD;iD;iD;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   switch (infos[0].type) {
@@ -533,13 +746,34 @@ int32_t lux_d_dT6_iLaDaD1T3rDq_0z1T4_5_f_(int32_t narg, int32_t ps[], double (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
+/** Bind a C function to a LUX function of type `iD*;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is schematically called like this:
+
+    \verbatim
+    *r++ = f(*i0++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_d_iarq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   while (infos[0].nelem--)
@@ -549,60 +783,38 @@ int32_t lux_d_d_iDarDq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-/** Bind a C function \p f to a LUX function with one at-least-double
-    array input parameter, one scalar at-least-double scalar input
-    parameter, and a double array return parameter with the same
-    dimensions as the first parameter.  Function \p f is called for
-    each element of the first parameter.
-
-    Standard arguments <tt>"i>D*;i>D1;rD&"</tt>.
-
-    @param [in] narg number of symbols in \p ps
-    @param [in] ps array of argument symbols
-    @param [in] f pointer to C function to bind
-    @return the symbol containing the result of the function call
- */
-int32_t lux_d_dd_iDaD1rDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
-{
-  Pointer *ptrs;
-  loopInfo *infos;
-  int32_t iq;
-
-  if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD&", &ptrs, &infos)) < 0)
-    return LUX_ERROR;
-  while (infos[0].nelem--)
-    *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d);
-  free(ptrs);
-  free(infos);
-  return iq;
-}
-/*-----------------------------------------------------------------------*/
-/** Bind a C function to a LUX function of type `iD*;iD#;rD`.
+/** Bind a C function to a LUX function of type `iD*;iD#;rD&`.
 
     The LUX function arguments are:
-    1. an input array, converted to `double`
-    2. a scalar or an array with the same number of elements as the
-       first one
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. a scalar or an array with the same number of elements as (but
+    possibly a different dimensional structure than) the first one,
+    converted to `double`.
 
     The LUX function returns a `double` array with the same dimensions
     as the first argument.
 
-    The C function is called for each element of the first array
-    combined with the scalar or corresponding element of the second
-    array.
+    The C function is called schematically like this:
+
+    \verbatim
+    *r++ = f(*i0++, *i1++)
+    \endverbatim
 
     @param [in] narg number of symbols in \p ps
     @param [in] ps array of argument symbols
     @param [in] f pointer to C function to bind
     @return the symbol containing the result of the function call
  */
-int32_t lux_d_dd_iDaDbrDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
+int32_t lux_d_dd_iaibrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D#;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD#;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   if (infos[1].nelem > 1) {
     /* same number of elements in parameters 0 and 1 */
@@ -618,22 +830,28 @@ int32_t lux_d_dd_iDaDbrDq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dd_iDarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
-{
-  Pointer *ptrs;
-  loopInfo *infos;
-  int32_t iq;
+/** Bind a C function to a LUX function of type `i>L*;rD&`.
 
-  if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
-    return LUX_ERROR;
-  while (infos[0].nelem--)
-    *ptrs[1].d++ = f(*ptrs[0].d++, 0.0);
-  free(ptrs);
-  free(infos);
-  return iq;
-}
-/*-----------------------------------------------------------------------*/
-int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32` if it is less than that.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    *r++ = f(*i0++, 0)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dd_iarq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 {
   Pointer *ptrs;
   loopInfo *infos;
@@ -667,13 +885,40 @@ int32_t lux_d_dd_iLarDq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, 
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dp3d_iD33aDmmarDmmq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double (*)[3], double))
+/** Bind a C function to a LUX function of type `iD3,3*;iD-,-&;rD[-]&`.
+
+    The LUX function arguments are:
+
+    1. an input array with the first two dimensions equal to 3, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. an input array with the same dimensions as the first argument
+    except that it omits the first two dimensions, converted to
+    `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the second argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    *r++ = f(i0, *i1++);
+    i0 += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dp33d_i33aimmqrcq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double [3][3], double))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;i>D-,-*;rD-,-&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3,3*;iD-,-&;rD[-]&", &ptrs, &infos))
+      < 0)
     return LUX_ERROR;
   double (*rnpb)[3] = (double (*)[3]) ptrs[0].d;
   while (infos[1].nelem--) {
@@ -685,13 +930,35 @@ int32_t lux_d_dp3d_iD33aDmmarDmmq_01_2_f_(int32_t narg, int32_t ps[], double (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dp_iD3arDm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double *))
+/** Bind a C function to a LUX function of type `iD3*;rD-3&`.
+
+    The LUX function arguments are:
+
+    1. an input array with the first dimension equal to 3, and
+    arbitrary following dimensions, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that it omits the first dimension.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    *r++ = f(i0);
+    i0 += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dp3_i3arm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;rD-3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;rD-3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   int32_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -703,13 +970,39 @@ int32_t lux_d_dp_iD3arDm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_dpdp_iD3aD3qrDm3q_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double *, double *))
+/** Bind a C function to a LUX function of type `iD3*;iD&;rD-3&`.
+
+    The LUX function arguments are:
+
+    1. an input array with the first dimension equal to 3, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. an input array with the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that it omits the first dimension.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    *r++ = f(i0, i1);
+    i0 += 3;
+    i1 += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_dp3dp3_i3aiqrm3q_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double [3], double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;i>D3&;rD-3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;iD&;rD-3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[2].nelem--) {
     *ptrs[2].d++ = f(ptrs[0].d, ptrs[1].d);
@@ -721,7 +1014,36 @@ int32_t lux_d_dpdp_iD3aD3qrDm3q_01_2_f_(int32_t narg, int32_t ps[], double (*f)(
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(double *, size_t count, size_t stride))
+/** Bind a C function to a LUX function of type `iD*;rD-&` or
+    `iD*;iL*;rD{-}&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an optional input scalar or array of arbitrary dimensions,
+    converted to `int32`, which acts as an axis specification.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that it omits the dimensions
+    indicated by the axis parameter, or omits the first dimension if
+    no axis parameter was specified.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    *r++ = f(i0, i0.dims[0], i0.step[0]);
+    advance(i0);
+    advance(r);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(double *, size_t count, size_t stride))
 {
   Pointer *ptrs, ptrs0, ptrsr;
   loopInfo *infos;
@@ -730,7 +1052,7 @@ int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(doub
 
   switch (narg) {
   case 1:                       /* source */
-    if ((iq = standard_args(narg, ps, "i>D*;rD-&", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, "iD*;rD-&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     axes = oneaxis;
     naxes = 1;
@@ -738,7 +1060,7 @@ int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(doub
     iret = 1;
     break;
   case 2:                       /* source, axes */
-    if ((iq = standard_args(narg, ps, "i>D*;iL*;rD{-}&", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, "iD*;iL*;rD{-}&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     axes = ptrs[1].l;
     naxes = infos[1].nelem;
@@ -777,13 +1099,39 @@ int32_t lux_d_sd_iDaLarDxq_000_2_f_(int32_t narg, int32_t ps[], double (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dT10dpT6_iDaT8oDqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double, double, double, double, double, double *, double *, double *, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;iD&;iD&;iD&;iD&;iD&;iD&;iD&;oD&;oD&;oD&;oD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. seven arguments of the same dimensions as the first one,
+    converted to `double`.
+
+    3. six output arguments changed to `double` and to the same
+    dimensions as the first input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, *i3++, *i4++, *i5++, *i6++, 0, *i7++,
+      o8++, o9++, o10++, o11++, o12++, o13++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double, double, double, double, double, double *, double *, double *, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD&;oD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;iD&;iD&;oD&;oD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++, *ptrs[4].d++,
@@ -794,13 +1142,38 @@ int32_t lux_i_dT10dpT6_iDaT8oDqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[], int3
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dT3dpdp_iDaDarDq_0z122_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double *, double *))
+/** Bind a C function to a LUX function of type `iD*;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an input argument of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, *i1++, &a, &b);
+    *r++ = a + b;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dT3dpdp_iaiqrq_0z122_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     double ut1, ut2;
@@ -810,17 +1183,45 @@ int32_t lux_i_dT3dpdp_iDaDarDq_0z122_f_(int32_t narg, int32_t ps[], int32_t (*f)
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dT5dp_iD3aD1D1rD3q_120003_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double *))
+/** Bind a C function to a LUX function of type `iD3*;iD;iD;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first dimension, followed
+    by arbitrary other dimensions, converted to `double`.
+
+    2. a scalar or single-element array, converted to `double`.
+
+    3. a scalar or single-element array, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i1, *i2, i0[0], i0[1], i0[2], r);
+    i0 += 3;
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dT5dp3_i3aiirq_120003_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;iD1;iD1;rD3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;iD;iD;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
-    f(*ptrs[1].d, *ptrs[2].d, ptrs[0].d[0], ptrs[0].d[1], ptrs[0].d[2], ptrs[3].d);
+    f(*ptrs[1].d, *ptrs[2].d, ptrs[0].d[0], ptrs[0].d[1], ptrs[0].d[2],
+      ptrs[3].d);
     ptrs[0].d += 3;
     ptrs[3].d += 3;
   }
@@ -829,13 +1230,41 @@ int32_t lux_i_dT5dp_iD3aD1D1rD3q_120003_f_(int32_t narg, int32_t ps[], int32_t (
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double, double [2][3]))
+/** Bind a C function to a LUX function of type
+    `iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. five input arguments with the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that dimensions with 2 and 3
+    elements are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, *i3++, *i4++, *i5++, r);
+    r += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double, double, double, double, double [2][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++, *ptrs[4].d++,
@@ -847,13 +1276,40 @@ int32_t lux_i_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], int32_t (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double (*)[3], double (*)[3]))
+/** Bind a C function to a LUX subroutine of type `i>L*;oD+2,+3&;oD[-]&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32` if it is less.
+
+    2. an output argument with the same dimensions as the first one,
+    except that dimensions equal to 2 and 3 are prefixed.
+
+    3. an output argument with the same dimensions as the previous
+    one, converted to `double`.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, o1, o2);
+    o1 += 6;
+    o2 += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dddp23T2_iaop2p3qocq_0z12_s_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double [2][3], double [2][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>L*;oD+2,+3&;oD+2,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>L*;oD+2,+3&;oD[-]&", &ptrs, &infos))
+      < 0)
     return LUX_ERROR;
   double (*pvh)[3] = (double (*)[3]) ptrs[1].d;
   double (*pvb)[3] = (double (*)[3]) ptrs[2].d;
@@ -895,13 +1351,35 @@ int32_t lux_i_dddp3dp3_iLaoDp2p3qT2_0z12_s_(int32_t narg, int32_t ps[], int32_t 
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dddpdp_iDarDq_0z11_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double *, double *))
+/** Bind a C function to a LUX function of type `iD*;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, &a, &b);
+    *r++ = a + b;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dddpdp_iarq_0z11_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     double tt1, tt2;
@@ -913,13 +1391,38 @@ int32_t lux_i_dddpdp_iDarDq_0z11_f_(int32_t narg, int32_t ps[], int32_t (*f)(dou
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, int32_t, double (*)[3]))
+/** Bind a C function to a LUX function of type `iD*;iL;rD+3,+2&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an input scalar or single-element array, converted to `int32`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that dimensions equal to 3 and 2 are
+    prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, *i1, r);
+    r += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_ddidp23_iairp3p2q_0z12_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, int32_t, double [2][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;iL1;rD+3,+2&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iL;rD+3,+2&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   while (infos[0].nelem--) {
@@ -931,13 +1434,43 @@ int32_t lux_i_ddidp3_iDaL1rDp3p2q_0z12_f_(int32_t narg, int32_t ps[], int32_t (*
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], int32_t (*f)(double [2][3], double *, double *, double *, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD2,3*;oD-2-3&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 2 and 3 elements in the first two
+    dimensions, and arbitrary following dimensions, converted to
+    `double`.
+
+    2. an output argument changed to be `double` and to have the same
+    dimensions as the first one, except that the first two dimensions
+    are omitted.
+
+    3. five output arguments changed similarly to the first output
+    argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i1++, i2++, i3++, i4++, i5++, i6++);
+    i0 += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(int32_t narg, int32_t ps[], int32_t (*f)(double [2][3], double *, double *, double *, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D2,3*;oD-2-3*;oD[-];oD[-];oD[-];oD[-];oD[-]", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps,
+                          "iD2,3*;oD-2-3&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
   while (nelem--) {
@@ -950,13 +1483,40 @@ int32_t lux_i_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], int32_
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, int32_t, int32_t, int32_t, double *))
+/** Bind a C function to a LUX function of type `iD*;iL;iL;rD&`
+
+    The LUX function arguments are:
+
+    1. an input scalar or array with arbitrary dimensions, converted
+    to `double`.
+
+    2. an input scalar or single-element array, converted to `int32`.
+
+    3. an input scalar or single-element array, converted to `int32`.
+
+    The LUX function returns a `double` scalar or array with the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i0.dims[0], *i1, *i2, r);
+    i0 += i0.dims[0];
+    r += i0.dims[0];
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dpiT3dp_iaiirq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, int32_t, int32_t, int32_t, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;iL;iL;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iL;iL;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
   while (nrepeat--) {
@@ -969,13 +1529,38 @@ int32_t lux_i_dpiT3dp_iDaiLiLrDq_00T3_f_(int32_t narg, int32_t ps[], int32_t (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_dpiidp_iDaLrDq_00T2_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, int32_t, int32_t, double *))
+/** Bind a C function to a LUX function of type `iD*;iL;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array with arbitrary dimensions, converted
+    to `double`.
+
+    2. an input scalar or single-element array, converted to `int32`.
+
+    The LUX function returns a `double` scalar or array with the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i0.dims[0], *i1, r);
+    i0 += i0.dims[0];
+    r += i0.dims[0];
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_dpiidp_iairq_00T2_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, int32_t, int32_t, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;iL;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iL;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
   while (nrepeat--) {
@@ -988,13 +1573,38 @@ int32_t lux_i_dpiidp_iDaLrDq_00T2_f_(int32_t narg, int32_t ps[], int32_t (*f)(do
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_idT3dp_iD3aL1rDq_10002_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double, double, double, double *))
+/** Bind a C function to a LUX function of type `iD3*;iL;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first dimension, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. an input scalar or single-element array, converted to `int32`.
+
+    The LUX function returns a `double` scalar or array with the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i1, i0[0], i0[1], i0[2], r);
+    i0 += 3;
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_idT3dp3_i3airq_10002_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double, double, double, double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;iL1;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;iL;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -1007,33 +1617,38 @@ int32_t lux_i_idT3dp_iD3aL1rDq_10002_f_(int32_t narg, int32_t ps[], int32_t (*f)
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-/** Bind a C function to a LUX function.
+/** Bind a C function to a LUX function of type `iL;iD3*;rD[-]&`.
 
-    The C function accepts an `int32_t` and four pointers to `double`
-    and returns an `int32_t`.
+    The LUX function arguments are:
 
-    The LUX function requires a single-element input value (converted
-    to `int32`), and an array (converted to `double`) with dimensions
-    3 and any, and returns a `double` array with the same dimensions
-    as the second argument.
+    1. an input scalar or single-element array, converted to `int32`.
 
-    Standard arguments format <tt>"iL;iD3*;rD[-]"</tt>
+    2. an input array with 3 elements in its first dimension, and
+    arbitrary following dimensions, converted to `double`.
 
-    Function \p f is called once per 3 elements of both the 2nd input
-    parameter and the return symbol.
+    The LUX function returns a `double` scalar or array with the same
+    dimensions as the second argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0, i1, &r[0], &r[1], &r[2]);
+    i1 += 3;
+    r += 3;
+    \endverbatim
 
     @param [in] narg number of symbols in \p ps
     @param [in] ps array of argument symbols
     @param [in] f pointer to C function to bind
     @return the symbol containing the result of the function call
  */
-int32_t lux_i_idpT4_iL1D3arDcq_0T222_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double *, double *, double *, double *))
+int32_t lux_i_idp3dpT3_ii3arcq_0T222_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double [3], double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "iL;iD3*;rD[-]", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iL;iD3*;rD[-]&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[1].nelem/3;
   while (nelem--) {
@@ -1046,7 +1661,30 @@ int32_t lux_i_idpT4_iL1D3arDcq_0T222_f_(int32_t narg, int32_t ps[], int32_t (*f)
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_idpdp_iLarDp2q_011_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double *, double *))
+/** Bind a C function to a LUX function of type `iL*;rD+2&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the argument, except that a single dimension with 2 elements is
+    prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, &r[0], &r[1]);
+    r += 2;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_idpdp_iarp2q_011_f_(int32_t narg, int32_t ps[], int32_t (*f)(int32_t, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
@@ -1063,17 +1701,99 @@ int32_t lux_i_idpdp_iLarDp2q_011_f_(int32_t narg, int32_t ps[], int32_t (*f)(int
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_sd_iDaLa_000_s_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
+/** Bind a C pointer-count-stride function to a LUX subroutine of type
+    `iD*` or `iD*;iL*`.
+
+    The LUX subroutine arguments are:
+
+    1. an `double` input/output scalar or array of arbitrary
+    dimensions.  It must be a named variable.
+
+    2. optionally, an input scalar or array of arbitrary dimensions,
+    converted to `int32` and treated as an axis parameter.
+
+    The mode argument `/allaxes` (`internalMode & 1`) is equivalent to
+    setting the second argument equal to an array listing all axes of
+    the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i0.dims[0], i0.step[0]);
+    advance(i0);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_sd_iaia_000_s_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
 {
   return lux_ivarl_copy_eachaxis_(narg, ps, f, 0);
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_sd_iDaLarDq_000_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
+/** Bind a C pointer-count-stride function to a LUX function of type
+    `iD*;rD&` or `iD*;iL*;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. optionally, an input scalar or array of arbitrary dimensions,
+    converted to `int32` and treated as an axis parameter.
+
+    The mode argument `/allaxes` (`internalMode & 1`) is equivalent to
+    setting the second argument equal to an array listing all axes of
+    the first argument.
+
+    The LUX function returns a `double` value with the same dimensions
+    as the input argument.  It first copies the first argument to the
+    return value, and then applies the C function to the return value.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    copy(i0, r);                // take into account stride
+    f(r, r.dims[0], r.step[0]);
+    advance(r);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_sd_iaiarq_000_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
 {
   return lux_ivarl_copy_eachaxis_(narg, ps, f, 1);
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*f)
+/** Bind a C function to a LUX function of type `iD*;iL?;iD;iD?;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the argument, except that a single dimension with 2 elements is
+    prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, &r[0], &r[1]);
+    r += 2;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*f)
 		    (double *, size_t srcount, size_t srcstride,
 		     double par1, double par2,
 		     double *, size_t tgtcount, size_t tgtstride))
@@ -1084,7 +1804,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
 
   switch (narg) {
   case 2:                       /* source, param1; (param2 = 0) */
-    if ((iq = standard_args(narg, ps, "i>D*;i>D;rD&", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, "iD*;iD;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     ipar1 = 1;
     ipar2 = -1;
@@ -1093,7 +1813,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
     setAxes(&infos[iret], 0, NULL, SL_EACHROW);
     break;
   case 3:                       /* source, param1, param2 */
-    if ((iq = standard_args(narg, ps, "i>D*;i>D;i>D;rD&", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, "iD*;iD;iD;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     ipar1 = 1;
     ipar2 = 2;
@@ -1102,7 +1822,7 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
     setAxes(&infos[iret], 0, NULL, SL_EACHROW);
     break;
   case 4:                       /* source, axis, param1, param2 */
-    if ((iq = standard_args(narg, ps, "i>D*;iL;i>D;i>D;rD&", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, "iD*;iL;iD;iD;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     ipar1 = 2;
     ipar2 = 3;
@@ -1125,14 +1845,43 @@ int32_t lux_i_sdddsd_iDaLDDrDq_000T333_f_(int32_t narg, int32_t ps[], int32_t (*
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_iddipT3dp_iLarDp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, int32_t *, int32_t *, int32_t *, double *))
+/** Bind a C function to a LUX function of type `i>L*;rD+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32` if it is less than that.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the argument, except that a single dimension with 3 elements is
+    prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    if (f(*i0++, 0, &y, &m, &d, &fd)) {
+      *r[0] = *r[1] = *r[2] = 0;
+    } else {
+      *r[0] = y;
+      *r[1] = m;
+      *r[2] = d + fd;
+    }
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_i_ddipT3dp_iarp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, int32_t *, int32_t *, int32_t *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq, y, m, d;
   double fd;
 
-  if ((iq = standard_args(narg, ps, "i>L*;r>D+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "i>L*;rD+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   switch (infos[0].type) {
@@ -1200,13 +1949,40 @@ int32_t lux_iddipT3dp_iLarDp3q_0z1111_f_(int32_t narg, int32_t ps[], int32_t (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT3d3_iD3DcqrDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *))
+/** Bind a C function to a LUX function of type `iD3*;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first dimension, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. an input array with the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i1, r);
+    i0 += 3;
+    i1 += 3;
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dp3T3_i3aiqrq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3], double [3], double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;i>D[-]&;rD[-]&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;iD&;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -1220,13 +1996,40 @@ int32_t lux_v_dT3d3_iD3DcqrDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT3d3_iD3aD1D1rD3q_120333_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double *, double *, double *, double *))
+/** Bind a C function to a LUX function of type `iD3*;iD;iD;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first dimension, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. a scalar or single-element input array, converted to `double`.
+
+    3. a scalar or single-element input array, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i1, *i2, i0, &r[0], &r[1], &r[2]);
+    i0 += 3;
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dddp3dpT3_i3aiirq_120333_f_(int32_t narg, int32_t ps[], int32_t (*f)(double, double, double [3], double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;i>D1;i>D1;rD3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;iD;iD;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -1240,33 +2043,42 @@ int32_t lux_v_dT3d3_iD3aD1D1rD3q_120333_f_(int32_t narg, int32_t ps[], int32_t (
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-/** Bind a C function to a LUX function.
+/** Bind a C function to a LUX function of type `iD*;iD&;iD&;rD+3,+3&`.
 
-    The C function accepts three `double` values and a pointer to an
-    array of 3 `double` values and returns `void`.
+    The LUX function arguments are:
 
-    The LUX function requires three numerical scalar or array
-    arguments (converted to `double`) with the same dimensions and
-    returns a `double` array with the same dimensions as the input
-    arguments but with dimensions 3 and 3 prefixed.
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
 
-    Standard arguments format <tt>"iD*;iD&;iD&;rD+3,+3"</tt>.
+    2. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    3. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that two dimensions with 3 element
+    are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, r);
+    r += 9;
+    \endverbatim
 
     @param [in] narg number of symbols in \p ps
     @param [in] ps array of argument symbols
     @param [in] f pointer to C function to bind
     @return the symbol containing the result of the function call
-
-    \todo Check if advancing through the return value works OK if the
-    first argument has more than one element.
  */
-int32_t lux_v_dT3dp3_iDaDqDqrDp3p3_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double (*)[3]))
+int32_t lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;rD+3,+3",
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;rD+3,+3&",
                           &ptrs, &infos)) < 0)
     return LUX_ERROR;
   do {
@@ -1280,32 +2092,42 @@ int32_t lux_v_dT3dp3_iDaDqDqrDp3p3_0T3_f_(int32_t narg, int32_t ps[], void (*f)(
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT3dp3_iDaT3rDp3p3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double (*)[3]))
-{
-  int32_t iq;
-  double (*r)[3];
-  Pointer *ptrs;
-  loopInfo *infos;
+/** Bind a C function to a LUX function of type `iD*;iD&;iD&;rD+3&`.
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
-    return LUX_ERROR;
-  r = (double (*)[3]) ptrs[3].d;
-  while (infos[0].nelem--) {
-    f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, r);
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    3. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that one dimension with 3 elements
+    is prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, r);
     r += 3;
-  }
-  free(ptrs);
-  free(infos);
-  return iq;
-}
-/*-----------------------------------------------------------------------*/
-int32_t lux_v_dT3dp_iDaT3rDp3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double [3]))
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;rD+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;rD+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   while (infos[0].nelem--) {
@@ -1317,14 +2139,43 @@ int32_t lux_v_dT3dp_iDaT3rDp3q_0T3_f_(int32_t narg, int32_t ps[], void (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT4dp3_iDaT3rDp3p3q_0z1T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double (*)[3]))
+/** Bind a C function to a LUX function of type `iD*;iD&;iD&;rD+3,+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    3. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that two dimensions with 3 elements
+    each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, *i1++, *i2++, r);
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double [3][3]))
 {
   int32_t iq;
   double (*tgt)[3];
   Pointer *ptrs;
   loopInfo *infos;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;rD+3,+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   tgt = (double (*)[3]) ptrs[3].d;
   while (infos[0].nelem--) {
@@ -1336,13 +2187,45 @@ int32_t lux_v_dT4dp3_iDaT3rDp3p3q_0z1T3_f_(int32_t narg, int32_t ps[], void (*f)
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT4dp3_iDaT4rDp3p3q_0T4_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double (*)[3]))
+/** Bind a C function to a LUX function of type `iD*;iD&;iD&;iD&;rD+3,+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    3. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    4. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that two dimensions with 3 elements
+    each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, *i3++, r);
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;rD+3,+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double (*r)[3] = (double (*)[3]) ptrs[4].d;
   while (infos[0].nelem--) {
@@ -1354,13 +2237,43 @@ int32_t lux_v_dT4dp3_iDaT4rDp3p3q_0T4_f_(int32_t narg, int32_t ps[], void (*f)(d
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT4dpT3_iDaDaoDqT3_0z1z2T4_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type `iD*;iD&;oD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. a input array of the same dimensions as the first one,
+    converted to `double`.
+
+    3. an output variable changed to be a `double` array of the same
+    dimensions as the first argument.
+
+    4. an output variable changed to be a `double` array of the same
+    dimensions as the first argument.
+
+    5. an output variable changed to be a `double` array of the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, *i1++, 0, o2++, o3++, o4++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;oD&;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, *ptrs[1].d++, 0.0, ptrs[2].d++, ptrs[3].d++, ptrs[4].d++);
@@ -1369,13 +2282,38 @@ int32_t lux_v_dT4dpT3_iDaDaoDqT3_0z1z2T4_s_(int32_t narg, int32_t ps[], void (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT4dpT4_iDaDaDoDqT4_0T2z3T6_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;iD&;iD&;oD&;oD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. two input arrays of the same dimensions as the first one,
+    converted to `double`.
+
+    3. four output variables changed to be `double` arrays of the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, 0, o3++, o4++, o5++, o6++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, 0.0, ptrs[3].d++,
@@ -1385,13 +2323,50 @@ int32_t lux_v_dT4dpT4_iDaDaDoDqT4_0T2z3T6_s_(int32_t narg, int32_t ps[], void (*
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT4dpdp3T5_iDaT3oDqDp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;iD&;iD&;oD&;oD+3,+3&;oD[-]&;oD[-]&;oD[-]&;oD[-]&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. two input arrays of the same dimensions as the first one,
+    converted to `double`.
+
+    3. one output variable changed to be a `double` array of the same
+    dimensions as the first argument.
+
+    3. five output variables changed to be `double` arrays of the same
+    dimensions as the first argument, except that two dimensions equal
+    to 3 each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, *i1++, *i2++, i3++, o4, o5, o6, o7, o8);
+    o4 += 9;
+    o5 += 9;
+    o6 += 9;
+    o7 += 9;
+    o8 += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double [3][3], double [3][3], double [3][3], double [3][3], double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;oD&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&", &ptrs, &infos)) < 0)
+  iq = standard_args(narg, ps,
+                     "iD*;iD&;iD&;oD&;oD+3,+3&;oD[-]&;oD[-]&;oD[-]&;oD[-]&",
+                     &ptrs, &infos);
+  if (iq  < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, 0.0, *ptrs[1].d++, *ptrs[2].d++, ptrs[3].d++,
@@ -1409,13 +2384,38 @@ int32_t lux_v_dT4dpdp3T5_iDaT3oDqDp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], v
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT4dpdp_iDaT3oDqDq_0T2z34_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;iD&;iD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. two input arrays of the same dimensions as the first one,
+    converted to `double`.
+
+    3. two output variables changed to be `double` arrays of the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, 0, o3++, o4++);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, 0.0, ptrs[3].d++, ptrs[4].d++);
@@ -1424,13 +2424,39 @@ int32_t lux_v_dT4dpdp_iDaT3oDqDq_0T2z34_s_(int32_t narg, int32_t ps[], void (*f)
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT4dpdp_iDaT4oDqDq_0T5_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;iD&;iD&;iD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. three input arrays of the same dimensions as the first one,
+    converted to `double`.
+
+    3. two output variables changed to be `double` arrays of the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, *i3++, o4++, o5++);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;oD&;oD&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++,
@@ -1440,18 +2466,47 @@ int32_t lux_v_dT4dpdp_iDaT4oDqDq_0T5_s_(int32_t narg, int32_t ps[], void (*f)(do
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double (*)[3]))
+/** Bind a C function to a LUX function of type `iD*;iD&;iD&;iD&;rD+3,+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. three input scalars or arrays of the same dimensions as the
+    first one, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that two dimensions with 3 elements
+    each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    d = floor(*i1 - 0.5) + 0.5;
+    t = *i1++ - d;
+    f(*i0++, 0, d, t, *i2++, *i3++, r);
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double [3][3]))
 {
   int32_t iq;
   Pointer *ptrs;
   loopInfo *infos;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;rD+3,+3&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     double d, t;
     d = floor(*ptrs[1].d - 0.5) + 0.5;
-    t = *ptrs[1].d - d;
+    t = *ptrs[1].d++ - d;
     f(*ptrs[0].d++, 0.0, d, t, *ptrs[2].d++, *ptrs[3].d++, (double (*)[3]) ptrs[4].d);
     ptrs[4].d += 9;
   }
@@ -1460,13 +2515,41 @@ int32_t lux_v_dT6dp3_iDaT4rDp3p3q_0z11T4_f_(int32_t narg, int32_t ps[], void (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double [2][3]))
+/** Bind a C function to a LUX function of type
+    `iD*;iD&;iD&;iD&;iD&;iD&;rD+2,+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. five more input scalars or arrays of the same dimensions as the
+    first one, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that dimensions with 2 and 3
+    elements are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, *i3++, *i4++, *i5++, r);
+    r += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double [2][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD+2,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++, *ptrs[4].d++,
@@ -1478,13 +2561,42 @@ int32_t lux_v_dT6dp3_iDaT6oDp2p3q_0T6_f_(int32_t narg, int32_t ps[], void (*f)(d
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT6dpT6_iDaT6oDqT6_0T11_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double *, double *, double *, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;iD&;iD&;iD&;iD&;iD&;oD&;oD&;oD&;oD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. five more input arrays of the same dimensions as the first one,
+    converted to `double`.
+
+    3. six output variables changed to be `double` arrays of the same
+    dimensions as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, *i2++, *i3++, *i4++, *i5++,
+      o6++, o7++, o8++, o9++, o10++, o11++);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double *, double *, double *, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;i>D*;oD&;oD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
+  iq = standard_args(narg, ps,
+                     "iD*;iD&;iD&;iD&;iD&;iD&;oD&;oD&;oD&;oD&;oD&;oD&",
+                     &ptrs, &infos);
+  if (iq < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++,
@@ -1495,13 +2607,40 @@ int32_t lux_v_dT6dpT6_iDaT6oDqT6_0T11_s_(int32_t narg, int32_t ps[], void (*f)(d
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dT8dp3_iDaT5rDp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double, double, double (*)[3]))
+/** Bind a C function to a LUX function of type
+    `iD*;iD&;iD&;iD&;iD&;rD+3,+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. four more input scalars or arrays of the same dimensions as the
+    first one, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that two dimensions of 3 elements
+    each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, 0, 0, *i1++, *i2++, *i3++, *i4++, r);
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double, double, double, double, double, double, double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;i>D*;i>D*;i>D*;rD+3,+3&",
+  if ((iq = standard_args(narg, ps, "iD*;iD&;iD&;iD&;iD&;rD+3,+3&",
                           &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double *jd = ptrs[0].d;
@@ -1520,7 +2659,35 @@ int32_t lux_v_dT8dp3_iDaT5rDp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[], void (*
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double (*)[3], double (*)[3], double (*)[3]))
+/** Bind a C function to a LUX subroutine of type
+    `i>L*;oD3,3;oD+3,+3&;oD[-]&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `int32` if it is less than that.
+
+    2. an output variable changed to be a `double` array of 3 by 3
+    elements.
+
+    3. two output variables changed to be `double` arrays of the same
+    dimensions as the first argument, except that two dimensions of 3
+    elements each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, o1, o2, o3);
+    o2 += 9;
+    o3 += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double [3][3], double [3][3], double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
@@ -1570,13 +2737,36 @@ int32_t lux_v_dddp3T3_iLaoD33oDp3p3qDcq_0z1T3_s_(int32_t narg, int32_t ps[], voi
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddp3_iDarDp3p3q_0z1_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double (*)[3]))
+/** Bind a C function to a LUX function of type `iD*;rD+3,+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that two dimensions of 3 elements
+    each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, r);
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dddp33_iarp3p3q_0z1_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;rD+3,+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;rD+3,+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double (*r)[3] = (double (*)[3]) ptrs[1].d;
 
@@ -1589,13 +2779,40 @@ int32_t lux_v_dddp3_iDarDp3p3q_0z1_f_(int32_t narg, int32_t ps[], void (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddp3dp3_iDaiDp3p3arDcq_0z12_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double (*)[3], double (*)[3]))
+/** Bind a C function to a LUX function of type `iD*;iD+3,+3&;rD[-]&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an input array of the same dimensions as the first one, except
+    that two dimensions of 3 element each are prefixed, converted to
+    `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the last argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, i1, r);
+    i1 += 9;
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double [3][3], double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D+3,+3*;rD[-]&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD+3,+3&;rD[-]&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   double (*r1)[3] = (double (*)[3]) ptrs[1].d;
@@ -1611,13 +2828,39 @@ int32_t lux_v_dddp3dp3_iDaiDp3p3arDcq_0z12_f_(int32_t narg, int32_t ps[], void (
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddpT16_iDaoDqT16_0z1T16_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. sixteen output variables changed to be `double` scalars or
+    arrays of the same dimensions as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, o1++, o2++, o3++, o4++, o5++, o6++, o7++, o8++,
+      o9++, o10++, o11++, o12++, o13++, o14++, o15++, o16++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dddpT16_iaoqT16_0z1T16_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
+  iq = standard_args(narg, ps,
+                     "iD*;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&",
+                     &ptrs, &infos);
+  if (iq < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++, ptrs[4].d++,
@@ -1629,13 +2872,34 @@ int32_t lux_v_dddpT16_iDaoDqT16_0z1T16_s_(int32_t narg, int32_t ps[], void (*f)(
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddpT3_iDaoDqT3_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type `iD*;oD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. three output variables changed to be `double` scalars or arrays
+    of the same dimensions as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, o1++, o2++, o3++)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dddpT3_iaoqT3_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;oD&;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++);
@@ -1644,13 +2908,47 @@ int32_t lux_v_dddpT3_iDaoDqT3_0z1T3_s_(int32_t narg, int32_t ps[], void (*f)(dou
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double (*)[3], double (*)[3], double (*)[3], double (*)[3], double (*)[3]))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;oD&;oD&;oD&;oD+3,+3&;oD[-1]&;oD[-]&;oD[-]&;oD[-]&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. three output variables changed to be `double` scalars or arrays
+    of the same dimensions as the input argument.
+
+    3. five output variables changed to be `double` arrays of the same
+    dimensions as the input argument, except that two dimensions equal
+    to 3 are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, o1++, o2++, o3++, o4, o5, o6, o7, o8);
+    o4 += 9;
+    o5 += 9;
+    o6 += 9;
+    o7 += 9;
+    o8 += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double [3][3], double [3][3], double [3][3], double [3][3], double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&;oD+3,+3&", &ptrs, &infos)) < 0)
+  iq = standard_args(narg, ps,
+                     "iD*;oD&;oD&;oD&;oD+3,+3&;oD[-1]&;oD[-]&;oD[-]&;oD[-]&",
+                     &ptrs, &infos);
+  if (iq < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++,
@@ -1668,13 +2966,35 @@ int32_t lux_v_dddpT3dp3T5_iDaoDqT3Dp3p3qT5_0z1T8_s_(int32_t narg, int32_t ps[], 
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddpT4_iDaoDqT4_0z1T4_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD*;oD&;oD&;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. four output variables changed to be `double` scalars or arrays
+    of the same dimensions as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, o1++, o2++, o3++, o4++);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dddpT4_iaoqT4_0z1T4_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;oD&;oD&;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++, ptrs[4].d++);
@@ -1683,13 +3003,39 @@ int32_t lux_v_dddpT4_iDaoDqT4_0z1T4_s_(int32_t narg, int32_t ps[], void (*f)(dou
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddp_iDaDarDp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double [3]))
+/** Bind a C function to a LUX function of type `iD*;iD&;rD+3&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an input array of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument, except that a dimension equal to 3 is
+    prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, *i1++, r)
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dddp3_iaiqrp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double, double, double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD&;rD+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   while (infos[0].nelem--) {
@@ -1701,13 +3047,34 @@ int32_t lux_v_dddp_iDaDarDp3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doubl
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dddpdp_iDaoDqDq_0z12_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *))
+/** Bind a C function to a LUX subroutine of type `iD*;oD&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. two output variables changed to be `double` scalars or arrays
+    of the same dimensions as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, 0, o1++, o2++);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dddpdp_iaoqoq_0z12_s_(int32_t narg, int32_t ps[], void (*f)(double, double, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++);
@@ -1716,13 +3083,36 @@ int32_t lux_v_dddpdp_iDaoDqDq_0z12_s_(int32_t narg, int32_t ps[], void (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_ddp3_iD1D33_01_s_(int32_t narg, int32_t ps[], void (*f)(double, double [3][3]))
+/** Bind a C function to a LUX subroutine of type `iD*;oD3,3&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. an output variable changed to be a `double` array of the same
+    dimensions as the input argument, except that two dimensions equal
+    to 3 each are prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, o1);
+    o1 += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_ddp33_iao33q_01_s_(int32_t narg, int32_t ps[], void (*f)(double, double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D1;i>D3,3", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;oD3,3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, (double (*)[3]) ptrs[1].d);
@@ -1733,27 +3123,34 @@ int32_t lux_v_ddp3_iD1D33_01_s_(int32_t narg, int32_t ps[], void (*f)(double, do
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-/** Bind a C function \p f (with one double argument and two double
-    Pointer arguments returning void) to a LUX function with one
-    scalar at-least-double input parameter and two double output
-    parameters that get the same dimensions as the input parameter.
-    The function is called once for each element of the input
-    parameter.
+/** Bind a C function to a LUX subroutine of type `iD*;oD&;oD&`.
 
-    Standard arguments <tt>"i>D*;oD&;oD&"</tt>.
+    The LUX subroutine arguments are:
+
+    1. an input scalar or array of arbitrary dimensions, converted to
+    `double`.
+
+    2. two output variables changed to be `double` arrays of the same
+    dimensions as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(*i0++, o1++, o2++);
+    \endverbatim
 
     @param [in] narg number of symbols in \p ps
     @param [in] ps array of argument symbols
-    @param [in] f Pointer to C function to bind
+    @param [in] f pointer to C function to bind
     @return the symbol containing the result of the function call
  */
-int32_t lux_v_ddpdp_iDaoDqDq_012_s_(int32_t narg, int32_t ps[], void (*f)(double, double*, double*))
+int32_t lux_v_ddpdp_iaoqoq_012_s_(int32_t narg, int32_t ps[], void (*f)(double, double*, double*))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;oD&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;oD&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     f(*ptrs[0].d++, ptrs[1].d++, ptrs[2].d++);
@@ -1761,13 +3158,41 @@ int32_t lux_v_ddpdp_iDaoDqDq_012_s_(int32_t narg, int32_t ps[], void (*f)(double
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2][3]))
+/** Bind a C function to a LUX function of type `iD2,3*;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 2 and 3 elements in the first two
+    dimensions, and arbitrary following dimensions, converted to
+    `double`.
+
+    2. an input array of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i1, r)
+    i0 += 6;
+    i1 += 6;
+    r += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp23T3_i23aiqrq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D2,3*;i>D2,3&;oD[-]&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD2,3*;iD&;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
   while (nelem--) {
@@ -1782,13 +3207,41 @@ int32_t lux_v_dp3T3_iD23aD23qoDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(d
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3T3_iD33aDaoDc_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [2][3], double [2][3]))
+/** Bind a C function to a LUX function of type `iD3,3*;iD-3+2&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first two dimensions, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. an input array of the same dimensions as the first one, except
+    that the first dimension is 2 instead of 3, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the second argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i1, r)
+    i0 += 9;
+    i1 += 6;
+    r += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [2][3], double [2][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;iD*;oD[-]", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3,3*;iD-3+2&;rD[-]&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/9;
   while (nelem--) {
@@ -1803,14 +3256,41 @@ int32_t lux_v_dp3T3_iD33aDaoDc_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3T3_iD33aDarDq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3], double (*)[3], double (*)[3]))
+/** Bind a C function to a LUX function of type `iD3,3*;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first two dimensions, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. an input array of the same dimensions as the first one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i1, r)
+    i0 += 9;
+    i1 += 9;
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp33T3_i33aiqrq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3][3], double [3][3]))
 {
   int32_t iq;
   Pointer *ptrs;
   loopInfo *infos;
   size_t nelem;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;i>D*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3,3*;iD&;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double (*r1)[3] = (double (*)[3]) ptrs[0].d;
   double (*r2)[3] = (double (*)[3]) ptrs[1].d;
@@ -1827,7 +3307,24 @@ int32_t lux_v_dp3T3_iD33aDarDq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3_rD33_0_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3]))
+/** Bind a C function to a LUX function of type `rD3,3`.
+
+    The LUX function has no arguments.
+
+    The LUX function returns a `double` array of 3 by 3 elements.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(r)
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp33_r33_0_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
@@ -1841,14 +3338,46 @@ int32_t lux_v_dp3_rD33_0_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3])
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double (*)[3], double, double (*)[3], double (*)[3]))
+/** Bind a C function to a LUX function of type `iD3,3*;iD-,-&;iD&;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first two dimensions, and
+    arbitrary following dimensions, converted to `double`.
+
+    2. an input scalar or array with the same dimensions as the first
+    one, except that the first two dimensions are omitted, converted
+    to `double`.
+
+    3. an input scalar or array with the same dimensions as the
+    previous one, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the last two input arguments.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, *i1++, i2, r);
+    i0 += 9;
+    i2 += 9;
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double, double [3][3], double [3][3]))
 {
   int32_t iq;
   Pointer *ptrs, era;
   loopInfo *infos;
   size_t nelem;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;i>D-,-*;i>D*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3,3*;iD-,-&;iD&;rD&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   era = ptrs[1];
   double (*rc2i)[3] = (double (*)[3]) ptrs[0].d;
@@ -1866,13 +3395,36 @@ int32_t lux_v_dp3ddp3dp3_iD33aDmmaDarDq_0T3_f_(int32_t narg, int32_t ps[], void 
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dp3_iD33arDq_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3][3]))
+/** Bind a C function to a LUX function of type `iD3,3*;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first two dimensions, and
+    arbitrary following dimensions, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the last two input arguments.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, r);
+    i0 += 9;
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp33T2_i33arq_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3,3*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   size_t nelem = infos[0].nelem/9;
@@ -1886,13 +3438,42 @@ int32_t lux_v_dp3dp3_iD33arDq_01_f_(int32_t narg, int32_t ps[], void (*f)(double
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2]))
+/** Bind a C function to a LUX function of type `iD2,3*;iD&;rD=,-&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 2 and 3 elements in its first two
+    dimensions, and arbitrary following dimensions, converted to
+    `double`.
+
+    2. an input array with the same dimensions as the previous one,
+    converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first input argument, except that the second dimension is
+    omitted.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i1, r);
+    i0 += 6;
+    i1 += 6;
+    r += 2;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double [2][3], double [2]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D2,3*;i>D2,3&;oD[-],-3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD2,3*;iD&;rD=,-&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
   while (nelem--) {
@@ -1907,13 +3488,41 @@ int32_t lux_v_dp3dp3dp_iD23aD23qoDcm3q_0T2_f_(int32_t narg, int32_t ps[], void (
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double *, double *, double *, double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD2,3*;oD-,-&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input array with 2 and 3 elements in the first two
+    dimensions, and arbitrary following dimensions, converted to
+    `double`.
+
+    2. six output variables changed to be `double` arrays of the same
+    dimensions as the input argument, except that the first two
+    dimensions are omitted.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, o1++, o2++, o3++, o4++, o5++, o6++);
+    i0 += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double *, double *, double *, double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D2,3*;oD-2-3*;oD[-];oD[-];oD[-];oD[-];oD[-]", &ptrs, &infos)) < 0)
+  iq = standard_args(narg, ps,
+                     "iD2,3*;oD-,-&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&",
+                     &ptrs, &infos);
+  if (iq < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
   while (nelem--) {
@@ -1926,13 +3535,38 @@ int32_t lux_v_dp3dpT6_iD23aoDm2m3aDcT5_0T6_s_(int32_t narg, int32_t ps[], void (
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dp_iD33arDm3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3]))
+/** Bind a C function to a LUX function of type `iD3,3*;rD-&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in each of its first two
+    dimensions, and arbitrary following dimensions, converted to
+    `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the first input argument, except that the first dimension is
+    omitted.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, r);
+    i0 += 9;
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp33dp3_i33armq_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;rD-3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3,3*;rD-&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   size_t nelem = infos[0].nelem/9;
@@ -1946,7 +3580,28 @@ int32_t lux_v_dp3dp_iD33arDm3q_01_f_(int32_t narg, int32_t ps[], void (*f)(doubl
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dp_oD33D3_01_s_(int32_t narg, int32_t ps[], void (*f)(double (*)[3], double *))
+/** Bind a C function to a LUX subroutine of type `oD3,3;oD3`.
+
+    The LUX subroutine arguments are:
+
+    1. an output variable changed to be a `double` array of 3 by 3
+    elements.
+
+    2. an output variable changed to be a `double` array of 3
+    elements.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(o0, o1);
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dp3dp_o33o3_01_s_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
@@ -1960,13 +3615,39 @@ int32_t lux_v_dp3dp_oD33D3_01_s_(int32_t narg, int32_t ps[], void (*f)(double (*
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dpdp_iD23aoDm2m3qDcq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD2,3*;oD-,-&;oD[-]&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input array with 2 and 3 elements in its first two
+    dimensions, followed by arbitrary dimensions, converted to
+    `double`.
+
+    2. two output variables changed to be `double` arrays with the
+    same dimensions as the input argument, except that the first two
+    dimensions are omitted.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, o1++, o2++);
+    i0 += 6;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dp23dpdp_i23aommqocq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double [2][3], double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D2,3*;oD-2-3&;oD[-]&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD2,3*;oD-,-&;oD[-]&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
   while (nelem--) {
@@ -1978,40 +3659,87 @@ int32_t lux_v_dp3dpdp_iD23aoDm2m3qDcq_0T2_s_(int32_t narg, int32_t ps[], void (*
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dpdp_iD33aDm3arDcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3], double [3]))
+/** Bind a C function to a LUX function of type `iD3,3*;iD-&;rD[-]&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in each of its first two
+    dimensions, and arbitrary following dimensions, converted to
+    `double`.
+
+    2. an input array with the same dimensions as the first one,
+    except that the first dimension is omitted, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the second input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i1, r);
+    i0 += 9;
+    i1 += 3;
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double [3], double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq, step;
 
-  iq = LUX_ERROR;
-  if ((iq = standard_args(narg, ps, "i>D3,3*;i>D-3*;rD[-]&", &ptrs, &infos))
-      > 0)
-    step = 9;
-  else if ((iq = standard_args(narg, ps, "i>D3,3;i>D-3*;rD[-]&", &ptrs, &infos))
-           > 0)
-    step = 0;
-  if (iq > 0) {
-    size_t nelem = infos[1].nelem/3;
-    while (nelem--) {
-      f((double (*)[3]) ptrs[0].d, ptrs[1].d, ptrs[2].d);
-      ptrs[0].d += step;
-      ptrs[1].d += 3;
-      ptrs[2].d += 3;
-    }
+  iq = standard_args(narg, ps, "iD3,3*;iD-&;rD[-]&", &ptrs, &infos);
+  if (iq < 0)
+    return iq;
+  size_t nelem = infos[1].nelem/3;
+  while (nelem--) {
+    f((double (*)[3]) ptrs[0].d, ptrs[1].d, ptrs[2].d);
+    ptrs[0].d += 9;
+    ptrs[1].d += 3;
+    ptrs[2].d += 3;
   }
   free(ptrs);
   free(infos);
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double (*)[3], double *, double *))
+/** Bind a C function to a LUX subroutine of type
+    `iD3,3*;oD-,-&;oD[-]&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input array with 3 elements in its first two dimensions,
+    followed by arbitrary dimensions, converted to `double`.
+
+    2. two output variables changed to be `double` arrays with the
+    same dimensions as the input argument, except that the first two
+    dimensions are omitted.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, o1++, o2++);
+    i0 += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dp33dpdp_i33aommqocq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double [3][3], double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3,3*;oD-3,-3&;oD-3,-3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3,3*;oD-,-&;oD[-]&",
+                          &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   size_t nelem = infos[0].nelem/9;
@@ -2024,13 +3752,40 @@ int32_t lux_v_dp3dpdp_iD33aoDm3m3qT2_0T2_s_(int32_t narg, int32_t ps[], void (*f
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dpT3_iD3aoDm3qoDq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *))
+/** Bind a C function to a LUX subroutine of type `iD3*;oD-&;oD&`.
+
+    The LUX subroutine arguments are:
+
+    1. an input array with 3 elements in its first dimension, followed
+    by arbitrary dimensions, converted to `double`.
+
+    2. an output variable changed to be `double` arrays with the same
+    dimensions as the input argument, except that the first dimension
+    is omitted.
+
+    3. an output variable changed to be `double` arrays with the same
+    dimensions as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, o1++, o2);
+    i0 += 3;
+    o2 += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+ */
+int32_t lux_v_dp3dpdp3_i3aomqoq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(double [3], double *, double [3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;oD-3&;oD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;oD-&;oD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -2043,13 +3798,37 @@ int32_t lux_v_dpT3_iD3aoDm3qoDq_0T2_s_(int32_t narg, int32_t ps[], void (*f)(dou
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dpT3_iD3arDm3p2q_011_f_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *))
+/** Bind a C function to a LUX function of type `iD3*;rD-3+2&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first dimension, and
+    arbitrary following dimensions, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the input argument, except that the first dimension has 2
+    instead of 3 elements.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, &r[0], &r[1]);
+    i0 += 3;
+    r += 2;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp3dpdp_i3arm3p2q_011_f_(int32_t narg, int32_t ps[], void (*f)(double [3], double *, double *))
 {
   int32_t iq;
   Pointer *ptrs;
   loopInfo *infos;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;r>D-3+2&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;rD-3+2&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   size_t nelem = infos[0].nelem/3;
@@ -2063,7 +3842,24 @@ int32_t lux_v_dpT3_iD3arDm3p2q_011_f_(int32_t narg, int32_t ps[], void (*f)(doub
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dpT3_rD3_000_f_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *))
+/** Bind a C function to a LUX function of type `rD3`.
+
+    The LUX function has no arguments.
+
+    The LUX function returns a `double` array with 3 elements.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(&r[0], &r[1], &r[2])
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dpT3_r3_000_f_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *))
 {
   Pointer *tgts;
   int32_t iq;
@@ -2074,13 +3870,36 @@ int32_t lux_v_dpT3_rD3_000_f_(int32_t narg, int32_t ps[], void (*f)(double *, do
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dpT4_iD3arD3q_0111_f_(int32_t narg, int32_t ps[], void (*f)(double *, double *, double *, double *))
+/** Bind a C function to a LUX function of type `iD3*;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first dimension, and
+    arbitrary following dimensions, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, &r[0], &r[1], &r[2]);
+    i0 += 3;
+    r += 3;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp3dpT3_i3arq_0111_f_(int32_t narg, int32_t ps[], void (*f)(double [3], double *, double *, double *))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;rD3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   int32_t nelem = infos[0].nelem/3;
   while (nelem--) {
@@ -2093,13 +3912,37 @@ int32_t lux_v_dpT4_iD3arD3q_0111_f_(int32_t narg, int32_t ps[], void (*f)(double
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_dpdp3_iD3arDp3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3], double [3][3]))
+/** Bind a C function to a LUX function of type `iD3*;rD+3&`.
+
+    The LUX function arguments are:
+
+    1. an input array with 3 elements in its first dimension, and
+    arbitrary following dimensions, converted to `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the input argument, except that a dimension with 3 elements is
+    prefixed.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, r);
+    i0 += 3;
+    r += 9;
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_dp3dp33_i3arp3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double [3], double [3][3]))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D3*;rD+3&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD3*;rD+3&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     f(ptrs[0].d, (double (*)[3]) ptrs[1].d);
@@ -2111,16 +3954,41 @@ int32_t lux_v_dpdp3_iD3arDp3q_01_f_(int32_t narg, int32_t ps[], void (*f)(double
   return iq;
 }
 /*-----------------------------------------------------------------------*/
-int32_t lux_v_sddsd_iDaD1rDq_012_f_(int32_t narg, int32_t ps[], void (*f)(double *, size_t, size_t, double, double *, size_t, size_t))
+/** Bind a C function to a LUX function of type `iD*;iD?;rD&`.
+
+    The LUX function arguments are:
+
+    1. an input scalar or array with arbitrary dimensions, converted
+    to `double`.
+
+    2. an optional input scalar or single-element array, converted to
+    `double`.
+
+    The LUX function returns a `double` array with the same dimensions
+    as the input argument.
+
+    The C function is called schematically like this:
+
+    \verbatim
+    f(i0, i0.dims[0], 1, i1? *i1: 3, r, r.dims[0], 1));
+    \endverbatim
+
+    @param [in] narg number of symbols in \p ps
+    @param [in] ps array of argument symbols
+    @param [in] f pointer to C function to bind
+    @return the symbol containing the result of the function call
+*/
+int32_t lux_v_sddsd_iairq_012_f_(int32_t narg, int32_t ps[], void (*f)(double *, size_t, size_t, double, double *, size_t, size_t))
 {
   Pointer *ptrs;
   loopInfo *infos;
   int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;iD1?;rD&", &ptrs, &infos)) < 0)
+  if ((iq = standard_args(narg, ps, "iD*;iD?;rD&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double width = ptrs[1].d? ptrs[1].d[0]: 3;
-  f(&ptrs[0].d[0], infos[0].dims[0], 1, width, &ptrs[2].d[0], infos[2].dims[0], 1);
+  f(&ptrs[0].d[0], infos[0].dims[0], 1, width, &ptrs[2].d[0],
+    infos[2].dims[0], 1);
   free(ptrs);
   free(infos);
   return iq;

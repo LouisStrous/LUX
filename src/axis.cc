@@ -53,45 +53,26 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <ctype.h>
 #include "axis.hh"
 
+/** Define which memory allocation routine to use for obstacks. */
 #define obstack_chunk_alloc malloc
+
+/** Define which memory freeing routine to use for obstacks. */
 #define obstack_chunk_free free
 
-void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims, 
-                        Symboltype type, int32_t naxes, int32_t const *axes,
-                        Pointer *data, int32_t mode);
-void rearrangeDimensionLoop(loopInfo *info);
-int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode, int32_t outType,
-		 loopInfo *src, Pointer *srcptr, int32_t *output, loopInfo *trgt,
-		 Pointer *trgtptr);
-int32_t advanceLoop(loopInfo *info, Pointer *ptr),
-  lux_convert(int32_t, int32_t [], Symboltype, int32_t);
-int32_t nextLoop(loopInfo *info), nextLoops(loopInfo *info1, loopInfo *info2);
-int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo, int32_t type,
-			Pointer *tptr);
-int32_t standardLoop1(int32_t source,
-                  int32_t nAxes, int32_t const * axes,
-                  int32_t srcMode,
-                  loopInfo *srcinf, Pointer *srcptr,
-                  int32_t nMore, int32_t const * more,
-                  int32_t nLess, int32_t const * less,
-                  Symboltype tgtType, int32_t tgtMode,
-                  int32_t *target, 
-                  loopInfo *tgtinf, Pointer *tgtptr);
 /*-------------------------------------------------------------------------*/
-void setAxisMode(loopInfo *info, int32_t mode) {
-  if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
-    info->advanceaxis = info->naxes;
-  else if (mode & SL_EACHROW)
-    info->advanceaxis = 1;
-  else
-    info->advanceaxis = 0;
-  info->axisindex = 0;
-  info->mode = mode;
+/** Adjusts loopInfo for axis treatment.
 
-  /* rearrange the dimensions for the first pass */
-  rearrangeDimensionLoop(info);
-}
-/*-------------------------------------------------------------------------*/
+    \param[in,out] info is a pointer to the \c loopInfo structure to
+    adjust.
+
+    \param[in] nAxes is the number of axes.
+
+    \param[in] axes points to the array of axes.
+
+    \param[in] mode says how to treat the axes.
+
+    \returns 0 for success, -1 for failure.
+ */
 int32_t setAxes(loopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
 {
   int32_t i;
@@ -106,7 +87,7 @@ int32_t setAxes(loopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
 	     && nAxes == 1		/* one axis specified */
 	     && *axes < 0)	/* and it is negative */
     nAxes = 0;
-  
+
   if ((mode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
     return luxerror("Only one axis allowed", -1);
@@ -134,55 +115,81 @@ int32_t setAxes(loopInfo *info, int32_t nAxes, int32_t *axes, int32_t mode)
 /*-------------------------------------------------------------------------*/
 /** Gather information for looping through a LUX array.
 
-    \param[in,out] info a pointer to the \c loopInfo structure in
-    which the information is gathered.
-    \param[in] ndim  the number of dimensions
-    \param[in] dims  the array of dimensions
-    \param[in] type  the LUX data type of the array elements
-    \param[in] naxes the number of axes to loop along
-    \param[in] axes  the array of axes to loop along
-    \param[in] data  a pointer to a \c pointer to the data
-    \param[in] mode flags that indicate how to loop through the axes,
-    as for \c standardLoop()
+    \param[in,out] info points to the predefined \c loopInfo structure
+    in which the information is gathered.
+
+    \param[in] ndim is the number of dimensions.  If it is less than 1
+    then \p dims is ignored and the data is assumed to consist of a
+    single element.
+
+    \param[in] dims points to a list of \p ndim dimensions.  If it is
+    \c NULL, then \p ndim is ignored and the data is assumed to
+    consist of a single element.  The elements of \dims are not
+    checked for validity.
+
+    \param[in] type is the LUX data type of the data.  It is not
+    checked for validity.
+
+    \param[in] naxes is the number of axes to loop along.  If it is 0
+    or negative, then \p axes is ignored and it is assumed that all
+    axes were specified.
+
+    \param[in] axes points to a list of \p naxes indexes of axes to
+    loop along.  If it is \c NULL but \p naxes is at least 1, then the
+    first \p naxes axes are assumed.  The elements of \p axes are not
+    checked for validity.
+
+    \param[in] data points to a predefined \c Pointer to use for
+    pointing at the currently selected data element.
+
+    \param[in] mode is a collection of bit flags that indicate how to
+    loop through the axes, as for standardLoop().
+
+    \returns 0 if everything is OK, non-0 if an error occurred.  If
+    the element count (the product of all dimensions) overflows, then
+    `EDOM` is returned.
  */
-void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims, 
-                        Symboltype type, int32_t naxes, int32_t const *axes,
-                        Pointer *data, int32_t mode)
+int setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims,
+                       Symboltype type, int32_t naxes, int32_t const *axes,
+                       Pointer *data, int32_t mode)
 {
   int32_t	i;
   size_t	size;
 
   /* first copy the arguments into the structure
-   NOTE: no checking to see if the values are legal. */
+     NOTE: no checking to see if the values are legal. */
 
-  /* the number of dimensions in the data: */
-  info->ndim = ndim;
-  /* the list of dimensions of the data: */
-  if (ndim)
-    memmove(info->dims, dims, ndim*sizeof(int32_t));
-  else				/* a scalar */
-    info->dims[0] = 1;		/* need something reasonable here or else
-				   advanceLoop() won't work properly. */
-  /* the number of dimensions along which should be looped (one at a time) */
-  info->naxes = naxes;
-  /* the number of elements in the array */
+  if (dims && ndim >= 0) {
+    info->ndim = ndim;          // the dimensions count
+    memmove(info->dims, dims, ndim*sizeof(int32_t)); // the dimensions
+  } else {                   // a scalar
+    // treat as single-element array
+    info->ndim = 1;
+    info->dims[0] = 1;
+  }
+  if (naxes > 0) {
+    info->naxes = naxes;
+    if (axes)
+      memmove(info->axes, axes, naxes*sizeof(*axes));
+    else                        // do all axes
+      for (i = 0; i < info->naxes; i++)
+        info->axes[i] = i;
+  }
+
+  // calculate the number of elements in the array.
   size = 1;
-  for (i = 0; i < info->ndim; i++)
+  size_t oldsize;
+  for (i = 0; i < info->ndim; i++) {
+    oldsize = size;
     size *= info->dims[i];
-  /* the size is small enough to fit in a (size_t), or else it would
-     not have been able to be created by array_scratch() or
-     array_clone(), but it may not be small enough to fit in an
-     (off_t). */
-  if (size > INT64_MAX/2)
-    printf("WARNING - array size (%lu elements) may be too great\n"
-           "for this operation!  Serious errors may occur!\n", size);
+    if (size < oldsize) {       // overflow occurred
+      return EDOM;
+    }
+  }
+  if (size >= INT64_MAX/2)
+    return EDOM;        // element count may be too large for an off_t
+
   info->nelem = size;
-  /* the list of dimensions along which should be looped */
-  if (axes)
-    memmove(info->axes, axes, naxes*sizeof(int32_t));
-  else
-    for (i = 0; i < info->naxes; i++)
-      info->axes[i] = i;		/* SL_ALLAXES was selected */
   /* the type of data: LUX_INT8, ..., LUX_DOUBLE */
   info->type = type;
   /* a pointer to a pointer to the data */
@@ -200,22 +207,29 @@ void setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims,
   info->stride = lux_type_size[type];
 
   setAxisMode(info, mode);
+  return 0;
 }
 /*-----------------------------------------------------------------------*/
 /** Advance along a loop.  The coordinates and the pointer to the data
     are advanced, taking into account the dimensional structure of the
     data and the configured axes.
 
-    \param[in,out] info the loop information
-    \param[in,out] ptr  a pointer to the data
-    \return the index of the first loop axis that is not yet
+    \param[in,out] info points to the loopInfo that describes the
+    dimensional structure and the way to traverse it.
+
+    \param[in,out] ptr points to a Pointer that indicates the current
+    data element.
+
+    \returns the index of the first loop axis that is not yet
     completely traversed.
+
+    For example, if the array has 4 by 5 by 6 elements, then
+    advancement from element (2,0,0) (to element (3,0,0)) yields 0,
+    (3,0,0) yields 1, (3,4,0) yields 2, and (3,4,5) yields 3.
  */
 int32_t advanceLoop(loopInfo *info, Pointer *ptr)
 /* advance coordinates; return index of first encountered incomplete
- axis.  I.e., if the array has 4 by 5 by 6 elements, then advancement
- from element (2,0,0) (to element (3,0,0)) yields 0, (3,0,0) yields 1,
- (3,4,0) yields 2, and (3,4,5) yields 3. */
+ axis.   */
 {
   int32_t	i, done;
 
@@ -241,10 +255,15 @@ int32_t advanceLoop(loopInfo *info, Pointer *ptr)
   return done;
 }
 /*-----------------------------------------------------------------------*/
+/** Are we at the start of the loop?
+
+    \param[in] info is the loopInfo to query.
+
+    \returns 1 if all coordinates are equal to 0, and 0 otherwise.
+    Can be used to test if the loop is back at the start again --
+    i.e., has completed.  See also advanceLoop().
+*/
 int32_t loopIsAtStart(loopInfo const *info)
-/* returns 1 if all coordinates are equal to 0, and 0 otherwise.
-   Can be used to test if the loop is back at the start again -- i.e.,
-   has completed.  See also advanceLoop(). */
 {
   int32_t state = 1, i;
 
@@ -253,9 +272,16 @@ int32_t loopIsAtStart(loopInfo const *info)
   return state;
 }
 /*-----------------------------------------------------------------------*/
+/** Rearranges dimensions suitable for walking along the selected
+    axes.
+
+    \param[in,out] info points at the loopInfo that gets adjusted.
+*/
 void rearrangeDimensionLoop(loopInfo *info)
-/* rearranges dimensions suitable for walking along the selected axis
-   <info>: information about the loop
+{
+  int32_t	axis, i, temp[MAX_DIMS], j, axisIndex, mode, axis2;
+
+  /*
    <info->axisindex>: index to the position in info->axes where the axis is
       stored along which is to be traveled
    <info->mode>: flags that indicate the desired treatment of the axes
@@ -269,9 +295,7 @@ void rearrangeDimensionLoop(loopInfo *info)
       SL_AXESBLOCK: the active axis goes first, then all remaining
          specified axes, and then the unspecified ones; in ascending order
 	 within each group
-*/
-{
-  int32_t	axis, i, temp[MAX_DIMS], j, axisIndex, mode, axis2;
+  */
 
   axisIndex = info->axisindex;
   mode = info->mode;
@@ -334,7 +358,7 @@ void rearrangeDimensionLoop(loopInfo *info)
 	  info->raxes[j++] = axis + 1; /* smallest axis in this lump */
 	}
 	info->rndim = j;
-	
+
 	/* get step sizes */
 	for (i = 0; i < info->rndim; i++)
 	  info->rsinglestep[i] = info->singlestep[info->raxes[i]];
@@ -394,7 +418,7 @@ void rearrangeDimensionLoop(loopInfo *info)
 	info->iraxes[i] = 0;
     }
   }
-  
+
   /* prepare step sizes for use in advanceLoop() */
   memcpy(info->step, info->rsinglestep, info->rndim*sizeof(int32_t));
   for (i = info->rndim - 1; i; i--)
@@ -404,27 +428,100 @@ void rearrangeDimensionLoop(loopInfo *info)
     info->coords[i] = 0;	/* initialize coordinates */
   info->data->v = info->data0;	/* initialize pointer */
 }
+/*-------------------------------------------------------------------------*/
+/** Sets the axes mode and rearranges the dimensions accordingly.
+
+    \param[in,out] info points at the loopInfo that gets adjusted.
+
+    \param[in] mode is a collection of bit flags that says how to
+    treat the axes.
+
+    \par Axes Modes
+
+    - `SL_EACHCOORD`: the indicated axis goes first; the remaining
+      axes come later in their original order; the user gets access to
+      all coordinates.
+
+    - `SL_AXISCOORD`: the indicated axis goes first; the user gets
+      access only to the coordinate along the indicated axis;
+      remaining axes come later, lumped together as much as possible
+      for faster execution.
+
+    - `SL_AXESBLOCK`: the active axis goes first, then all remaining
+      specified axes, and then the unspecified ones; in ascending
+      order within each group.
+ */
+void setAxisMode(loopInfo *info, int32_t mode) {
+  if ((mode & SL_EACHBLOCK) == SL_EACHBLOCK)
+    info->advanceaxis = info->naxes;
+  else if (mode & SL_EACHROW)
+    info->advanceaxis = 1;
+  else
+    info->advanceaxis = 0;
+  info->axisindex = 0;
+  info->mode = mode;
+
+  /* rearrange the dimensions for the first pass */
+  rearrangeDimensionLoop(info);
+}
 /*-----------------------------------------------------------------------*/
+/** Create an appropriate result symbol.
+
+   \param[in] sinfo points to a loopInfo that describes the source.
+
+   \param[in] tmode is a collection of bit flags that specifies the
+   desired result.  See below.
+
+   \param[in] ttype is the desired output type.
+
+   \param[in] nMore is the count of elements in \p more.  If it is 0,
+   then \p more is ignored.  It is an error if it is negative or if
+   `nMore` plus the number of source dimensions exceeds `MAX_DIMS`.
+
+   \param[in] more points at a list of \p nMore dimensions to add to
+   the target, compared to the source.  If it is \c NULL, then it and
+   \p nMore are ignored.  Otherwise, the new dimensions, prefixed to
+   those from the source, are applied to the target.
+
+   \param[in] nLess is the count of elements in \p less.  If it is 0,
+   then \p less is ignored.  It is an error if it is negative or
+   greater than \p nAxes.
+
+   \param[in] less if not \c NULL, points at a list of \p nLess
+   divisors to apply to the source dimensions to get the target
+   dimensions.  It is an error if one of the \c less values does not
+   evenly divide the corresponding source dimension.  If \p less is \c
+   NULL, then it and \p nLess are ignored.
+
+   \param[out] tinfo points at a predefined loopInfo that gets filled
+   with info about the output symbol.
+
+   \param[out] tptr points to a Pointer to the current location in the
+   target data.
+
+   \returns the newly created target symbol.
+
+   \par Output Mode Specification
+
+   - `SL_ONEDIMS` says to set omitted dimensions to 1 in the output.
+     If this option is not selected, then omitted dimensions are
+     really not present in the output.  If due to such omissions no
+     dimensions are left, then a scalar is returned as output symbol
+
+   - `SL_SAMEDIMS` says that the output has same dimensions as the
+     source.
+
+   - `SL_COMPRESS` is as `SL_SAMEDIMS`, except that the first
+        specified axis is omitted.
+
+   - `SL_COMPRESSALL` is as `SL_SAMEDIMS`, but all specified axes are
+      omitted.
+*/
 int32_t dimensionLoopResult1(loopInfo const *sinfo,
                          int32_t tmode, Symboltype ttype,
                          int32_t nMore, int32_t const * more,
                          int32_t nLess, int32_t const * less,
                          loopInfo *tinfo, Pointer *tptr)
-/* create an appropriate result symbol
-   <sinfo>: contains information about the loops through the source
-   <tmode>: specifies desired result
-     SL_ONEDIMS:   set omitted dimensions to 1 in the output.  If this
-        option is not selected, then omitted dimensions are really
-	not present in the output.  If due to such omissions no dimensions
-        are left, then a scalar is returned as output symbol
-     SL_SAMEDIMS:  output has same dimensions as source
-     SL_COMPRESS:  as SL_SAMEDIMS, except that the first specified axis
-        is omitted
-     SL_COMPRESSALL: as SL_SAMEDIMS, but all specified axes are omitted
-   <tinfo>: is filled with info about the output symbol
-   <type>: the desired output type
-   <tptr>: a pointer to a pointer to the target data
- */
 {
   int32_t	target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j,
     nOmitAxes = 0, omitAxes[MAX_DIMS];
@@ -453,18 +550,7 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
       if (dims[axes[i]] == 1 && less[i] > 1) /* this dimension becomes 1 */
 	omitAxes[nOmitAxes++] = i;
     }
-#if UNNEEDED
-    for ( ; i < naxes; i++) {
-      if (dims[axes[i]] % less[nLess - 1])
-        return luxerror("Reduction factor %d is not a divisor of dimension"
-                        " %d size %d", -1, less[nLess - 1], axes[i],
-                        dims[axes[i]]);
-      dims[axes[i]] /= less[nLess - 1];
-      if (dims[axes[i]] == 1 && less[i] > 1) /* this dimension becomes 1 */
-	omitAxes[nOmitAxes++] = i;
-    }
-#endif
-    if (!(tmode & SL_ONEDIMS) && nOmitAxes) { 
+    if (!(tmode & SL_ONEDIMS) && nOmitAxes) {
       /* remove dimensions corresponding to axes mentioned in omit[] */
       int32_t retain[MAX_DIMS];
       for (i = 0; i < ndim; i++)
@@ -553,7 +639,7 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
 	n = 1;			/* omit one axis only */
       else
 	n = sinfo->naxes;	/* omit all axes */
-      
+
       if (sinfo->axes) {	/* have specific axes */
         if (tmode & SL_ONEDIMS)  /* replace by dimension of 1 */
 	  for (i = 0; i < n; i++)
@@ -614,6 +700,11 @@ int32_t dimensionLoopResult1(loopInfo const *sinfo,
   return target;
 }
 /*-----------------------------------------------------------------------*/
+/** Create an appropriate result symbol without adjusting dimensions.
+    The arguments and return value are the same as the corresponding
+    ones of dimensionLoopResult1(), except that no `more` and `less`
+    arguments are specified.
+ */
 int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
                             Symboltype ttype, Pointer *tptr)
 {
@@ -621,83 +712,103 @@ int32_t dimensionLoopResult(loopInfo const *sinfo, loopInfo *tinfo,
                               0, NULL, 0, NULL, tinfo, tptr);
 }
 /*-----------------------------------------------------------------------*/
-/** Initiates a standard array loop.  advanceLoop() runs through the loop.
+/** Initiates a standard array loop taking the axes from a LUX symbol.
+    advanceLoop() runs through the loop.
 
-    \param data source data symbol, must be numerical
+    \param[in] data source data symbol, must be numerical.
 
-    \param axes a pointer to the list of axes to treat
+    \param[in] axes a pointer to the list of axes to treat.
 
-    \param nAxes the number of axes to treat
+    \param[in] nAxes the number of axes to treat.
 
-    \param mode flags that indicate desired action; see below
+    \param[in] mode flags that indicate desired action; see below.
 
-    \param outType desired data type for output symbol
+    \param[in] outType desired data type for output symbol.
 
-    \param src returns loop info for \p data
+    \param[out] src returns loop info for \p data.
 
-    \param srcptr pointer to a pointer to the data in \p data
+    \param[out] srcptr pointer to a pointer to the data in \p data.
 
-    \param output returns created output symbol, if unequal to \c
-    NULL on entry
+    \param[out] output returns created output symbol, if unequal to \c
+    NULL on entry.
 
-    \param trgt returns loop info for \p output, if that is unequal
-    to \c NULL on entry
+    \param[out] trgt returns loop info for \p output, if that is
+    unequal to \c NULL on entry.
 
-    \param trgtptr pointer to a pointer to the data in the output symbol
+    \param[out] trgtptr pointer to a pointer to the data in the output
+    symbol.
 
-   \p mode flags:
+    \p mode flags:
 
-   - about the axes:
+    - about the axes:
+
      - \c SL_ALLAXES: same as specifying all dimensions of \p data in
        ascending order in \p axes; the values of \p axes and \p nAxes
        are ignored.
+
      - \c SL_TAKEONED: take the \p data as one-dimensional; the values of
        \p axes and \p nAxes are ignored
 
-   - about specified axes:
+    - about specified axes:
+
      - \c SL_NEGONED: if the user supplies a single axis and that axis
        is negative, then \p data is treated as if it were
        one-dimensional (yet containing all of its data elements)
+
      - \c SL_ONEAXIS:  only a single axis is allowed
+
      - \c SL_UNIQUEAXES: all specified axes must be unique (no duplicates)
 
-   - about the input \p data:
+    - about the input \p data:
+
      - \c SL_SRCUPGRADE: use a copy of \p data that is upgraded to \p
        outType if necessary
 
-   - about the output symbol, if any:
+    - about the output symbol, if any:
+
      - \c SL_EXACT: must get exactly the data type indicated by \p
        outType (DEFAULT)
+
      - \c SL_UPGRADE: must get the data type of \p data or \p outType,
        whichever is greater
+
      - \c SL_KEEPTYPE: same type as input symbol
+
      - \c SL_ONEDIMS: omitted dimensions are not really removed but
        rather set to 1
+
      - \c SL_SAMEDIMS: gets the same dimensions as \p data (DEFAULT)
+
      - \c SL_COMPRESS: gets the same dimensions as \p data, except
        that the currently selected axis is omitted.  if no dimensions
        are left, a scalar is returned
+
      - \c SL_COMPRESSALL: must have the same dimensions as \p data,
        except that all selected axes are omitted.  if no dimensions
        are left, a scalar is retuned
 
-   - about the desired axis order and coordinate availability:
+    - about the desired axis order and coordinate availability:
+
      - \c SL_EACHCOORD: the currently selected axis goes first; the
        remaining axes come later, in their original order; the user
        gets access to all coordinates (DEFAULT)
+
      - \c SL_AXISCOORD: the currently selected axis goes first; the
        user gets access only to the coordinate along the indicated
        axis; remaining axes come later, lumped together as much as
        possible for faster execution
+
      - \c SL_AXESBLOCK: all specified axes go first in the specified
        order; the remaining axes come later, in their original order;
        the user gets access to all coordinates.  Implies \c
        SL_UNIQUEAXES.
 
-   - about the coordinate treatment:
+    - about the coordinate treatment:
+
      - \c SL_EACHROW: the data is advanced one row at a time; the user
        must take care of advancing the data pointer to the beginning
        of the next row
+
      - \c SL_EACHBLOCK: like \c SL_EACHROW, but all selected axes
        together are considered to be a "row".  Implies \c
        SL_AXESBLOCK.
@@ -706,6 +817,8 @@ int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode,
                      Symboltype outType, loopInfo *src, Pointer *srcptr,
                      int32_t *output, loopInfo *trgt, Pointer *trgtptr)
 {
+  /*
+   */
   int32_t i, nAxes;
   Pointer axes;
 
@@ -723,8 +836,9 @@ int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode,
 
 }
 /*-----------------------------------------------------------------------*/
-/* Like standardLoop but can produce a target like the source
-   but with adjusted dimensions. LS 2011-07-22 */
+/** Like standardLoop() but can produce a target with adjusted
+    dimensions.
+ */
 int32_t standardLoopX(int32_t source, int32_t axisSym, int32_t srcMode,
                   loopInfo *srcinf, Pointer *srcptr,
                   int32_t nMore, int32_t const * more,
@@ -733,12 +847,22 @@ int32_t standardLoopX(int32_t source, int32_t axisSym, int32_t srcMode,
                   int32_t *target,
                   loopInfo *tgtinf, Pointer *tgtptr)
 {
+  // LS 2011-07-22
   int32_t i, nAxes;
   Pointer axes;
+  int32_t standardLoop1(int32_t source,
+                        int32_t nAxes, int32_t const * axes,
+                        int32_t srcMode,
+                        loopInfo *srcinf, Pointer *srcptr,
+                        int32_t nMore, int32_t const * more,
+                        int32_t nLess, int32_t const * less,
+                        Symboltype tgtType, int32_t tgtMode,
+                        int32_t *target,
+                        loopInfo *tgtinf, Pointer *tgtptr);
 
   if (axisSym > 0) {		/* <axisSym> is a regular symbol */
     if (!symbolIsNumerical(axisSym))
-      return luxerror("Need a numerical argument", axisSym); /* <axisSym> was not numerical */
+      return luxerror("Need a numerical argument", axisSym);
     i = lux_long(1, &axisSym);	/* get a LONG copy */
     numerical(i, NULL, NULL, &nAxes, &axes); /* get info */
   } else {
@@ -746,29 +870,35 @@ int32_t standardLoopX(int32_t source, int32_t axisSym, int32_t srcMode,
     axes.l = NULL;
   }
   int32_t result = standardLoop1(source, nAxes, axes.l, srcMode,
-                             srcinf, srcptr, nMore, more, nLess, less,
-                             tgtType, tgtMode, target, tgtinf, tgtptr);
+                                 srcinf, srcptr, nMore, more, nLess, less,
+                                 tgtType, tgtMode, target, tgtinf, tgtptr);
   return result;
 }
 /*-----------------------------------------------------------------------*/
+/**
+   Initiates a standard loop based on a list of axes.  Is like
+   standardLoop() but has an explicit list of axes instead of a LUX
+   symbol indicating the axes.
+
+   The arguments and return value are like those of standardLoop(),
+   except for:
+
+   \param[in] nAxes is the count of axes in \p axes.
+
+   \param[in] axes points at a list of axes to walk along.
+ */
 int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
                       int32_t mode, Symboltype outType,
                       loopInfo *src, Pointer *srcptr, int32_t *output,
                       loopInfo *trgt, Pointer *trgtptr)
 {
   int32_t	*dims, ndim, i, temp[MAX_DIMS];
+  int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
-#if DEBUG_VOCAL
-  debugout("in standardLoop()");
-  debugout("checking <data>");
-#endif
   /* check if <data> is of proper class, and get some info about it */
   if (numerical(data, &dims, &ndim, NULL, srcptr) == LUX_ERROR)
     return LUX_ERROR;		/* some error */
 
-#if DEBUG_VOCAL
-  debugout("treating SL_TAKEONED, SL_ALLAXES");
-#endif
   if (mode & SL_TAKEONED)	/* take data as 1D */
     nAxes = 0;			/* treat as 1D */
   else if (mode & SL_ALLAXES) { /* select all axes */
@@ -779,16 +909,10 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
 	     && *axes < 0)	/* and it is negative */
     nAxes = 0;
 
-#if DEBUG_VOCAL
-  debugout("treating SL_ONEAXIS");
-#endif
   if ((mode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
     return luxerror("Only one axis allowed", -1);
 
-#if DEBUG_VOCAL
-  debugout("checking axes for legality");
-#endif
   /* check the specified axes for legality */
   if (nAxes && axes) {
     for (i = 0; i < nAxes; i++) /* check all specified axes */
@@ -806,27 +930,15 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
 
   /* The input is of legal classes and types. */
 
-#if DEBUG_VOCAL
-  debugout("treating SL_SRCUPGRADE");
-#endif
   if ((mode & SL_SRCUPGRADE)	/* upgrade source if necessary */
       && (symbol_type(data) < outType))	{ /* source needs upgrading */
     data = lux_convert(1, &data, outType, 1); /* upgrade */
     numerical(data, NULL, NULL, NULL, srcptr);
   }
 
-#if DEBUG_VOCAL
-  debugout("calling setupDimensionLoop()");
-#endif
   setupDimensionLoop(src, ndim, dims, symbol_type(data), nAxes,
 		     axes, srcptr, mode);
-#if DEBUG_VOCAL
-  debugout("back from setupDimensionLoop()");
-#endif
 
-#if DEBUG_VOCAL
-  debugout("generating output symbol (if requested)");
-#endif
   if (output) {			/* user wants an output symbol */
     if (((mode & SL_UPGRADE)
 	 && outType < src->type)
@@ -840,22 +952,166 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
       /* but didn't get one */
       return LUX_ERROR;
   }
-  
-#if DEBUG_VOCAL
-  debugout("treating SL_TAKEONED");
-#endif 
+
   if (mode & SL_TAKEONED) { /* mimic 1D array */
     src->dims[0] = src->rdims[0] = src->nelem;
     src->ndim = src->rndim = 1;
   }
-#if DEBUG_VOCAL
-  debugout("exiting standardLoop()");
-#endif
 
   return LUX_OK;
 }
-#undef DEBUG_VOCAL
 /*-----------------------------------------------------------------------*/
+/** Initiates a standard array loop.  advanceLoop() runs through the loop.
+
+   \param[in] source is the source data symbol, must be numerical.
+
+   \param[in] nAxes is the number of elements stored at \p axes.  If
+   it is less than 0, then an error is declared.  If it is 0, then \p
+   axes is ignored.
+
+   \param[in] axes points to the list of axes to treat.  If it is \c
+   NULL, then \p nAxes is ignored.  Otherwise, the list must contain
+   at least \p nAxes elements indicating the axes (dimensions) of
+   interest.  If any of those axes are negative or greater than or
+   equal to the number of dimensions in \p source, then an error is
+   declared.  Further restrictions on the axis values may be specified
+   through \p srcMode.
+
+   \param[in] srcMode contains bit flags that indicate desired action
+   for \p source, see below.
+
+   \param[out] srcinf points at the loopInfo for the source.
+
+   \param[out] srcptr points at the Pointer for the source.
+
+   \param[in] nMore is the number of elements stored at \p more.  If
+   it is less than 0, then an error is declared.  If it is 0, then \p
+   more is ignored.
+
+   \param[in] more is a pointer to a list of dimensions to add.  If it
+   is \c NULL, then \p nMore is ignored.  Otherwise, \p more must
+   point at a list of \p nMore numbers indicating the sizes of the new
+   dimensions to add to \p target, in addition to the dimensions of \p
+   source.  If any of those sizes are less than 1, then an error is
+   declared.  The extra dimensions are prefixed to the existing ones,
+   in the indicated order.
+
+   \param[in] nLess is the number of elements stored at \p less.  If
+   it is less than 0, then an error is declared.  If it is 0, then \p
+   less is ignored.  If \p nLess is greater than \p nAxes, then an
+   error is declared.
+
+   \param[in] less is a pointer to a list of dimension divisors.  If
+   it is \c NULL, then \p nLess is ignored.  Otherwise, \p less must
+   point at a list of \p nLess numbers indicating by which factors the
+   sizes of the corresponding axes from \p axes are reduced.  If \p
+   nLess is greater than 0 but less than \p nAxes, then the last
+   element of \p less is repeated as needed.  If the size of one of
+   the corresponding dimensions of \p source is not a multiple of the
+   corresponding number from \p less, then an error is declared.  If
+   after reduction the size of the dimension is equal to 1, then that
+   dimension may be omitted from the result, depending on the value of
+   \p tgtMode.
+
+   \param[in] tgtType is the desired data type for newly created
+   target data symbol.
+
+   \param[in] tgtmode contains bit flags that indicate desired action
+   for target, see below.
+
+   \param[out] target points at the created target data symbol.  If it
+   is \c NULL, then no target-related output variables are filled in.
+   By default, \p target gets the same dimensions as \p source.  This
+   can be changed through \p more, \p less, and \p tgtMode.  If the
+   final number of dimensions in \p target (taking into account \p
+   more and \p less and \p tgtMode) would exceed \c MAX_DIMS, then an
+   error is declared.
+
+   \param[out] tgtinf points at the loopInfo for the target.  If \p
+   tgtinf or \p target are \c NULL, then \p tgtinf is not filled in.
+
+   \param[out] trgtptr points at the Pointer the target.  If \p tgtptr
+   or \p target are \c NULL, then \p tgtptr is not filled in.
+
+   \par \p srcMode flags
+
+   About the axes:
+   - `SL_ALLAXES`: same as specifying all dimensions of \p data in
+     ascending order in \p axes; the values of \p axes and \p nAxes
+     are ignored.
+   - `SL_TAKEONED`: take the \p data as one-dimensional; the values of
+     \p axes and \p nAxes are ignored.
+
+   About specified axes:
+   - `SL_NEGONED`: if the user supplies a single axis and that axis is
+     negative, then \p data is treated as if it were one-dimensional
+     (yet containing all of its data elements).
+   - `SL_ONEAXIS`:  only a single axis is allowed.
+   - `SL_UNIQUEAXES`: all specified axes must be unique (no duplicates).
+
+   About the input \p data:
+   - `SL_SRCUPGRADE`: use a copy of \p data which is upgraded to \p
+      tgtType if necessary.
+
+   About the desired axis order and coordinate availability:
+   - `SL_EACHCOORD`: the currently selected axis goes first; the
+     remaining axes come later, in their original order; the user gets
+     access to all coordinates.  This is the default.
+   - `SL_AXISCOORD`: the currently selected axis goes first; the user
+     gets access only to the coordinate along the indicated axis;
+     remaining axes come later, lumped together as much as possible
+     for faster execution.
+   - `SL_AXESBLOCK`: all specified axes go first in the specified
+     order; the remaining axes come later, in their original order;
+     the user gets access to all coordinates.  Implies
+     `SL_UNIQUEAXES`.
+
+   About the coordinate treatment:
+   - `SL_EACHROW`: the data is advanced one row at a time; the user
+     must take care of advancing the data pointer to the beginning of
+     the next row.
+   - `SL_EACHBLOCK`: like `SL_EACHROW`, but all selected axes together
+     are considered to be a "row".  Implies `SL_AXESBLOCK`.
+
+   \par \p tgtMode flags
+
+   About the output symbol:
+   - `SL_EXACT`: must get exactly the data type indicated by \p
+     tgtType.  This is the default.
+   - `SL_UPGRADE`: must get the data type of \p source or \p tgtType,
+     whichever is greater
+   - `SL_KEEPTYPE`: gets the same type as \p source.
+   - `SL_ONEDIMS`: omitted dimensions are not really removed but
+     rather set to 1.
+   - `SL_COMPRESS`: gets the same dimensions as \p data, except that
+     the currently selected axis is omitted.  If no dimensions are
+     left, then a scalar is returned.  Ignored unless \p less is \c
+     NULL.
+   - `SL_COMPRESSALL`: gets the same dimensions as \p data, except
+     that all selected axes are omitted.  If no dimensions are left,
+     then a scalar is returned.  Ignored unless \p less is \c NULL.
+
+   About the desired axis order and coordinate availability:
+   - `SL_EACHCOORD`: the currently selected axis goes first; the
+     remaining axes come later, in their original order; the user gets
+     access to all coordinates.  This is the default.
+   - `SL_AXISCOORD`: the currently selected axis goes first; the user
+     gets access only to the coordinate along the indicated axis;
+     remaining axes come later, lumped together as much as possible
+     for faster execution.
+   - `SL_AXESBLOCK`: all specified axes go first in the specified
+     order; the remaining axes come later, in their original order;
+     the user gets access to all coordinates.  Implies
+     `SL_UNIQUEAXES`.
+
+   About the coordinate treatment:
+   - `SL_EACHROW`: the data is advanced one row at a time; the user
+     must take care of advancing the data pointer to the beginning of
+     the next row.
+   - `SL_EACHBLOCK`: like `SL_EACHROW`, but all selected axes together
+     are considered to be a "row".  Implies `SL_AXESBLOCK`.
+
+  */
 int32_t standardLoop1(int32_t source,
                   int32_t nAxes, int32_t const * axes,
                   int32_t srcMode,
@@ -863,154 +1119,17 @@ int32_t standardLoop1(int32_t source,
                   int32_t nMore, int32_t const * more,
                   int32_t nLess, int32_t const * less,
                   Symboltype tgtType, int32_t tgtMode,
-                  int32_t *target, 
+                  int32_t *target,
                   loopInfo *tgtinf, Pointer *tgtptr)
-/* initiates a standard array loop.  advanceLoop() runs through the loop.
-   <source> (in): source data symbol, must be numerical
-   <nAxes> (in): the number of axes to treat
-   <axes> (in): a pointer to the list of axes to treat
-   <srcMode> (in): flags that indicate desired action for source
-   <srcinf> (out): loop info for source
-   <srcptr> (out): pointer to the data in source
-   <nMore> (in): the number of axes (out of <axes>) of which to
-     increase the size
-   <more> (in): a pointer to the list of axis size factors
-   <nLess> (in): the number of axes (out of <axes>) of which to
-     decrease the size
-   <less> (in): a pointer to the list of axis size divisors
-   <tgtType> (in): desired data type for newly created target data symbol
-   <tgtmode> (in): flags that indicate desired action for target
-   <target> (out): created target data symbol
-   <tgtinf> (out): returns loop info for target
-   <trgtptr> (out): pointer to the data in target
-
-   if <target> is NULL, then no target-related output variables are
-   filled in.  If any of the output variables are NULL, then those
-   variables are not filled in.
-
-   If <axes> is NULL, then <nAxes> is ignored.  If <axes> is not NULL,
-   then it must point to an array of <nAxes> numbers indicating the
-   axes (dimensions) of interest.  If any of those axes are negative
-   or greater than or equal to the number of dimensions in <source>,
-   then an error is declared.  If <nAxes> is less than 1, then an
-   error is declared.  Further restrictions on the axis values may be
-   specified through <srcMode>.
-
-   By default, <target> gets the same dimensions as <source>.  This
-   can be changed through <more>, <nMore>, <less>, <nLess>, and
-   <tgtMode>.  <nMore> and <more> specify how many dimensions to add,
-   and of what size.
-
-   If <more> is NULL, then <nMore> is ignored.  If <nMore> is zero,
-   then <more> is ignored.  If <more> is not NULL, then it must point
-   to an array of <nMore> numbers indicating the sizes of the new
-   dimensions to be added to <target>.  If any of those sizes are less
-   than 1, then an error is declared.  If <nMore> is less than 1, then
-   an error is declared.  The extra dimensions are prefixed to the
-   existing ones, in the indicated order.
-
-   If <less> is NULL, then <nLess> is ignored.  If <nLess> is zero,
-   then <less> is ignored.  If <less> is not NULL, then it must point
-   to an array of <nLess> numbers indicating by which factors the
-   sizes of the indicated axes should be reduced.  The "indicated
-   axes" are those from <axes>.  If <nLess> is greater than the number
-   of indicated axes, then an error is declared.  If <nLess> is less
-   than 1, then an error is declared.  If <nLess> is greater than 0
-   but less than the number of indicated axes, then the last element
-   of <less> is implicitly repeated as needed.  If the size of one of
-   the corresponding axes of <source> is not a multiple of the
-   corresponding number from <more>, then an error is declared.  If
-   after reduction the size of the dimension is equal to 1, then that
-   dimension may be omitted from the result, depending on the value of
-   <tgtMode>.
-
-   If the final number of dimensions in <target> (taking into account
-   <more> and <less> and <tgtMode>) would exceed MAX_DIMS, then an
-   error is declared.
-    
-   <srcMode> flags:
-
-   about the axes:
-   SL_ALLAXES: same as specifying all dimensions of <data> in ascending order
-           in <axes>; the values of <axes> and <nAxes> are ignored.
-   SL_TAKEONED: take the <data> as one-dimensional; the values of <axes>
-           and <nAxes> are ignored
-
-   about specified axes:
-   SL_NEGONED:  if the user supplies a single axis and that axis is negative,
-           then <data> is treated as if it were one-dimensional (yet
-	   containing all of its data elements)
-   SL_ONEAXIS:  only a single axis is allowed
-   SL_UNIQUEAXES: all specified axes must be unique (no duplicates)
-
-   about the input <data>:
-   SL_SRCUPGRADE: use a copy of <data> which is upgraded to <tgtType> if
-           necessary
-
-   about the desired axis order and coordinate availability:
-   SL_EACHCOORD: the currently selected axis goes first; the remaining
-           axes come later, in their original order; the user gets
-	   access to all coordinates (DEFAULT)
-   SL_AXISCOORD: the currently selected axis goes first; the user gets access
-	    only to the coordinate along the indicated axis; remaining axes
-	    come later, lumped together as much as possible for faster
-	    execution
-   SL_AXESBLOCK: all specified axes go first in the specified order;
-	    the remaining axes come later, in their original order; the user
-	    gets access to all coordinates.  Implies SL_UNIQUEAXES.
-
-   about the coordinate treatment:
-   SL_EACHROW: the data is advanced one row at a time; the user must
-	    take care of advancing the data pointer to the beginning of
-	    the next row   
-   SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
-	    considered to be a "row".  Implies SL_AXESBLOCK.
-
-   <tgtMode> flags:
-
-   about the output symbol:
-   SL_EXACT: must get exactly the data type indicated by <tgtType> (DEFAULT)
-   SL_UPGRADE: must get the data type of <source> or <tgtType>, whichever is
-           greater
-   SL_KEEPTYPE: gets the same type as <source>
-
-   SL_ONEDIMS: omitted dimensions are not really removed but rather set to 1
-
-   SL_COMPRESS: gets the same dimensions as <data>, except that
-           the currently selected axis is omitted.  If no dimensions
-           are left, then a scalar is returned.  Ignored unless <less>
-           is NULL.
-   SL_COMPRESSALL: gets the same dimensions as <data>, except that all
-           selected axes are omitted.  If no dimensions are left, then
-           a scalar is returned.  Ignored unless <less> is NULL.
-
-   about the desired axis order and coordinate availability:
-   SL_EACHCOORD: the currently selected axis goes first; the remaining
-           axes come later, in their original order; the user gets
-	   access to all coordinates (DEFAULT)
-   SL_AXISCOORD: the currently selected axis goes first; the user gets access
-	    only to the coordinate along the indicated axis; remaining axes
-	    come later, lumped together as much as possible for faster
-	    execution
-   SL_AXESBLOCK: all specified axes go first in the specified order;
-	    the remaining axes come later, in their original order; the user
-	    gets access to all coordinates.  Implies SL_UNIQUEAXES.
-
-   about the coordinate treatment:
-   SL_EACHROW: the data is advanced one row at a time; the user must
-	    take care of advancing the data pointer to the beginning of
-	    the next row   
-   SL_EACHBLOCK: like SL_EACHROW, but all selected axes together are
-	    considered to be a "row".  Implies SL_AXESBLOCK.
-  */
 {
   int32_t *dims;
   int32_t ndim, i, temp[MAX_DIMS];
+  int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   /* check if <source> is of proper class, and get some info about it */
   if (numerical_or_string(source, &dims, &ndim, NULL, srcptr) == LUX_ERROR)
     return LUX_ERROR;		/* some error */
-  
+
   if (srcMode & SL_TAKEONED)	/* take data as 1D */
     nAxes = 0;			/* treat as 1D */
   else if (srcMode & SL_ALLAXES) { /* select all axes */
@@ -1020,7 +1139,7 @@ int32_t standardLoop1(int32_t source,
 	     && nAxes == 1		/* one axis specified */
 	     && *axes < 0)	/* and it is negative */
     nAxes = 0;
-  
+
   if ((srcMode & SL_ONEAXIS)	/* only one axis allowed */
       && nAxes > 1)		/* and more than one selected */
     return luxerror("Only one axis allowed", -1);
@@ -1039,9 +1158,9 @@ int32_t standardLoop1(int32_t source,
 			  -1, axes[i]);
     }
   }
-  
+
   /* The input is of legal classes and types. */
-    
+
   if ((srcMode & SL_SRCUPGRADE)	/* upgrade source if necessary */
       && (symbol_type(source) < tgtType))	{ /* source needs upgrading */
     source = lux_convert(1, &source, tgtType, 1); /* upgrade */
@@ -1058,7 +1177,7 @@ int32_t standardLoop1(int32_t source,
       tgtinf->type = srcinf->type; /* output type equal to source type */
     else
       tgtinf->type = tgtType;	/* take specified output type */
-        
+
     *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type, 
                                    nMore, more, nLess, less, tgtinf,
                                    tgtptr);
@@ -1066,7 +1185,7 @@ int32_t standardLoop1(int32_t source,
       /* but didn't get one */
       return LUX_ERROR;
   }
-  
+
   if (srcMode & SL_TAKEONED) { /* mimic 1D array */
     srcinf->dims[0] = srcinf->rdims[0] = srcinf->nelem;
     srcinf->ndim = srcinf->rndim = 1;
@@ -1075,9 +1194,13 @@ int32_t standardLoop1(int32_t source,
   return LUX_OK;
 }
 /*-----------------------------------------------------------------------*/
+/** Rearranges dimensions for a next loop through the array.
+
+    \param[in,out] info is the loopInfo to adjust.
+
+    \returns 1 if OK, 0 if we're beyond the last specified axis.
+*/
 int32_t nextLoop(loopInfo *info)
-/* rearranges dimensions for a next loop through the array; returns 1
- if OK, 0 if we're beyond the last specified axis */
 {
   if (++(info->axisindex) >= info->naxes)
     return 0;
@@ -1085,9 +1208,16 @@ int32_t nextLoop(loopInfo *info)
   return LUX_OK;
 }
 /*-----------------------------------------------------------------------*/
+/** Rearranges dimensions for a next loop through two arrays.
+
+    \param[in,out] info1 is the first loopInfo to adjust.
+
+    \param[in,out] info2 is the second loopInfo to adjust.
+
+    \returns 1 if OK, 0 if we're beyond the last specified axis <em>for
+    the first loopInfo</em>.
+*/
 int32_t nextLoops(loopInfo *info1, loopInfo *info2)
-/* rearranges dimensions for a next loop through the arrays; returns 1
- if OK, 0 if we're beyond the last specified axis */
 {
   if (++(info1->axisindex) >= info1->naxes)
     return 0;
@@ -1097,21 +1227,30 @@ int32_t nextLoops(loopInfo *info1, loopInfo *info2)
   return 1;
 }
 /*-----------------------------------------------------------------------*/
+/** This routine selects a subset of the source data for treatment.
+
+    \param[in] range points at a list of elements describing the
+    beginning and end of the range in each of the source coordinates.
+    The first element specifies the beginning of the range for the
+    first rearranged dimension, the second element the end of that
+    range.  Each next pair applies to the next rearranged dimension.
+
+    \param[in,out] src is the loopInfo to adjust.
+
+    This routine should only be used if no dimension compression has
+    been applied.
+ */
 void subdataLoop(int32_t *range, loopInfo *src)
-/* this routine selects less than the full source data set for treatment */
-/* by modifying src->step[] and src->rdims[] and src->data */
-/* <range> must contain the beginning and end of the range in each of
- the source coordinates.  This routine should only be used if
- no dimension compression has been applied. LS 30apr98 */
 {
-  int32_t	i, offset;
+  /* LS 30apr98 */
+   int32_t	i, offset;
 
   offset = 0;
   for (i = 0; i < src->ndim; i++) {
     offset += range[2*i]*src->singlestep[i];
     src->rdims[src->raxes[i]] = range[2*i + 1] - range[2*i] + 1;
   }
-  
+
   memcpy(src->step, src->rsinglestep, src->ndim*sizeof(int32_t));
 
   for (i = src->ndim - 1; i > 0; i--)
@@ -1120,18 +1259,42 @@ void subdataLoop(int32_t *range, loopInfo *src)
   (*src->data).b = (uint8_t *) src->data0 + offset*src->stride;
 }
 /*--------------------------------------------------------------------*/
+/** Modifies loopInfo objects for for walking along only the outer
+    edges of the data set.
+
+    \param[in,out] src is the loopInfo describing the source.  It is
+    assumed to be configured to point to the beginning of the data.
+
+    \param[in,out] trgt is the loopInfo describing the target.  If it
+    is not \c NULL, then it modified the same as \p src.  It is then
+    assumed to contain the same dimensions and axes as \p src, and to
+    be configured to point to the beginning of the data.
+
+    \param[in] index is the index of the edge to walk along.  It must
+    be between 0 and `2*src->ndim - 1`, but this is not checked.
+
+    Edge number \p index consists of all data points that have
+    rearranged coordinate number `index/2` equal to 0 (if `index%2 ==
+    0`) or to `src->rdims[index/2] - 1` (if `index%2 == 1`).  So,
+
+    - index 0 yields all elements at the beginning of the first
+      rearranged coordinate; schematically: `x(0,*)`.
+
+    - index 1 yields all elements at the end of the first rearranged
+      coordinate.  Schematically: `x(*-1,*)`.
+
+    - index 2 yields all elements at the beginning of the second
+      rearranged coordinate.  Schematically: `x(*,0)`.
+
+    - index 3 yields all elements at the end of the second rearranged
+      coordinate.  Schematically: `x(*,*-1)`.
+
+    - and so on.
+
+*/
 void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
-/* modifies <src> and <trgt> for walking along only the outer edges of the
-   data set.  For this purpose, edge number <index> consists of all data
-   points that have rearranged coordinate number <index>/2 equal to
-   0 (if <index>%2 == 0) or to <src>->rdims[index/2] - 1 (if <index>%2 == 1).
-   If <trgt> is not equal to NULL, then it is modified the same as <src>.
-   In that case it is assumed that <trgt> contains the same dimensions
-   and axes as <src>.  It is also assumed that <index> has a legal value,
-   i.e., between 0 and 2*<src>->ndim - 1, and that <src>->data0 and
-   <trgt>->data0 point at the start of their respective data.  LS 23oct98
-   LS 2feb99 */
 {
+  // LS 23oct98 LS 2feb99
   uint8_t	back;
   int32_t	axis, trgtstride, i;
   Pointer	*trgtdata;
@@ -1140,13 +1303,13 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
   back = index % 2;		/* 0 -> front edge, 1 -> back edge */
   index /= 2;			/* the target axis */
   axis = src->axes[index];
-    
+
   /* put target dimension in the back; get rearranged step sizes */
   memcpy(src->rsinglestep, src->singlestep, axis*sizeof(int32_t));
   memcpy(src->rsinglestep + axis, src->singlestep + axis + 1,
 	 (src->ndim - axis - 1)*sizeof(int32_t));
   src->rsinglestep[src->ndim - 1] = src->singlestep[axis];
-    
+
   /* get rearranged dimensions */
   src->rndim = src->ndim;
   memcpy(src->rdims, src->dims, axis*sizeof(int32_t));
@@ -1195,58 +1358,74 @@ void rearrangeEdgeLoop(loopInfo *src, loopInfo *trgt, int32_t index)
   }
 }
 /*--------------------------------------------------------------------*/
+/** Prepares for handling diagonals.
+
+    \param[in] symbol is the symbol number of a LUX array whose
+    contents specify which connections to nearest neighbors to accept.
+    The array must one number for each dimension of the target array.
+    These numbers may have values 0, 1, or 2, see below.  If \p symbol
+    is equal to 0, then `one(lonarr(info->ndim))*2` is assumed for it;
+    i.e., all directions are allowed.
+
+    \param[in] info is a loopInfo that describes the dimensional
+    structure of the target.
+
+    \param[in] part says which part of all directions to service.  If
+    you want to reach all allowed neighbors, then set \p part equal
+    to 1.  If you want to service all allowed directions but do not
+    distinguish between diametrically opposite directions, then set \p
+    part equal to 2.
+
+    \param[out] offset if not \c NULL, is made to point at an array
+    containing the offsets from the central position to service all of
+    the allowed diagonals, based on the array dimensions taken from
+    `info->dims`.  Memory for this array is allocated by the routine.
+    The user should `free` the memory when done.
+
+    \param[out] edge if not \c NULL, is made to point at an array
+    with two elements for each dimension; the first of each pair
+    refers to the near edge (with the appropriate coordinate equal to
+    0) and the second one to the far edge (with the appropriate
+    coordinate equal to `info.dims[] - 1`).  Each of these numbers is
+    set to 1 if one or more of the offsets point at the corresponding
+    edge, and to 0 otherwise.  Memory for this array is allocated by
+    the routine.  The user should `free` the memory when done.
+
+    \param[out] rcoord if not \c NULL, is made to point at an array
+    with one set of coordinates for each direction (corresponding to
+    one member of \p offset), with each number in each set equal to
+    the offset expressed in the corresponding dimension.  All elements
+    of \p rcoord are equal to -1, 0, or +1.  Memory for this array is
+    allocated by the routine.  The user should `free` the memory when
+    done.
+
+    \param[out] diagonal if not \c NULL, is made to point at the
+    start of the list of diagonal code numbers (i.e., the contents of
+    \p symbol) -- or a pointer to \c NULL if \p symbol is equal to 0.
+
+    \returns the number of offsets, or \c LUX_ERROR if an error
+    occurred.
+
+    \par Neighbor numbers
+
+    The acceptable values 0, 1, 2 for the array elements in \p symbol
+    have the following meaning:
+
+    0. Neighbors in this dimension are not recognized.
+
+    1. Neighbors in this dimension are only recognized as such if they
+    share a face.  I.e., if an allowed direction has a non-zero
+    component in this dimension, then that component is the
+    <b>only</b> non-zero component of that direction.
+
+    2. Neighbors in this dimension are recognized as such if they
+    share a face or a vertex.
+*/
 int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
-		     int32_t **offset, int32_t **edge, int32_t **rcoord, int32_t **diagonal)
-/* takes the numerical array <symbol> that specifies which connections
-   to nearest neighbors to accept and calculates various associated
-   numbers.  The target array dimensions are taken from <info>.
-   <symbol> must contain one number for each dimension of the target
-   array.  Currently, these numbers may have values 0, 1, or 2.
-
-   0: neighbors in this dimension are not recognized.
-
-   1: neighbors in this dimension are only recognized as such if they
-   share a face.  I.e., if an allowed direction has a non-zero
-   component in this dimension, then that component is the *only*
-   non-zero component of that direction.
-
-   2: neighbors in this dimension are recognized as such if they share
-   a face or a vertex.
-
-   If <symbol> is equal to zero, then ONE(LONARR(info->ndim))*2 is
-   assumed for it; i.e., all directions are allowed.
-
-   If <offset> is non-zero, then it is made to point at an array
-   containing the offsets from the central position to service all of
-   the allowed diagonals, based on the array dimensions taken from
-   <info->dims>.  Memory for this array is allocated by the routine.
-
-   If <edge> is non-zero, then it is made to point at an array with
-   two elements for each dimension; the first of each pair refers to
-   the near edge (with the appropriate coordinate equal to 0) and the
-   second one to the far edge (with the appropriate coordinate equal
-   to info.dims[] - 1).  Each of these numbers is set to 1 if one or
-   more of the offsets point at the corresponding edge, and to 0
-   otherwise.  Memory for this array is allocated by the routine.
-
-   If <rcoord> is non-zero, then it is made to point at an array with
-   one set of coordinates for each direction (corresponding to one
-   member of <offset>), with each number in each set equal to the
-   offset expressed in the corresponding dimension.  All elements of
-   <rcoord> are equal to -1, 0, or +1.  Memory for this array is
-   allocated by the routine.
-   
-   If <diagonal> is non-zero, then in it is returned a pointer to the
-   start of the list of diagonal code numbers (i.e., the contents of
-   <symbol>) -- or a pointer to NULL if <symbol> is equal to 0.
-
-   The user must free <offset>, <edge>, and <rcoord> when the user is
-   done with them.  if you want to reach all allowed neighbors, then
-   set <part> equal to 1; if you want to service all allowed
-   directions but do not distinguish between diametrically opposite
-   directions, then set <part> equal to 2.  Returns the number of
-   offsets, or LUX_ERROR if an error occurred.  LS 10feb99 */
+                         int32_t **offset, int32_t **edge, int32_t **rcoord,
+                         int32_t **diagonal)
 {
+  // LS 10feb99
   int32_t	i, j, *d, nDiagonal, nDoDim, n, n0, n1, n2, k;
 
   if (symbol) {			/* have <diagonal> */
@@ -1281,8 +1460,9 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
      LS 10feb99 */
 
   if (offset) {
-    *offset = (int32_t *) malloc(n*sizeof(int32_t)); /* offsets to elements to be 
-						investigated */
+    *offset = (int32_t *) malloc(n*sizeof(int32_t)); /* offsets to
+                                                        elements to be
+                                                        investigated */
     if (!*offset)
       return cerror(ALLOC_ERR, 0);
   }
@@ -1297,13 +1477,13 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
     if (!*rcoord)
       return cerror(ALLOC_ERR, 0);
   }
-  
+
   /* calculate offsets to elements to be investigated */
   /* we need to treat n directions */
   for (i = 0; i < info->ndim; i++)
     info->coords[i] = 0;
   info->coords[0] = 1;
-  
+
   n0 = n1 = 0;
   n2 = 1;			/* defaults for when diagonal == 0 */
   for (k = 0; k < n; ) {
@@ -1361,16 +1541,27 @@ int32_t prepareDiagonals(int32_t symbol, loopInfo *info, int32_t part,
   return n;
 }
 /*--------------------------------------------------------------------*/
+/** Adjust the position along an axis.
+
+    \param[in,out] info is the loopInfo object to adjust.
+
+    \param[in] index is the index of the rearrange axis to move along.
+    If it points at a non-existent axis, then no adjustments are made.
+
+    \param[in] distance is the distance to move over.  It may be
+    negative and may have any magnitude.
+
+    Moves along rearranged axis number \p index over the indicated \p
+    distance, updating the coordinates and pointers in \p info.
+
+    \returns `info->rndim` if \p index is negative.  Otherwise, if
+    `index` is greater than or equal to `info->rndim`, then returns
+    `index + 1`.  Otherwise, returns the index of the last affected
+    dimension.
+*/
 int32_t moveLoop(loopInfo *info, int32_t index, int32_t distance)
-/* moves along rearranged axis number <index> over the indicated <distance>, */
-/* updating the coordinates and pointers in <info>.  <distance> may be
-   negative and may have any magnitude.  If <index> points at a non-existent
-   axis, then no adjustments are made.  If <index> is negative, then
-   <info->rndim> is returned.  If <index> is greater than or equal to
-   <info->rndim>, then <index> + 1 is returned.
-   Otherwise, returns the index of the last affected dimension.
-   LS 9apr99 */
 {
+  // LS 9apr99
   int32_t	i;
 
   if (index < 0)		/* illegal axis; don't do anything */
@@ -1407,36 +1598,72 @@ int32_t moveLoop(loopInfo *info, int32_t index, int32_t distance)
   return index;
 }
 /*--------------------------------------------------------------------*/
+/** Move to the start of the rearranged axis.
+
+    \param[in,out] info points to the loopInfo to adjust.
+
+    \param[in,out] ptr points to the Pointer to adjust.
+
+    \param[in] index is the index of the rearranged axis.
+
+    Moves to the start of the rearranged axis indicated by \p index,
+    zeroing all rearranged coordinates up to and including that one,
+    and adjusting the pointer accordingly.
+*/
 void returnLoop(loopInfo *info, Pointer *ptr, int32_t index)
-/* moves to the start of the rearranged axis indicated by <index>, */
-/* zeroing all rearranged coordinates up to and including that one and */
-/* adjusting the pointer accordingly.  LS 9apr99 */
 {
+  // LS 9apr99
   int32_t	i;
-  
+
   for (i = 0; i <= index; i++) {
     ptr->b -= info->coords[index]*info->rsinglestep[index]*info->stride;
     info->coords[index] = 0;
   }
 }
 /*--------------------------------------------------------------------*/
+/** Gets information about a numerical or string symbol.
+
+    \param[in] data is the number of the symbol to inspect.
+
+    \param[out] dims if not \c NULL, points at memory where a list of
+    dimensions of the symbol will be stored.
+
+    \param[out] nDim if not \c NULL, points at memory where the
+    dimension count of the symbol will be stored.
+
+    \param[out] size if not \c NULL, points at memory where the
+    element count of the symbol will be stored.
+
+    \param[out] src if not \c NULL, points at a Pointer in which the
+    location of the beginning of the data of the symbol will be
+    stored.
+
+    \param[in] string_is_ok says whether or not the symbol may be of a
+    `string` type.
+
+    \returns 1 if everything is OK, `LUX_ERROR` if the symbol is not
+    numerical or is of type `string` and `string_is_ok` is 0.
+
+    The user must provide adequate memory for each of the returned
+    values.
+*/
 static int32_t numerical_or_string_choice(int32_t data, int32_t **dims, int32_t *nDim, int32_t *size, Pointer *src, int32_t string_is_ok)
-/* checks that <data> is of numerical type and returns dimensional */
-/* information in <*dims>, <*nDim>, and <*size> (if these are non-zero), */
-/* and a pointer to the data in <*src>.  If <*dims> is non-null, then
-   the user must have made sure it points at properly reserved memory
-   space. LS 21apr97 */
 {
+  // LS 21apr97
   static int32_t	one = 1;
+
+  if (symbolIsString(data)
+      && !string_is_ok)
+    return LUX_ERROR;
 
   switch (symbol_class(data)) {
   default:
-      return LUX_ERROR;         /* no message, because not always wanted */
+    return LUX_ERROR;         /* no message, because not always wanted */
   case LUX_SCAL_PTR:
     data = dereferenceScalPointer(data);
     /* fall-thru */
   case LUX_SCALAR:
-    if (dims) 
+    if (dims)
       *dims = &one;
     if (nDim)
       *nDim = 1;
@@ -1479,36 +1706,104 @@ static int32_t numerical_or_string_choice(int32_t data, int32_t **dims, int32_t 
   return 1;
 }
 /*---------------------------------------------------------------------*/
+/** Gets information about a numerical symbol.
+
+    \param[in] data is the number of the symbol to inspect.
+
+    \param[out] dims if not \c NULL, points at memory where a list of
+    dimensions of the symbol will be stored.
+
+    \param[out] nDim if not \c NULL, points at memory where the
+    dimension count of the symbol will be stored.
+
+    \param[out] size if not \c NULL, points at memory where the
+    element count of the symbol will be stored.
+
+    \param[out] src if not \c NULL, points at a Pointer in which the
+    location of the beginning of the data of the symbol will be
+    stored.
+
+    \returns 1 if everything is OK, `LUX_ERROR` if the symbol is not
+    numerical.
+
+    The user must provide adequate memory for each of the returned
+    values.
+*/
 int32_t numerical(int32_t data, int32_t **dims, int32_t *nDim, int32_t *size, Pointer *src)
-/* checks that <data> is of numerical type and returns dimensional */
-/* information in <*dims>, <*nDim>, and <*size> (if these are non-zero), */
-/* and a pointer to the data in <*src>.  If <*dims> is non-null, then
-   the user must have made sure it points at properly reserved memory
-   space. LS 21apr97 */
 {
+  // LS 21apr97
   return numerical_or_string_choice(data, dims, nDim, size, src, 0);
 }
 /*---------------------------------------------------------------------*/
+/** Gets information about a numerical or string symbol.
+
+    \param[in] data is the number of the symbol to inspect.
+
+    \param[out] dims if not \c NULL, points at memory where a list of
+    dimensions of the symbol will be stored.
+
+    \param[out] nDim if not \c NULL, points at memory where the
+    dimension count of the symbol will be stored.
+
+    \param[out] size if not \c NULL, points at memory where the
+    element count of the symbol will be stored.
+
+    \param[out] src if not \c NULL, points at a Pointer in which the
+    location of the beginning of the data of the symbol will be
+    stored.
+
+    \returns 1 if everything is OK, `LUX_ERROR` if the symbol is not
+    numerical or `string`.
+
+    The user must provide adequate memory for each of the returned
+    values.
+*/
 int32_t numerical_or_string(int32_t data, int32_t **dims, int32_t *nDim, int32_t *size, Pointer *src)
-/* checks that <data> is of numerical or string type and returns
-   dimensional information in <*dims>, <*nDim>, and <*size> (if these
-   are non-zero), and a pointer to the data in <*src>.  If <*dims> is
-   non-null, then the user must have made sure it points at properly
-   reserved memory space. LS 21apr97 */
 {
+  // LS 21apr97
   return numerical_or_string_choice(data, dims, nDim, size, src, 1);
 }
 /*--------------------------------------------------------------------*/
+/** Redefine an array and set up for moving through it.
+
+    \param[in] iq is the symbol to process.
+
+    \param[in] type is the data type the symbol should get.
+
+    \param[in] num_dims is the count of dimensions in \p dims.
+
+    \param[in] dims points to a list of \p num_dims dimensions that
+    the symbol should get.
+
+    \param[in] naxes is the count of axes in \p axes.
+
+    \param[in] axes points to a list of \p naxes axes for walking
+    through the array.
+
+    \param[in] mode is the desired treatment mode.
+
+    \param[out] ptr if not \c NULL, points to a predefined Pointer for
+    indicating the current data position in the array.
+
+    \param[in,out] info points at a preexisting loopInfo that gets
+    adjusted for walking through the new array.
+ */
 void standard_redef_array(int32_t iq, Symboltype type,
-			  int32_t num_dims, int32_t *dims, 
+			  int32_t num_dims, int32_t *dims,
 			  int32_t naxes, int32_t *axes,
+                          int32_t mode,
 			  Pointer *ptr, loopInfo *info)
 {
   redef_array(iq, type, num_dims, dims);
   ptr->v = array_data(iq);
-  setupDimensionLoop(info, num_dims, dims, type, naxes, axes, ptr, info->mode);
+  setupDimensionLoop(info, num_dims, dims, type, naxes, axes, ptr, mode);
 }
 /*--------------------------------------------------------------------*/
+/** Free a param_spec_list.
+
+    \param[in] psl points to the param_spec_list for which to free the
+    allocated memory.
+ */
 void free_param_spec_list(struct param_spec_list *psl)
 {
   if (psl) {
@@ -1522,6 +1817,12 @@ void free_param_spec_list(struct param_spec_list *psl)
   }
 }
 
+/** Parse a standard arguments format.
+
+    \param [in] fmt points at the format to parse.
+
+    \returns a list of parsed parameter specifications.
+ */
 struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 {
   struct obstack ops, ods;
@@ -1656,13 +1957,13 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         }
       }
       if (*fmt == '{') {   /* optional axis parameter specification */
-	if (p_spec.logical_type == PS_INPUT) {
-	  luxerror("Axis parameter illegally specified for input parameter",
-		   0, fmt);
-	  errno = EINVAL;
-          bad = 1;
-          break;
-	}
+	// if (p_spec.logical_type == PS_INPUT) {
+	//   luxerror("Axis parameter illegally specified for input parameter",
+	// 	   0, fmt);
+	//   errno = EINVAL;
+        //   bad = 1;
+        //   break;
+	// }
         fmt++;
         if (*fmt++ == '-')
           p_spec.axis_par = -1;  /* point at previous parameter */
@@ -1676,6 +1977,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           bad = 1;
           break;
         }
+        // TODO: parse axis modes
         if (*fmt == '}')
           fmt++;
         else {
@@ -1904,6 +2206,22 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   return psl;
 }
 
+/** Determines the common symbol type for standard arguments.
+
+    \param[in] num_param_specs is the count of param_spec in \p
+    param_specs.
+
+    \param[in] param_specs points at the parameter specifications to
+    inspect.
+
+    \param[in] narg is the count of arguments in \p ps.
+
+    \param[in] ps points at the arguments.
+
+    \returns the highest Symboltype among the arguments for which the
+    common symbol type is requested, or `LUX_NO_SYMBOLTYPE` if there
+    aren't any.
+ */
 Symboltype standard_args_common_symboltype(int32_t num_param_specs,
                                            param_spec* param_specs,
                                            int32_t narg,
@@ -1948,8 +2266,8 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     `NULL` (in case of a problem) or a pointer to a freshly allocated
     list of pointers, one for each argument (whether mandatory or
     optional) and possibly one for the return symbol.  Memory for the
-    list is allocated using `malloc`.  The user is responsible for
-    `free`ing the memory when it is no longer needed.
+    list is allocated using malloc().  The user is responsible for
+    free()ing the memory when it is no longer needed.
 
     \param [out] infos is the address of a pointer in which is
     returned `NULL` (in case of a problem) or a pointer to a list of
@@ -1972,7 +2290,7 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
 
     3. Specify the data types of the input, output, and return
        parameter that are made available to the back-end (through the
-       `ptrs` parameter of `standard_args`).  These data types may
+       `ptrs` parameter of standard_args()).  These data types may
        depend on the type of an earlier parameter.
 
     4. Specify the expectations for the dimensions of the input
@@ -2429,6 +2747,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
   loopInfo li;
   Pointer p;
   Symboltype type;
+  int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   returnSym = LUX_ONE;
   psl = parse_standard_arg_fmt(fmt);

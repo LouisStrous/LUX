@@ -2280,7 +2280,7 @@ void esmooth_asymmetric(double *srcdata, size_t srccount, size_t srcstride,
   }
 }
 /* i>D*;i?D1;rD& */
-BIND(esmooth_asymmetric, v_sddsd_iDaD1rDq_012, f, esmooth1, 1, 2, NULL);
+BIND(esmooth_asymmetric, v_sddsd_iairq_012, f, esmooth1, 1, 2, NULL);
 /*------------------------------------------------------------------------- */
 void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
 		       double width,
@@ -2330,7 +2330,7 @@ void esmooth_symmetric(double *srcdata, size_t srccount, size_t srcstride,
   }
 }
 /* i>D*;i?D1;rD& */
-BIND(esmooth_symmetric, v_sddsd_iDaD1rDq_012, f, esmooth2, 1, 2, NULL);
+BIND(esmooth_symmetric, v_sddsd_iairq_012, f, esmooth2, 1, 2, NULL);
 /*------------------------------------------------------------------------- */
 void vargsmoothkernel(double width, int32_t nx, int32_t *n2, int32_t *ng, double **gkern,
 		      double *gsum, double **partial)

@@ -18,6 +18,9 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/// \file
+/// Declares StandardArguments.
+
 #ifndef STANDARDARGUMENTS_HH_
 #define STANDARDARGUMENTS_HH_
 
@@ -30,7 +33,10 @@ public:
   Pointer* pointer();
   loopInfo* loop_info();
 private:
+  /// Points to the beginning of a list of Pointer for all arguments.
   Pointer* m_pointer;
+
+  /// Points to the beginning of a list of loopInfo for all arguments.
   loopInfo* m_loop_info;
 };
 

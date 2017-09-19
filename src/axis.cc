@@ -167,8 +167,8 @@ int setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims,
     info->ndim = 1;
     info->dims[0] = 1;
   }
+  info->naxes = naxes;
   if (naxes > 0) {
-    info->naxes = naxes;
     if (axes)
       memmove(info->axes, axes, naxes*sizeof(*axes));
     else                        // do all axes

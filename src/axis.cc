@@ -1266,9 +1266,9 @@ void subdataLoop(int32_t *range, loopInfo *src)
     assumed to be configured to point to the beginning of the data.
 
     \param[in,out] trgt is the loopInfo describing the target.  If it
-    is not \c NULL, then it modified the same as \p src.  It is then
-    assumed to contain the same dimensions and axes as \p src, and to
-    be configured to point to the beginning of the data.
+    is not \c NULL, then it is modified the same as \p src.  It is
+    then assumed to contain the same dimensions and axes as \p src,
+    and to be configured to point to the beginning of the data.
 
     \param[in] index is the index of the edge to walk along.  It must
     be between 0 and `2*src->ndim - 1`, but this is not checked.

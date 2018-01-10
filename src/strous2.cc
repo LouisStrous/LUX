@@ -556,7 +556,7 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
 
   if (!ps[1])			/* no <data> */
     return luxerror("Need data array", 0);
-  
+
   if (narg > 2) {		/* have <width> */
     width = int_arg((narg == 4)? ps[3]: ps[2]);
     if (width < 3)
@@ -602,25 +602,10 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
       return luxerror("Illegal keyword combination", 0);
   }
 
-  /* we do not treat data that is on an edge.  Rather than checking for
-     each data point if it is on an edge, we do a plain copy of the data
-     along the edges and then just treat the interior points.
-     First we copy the edges. */
-  for (i = 0; i < 2*srcinfo.naxes; i++) {
-    /* since rearrangeEdgeLoop() modifies its loopInfo arguments, we make
-       copies to feed it so the original (srcinfo) remaines unchanged. */
-    tmpinfo = srcinfo;
-    tmpinfo.data = &tmpsrc;
-    tmpsrc = src;
-    tmpinfo2 = trgtinfo;
-    tmpinfo2.data = &tmptrgt;
-    tmptrgt = trgt;
-    rearrangeEdgeLoop(&tmpinfo, &tmpinfo2, i); /* get ready */
-    do
-      memcpy(tmptrgt.b, tmpsrc.b, tmpinfo.stride); /* copy */
-    while (advanceLoop(&tmpinfo2, &tmptrgt),
-	   advanceLoop(&tmpinfo, &tmpsrc) < tmpinfo.ndim - 1);
-  }
+  // we do not treat data that is on an edge.  Rather than checking
+  // for each data point if it is on an edge, we do a plain copy of
+  // the data and then treat just the interior points.
+  memcpy(trgt.b, src.b, srcinfo.stride*srcinfo.nelem);
 
   /* we calculate the offsets of the elements to be considered */
   for (i = 0; i < srcinfo.naxes; i++)

@@ -342,7 +342,8 @@ int32_t lux_show(int32_t narg, int32_t ps[])
 /*------------------------------------------------------------------------- */
 void symdumpswitch(int32_t nsym, int32_t mode)
 {
-  char	*typeName(int32_t), *save;
+  const char	*typeName(int32_t);
+  char* save;
   char const* s;
   int32_t	j, *ip;
   int32_t	evalListPtr(int32_t);

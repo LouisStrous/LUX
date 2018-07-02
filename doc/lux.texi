@@ -17855,11 +17855,11 @@ See also: @ref{fzwrite}, @ref{fzread}, @ref{fzhead}
 @code{fft, @var{data} [, @var{axes}, /allaxes, /amplitudes]}
 
 Returns a discrete forward Fourier transform of the real
-@code{@var{data}} along the indicated @code{@var{axes}}
-@code{@var{direction}}.  By default, the forward transform (to
-frequency space) is applied in the first dimension.  The returned
-values are of type @code{double}.  The subroutine form replaces
-@code{@var{data}} with the transformed version.
+@code{@var{data}} along the indicated @code{@var{axes}}.  By default,
+the forward transform (to frequency space) is applied in the first
+dimension.  The returned values are of type @code{double}.  The
+subroutine form replaces @code{@var{data}} with the transformed
+version.
 
 If @code{@var{axes}} is specified, then it is taken to contain the
 axes along which transformation is to be done.  No axis may appear
@@ -17882,7 +17882,7 @@ Fourier transform at frequency @code{@var{f}} is equal to that at
 frequency @code{@var{f} mod @var{n}} for sequence length
 @code{@var{n}}.
 
-note that only one half of the relevant frequencies are represented in
+Note that only one half of the relevant frequencies are represented in
 the results, because the missing half can be constructed from the
 provided half by complex conjugation.  Just adding up the squares of
 all of the values in the result and dividing by the sequence length
@@ -17923,11 +17923,11 @@ See also: @ref{power}, @ref{sc}, @ref{scb}
 @code{fftb, @var{data} [, @var{axes}, /allaxes]}
 
 Returns a discrete backward Fourier transform of the real
-@code{@var{data}} along the indicated @code{@var{axes}}
-@code{@var{direction}}.  By default, the backward transform (from
-frequency space) is applied in the first dimension.  The returned
-values are of type @code{double}.  The subroutine form replaces
-@code{@var{data}} with the transformed version.
+@code{@var{data}} along the indicated @code{@var{axes}}.  By default,
+the backward transform (from frequency space) is applied in the first
+dimension.  The returned values are of type @code{double}.  The
+subroutine form replaces @code{@var{data}} with the transformed
+version.
 
 If @code{@var{axes}} is specified, then it is taken to contain the
 axes along which transformation is to be done.  No axis may appear
@@ -17945,7 +17945,7 @@ imaginary part is given for values that are always real, i.e., for
 frequency zero and (for even-length sequences) also for the highest
 represented frequency (equal to half of the sequence length).
 
-note that only one half of the relevant frequencies are represented in
+Note that only one half of the relevant frequencies are represented in
 @code{@var{data}}, because the missing half can be constructed from
 the provided half by complex conjugation.
 
@@ -19774,7 +19774,7 @@ graph in the legend in the plot.
 @findex gplot
 
 @code{gplot[,@var{x}],@var{y}[,@var{z}]
-        [,dashtype=@var{dashtype}]
+        [,linetype=@var{ltype},pointtype=@var{ptype},dashtype=@var{dtype}]
         [,xtitle=@var{xtitle},ytitle=@var{ytitle},ztitle=@var{ztitle}]
         [,title=@var{title}]
         [,legend=@var{legend}]
@@ -19795,8 +19795,11 @@ from @code{@var{x}} and the y coordinates are taken from
 are specified, then all three must have the same dimensional structure
 and provide the x, y, and z coordinates of the points to plot.
 
-@code{@var{dashtype}} is a non-negative integer that selects the kind
-of dashes to use to draw the lines.
+@code{@var{ltype}} is a positive integer that selects the line type.
+@code{@var{ptype}} is a positive integer that selects the point type.
+@code{@var{dtype}} is a positive integer that selects the dash type.
+Depending on which of these are specified, you get a graph showing
+lines, symbols, or both.
 
 @code{@var{xtitle}} provides the title for the x axis.
 
@@ -19822,9 +19825,10 @@ similarly specify for the x, y, and z axes.
 
 @code{gplot3d[, @code{@var{x}}, @code{@var{y}}], @code{@var{z}}
   [,xtitle=@var{xtitle},ytitle=@var{ytitle},ztitle=@var{ztitle},title=@var{title}]
-  [,rotx=@var{rotx},roty=@var{roty}]
+  [,rotx=@var{rotx},rotz=@var{rotz}]
   [,contours=@var{contours}][,/flat]
-  [,/lii,/lio,/loi,/loo]}
+  [,/lii,/lio,/loi,/loo]
+  [,/liii,/lioi,/loii,/looi,/liio,/lioo,/loio,/looo]}
 
 Displays a 3D plot of 2D data set @code{@var{z}} via the gnuplot
 program.
@@ -19860,9 +19864,11 @@ array, then it specifies the contour levels to use.
 @code{/flat} requests an orthographic view from above; i.e., a flat
 image.
 
-@code{/lii} requests linear x and y axes; @code{/loi} requests
-logarithmic x and linear y axes; @code{/lio} requests linear x and
-logarithmic y axes; @code{/loo} requests logarithmic x and y axes.
+The options beginning with @code{/l} are followed by two or three
+letters that say whether the x, y, and z axes should be linear
+(@code{i}) or logarithmic (@code{o}).  For example, @code{/lio} and
+@code{/lioi} select linear x and z axes and logarithmic y axis, and
+@code{/looo} selects logarithmic x, y, and z axes.
 
 @c -------------------------------------
 @node gridmatch, gsmooth, gplot3d, Internal Routines

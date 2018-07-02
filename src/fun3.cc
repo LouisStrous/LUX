@@ -503,7 +503,7 @@ int32_t gsl_fft(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_rwork(n))
     return 1;
-  
+
   int32_t result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
   if (internalMode & 2) {	/* /AMPLITUDES */
     double factor1 = 1.0/n;

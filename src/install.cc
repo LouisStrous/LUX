@@ -4237,16 +4237,16 @@ enumElem	classesStruct[] = {
 };
 
 enumElem	typesStruct[] = {
-  { "BYTE", LUX_INT8 },
-  { "WORD", LUX_INT16 },
-  { "LONG", LUX_INT32 },
-  { "INT64", LUX_INT64 },
-  { "FLOAT", LUX_FLOAT },
-  { "DOUBLE", LUX_DOUBLE },
-  { "STRING", LUX_TEMP_STRING },
-  { "CFLOAT", LUX_CFLOAT },
-  { "CDOUBLE", LUX_CDOUBLE },
-  { "UNDEFINED", LUX_UNDEFINED }
+  { "byte", LUX_INT8 },
+  { "word", LUX_INT16 },
+  { "long", LUX_INT32 },
+  { "int64", LUX_INT64 },
+  { "float", LUX_FLOAT },
+  { "double", LUX_DOUBLE },
+  { "string", LUX_TEMP_STRING },
+  { "cfloat", LUX_CFLOAT },
+  { "cdouble", LUX_CDOUBLE },
+  { "undefined", LUX_UNDEFINED }
 };
 
 enumElem	eventStruct[] =	{ /* see lux_register_event in menu.c */

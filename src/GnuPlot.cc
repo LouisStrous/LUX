@@ -32,12 +32,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 GnuPlot::GnuPlot()
-  : m_datablock_count(0)
+  : m_datablock_count(0), m_verbosity(0)
 {
   m_pipe = popen("gnuplot", "w");
   if (!m_pipe)
     luxerror("Unable to start 'gnuplot'", 0);
-  m_verbosity = 0;
+  // the default tick label format is "% h", which on my system
+  // (Fedora 27 on GNU/Linux 4.16.7-200; gnuplot 5.0 patchlevel 6)
+  // leads to tick labels being always shown with the same, large
+  // number of digits.  The documented behavior of the whitespace
+  // before the 'h' is to prefix a whitespace to nonnegative numbers,
+  // but that's not what I get.  Format "%h" is better behaved.
+  sendf("%s\n", "set format '%h';");
 }
 
 GnuPlot::~GnuPlot()
@@ -77,11 +83,11 @@ GnuPlot::sendf(const char* format, ...)
     va_end(ap);
     if (m_verbosity) {
       size_t n = strlen(buf);
-      if (buf[n] == '\n') {
+      if (buf[n - 1] == '\n') {
         if (n == 1) {
           puts("Sending to gnuplot: <newline>");
         } else {
-          printf("Sending to gnuplot: X '%.*s'\n", n - 1, buf);
+          printf("Sending to gnuplot: '%.*s'\n", n - 1, buf);
         }
       } else {
         printf("Sending to gnuplot: '%s'\n", buf);

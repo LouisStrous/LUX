@@ -245,7 +245,7 @@ int32_t lux_oplot(int32_t narg, int32_t ps[]) /* oplot routine */
       || fixPlotStyle(&symStyle, &lineStyle) < 0
       || oplotx(q1.f, q2.f, q3.f, q4.f, nelem, dq3, dq4) != 1)
     return LUX_ERROR;
-  return 1; 
+  return 1;
 }
  /*------------------------------------------------------------------------- */
 int32_t preplot(int32_t narg, int32_t ps[])
@@ -254,10 +254,9 @@ int32_t preplot(int32_t narg, int32_t ps[])
   int32_t	i, iq, freePos = 1, xfmtsym, yfmtsym;
   int32_t	lux_indgen(int32_t, int32_t []);
   extern int32_t	curRoutineNum;
-  char	*keyName(internalRoutine *, int32_t, int32_t);
 
   /* loop through the args and check what we have */
-  xsym = ysym = ytitlesym = xtitlesym = titlesym = isym = exsym = eysym = 
+  xsym = ysym = ytitlesym = xtitlesym = titlesym = isym = exsym = eysym =
     xfmtsym = yfmtsym = 0;
   symStyle = lineStyle = LUX_UNSPECIFIED;
   numarrays = numscalars = numstrings = 0;
@@ -1485,6 +1484,7 @@ int32_t tkplot_clip(float x, float y, int32_t lineStyle, int32_t symStyle)
 
   tkplot(x, y, fabs(x - x_prev) < 0.5? lineStyle: 0, symStyle);
   x_prev = x;
+  return 0;
 }
  /*------------------------------------------------------------------------*/
 int32_t lux_pen(int32_t narg, int32_t ps[])

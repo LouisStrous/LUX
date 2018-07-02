@@ -116,10 +116,28 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
   // reserve the next data block for this call
   int32_t datablock_index = gp->next_available_datablock_index();
 
-  int style = 1;
+  int linetype = -1;
   if (enarg) {
-    if (*eps) {               // style
-      style = int_arg(*eps);
+    if (*eps) {               // linetype
+      linetype = int_arg(*eps);
+    }
+    --enarg;
+    ++eps;
+  }
+
+  int pointtype = -1;
+  if (enarg) {
+    if (*eps) {               // pointtype
+      pointtype = int_arg(*eps);
+    }
+    --enarg;
+    ++eps;
+  }
+
+  int dashtype = -1;
+  if (enarg) {
+    if (*eps) {               // dashtype
+      dashtype = int_arg(*eps);
     }
     --enarg;
     ++eps;
@@ -200,8 +218,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
       gp->sendf("set title\n");
 
     gp->sendf("set auto fix; "
-             "set offsets graph 0.05, graph 0.05, graph 0.05, graph 0.05; "
-             "set tics; ");
+              "set offsets graph 0.05, graph 0.05, graph 0.05, graph 0.05; ");
 
     extern double plims[];
 
@@ -281,50 +298,58 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
   }
   gp->sendf("EOD\n");
 
-  // positive styles: lines + symbols
-  // styles < -1 : symbols only
-  // style == -1 : dots only
-  std::string kind_text;
-  std::string style_text;
-  if (style >= 0) {
-    kind_text = "lines";
-    style_text = "dashtype";
-  } else if (style < -1) {
-    kind_text = "points";
-    style_text = "pointtype";
-    style = -style - 1;
+  // what to do with linetype, pointtype, dashtype:
+  // if none are specified, or if only linetype and/or dashtype is
+  // specified, then use "with lines"
+  // if only pointtype is specified, then use "with points"
+  // if pointtype and one or both of linetype and dashtype are specified,
+  // then use "with linespoint"
+
+  std::string with_text;
+  if (pointtype > 0) {
+    if (linetype > 0 || dashtype > 0)
+      with_text = "linespoints";
+    else
+      with_text = "points";
+  } else {
+    with_text = "lines";
   }
 
+  std::string type_text;
+  {
+    std::ostringstream oss;
+    if (linetype > 0)
+      oss << " linetype " << linetype;
+    if (pointtype > 0)
+      oss << " pointtype " << pointtype;
+    if (dashtype > 0)
+      oss << " dashtype " << dashtype;
+    type_text = oss.str();
+  }
+
+  extern int current_pen;
+
   switch (ndata) {
-  case 1:
-    if (style_text.empty())
-      gp->remember_for_current_datablock("using 1 with dots title \"%s\"",
+  case 1:                       // y only
+      gp->remember_for_current_datablock("using 1 with %s lw %d %s title \"%s\"",
+                                         with_text.c_str(),
+                                         current_pen,
+                                         type_text.c_str(),
                                          legend? legend: "");
-    else
-      gp->remember_for_current_datablock("using 1 with %s title \"%s\" %s %d",
-                                         kind_text.c_str(),
-                                         legend? legend: "",
-                                         style_text.c_str(), style);
     break;
-  case 2:
-    if (style_text.empty())
-      gp->remember_for_current_datablock("using 1:2 with dots title \"%s\"",
+  case 2:                       // x,y
+      gp->remember_for_current_datablock("using 1:2 with %s lw %d %s title \"%s\"",
+                                         with_text.c_str(),
+                                         current_pen,
+                                         type_text.c_str(),
                                          legend? legend: "");
-    else
-      gp->remember_for_current_datablock("using 1:2 with %s title \"%s\" %s %d",
-                                         kind_text.c_str(),
-                                         legend? legend: "",
-                                         style_text.c_str(), style);
     break;
-  case 3:
-    if (style_text.empty())
-      gp->remember_for_current_datablock("using 1:2:3 with dots title \"%s\"",
+  case 3:                       // x,y,z
+      gp->remember_for_current_datablock("using 1:2:3 with %s lw %d %s %d title \"%s\"",
+                                         with_text.c_str(),
+                                         current_pen,
+                                         type_text.c_str(),
                                          legend? legend: "");
-    else
-      gp->remember_for_current_datablock("using 1:2:3 with %s title \"%s\" %s %d",
-                                         kind_text.c_str(),
-                                         legend? legend: "",
-                                         style_text.c_str(), style);
     break;
   }
 
@@ -342,8 +367,10 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 
-/// gplot[,<x>],<y>[,<z>][,style=<style>,xtitle=<xtitle>,ytitle=<ytitle>,
-///      ztitle=<ztitle>,title=<title>,legend=<legend>]
+/// gplot[,<x>],<y>[,<z>]
+///      [,linetype=<ltype>,pointtype=<ptype>,dashtype=<dtype>
+///      ,xtitle=<xtitle>,ytitle=<ytitle>,ztitle=<ztitle>,title=<title>
+///      ,legend=<legend>]
 ///      [,/lii,/lio,/loi,/loo]
 ///      [,/liii,/lioi,/loii,/looi,/liio,/lioo,/loio,/looo]
 ///
@@ -352,8 +379,11 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
 /// <x>, <y>, and <z> provide the x, y, and z coordinates of the data
 /// points.  They must have the same dimensional structure.
 ///
-/// <style> is an integer that specifies the type of line (solid,
-/// dashed, etc.).
+/// <ltype> is an integer that specifies the type of line to draw.
+///
+/// <ptype> is an integer that specifies the type of points to draw.
+///
+/// <dtype> is an integer that specified the type of dashes to draw.
 ///
 /// <xtitle> is the title for the x axis.
 ///
@@ -370,25 +400,29 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
 /// and /loo asks for logarithmic x and y axes.  /liii through /looo
 /// likewise specify linear or logarithmic x, y, and z axes.
 int32_t lux_gplot(int32_t narg, int32_t ps[]) {
-  lux_gplot_or_goplot(true, narg, ps);
+  return lux_gplot_or_goplot(true, narg, ps);
 }
-REGISTER(gplot, s, gplot, 1, 9, ":::style:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+REGISTER(gplot, s, gplot, 1, 11, ":::linetype:pointtype:dashtype:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
-/// gplot[,<x>],<y>[,style=<style>,legend=<legend>]
+/// goplot[,<x>],<y>[,linetype=<ltype>,pointtype=<ptype>,dashtype=<dtype>,
+///     legend=<legend>]
 ///
 /// Add another curve to the previous plot through gnuplot.
 ///
 /// <x> and <y> provide the x and y coordinates of the data points.
 /// They must have the same dimensional structure.
 ///
-/// <style> is an integer that specifies the type of line (solid,
-/// dashed, etc.).
+/// <ltype> is an integer that specifies the type of line to draw.
+///
+/// <ptype> is an integer that specifies the type of points to draw.
+///
+/// <dtype> is an integer that specified the type of dashes to draw.
 ///
 /// <legend> is the text to display in the legend.
 int32_t lux_goplot(int32_t narg, int32_t ps[]) {
-  lux_gplot_or_goplot(false, narg, ps);
+  return lux_gplot_or_goplot(false, narg, ps);
 }
-REGISTER(goplot, s, goplot, 1, 5, ":::style:legend");
+REGISTER(goplot, s, goplot, 1, 7, ":::linetype:pointtype:dashtype:legend");
 
 int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
                                std::string gnuplot_command_fmt) {
@@ -613,16 +647,22 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
   }
 
   if (internalMode & 2)         // logarithmic x axis
-    gp->sendf("set logscale x\n");
+    gp->sendf("%s\n", "set logscale x");
   else
-    gp->sendf("unset logscale x\n");
+    gp->sendf("unset logscale x;\n");
 
   if (internalMode & 4)         // logarithmic y axis
-    gp->sendf("set logscale y\n");
+    gp->sendf("%s\n", "set logscale y");
   else
-    gp->sendf("unset logscale y\n");
+    gp->sendf("unset logscale y;\n");
 
-  gp->sendf("set tics; set auto fix\n");
+  if (internalMode & 8) {       // logarithmic z axis
+    gp->sendf("%s\n", "set logscale z; set logscale cb;");
+  } else {
+    gp->sendf("unset logscale z; unset logscale cb;\n");
+  }
+
+  // gp->sendf("set tics; set auto fix;\n");
 
   int ndata = 0;
   for (int i = 0; i < narg && i < 3; ++i)
@@ -643,9 +683,10 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
       loopInfo *info;
       int32_t myps[3];
 
+      // gnuplot expects 32-bit IEEE floating-point values
       for (int i = 0; i < ndata; ++i)
-        myps[i] = lux_double(1, &ps[i]);
-      if (standard_args.set(ndata, myps, "iD*;iD*;iD>1,*", &data, &info) < 0)
+        myps[i] = lux_float(1, &ps[i]);
+      if (standard_args.set(ndata, myps, "iF*;iF*;iF>1,*", &data, &info) < 0)
         return LUX_ERROR;
 
       if (info[0].ndim < 1 || info[0].ndim > 2)
@@ -691,17 +732,17 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
           if (tmp.is_open()) {
             // std::cout << "Writing to " << gp->data_file_name() << std::endl;
             // write the number of columns
-            double n = info[2].dims[0];
+            float n = info[2].dims[0];
             tmp.write((char*) &n, sizeof(n));
             // write the x coordinates
-            tmp.write((char*) &data[0].d[0], info[2].dims[0]*sizeof(data[0].d[0]));
+            tmp.write((char*) &data[0].f[0], info[2].dims[0]*sizeof(data[0].f[0]));
 
             // treat all rows
-            char* z = (char*) &data[2].d[0];
-            size_t size = info[2].dims[0]*sizeof(data[2].d[0]);
+            char* z = (char*) &data[2].f[0];
+            size_t size = info[2].dims[0]*sizeof(data[2].f[0]);
             for (int i = 0; i < info[2].dims[1]; ++i) {
               // write the y coordinate
-              tmp.write((char*) &data[1].d[i], sizeof(data[1].d[i]));
+              tmp.write((char*) &data[1].f[i], sizeof(data[1].f[i]));
               // write the row of z coordinates
               tmp.write(z, size);
               z += size;
@@ -732,7 +773,7 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
   }
   return LUX_OK;
 }
-REGISTER(gnuplot3d, s, gplot3d, 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo");
+REGISTER(gnuplot3d, s, gplot3d, 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
 /// gcontour,x[,/equalxy][,/image]
 ///

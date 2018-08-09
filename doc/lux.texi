@@ -852,6 +852,7 @@ Internal Functions and Subroutines
 * fzw::                         Write data to an FZ file
 * fzwrite::                     Write data to an FZ file
 * gamma::                       Gamma function
+* gaplot::                      Delayed plot via gnuplot
 * gc2gd::                       Geodetic from geocentric coordinates
 * gc2gde::                      Geodetic from geocentric coordinates and ellipsoid
 * gcommand::                    Send a gnuplot command to gnuplot
@@ -884,6 +885,7 @@ Internal Functions and Subroutines
 * gst06a::                      Greenwich apparent sidereal time, IAU 2000/2006
 * gst94::                       Greenwich apparent sidereal time, IAU 1982/1994
 * gt::                          Greater-than
+* gterm::                       Change gnuplot terminal
 * gtv::                         Display an image via gnuplot
 * h2fk5::                       Hipparcos to FK5 J2000.0 star positions
 * hairs::                       User-selected position
@@ -1125,7 +1127,7 @@ Internal Functions and Subroutines
 * setenv::                      Set an environment variable
 * setfg::                       Set the foreground color
 * setforeground::               Set the foreground color
-* setnan::                      Markk values as Not-a-Number
+* setnan::                      Mark values as Not-a-Number
 * sgn::                         The signum function: the sign of data
 * shift::                       Circular integer shift of an array
 * shift3::                      Bicubic interpolation shift of an array
@@ -12114,6 +12116,7 @@ arguments.
 * fzw::                         Write data to an FZ file
 * fzwrite::                     Write data to an FZ file
 * gamma::                       Gamma function
+* gaplot::                      Delayed plot via gnuplot
 * gc2gd::                       Geodetic from geocentric coordinates
 * gc2gde::                      Geodetic from geocentric coordinates and ellipsoid
 * gcommand::                    Send a gnuplot command to gnuplot
@@ -12146,6 +12149,7 @@ arguments.
 * gst06a::                      Greenwich apparent sidereal time, IAU 2000/2006
 * gst94::                       Greenwich apparent sidereal time, IAU 1982/1994
 * gt::                          Greater-than
+* gterm::                       Change gnuplot terminal
 * gtv::                         Display an image via gnuplot
 * h2fk5::                       Hipparcos to FK5 J2000.0 star positions
 * hairs::                       User-selected position
@@ -19376,6 +19380,66 @@ function is returned.
 See also: @ref{igamma}, @ref{beta}
 
 @c -------------------------------------
+@node gaplot
+@comment  node-name,  next,  previous,  up
+@subsection gaplot
+@findex gaplot
+
+@code{gaplot}
+
+@code{gaplot[,@var{x}],@var{y}[,@var{z}]
+        [,linetype=@var{ltype},pointtype=@var{ptype},dashtype=@var{dtype}]
+        [,color=@var{color},legend=@var{legend},xtitle=@var{xtitle}]
+        [,ytitle=@var{ytitle},ztitle=@var{ztitle},title=@var{title}]
+        [,/lii,/loi,/lio,/loo]
+        [,/liii,/loii,/lioi,/looi,/liio,/loio,/lioo,/looo]}
+
+Defines a plot of @code{@var{y}} versus @code{@var{x}}, or
+@code{@var{z}} versus @code{@var{x}} and @code{@var{y}}, to be
+produced through the external "gnuplot" program, if that program is
+available.
+
+The call without any arguments constructs the plot based on all
+preceding @code{gaplot} calls that haven't produced a plot yet.
+
+Compare @ref{gplot}.
+
+If only one of @code{@var{x}}, @code{@var{y}}, @code{@var{z}} are
+specified, then it is interpreted as @code{@var{y}} and provides the y
+coordinates of the data points to plot, with default x coordinates.
+If @code{@var{x}} and @code{@var{y}} are specified, then they must
+have the same dimensional structure.  Then the x coordinates are taken
+from @code{@var{x}} and the y coordinates are taken from
+@code{@var{y}}.  If @code{@var{x}}, @code{@var{y}}, and @code{@var{z}}
+are specified, then all three must have the same dimensional structure
+and provide the x, y, and z coordinates of the points to plot.
+
+@code{@var{ltype}} is a positive integer that selects the line type.
+@code{@var{ptype}} is a positive integer that selects the point type.
+@code{@var{dtype}} is a positive integer that selects the dash type.
+Depending on which of these are specified, you get a graph showing
+lines, symbols, or both.
+
+@code{@var{color}} is text specifying which color to use.
+
+@code{@var{legend}} specifies the text with which to identify the
+graph in the legend in the plot.
+
+@code{@var{xtitle}} provides the title for the x axis.
+
+@code{@var{ytitle}} provides the title for the y axis.
+
+@code{@var{ztitle}} provides the title for the y axis.
+
+@code{@var{title}} provides the main title, displayed above the plot.
+
+Mode parameters @code{/lii /loi /lio /loo} specify whether the x and y
+axes are linear (@code{i}) or logarithmic (@code{o}) for the x (first
+@code{i} or @code{o}) and y (second @code{i} or @code{o}) axes.  Mode
+parameters @code{/liii /loii /lioi /looi /liio /loio /lioo /looo}
+similarly specify for the x, y, and z axes.
+
+@c -------------------------------------
 @node gc2gd, gc2gde, gamma, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gc2gd
@@ -19603,7 +19667,7 @@ Matches any single character except those from the set listed between
 the square brackets.
 @item *
 Matches zero or more successive occurrences of the preceding regular
-expression. 
+expression.
 @item ^
 Matches the beginning of the line (if it is the first character in the
 pattern).
@@ -19749,7 +19813,9 @@ See also: @ref{Astronomical Coordinate Calculations}
 @subsection goplot
 @findex goplot
 
-@code{goplot[,@var{x}],@var{y}[,dashtype=@var{dashtype},legend=@var{legend}]}
+@code{goplot[,@var{x}],@var{y}[,linetype=@var{ltype}]
+        [,pointtype=@var{ptype},dashtype=@var{dtype}]
+        [,color=@var{color},legend=@var{legend}]}
 
 Adds the graph of @code{@var{y}} versus @code{@var{x}} to the previous
 plot created using @code{gplot} or @code{goplot}, through the external
@@ -19762,8 +19828,13 @@ specified, then they must have the same dimensional structure.  Then
 the x coordinates are taken from @code{@var{x}} and the y coordinates
 are taken from @code{@var{y}}.
 
-@code{@var{dashtype}} is a non-negative integer that selects the kind
-of dashes to use to draw the lines.
+@code{@var{ltype}} is a positive integer that selects the line type.
+@code{@var{ptype}} is a positive integer that selects the point type.
+@code{@var{dtype}} is a positive integer that selects the dash type.
+Depending on which of these are specified, you get a graph showing
+lines, symbols, or both.
+
+@code{@var{color}} is text specifying which color to use.
 
 @code{@var{legend}} specifies the text with which to identify the
 graph in the legend in the plot.
@@ -19775,15 +19846,19 @@ graph in the legend in the plot.
 
 @code{gplot[,@var{x}],@var{y}[,@var{z}]
         [,linetype=@var{ltype},pointtype=@var{ptype},dashtype=@var{dtype}]
-        [,xtitle=@var{xtitle},ytitle=@var{ytitle},ztitle=@var{ztitle}]
-        [,title=@var{title}]
-        [,legend=@var{legend}]
+        [,color=@var{color},legend=@var{legend},xtitle=@var{xtitle}]
+        [,ytitle=@var{ytitle},ztitle=@var{ztitle},title=@var{title}]
         [,/lii,/loi,/lio,/loo]
         [,/liii,/loii,/lioi,/looi,/liio,/loio,/lioo,/looo]}
 
 Plots @code{@var{y}} versus @code{@var{x}}, or @code{@var{z}} versus
 @code{@var{x}} and @code{@var{y}} through the external "gnuplot"
 program, if that program is available.
+
+To add more data to the plot, use @ref{goplot}.  This causes
+replotting of all data from the last @code{gplot} on.  If you want to
+specify all data before creating the plot, then use @ref{gaplot}
+instead.
 
 If only one of @code{@var{x}}, @code{@var{y}}, @code{@var{z}} are
 specified, then it is interpreted as @code{@var{y}} and provides the y
@@ -19801,6 +19876,11 @@ and provide the x, y, and z coordinates of the points to plot.
 Depending on which of these are specified, you get a graph showing
 lines, symbols, or both.
 
+@code{@var{color}} is text specifying which color to use.
+
+@code{@var{legend}} specifies the text with which to identify the
+graph in the legend in the plot.
+
 @code{@var{xtitle}} provides the title for the x axis.
 
 @code{@var{ytitle}} provides the title for the y axis.
@@ -19808,9 +19888,6 @@ lines, symbols, or both.
 @code{@var{ztitle}} provides the title for the y axis.
 
 @code{@var{title}} provides the main title, displayed above the plot.
-
-@code{@var{legend}} specifies the text with which to identify the
-graph in the legend in the plot.
 
 Mode parameters @code{/lii /loi /lio /loo} specify whether the x and y
 axes are linear (@code{i}) or logarithmic (@code{o}) for the x (first
@@ -20021,7 +20098,7 @@ resolutions.  The result has the same dimensions as @code{@var{jdut}}.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node gt, gtv, gst94, Internal Routines
+@node gt, gterm, gst94, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gt
 @findex gt
@@ -20038,7 +20115,19 @@ set.
 See also: @ref{ne}, @ref{eq}, @ref{ge}, @ref{lt}, @ref{le}
 
 @c -------------------------------------
-@node gtv, h2fk5, gt, Internal Routines
+@node gterm, gtv, gt, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection gterm
+@findex gterm
+
+@code{gterm, @var{n}}
+
+Changes to the gnuplot terminal with number @code{@var{n}}, which must
+be nonnegative.  Subsequent plots created through gnuplot show up in
+the chosen terminal.
+
+@c -------------------------------------
+@node gtv, h2fk5, gterm, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gtv
 @findex gtv

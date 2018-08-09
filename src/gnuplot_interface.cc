@@ -28,24 +28,26 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits>               // for numeric_limits
 #include <sstream>              // for ostringstream
 
-static GnuPlot* gp = 0;
+enum GplotStatus
+  {
+   gplot,
+   goplot,
+   gaplot
+  };
+
+static GnuPlot gp;
 
 int32_t lux_gcommand(int32_t narg, int32_t ps[])
 {
-  if (!gp)
-    gp = new GnuPlot;
-
   if (narg > 1 && ps[1]) {
-    gp->set_verbosity(int_arg(ps[1]));
+    gp.set_verbosity(int_arg(ps[1]));
   }
   if (symbolIsString(ps[0])) {
     char* command = string_value(ps[0]);
     if (!strncmp(command, "exit", 4)) {
-      delete gp;
-      gp = new GnuPlot();       // get a new one; closes the old one
+      gp = GnuPlot();           // get a new one; closes the old one
     } else {
-      gp->sendf("%s\n", string_value(ps[0]));
-      gp->flush();
+      gp.sendn(string_value(ps[0])).flush();
     }
   } else if (ps[0]) {
     cerror(NEED_STR, ps[0]);
@@ -53,6 +55,17 @@ int32_t lux_gcommand(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 REGISTER(gcommand, s, gcommand, 1, 2, ":verbose");
+
+int32_t lux_gterm(int32_t narg, int32_t ps[])
+{
+  int terminal_number = int_arg(ps[0]);
+  if (terminal_number < 0)
+    luxerror("Need a nonnegative argument.\n", ps[0]);
+  gp.sendf("set term @GPVAL_TERM %d\n", terminal_number)
+    .flush();
+  return LUX_OK;
+}
+REGISTER(gterm, s, gterm, 1, 1, "");
 
 /// Plots or overplots data through gnuplot.  This function gets
 /// called for the LUX "gplot" and "goplot" subroutines.  See there
@@ -66,7 +79,7 @@ REGISTER(gcommand, s, gcommand, 1, 2, ":verbose");
 /// \par ps is an array of LUX arguments.
 ///
 /// \returns #LUX_OK for success, #LUX_ERROR for failure.
-int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
+int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
 {
   // LUX offers subroutines "plot" and "oplot" based on X11.  "plot"
   // generates a new plot, and "oplot" adds another curve to an
@@ -95,9 +108,21 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
   // All setting up of the plot (e.g., defining titles) is done for
   // gplot and does not need to be remembered for the data block.
 
-  StandardArguments standard_args;
-  Pointer *data;
-  loopInfo *info;
+  int32_t datablock_index;
+
+  switch (status) {
+  case GplotStatus::gplot:
+    gp.discard_datablocks();
+    datablock_index = gp.next_available_datablock_index();
+    break;
+  case GplotStatus::goplot:
+    datablock_index = gp.next_available_datablock_index();
+    break;
+  case GplotStatus::gaplot:
+    if (narg)
+      datablock_index = gp.next_available_datablock_index();
+    break;
+  }
 
   // the first three arguments indicate <x>, <y>, <z>
   int32_t enarg = narg - 3;
@@ -105,16 +130,6 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
 
   if (enarg < 0)
     enarg = 0;
-
-  if (!gp)
-    gp = new GnuPlot;
-
-  if (clear) {                  // gplot
-    gp->discard_datablocks();
-  }
-
-  // reserve the next data block for this call
-  int32_t datablock_index = gp->next_available_datablock_index();
 
   int linetype = -1;
   if (enarg) {
@@ -143,14 +158,26 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
     ++eps;
   }
 
+  char* color = 0;
+  if (enarg) {
+    if (*eps) {                 // color
+      if (symbolIsString(*eps)) {
+        color = string_value(*eps);
+      } else
+        return cerror(NEED_STR, *eps);
+    }
+    --enarg;
+    ++eps;
+  }
+
   bool done = false;
-  if (clear) {                  // for gplot
+  if (status == GplotStatus::gplot) { // for gplot
     if (enarg) {
       if (*eps) {               // xtitle
         if (symbolIsString(*eps)) {
           char* text = string_value(*eps);
           if (*text) {
-            gp->sendf("set xlabel \"%s\"\n", text);
+            gp.sendf("set xlabel \"%s\"\n", text);
             done = 1;
           }
         }
@@ -161,7 +188,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
       ++eps;
     }
     if (!done)
-      gp->sendf("set xlabel\n");
+      gp.send("set xlabel\n");
 
     done = false;
     if (enarg) {
@@ -169,7 +196,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
         if (symbolIsString(*eps)) {
           char* text = string_value(*eps);
           if (*text) {
-            gp->sendf("set ylabel \"%s\"\n", text);
+            gp.sendf("set ylabel \"%s\"\n", text);
             done = 1;
           }
         } else
@@ -179,7 +206,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
       ++eps;
     }
     if (!done)
-      gp->sendf("set ylabel\n");
+      gp.send("set ylabel\n");
 
     done = false;
     if (enarg) {
@@ -187,7 +214,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
         if (symbolIsString(*eps)) {
           char* text = string_value(*eps);
           if (*text) {
-            gp->sendf("set zlabel \"%s\"\n", text);
+            gp.sendf("set zlabel \"%s\"\n", text);
             done = 1;
           }
         } else
@@ -197,7 +224,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
       ++eps;
     }
     if (!done)
-      gp->sendf("set zlabel\n");
+      gp.send("set zlabel\n");
 
     done = false;
     if (enarg) {
@@ -205,7 +232,7 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
         if (symbolIsString(*eps)) {
           char* text = string_value(*eps);
           if (*text) {
-            gp->sendf("set title \"%s\"\n", text);
+            gp.sendf("set title \"%s\"\n", text);
             done = 1;
           }
         } else
@@ -215,40 +242,55 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
       ++eps;
     }
     if (!done)
-      gp->sendf("set title\n");
+      gp.send("set title\n");
 
-    gp->sendf("set auto fix; "
-              "set offsets graph 0.05, graph 0.05, graph 0.05, graph 0.05; ");
+    extern float plims[];
 
-    extern double plims[];
+    // prevent gnuplot widening the plot to the nearest round values
+    gp.send("set auto fix\n");
+
+    // set the distance between the data and the axes to 5% of the
+    // graph size if no explicit plot limits are given, and to 0
+    // otherwise
+    gp.send("set offsets graph ");
+    if (plims[0] == plims[1] && !plims[0])
+      gp.send("0.05, graph 0.05");
+    else
+      gp.send("0, graph 0");
+    gp.send(", graph ");
+    if (plims[2] == plims[3] && !plims[2])
+      gp.send("0.05, graph 0.05");
+    else
+      gp.send("0, graph 0");
+    gp.send("\n");
 
     if (plims[0] != plims[1])
-      gp->sendf("set xrange [%f:%f]\n", plims[0], plims[1]);
+      gp.sendf("set xrange [%f:%f]\n", plims[0], plims[1]);
     else
-      gp->sendf("set xrange [*:*]\n");
+      gp.send("set xrange [*:*]\n");
 
     if (plims[2] != plims[3])
-      gp->sendf("set yrange [%f:%f]\n", plims[2], plims[3]);
+      gp.sendf("set yrange [%f:%f]\n", plims[2], plims[3]);
     else
-      gp->sendf("set yrange [*:*]\n");
+      gp.send("set yrange [*:*]\n");
 
     if (internalMode & 2)         // logarithmic x axis
-      gp->sendf("set logscale x\n");
+      gp.send("set logscale x\n");
     else
-      gp->sendf("unset logscale x\n");
+      gp.send("unset logscale x\n");
 
     if (internalMode & 4)         // logarithmic y axis
-      gp->sendf("set logscale y\n");
+      gp.send("set logscale y\n");
     else
-      gp->sendf("unset logscale y\n");
+      gp.send("unset logscale y\n");
 
     if (internalMode & 8)         // logarithmic z axis
-      gp->sendf("set logscale z\n");
+      gp.send("set logscale z\n");
     else
-      gp->sendf("unset logscale z\n");
+      gp.send("unset logscale z\n");
 
     if (internalMode & 14)
-      gp->sendf("set format \"%%g\"\n");
+      gp.send("set format \"%g\"\n");
   }
 
   char* legend = 0;
@@ -274,101 +316,113 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
       break;
   }
 
-  if (standard_args.set(ndata, myps, "iD*;iD&?;iD&?", &data, &info) < 0)
-    return LUX_ERROR;
+  if (narg) {
+    StandardArguments standard_args;
+    Pointer *data;
+    loopInfo *info;
 
-  // send the data to a gnuplot data block
-  gp->sendf("$LUX%d << EOD\n", datablock_index);
-  switch (ndata) {
-  case 1:
-    for (int i = 0; i < info[0].nelem; ++i) {
-      gp->sendf("%.10g\n", *data[0].d++);
+    if (standard_args.set(ndata, myps, "iD*;iD&?;iD&?", &data, &info) < 0)
+      return LUX_ERROR;
+
+    // send the data to a gnuplot data block
+    gp.sendf("$LUX%d << EOD\n", datablock_index);
+    switch (ndata) {
+    case 1:
+      for (int i = 0; i < info[0].nelem; ++i) {
+        gp.sendf("%.10g\n", *data[0].d++);
+      }
+      break;
+    case 2:
+      for (int i = 0; i < info[0].nelem; ++i) {
+        gp.sendf("%.10g %.10g\n", *data[0].d++, *data[1].d++);
+      }
+      break;
+    case 3:
+      for (int i = 0; i < info[0].nelem; ++i) {
+        gp.sendf("%.10g %.10g %.10g\n", *data[0].d++, *data[1].d++, *data[2].d++);
+      }
+      break;
     }
-    break;
-  case 2:
-    for (int i = 0; i < info[0].nelem; ++i) {
-      gp->sendf("%.10g %.10g\n", *data[0].d++, *data[1].d++);
+    gp.send("EOD\n");
+  }
+
+  if (narg) {
+    // what to do with linetype, pointtype, dashtype:
+    // if none are specified, or if only linetype and/or dashtype is
+    // specified, then use "with lines"
+    // if only pointtype is specified, then use "with points"
+    // if pointtype and one or both of linetype and dashtype are specified,
+    // then use "with linespoint"
+
+    std::string with_text;
+    if (pointtype > 0) {
+      if (linetype > 0 || dashtype > 0)
+        with_text = "linespoints";
+      else
+        with_text = "points";
+    } else {
+      with_text = "lines";
     }
-    break;
-  case 3:
-    for (int i = 0; i < info[0].nelem; ++i) {
-      gp->sendf("%.10g %.10g %.10g\n", *data[0].d++, *data[1].d++, *data[2].d++);
+
+    std::string type_text;
+    {
+      std::ostringstream oss;
+      if (linetype > 0)
+        oss << " linetype " << linetype;
+      if (pointtype > 0)
+        oss << " pointtype " << pointtype;
+      if (dashtype > 0)
+        oss << " dashtype " << dashtype;
+      type_text = oss.str();
     }
-    break;
-  }
-  gp->sendf("EOD\n");
 
-  // what to do with linetype, pointtype, dashtype:
-  // if none are specified, or if only linetype and/or dashtype is
-  // specified, then use "with lines"
-  // if only pointtype is specified, then use "with points"
-  // if pointtype and one or both of linetype and dashtype are specified,
-  // then use "with linespoint"
+    extern int current_pen;
 
-  std::string with_text;
-  if (pointtype > 0) {
-    if (linetype > 0 || dashtype > 0)
-      with_text = "linespoints";
-    else
-      with_text = "points";
-  } else {
-    with_text = "lines";
-  }
+    std::ostringstream using_oss;
+    using_oss << "using ";
 
-  std::string type_text;
-  {
-    std::ostringstream oss;
-    if (linetype > 0)
-      oss << " linetype " << linetype;
-    if (pointtype > 0)
-      oss << " pointtype " << pointtype;
-    if (dashtype > 0)
-      oss << " dashtype " << dashtype;
-    type_text = oss.str();
-  }
+    switch (ndata) {
+    case 1:                       // y only
+      using_oss << "1";
+      break;
+    case 2:                       // x,y
+      using_oss << "1:2";
+      break;
+    case 3:                       // x,y,z
+      using_oss << "1:2:3";
+      break;
+    }
 
-  extern int current_pen;
+    using_oss << " with " << with_text
+              << " lw " << current_pen;
 
-  switch (ndata) {
-  case 1:                       // y only
-      gp->remember_for_current_datablock("using 1 with %s lw %d %s title \"%s\"",
-                                         with_text.c_str(),
-                                         current_pen,
-                                         type_text.c_str(),
-                                         legend? legend: "");
-    break;
-  case 2:                       // x,y
-      gp->remember_for_current_datablock("using 1:2 with %s lw %d %s title \"%s\"",
-                                         with_text.c_str(),
-                                         current_pen,
-                                         type_text.c_str(),
-                                         legend? legend: "");
-    break;
-  case 3:                       // x,y,z
-      gp->remember_for_current_datablock("using 1:2:3 with %s lw %d %s %d title \"%s\"",
-                                         with_text.c_str(),
-                                         current_pen,
-                                         type_text.c_str(),
-                                         legend? legend: "");
-    break;
+    if (!type_text.empty())
+      using_oss << " " << type_text;
+
+    if (color)
+      using_oss << " linecolor " << color;
+
+    using_oss << " title \"" << (legend? legend: "") << "\"";
+
+    gp.remember_for_current_datablock(using_oss.str());
   }
 
-  switch (ndata) {
-  case 1: case 2:
-    gp->sendf("%s;\n", gp->construct_plot_command().c_str());
-    break;
-  case 3:
-    gp->sendf("%s;\n", gp->construct_splot_command().c_str());
-    break;
-  }
+  if (status != GplotStatus::gaplot
+      || !narg)
+    gp.sendn(gp.construct_plot_command());
 
-  gp->flush();
+  gp.flush();
+
+  if (!narg && status == GplotStatus::gaplot) { // gplot
+    gp.discard_datablocks();
+  }
 
   return LUX_OK;
 }
 
 /// gplot[,<x>],<y>[,<z>]
 ///      [,linetype=<ltype>,pointtype=<ptype>,dashtype=<dtype>
+///      ,color=<color>,
 ///      ,xtitle=<xtitle>,ytitle=<ytitle>,ztitle=<ztitle>,title=<title>
 ///      ,legend=<legend>]
 ///      [,/lii,/lio,/loi,/loo]
@@ -385,6 +439,8 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
 ///
 /// <dtype> is an integer that specified the type of dashes to draw.
 ///
+/// <color> is text that identifies the color to use
+///
 /// <xtitle> is the title for the x axis.
 ///
 /// <ytitle> is the title for the y axis.
@@ -400,12 +456,12 @@ int32_t lux_gplot_or_goplot(bool clear, int32_t narg, int32_t ps[])
 /// and /loo asks for logarithmic x and y axes.  /liii through /looo
 /// likewise specify linear or logarithmic x, y, and z axes.
 int32_t lux_gplot(int32_t narg, int32_t ps[]) {
-  return lux_gplot_or_goplot(true, narg, ps);
+  return lux_gplot_backend(GplotStatus::gplot, narg, ps);
 }
-REGISTER(gplot, s, gplot, 1, 11, ":::linetype:pointtype:dashtype:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+REGISTER(gplot, s, gplot, 1, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
 /// goplot[,<x>],<y>[,linetype=<ltype>,pointtype=<ptype>,dashtype=<dtype>,
-///     legend=<legend>]
+///     color=<color>,legend=<legend>]
 ///
 /// Add another curve to the previous plot through gnuplot.
 ///
@@ -418,11 +474,18 @@ REGISTER(gplot, s, gplot, 1, 11, ":::linetype:pointtype:dashtype:xtitle:ytitle:z
 ///
 /// <dtype> is an integer that specified the type of dashes to draw.
 ///
+/// <color> is the color to use.
+///
 /// <legend> is the text to display in the legend.
 int32_t lux_goplot(int32_t narg, int32_t ps[]) {
-  return lux_gplot_or_goplot(false, narg, ps);
+  return lux_gplot_backend(GplotStatus::goplot, narg, ps);
 }
-REGISTER(goplot, s, goplot, 1, 7, ":::linetype:pointtype:dashtype:legend");
+REGISTER(goplot, s, goplot, 1, 8, ":::linetype:pointtype:dashtype:color:legend");
+
+int32_t lux_gaplot(int32_t narg, int32_t ps[]) {
+  return lux_gplot_backend(GplotStatus::gaplot, narg, ps);
+}
+REGISTER(gaplot, s, gaplot, 0, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
 int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
                                std::string gnuplot_command_fmt) {
@@ -437,14 +500,11 @@ int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
   if (!gnuplot_type)
     return cerror(ILL_TYPE, ps[0]);
 
-  if (!gp)
-    gp = new GnuPlot;
-
-  gp->sendf(gnuplot_command_fmt.c_str(), info[0].dims[0], info[0].dims[1],
-           gnuplot_type);
-  gp->sendf("\n");
-  gp->write(&data[0].b[0], info[0].nelem*lux_type_size[info[0].type]);
-  gp->flush();
+  gp.sendf(gnuplot_command_fmt.c_str(), info[0].dims[0], info[0].dims[1],
+           gnuplot_type)
+    .send("\n")
+    .write(&data[0].b[0], info[0].nelem*lux_type_size[info[0].type])
+    .flush();
 
   return LUX_OK;
 }
@@ -516,56 +576,53 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
   if (enarg < 0)
     enarg = 0;
 
-  if (!gp)
-    gp = new GnuPlot;
-
   if (enarg) {
     if (*eps) {                 // xtitle
       if (symbolIsString(*eps))
-        gp->sendf("set xlabel \"%s\"\n", string_value(*eps));
+        gp.sendf("set xlabel \"%s\"\n", string_value(*eps));
       else
         return cerror(NEED_STR, *eps);
     }
     --enarg;
     ++eps;
   } else
-    gp->sendf("set xlabel\n");
+    gp.send("set xlabel\n");
 
   if (enarg) {
     if (*eps) {                 // ytitle
       if (symbolIsString(*eps))
-        gp->sendf("set ylabel \"%s\"\n", string_value(*eps));
+        gp.sendf("set ylabel \"%s\"\n", string_value(*eps));
       else
         return cerror(NEED_STR, *eps);
     }
     --enarg;
     ++eps;
   } else
-    gp->sendf("set ylabel\n");
+    gp.send("set ylabel\n");
 
   if (enarg) {
     if (*eps) {                 // ztitle
       if (symbolIsString(*eps))
-        gp->sendf("set zlabel \"%s\"\n", string_value(*eps));
+        gp.sendf("set zlabel \"%s\"\n", string_value(*eps));
       else
         return cerror(NEED_STR, *eps);
     }
     --enarg;
     ++eps;
   } else
-    gp->sendf("set zlabel\n");
+    gp.send("set zlabel\n");
 
   if (enarg) {
     if (*eps) {                 // title
       if (symbolIsString(*eps))
-        gp->sendf("set title \"%s\"\n", string_value(*eps));
+        gp.sendf("set title \"%s\"\n", string_value(*eps));
       else
         return cerror(NEED_STR, *eps);
     }
     --enarg;
     ++eps;
   } else
-    gp->sendf("set title\n");
+    gp.send("set title\n");
 
   double angle_x = 60;
   double angle_z = 30;
@@ -604,14 +661,14 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
           int32_t value = int_arg(*eps);
           if (value == 1) { // fully automatic contours
             // display automatically selected contours
-            gp->sendf("set contour surface; set cntrparam levels auto;\n");
+            gp.send("set contour surface; set cntrparam levels auto;\n");
             done = true;
           } else if (value > 1) { // desired contour count
-            gp->sendf("set contour surface; set cntrparam levels auto %d;\n",
+            gp.sendf("set contour surface; set cntrparam levels auto %d;\n",
                      value);
             done = true;
           } else if (value == 0) { // no contours
-            gp->sendf("unset contour\n");
+            gp.send("unset contour\n");
             done = true;
           } else
             return luxerror("Negative contour count %d not supported",
@@ -624,45 +681,45 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
         int32_t iq = lux_double(1, eps);
         if (numerical(iq, NULL, NULL, &contours_count, &contours) < 0)
           return LUX_ERROR;
-        gp->sendf("set contour surface; set cntrparam levels discrete ");
+        gp.send("set contour surface; set cntrparam levels discrete ");
         for (int i = 0; i < contours_count; ++i) {
           if (i)
-            gp->sendf(",");
-          gp->sendf("%f", *contours.f++);
+            gp.sendf(",");
+          gp.sendf("%f", *contours.f++);
         }
-        gp->sendf("\n");
+        gp.send("\n");
       }
     } else
-      gp->sendf("unset contour;\n");
+      gp.send("unset contour;\n");
     --enarg;
     ++eps;
   } else
-    gp->sendf("unset contour;\n");
+    gp.send("unset contour;\n");
 
   if (internalMode & 1)         // /flat
-    gp->sendf("set view map\n");
+    gp.send("set view map\n");
   else {
-    gp->sendf("unset view\n");
-    gp->sendf("set view %f,%f\n", angle_x, angle_z);
+    gp.send("unset view\n");
+    gp.sendf("set view %f,%f\n", angle_x, angle_z);
   }
 
   if (internalMode & 2)         // logarithmic x axis
-    gp->sendf("%s\n", "set logscale x");
+    gp.send("set logscale x\n");
   else
-    gp->sendf("unset logscale x;\n");
+    gp.send("unset logscale x\n");
 
   if (internalMode & 4)         // logarithmic y axis
-    gp->sendf("%s\n", "set logscale y");
+    gp.send("set logscale y\n");
   else
-    gp->sendf("unset logscale y;\n");
+    gp.send("unset logscale y;\n");
 
   if (internalMode & 8) {       // logarithmic z axis
-    gp->sendf("%s\n", "set logscale z; set logscale cb;");
+    gp.send("set logscale z; set logscale cb;\n");
   } else {
-    gp->sendf("unset logscale z; unset logscale cb;\n");
+    gp.send("unset logscale z; unset logscale cb;\n");
   }
 
-  // gp->sendf("set tics; set auto fix;\n");
+  // gp.send("set tics; set auto fix;\n");
 
   int ndata = 0;
   for (int i = 0; i < narg && i < 3; ++i)
@@ -727,10 +784,10 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
           // previous one has been completed by gnuplot (e.g., in
           // batch mode).
 
-          gp->data_remove();     // previous data file, if any
-          std::ofstream& tmp = gp->data_ofstream();
+          gp.data_remove();     // previous data file, if any
+          std::ofstream& tmp = gp.data_ofstream();
           if (tmp.is_open()) {
-            // std::cout << "Writing to " << gp->data_file_name() << std::endl;
+            // std::cout << "Writing to " << gp.data_file_name() << std::endl;
             // write the number of columns
             float n = info[2].dims[0];
             tmp.write((char*) &n, sizeof(n));
@@ -749,9 +806,9 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
             }
             tmp.close();
 
-            gp->sendf("splot '%s' binary nonuniform matrix using 1:2:3 notitle with pm3d;\n",
-                     gp->data_file_name().c_str());
-            gp->flush();
+            gp.sendf("splot '%s' binary nonuniform matrix using 1:2:3 notitle with pm3d;\n",
+                     gp.data_file_name().c_str())
+              .flush();
           } else
             return luxerror("Could not open temp file for transferring data to gnuplot", 0);
         }
@@ -787,26 +844,25 @@ REGISTER(gnuplot3d, s, gplot3d, 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:
 /// of the image.  Otherwise, only the contour plot is shown.
 int32_t lux_gnucontour(int32_t narg, int32_t ps[])
 {
-  std::string gnuplot_command_fmt;
+  std::ostringstream oss;
 
   if (internalMode & 1)       // /equalxy
     // "set view equal xy" leads to plots with no contours
-    gnuplot_command_fmt += "set size ratio -1; ";
-  gnuplot_command_fmt += "set view map; ";
+    oss << "set size ratio -1; ";
+  oss << "set view map; ";
   if (internalMode & 2)         // /image
-    gnuplot_command_fmt += "set surface; set contour surface; ";
+    oss << "set surface; set contour surface; ";
   else
-    gnuplot_command_fmt += "unset surface; set contour base; ";
-  gnuplot_command_fmt
-    += "set cntrparam cubicspline; "
+    oss << "unset surface; set contour base; ";
+  oss << "set cntrparam cubicspline; "
     "splot '-' binary array=(%d,%d) format=\"%s\" title '' ";
   if (internalMode & 2)
-    gnuplot_command_fmt += "with pm3d;"; // with image => no contours
+    oss << "with pm3d;"; // with image => no contours
   else
-    gnuplot_command_fmt += "with lines;";
-  gnuplot_command_fmt += "reset; ";
+    oss << "with lines;";
+  oss << "reset; ";
 
-  return lux_gnuplot_with_image(narg, ps, gnuplot_command_fmt);
+  return lux_gnuplot_with_image(narg, ps, oss.str());
 }
 REGISTER(gnucontour, s, gcontour, 1, 1, ":1equalxy:2image");
 

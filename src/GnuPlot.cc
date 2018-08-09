@@ -32,7 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 GnuPlot::GnuPlot()
-  : m_datablock_count(0), m_verbosity(0)
+  : m_datablock_count(0), m_verbosity(false)
 {
   m_pipe = popen("gnuplot", "w");
   if (!m_pipe)
@@ -48,7 +48,7 @@ GnuPlot::GnuPlot()
 
 GnuPlot::~GnuPlot()
 {
-  if (m_verbosity > 0) {
+  if (m_verbosity) {
     puts("Closing gnuplot");
   }
   if (m_pipe) {
@@ -64,51 +64,70 @@ GnuPlot::operator=(const GnuPlot& src) {
   return *this;
 }
 
-int
-GnuPlot::set_verbosity(int value) {
+bool
+GnuPlot::set_verbosity(bool value) {
   int old = m_verbosity;
   m_verbosity = value;
   return old;
 }
 
-void
-GnuPlot::sendf(const char* format, ...)
+const GnuPlot&
+GnuPlot::sendf(const char* format, ...) const
 {
   if (m_pipe) {
-    char buf[1024];
+    char* buf;
     va_list ap;
 
     va_start(ap, format);
-    vsnprintf(buf, sizeof(buf), format, ap);
+    vasprintf(&buf, format, ap);
     va_end(ap);
+    send(buf);
+    free(buf);
+  }
+  return *this;
+}
+
+const GnuPlot&
+GnuPlot::send(const std::string& text) const
+{
+  if (m_pipe) {
     if (m_verbosity) {
-      size_t n = strlen(buf);
-      if (buf[n - 1] == '\n') {
+      size_t n = text.size();
+      if (n > 0 && text[n - 1] == '\n') {
         if (n == 1) {
           puts("Sending to gnuplot: <newline>");
         } else {
-          printf("Sending to gnuplot: '%.*s'\n", n - 1, buf);
+          printf("Sending to gnuplot: '%.*s'\n", n - 1, text.c_str());
         }
       } else {
-        printf("Sending to gnuplot: '%s'\n", buf);
+        printf("Sending to gnuplot: '%s'\n", text.c_str());
       }
     }
-    fputs(buf, m_pipe);
+    fputs(text.c_str(), m_pipe);
   }
+  return *this;
 }
 
-void
-GnuPlot::write(void* data, size_t size)
+const GnuPlot&
+GnuPlot::sendn(const std::string& text) const
+{
+  return send(text).send("\n");
+}
+
+const GnuPlot&
+GnuPlot::write(void* data, size_t size) const
 {
   if (m_pipe) {
     fwrite(data, 1, size, m_pipe);
   }
+  return *this;
 }
 
-void
-GnuPlot::flush()
+const GnuPlot&
+GnuPlot::flush() const
 {
   fflush(m_pipe);
+  return *this;
 }
 
 std::ofstream&
@@ -185,15 +204,21 @@ GnuPlot::initialize_data_file(void)
 void
 GnuPlot::remember_for_current_datablock(const char* format, ...)
 {
-  char buf[1024];
+  char* buf;
   va_list ap;
 
+  va_start(ap, format);
+  asprintf(&buf, format, ap);
+  va_end(ap);
+  remember_for_current_datablock(std::string(buf));
+  free(buf);
+}
+
+void
+GnuPlot::remember_for_current_datablock(const std::string& text)
+{
   uint32_t index = current_datablock_index();
   if (index > 0) {
-    va_start(ap, format);
-    vsnprintf(buf, sizeof(buf), format, ap);
-    va_end(ap);
-    std::string text = std::string(buf);
     while (m_datablock_plot_elements.size() < index)
       m_datablock_plot_elements.push_back("");
     m_datablock_plot_elements[index - 1] = text;

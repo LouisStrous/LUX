@@ -1741,11 +1741,17 @@ void register_the_bindings()
   int32_t lux_gcommand(int32_t, int32_t []);
   register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
 
+  int32_t lux_gterm(int32_t, int32_t []);
+  register_lux_s(lux_gterm, "gterm", 1, 1, "");
+
   int32_t lux_gplot(int32_t, int32_t []);
-  register_lux_s(lux_gplot, "gplot", 1, 11, ":::linetype:pointtype:dashtype:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+  register_lux_s(lux_gplot, "gplot", 1, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
   int32_t lux_goplot(int32_t, int32_t []);
-  register_lux_s(lux_goplot, "goplot", 1, 7, ":::linetype:pointtype:dashtype:legend");
+  register_lux_s(lux_goplot, "goplot", 1, 8, ":::linetype:pointtype:dashtype:color:legend");
+
+  int32_t lux_gaplot(int32_t, int32_t []);
+  register_lux_s(lux_gaplot, "gaplot", 0, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
   int32_t lux_gnutv(int32_t, int32_t []);
   register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);

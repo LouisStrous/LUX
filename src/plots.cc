@@ -54,7 +54,7 @@ static	int32_t	nelem, isym, nbreak, *qi, huge = INT32_MAX, dq3, dq4,
 		lineStyle;	/* lineStyle not yet fully implemented */
 char	form[20], label[25], callig_update = 1;
 char const *plotxfmt = "%1g", *plotyfmt = "%1g";
-int32_t	landscape = 1, iorder = 0, current_pen = 3;
+int32_t	landscape = 1, iorder = 0, current_pen = 1;
 float	current_gray = 1, startx, stepx, starty, stepy;
  /* contents of VMS common plots follows */
 int32_t	ilabx = 1, ilaby = 1, irxf = 1, iryf = 1, ndx, fstepx = 0, fstepy = 0;

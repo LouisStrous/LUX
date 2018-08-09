@@ -55,7 +55,25 @@ public:
   ///
   /// \param ... are any number of data values.  They get formatted
   /// according to the format string.
-  void sendf(const char* format, ...);
+  ///
+  /// \returns a reference to the GnuPlot object.
+  const GnuPlot& sendf(const char* format, ...) const;
+
+  /// Sends text to the "gnuplot" program.  Don't forget to #flush
+  /// when the command is complete.
+  ///
+  /// \param text is the text to send.
+  ///
+  /// \returns a reference to the GnuPlot object.
+  const GnuPlot& send(const std::string& text) const;
+
+  /// Sends text to the "gnuplot" program with a newline appended.
+  /// Don't forget to #flush when the command is complete.
+  ///
+  /// \param text is the text to send.
+  ///
+  /// \returns a reference to the GnuPlot object.
+  const GnuPlot& sendn(const std::string& text) const;
 
   /// Sends unformatted information to the "gnuplot" program.  Don't
   /// forget to #flush when the command is complete.
@@ -63,10 +81,14 @@ public:
   /// \param data points to the beginning of the data to send.
   ///
   /// \param size is the number of bytes of data to send.
-  void write(void* data, size_t size);
+  ///
+  /// \returns a reference to the GnuPlot object.
+  const GnuPlot& write(void* data, size_t size) const;
 
   /// Flush recently written input to the "gnuplot" program.
-  void flush();
+  ///
+  /// \returns a reference to the GnuPlot object.
+  const GnuPlot& flush() const;
 
   /// Returns an ofstream to the current temporary file that can be
   /// used to store data for use by gnuplot.  The corresponding file
@@ -112,6 +134,11 @@ public:
   /// formatted according to the format string.
   void remember_for_current_datablock(const char* format, ...);
 
+  /// Remember the text for the current datablock.
+  ///
+  /// \param text is the text to remember.
+  void remember_for_current_datablock(const std::string& text);
+
   /// Construct a gnuplot 'plot' command based on the remembered data
   /// blocks.
   std::string construct_plot_command() const;
@@ -131,7 +158,7 @@ public:
   /// \param value is the new verbosity level.
   ///
   /// \returns the previous verbosity level.
-  int set_verbosity(int value);
+  bool set_verbosity(bool value);
 
 private:
   /// Initialize a temporary data file, if needed.
@@ -154,7 +181,7 @@ private:
   uint32_t m_datablock_count;
 
   /// The verbosity level
-  int m_verbosity;
+  bool m_verbosity;
 
   typedef std::vector<std::string> DatablockBackendCollection;
 

@@ -653,6 +653,7 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
     ++eps;
   }
 
+  bool have_contour_labels = false;
   if (enarg) {
     if (*eps) {                 // contours
       bool done = false;
@@ -662,10 +663,12 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
           if (value == 1) { // fully automatic contours
             // display automatically selected contours
             gp.send("set contour surface; set cntrparam levels auto;\n");
+            have_contour_labels = true;
             done = true;
           } else if (value > 1) { // desired contour count
             gp.sendf("set contour surface; set cntrparam levels auto %d;\n",
                      value);
+            have_contour_labels = true;
             done = true;
           } else if (value == 0) { // no contours
             gp.send("unset contour\n");
@@ -688,6 +691,7 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
           gp.sendf("%f", *contours.f++);
         }
         gp.send("\n");
+        have_contour_labels = true;
       }
     } else
       gp.send("unset contour;\n");

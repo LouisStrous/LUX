@@ -3583,7 +3583,6 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
       return LUX_ERROR;
   }
 
-
   if (!haveWeights) {
 #if DEBUG_VOCAL
     debugout("calculating # elements per result");
@@ -3614,6 +3613,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
       winfo.naxes++;
     }
   }
+
+  bool omitNaNs = (internalMode & 8) != 0;
 
   if (p == 1) {			/* regular summation */
     if (haveWeights) {		/* have <weights> */
@@ -3775,17 +3776,33 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.f = 0.0;
-		w.f = 0.0;
-		do {
-		  sum.f += *src.f * *weights.f;
-		  w.f += *weights.f;
-		} while ((done = (advanceLoop(&winfo, &weights),
-				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
-		*trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.f = 0.0;
+                  w.f = 0.0;
+                  do {
+                    if (!isnan(*src.f) && !isnan(*weights.f)) {
+                      sum.f += *src.f * *weights.f;
+                      w.f += *weights.f;
+                    }
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.f = 0.0;
+                  w.f = 0.0;
+                  do {
+                    sum.f += *src.f * *weights.f;
+                    w.f += *weights.f;
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
             /* no cases LUX_DOUBLE, LUX_CFLOAT, or LUX_CDOUBLE: if <x> */
 	    /* is any of those types, then so is the output */
@@ -3846,30 +3863,62 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.d = 0.0;
-		w.d = 0.0;
-		do {
-		  sum.d += (double) *src.f * *weights.f;
-		  w.d += *weights.f;
-		} while ((done = (advanceLoop(&winfo, &weights),
-				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
-		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = 0.0;
+                  w.d = 0.0;
+                  do {
+                    if (!isnan(*src.f) && !isnan(*weights.f)) {
+                      sum.d += (double) *src.f * *weights.f;
+                      w.d += *weights.f;
+                    }
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = 0.0;
+                  w.d = 0.0;
+                  do {
+                    sum.d += (double) *src.f * *weights.f;
+                    w.d += *weights.f;
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	    case LUX_DOUBLE:
-	      do {
-		sum.d = 0.0;
-		w.d = 0.0;
-		do {
-		  sum.d += *src.d * *weights.d;
-		  w.d += *weights.d;
-		} while ((done = (advanceLoop(&winfo, &weights),
-				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
-		*trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = 0.0;
+                  w.d = 0.0;
+                  do {
+                    if (!isnan(*src.d) && !isnan(*weights.d)) {
+                      sum.d += *src.d * *weights.d;
+                      w.d += *weights.d;
+                    }
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = 0.0;
+                  w.d = 0.0;
+                  do {
+                    sum.d += *src.d * *weights.d;
+                    w.d += *weights.d;
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
             /* no cases LUX_CFLOAT, or LUX_CDOUBLE: if <x> */
 	    /* is any of those types, then so is the output */
@@ -4069,13 +4118,27 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.f = 0.0;
-		do
-		  sum.f += *src.f;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
-		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.f = 0.0;
+                  size_t w = 0;
+                  do {
+                    if (!isnan(*src.f)) {
+                      sum.f += *src.f;
+                      ++w;
+                    }
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.f++ = mean? (w? sum.f/w: 0): sum.f;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.f = 0.0;
+                  do
+                    sum.f += *src.f;
+                  while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.f++ = mean? sum.f/n: sum.f;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
            /* no cases DOUBLE, CFLOAT, or CDOUBLE */
 	  } /* end of switch (type) */
@@ -4119,22 +4182,50 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.d = 0.0;
-		do
-		  sum.d += *src.f;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
-		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = 0.0;
+                  size_t w = 0;
+                  do {
+                    if (!isnan(*src.f)) {
+                      sum.d += *src.f;
+                      ++w;
+                    }
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? (w? sum.d/w: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = 0.0;
+                  do
+                    sum.d += *src.f;
+                  while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? sum.d/n: sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	    case LUX_DOUBLE:
-	      do {
-		sum.d = 0.0;
-		do
-		  sum.d += *src.d;
-		while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
-		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = 0.0;
+                  size_t w = 0;
+                  do {
+                    if (!isnan(*src.d)) {
+                      sum.d += *src.d;
+                      ++w;
+                    }
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? (w? sum.d/w: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = 0.0;
+                  do
+                    sum.d += *src.d;
+                  while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? sum.d/n: sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
            /* no cases CFLOAT, CDOUBLE */
 	  } /* end of switch (type) */
@@ -4498,29 +4589,58 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.f = w.f = 0.0;
-		do {
-		  temp.f = *src.f; /* data value */
-		  value.f = 1.0;
-		  for (i = 0; i < nbase; i++) {
-		    if (present[i])
-		      value.f *= temp.f;
-		    temp.f *= temp.f;
-		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
-		    value.f = value.f? *weights.f/value.f: 0.0;
-		  else
-		    value.f *= *weights.f;
-		  sum.f += value.f;
-		  w.f += *weights.f;
-		} while ((done = (advanceLoop(&winfo, &weights),
-				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
-		*trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.f = w.f = 0.0;
+                  do {
+                    if (!isnan(*src.f) && !isnan(*weights.f)) {
+                      temp.f = *src.f; /* data value */
+                      value.f = 1.0;
+                      for (i = 0; i < nbase; i++) {
+                        if (present[i])
+                          value.f *= temp.f;
+                        temp.f *= temp.f;
+                      }
+                      // we now have the data value to the given
+                      // unsigned power. add in the exponent sign and
+                      // the weight
+                      if (psign == -1) /* negative exponent: must divide */
+                        value.f = value.f? *weights.f/value.f: 0.0;
+                      else
+                        value.f *= *weights.f;
+                      sum.f += value.f;
+                      w.f += *weights.f;
+                    }
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.f = w.f = 0.0;
+                  do {
+                    temp.f = *src.f; /* data value */
+                    value.f = 1.0;
+                    for (i = 0; i < nbase; i++) {
+                      if (present[i])
+                        value.f *= temp.f;
+                      temp.f *= temp.f;
+                    }
+                    /* we now have the data value to the given unsigned power */
+                    /* add in the exponent sign and the weight */
+                    if (psign == -1) /* negative exponent: must divide */
+                      value.f = value.f? *weights.f/value.f: 0.0;
+                    else
+                      value.f *= *weights.f;
+                    sum.f += value.f;
+                    w.f += *weights.f;
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -4627,54 +4747,112 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.d = w.d = 0.0;
-		do {
-		  temp.d = *src.f; /* data value */
-		  value.d = 1.0;
-		  for (i = 0; i < nbase; i++) {
-		    if (present[i])
-		      value.d *= temp.d;
-		    temp.d *= temp.d;
-		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
-		    value.d = value.d? *weights.f/value.d: 0.0;
-		  else
-		    value.d *= *weights.f;
-		  sum.d += value.d;
-		  w.d += *weights.f;
-		} while ((done = (advanceLoop(&winfo, &weights),
-				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
-		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = w.d = 0.0;
+                  do {
+                    if (!isnan(*src.f) && !isnan(*weights.f)) {
+                      temp.d = *src.f; /* data value */
+                      value.d = 1.0;
+                      for (i = 0; i < nbase; i++) {
+                        if (present[i])
+                          value.d *= temp.d;
+                        temp.d *= temp.d;
+                      }
+                      // we now have the data value to the given
+                      // unsigned power.  add in the exponent sign and
+                      // the weight
+                      if (psign == -1) /* negative exponent: must divide */
+                        value.d = value.d? *weights.f/value.d: 0.0;
+                      else
+                        value.d *= *weights.f;
+                      sum.d += value.d;
+                      w.d += *weights.f;
+                    }
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = w.d = 0.0;
+                  do {
+                    temp.d = *src.f; /* data value */
+                    value.d = 1.0;
+                    for (i = 0; i < nbase; i++) {
+                      if (present[i])
+                        value.d *= temp.d;
+                      temp.d *= temp.d;
+                    }
+                    // we now have the data value to the given
+                    // unsigned power.  add in the exponent sign and
+                    // the weight
+                    if (psign == -1) /* negative exponent: must divide */
+                      value.d = value.d? *weights.f/value.d: 0.0;
+                    else
+                      value.d *= *weights.f;
+                    sum.d += value.d;
+                    w.d += *weights.f;
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	    case LUX_DOUBLE:
-	      do {
-		sum.d = w.d = 0.0;
-		do {
-		  temp.d = *src.d; /* data value */
-		  value.d = 1.0;
-		  for (i = 0; i < nbase; i++) {
-		    if (present[i])
-		      value.d *= temp.d;
-		    temp.d *= temp.d;
-		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
-		    value.d = value.d? *weights.d/value.d: 0.0;
-		  else
-		    value.d *= *weights.d;
-		  sum.d += value.d;
-		  w.d += *weights.d;
-		} while ((done = (advanceLoop(&winfo, &weights),
-				  advanceLoop(&srcinfo, &src)))
-			 < srcinfo.naxes);
-		*trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = w.d = 0.0;
+                  do {
+                    if (!isnan(*src.d) && !isnan(*weights.d)) {
+                      temp.d = *src.d; /* data value */
+                      value.d = 1.0;
+                      for (i = 0; i < nbase; i++) {
+                        if (present[i])
+                          value.d *= temp.d;
+                        temp.d *= temp.d;
+                      }
+                      /* we now have the data value to the given unsigned power */
+                      /* add in the exponent sign and the weight */
+                      if (psign == -1) /* negative exponent: must divide */
+                        value.d = value.d? *weights.d/value.d: 0.0;
+                      else
+                        value.d *= *weights.d;
+                      sum.d += value.d;
+                      w.d += *weights.d;
+                    }
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = w.d = 0.0;
+                  do {
+                    temp.d = *src.d; /* data value */
+                    value.d = 1.0;
+                    for (i = 0; i < nbase; i++) {
+                      if (present[i])
+                        value.d *= temp.d;
+                      temp.d *= temp.d;
+                    }
+                    /* we now have the data value to the given unsigned power */
+                    /* add in the exponent sign and the weight */
+                    if (psign == -1) /* negative exponent: must divide */
+                      value.d = value.d? *weights.d/value.d: 0.0;
+                    else
+                      value.d *= *weights.d;
+                    sum.d += value.d;
+                    w.d += *weights.d;
+                  } while ((done = (advanceLoop(&winfo, &weights),
+                                    advanceLoop(&srcinfo, &src)))
+                           < srcinfo.naxes);
+                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -5078,24 +5256,50 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.f = 0.0;
-		do {
-		  temp.f = *src.f; /* data value */
-		  value.f = 1.0;
-		  for (i = 0; i < nbase; i++) {
-		    if (present[i])
-		      value.f *= temp.f;
-		    temp.f *= temp.f;
-		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
-		    value.f = value.f? 1.0/value.f: 0.0;
-		  sum.f += value.f;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
-		*trgt.f++ = mean? sum.f/n: sum.f;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.f = 0.0;
+                  size_t w = 0;
+                  do {
+                    if (!isnan(*src.f)) {
+                      temp.f = *src.f; /* data value */
+                      value.f = 1.0;
+                      for (i = 0; i < nbase; i++) {
+                        if (present[i])
+                          value.f *= temp.f;
+                        temp.f *= temp.f;
+                      }
+                      // we now have the data value to the given
+                      // unsigned power.  add in the exponent sign and
+                      // the weight
+                      if (psign == -1) /* negative exponent: must divide */
+                        value.f = value.f? 1.0/value.f: 0.0;
+                      sum.f += value.f;
+                      ++w;
+                    }
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.f++ = mean? (w? sum.f/w: 0): sum.f;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.f = 0.0;
+                  do {
+                    temp.f = *src.f; /* data value */
+                    value.f = 1.0;
+                    for (i = 0; i < nbase; i++) {
+                      if (present[i])
+                        value.f *= temp.f;
+                      temp.f *= temp.f;
+                    }
+                    /* we now have the data value to the given unsigned power */
+                    /* add in the exponent sign and the weight */
+                    if (psign == -1) /* negative exponent: must divide */
+                      value.f = value.f? 1.0/value.f: 0.0;
+                    sum.f += value.f;
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.f++ = mean? sum.f/n: sum.f;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	  } /* end of switch (type) */
 	  break;
@@ -5182,44 +5386,94 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      } while (done < srcinfo.rndim);
 	      break;
 	    case LUX_FLOAT:
-	      do {
-		sum.d = 0.0;
-		do {
-		  temp.d = *src.f; /* data value */
-		  value.d = 1.0;
-		  for (i = 0; i < nbase; i++) {
-		    if (present[i])
-		      value.d *= temp.d;
-		    temp.d *= temp.d;
-		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
-		    value.d = value.d? 1.0/value.d: 0.0;
-		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
-		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = 0.0;
+                  size_t w = 0;
+                  do {
+                    if (!isnan(*src.f)) {
+                      temp.d = *src.f; /* data value */
+                      value.d = 1.0;
+                      for (i = 0; i < nbase; i++) {
+                        if (present[i])
+                          value.d *= temp.d;
+                        temp.d *= temp.d;
+                      }
+                      /* we now have the data value to the given unsigned power */
+                      /* add in the exponent sign and the weight */
+                      if (psign == -1) /* negative exponent: must divide */
+                        value.d = value.d? 1.0/value.d: 0.0;
+                      sum.d += value.d;
+                      ++w;
+                    }
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? (w? sum.d/w: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = 0.0;
+                  do {
+                    temp.d = *src.f; /* data value */
+                    value.d = 1.0;
+                    for (i = 0; i < nbase; i++) {
+                      if (present[i])
+                        value.d *= temp.d;
+                      temp.d *= temp.d;
+                    }
+                    /* we now have the data value to the given unsigned power */
+                    /* add in the exponent sign and the weight */
+                    if (psign == -1) /* negative exponent: must divide */
+                      value.d = value.d? 1.0/value.d: 0.0;
+                    sum.d += value.d;
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? sum.d/n: sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	    case LUX_DOUBLE:
-	      do {
-		sum.d = 0.0;
-		do {
-		  temp.d = *src.d; /* data value */
-		  value.d = 1.0;
-		  for (i = 0; i < nbase; i++) {
-		    if (present[i])
-		      value.d *= temp.d;
-		    temp.d *= temp.d;
-		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
-		    value.d = value.d? 1.0/value.d: 0.0;
-		  sum.d += value.d;
-		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
-		*trgt.d++ = mean? sum.d/n: sum.d;
-	      } while (done < srcinfo.rndim);
+              if (omitNaNs) {
+                do {
+                  sum.d = 0.0;
+                  size_t w = 0;
+                  do {
+                    if (!isnan(*src.d)) {
+                      temp.d = *src.d; /* data value */
+                      value.d = 1.0;
+                      for (i = 0; i < nbase; i++) {
+                        if (present[i])
+                          value.d *= temp.d;
+                        temp.d *= temp.d;
+                      }
+                      /* we now have the data value to the given unsigned power */
+                      /* add in the exponent sign and the weight */
+                      if (psign == -1) /* negative exponent: must divide */
+                        value.d = value.d? 1.0/value.d: 0.0;
+                      sum.d += value.d;
+                      ++w;
+                    }
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? (w? sum.d/n: 0): sum.d;
+                } while (done < srcinfo.rndim);
+              } else {
+                do {
+                  sum.d = 0.0;
+                  do {
+                    temp.d = *src.d; /* data value */
+                    value.d = 1.0;
+                    for (i = 0; i < nbase; i++) {
+                      if (present[i])
+                        value.d *= temp.d;
+                      temp.d *= temp.d;
+                    }
+                    /* we now have the data value to the given unsigned power */
+                    /* add in the exponent sign and the weight */
+                    if (psign == -1) /* negative exponent: must divide */
+                      value.d = value.d? 1.0/value.d: 0.0;
+                    sum.d += value.d;
+                  } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
+                  *trgt.d++ = mean? sum.d/n: sum.d;
+                } while (done < srcinfo.rndim);
+              }
 	      break;
 	  } /* end of switch (type) */
 	  break;

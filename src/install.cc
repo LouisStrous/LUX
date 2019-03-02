@@ -914,7 +914,7 @@ internalRoutine function_table[] = {
   { "cos",	1, 1, lux_cos, "*" }, /* fun1.c */
   { "cosh",	1, 1, lux_cosh, "*" }, /* fun1.c */
   { "covariance", 2, 4, lux_covariance,
-    ":::weights:*0sample:1population:2keepdims:4double" }, /* fun2.c */
+    ":::weights:*0sample:1population:2keepdims:4double:8omitnans" }, /* fun2.c */
   { "crosscorr", 2, 3, lux_crosscorr, 0 }, /* fun2.c */
   { "crunch",	3, 3, lux_crunch_f, 0 }, /* crunch.c */
   { "cspline",	0, 6, lux_cubic_spline, /* fun3.c */ "1keep:2periodic:4akima:8getderivative:16getintegral" },
@@ -1075,7 +1075,7 @@ internalRoutine function_table[] = {
   { "maxdir",	2, 3, lux_max_dir, 0 },	/* topology.c */
   { "maxfilter", 1, 3, lux_maxfilter, 0 }, /* strous2.c */
   { "maxloc",	1, 2, lux_maxloc, "1keepdims" }, /* fun3.c */
-  { "mean", 	1, 4, lux_mean, "::power:weights:1double:2keepdims:4float" }, /* fun1.c */
+  { "mean", 	1, 4, lux_mean, "::power:weights:1double:2keepdims:4float:8omitnans" }, /* fun1.c */
   { "medfilter", 1, 4, lux_medfilter, "%1%" }, /* strous2.c */
   { "median",	1, 3, lux_median, "%1%" }, /* strous2.c */
   { "memory",	0, 0, lux_memory, 0 }, /* memck.c */
@@ -1143,7 +1143,7 @@ internalRoutine function_table[] = {
   { "scalerange", 3, 5, lux_scalerange, "*1fullrange:2zoom" }, /* fun3.c */
   { "scanf",	2, MAX_ARG, lux_freadf_f, "|1|1eof" }, /* files.c */
   { "sdev",	1, 3, lux_sdev, /* fun2.c */
-    "::weights:*0sample:1population:2keepdims:4double" },
+    "::weights:*0sample:1population:2keepdims:4double:8omitnans" },
   { "segment",	1, 3, lux_segment, ":sign:diagonal:1degree" }, /* topology.c */
   { "segmentdir", 2, 3, lux_segment_dir, "::sign" }, /* topology.c */
   { "sgn",	1, 1, lux_sgn, "*" }, /* fun1.c */
@@ -1206,7 +1206,7 @@ internalRoutine function_table[] = {
 #if DEVELOP
   { "test",	2, 3, lux_test, 0 }, /* execute.c */
 #endif
-  { "total", 	1, 4, lux_total, "::power:weights:1double:2keepdims:4float" }, /* fun1.c */
+  { "total", 	1, 4, lux_total, "::power:weights:1double:2keepdims:4float:8omitnans" }, /* fun1.c */
   { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, /* trace_decoder_ana.c */
   { "trend",	1, 2, lux_trend, "*" }, /* fun2.c */
   { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, /* ephem.c */
@@ -4376,6 +4376,7 @@ void symbolInitialization(void)
  l_fix("#42", 		42);
  l_fix("#0", 		0);
  f_fix("#infty",	INFTY);
+ f_fix("#nan",          acos(2));
  cf_fix("#i",		0.0, 1.0); /* imaginary unit */
  l_fix("#max_args",	MAX_ARG);
  l_fix("#max_byte",	bounds.max.b);

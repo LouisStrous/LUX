@@ -406,6 +406,7 @@ Read-Only Global Variables
 * #min_word::                   Most negative value possible in an INT
 * #minus1::                     Minus one
 * #msbfirst::                   Byte order
+* #nan::                        Not-a-Number
 * #pi::                         Pi
 * #p3d::                        Projection matrix
 * #r::                          Gas constant (cgs)
@@ -9557,6 +9558,7 @@ everywhere, including inside subroutines and functions.
 * #min_word::                   Most negative value possible in an INT
 * #minus1::                     Minus one
 * #msbfirst::                   Byte order
+* #nan::                        Not a Number
 * #pi::                         Pi
 * #p3d::                        Projection matrix
 * #r::                          Gas constant (cgs)
@@ -9921,7 +9923,7 @@ See also: @ref{#max_word}, @ref{#min_double}, @ref{#min_float},
 Has value @code{LONG -1}.
 
 @c --------------------------------------
-@node #msbfirst, #pi, #minus1, Read-Only Globals
+@node #msbfirst, #nan, #minus1, Read-Only Globals
 @comment  node-name,  next,  previous,  up
 @subsection #msbfirst
 
@@ -9933,7 +9935,14 @@ significant byte first (i.e., is littleendian).
 See also: @ref{Byte Order}, @ref{endian}
 
 @c --------------------------------------
-@node #pi, #p3d, #msbfirst, Read-Only Globals
+@node #nan, #pi, #msbfirst, Read-Only Globals
+@subsection #nan
+
+Is a @code{float} value that indicates ``not a number'' (NaN), in
+contexts that support it.
+
+@c --------------------------------------
+@node #pi, #p3d, #nan, Read-Only Globals
 @subsection #pi
 
 Has the @code{double} value of pi, the ratio between the circumference
@@ -11957,10 +11966,11 @@ arguments.
 * constellation::               Determine the astronomical constellation
 * constellationname::           Provide constellation names
 * contour::                     Contour plot
-* convert::                     Convert to specified data type 
+* convert::                     Convert to specified data type
 * coordtrf::                    Plot/windoe coordinate conversions
 * cos::                         Cosine
 * cosh::                        Hyperbolic cosine
+* covariance::                  Covariance
 * crosscorr::                   Cross-correlation coefficient
 * crunch::                      Data compression
 * crunchrun::
@@ -15911,7 +15921,7 @@ Reverse: @ref{acos}
 
 See also: @ref{#deg}, @ref{Trigonometry}, @ref{Complex Functions}
 @c -------------------------------------
-@node cosh, crosscorr, cos, Internal Routines
+@node cosh, covariance, cos, Internal Routines
 @subsection cosh
 @findex cosh
 
@@ -15922,7 +15932,60 @@ and may be complex.
 
 See also: @ref{Hyperbolic Functions}, @ref{Complex Functions}
 @c -------------------------------------
-@node crosscorr, crunch, cosh, Internal Routines
+@node covariance, crosscorr, cosh, Internal Routines
+@subsection covariance
+@findex covariance
+
+@code{covariance(@var{x}, @var{y} [, @var{mode}, weights=@var{w}],
+/sample, /population, /keepdims, /double, /omitnans])}
+
+By default, this function returns the sample covariance of numerical
+arrays @code{@var{x}} and @code{@var{y}}, which must have the same
+number of elements.
+
+If @code{@var{mode}} is a scalar or an array with a size different
+from that of @code{@var{x}}, then it indicates the dimension(s) along
+which covariances are calculated for each combination of the remaining
+coordinates.  In that case, if also @code{/keepdims} is specified,
+then the dimension(s) along which the covariances are calculated are
+set to 1 in the result.  If @code{/keepdims} is not set, then such
+dimensions are omitted from the result, and if only a single number is
+returned, then it is returned as a scalar.
+
+If @code{@var{mode}} is an array with the same number of elements as
+@code{@var{x}}, then each element of @code{@var{mode}} identifies the
+(scalar) class to which each corresponding element of @code{@var{x}}
+and @code{@var{y}} belong, and then a covariance is returned for each
+class.  The first element of the result refers to class @code{0} (if
+no class is negative), or to the most negative class.
+
+If @code{@var{weights}} is specified, then it must be a numerical
+array with the same dimensions as @code{@var{x}} and @code{@var{y}}
+(or merely the same number of elements, if covariances are calculated
+by class), and then each of its elements indicates the weight of the
+corresponding elements of @code{@var{x}} and @code{@var{y}}, and then
+weighted covariances are returned.  The @code{@var{weights}} are
+copied to a version with the same data type as @code{@var{x}} for the
+internal calculations (except that the copy is kept real even if
+@code{@var{x}} is complex).
+
+If @code{/population} or @code{@var{weights}} are specified, then
+population covariances are returned.  Otherwise, sample covariances
+are returned.
+
+If @code{/omitnans} is specified, then data elements and weights that
+are equal to NaN are omitted from the calculations.
+
+Complex numbers are supported.
+
+The result has type @code{double} if @code{@var{x}} or @code{@var{y}}
+are @code{double} or @code{cdouble}, or if @code{/double} was
+specified.  Otherwise, the result has type @code{float}.
+
+See also: @ref{sdev}, @ref{variance}
+
+@c -------------------------------------
+@node crosscorr, crunch, covariance, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection crosscorr
 @findex crosscorr
@@ -21460,7 +21523,7 @@ rows and columns equal to the number of elements in
 @findex mean
 
 @code{mean(@var{x} [, @var{mode}, power=@var{power},
-weights=@var{weights}, /float, /double, /keepdims])}
+weights=@var{weights}, /float, /double, /keepdims, /omitnans])}
 
 By default, returns the arithmetic average of numerical array
 @code{@var{x}}: the sum divided by the number of summed values.
@@ -21494,6 +21557,11 @@ elements indicates the weight of the corresponding element of
 @code{@var{weights}} are copied to a version with the same data type as
 @code{@var{x}} for the internal calculations (except that the copy is
 kept real even if @code{@var{x}} is complex).
+
+If @code{/omitnans} is specified then NaN-values are omitted from the
+calculations.  Otherwise the result is NaN for any summation over at
+least one NaN value.  For example, @code{mean(#nan, 3, 5, /omitnans)}
+returns 4, and @code{mean(#nan, 3, 5)} returns NaN.
 
 Complex numbers are supported.
 
@@ -25238,7 +25306,7 @@ n. Schwarztrauber's fftpack version 4, obtained from the Netlib cd-rom
 @findex sdev
 
 @code{sdev(@var{x} [, @var{mode}, weights=@code{weights}, /sample,
-/population, /keepdims, /double])}
+/population, /keepdims, /double, /omitnans])}
 
 By default, this function returns the sample standard deviation of
 numerical array @code{@var{x}}.
@@ -25271,6 +25339,9 @@ kept real even if @code{@var{x}} is complex).
 If @code{/population} or @code{@var{weights}} are specified, then
 population standard deviations are returned.  Otherwise, sample standard
 deviations are returned.
+
+If @code{/omitnans} is specified, then data elements and weights that
+are equal to NaN are omitted from the calculations.
 
 Complex numbers are supported.
 
@@ -27304,7 +27375,7 @@ equal to @code{@var{list}(@var{index},*)}.
 @findex total
 
 @code{total(@var{x} [, @var{mode}, power=@var{power},
-weights=@var{weights}, /float, /double, /keepdims])}
+weights=@var{weights}, /float, /double, /keepdims, /omitnans])}
 
 By default, returns the sum of numerical array @code{@var{x}}.  The
 arguments, keywords, and type and dimensions of the result are exactly
@@ -27985,7 +28056,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 @findex variance
 
 @code{variance(@var{x} [, @var{mode}, weights=@code{weights}, /sample,
-/population, /keepdims, /double])}
+/population, /keepdims, /double, /omitnans])}
 
 By default, this function returns the sample variance of numerical array
 @code{@var{x}}, which is the square of the corresponding standard

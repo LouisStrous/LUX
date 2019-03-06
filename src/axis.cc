@@ -2011,6 +2011,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
             break;
           case ':':
             type = DS_ACCEPT;
+            fmt++;
             break;
           case '>':
             type = DS_ATLEAST;
@@ -2244,8 +2245,9 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
               && pspec->data_type != LUX_NO_SYMBOLTYPE
               && type != pspec->data_type))
         type = pspec->data_type;
-      if (common_type == LUX_NO_SYMBOLTYPE
-          || type > common_type)
+      if (type != LUX_NO_SYMBOLTYPE
+          && (common_type == LUX_NO_SYMBOLTYPE
+              || type > common_type))
         common_type = type;
     }
   }
@@ -3121,20 +3123,18 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
 	  tgt_dims_ix = k;
 	} // end if (pspec->axis_par > -2)
         if (param_ix == num_in_out_params) {      /* a return parameter */
-          if (ref_param >= 0
-              && pspec->data_type_limit == PS_LOWER_LIMIT) {
-            iq = ps[ref_param];
-            type = symbol_type(iq);
-            if (type < pspec->data_type)
-              type = pspec->data_type;
+          if (ref_param >= 0) {
+            type = symbol_type(ps[ref_param]);
           } else if (pspec->data_type != LUX_NO_SYMBOLTYPE) {
             type = pspec->data_type;
-          } else {
-            type = symbol_type(ps[ref_param]);
-          } // end if (ref_param >= 0 ...) else
+          } // end if (ref_param >= 0) else
           if (pspec->common_type
-              && common_type != LUX_NO_SYMBOLTYPE)
+              && common_type != LUX_NO_SYMBOLTYPE) {
             type = common_type;
+          } else if (pspec->data_type_limit == PS_LOWER_LIMIT
+              && type < pspec->data_type) {
+            type = pspec->data_type;
+          }
 	  if (tgt_dims_ix)
 	    iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
 	  else

@@ -37,7 +37,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
     \c <returntype> is an encoding of the return type of the bound C
     function.  \c void is encoded as `v`, \c double as `d`, \c int32_t
-    as `i`.  A points to a type gets a `p` appended, so a `double *`
+    as `i`.  A pointer to a type gets a `p` appended, so a `double *`
     is encoded as `dp`.  A pointer to a `double` array of 3 by 2
     elements is encoded as `dp32`.
 

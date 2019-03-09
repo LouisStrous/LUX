@@ -903,16 +903,50 @@ int32_t lux_plot3d(int32_t narg, int32_t ps[])
 /* scanPolygon() returns the boundaries of horizontal slices of a polygon */
 
 /* each vertex is the endpoint of its associated edge */
-struct vertexStruct
-{ int32_t	x;			/* vertex x coordinate */
-  int32_t	y;			/* vertex y coordinate */
-  char	type;			/* vertex type in polygon */
-  char  dir;			/* edge direction */
-  float	slope; };		/* edge slope */
-typedef struct vertexStruct	Vertex;
 
-enum { VERTEX_TOP, VERTEX_FLAT_TOP, VERTEX_SIDE, VERTEX_FLAT_BOTTOM,
-	 VERTEX_BOTTOM, VERTEX_HORIZONTAL };
+/// An enumeration of the types of Vertex in a polygon.
+enum VertexType
+  {
+   // the vertex is at the top: its neighbors are lower
+   VERTEX_TOP,
+
+   // the vertex is at the top, but one or both of its neighbors are
+   // at the same height
+   VERTEX_FLAT_TOP,
+
+   // the vertex is neither at the top nor at the bottom
+   VERTEX_SIDE,
+
+   // the vertex is at the bottom, but one or both of its neighbors
+   // are at the same height
+   VERTEX_FLAT_BOTTOM,
+
+   // the vertex is at the bottom; its neighbors are higher
+   VERTEX_BOTTOM,
+
+   // the vertex is horizontal
+   VERTEX_HORIZONTAL
+  };
+
+/// A vertex in a polygon.
+struct Vertex
+{
+  /// The vertex x coordinate.
+  int32_t x;
+
+  /// The vertex y coordinate.
+  int32_t y;
+
+  /// The vertex type in polygon.
+  VertexType type;
+
+  /// The edge direction.
+  char dir;
+
+  /// The edge slope.
+  float	slope;
+};
+
 enum { POLY_INIT, POLY_NEXT, POLY_END };
 #define X_UP	2
 #define Y_UP	1

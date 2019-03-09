@@ -686,19 +686,19 @@ int32_t lux_medfilter(int32_t narg, int32_t ps[])
 int32_t lux_quantile(int32_t narg, int32_t ps[])
 /* QUANTILE([<order> ,] <data> [, <axes>]) */
 {
-  int32_t	output, med, nelem, i;
-  float	order;
+  int32_t	output, t, nelem, i;
+  double	order, f;
   loopInfo	srcinfo, trgtinfo;
   /* we use a global pointer src */
   Pointer	trgt, tmp, tmp0;
 
   if (!ps[1])			/* no <data> */
     return luxerror("Need data array", 0);
-  
+
   if (ps[0]) {			/* have <order> */
-    order = float_arg(ps[0]);
+    order = double_arg(ps[0]);
     if (order < 0.0 || order > 1.0)
-      return luxerror("Order fraction must be between 0 and 1, was %f",
+      return luxerror("Order fraction must be between 0 and 1, was %g",
 		   ps[0], order);
   } else
     order = -1;			/* flag that we didn't have one */
@@ -713,22 +713,25 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
   nelem = 1;
   for (i = 0; i < srcinfo.naxes; i++)
     nelem *= srcinfo.rdims[i];
-  if (order != -1) 		/* we had an explicit <order> */
-    med = (int32_t) (order*(nelem - 0.0001)); /* the index in the sorted
-					   data values of the value to be
-					   returned. */
-  else switch (internalMode) {
+  if (order == -1) {
+    switch (internalMode) {
     case 0: case 1:		/* /MEDIAN or default */
-      med = (nelem - 1)/2;
+      order = 0.5;
       break;
-    case 2:
-      med = 0;
+    case 2:                     // min
+      order = 0;
       break;
-    case 3:
-      med = nelem - 1;
+    case 3:                     // max
+      order = 1;
       break;
     default:
       return luxerror("Illegal keyword combination", 0);
+    }
+  }
+  {
+    double target = order*(nelem - 1);
+    t = floor(target);
+    f = target - t;
   }
 
   type = srcinfo.type;		/* so mcmp() knows what type it is */
@@ -747,40 +750,45 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
     qsort(tmp0.b, nelem, srcinfo.stride, cmp);
     switch (type) {
       case LUX_INT8:
-	if (nelem % 2)
-	  *trgt.b = tmp0.b[med];
-	else
-	  *trgt.b = ((int16_t) tmp0.b[med] + tmp0.b[med + 1])/2;
+        *trgt.b = tmp0.b[t];
+        if (f) {
+          *trgt.b +=
+            static_cast<uint8_t>((tmp0.b[t + 1] - tmp0.b[t])*f);
+        }
 	break;
       case LUX_INT16:
-	if (nelem % 2)
-	  *trgt.w = tmp0.w[med];
-	else
-	  *trgt.w = ((int32_t) tmp0.w[med] + tmp0.w[med + 1])/2;
+        *trgt.w = tmp0.w[t];
+        if (f) {
+          *trgt.w +=
+            static_cast<int16_t>((tmp0.w[t + 1] - tmp0.w[t])*f);
+        }
 	break;
       case LUX_INT32:
-	if (nelem % 2)
-	  *trgt.l = tmp0.l[med];
-	else
-	  *trgt.l = (tmp0.l[med] + tmp0.l[med + 1])/2;
+        *trgt.l = tmp0.l[t];
+        if (f) {
+          *trgt.l +=
+            static_cast<int32_t>((tmp0.l[t + 1] - tmp0.l[t])*f);
+        }
 	break;
       case LUX_INT64:
-	if (nelem % 2)
-	  *trgt.q = tmp0.q[med];
-	else
-	  *trgt.q = (tmp0.q[med] + tmp0.q[med + 1])/2;
+        *trgt.q = tmp0.q[t];
+        if (f) {
+          *trgt.q +=
+            static_cast<int64_t>((tmp0.q[t + 1] - tmp0.q[t])*f);
+        }
 	break;
       case LUX_FLOAT:
-	if (nelem % 2)
-	  *trgt.f = tmp0.f[med];
-	else
-	  *trgt.f = (tmp0.f[med] + tmp0.f[med + 1])/2;
+        *trgt.f = tmp0.f[t];
+        if (f) {
+          *trgt.f +=
+            static_cast<float>((tmp0.f[t + 1] - tmp0.f[t])*f);
+        }
 	break;
       case LUX_DOUBLE:
-	if (nelem % 2)
-	  *trgt.d = tmp0.d[med];
-	else
-	  *trgt.d = (tmp0.d[med] + tmp0.d[med + 1])/2;
+        *trgt.d = tmp0.d[t];
+        if (f) {
+          *trgt.d += (tmp0.d[t + 1] - tmp0.d[t])*f;
+        }
 	break;
     }
   } while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.rndim);

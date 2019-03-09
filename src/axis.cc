@@ -45,6 +45,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include <algorithm>            // for std::remove_if
+#include <cassert>
+#include <cstring>              // for std::memset
+#include <functional>           // for std::multiplies
+#include <numeric>              // for std::accumulate
+
+#include "NumericDataDescriptor.hh"
+
 #include <string.h>
 #include <limits.h>
 #include "action.hh"
@@ -1705,23 +1714,25 @@ static int32_t numerical_or_string_choice(int32_t data, int32_t **dims, int32_t 
   }
   return 1;
 }
+
 /*---------------------------------------------------------------------*/
 /** Gets information about a numerical symbol.
 
     \param[in] data is the number of the symbol to inspect.
 
-    \param[out] dims if not \c NULL, points at memory where a list of
-    dimensions of the symbol will be stored.
+    \param[out] dims, if not \c NULL, points at the location where the
+    address of the beginning of the list of dimensions of the symbol
+    will be stored.
 
-    \param[out] nDim if not \c NULL, points at memory where the
+    \param[out] nDim, if not \c NULL, points at the location where the
     dimension count of the symbol will be stored.
 
-    \param[out] size if not \c NULL, points at memory where the
+    \param[out] size, if not \c NULL, points at the location where the
     element count of the symbol will be stored.
 
-    \param[out] src if not \c NULL, points at a Pointer in which the
-    location of the beginning of the data of the symbol will be
-    stored.
+    \param[out] src, if not \c NULL, points at the location where the
+    Pointer pointing at the beginning of the data of the symbol will
+    be stored.
 
     \returns 1 if everything is OK, `LUX_ERROR` if the symbol is not
     numerical.
@@ -1940,7 +1951,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           p_spec.ref_par = strtol(fmt, &p, 10);
           fmt = p;
         } else {
-          luxerror("Expected a digit or minus sign after [ in"
+          luxerror("Expected a digit or hyphen after [ in"
                    " reference parameter specification but found %c", 0, *fmt);
           errno = EINVAL;
           bad = 1;
@@ -1971,7 +1982,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
           char *p;
           p_spec.axis_par = strtol(fmt, &p, 10);
         } else {
-          luxerror("Expected a digit or minus sign after { in"
+          luxerror("Expected a digit or hyphen after { in"
                    " reference parameter specification but found %c", 0, *fmt);
           errno = EINVAL;
           bad = 1;
@@ -1991,6 +2002,12 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 	p_spec.axis_par = -2;		     /* indicates "none" */
       if (bad)
         break;
+      if (*fmt == '@') {
+        p_spec.omit_dimensions_equal_to_one = true;
+        ++fmt;
+      } else {
+        p_spec.omit_dimensions_equal_to_one = false;
+      }
       while (*fmt && !strchr("*?;&#", *fmt)) { /* all dims */
         memset(&d_spec, '\0', sizeof(d_spec));
         while (*fmt && !strchr(",?*;&#", *fmt)) { /* every dim */
@@ -2350,13 +2367,13 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     A reference parameter can be indicated for all but the first
     parameter.  Some missing information (like a data type or a
     dimension) may be copied from the reference parameter.  The
-    reference parameter is indicated by a number or a minus sign (`-`)
+    reference parameter is indicated by a number or a hyphen (`-`)
     between square brackets (`[]`) just after the parameter data type
     (described later), which itself follows the parameter type.  A
     number indicates a particular parameter (0 indicates the first
-    one), and a minus sign indicates the parameter preceding the
-    current one.  If no reference parameter is explicitly given, then
-    the first parameter is the reference parameter.  The reference
+    one), and a hyphen indicates the parameter preceding the current
+    one.  If no reference parameter is explicitly given, then the
+    first parameter is the reference parameter.  The reference
     parameter must have a smaller index than the current parameter.
 
     \verbatim
@@ -2488,11 +2505,10 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     dimension must be at least as great as the number.
 
     \verbatim
-    i>7*
+    i>7
     \endverbatim
 
-    says that the first dimension must be at least 7, and the other
-    dimensions are unrestricted.
+    says that the first (and only) dimension must be at least 7.
 
     For input parameters, a colon (`:`) means to accept the current
     dimension.
@@ -2504,12 +2520,24 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     says that the input parameter must have 3 dimensions of which the
     2nd one is equal to 4.
 
+    An at sign (`@`) at the beginning of the dimensions specification
+    means that dimensions equal to 1 are ignored, as far as possible.
+    If omitting all dimensions equal to 1 would mean that there are no
+    dimensions left, then a single dimension equal to 1 is retained.
+
+    \verbatim
+    i@:,:
+    \endverbatim
+
+    says that the input parameter must have two dimensions after
+    dimensions equal to 1 are omitted.
+
     Dimensions for output parameters and the return value can be
     copied from the reference parameter.  An equals sign (`=`) means
     that the corresponding dimension of the reference parameter is
     copied.  If a number follows the equals sign immediately, then it
     says what the dimension of the reference parameter must be.  A
-    minus sign (`-`) means that the corresponding dimension of the
+    hyphen (`-`) means that the corresponding dimension of the
     reference parameter is skipped.  A plus sign (`+`) followed by a
     number means that, relative to the reference parameter, a
     dimension equal to that number is inserted.
@@ -2632,7 +2660,7 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
       <format> = <param-spec>[;<param-spec>]*
       <param-spec> = {'i'|'o'|'r'}[<type-spec>][<dims-spec>]['?']
       <type-spec> = {{['>']{'B'|'W'|'L'|'Q'|'F'|'D'}}|'S'}['^']
-      <dims-spec> = ['['<ref-par>']']['{'<axis-par>'}']
+      <dims-spec> = ['@']['['<ref-par>']']['{'<axis-par>'}']
                     <dim-spec>[,<dim-spec>]*['*'|'&'|'#']
       <dim-spec> = [{['+'|'-'|'=']NUMBER|'-'|'='|':'}]*
     \endverbatim
@@ -2646,16 +2674,16 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     - a type specification consists of an `S`, or else of an optional
       greater-than sign `>` followed by one of `B`, `W`, `L`, `Q`,
       `F`, or `D`.  Optionally, a `^` follows.
-    - a dimensions specification consists of a optional reference
-      parameter number between square brackets `[]`, followed by an
-      optional axis parameter number between curly braces `{}`,
-      followed by one or more dimension specifications separated by
-      commas `,`, optionally followed by an asterisk `*` or ampersand
-      `&` or hash symbol `#`.
-    - a dimension specification consists of a minus sign `-`, an
-      equals sign `=`, a colon `:`, or a number preceded by a plus
-      sign `+`, a minus sign `-`, or an equals sign `=`; followed by
-      any number of additional instances of the preceding.
+    - a dimensions specification consists of an optional at sign `@`,
+      an a optional reference parameter number between square brackets
+      `[]`, followed by an optional axis parameter number between
+      curly braces `{}`, followed by one or more dimension
+      specifications separated by commas `,`, optionally followed by
+      an asterisk `*` or ampersand `&` or hash symbol `#`.
+    - a dimension specification consists of a hyphen `-`, an equals
+      sign `=`, a colon `:`, or a number preceded by a plus sign `+`,
+      a hyphen `-`, or an equals sign `=`; followed by any number of
+      additional instances of the preceding.
 
     Some of the characteristics of a parameter may depend on those of
     a reference parameter.  That reference parameter is the very first
@@ -2706,9 +2734,12 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
     - If a number, then the indicated parameter is taken for it.
     - If `-`, then the previous parameter is taken for it.
 
-    The removal of dimensions is done, and the axis numbers apply,
-    only after all the other dimension specifications have been
-    processed.
+    An at sign `@` at the beginning of the list of dimension
+    specifications indicates that dimensions equal to 1 are omitted.
+    For an input parameter such dimensions are omitted before
+    considering the dimension specifications.  For an output or a
+    return parameter such dimensions are omitted just before adjusting
+    or creating the symbol.
 
     For the dimension specification \c dim-spec:
     - NUMBER = the current dimension has the specified size.  For
@@ -2736,19 +2767,21 @@ Symboltype standard_args_common_symboltype(int32_t num_param_specs,
 
     Both a `+`NUMBER and a `-`NUMBER may be given in the same
     dimension specification \c dim_spec.
+
   */
-int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptrs,
-                  loopInfo **infos)
+int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
+                      Pointer **ptrs, loopInfo **infos)
 {
-  int32_t returnSym, *ref_dims, tgt_dims[MAX_DIMS], prev_ref_param, *final;
+  int32_t returnSym, prev_ref_param, *final;
   struct param_spec *pspec;
   struct param_spec_list *psl;
   struct dims_spec *dims_spec;
   struct obstack o;
-  int32_t param_ix, num_ref_dims;
+  int32_t param_ix;
   loopInfo li;
   Pointer p;
   Symboltype type;
+  std::vector<DimensionSize_tp> tgt_dims;
   int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   returnSym = LUX_ONE;
@@ -2788,40 +2821,47 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
   obstack_init(&o);
   /* now we treat the parameters. */
   prev_ref_param = -1; /* < 0 indicates no reference parameter set yet */
+
+  NumericDataDescriptor refDescr;
+
   for (param_ix = 0; param_ix < psl->num_param_specs; param_ix++) {
     int32_t pspec_dims_ix; /* parameter dimension specification index */
-    int32_t tgt_dims_ix;   /* target dimension index */
     int32_t ref_dims_ix;   /* reference dimension index */
     int32_t src_dims_ix;   /* input dimension index */
-    int32_t *src_dims;        /* dimensions of input parameter */
-    int32_t num_src_dims;      /* number of dimensions of input parameter */
     int32_t iq, d;
+
+    NumericDataDescriptor srcDescr;
 
     pspec = &psl->param_specs[param_ix];
     dims_spec = pspec->dims_spec;
-    if (param_ix == num_in_out_params || param_ix >= narg || !ps[param_ix] ||
-        numerical(ps[param_ix], &src_dims, &num_src_dims, NULL, NULL) < 0) {
-      src_dims = NULL;
-      num_src_dims = 0;
-    } // end if (param_ix == num_in_out_params || ...)
+    if (param_ix == num_in_out_params || param_ix >= narg || !ps[param_ix]
+        || !srcDescr.set_from(ps[param_ix])) {
+      srcDescr.reset();
+    } else if (pspec->omit_dimensions_equal_to_one && srcDescr.is_valid()) {
+      srcDescr.omit_dimensions_equal_to_one();
+    } // end if (param_ix == num_in_out_params || ...) else
 
     int32_t ref_param = pspec->ref_par;
     if (ref_param < 0)
       ref_param = (param_ix? param_ix - 1: 0);
-    if (param_ix > 0            /* first parameter has no reference */
-        && (!ref_dims           /* no reference yet */
-            || ref_param != prev_ref_param)) { /* or different from before */
-      /* get reference parameter's information */
-      /* if the reference parameter is an output parameter, then
-         we must get the information from its *final* value */
+    if (param_ix > 0             // first parameter has no reference
+        && (!refDescr.is_valid() // no reference yet
+            || ref_param != prev_ref_param)) { // or different from
+                                               // before
+      // get reference parameter's information.  If the reference
+      // parameter is an output parameter, then we must get the
+      // information from its *final* value
       switch (psl->param_specs[ref_param].logical_type) {
       case PS_INPUT:
-        if (numerical(ps[ref_param], &ref_dims, &num_ref_dims, NULL, NULL)
-            < 0) {
+        if (refDescr.set_from(ps[ref_param])) {
+          if (psl->param_specs[ref_param].omit_dimensions_equal_to_one) {
+            refDescr.omit_dimensions_equal_to_one();
+          }
+        } else {
           returnSym = luxerror("Reference parameter %d must be an array",
                                ps[param_ix], ref_param + 1);
           goto error;
-        } // end if (numerical(ps[ref_param], ...) < 0)
+        } // end if (refDescr.valid()) else
         break;
       case PS_OUTPUT: case PS_RETURN:
         if (!final[ref_param]) {
@@ -2830,27 +2870,25 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                ref_param + 1, param_ix + 1);
           goto error;
         } // end if (!final[ref_param])
-        if (numerical(final[ref_param], &ref_dims, &num_ref_dims, NULL, NULL)
-            < 0) {
+        if (refDescr.set_from(final[ref_param])) {
+          refDescr.omit_dimensions_equal_to_one();
+        } else {
           returnSym = luxerror("Reference parameter %d must be an array",
                                final[param_ix], ref_param + 1);
           goto error;
-        } // end if (numerical(final[ref_param], ...) < 0)
+        } // end if (refDescr.set_from(final[ref_param])) else
         break;
       } // end switch (psl->param_specs[ref_param].logical_type)
       prev_ref_param = ref_param;
     } else if (!param_ix) {
-      ref_dims = NULL;
-      num_ref_dims = 0;
+      refDescr.reset();
     } // end if (param_ix > 0 ...) else if (!param_ix)
 
     if (!pspec->is_optional || param_ix == num_in_out_params
         || (param_ix < narg && ps[param_ix])) {
-      for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0,
-             ref_dims_ix = 0;
+      for (pspec_dims_ix = 0, src_dims_ix = 0, ref_dims_ix = 0;
            pspec_dims_ix < pspec->num_dims_spec; pspec_dims_ix++) {
-        int src_dim_size = (src_dims_ix < num_src_dims? src_dims[src_dims_ix]:
-                            0);
+        int src_dim_size = srcDescr.dimension(src_dims_ix);
         switch (dims_spec[pspec_dims_ix].type) {
         case DS_EXACT: /* an input parameter must have the exact
                           specified dimension */
@@ -2874,20 +2912,20 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
             } // end if (dims_spec[pspec_dims_ix].type == DS_EXACT ...) else if
           } // end if (pspec->logical_type == PS_INPUT)
           /* the target gets the exact specified dimension */
-          tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
-          src_dims_ix++;
-          ref_dims_ix++;
+          tgt_dims.push_back(dims_spec[pspec_dims_ix].size_add);
+          ++src_dims_ix;
+          ++ref_dims_ix;
           break;
         case DS_COPY_REF:       /* copy from reference */
-          if (src_dims_ix >= num_ref_dims) {
+          if (src_dims_ix >= refDescr.dimensions_count()) {
             returnSym = luxerror("Requested copying dimension %d from the "
                                  "reference parameter which has only %d "
                                  "dimensions", ps[param_ix], src_dims_ix,
-                                 num_ref_dims);
+                                 refDescr.dimensions_count());
             goto error;
-          } // end if (src_dims_ix >= num_ref_dims)
-          tgt_dims[tgt_dims_ix++] = ref_dims[ref_dims_ix++];
-          src_dims_ix++;
+          } // end if (src_dims_ix >= refDescr.dimensions_count())
+          tgt_dims.push_back(refDescr.dimension(ref_dims_ix++));
+          ++src_dims_ix;
           break;
         case DS_ADD:
           d = dims_spec[pspec_dims_ix].size_add;
@@ -2899,11 +2937,11 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                                    d, src_dims_ix, src_dim_size);
               goto error;
             } // end if (src_dim_size != d)
-            src_dims_ix++;
-            tgt_dims[tgt_dims_ix++] = d;
+            ++src_dims_ix;
+            tgt_dims.push_back(d);
             break;
           case PS_OUTPUT: case PS_RETURN:
-            tgt_dims[tgt_dims_ix++] = d;
+            tgt_dims.push_back(d);
             break;
           } // end switch (pspec->logical_type)
           break;
@@ -2912,39 +2950,41 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
           case PS_INPUT:
             {
               int32_t d = dims_spec[pspec_dims_ix].size_remove;
-              if (d && ref_dims[ref_dims_ix] != d) {
+              if (d && refDescr.dimension(ref_dims_ix) != d) {
                 returnSym = luxerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
-                                     d, ref_dims_ix, ref_dims[ref_dims_ix]);
+                                     d, ref_dims_ix,
+                                     refDescr.dimension(ref_dims_ix));
                 goto error;
-              } // end if (d && ref_dims[ref_dims_ix] != d)
+              } // end if (d && refDescr.dimension(ref_dims_ix) != d)
             }
             break;
           case PS_OUTPUT: case PS_RETURN:
             {
               int32_t d = dims_spec[pspec_dims_ix].size_remove;
-              if (d && ref_dims[ref_dims_ix] != d) {
+              if (d && refDescr.dimension(ref_dims_ix) != d) {
                 returnSym = luxerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
-                                     d, ref_dims_ix, ref_dims[ref_dims_ix]);
+                                     d, ref_dims_ix,
+                                     refDescr.dimension(ref_dims_ix));
                 goto error;
               } // end if (d && ref_dims[ref_dims_ix] != d)
             }
             if (dims_spec[pspec_dims_ix].type == DS_ADD_REMOVE)
-              tgt_dims[tgt_dims_ix++] = dims_spec[pspec_dims_ix].size_add;
+              tgt_dims.push_back(dims_spec[pspec_dims_ix].size_add);
             break;
           } // end switch (pspec->logical_type)
           ref_dims_ix++;
           break;
         case DS_ACCEPT:         /* copy from input */
-          if (src_dims_ix >= num_src_dims) {
+          if (src_dims_ix >= srcDescr.dimensions_count()) {
             returnSym = luxerror("Cannot copy non-existent dimension %d",
                                  ps[param_ix], src_dims_ix);
             goto error;
           } else {
-            tgt_dims[tgt_dims_ix++] = src_dims[src_dims_ix++];
-            ref_dims_ix++;
-          } // end if (src_dims_ix >= num_src_dims) else
+            tgt_dims.push_back(srcDescr.dimension(src_dims_ix++));
+            ++ref_dims_ix;
+          } // end if (src_dims_ix >= srcDescr.dimensions_count()) else
           break;
         default:
           returnSym = luxerror("Dimension specification type %d "
@@ -2959,82 +2999,98 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
       case PS_INPUT:
         switch (pspec->remaining_dims) {
         case PS_EQUAL_TO_REFERENCE:
-          if (ref_dims && ref_dims_ix < num_ref_dims) {
-	    int32_t expect = num_ref_dims + src_dims_ix - ref_dims_ix;
-            if (expect != num_src_dims) {
+          if (refDescr.is_valid()
+              && ref_dims_ix < refDescr.dimensions_count()) {
+	    int32_t expect = refDescr.dimensions_count()
+              + src_dims_ix - ref_dims_ix;
+            if (expect != srcDescr.dimensions_count()) {
               returnSym = luxerror("Expected %d dimensions but found %d",
                                    ps[param_ix],
-                                   num_ref_dims + src_dims_ix - ref_dims_ix,
-                                   num_src_dims);
+                                   refDescr.dimensions_count()
+                                   + src_dims_ix - ref_dims_ix,
+                                   srcDescr.dimensions_count());
               goto error;
             } // end if (expect != num_src_dims)
             int32_t i, j;
-            for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
-              if (ref_dims[i] != src_dims[j]) {
+            for (i = ref_dims_ix, j = src_dims_ix;
+                 i < refDescr.dimensions_count(); i++, j++)
+              if (refDescr.dimension(i) != srcDescr.dimension(j)) {
                 returnSym = luxerror("Expected dimension %d equal to %d "
                                      "but found %d", ps[param_ix], i + 1,
-                                     ref_dims[i], src_dims[j]);
+                                     refDescr.dimension(i),
+                                     srcDescr.dimension(j));
                 goto error;
-              } // end if (ref_dims[i] != src_dims[j])
+              } // end if (refDescr.dimension(i) != srcDescr.dimension(j))
           } else {
             returnSym = luxerror("Dimensions of parameter %d required to be "
                                  "equal to those of the reference, but no "
                                  "reference is available",
                                  ps[param_ix], param_ix + 1);
             goto error;
-          } // end if (ref_dims && ref_dims_ix < num_ref_dims) else
+          } // end if (refDescr.is_valid() && ref_dims_ix <
+            // refDescr.dimensions_count()) else
           break;
         case PS_ONE_OR_EQUAL_TO_REFERENCE:
-          if (ref_dims && ref_dims_ix < num_ref_dims) {
-	    int32_t expect = num_ref_dims + src_dims_ix - ref_dims_ix;
-            if (expect != num_src_dims) {
+          if (refDescr.is_valid()
+              && ref_dims_ix < refDescr.dimensions_count()) {
+	    int32_t expect = refDescr.dimensions_count()
+              + src_dims_ix - ref_dims_ix;
+            if (expect != srcDescr.dimensions_count()) {
               returnSym = luxerror("Expected %d dimensions but found %d",
                                    ps[param_ix],
-                                   num_ref_dims + src_dims_ix - ref_dims_ix,
-                                   num_src_dims);
+                                   refDescr.dimensions_count()
+                                   + src_dims_ix - ref_dims_ix,
+                                   srcDescr.dimensions_count());
               goto error;
-            } // end if (expect != num_src_dims)
+            } // end if (expect != srcDescr.dimensions_count())
             int32_t i, j;
-            for (i = ref_dims_ix, j = src_dims_ix; i < num_ref_dims; i++, j++)
-              if (src_dims[j] != 1 && ref_dims[i] != src_dims[j]) {
-                if (ref_dims[i] == 1)
+            for (i = ref_dims_ix, j = src_dims_ix;
+                 i < refDescr.dimensions_count(); i++, j++)
+              if (srcDescr.dimension(j) != 1
+                  && refDescr.dimension(i) != srcDescr.dimension(j)) {
+                if (refDescr.dimension(i) == 1)
                   returnSym = luxerror("Expected dimension %d equal to %d "
                                        "but found %d", ps[param_ix], i + 1,
-                                       ref_dims[i], src_dims[j]);
+                                       refDescr.dimension(i),
+                                       srcDescr.dimension(j));
                 else
                   returnSym = luxerror("Expected dimension %d equal to 1 or "
                                        "%d but found %d", ps[param_ix], i + 1,
-                                       ref_dims[i], src_dims[j]);
+                                       refDescr.dimension(i),
+                                       srcDescr.dimension(j));
                 goto error;
-              } // end if (src_dims[j] != 1 && ref_dims[i] != src_dims[j])
+              } // end if (srcDescr.dimension(j) != 1 &&
+                // refDescr.dimension(i) != srcDescr.dimension(j))
           } else {
             returnSym = luxerror("Dimensions of parameter %d required to be "
                                  "equal to those of the reference, but no "
                                  "reference is available",
                                  ps[param_ix], param_ix + 1);
             goto error;
-          } // end if (ref_dims && ref_dims_ix < num_ref_dims) else
+          } // end if (ref_dims && ref_dims_ix <
+            // refDescr.dimensions_count()) else
           break;
         case PS_ARBITRARY:
           break;
         case PS_ABSENT:
           if (!pspec_dims_ix) {     /* had no dimensions */
             /* assume dimension equal to 1 */
-            if (src_dims[src_dims_ix] != 1) {
+            if (srcDescr.dimension(src_dims_ix) != 1) {
               returnSym = luxerror("Expected dimension %d equal to 1 "
                                    "but found %d", ps[param_ix],
-                                   src_dims_ix + 1, src_dims[src_dims_ix]);
+                                   src_dims_ix + 1,
+                                   srcDescr.dimension(src_dims_ix));
               goto error;
             } else
               src_dims_ix++;
           } // end if (!pspec_dims_ix)
-          if (src_dims_ix < num_src_dims) {
+          if (src_dims_ix < srcDescr.dimensions_count()) {
             returnSym = luxerror("Specification (parameter %d) says %d "
                                  "dimensions but source has %d dimensions",
                                  ps[param_ix], param_ix, src_dims_ix,
-                                 num_src_dims);
+                                 srcDescr.dimensions_count());
             goto error;
-          } // end if (src_dims_ix < num_src_dims)
+          } // end if (src_dims_ix < srcDescr.dimensions_count())
           break;
         } // end switch (pspec->remaining_dims)
         iq = ps[param_ix];
@@ -3054,15 +3110,14 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
         case PS_ABSENT:
           break;
         case PS_EQUAL_TO_REFERENCE:
-          if (ref_dims_ix < num_ref_dims) {
+          if (ref_dims_ix < refDescr.dimensions_count()) {
             /* append remaining dimensions from reference parameter*/
-            size_t e = num_ref_dims - ref_dims_ix;
-            memcpy(tgt_dims + tgt_dims_ix, ref_dims + ref_dims_ix,
-                   e*sizeof(int32_t));
-            tgt_dims_ix += e;
-            src_dims_ix += e;
-            ref_dims_ix += e;
-          } // end if (ref_dims_ix < num_ref_dims)
+            while (ref_dims_ix < refDescr.dimensions_count()) {
+              tgt_dims.push_back(refDescr.dimension(ref_dims_ix));
+              ++src_dims_ix;
+              ++ref_dims_ix;
+            }
+          } // end if (ref_dims_ix < refDescr.dimensions_count())
           break;
         case PS_ARBITRARY:
           returnSym = luxerror("'Arbitrary' remaining dimensions makes no "
@@ -3105,23 +3160,31 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
 	  numerical(aq, NULL, NULL, &nAxes, &axes);
 	  int32_t j;
 	  for (j = 0; j < nAxes; j++) {
-	    if (axes.l[j] < 0 || axes.l[j] >= tgt_dims_ix) {
+	    if (axes.l[j] < 0 || axes.l[j] >= tgt_dims.size()) {
 	      returnSym = luxerror("Axis %d out of bounds for"
 				   " parameter %d", 0,
 				   axes.l[j], param_ix + 1);
 	      goto error;
 	    } // end if (axes.l[j] < 0 || axes.l[j] >= tgt_dims_ix)
-	    tgt_dims[axes.l[j]] = 0; /* flags removal.  Note: no check for
-				      duplicate axes */
+	    tgt_dims[axes.l[j]] = 0; // flags removal.  Note: no check
+                                     // for duplicate axes
 	  } // end for (j = 0; j < nAxes; j++)
 	  int32_t k;
 	  /* remove flagged dimensions */
-	  for (j = k = 0; j < tgt_dims_ix; j++) {
-	    if (tgt_dims[j])
-	      tgt_dims[k++] = tgt_dims[j];
-	  } // end for (j = k = 0; j < tgt_dims_ix; j++)
-	  tgt_dims_ix = k;
+          tgt_dims.erase(std::remove(tgt_dims.begin(), tgt_dims.end(), 0),
+                         tgt_dims.end());
 	} // end if (pspec->axis_par > -2)
+        if (pspec->omit_dimensions_equal_to_one) {
+          if (tgt_dims.size() > 0) {
+            tgt_dims.erase(std::remove(tgt_dims.begin(),
+                                       tgt_dims.end(),
+                                       1),
+                           tgt_dims.end());
+            if (!tgt_dims.size()) {
+              tgt_dims.push_back(1);
+            }
+          }
+        }
         if (param_ix == num_in_out_params) {      /* a return parameter */
           if (ref_param >= 0) {
             type = symbol_type(ps[ref_param]);
@@ -3135,8 +3198,9 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
               && type < pspec->data_type) {
             type = pspec->data_type;
           }
-	  if (tgt_dims_ix)
-	    iq = returnSym = array_scratch(type, tgt_dims_ix, tgt_dims);
+	  if (tgt_dims.size())
+	    iq = returnSym = array_scratch(type, tgt_dims.size(),
+                                           tgt_dims.data());
 	  else
 	    iq = returnSym = scalar_scratch(type);
         } else { // if (param_ix == num_in_out_params) else
@@ -3150,8 +3214,8 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
                       && pspec->data_type != LUX_NO_SYMBOLTYPE
                       && type != pspec->data_type)))
             type = pspec->data_type;
-	  if (tgt_dims_ix)
-	    redef_array(iq, type, tgt_dims_ix, tgt_dims);
+	  if (tgt_dims.size())
+	    redef_array(iq, type, tgt_dims.size(), tgt_dims.data());
 	  else
 	    redef_scalar(iq, type, NULL);
         } // end if (param_ix == num_in_out_params) else
@@ -3159,6 +3223,9 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt, Pointer **ptr
       } // end switch (pspec->logical_type)
       final[param_ix] = iq;
       standardLoop(iq, 0, SL_ALLAXES, symbol_type(iq), &li, &p, NULL, NULL, NULL);
+      // TODO: ensure that iq is treated as if it has the dimensions
+      // from tgt_dims.  Then remove the following assert.
+      assert(tgt_dims.size() == array_num_dims(iq));
       if (infos)
         (*infos)[param_ix] = li;
       if (ptrs)

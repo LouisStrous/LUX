@@ -33,6 +33,8 @@ nonbind_sources = \
 	GnuPlot.hh\
 	MonotoneInterpolation.cc\
 	MonotoneInterpolation.hh\
+	NumericDataDescriptor.cc\
+	NumericDataDescriptor.hh\
 	Rotate3d.cc\
 	Rotate3d.hh\
 	SSFC.cc\
@@ -136,6 +138,7 @@ nonbind_sources = \
 	terminfo.hh\
 	topology.cc\
 	trace_decoder_lux.cc\
+	types.hh\
 	visualclass.c\
 	visualclass.h\
 	vsop.cc\

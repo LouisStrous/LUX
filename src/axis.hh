@@ -20,8 +20,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_AXIS_H
 #define HAVE_AXIS_H
 
+#include <vector>
+#include "types.hh"
+
 /// \file
-/// Declares enums for standard_args().
+/// Declares supporting data types and functions for standard_args().
 
 /// Selects how to handle a particular dimension, for use in
 /// standard_args().  Each constant is a bit flag that can be combined
@@ -156,6 +159,10 @@ struct param_spec {
   /// `true` if the current dimension has the "common type" flag (`^`
   /// in a standard_args() format specification), `false` otherwise.
   bool common_type;
+
+  /// `true` if dimensions equal to one should be suppressed as far as
+  /// possible, `false` otherwise.
+  bool omit_dimensions_equal_to_one;
 };
 
 /// Represents a list of parameter specifications corresponding to a

@@ -502,33 +502,33 @@ subsc:                          /* a general subscript */
 range
 
 | range ':' '+' {
-  sym[$1].spec.evb.args[2] = 1;
+  pre_range_sum($1) = 1;
   $$ = $1;
 }
 
 | range ':' '>' expr {
-  sym[$1].spec.evb.args[3] = $4;
+  pre_range_redirect($1) = $4;
   $$ = $1;
 }
 
 | '+' {
   $$ = newSymbol(LUX_PRE_RANGE, LUX_ZERO, -LUX_ONE);
-  sym[$$].spec.evb.args[2] = 1;
+  pre_range_sum($$) = 1;
 }
 
 | '>' expr {
   $$ = newSymbol(LUX_PRE_RANGE, LUX_ZERO, -LUX_ONE);
-  sym[$$].spec.evb.args[3] = $2;
+  pre_range_redirect($$) = $2;
 }
 
 | expr ':' '>' expr {
   $$ = newSymbol(LUX_PRE_RANGE, $1, LUX_ZERO);
-  sym[$$].spec.evb.args[3] = $4;
+  pre_range_redirect($$) = $4;
 }
 
 | expr ':' '+' {
   $$ = newSymbol(LUX_PRE_RANGE, $1, LUX_ZERO);
-  sym[$$].spec.evb.args[2] = 1;
+  pre_range_sum($$) = 1;
 }
 ;
 

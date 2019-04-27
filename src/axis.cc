@@ -3194,7 +3194,8 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
           if (pspec->common_type
               && common_type != LUX_NO_SYMBOLTYPE) {
             type = common_type;
-          } else if (pspec->data_type_limit == PS_EXACT) {
+          } else if (pspec->data_type_limit == PS_EXACT
+                     && pspec->data_type != LUX_NO_SYMBOLTYPE) {
             type = pspec->data_type;
           } else if (pspec->data_type_limit == PS_LOWER_LIMIT
               && type < pspec->data_type) {
@@ -3225,9 +3226,6 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
       } // end switch (pspec->logical_type)
       final[param_ix] = iq;
       standardLoop(iq, 0, SL_ALLAXES, symbol_type(iq), &li, &p, NULL, NULL, NULL);
-      // TODO: ensure that iq is treated as if it has the dimensions
-      // from tgt_dims.  Then remove the following assert.
-      assert(!tgt_dims.size() || tgt_dims.size() == array_num_dims(iq));
       if (infos)
         (*infos)[param_ix] = li;
       if (ptrs)

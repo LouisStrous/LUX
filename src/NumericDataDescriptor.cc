@@ -57,15 +57,16 @@ NumericDataDescriptor::data() const
 bool
 NumericDataDescriptor::set_from(SymbolProxy_tp symbol)
 {
-  switch (symbol_type(symbol)) {
+  switch (symbol_class(symbol)) {
   case LUX_SCALAR:
     m_dimensions.push_back(1);
     m_data.b = &scalar_value(symbol).b;
     break;
   case LUX_ARRAY:
+    m_dimensions.resize(array_num_dims(symbol));
     std::copy(array_dims(symbol),
               array_dims(symbol) + array_num_dims(symbol),
-              m_dimensions.end());
+              m_dimensions.begin());
     m_data.v = array_data(symbol);
     break;
   default:

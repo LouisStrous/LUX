@@ -3336,14 +3336,15 @@ double kepler_v(double M, double e)
     }
   }
   // if we get here then we're calculating for a non-parabolic orbit
+  double delta = e - 1;
   if (e == prev_e) {
     f = prev_f;
   } else {
-    f = sqrt(fabs((1+e)/(1-e)));
+    f = sqrt(fabs((1+e)/delta));
     prev_f = f;
     prev_e = e;
   }
-  double srd = sqrt(fabs(1-e));
+  double srd = sqrt(fabs(delta));
   double isrd = 1/srd;
 
   double Mq;                    // perifocal anomaly
@@ -3351,45 +3352,74 @@ double kepler_v(double M, double e)
     Mq = M;
     M *= srd*srd*srd;           // from perifocal to mean anomaly
   }                             // otherwise the input is mean anomaly
-  if (e < 1) {                  // elliptical orbit
-    M = fasmod(M, TWOPI);       // between -π and +π
+  if (e < 1                     // elliptical orbit
+      && fabs(M) >= TWOPI) {    // only modify if needed
+    M = fasmod(M, TWOPI);       // move between -π and +π
   }
-  Mq = M*isrd*isrd*isrd;
+  if ((internalMode & 1) == 0)
+    Mq = M*isrd*isrd*isrd;
 
-  // calculate initial estimate based on small anomaly
-  double P = 2/e;
-  double Q = 3*Mq/e;
-  double u = cbrt(Q + sqrt(Q*Q + P*P*P));
-  double Eq = u - P/u;
-  E = Eq*srd;
+  switch ((internalMode >> 4) & 3) {
+  case 0: case 3:               // combination
+    {
+      // calculate initial estimate based on small anomaly
+      double W = sqrt(9./8.)*Mq;
+      double u = cbrt(W + sqrt(W*W + 1/(e*e*e)));
+      double T = u - 1/(e*u);
+      E = T*srd*sqrt(2);
 
-  if (e > 1) {                  // hyperbolic orbit
-    double Eh = asinh(M/e); // initial estimate based on large anomaly
-    if (fabs(Eh) < 0.53*fabs(e*sinh(E) - E - M))
-      E = Eh;
-    // otherwise we use the initial estimate based on small anomaly
+      if (e > 1) {                  // hyperbolic orbit
+        double Eh = asinh(M/e); // initial estimate based on large anomaly
+        if (fabs(Eh) < 0.53*fabs(e*sinh(E) - E - M))
+          E = Eh;
+        // otherwise we use the initial estimate based on small anomaly
+      }
+    }
+    break;
+  case 1:                       // start with small anomaly estimate
+    {
+      // calculate initial estimate based on small anomaly
+      double W = sqrt(9./8.)*Mq;
+      double u = cbrt(W + sqrt(W*W + 1/(e*e*e)));
+      double T = u - 1/(e*u);
+      E = T*srd*sqrt(2);
+    }
+    break;
+  case 2:                       // start with large anomaly estimate
+    E = asinh(M/e);         // initial estimate based on large anomaly
+    break;
   }
 
   double dE, B;
+  int iterations_count = 0;
   do {
-    double s, c, d;
+    if (++iterations_count == 100) {
+      E = acos(2);              // NaN
+      break;
+    }
+    double tau, tau2, s, c, d;
     if (e < 1) {                  // elliptic orbit
-      sincos(E, &s, &c);
-      s *= e;                     // e sin(E)
-      c = 1 - e*c;                // 1 - e cos(E)
-      d = E - s - M;
+      tau = tan(E/2);
+      tau2 = tau*tau;
+      s = 2*e*tau;
+      c = tau2*(1 + e) - delta;
+      d = (M - E)*(1 + tau2) + s;
     } else {                      // hyperbolic orbit
-      s = e*sinh(E);              // e sinh(E)
-      c = e*cosh(E) - 1;          // e cosh(E) - 1
-      d = s - E - M;
+      tau = tanh(E/2);
+      tau2 = tau*tau;
+      s = 2*e*tau;
+      c = tau2*(1 + e) + delta;
+      d = (M + E)*(1 - tau2) - s;
     }
     B = fabs(2*std::numeric_limits<double>::epsilon()*E*c/s);
     dE = d/c;
-    E -= dE;
+    E += dE;
   } while (dE*dE >= B);
 
   if (internalMode & 2)
     return E;                   // output is eccentric anomaly
+  else if (internalMode & 8)
+    return iterations_count;
   else {
     double tau;
     if (e > 1)
@@ -3402,7 +3432,7 @@ double kepler_v(double M, double e)
       return 2*atan(tau);       // output is true anomaly
   }
 }
-BIND(kepler_v, d_dd_iaibrq_01_2, f, kepler, 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau");
+BIND(kepler_v, d_dd_iaibrq_01_2, f, kepler, 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount:16small:32big");
 /*--------------------------------------------------------------------------*/
 double interpolate_angle(double a1, double a2, double f)
      /* interpolates between angles <a1> and <a2> (measured in

@@ -31,7 +31,7 @@
 This text documents the LUX data processing language and program,
 version @value{VERSION}, and was last updated on @value{UPDATED}.
 
-@copyright{} 1995-2017 Louis Strous
+@copyright{} 1995-2019 Louis Strous
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -406,7 +406,7 @@ Read-Only Global Variables
 * #min_word::                   Most negative value possible in an INT
 * #minus1::                     Minus one
 * #msbfirst::                   Byte order
-* #nan::                        Not-a-Number
+* #nan::                        Not a Number
 * #pi::                         Pi
 * #p3d::                        Projection matrix
 * #r::                          Gas constant (cgs)
@@ -694,10 +694,11 @@ Internal Functions and Subroutines
 * constellation::               Determine the astronomical constellation
 * constellationname::           Provide constellation names
 * contour::                     Contour plot
-* convert::                     Convert to specified data type 
+* convert::                     Convert to specified data type
 * coordtrf::                    Plot/windoe coordinate conversions
 * cos::                         Cosine
 * cosh::                        Hyperbolic cosine
+* covariance::                  Covariance
 * crosscorr::                   Cross-correlation coefficient
 * crunch::                      Data compression
 * crunchrun::
@@ -20883,20 +20884,81 @@ See also: @ref{jpegread}, @ref{fcwrite}, @ref{fzwrite}, @ref{gifwrite}
 @findex kepler
 
 @code{@var{out} = kepler(@var{in}, @var{e} [, /meananomaly,
-/perifocalanomaly] [, /trueanomaly, /eccentricanomaly, /tau]}
+/perifocalanomaly] [, /trueanomaly, /eccentricanomaly,
+/reducedeccentricanomaly, /tau, /itercount]}
 
-Solves Kepler's equation.  @code{@var{e}} is the eccentricity of the
-orbit.  @code{@var{in}} is the input quantity, which is the mean
-anomaly by default or when @code{/meananomaly} is specified, or is the
-perifocal anomaly when @code{/perifocalanomaly} is specified.  The
-perifocal anomaly is similar to the mean anomaly, but is based on the
-perifocal distance instead of the length of the semimajor axis of the
-orbit.
+Solves Kepler's equation (@code{M = E - e sin(E)}) for the motion of a
+planet (or other object) around the Sun (or another central object)
+when subject to only their mutual force of gravity.  See
+@url{https://www.aa.quae.nl/en/reken/kepler.html} for the algorithm.
 
-The returned value is the true anomaly by default or when
-@code{/trueanomaly} is specified, or is the eccentric anomaly when
-@code{/eccentricanomaly} is specified, or is the tangent of half of
-the true anomaly when @code{/tau} is specified.
+@code{@var{e}} is the eccentricity of the orbit (@code{e} in the
+equation), which may have any value.  Negative values are treated as
+the corresponding positive values.
+
+@code{@var{in}} is the input quantity, of which the meaning depends on
+the mode switches from the following list.  If none of these switches
+are specified, then @code{/meananomaly} is implied.  The quantity may
+have any value.
+
+@table @code
+@item /meananomaly
+
+The input quantity is the mean anomaly (@code{M} in the equation).
+The mean anomaly is the angle between a fictional planet and the
+perifocus as seen from the Sun, if that fictional planet had the same
+period as the true planet but followed a circular orbit at fixed
+speed.  The mean anomaly is zero when the planet is in the perifocus
+(closest to the Sun).  The mean anomaly increases with time at a fixed
+rate.
+
+@item /perifocalanomaly
+
+The input quantity is the perifocal anomaly, which is like the mean
+anomaly except that its rate of increase is based on the perifocus
+distance instead of the semimajor axis.  For near-parabolic orbits
+(eccentricity near 1), the perifocal anomaly depends much less
+strongly on the eccentricity than the mean anomaly does.
+
+The perifocal anomaly @code{M_q} and the mean anomaly @code{M} are
+linked through @code{M = M_q*(abs(e - 1))^1.5}.
+
+@end table
+
+The meaning of the returned value depends on the mode switches from
+the following list.  If none of the switches are specified, then
+@code{/trueanomaly} is implied.
+
+@table @code
+@item /eccentricanomaly
+
+The return value is the eccentric anomaly (@code{E} in the equation).
+
+@item /trueanomaly
+
+The return value is the true anomaly.  The true anomaly is the angle
+between the planet and the perifocus as seen from the Sun.  The true
+anomaly @code{ν} is calculated from the eccentric anomaly through
+@code{ν = 2*atan(sqrt((e + 1)/(e - 1))*tan(E/2))}.
+
+@item /reducedeccentricanomaly
+
+The return value is the reduced eccentric anomaly.  The reduced
+eccentric anomaly @code{E_q} and regular eccentric anomaly @code{E}
+are related through @code{E = E_q*sqrt(abs(e - 1))}.
+
+@item /tau
+
+The return value is the tangent of half of the true anomaly,
+@code{tan(ν/2)}.  The cartesian coordinates can be calculated from
+this directly, without going through the true anomaly.
+
+@item /itercount
+
+The return value is the count of iterations that were needed to find
+the solution.
+
+@end table
 
 @c -------------------------------------
 @node ksmooth, le, kepler, Internal Routines

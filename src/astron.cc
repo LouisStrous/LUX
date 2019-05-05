@@ -3303,9 +3303,6 @@ void kepler(double m, double e, double v_factor, double *v, double *rf)
 */
 double kepler_v(double M, double e)
 {
-  double	E, de, p, f;
-  static double prev_e = 0, prev_f = 1;
-
   if (isnan(M) || isnan(e))
     return M;
   e = fabs(e);
@@ -3322,6 +3319,8 @@ double kepler_v(double M, double e)
     if ((internalMode & 1) == 0 // input is mean anomaly
         || (internalMode & 6) == 2) // output is eccentric anomaly
       return std::numeric_limits<double>::quiet_NaN(); // cannot compute
+    else if (internalMode & 8)  // output is iterations count
+      return 0;
     else {
       // if we get here then the input is perifocal anomaly and the
       // requested output is true anomaly or tau (= tangent of half of
@@ -3337,102 +3336,88 @@ double kepler_v(double M, double e)
   }
   // if we get here then we're calculating for a non-parabolic orbit
   double delta = e - 1;
-  if (e == prev_e) {
-    f = prev_f;
-  } else {
-    f = sqrt(fabs((1+e)/delta));
-    prev_f = f;
-    prev_e = e;
-  }
-  double srd = sqrt(fabs(delta));
+  double ad = fabs(delta);
+  double srd = sqrt(ad);
+  double srd3 = srd*ad;
   double isrd = 1/srd;
+  double isrd3 = 1/srd3;
 
   double Mq;                    // perifocal anomaly
   if (internalMode & 1) {       // input is perifocal anomaly
     Mq = M;
-    M *= srd*srd*srd;           // from perifocal to mean anomaly
+    M *= srd3;                  // from perifocal to mean anomaly
   }                             // otherwise the input is mean anomaly
   if (e < 1                     // elliptical orbit
-      && fabs(M) >= TWOPI) {    // only modify if needed
+      && fabs(M) > M_PI) {      // only modify if needed
     M = fasmod(M, TWOPI);       // move between -π and +π
+    if (internalMode & 1)
+      Mq = M*isrd3;
   }
   if ((internalMode & 1) == 0)
-    Mq = M*isrd*isrd*isrd;
+    Mq = M*isrd3;
 
-  switch ((internalMode >> 4) & 3) {
-  case 0: case 3:               // combination
-    {
-      // calculate initial estimate based on small anomaly
-      double W = sqrt(9./8.)*Mq;
-      double u = cbrt(W + sqrt(W*W + 1/(e*e*e)));
-      double T = u - 1/(e*u);
-      E = T*srd*sqrt(2);
+  double E;
+  {
+    double W = sqrt(9./8.)*Mq/e;
+    double u = cbrt(W + sqrt(W*W + 1/(e*e*e)));
+    double T = u - 1/(e*u);
+    // initial estimate based on small anomaly
+    E = T*srd*sqrt(2);
 
-      if (e > 1) {                  // hyperbolic orbit
-        double Eh = asinh(M/e); // initial estimate based on large anomaly
-        if (fabs(Eh) < 0.53*fabs(e*sinh(E) - E - M))
-          E = Eh;
-        // otherwise we use the initial estimate based on small anomaly
-      }
+    if (e > 1) {                  // hyperbolic orbit
+      double Eh = asinh(M/e); // initial estimate based on large anomaly
+      if (fabs(Eh) < 0.53*fabs(e*sinh(E) - E - M))
+        E = Eh;
+      // otherwise we use the initial estimate based on small anomaly
     }
-    break;
-  case 1:                       // start with small anomaly estimate
-    {
-      // calculate initial estimate based on small anomaly
-      double W = sqrt(9./8.)*Mq;
-      double u = cbrt(W + sqrt(W*W + 1/(e*e*e)));
-      double T = u - 1/(e*u);
-      E = T*srd*sqrt(2);
-    }
-    break;
-  case 2:                       // start with large anomaly estimate
-    E = asinh(M/e);         // initial estimate based on large anomaly
-    break;
   }
 
-  double dE, B;
   int iterations_count = 0;
-  do {
-    if (++iterations_count == 100) {
-      E = acos(2);              // NaN
-      break;
-    }
-    double tau, tau2, s, c, d;
-    if (e < 1) {                  // elliptic orbit
-      tau = tan(E/2);
-      tau2 = tau*tau;
-      s = 2*e*tau;
-      c = tau2*(1 + e) - delta;
-      d = (M - E)*(1 + tau2) + s;
-    } else {                      // hyperbolic orbit
-      tau = tanh(E/2);
-      tau2 = tau*tau;
-      s = 2*e*tau;
-      c = tau2*(1 + e) + delta;
-      d = (M + E)*(1 - tau2) - s;
-    }
-    B = fabs(2*std::numeric_limits<double>::epsilon()*E*c/s);
-    dE = d/c;
-    E += dE;
-  } while (dE*dE >= B);
+  {
+    double dE, B;
+    do {
+      if (++iterations_count == 100) {
+        E = acos(2);              // NaN
+        break;
+      }
+      double s, c, d;
+      if (e < 1) {                  // elliptic orbit
+        s = e*sin(E);
+        c = 1 - e*cos(E);
+        d = M - E + s;
+      } else {                      // hyperbolic orbit
+        s = e*sinh(E);
+        c = e*cosh(E) - 1;
+        d = M + E - s;
+      }
+      B = fabs(2*std::numeric_limits<double>::epsilon()*E*c/s);
+      dE = d/c;
+      E += dE;
+    } while (dE*dE >= B);
+  }
 
-  if (internalMode & 2)
-    return E;                   // output is eccentric anomaly
-  else if (internalMode & 8)
+  if (internalMode & 8)
     return iterations_count;
-  else {
+
+  {
+    int kind = ((internalMode >> 1) & 3);
+    if (kind == 1)              // eccentric anomaly
+      return E;
+
+    double f = sqrt((e + 1)/ad);
     double tau;
     if (e > 1)
       tau = f*tanh(E/2);
     else
       tau = f*tan(E/2);
-    if (internalMode & 4)       // output is tau
+
+    if (kind == 2)              // tau, tangent of half true anomaly
       return tau;
-    else
-      return 2*atan(tau);       // output is true anomaly
+
+    return 2*atan(tau);         // output is true anomaly
   }
 }
-BIND(kepler_v, d_dd_iaibrq_01_2, f, kepler, 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount:16small:32big");
+BIND(kepler_v, d_dd_iaibrq_01_2, f, kepler, 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount");
 /*--------------------------------------------------------------------------*/
 double interpolate_angle(double a1, double a2, double f)
      /* interpolates between angles <a1> and <a2> (measured in

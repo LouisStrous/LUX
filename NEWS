@@ -1,3 +1,5 @@
+2019-05-05 LUX 1.2.0 released, with various fixes and additions.
+           BREAKING CHANGE: LUX identifiers are now case-sensitive.
 2015-08-01 LUX 1.1.1 released, with various fixes.
 2014-09-05 LUX 1.1.0 released, switch from C to C++
 2014-07-23 LUX 1.0.5 released, with fix for printing negative integers

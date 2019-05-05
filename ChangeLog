@@ -2,6 +2,28 @@
 
 Change Log of LUX
 
+- <2019-05-05 Sun> lux@quae.nl v1.2.0
+  - BREAKING CHANGE: Make LUX IDs case-sensitive.  All keywords and
+    names of built-in functions and subroutines are now lower case.
+    'SIN(1)' no longer calculates the sine of 1, but 'sin(1)' still
+    does.  'x' and 'X' are now separate variables.
+  - Fix the epoch of the Egyptian calendar (from CJDN 1448273 to CJDN
+    1448638).
+  - Improve 'kepler' for solving Kepler's equation.
+  - Fix the edges of 'ordfilter' and 'medfilter'.
+  - Make 'min'/'max' ignore NaNs.
+  - Propagate NaNs through '<' and '>'.
+  - Add '/omitnans' to 'mean', 'sdev', 'covariance'.
+  - Make the symbol type of all string-like symbols equal to
+    '#type.string'.
+  - Make 'differ' support complex values.
+  - Add an interface to the external gnuplot application for graphical
+    output.  New subroutines 'gplot', 'goplot', 'gplot3d', 'gaplot',
+    'gtv', 'gcontour', 'gcommand'.
+  - Add 'setnan'.
+  - Add a mask for 'zero'.
+  - Add 'ssfctopolar' and 'polartossfc'.
+  - Add 'monotoneinterpolation'.
 - <2015-08-01 Sat> lux@quae.nl v1.1.1
   - Re-enable %T, %J printf formats.  %J interprets the value as
     Chronological Julian Day rather than as Julian Day; new %#J

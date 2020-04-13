@@ -29,15 +29,20 @@ if HAVE_DOXYGEN
 
 EXTRA_DIST += Doxyfile
 
-doxy: doxyfile.stamp
+all-local: doxyfile.stamp
 
-doxyfile.stamp: $(top_builddir)/src/liblux.a
+doxyfile.stamp: Doxyfile $(top_builddir)/src/liblux.a
 	$(DOXYGEN) Doxyfile
 	touch doxyfile.stamp
 
 CLEANFILES = doxyfile.stamp
 
-all-local: doxyfile.stamp
 clean-local:
-	rm -rf $(top_builddir)/doc/lux.doxy
+	rm -rf $(top_builddir)/doc/lux.doxy doxyfile.stamp
+
+else
+
+all-local:
+	@echo No doxygen, so no output
+
 endif

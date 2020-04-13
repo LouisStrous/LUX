@@ -125,11 +125,13 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
 /* to any profile specification. */
 /* LS 24oct95 */
 {
-  int32_t   ySym, xSym, nPoints, n, nPar, nIter, iThresh, nSame, size,
+  int32_t ySym, xSym, nPoints, n, nPar, nIter, iThresh, nSame, size,
     iq, i, j, iter, same, fitSym, fitTemp, xTemp, nn, wSym;
-  double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound, *hibound,
-        *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran, qual, temp,
-    dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
+
+  double *yp, *xp, *start, *step, qThresh, *pThresh, fac, *lowbound,
+    *hibound, *err, *par, qBest1, qBest2, *parBest1, *parBest2, *ran,
+    qual, temp, dir, dThresh, qLast, mu, *meanShift, *weights, tThresh;
+
   char  vocal, onebyone, vocal_err;
   void  randome(void *output, int32_t number, double limit);
   double (*fitProfiles[2])(double *, int32_t, double *, double *, double *, int32_t) =
@@ -140,14 +142,14 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   int32_t   lux_indgen(int32_t, int32_t []), eval(int32_t);
   void  zap(int32_t);
   time_t starttime;
-  
+
   /* check input variables */
   if (narg >= 15 && (iq = ps[15])) { /* FIT */
     if (symbol_class(iq) != LUX_STRING)
       return cerror(NEED_STR, iq);
     n = SP_USER_FUNC;
     fitSym = stringpointer(string_value(iq), n);
-    if (fitSym < 0)             /* internal routine rather than user-defined */
+    if (fitSym < 0)    // internal routine rather than user-defined
       return
         luxerror("Sorry, fitting to internal routines is not yet implemented",
               iq);

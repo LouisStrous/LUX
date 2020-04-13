@@ -2497,7 +2497,7 @@ int32_t gscanf(void **source, char const* format, void *arg, int32_t isString)
   } else {			/* reading from a file */
     if (feof(*((FILE **) source)))
       return 0;
-    if (arg) 
+    if (arg)
       fscanf(*((FILE **) source), aformat, arg, &i);
     else
       fscanf(*((FILE **) source), aformat, &i);
@@ -2530,7 +2530,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
    <string.h>: strcpy(), strlen()
  */
 {
-  char	*fmt, *scr, *p, c, *ptr0;
+  char	*fmt, c, *ptr0;
   int32_t	string2, pr, i, len, nout = 0;
   Symboltype type;
   double	d, k, f, d2;
@@ -2559,7 +2559,6 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
   if (!fmt)
     return LUX_ERROR;		/* no format string */
   narg--;			/* number of target arguments */
-  scr = curScrat;
 
   fmt = fmttok(fmt);		/* install format string and determine
 				   its first token */
@@ -2653,159 +2652,161 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
       }
     }
 
-    if (theFormat.type != FMT_PLAIN)
-      switch (type) {
-	case LUX_TEMP_STRING:	/* a string */
-	  if (theFormat.count > 1)
-	    return showerrors? 
-	      luxerror("Reading of string arrays is not yet implemented", 0):
-		nout;
-	  if (theFormat.flags & FMT_SUPPRESS) {
-	    /* %*s or %*S or %*[...]: skip next whitespace-delimited Word */
-	    /* (%*s) or to line end (%*S) or next scan set (%*[...]) */
-	    if (*theFormat.spec_char == '[') {
-	      if (theFormat.width > 0)
-		sprintf(scr, "%%*%1d%s", theFormat.width, theFormat.start);
-	      else
-		strcpy(scr, theFormat.start);
-	    } else {
-	      if (theFormat.width > 0)
-		sprintf(scr, (*theFormat.spec_char == 's')? "%%*%1d[^ \n]":
-			"%%*%1d[^\n]", theFormat.width);
-	      else
-		strcpy(scr, (*theFormat.spec_char == 's')? "%*[^ \n]":
-		       "%*[^\n]");
-	    }
-	    p = scr + strlen(scr) + 1; /* beyond format string */
-	    if (!(len = gscanf(&ptr, scr, NULL, isString)))
-	      return showerrors? cerror(READ_ERR, 0): nout;
-	    if (*theFormat.spec_char == 'S' 
-		&& len < theFormat.width /* not yet at field width */
-		&& *(char *) ptr == '\n') /* and we have a \n */
-	      ptr = (void *) ((char *) ptr + 1); /* skip the \n */
-	  } else {		/* %s or %S or %[...]: read */
-	    if (*theFormat.spec_char == '[') {
-	      if (theFormat.width > 0)
-		sprintf(scr, "%%%1d%s", theFormat.width, theFormat.start);
-	      else
-		strcpy(scr, theFormat.start);
-	    } else {            /* %s or %S */
-              strcpy(scr, theFormat.start);
-	    }
-	    p = scr + strlen(scr) + 1; /* beyond specification */
-	    if (!(len = gscanf(&ptr, scr, p, isString))) /* read */
-	      return showerrors? cerror(READ_ERR, 0): nout;
-	    if (*theFormat.spec_char == 'S'
-		&& len < theFormat.width /* not yet at field width */
-		&& *(char *) ptr == '\n') /* and we have a \n */
-	      ptr = (void *) ((char *) ptr + 1); /* skip the \n */
+    if (theFormat.type != FMT_PLAIN) {
+      if (theFormat.count < 1) /* no explicit count */
+        theFormat.count = 1; /* so read 1 */
+      while (theFormat.count--) {
+        bool count_spaces = false;
+        char* input_data;
+        char* free_space = curScrat;
+        if (theFormat.width > 0 && (internalMode & 1)) {
+          // in gcc at least, whitespace ordinarily does not count
+          // against the field width for numerical arguments; the
+          // %5d format, for example, reads up to 5 digits after
+          // first skipping any initial whitespace.  This is not
+          // suitable for reading tables when some table entries
+          // may be missing, so we offer /COUNTSPACES which, when
+          // set, makes whitespace count against field width.  LS
+          // 19jan99
 
-	    symbol_memory(*ps) = strlen(p) + 1;
+          // Have an explicit width and must count whitespace.  First
+          // we read the number of chars indicated by the width.
+          char* fmtz = free_space + theFormat.width + 1;
+          sprintf(fmtz, "%%%1dc\0", theFormat.width);
+          //  | <unchanged> | %<width>c\0
+          // free_space     fmtz
+          gscanf(&ptr, fmtz, free_space, isString);
+          free_space[theFormat.width] = '\0'; // terminate
+          //  | <text>\0    | %<width>c\0 (not needed anymore)
+          // free_space     fmtz
+          /* and then we read values from the read string */
+          input_data = free_space;
+          ptr2 = (void **) &input_data;
+          free_space = fmtz;
+          string2 = 1;
+        } else {		/* we convert directly from the source */
+          ptr2 = &ptr;
+          string2 = isString;
+        }
+
+        if (!(theFormat.flags & FMT_SUPPRESS)) {
+          if (type == LUX_TEMP_STRING) {
+            if (theFormat.count)
+              return showerrors?
+                luxerror("Reading of string arrays is not yet "
+                         "implemented", 0):
+                nout;
+            /* %s or %S or %[...]: read */
+            char* fmtz = free_space;
+	    if (*theFormat.spec_char == '[') {
+	      if (theFormat.width > 0)
+		sprintf(fmtz, "%%%1d%s", theFormat.width, theFormat.start);
+	      else
+		strcpy(fmtz, theFormat.start);
+	    } else {            /* %s or %S */
+              strcpy(fmtz, theFormat.start);
+	    }
+            free_space = strchr(free_space, '\0') + 1;
+	    if (!(len = gscanf(ptr2, fmtz, free_space, isString))) /* read */
+	      return showerrors? cerror(READ_ERR, 0): nout;
+            if (*theFormat.spec_char == 'c') {
+              free_space[len] = '\0'; // terminate
+            }
+	    symbol_memory(*ps) = strlen(free_space) + 1;
 	    trgt.s = (char*) realloc(trgt.s, symbol_memory(*ps));
 	    if (!trgt.s)
 	      return showerrors? cerror(ALLOC_ERR, 0): nout;
 	    string_value(*ps) = trgt.s;
-	    strcpy(trgt.s, p);
-	  }
-	  break;
-	default:		/* something other than a string */
-	  if (theFormat.count < 1) /* no explicit count */
-	    theFormat.count = 1; /* so read 1 */
-	  while (theFormat.count--) {
-	    if (theFormat.width > 0 && (internalMode & 1)) {
-	      /* in gcc at least, whitespace ordinarily does not count against
-		 the field width for numerical arguments; the %5d format, for
-		 example, reads up to 5 digits after first skipping any initial
-		 whitespace.  This is not suitable for reading tables when some
-		 table entries may be missing, so we offer /COUNTSPACES which,
-		 when set, makes whitespace count against field width.
-		 LS 19jan99 */
-	      /* have an explicit width and must count whitespace */
-	      /* first we read the number of chars indicated by the width */
-	      sprintf(scr, "%%%1dc", theFormat.width);
-	      p = scr + strlen(scr) + 1;
-	      gscanf(&ptr, scr, p, isString);
-	      p[theFormat.width] = '\0'; /* terminate */
-	      /* and then we read values from the read string */
-	      ptr2 = (void **) &p;
-	      string2 = 1;
-	    } else {		/* we convert directly from the source */
-	      ptr2 = &ptr;
-	      string2 = isString;
-	    }
+	    strcpy(trgt.s, free_space);
+          } else {              /* something other than a string */
 	    switch (theFormat.type) {
-	      case FMT_TIME:	/* a time specification xx:yy:zz.zzz */
-		pr = theFormat.precision;
-		if (pr < 2)
-		  pr = 2;
-		d = 0.0;	/* will contain the read value */
-		k = 1.0;	/* multiplication factor */
-		while (pr--) {
-		  if (pr) {	/* not the last one: read an integer */
-		    if (!gscanf(ptr2, "%d", &i, string2))
-		      return
-			showerrors? luxerror("Expected a digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
-		    d += i*k;
-		    if (i < 0)
-		      k = -k;
-		    k /= 60.0;
-		    /* skip the separator: anything except digits */
-		    if (!gscanf(ptr2, "%*[^0-9]", NULL, string2))
-		      return
-			showerrors? luxerror("Expected a non-digit while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
-		  } else {	/* the last one: read a float */
-		    if (!gscanf(ptr2, "%lf", &f, string2))
-		      return
-			showerrors? luxerror("Expected a (floating-point) number while looking for a time at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
-		    d += f*k;
-		  }
-		}
-		
-		if (theFormat.flags & FMT_ALTERNATIVE)
-		  d *= 15;	/* from hours to degrees */
-		
-		if (!(theFormat.flags & FMT_SUPPRESS)) {
-		  if (type == LUX_FLOAT)
-		    *trgt.f = (float) d;
-		  else
-		    *trgt.d = d;
-		}
-		break;
-	      case FMT_COMPLEX:
-		/* we expect numbers in the form  aaa.bbb+ccc.dddi */
-		/* NOTE: sscanf (and gscanf) do not like whitespace
-		   between a sign and the rest of the number! */
-		gscanf(ptr2, "%lf", &d, string2);
-		gscanf(ptr2, "%lf", &d2, string2);
-		if (!gscanf(ptr2, "%*1[iI]", NULL, string2)) {
-		  if (internalMode & 1)	/* /COUNTSPACES: the number is
-					 absent so we substitute 0 */
-		    d = d2 = 0.0;
-		  else
-		    return showerrors? luxerror("Unexpected input", 0): nout;
-		}
-		if (!(theFormat.flags & FMT_SUPPRESS)) {
-		  if (type == LUX_CFLOAT) {
-		    trgt.cf->real = d;
-		    trgt.cf->imaginary = d2;
-		  } else {
-		    trgt.cd->real = d;
-		    trgt.cd->imaginary = d2;
-		  }
-		}
-		break;
-	      default:		/* regular numbers */
-		if (!gscanf(ptr2, theFormat.current,
-			    (theFormat.flags & FMT_SUPPRESS)? NULL: trgt.b,
-			    string2))
-		  return showerrors? luxerror("Expected a number at character index %d in %s", 0, (char *) *ptr2 - ptr0, ptr0): nout;
-		break;
-	    } /* end of switch (type) */
-	    trgt.b += lux_type_size[type];
-	  } /* end of while (theFormat.count--) */
-	  break;
-      } /* end of switch (type) */
-    
+            case FMT_TIME:	/* a time specification xx:yy:zz.zzz */
+              pr = theFormat.precision;
+              if (pr < 2)
+                pr = 2;
+              d = 0.0;	/* will contain the read value */
+              k = 1.0;	/* multiplication factor */
+              while (pr--) {
+                if (pr) {	/* not the last one: read an integer */
+                  if (!gscanf(ptr2, "%d", &i, string2))
+                    return
+                      showerrors?
+                      luxerror("Expected a digit while looking for a "
+                               "time at character index %d in %s", 0,
+                               (char *) *ptr2 - ptr0, ptr0): nout;
+                  d += i*k;
+                  if (i < 0)
+                    k = -k;
+                  k /= 60.0;
+                  /* skip the separator: anything except digits */
+                  if (!gscanf(ptr2, "%*[^0-9]", NULL, string2))
+                    return
+                      showerrors?
+                      luxerror("Expected a non-digit while looking for "
+                               "a time at character index %d in %s", 0,
+                               (char *) *ptr2 - ptr0, ptr0): nout;
+                } else {	/* the last one: read a float */
+                  if (!gscanf(ptr2, "%lf", &f, string2))
+                    return
+                      showerrors?
+                      luxerror("Expected a (floating-point) number "
+                               "while looking for a time at character "
+                               "index %d in %s", 0,
+                               (char *) *ptr2 - ptr0, ptr0): nout;
+                  d += f*k;
+                }
+              }
+
+              if (theFormat.flags & FMT_ALTERNATIVE)
+                d *= 15;	/* from hours to degrees */
+
+              if (!(theFormat.flags & FMT_SUPPRESS)) {
+                if (type == LUX_FLOAT)
+                  *trgt.f = (float) d;
+                else
+                  *trgt.d = d;
+              }
+              break;
+            case FMT_COMPLEX:
+              /* we expect numbers in the form  aaa.bbb+ccc.dddi */
+              /* NOTE: sscanf (and gscanf) do not like whitespace
+                 between a sign and the rest of the number! */
+              gscanf(ptr2, "%lf", &d, string2);
+              gscanf(ptr2, "%lf", &d2, string2);
+              if (!gscanf(ptr2, "%*1[iI]", NULL, string2)) {
+                if (internalMode & 1)	/* /COUNTSPACES: the number is
+                                           absent so we substitute 0 */
+                  d = d2 = 0.0;
+                else
+                  return showerrors?
+                    luxerror("Unexpected input", 0): nout;
+              }
+              if (!(theFormat.flags & FMT_SUPPRESS)) {
+                if (type == LUX_CFLOAT) {
+                  trgt.cf->real = d;
+                  trgt.cf->imaginary = d2;
+                } else {
+                  trgt.cd->real = d;
+                  trgt.cd->imaginary = d2;
+                }
+              }
+              break;
+            default:		/* regular numbers */
+              if (!gscanf(ptr2, theFormat.current,
+                          (theFormat.flags & FMT_SUPPRESS)? NULL: trgt.b,
+                          string2))
+                return showerrors?
+                  luxerror("Expected a number at character index %d "
+                           "in %s", 0, (char *) *ptr2 - ptr0, ptr0):
+                  nout;
+              break;
+	    } /* end of switch (theFormat.type) */
+          }   // end if (type == LUX_TEMP_STRING) else
+          trgt.b += lux_type_size[type];
+        } // end if (!(theFormat.flags & FMT_SUPPRESS))
+      } // end while (theFormat.count--)
+    } // end if (theFormat.type != FMT_PLAIN)
+
     if (theFormat.type == FMT_PLAIN || theFormat.end > theFormat.plain) {
       c = *theFormat.end;
       *theFormat.end = '\0';	/* temporary end */

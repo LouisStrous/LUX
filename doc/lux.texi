@@ -13221,7 +13221,7 @@ elements=@var{elements}] [, /xyz, /equatorial, /ecliptical,
 
 Returns the positions of a set of heavenly bodies at a specific set of
 times.  Unless the user specifies otherwise, the times are taken to be
-in UT, light-time, nutation, and aberration effects are not included,
+in UTC, light-time, nutation, and aberration effects are not included,
 the observer is assumed to be at the center of the Earth, and
 ecliptical coordinates (longitude and latitude in degrees, distance in
 AU) for equinox J2000.0 are returned, referred to the VSOP dynamical
@@ -13233,7 +13233,9 @@ Algorithms}, Willmann-Bell Inc., 1991, ISBN 0-943396-35-2).
 
 @table @var
 @item jds
-Julian dates for which results are desired.  (@ref{calendar})
+Julian days (JD) for which results are desired.  Beware!  By default,
+@ref{calendar} returns Chronological Julian days (CJD), not Julian
+days (JD).  Use @code{calendar(..., /tojd)} to get JD.
 @item objects
 scalar or array of numbers of objects for which info is to be returned.
 Currently supported: 0 for the Sun, 1 for Mercury, 2 for Venus, 3 for
@@ -14384,23 +14386,27 @@ See also: @ref{Running}
 @findex calendar
 
 @code{calendar(@var{date} [, /fromcommon, /fromgregorian,
-/fromislamic, /fromjulian, /fromjd, /fromhebrew, /fromlongcount,
-/fromegyptian, /fromlunar] [, /tocommon, /togregorian, /toislamic,
-/tojulian, /tojd, /tohebrew, /tomayan, /tolongcount, /toegyptian,
-/tolunar, /tolatin] [, /totext, /toisotext] [, /fromutc, /fromtai,
-/fromtt] [, /toutc, /totai, /tott] [, /fromymd, /fromdmy] [, /toymd,
-/todmy])}
+/fromislamic, /fromjulian, /fromhebrew, /fromegyptian, /fromjd,
+/fromcjd, /fromlunar, /frommayan, /fromlongcount, /fromlatin] [,
+/tocommon, /togregorian, /toislamic, /tojulian, /tohebrew,
+/toegyptian, /tojd, /tocjd, /tolunar, /tomayan, /tolongcount,
+/tolatin] [, /tonumeric, /tolong, /todouble, /totext] [, /fromutc,
+/fromtai, /fromtt, /fromlt] [, /toutc, /totai, /tott, /tolt] [,
+/fromymd, /fromdmy] [, /toymd, /todmy])}
 
-Transforms date @code{@var{date}} from one calendar system into another.
-The @code{/from@dots{}} keywords specify the source calendar system, and
-the @code{/to@dots{}} keywords the target calendar system.  The input
-data may be numerical or in the form of text, and likewise for the
-output.
+Transforms date @code{@var{date}} from one calendar system into
+another.  The @code{/from@dots{}} keywords specify the source calendar
+system, and the @code{/to@dots{}} keywords the target calendar system.
+The input data may be numerical or in the form of text, and likewise
+for the output.
 
 Through keywords, one can specify calendars, time systems, date
 component orders, and the data output type.
 
 @table @code
+@item /...common
+equals @code{/...gregorian} from 15 October 1582 (Gregorian) on and
+@code{/...julian} before then.
 @item /...gregorian
 indicates the Gregorian (modern Western) calendar.  The first day of
 this calendar is 15 October 1582 (Gregorian), which followed directly
@@ -14410,76 +14416,87 @@ indicates the most widespread tabulated Islamic calendar.  The first day
 of this calendar corresponds to 16 July 622 in the Julian calendar.
 @item /...julian
 indicates the Julian (proleptic) calendar.
-@item /...jd
-indicates the Julian day number system.  Julian day number 0 corresponds
-to 1 January -4712 in the Julian calendar.
 @item /...hebrew
 indicates the Hebrew calendar.  The first day of this calendar
 corresponds to 6 October @minus{}3760 in the Julian calendar.
-@item /...common
-equals @code{/...gregorian} from 15 October 1582 (Gregorian) on and
-@code{/...julian} before then.
-@item /tomayan
-indicates the Mayan Tikal calendar round (according to "The Book of the
-Year" by Munro Edmonson).  @code{/frommayan} is not available.
-@code{/tomayan} implies @code{/totext}.
-@item /...longcount
-indicates the Olmec Long Count (according to Edmonson).  Long Count
-0.0.0.0.0 corresponds to 6 September -3113 in the Julian calendar.
-@code{/tolongcount} implies @code{/totext}.  @code{/fromlongcount}
-only works if the input is text.
 @item /...egyptian
 indicates the Egyptian calendar used in ancient astronomy (e.g., by
 Ptolemy in the Almagest), with strictly 365 days per year.  The year
 count is based on the era of Nabonassar (1 Thoth, year 1 = 26 February
 @minus{}746 in the Julian calendar).
+@item /...jd
+indicates the Julian Day number system (JD).  This system is much used
+in astronomy.  Julian Day number 0.0 (JD 0.0) corresponds to 12:00
+(noon) on 1 January @minus{}4712 in the Julian calendar, so in this
+system days begin at noon.
+@item /...cjd
+indicates the Chronological Julian Day (CJD) number system.  This is
+similar to the Julian Day number system except that the day begins at
+midnight (00:00).  Chronological Julian Day 0 (CJD 0) corresponds to 1
+January @minus{}4712 in the Julian calendar.  JD = CJD @minus{} 0.5.
 @item /...lunar
-indicates a (fractional) count of New Moons since the first New Moon
-after Julian Day number 0.  The count is based on the mean motion of the
-Moon, disregarding short-term perturbations.
-@item /tolatin
+indicates a (fractionalf) count of New Moons since thef first New Moon
+after Julian Day number 0.  The count is based on the mean motion of
+the Moon, disregarding short-term perturbations.
+@item /...mayan
+indicates the Mayan Tikal calendar round (according to "The Book of the
+Year" by Munro Edmonson).
+@item /...longcount
+indicates the Olmec Long Count (according to Edmonson).  Long Count
+0.0.0.0.0 corresponds to 6 September -3113 in the Julian calendar.
+@code{/tolongcount} implies @code{/totext}.  @code{/fromlongcount}
+only works if the input is text.
+@item /...latin
 indicates the Common calendar counted the Latin way.
+@item /tonumeric
+indicates that the result should be numeric, using the most
+appropriate type (@code{long} or @code{double}).
+@item /toint
+indicates that the result should be in the form of integer numbers, in
+fact @code{long} numbers.  This option isn't called @code{/tolong}
+because that gets interpreted as @code{/tolongcount}.
+@item /todouble
+indicates that the result should be in the form of @code{double}
+numbers.
 @item /totext
-indicates that the dates are returned in text form, as strings, with the
-(integer) day, month, and year separated by whitespace.  This keyword
-does not work with @code{/tojd}.
-@item /toisotext
-indicates that the dates are returned in text form, as strings, in
-standard iso format: yyyy-mm-ddThh:mm:ss.
-@item /...ymd
-indicates that the components of each date are in the order year, month,
-day.  This keyword does not work with @code{/...jd}. 
-@item /...dmy
-indicates that the components of each date are in the order day, month,
-year.  This keyword does not work with @code{/...jd}.
+indicates that the result should be text.
 @item /...utc
 indicates dates/times in Coordinated Universal Time (UTC).
 @item /...tai
 indicates dates/times in International Atomic Time (TAI).
 @item /...tt
 indicates dates/times in Terrestrial Time (TT).
+@item /...lt
+indicates dates/times in the local timezone of the current system.
+@item /...ymd
+indicates that the components of each date are in the order year, month,
+day.  This keyword does not work with @code{/...jd}.
+@item /...dmy
+indicates that the components of each date are in the order day, month,
+year.  This keyword does not work with @code{/...jd}.
 @end table
 
 The default source calendar is @code{/fromcommon} if @code{@var{date}}
 is numerical and has 3 elements in its first dimension, or if
 @code{@var{date}} contains text data.  Otherwise, the default source
-calendar is @code{/fromjd}.  The default target calendar is @code{/tojd}
-unless the source calendar was @code{/fromjd}, in which case the default
-target calendar is @code{/tocommon}.
+calendar is @code{/fromcjd}.  The default target calendar is
+@code{/tocjd} if @code{@var{date}} has 1 element in its first
+dimension, and otherwise is @code{/tocommon}.
 
-With numerical input, one number is expected per date for @code{/fromjd}
-and @code{/fromlunar}, and three numbers for all other calendars.
-Three-number input is interpreted by default in the order year, month,
-day.  For the Gregorian, Julian, Islamic, and Egyptian calendars (all of
-which always have 12 months per calendar year), month and day numbers
-outside of the usual ranges may be specified; month numbers are reduced
-to the range of 1 - 12, adjusting the year count accordingly, and day
-numbers are interpreted relative to the start of the indicated month
-just like day numbers within the expected ranges.  For example, the
-input [232,17,43] is adjusted internally to [233,5,43], which indicates
-a date 42 days after the one indicated by [233,5,1], and [232,-5,-3]
-indicates a date 4 days before [231,7,1].  For most calendars, negative
-and zero years may be specified.
+With numerical input, one number is expected per date for
+@code{/fromjd}, @code{/fromcjd}, and @code{/fromlunar}, and three
+numbers for all other calendars.  Three-number input is interpreted by
+default in the order year, month, day.  For the Gregorian, Julian,
+Islamic, and Egyptian calendars (all of which always have 12 months
+per calendar year), month and day numbers outside of the usual ranges
+may be specified; month numbers are reduced to the range of 1 - 12,
+adjusting the year count accordingly, and day numbers are interpreted
+relative to the start of the indicated month just like day numbers
+within the expected ranges.  For example, the input [232,17,43] is
+adjusted internally to [233,5,43], which indicates a date 42 days
+after the one indicated by [233,5,1], and [232,@minus{}5,@minus{}3]
+indicates a date 4 days before [231,7,1].  For most calendars,
+negative and zero years may be specified.
 
 If the input is in the form of text and @code{/fromlongcount} is not
 specified, then each string must contain a date with the day and year
@@ -14505,27 +14522,28 @@ of units of time at each level of the Long Count, from large to small.
 There may be any (non-zero) number of levels.  Each next higher level
 is assumed to represent a unit of time 20 times greater than the next
 lower level, except that the 3rd level is only 18 times greater than
-the 2nd one.  The lowest level represents days. 
+the 2nd one.  The lowest level represents days.
 
 The default time system is @code{/...utc}.  Transformation from UTC to
 TAI or TT is based on tables of leap seconds for dates between
 1961-01-01 and (predicted) 1999-07-01, and on estimates for UT since
--390 for dates before 1961-01-01.  (See "Explanatory Supplement to the
-Astronomical Almanac", P. K. Seidelmann (editor), University Science
-Books (1992), section 2.553).
+@minus{}390 for dates before 1961-01-01.  (See "Explanatory Supplement
+to the Astronomical Almanac", P. K. Seidelmann (editor), University
+Science Books (1992), section 2.553).
 
 Not all calendars have a new day start at the same time.  For example,
-in the Common calendar a new day starts at midnight, but in the Islamic
-and Hebrew calendars a new day starts at sunset.  Our calendar
-conversion algorithms must deal with this somehow.  For the traditional
-calendars (all except @code{/...jd} and @code{/...lunar}), the
-conversions are based on the integer parts of the dates only, and are
-referred to noontime.  The fractional part of the day is not modified.
-For example, day 1 Muharram 1 A.H. (@ref{Islamic Calendar}) ran from
-sunset on 15 July 622 C.E. (@ref{Common Calendar}) to sunset on 16 July,
-so 1 Muharram 1 A.H. coincided with parts of 15 and 16 July 622 C.E.,
-and 16 July 622 C.E. coincided with parts of 1 and 2 Muharram 1 A.H.
-The @code{calendar} function gives you the correspondence between these
+in the Common calendar a new day starts at midnight, but in the
+Islamic and Hebrew calendars a new day starts at sunset.  Our calendar
+conversion algorithms must deal with this somehow.  For the
+traditional calendars (all except @code{/...jd}, @code{/...cjd}, and
+@code{/...lunar}), the conversions are based on the integer parts of
+the dates only, and are referred to noontime.  The fractional part of
+the day is not modified.  For example, day 1 Muharram 1
+A.H. (@ref{Islamic Calendar}) ran from sunset on 15 July 622
+C.E. (@ref{Common Calendar}) to sunset on 16 July, so 1 Muharram 1
+A.H. coincided with parts of 15 and 16 July 622 C.E., and 16 July 622
+C.E. coincided with parts of 1 and 2 Muharram 1 A.H.  The
+@code{calendar} function gives you the correspondence between these
 calendars at noon.  It shows that noon of 1 Muharram 1 A.H. coincided
 with noon of 16 July 622 C.E.
 
@@ -19934,11 +19952,13 @@ from @code{@var{x}} and the y coordinates are taken from
 are specified, then all three must have the same dimensional structure
 and provide the x, y, and z coordinates of the points to plot.
 
-@code{@var{ltype}} is a positive integer that selects the line type.
-@code{@var{ptype}} is a positive integer that selects the point type.
-@code{@var{dtype}} is a positive integer that selects the dash type.
-Depending on which of these are specified, you get a graph showing
-lines, symbols, or both.
+@code{@var{linetype}} is a positive integer that selects the line type
+(with lines differing by color).  @code{@var{pointtype}} is a non-zero
+integer that selects the point type.  Negative integers produce
+circles that get smaller the more negative the number is.  Positive
+integers select different point symbols.  @code{@var{dashtype}} is a
+positive integer that selects the dash type.  Depending on which of
+these are specified, you get a graph showing lines, symbols, or both.
 
 @code{@var{color}} is text specifying which color to use.
 
@@ -20243,14 +20263,21 @@ See also: @ref{xplace}
 @subsection help
 @findex help
 
-@code{help [, @var{topic}]}
+@code{help [, @var{topic}] [, /manual]}
 
-Yields information on the specified @code{@var{topic}} (a string).  To
-start at the top of the help tree, try @code{help}.
-@code{@var{topic}} is case-insensitive.  The information is extracted
-from the LUX info files (for built-in routines and features of the LUX
-language) and @file{$LUX_path/*} (for user-defined subroutines and
-functions).
+Yields information on the specified @code{@var{topic}} (a string).  By
+default, first a user-defined subroutine or function with a name equal
+to the @code{@var{topic}} is sought.  If a file providing such a
+definition is found in @file{$LUX_PATH/*}, then its 2nd and further
+lines are displayed as long as they begin with a semicolon @code{;}
+indicating a LUX comment.
+
+If @code{/manual} is specified or if no user-defined subroutine or
+function is found, then the @code{@var{topic}} is sought as a node in
+the manual, via the GNU info program.
+
+To start at the top of the help tree, try @code{help}.
+@code{@var{topic}} is case-insensitive.
 
 @c ------------------------------------
 @node hex, hfk5z, help, Internal Routines

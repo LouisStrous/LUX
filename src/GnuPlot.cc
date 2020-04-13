@@ -258,6 +258,12 @@ GnuPlot::construct_splot_command() const
   return construct_plot_or_splot_command("splot");
 }
 
+bool
+GnuPlot::have_datablock_plot_elements() const
+{
+  return !m_datablock_plot_elements.empty();
+}
+
 uint32_t
 GnuPlot::current_datablock_index() const
 {

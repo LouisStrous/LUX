@@ -195,7 +195,7 @@ static void CJDto3SA(double const *CJD, char **date,
   CJDtoCal3A(CJD, datec);
   if (asprintf(date, "%g %s %d", datec[2], monthnames[(int32_t) datec[1] - 1],
                (int32_t) datec[0]) < 0)
-    *date = NULL;  
+    *date = NULL;
 }
 /*--------------------------------------------------------------------------*/
 /** Compares two strings disregarding case distinctions and
@@ -231,7 +231,7 @@ static int32_t stralnumtouppercmp(char const * const a, char const * const b)
 /*--------------------------------------------------------------------------*/
 /** Seeks a name in an array of unsorted names, disregarding case
    distinctions and disregarding non-alphanumerical characters.
-   
+
    \param[in] name the name to seek
    \param[in] num_names the number of names in the array
    \param[in] names the array of names to search through
@@ -259,13 +259,13 @@ static size_t find_name(char * const name, int32_t num_names,
     \param[in] Cal3toCJDN a pointer to a calendar-specific function
     that translates a numerical calendar date into a Chronological
     Julian Day Number.
-    
+
     \param[in] nmonthnames the number of month names in \p monthnames
 
     \param[in] monthnames an array of month names in increasing order
     of month number.  Element 0 corresponds to the first month.  There
     must be at least \p nmonthnames month names!
-    
+
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
@@ -297,13 +297,13 @@ static int32_t S3toCJDN(char const * date,
     \param[in] Cal3toCJDN a pointer to a calendar-specific function
     that translates a numerical calendar date into a Chronological
     Julian Day Number.
-    
+
     \param[in] nmonthnames the number of month names in \p monthnames
 
     \param[in] monthnames an array of month names in increasing order
     of month number.  Element 0 corresponds to the first month.  There
     must be at least \p nmonthnames month names!
-    
+
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
@@ -334,13 +334,13 @@ static void S3toCJDNA(char * const * date, int32_t *CJDN,
     \param[in] Cal3toCJD a pointer to a calendar-specific function
     that translates a numerical calendar date into a Chronological
     Julian Day.
-    
+
     \param[in] nmonthnames the number of month names in \p monthnames
 
     \param[in] monthnames an array of month names in increasing order
     of month number.  Element 0 corresponds to the first month.  There
     must be at least \p nmonthnames month names!
-    
+
     \return the corresponding Chronological Julian Day Number, or 0 if
     no legal date was recognized in the input.
  */
@@ -366,7 +366,7 @@ static double S3toCJD(char const * date,
 }
 /*--------------------------------------------------------------------------*/
 /** Translates a calendar date in text to a Chronological Julian Day.
-    
+
     \param[in] date a pointer to the date string to parse.  The
     pointer must not be NULL, and the date string itself must not be
     NULL!
@@ -374,17 +374,17 @@ static double S3toCJD(char const * date,
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!  If no legal date is recognized in
     the input, then Chronological Julian Day 0 is returned.
-    
+
     \param[in] Cal3AtoCJDN a pointer to a calendar-specific function
     that translates a numerical calendar date into a Chronological
     Julian Day Number.
-    
+
     \param[in] nmonthnames the number of month names in \p monthnames
 
     \param[in] monthnames an array of month names in increasing order
     of month number.  Element 0 corresponds to the first month.  There
     must be at least \p nmonthnames month names!
-    
+
  */
 static void S3toCJDA(char * const *date, double *CJD,
                      void (*Cal3AtoCJD) (double const *, double *),
@@ -1557,12 +1557,12 @@ static void MayanSto(char const *date, int32_t *CJDN, double *CJD)
     BUSY, OK, BAD
   } state = BUSY;
   int32_t CJDN_upper;
-  
+
   name = NULL;
   datepos = 0;
   n = sscanf(date, "%lg %as%n", &number, &name, &nc);
   if (n == 2) {
-    if ((i = find_venteina_name(name)) 
+    if ((i = find_venteina_name(name))
         < arraysize(Mayan_venteina_names)) { /* a venteina name */
       trecena = floor(number);
       venteina = i + 1;
@@ -1580,7 +1580,7 @@ static void MayanSto(char const *date, int32_t *CJDN, double *CJD)
     datepos += nc;
     n = sscanf(date + datepos, "%lg %as%n", &number, &name, &nc);
     if (n == 2) {
-      if ((i = find_venteina_name(name)) 
+      if ((i = find_venteina_name(name))
           < arraysize(Mayan_venteina_names)) { /* a venteina name */
         if (venteina >= 0) {      /* already have "day" tzolkin */
           trecena_year = floor(number);  /* must be "year" tzolkin */
@@ -1606,7 +1606,7 @@ static void MayanSto(char const *date, int32_t *CJDN, double *CJD)
     n = sscanf(date + datepos, "%d %as%n", &inumber, &name, &nc);
     if (n == 2) {
       if (venteina_year < 0     /* no "year" tzolkin found yet */
-          && (i = find_venteina_name(name)) 
+          && (i = find_venteina_name(name))
           < arraysize(Mayan_venteina_names)) { /* a venteina name */
         trecena_year = inumber;
         venteina_year = i + 1;
@@ -1685,7 +1685,7 @@ void MayantoCJDA(double const *date, double *CJD)
 double MayanStoCJD(char const *date)
 {
   double CJD;
-  
+
   MayanSto(date, NULL, &CJD);
   return CJD;
 }

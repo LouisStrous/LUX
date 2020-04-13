@@ -68,11 +68,10 @@ int32_t lux_gterm(int32_t narg, int32_t ps[])
 REGISTER(gterm, s, gterm, 1, 1, "");
 
 /// Plots or overplots data through gnuplot.  This function gets
-/// called for the LUX "gplot" and "goplot" subroutines.  See there
-/// for details of the LUX arguments.
+/// called for the LUX "gplot", "goplot", and "gaplot" subroutines.
+/// See there for details of the LUX arguments.
 ///
-/// \par clear says whether to start a new plot (if #clear is true) or
-/// to add to the previous plot (if #clear is false).
+/// \par status says what plotting mode is used.
 ///
 /// \par narg is the number of LUX arguments
 ///
@@ -109,6 +108,7 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
   // gplot and does not need to be remembered for the data block.
 
   int32_t datablock_index;
+  bool first_gaplot = false;
 
   switch (status) {
   case GplotStatus::gplot:
@@ -119,7 +119,8 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     datablock_index = gp.next_available_datablock_index();
     break;
   case GplotStatus::gaplot:
-    if (narg)
+    first_gaplot = !gp.have_datablock_plot_elements();
+    if (narg)                   // not emitting saved elements
       datablock_index = gp.next_available_datablock_index();
     break;
   }
@@ -131,7 +132,7 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
   if (enarg < 0)
     enarg = 0;
 
-  int linetype = -1;
+  int linetype = 0;
   if (enarg) {
     if (*eps) {               // linetype
       linetype = int_arg(*eps);
@@ -140,7 +141,7 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     ++eps;
   }
 
-  int pointtype = -1;
+  int pointtype = 0;
   if (enarg) {
     if (*eps) {               // pointtype
       pointtype = int_arg(*eps);
@@ -149,7 +150,7 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     ++eps;
   }
 
-  int dashtype = -1;
+  int dashtype = 0;
   if (enarg) {
     if (*eps) {               // dashtype
       dashtype = int_arg(*eps);
@@ -171,7 +172,7 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
   }
 
   bool done = false;
-  if (status == GplotStatus::gplot) { // for gplot
+  if (status == GplotStatus::gplot || first_gaplot) {
     if (enarg) {
       if (*eps) {               // xtitle
         if (symbolIsString(*eps)) {
@@ -264,15 +265,37 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
       gp.send("0, graph 0");
     gp.send("\n");
 
-    if (plims[0] != plims[1])
-      gp.sendf("set xrange [%f:%f]\n", plims[0], plims[1]);
-    else
-      gp.send("set xrange [*:*]\n");
+    {
+      std::ostringstream oss;
+      oss << "set xrange [";
+      if (plims[0])
+        oss << plims[0];
+      else
+        oss << "*";
+      oss << ":";
+      if (plims[1])
+        oss << plims[1];
+      else
+        oss << "*";
+      oss << "]\n";
+      gp.send(oss.str());
+    }
 
-    if (plims[2] != plims[3])
-      gp.sendf("set yrange [%f:%f]\n", plims[2], plims[3]);
-    else
-      gp.send("set yrange [*:*]\n");
+    {
+      std::ostringstream oss;
+      oss << "set yrange [";
+      if (plims[2])
+        oss << plims[2];
+      else
+        oss << "*";
+      oss << ":";
+      if (plims[3])
+        oss << plims[3];
+      else
+        oss << "*";
+      oss << "]\n";
+      gp.send(oss.str());
+    }
 
     if (internalMode & 2)         // logarithmic x axis
       gp.send("set logscale x\n");
@@ -360,6 +383,8 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
         with_text = "linespoints";
       else
         with_text = "points";
+    } else if (pointtype < 0) {
+      with_text = "points";
     } else {
       with_text = "lines";
     }
@@ -371,6 +396,8 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
         oss << " linetype " << linetype;
       if (pointtype > 0)
         oss << " pointtype " << pointtype;
+      else if (pointtype < 0)
+        oss << " pointtype 6 pointsize " << pow(10, pointtype*0.1) << " ";
       if (dashtype > 0)
         oss << " dashtype " << dashtype;
       type_text = oss.str();
@@ -734,9 +761,10 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
 
   switch (ndata) {
   case 1:
-    return lux_gnuplot_with_image(ndata, ps,
-                                  "splot '-' binary array=(%d,%d) format=\"%s\" "
-                                  "notitle with pm3d;");
+    return lux_gnuplot_with_image
+      (ndata, ps,
+       "splot '-' binary array=(%d,%d) format=\"%s\" "
+       "notitle with pm3d;");
   case 3:
     {
       StandardArguments standard_args;

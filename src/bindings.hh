@@ -20,6 +20,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_BINDINGS_H
 #define HAVE_BINDINGS_H
 
+#include <cstdint>              // for int32_t
+#include <cstdlib>              // for size_t
+
 /** \file
 
     A number of binding functions that bind a particular C function
@@ -115,21 +118,69 @@ void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t
                    int32_t max_arg, char const* spec);
 void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t min_arg,
                    int32_t max_arg, char const* spec);
-/*
-#define REGISTER(func, fs, name, minarg, maxarg, fsspec)        \
-void register_lux_ ## func ## _ ## fs (void) __attribute__((constructor)); \
-void register_lux_ ## func ## _ ## fs (void) { \
-  register_lux_ ## fs( lux_ ## func, #name, minarg, maxarg, fsspec );    \
-}
-
-#define BIND(func, type, fs, name, minarg, maxarg, fsspec)      \
-int32_t lux_ ## func ## _ ## fs(int32_t narg, int32_t ps[]) { \
- int32_t result = lux_ ## type ## _ ## fs ## _(narg, ps, func); \
- if (result < 0) luxerror("Error in " #name, 0); \
- return result; \
-} \
-REGISTER(func ## _ ## fs, fs, name, minarg, maxarg, fsspec)
-*/
 #define REGISTER(func, fs, name, minarg, maxarg, fsspec)
+
+/// A macro to bind a C++ function to a LUX function or subroutine via
+/// a binding function.
+///
+/// \param func is the unquoted name of the C++ function to bind.
+///
+/// \param type is the unquoted identification of the binding
+/// function.
+///
+/// \param fs is the unquoted indication of whether the LUX thing to
+/// bind to is a function (\c f) or a subroutine (\c s).
+///
+/// \param name is the unquoted name of the LUX function or
+/// subroutine.
+///
+/// \param minarg is the least acceptable number of arguments to the
+/// LUX function or subroutine.
+///
+/// \param maxarg is the greatest acceptable number of arguments to
+/// the LUX function or subroutine.
+///
+/// \param fsspec is the specification of the options and named
+/// parameters of the LUX function or subroutine, like the \a fmt
+/// parameter of standard_args().
+///
+/// The name of the binding function is schematically \c lux_type_fs_
+/// where \c type stands for the value of parameter \a type, and \c fs
+/// for the value of parameter \a fs.  This binding function must
+/// exist, most likely in file bindings.cc.
+// This macro expands to nothing.  Its presence is detected and acted
+// upon by an external script (bindings.pl).
 #define BIND(func, type, fs, name, minarg, maxarg, fsspec)
+
+/// A macro to bind a C function to a LUX function or subroutine via a
+/// binding function.
+///
+/// \param func is the unquoted name of the C function to bind.
+///
+/// \param type is the unquoted identification of the binding
+/// function.
+///
+/// \param fs is the unquoted indication of whether the LUX thing to
+/// bind to is a function (\c f) or a subroutine (\c s).
+///
+/// \param name is the unquoted name of the LUX function or
+/// subroutine.
+///
+/// \param minarg is the least acceptable number of arguments to the
+/// LUX function or subroutine.
+///
+/// \param maxarg is the greatest acceptable number of arguments to
+/// the LUX function or subroutine.
+///
+/// \param fsspec is the specification of the options and named
+/// parameters of the LUX function or subroutine, like the \a fmt
+/// parameter of standard_args().
+///
+/// The name of the binding function is schematically \c lux_type_fs_
+/// where \c type stands for the value of parameter \a type, and \c fs
+/// for the value of parameter \a fs.  This binding function must
+/// exist, most likely in file bindings.cc.
+// This macro expands to nothing.  Its presence is detected and acted
+// upon by an external script (bindings.pl).
+#define BINDC(func, type, fs, name, minarg, maxarg, fsspec)
 #endif

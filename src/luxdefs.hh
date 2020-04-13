@@ -318,11 +318,10 @@ enum binaryOp {
 /* PLOT_INFTY cannot be as large as FLT_MAX or internal errors in SYMPLOT */
 /* occur  - LS 21mar94 */
 
-#ifndef TWOPI
-#define TWOPI   (2*M_PI)
-#endif
-#define DEG     (M_PI/180)
-#define RAD     (180*M_1_PI)
+const double PI = 3.141592653589793238463;
+const double TWOPI = 2*PI;
+const double DEG = PI/180;
+const double RAD = 180/PI;
 
 /* coordinate systems */
 #define LUX_DEP 0               /* LUX_DVI or LUX_DEV, depending on */

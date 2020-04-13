@@ -222,7 +222,7 @@ int32_t fmt_entry(formatInfo *fmi)
     case 'T':
       type = FMT_TIME;
       break;
-    case 's': case 'S':
+    case 's': case 'S': case 'c':
       type = FMT_STRING;
       break;
     case 'z':

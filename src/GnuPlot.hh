@@ -139,6 +139,8 @@ public:
   /// \param text is the text to remember.
   void remember_for_current_datablock(const std::string& text);
 
+  bool have_datablock_plot_elements() const;
+
   /// Construct a gnuplot 'plot' command based on the remembered data
   /// blocks.
   std::string construct_plot_command() const;

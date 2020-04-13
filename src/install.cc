@@ -382,8 +382,7 @@ internalRoutine	subroutine_table[] = {
 #if HAVE_LIBX11
   { "hairs",	0, 0, lux_xplace, 0 }, /* xport.c */
 #endif
-  { "help",	0, 1, lux_help,	/* strous.c */
-    "|30|1exact:2routine:4tree:8subroutine:16function:32list::page" },
+  { "help",	0, 1, lux_help,	"1manual" }, /* strous.c */
   { "hex",	1, MAX_ARG, lux_hex, 0 }, /* files.c */
   { "idlrestore", 1, 1, lux_idlrestore, 0 }, /* idl.c */
   { "info",	0, 0, site, /* site.c */
@@ -880,7 +879,7 @@ internalRoutine function_table[] = {
   { "bytarr",	1, MAX_DIMS, bytarr, 0 }, /* symbols.c */
   { "byte",	1, 1, lux_byte, "*" }, /* symbols.c */
   { "bytfarr",	3, MAX_DIMS + 1, bytfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */
-  { "calendar",	1, 1, lux_calendar, /* astron.c */ "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew:6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan:11fromlongcount:12fromlatin:16tocommon:32togregorian:48toislamic:64tojulian:80tohebrew:96toegyptian:112tojd:128tocjd:144tolunar:160tomayan:176tolongcount:192tolatin:0tonumeric:256tolong:512todouble:768totext:0fromutc:1024fromtai:2048fromtt:3072fromlt:0toutc:4096totai:8192tott:12288tolt:0fromymd:16384fromdmy:0toymd:32768todmy" },
+  { "calendar",	1, 1, lux_calendar, /* astron.c */ "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew:6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan:11fromlongcount:12fromlatin:16tocommon:32togregorian:48toislamic:64tojulian:80tohebrew:96toegyptian:112tojd:128tocjd:144tolunar:160tomayan:176tolongcount:192tolatin:0tonumeric:256toint:512todouble:768totext:0fromutc:1024fromtai:2048fromtt:3072fromlt:0toutc:4096totai:8192tott:12288tolt:0fromymd:16384fromdmy:0toymd:32768todmy" },
   { "cbrt",	1, 1, lux_cbrt, "*" }, /* fun1.c */
   { "cdblarr",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
   { "cdblfarr", 3, MAX_DIMS + 1, cdblfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */

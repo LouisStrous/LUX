@@ -296,7 +296,7 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
   } else {
     if (narg < 1)
       return luxerror("Need 1 argument", 0);
-    if ((iq = standard_args(narg, ps, "i>L3*;rD-3*", &ptrs, &infos)) < 0)
+    if ((iq = standard_args(narg, ps, "i>L3*;rD-3", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     switch (infos[0].type) {
     case LUX_INT32:

@@ -385,7 +385,7 @@ int32_t DatetoCJDN(int32_t year, int32_t month, int32_t day, int32_t calendar)
   if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
       || !f[calendar])
     return 0;
-  
+
   return f[calendar](year, month, day);
 }
 /*--------------------------------------------------------------------------*/
@@ -405,7 +405,7 @@ double DatetoCJD(int32_t year, int32_t month, double day, int32_t calendar)
   if (calendar < 0 || calendar >= sizeof(f)/sizeof(*f)
       || !f[calendar])
     return 0.0;
-  
+
   return f[calendar](year, month, day);
 }
 /*--------------------------------------------------------------------------*/
@@ -729,7 +729,7 @@ int32_t construct_output_dims(int32_t *input_dims, int32_t num_input_dims,
   if (input_dims[0] % inputs_per_entry != 0)
     /* first input dimension doesn't fit a whole number of entries */
     return -2;
-  
+
   if (outputs_per_entry > 1) {
     /* put the output values for each entry into the first dimension */
     *output_dims++ = outputs_per_entry;
@@ -826,19 +826,46 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
   tocalendar = (Calendar) extractbits(internalMode,
                                       CAL_CALENDAR_BASE + CAL_CALENDAR_BITS,
                                       CAL_CALENDAR_BITS);
+  // fromcalendar, tocalendar:
+  //  0 : based on input
+  //  1 : common
+  //  2 : gregorian
+  //  3 : islamic
+  //  4 : julian
+  //  5 : hebrew
+  //  6 : egyptian
+  //  7 : jd
+  //  8 : cjd
+  //  9 : lunar
+  // 10 : mayan
+  // 11 : longcount
+  // 12 : latin
+
   outputkind = (Calendar_outputtype) extractbits(internalMode,
                                                  CAL_OUTPUT_BASE,
-                                                 CAL_OUTPUT_BITS); /* /NUMERIC, /TEXT, /ISOTEXT */
+                                                 CAL_OUTPUT_BITS);
+  // outputkind:
+  //  0 : numeric
+  //  1 : integer
+  //  2 : double
+  //  3 : text
+
   /*
   fromorder = extractbits(internalMode, CAL_ORDER_BASE, CAL_ORDER_BITS); / /FROMYMD, /FROMDMY /
   toorder = extractbits(internalMode, CAL_ORDER_BASE + CAL_ORDER_BITS,
 			CAL_ORDER_BITS); / /TOYMD, /TODMY /
   */
+
   fromtime = (Calendar_timescale) extractbits(internalMode, CAL_TIME_BASE,
                                               CAL_TIME_BITS);
   totime = (Calendar_timescale) extractbits(internalMode,
                                             CAL_TIME_BASE + CAL_TIME_BITS,
                                             CAL_TIME_BITS);
+  // fromtime, totime:
+  // 0 : UTC
+  // 1 : TAI
+  // 2 : TT
+  // 3 : LT
 
   numerical_or_string(ps[0], &dims, &ndim, NULL, NULL);
 
@@ -890,7 +917,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     return luxerror("Incompatible first dimension: expected a multiple "
                     "of %d but found %d", ps[0], input_elem_per_date,
                     dims[0]);
-  
+
   /* If no specific "to" calendar is specified, then assume the Common
      calendar if the (effective) "from" calendar is a
      one-element-per-date calendar, and otherwise CJD */
@@ -913,7 +940,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     = cal_data[tocalendar].CJDNtoCalS;
   void (*CJDtoCalS)(double const *CJD, char **date)
     = cal_data[tocalendar].CJDtoCalS;
-  
+
   assert(CaltoCJDN || CaltoCJD);
   assert(CJDNtoCal || CJDtoCal);
 
@@ -942,7 +969,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
      If CaltoCJD is NULL and the number of input elements per date
      is not equal to 1, then work with a LONG ("floor") copy of the
      input symbol. */
-  
+
   else if (inputtype == LUX_DOUBLE) {
     if (CaltoCJD || fromtime != totime)
       internaltype = LUX_DOUBLE;
@@ -965,7 +992,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
       internaltype = LUX_INT32;
     input_elem_per_date = 1; /* all input elements in a single text value */
   }
-  
+
   /* for numeric output, the output type is DOUBLE if CJDNtoCal is
      NULL (i.e., a conversion routine to LONG is not available), or
      LONG if CJDtoCal is NULL (i.e., a conversion routine to DOUBLE is
@@ -998,7 +1025,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
         less[0] = input_elem_per_date; /* reduce 1st dimension */
       }
     }
-    
+
     if (standardLoopX(iq, LUX_ZERO,
                       SL_AXISCOORD
                       | SL_EACHROW,
@@ -1032,7 +1059,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     setupDimensionLoop(&srcinfo, srcinfo.ndim, dims, srcinfo.type,
                        srcinfo.naxes, srcinfo.axes, srcinfo.data,
                        srcinfo.mode);
-  }    
+  }
 
   /* complain if the desired type of translation is not available.  We
      don't need to check for numerical types, because we demand that
@@ -1181,7 +1208,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     default:
       break;
     }
-  } while (advanceLoop(&tgtinfo, &tgt), 
+  } while (advanceLoop(&tgtinfo, &tgt),
 	   advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   if (!loopIsAtStart(&tgtinfo))
     return luxerror("Source loop is finished but target loop is not!", ps[0]);
@@ -1297,7 +1324,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
 
   outtype = type;               /* default */
   if (fromcalendar == CAL_LUNAR || tocalendar == CAL_LUNAR
-      || fromcalendar == CAL_JD || tocalendar == CAL_JD 
+      || fromcalendar == CAL_JD || tocalendar == CAL_JD
       || type == LUX_STRING_ARRAY)
     outtype = LUX_DOUBLE;
 
@@ -1337,7 +1364,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
 	int32_t level = 0;
 	long stride = 1;
 	long d = 0, this_value = 0;
-	
+
 	p = data.sp[i];
 	q = strchr(p,'\0');	/* end of string */
 	while (q > p) {
@@ -1351,7 +1378,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
 	    stride *= (level == 1? 18: 20);
 	    level++;
 	  }
-	}	  
+	}
 	JD.d[i] = 584282.5 + d;
       }
       break;
@@ -1530,7 +1557,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       break;
     }
   }
-  
+
   /* n = number of input values per input calendar date */
 
   /* now from JD or CJDN to the required target calendar */
@@ -2098,7 +2125,7 @@ void TAI_to_UTC(double *CJD)
           UTC ∆T(UTC)      TAI
      23:59:42      17 23:59:59
      23:59:43      17 00:00:00
-     23:59:59      17 00:00:16 
+     23:59:59      17 00:00:16
      23:59:60      17 00:00:17
      00:00:00      18 00:00:18
 
@@ -2110,7 +2137,7 @@ void TAI_to_UTC(double *CJD)
      00:00:16      18 23:59:58         17 23:59:59
      00:00:17      18 23:59:59         17 00:00:00
      00:00:18      18 00:00:00         18 00:00:00
-     
+
      TAI - ∆T(UTC_est) = UTC except for the leap second, as long as ∆T >= 0.
   */
 
@@ -2200,7 +2227,7 @@ void eclipticPrecession(double *pos, double JDE, double equinox)
 {
   static double	oldJDE = DBL_MAX, oldEquinox = DBL_MAX;
   double	a, b, c, cb, sb, s;
-  
+
   if (JDE != oldJDE || equinox != oldEquinox) {
     initEclipticPrecession(JDE, equinox);
     oldJDE = JDE;
@@ -2284,7 +2311,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
     zap(result);
     return luxerror("Need at least 2 elements in the first dimension", ps[0]);
   }
-  
+
   switch (symbol_type(ps[0])) {
   case LUX_INT8:
     do {
@@ -2562,7 +2589,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
   return result;
 }
 /*--------------------------------------------------------------------------*/
-int32_t lux_constellationname(int32_t narg, int32_t ps[]) 
+int32_t lux_constellationname(int32_t narg, int32_t ps[])
 /* CONSTELLATIONNAME(<index>) returns the official abbreviation of the
    name of the constellation with the given <index> (may be an array),
    as returned by function CONSTELLATION.  LS 2004may03
@@ -2822,10 +2849,10 @@ double siderealTime(double JD, double *dPsi, double ceps)
     c += *dPsi*ceps;
   c -= floor(c);
   c *= TWOPI;
-  return c;  
+  return c;
 }
 /*--------------------------------------------------------------------------*/
-int32_t lux_siderealtime(int32_t narg, int32_t ps[]) 
+int32_t lux_siderealtime(int32_t narg, int32_t ps[])
 /* SIDEREALTIME(<jd>) returns the mean sidereal time at the indicated */
 /* julian dates, in hours */
 /* LS 31mar2002 */
@@ -2888,7 +2915,7 @@ void VSOPtoFK5(double T, double *pos)
    relative to the VSOP dynamical ecliptic and equinox of date */
 {
   double	ll, cll, sll;
-  
+
   ll = pos[0] - 0.024382*T*(1 + 0.000222*T);
   cll = cos(ll);
   sll = sin(ll);
@@ -2970,7 +2997,7 @@ int32_t readExtra(char const* file, char mode)
   for (pp = orbitLine; isspace((uint8_t) *pp); pp++);
   if (*pp && mode & 1)
     printf(pp);
-  
+
   if (extraOrbits && mode == 2) { /* replace */
     free(extraOrbits);
     free(extraIDs);
@@ -2991,7 +3018,7 @@ int32_t readExtra(char const* file, char mode)
 				   nExtraObj*sizeof(struct extraInfo));
     extraIDs = (int32_t *) realloc(extraIDs, nExtraObj*sizeof(int32_t));
   }
-    
+
   if (!extraOrbits || !extraIDs)
     return cerror(ALLOC_ERR, 0);
 
@@ -3003,7 +3030,7 @@ int32_t readExtra(char const* file, char mode)
 	printf(orbitLine);
     }
     ungetc(c, fp);
-      
+
     fscanf(fp, "%d %d %lf", &id, &nterm, &mag);
     while (nmore && extraIDs[indx] < id) {
       nmore--;
@@ -3022,14 +3049,14 @@ int32_t readExtra(char const* file, char mode)
       memmove(extraOrbits + indx + 1, extraOrbits + indx,
 	      nmore*sizeof(struct extraInfo));
     }
-    
+
     extraIDs[indx] = id;
     extraOrbits[indx].nterms = nterm;
     extraOrbits[indx].absmag = mag;
 
 				/* seek equinox specification */
     format = 0;
-    do 
+    do
       c = getc(fp);
     while (c != EOF && c != '\n' && isspace(c));
     switch (c) {
@@ -3442,10 +3469,10 @@ int32_t extraHeliocentric(double JDE, int32_t object, double *equinox,
   double	m, e, k, d1, d2, q;
   struct extraInfo	*pp;
   struct orbitParams	*qq;
-  
+
   if (!nExtraObj && readExtra(NULL, 0) == LUX_ERROR)
     return luxerror("Error reading orbital data.", 0);
-  
+
   /* first see if the object number is known */
   i = findint(object, extraIDs, nExtraObj);
   if (i < 0)
@@ -3507,7 +3534,7 @@ int32_t extraHeliocentric(double JDE, int32_t object, double *equinox,
   return 1;
 }
 /*--------------------------------------------------------------------------*/
-void extraElementsHeliocentric(double JDE, double *equinox, double *f, 
+void extraElementsHeliocentric(double JDE, double *equinox, double *f,
                                double *r)
 {
   static double	xfac, yfac, zfac, xangle, yangle, zangle, epoch, m0, n,
@@ -3548,7 +3575,7 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
 	}
 	a = fabs(extraElements[2]);
 	q = fabs(a*(1 - e));
-	n = a? 0.01720209895/(a*sqrt(a)): 0.0; /* n rad/d */      
+	n = a? 0.01720209895/(a*sqrt(a)): 0.0; /* n rad/d */
 	/* if (e > 1) n = -n; */
 	m0 = extraElements[7]*DEG;
 	break;
@@ -3578,8 +3605,9 @@ void extraElementsHeliocentric(double JDE, double *equinox, double *f,
   f[2] = *r*zfac*sin(zangle + m);
 }
 /*--------------------------------------------------------------------------*/
-void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
-		      double *r, double tolerance, int32_t vocal, int32_t source)
+void heliocentricXYZr(double JDE, int32_t object, double equinox,
+		      double *pos, double *r, double tolerance,
+		      int32_t vocal, int32_t source)
 // returns in <f> the cartesian heliocentric ecliptic coordinates of
 // object <object> for the desired <equinox> at <JDE>, and in <r> the
 // heliocentric distance
@@ -3662,7 +3690,7 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
     }
     *r = hypota(3, pos);        /* heliocentric distance */
     if (vocal) {
-      printf("ASTRON: (%s) geometric heliocentric ecliptic coordinates for equinox JD %2$.14g = %2$-#24.6J:\n", 
+      printf("ASTRON: (%s) geometric heliocentric ecliptic coordinates for equinox JD %2$.14g = %2$-#24.6J:\n",
              objectName(object), equinox);
       printXYZtoLBR(pos);
     }
@@ -3677,15 +3705,20 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
 
       Tc = T*10; /* convert from julian millennia to */
       /* julian centuries */
-      lmoon = mpol4(218.3164591,481267.88134236,-0.0013268,1.0/538841,-1.0/65194000,Tc,360);
+      lmoon = mpol4(218.3164591, 481267.88134236, -0.0013268, 1.0/538841,
+                    -1.0/65194000, Tc, 360);
       lmoon *= DEG;
-      elon = mpol4(297.8502042,445267.1115168,-0.0016300,1.0/545868,-1.0/113065000,Tc,360);
+      elon = mpol4(297.8502042, 445267.1115168, -0.0016300, 1.0/545868,
+                   -1.0/113065000, Tc, 360);
       elon *= DEG;
-      msun = mpol3(357.5291092,35999.0502909,-0.0001536,1.0/24490000,Tc,360);
+      msun = mpol3(357.5291092, 35999.0502909, -0.0001536, 1.0/24490000,
+                   Tc, 360);
       msun *= DEG;
-      mmoon = mpol4(134.9634114,477198.8676313,0.0089970,1.0/69699,-1.0/14712000,Tc,360);
+      mmoon = mpol4(134.9634114, 477198.8676313, 0.0089970, 1.0/69699,
+                    -1.0/14712000, Tc, 360);
       mmoon *= DEG;
-      nodedist = mpol4(93.2720993,483202.0175273,-0.0034029,-1.0/3526000,1.0/863310000,Tc,360);
+      nodedist = mpol4(93.2720993, 483202.0175273, -0.0034029,
+                       -1.0/3526000, 1.0/863310000, Tc, 360);
       nodedist *= DEG;
       a1 = famod(119.75 + 131.849*Tc,360);
       a1 *= DEG;
@@ -3702,7 +3735,8 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox, double *pos,
       for (i = 0; i < sizeof(moonlr)/sizeof(struct moonlrTerm); i++) {
 	double arg, fac;
 	fac = E[mlrt->m + 2];
-	arg = mlrt->d*elon + mlrt->m*msun + mlrt->mm*mmoon + mlrt->f*nodedist;
+	arg = mlrt->d*elon + mlrt->m*msun + mlrt->mm*mmoon
+          + mlrt->f*nodedist;
 	suml += mlrt->l*sin(arg)*fac;
 	sumr += mlrt->r*cos(arg)*fac;
 	mlrt++;
@@ -3882,7 +3916,7 @@ void XYZtoLBR(double *pos, double *pos2)
 /*--------------------------------------------------------------------------*/
 void ectoeq(double *pos, double ceps, double seps, char forward)
 /* transforms from ecliptical to equatorial coordinates or vice versa */
-{ 
+{
   double	alpha, delta, sl, cl, sb, cb;
 
   sl = sin(pos[0]);
@@ -4168,7 +4202,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
      /*			    /HORIZONTAL, /DATE, /ERROR, /ABERRATION, */
      /*                     /GEOMETRICAL, /TDT, /QELEMENTS, /FK5, /NUTATION,
                             /LIGHTTIME]) */
-     /* JDs = Julian dates for which elements are desired, in UT */
+     /* JDs = Julian dates for which elements are desired, in UTC */
      /* OBJECTS = scalar or array of object numbers. */
      /* OBJECT2 = number of the object relative to which the other */
      /*		  coordinates are requested */
@@ -4710,7 +4744,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
  dx_l] = cov[x_k,x_l], and
    cov[y_j,y_m] = E[dy_j dy_m] = E[Sum_k Sum_l (dy_j/dx_k)(dy_m/dx_l)
      dx_k dx_l] = Sum_k Sum_l (dy_j/dx_k)(dy_m/dx_l) cov[x_k,x_l].
- 
+
  The VSOP theory yields heliocentric ecliptical longitude and
  latitude, referred to the mean dynamical ecliptic and equinox of the
  date, and the heliocentric distance of the planets and also estimates
@@ -4743,7 +4777,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
    z = Z - Z0
  The covariances of the differences are equal to the sums of the
  covariances of the terms:
-   cov[x_k,x_l] = cov[X_k,X_l] + cov[X0_k,X0_l]. 
+   cov[x_k,x_l] = cov[X_k,X_l] + cov[X0_k,X0_l].
 
  The fifth transformation is the correction for nutation, and this I
  assume does not change the covariances.
@@ -4794,7 +4828,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
  where H is the hour angle, rcp = rho' cos(phi') and rsp = rho'
  sin(phi') are the geocentric coordinates of the observer, and s is
  a constant, all of which I assume do not contribute to the
- covariances.  The partial derivatives are 
+ covariances.  The partial derivatives are
           H:
   H': cos(d) (r cos(d) - cos(H) rcp s)/(r U^2)
   d': -A C rcp s/(U r q^2)
@@ -4819,4 +4853,3 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
   h: (-cos(H) cos(phi) sin(d) + cos(d) sin(phi))/cos(h).
 
 */
-

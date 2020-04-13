@@ -3475,11 +3475,12 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
       while (isdigit((int32_t) p[-1]));
     }
     kind = toupper(p[-1]);
-    thetype = LUX_FLOAT;	/* default */
+    thetype = LUX_DOUBLE;	/* default */
     if (kind == 'D' || kind == 'E') {
       if (kind == 'D') {
         p[-1] = 'E';		/* so atof can read it */
-        thetype = LUX_DOUBLE;
+      } else {
+        thetype = LUX_FLOAT;
       }
       ch = nextchar(fp);
       if (ch == '+' || ch == '-') /* a signed exponent */

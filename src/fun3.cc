@@ -625,8 +625,8 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
     if (!result) {
       temp2 = temp;
       for (i = 0; i < tcount; i++) {
-	*tdata2 = *temp2++;
-	tdata2 += tstride;
+        *tdata2 = *temp2++;
+        tdata2 += tstride;
       }
     }
     free(temp);
@@ -638,9 +638,10 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;
-  int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
+  int32_t iq;
+  StandardArguments_RAII sa;
+  if ((iq = sa.set(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double factor = *ptrs[1].d;
   if (factor <= 0)
@@ -660,14 +661,12 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
 
   do {
     gsl_fft_expand(ptrs[0].d, infos[0].dims[0], 1,
-		   ptrs[2].d, infos[2].dims[0], 1);
+                   ptrs[2].d, infos[2].dims[0], 1);
     ptrs[0].d += infos[0].singlestep[1];
     ptrs[2].d += infos[2].singlestep[2];
   } while (advanceLoop(&infos[0], &ptrs[0]),
-	   advanceLoop(&infos[2], &ptrs[2]) < infos[2].ndim);
-  free(ptrs);
-  free(infos);
-  return iq;
+           advanceLoop(&infos[2], &ptrs[2]) < infos[2].ndim);
+  return sa.result();
 }
 REGISTER(fft_expand, f, fftexpand, 2, 2, NULL);
 /*------------------------------------------------------------------------- */

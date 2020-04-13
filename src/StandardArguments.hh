@@ -30,6 +30,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t standard_args(int32_t, int32_t [], char const *, Pointer **,
                       LoopInfo **, size_t* = 0);
 
+/// A class to facilitate applying functions to a collection of LUX
+/// symbols.
 class StandardArguments {
 public:
   StandardArguments(int32_t narg, int32_t ps[], const std::string& fmt);
@@ -59,20 +61,20 @@ private:
 /// work, so an interim solution is to use the current class.  Replace
 /// every call
 ///
-///    {
-///      iq = standard_args(narg, ps, fmt, ptrs, infos);
-///      ...
-///      free(ptrs);
-///      free(infos);
-///    }
+///     {
+///       iq = standard_args(narg, ps, fmt, ptrs, infos);
+///       ...
+///       free(ptrs);
+///       free(infos);
+///     }
 ///
 /// with
 ///
-///    {
-///      StandardArguments_RAII sa(narg, ps, fmt, ptrs, infos);
-///      iq = sa.result();
-///      ...
-///    }
+///     {
+///       StandardArguments_RAII sa(narg, ps, fmt, ptrs, infos);
+///       iq = sa.result();
+///       ...
+///     }
 ///
 /// The problem with the old code is that the free() calls are often
 /// forgotten.  With the new code, when the StandardArguments_RAII
@@ -80,13 +82,22 @@ private:
 /// associated with `ptrs` and `infos` is released automatically.
 class StandardArguments_RAII {
 public:
+  StandardArguments_RAII();
   StandardArguments_RAII(int32_t narg, int32_t ps[], const std::string& fmt,
                          Pointer** ptrs, LoopInfo** infos);
   ~StandardArguments_RAII();
+  int32_t set(int32_t narg, int32_t ps[], const std::string& fmt,
+              Pointer** ptrs, LoopInfo** infos);
   int32_t result() const;
 private:
+  /// Points at a sequence of instances of Pointer, one for each argument.
   Pointer* m_pointers;
+
+  /// Points at a sequence of instances of LoopInfo, one for each
+  /// argument.
   LoopInfo* m_loopInfos;
+
+  /// The LUX symbol to return.
   int32_t m_result_symbol;
 };
 

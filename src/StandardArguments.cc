@@ -84,10 +84,22 @@ StandardArguments::advanceLoop(size_t index)
 }
 
 /// Creates an object to which the instances of Pointer and LoopInfo
-/// created by the standard_args() function are tied.  When this
+/// created by a standard_args() function call can be tied.  When this
 /// object goes out of scope, then those instances of Pointer and
 /// LoopInfo are properly cleaned up.  Otherwise the user has to
 /// remember to call free() on the memory storing the arrays of
+/// instances of Pointer and LoopInfo.  Call set() to make the tie.
+StandardArguments_RAII::StandardArguments_RAII()
+  : m_pointers(), m_loopInfos(), m_result_symbol()
+{ }
+
+/// Creates an object to which the instances of Pointer and LoopInfo
+/// created by a standard_args() function call are tied.  The
+/// constructor does the standard_args() call.
+///
+/// When this object goes out of scope, then those instances of
+/// Pointer and LoopInfo are properly cleaned up.  Otherwise the user
+/// has to remember to call free() on the memory storing the arrays of
 /// instances of Pointer and LoopInfo.
 ///
 /// The parameters are the same as those of standard_args().
@@ -96,12 +108,32 @@ StandardArguments_RAII::StandardArguments_RAII(int32_t narg, int32_t ps[],
                                                Pointer** ptrs,
                                                LoopInfo** infos)
 {
+  set(narg, ps, fmt, ptrs, infos);
+}
+
+/// Calls standard_args() with the given arguments and ties the
+/// resulting instances of Pointer and LoopInfo to the current
+/// instance.  free() is called on the memory storing the previous
+/// instances of Pointer and LoopInfo, if any.
+int32_t
+StandardArguments_RAII::set(int32_t narg, int32_t ps[], const std::string& fmt,
+                            Pointer** ptrs, LoopInfo** infos)
+{
+  if (m_pointers) {
+    free(m_pointers);
+    m_pointers = NULL;
+  }
+  if (m_loopInfos) {
+    free(m_loopInfos);
+    m_loopInfos = NULL;
+  }
   m_result_symbol = standard_args(narg, ps, fmt.c_str(), &m_pointers,
                                   &m_loopInfos);
   if (ptrs)
     *ptrs = m_pointers;
   if (infos)
     *infos = m_loopInfos;
+  return m_result_symbol;
 }
 
 /// Destructor.  Releases the dynamic memory associated with the

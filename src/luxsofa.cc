@@ -199,9 +199,9 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
   double djm0, djm;
   Pointer *ptrs;
   LoopInfo *infos;
-  int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos)) < 0)
+  StandardArguments_RAII sa(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos);
+  if (sa.result() < 0)
     return LUX_ERROR;
 
   /* iauCal2jd(int32_t iy, int32_t im, int32_t id, double *djm0, double *djm) */
@@ -230,7 +230,8 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
     while (infos[1].nelem--) {
       int32_t day = floor(ptrs[0].f[2]);
       double daypart = ptrs[0].f[2] - day;
-      if (iauCal2jd((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], day, &djm0, &djm))
+      if (iauCal2jd((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], day,
+                    &djm0, &djm))
         *ptrs[1].f = 0;
       else
         *ptrs[1].f = djm0 + djm + daypart;
@@ -242,7 +243,8 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
     while (infos[1].nelem--) {
       int32_t day = floor(ptrs[0].d[2]);
       double daypart = ptrs[0].d[2] - day;
-      if (iauCal2jd((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], day, &djm0, &djm))
+      if (iauCal2jd((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], day,
+                    &djm0, &djm))
         *ptrs[1].d = 0;
       else
         *ptrs[1].d = 2400000.5 + djm + daypart;
@@ -253,9 +255,7 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
   default:
     return cerror(ILL_TYPE, ps[0]);
   }
-  free(ptrs);
-  free(infos);
-  return iq;
+  return sa.result();
 }
 REGISTER(iauCal2jd, f, cal2jd, 1, 1, 0);
 /*-----------------------------------------------------------------------*/
@@ -296,7 +296,8 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
   } else {
     if (narg < 1)
       return luxerror("Need 1 argument", 0);
-    if ((iq = standard_args(narg, ps, "i>L3*;rD-3", &ptrs, &infos)) < 0)
+    StandardArguments_RAII sa;
+    if ((iq = sa.set(narg, ps, "i>L3*;rD-3", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     switch (infos[0].type) {
     case LUX_INT32:
@@ -315,7 +316,8 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
       while (infos[1].nelem--) {
         int32_t d = (int32_t) floor(ptrs[0].f[2]);
         double f = ptrs[0].f[2] - d;
-        iauDat((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], d, f, ptrs[1].d++);
+        iauDat((int32_t) ptrs[0].f[0], (int32_t) ptrs[0].f[1], d, f,
+               ptrs[1].d++);
         ptrs[0].f += 3;
       }
       break;
@@ -323,15 +325,14 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
       while (infos[1].nelem--) {
         int32_t d = (int32_t) floor(ptrs[0].d[2]);
         double f = ptrs[0].d[2] - d;
-        iauDat((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], d, f, ptrs[1].d++);
+        iauDat((int32_t) ptrs[0].d[0], (int32_t) ptrs[0].d[1], d, f,
+               ptrs[1].d++);
         ptrs[0].d += 3;
       }
       break;
     default:
       break;
     }
-    free(ptrs);
-    free(infos);
   }
   return iq;
 }
@@ -415,9 +416,9 @@ int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;
-  int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;rD&", &ptrs, &infos)) < 0)
+  StandardArguments_RAII sa(narg, ps, "i>D*;rD&", &ptrs, &infos);
+  if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     double djm0, djm;
@@ -425,9 +426,7 @@ int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
     iauEpb2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
   }
-  free(ptrs);
-  free(infos);
-  return iq;
+  return sa.result();
 }
 REGISTER(iauEpb2jd, f, epb2jd, 1, 1, 0);
 /*-----------------------------------------------------------------------*/
@@ -444,9 +443,9 @@ int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;
-  int32_t iq;
 
-  if ((iq = standard_args(narg, ps, "i>D*;rD*", &ptrs, &infos)) < 0)
+  StandardArguments_RAII sa(narg, ps, "i>D*;rD*", &ptrs, &infos);
+  if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
     double djm0, djm;
@@ -454,9 +453,7 @@ int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
     iauEpj2jd(*ptrs[0].d++, &djm0, &djm);
     *ptrs[1].d++ = djm0 + djm;
   }
-  free(ptrs);
-  free(infos);
-  return iq;
+  return sa.result();
 }
 REGISTER(iauEpj2jd, f, epj2jd, 1, 1, 0);
 /*-----------------------------------------------------------------------*/

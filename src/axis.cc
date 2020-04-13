@@ -1820,7 +1820,7 @@ void free_param_spec_list(struct param_spec_list *psl)
   if (psl) {
     size_t i;
     for (i = 0; i < psl->num_param_specs; i++) {
-      struct param_spec *p = &psl->param_specs[i];
+      Param_spec *p = &psl->param_specs[i];
       free(p->dims_spec);
     }
     free(psl->param_specs);
@@ -1838,7 +1838,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 {
   struct obstack ops, ods;
   struct param_spec_list *psl = NULL;
-  struct param_spec *ps = NULL;
+  Param_spec *ps = NULL;
   struct dims_spec *ds = NULL;
   size_t i, prev_ods_num_elem;
   int32_t return_param_index = -1;
@@ -1854,7 +1854,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   prev_ods_num_elem = 0;
   int bad = 0;
   while (*fmt) {
-    struct param_spec p_spec;
+    Param_spec p_spec;
     memset(&p_spec, '\0', sizeof(p_spec));
 
     while (*fmt && *fmt != ';') { /* every parameter specification */
@@ -2133,7 +2133,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       size_t n = obstack_object_size(&ods)/sizeof(struct dims_spec) - prev_ods_num_elem;
       p_spec.num_dims_spec = n;
       p_spec.dims_spec = NULL;                     /* will be filled in later */
-      obstack_grow(&ops, &p_spec, sizeof(p_spec)); /* the param_spec */
+      obstack_grow(&ops, &p_spec, sizeof(p_spec)); /* the Param_spec */
       prev_ods_num_elem += n;
     } /* end of while (*fmt && *fmt != ';') */
     if (bad)
@@ -2159,7 +2159,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     }
   }
   if (!bad) {
-    psl->param_specs = (param_spec*) calloc(param_index, sizeof(struct param_spec));
+    psl->param_specs = (Param_spec*) calloc(param_index, sizeof(Param_spec));
     if (!psl->param_specs) {        /* malloc sets errno */
       cerror(ALLOC_ERR, 0);
       bad = 1;
@@ -2169,10 +2169,10 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     /* the return parameter, if any, gets moved to the end */
     psl->num_param_specs = param_index;
     psl->return_param_index = -1; /* default, may be updated later */
-    ps = (param_spec*) obstack_finish(&ops);
+    ps = (Param_spec*) obstack_finish(&ops);
     ds = (dims_spec*) obstack_finish(&ods);
 
-    struct param_spec *pstgt;
+    Param_spec *pstgt;
     size_t ds_ix, j;
 
     pstgt = psl->param_specs;
@@ -2183,7 +2183,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         j0 = j;
         j = psl->return_param_index = psl->num_param_specs - 1;
       }
-      memcpy(pstgt + j, ps + i, sizeof(struct param_spec));
+      memcpy(pstgt + j, ps + i, sizeof(Param_spec));
       if (pstgt[j].num_dims_spec) {
         size_t size = pstgt[j].num_dims_spec*sizeof(struct dims_spec);
         pstgt[j].dims_spec = (dims_spec*) malloc(size);
@@ -2226,7 +2226,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
 
 /** Determines the common symbol type for standard arguments.
 
-    \param[in] num_param_specs is the count of param_spec in \p
+    \param[in] num_param_specs is the count of Param_spec in \p
     param_specs.
 
     \param[in] param_specs points at the parameter specifications to
@@ -2241,14 +2241,14 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     aren't any.
  */
 Symboltype standard_args_common_symboltype(int32_t num_param_specs,
-                                           param_spec* param_specs,
+                                           Param_spec* param_specs,
                                            int32_t narg,
                                            int32_t* ps)
 {
   Symboltype common_type = LUX_NO_SYMBOLTYPE;
 
   for (int param_ix = 0; param_ix < num_param_specs; ++param_ix) {
-    param_spec* pspec = &param_specs[param_ix];
+    Param_spec* pspec = &param_specs[param_ix];
     if (pspec->common_type) {
       int32_t iq = ps[param_ix];
       Symboltype type;
@@ -2773,7 +2773,6 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
                       Pointer **ptrs, loopInfo **infos)
 {
   int32_t returnSym, prev_ref_param, *final;
-  struct param_spec *pspec;
   struct param_spec_list *psl;
   struct dims_spec *dims_spec;
   struct obstack o;
@@ -2832,7 +2831,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
 
     NumericDataDescriptor srcDescr;
 
-    pspec = &psl->param_specs[param_ix];
+    Param_spec* pspec = &psl->param_specs[param_ix];
     dims_spec = pspec->dims_spec;
     if (param_ix == num_in_out_params || param_ix >= narg || !ps[param_ix]
         || !srcDescr.set_from(ps[param_ix])) {

@@ -127,7 +127,7 @@ enum remaining_dims_type {
 
 /// Represents the specification of a single parameter in a
 /// standard_args() format specification.
-struct param_spec {
+struct Param_spec {
   /// The parameter type.
   enum param_spec_type logical_type;
 
@@ -173,7 +173,7 @@ struct param_spec_list {
 
   /// A pointer to the beginning of the list of parameter
   /// specifications.
-  struct param_spec *param_specs;
+  Param_spec *param_specs;
 
   /// The index of the return parameter in the list of parameter
   /// specifications.

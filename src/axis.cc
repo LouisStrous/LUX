@@ -1839,7 +1839,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
   struct obstack ops, ods;
   struct param_spec_list *psl = NULL;
   Param_spec *ps = NULL;
-  struct dims_spec *ds = NULL;
+  Dims_spec *ds = NULL;
   size_t i, prev_ods_num_elem;
   int32_t return_param_index = -1;
   int32_t param_index;
@@ -1940,7 +1940,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       }
 
       /* optional dims-specs */
-      struct dims_spec d_spec;
+      Dims_spec d_spec;
       if (*fmt == '[') {       /* reference parameter specification */
         fmt++;
         if (*fmt == '-') {
@@ -2130,7 +2130,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
         break;
       /* determine the number of dims_specs added to the list for this
          parameter */
-      size_t n = obstack_object_size(&ods)/sizeof(struct dims_spec) - prev_ods_num_elem;
+      size_t n = obstack_object_size(&ods)/sizeof(Dims_spec) - prev_ods_num_elem;
       p_spec.num_dims_spec = n;
       p_spec.dims_spec = NULL;                     /* will be filled in later */
       obstack_grow(&ops, &p_spec, sizeof(p_spec)); /* the Param_spec */
@@ -2170,7 +2170,7 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
     psl->num_param_specs = param_index;
     psl->return_param_index = -1; /* default, may be updated later */
     ps = (Param_spec*) obstack_finish(&ops);
-    ds = (dims_spec*) obstack_finish(&ods);
+    ds = (Dims_spec*) obstack_finish(&ods);
 
     Param_spec *pstgt;
     size_t ds_ix, j;
@@ -2185,8 +2185,8 @@ struct param_spec_list *parse_standard_arg_fmt(char const *fmt)
       }
       memcpy(pstgt + j, ps + i, sizeof(Param_spec));
       if (pstgt[j].num_dims_spec) {
-        size_t size = pstgt[j].num_dims_spec*sizeof(struct dims_spec);
-        pstgt[j].dims_spec = (dims_spec*) malloc(size);
+        size_t size = pstgt[j].num_dims_spec*sizeof(Dims_spec);
+        pstgt[j].dims_spec = (Dims_spec*) malloc(size);
         if (!pstgt[j].dims_spec) {
           cerror(ALLOC_ERR, 0);
           bad = 1;
@@ -2774,7 +2774,6 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
 {
   int32_t returnSym, prev_ref_param, *final;
   struct param_spec_list *psl;
-  struct dims_spec *dims_spec;
   struct obstack o;
   int32_t param_ix;
   loopInfo li;
@@ -2832,7 +2831,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
     NumericDataDescriptor srcDescr;
 
     Param_spec* pspec = &psl->param_specs[param_ix];
-    dims_spec = pspec->dims_spec;
+    Dims_spec* dspec = pspec->dims_spec;
     if (param_ix == num_in_out_params || param_ix >= narg || !ps[param_ix]
         || !srcDescr.set_from(ps[param_ix])) {
       srcDescr.reset();
@@ -2888,30 +2887,30 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
       for (pspec_dims_ix = 0, src_dims_ix = 0, ref_dims_ix = 0;
            pspec_dims_ix < pspec->num_dims_spec; pspec_dims_ix++) {
         int src_dim_size = srcDescr.dimension(src_dims_ix);
-        switch (dims_spec[pspec_dims_ix].type) {
+        switch (dspec[pspec_dims_ix].type) {
         case DS_EXACT: /* an input parameter must have the exact
                           specified dimension */
         case DS_ATLEAST: // or at least the specified size
           if (pspec->logical_type == PS_INPUT) {
-            if (dims_spec[pspec_dims_ix].type == DS_EXACT
-                && src_dim_size != dims_spec[pspec_dims_ix].size_add) {
+            if (dspec[pspec_dims_ix].type == DS_EXACT
+                && src_dim_size != dspec[pspec_dims_ix].size_add) {
               returnSym = luxerror("Expected size %d for dimension %d "
                                    "but found %d", ps[param_ix],
-                                   dims_spec[pspec_dims_ix].size_add,
+                                   dspec[pspec_dims_ix].size_add,
                                    src_dims_ix, src_dim_size);
               goto error;
             }
-            else if (dims_spec[pspec_dims_ix].type == DS_ATLEAST
-                && src_dim_size < dims_spec[pspec_dims_ix].size_add) {
+            else if (dspec[pspec_dims_ix].type == DS_ATLEAST
+                     && src_dim_size < dspec[pspec_dims_ix].size_add) {
               returnSym = luxerror("Expected at least size %d for dimension %d "
                                    "but found %d", ps[param_ix],
-                                   dims_spec[pspec_dims_ix].size_add,
+                                   dspec[pspec_dims_ix].size_add,
                                    src_dims_ix, src_dim_size);
               goto error;
-            } // end if (dims_spec[pspec_dims_ix].type == DS_EXACT ...) else if
+            } // end if (dspec[pspec_dims_ix].type == DS_EXACT ...) else if
           } // end if (pspec->logical_type == PS_INPUT)
           /* the target gets the exact specified dimension */
-          tgt_dims.push_back(dims_spec[pspec_dims_ix].size_add);
+          tgt_dims.push_back(dspec[pspec_dims_ix].size_add);
           ++src_dims_ix;
           ++ref_dims_ix;
           break;
@@ -2927,7 +2926,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
           ++src_dims_ix;
           break;
         case DS_ADD:
-          d = dims_spec[pspec_dims_ix].size_add;
+          d = dspec[pspec_dims_ix].size_add;
           switch (pspec->logical_type) {
           case PS_INPUT:
             if (src_dim_size != d) {
@@ -2948,7 +2947,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
           switch (pspec->logical_type) {
           case PS_INPUT:
             {
-              int32_t d = dims_spec[pspec_dims_ix].size_remove;
+              int32_t d = dspec[pspec_dims_ix].size_remove;
               if (d && refDescr.dimension(ref_dims_ix) != d) {
                 returnSym = luxerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
@@ -2960,7 +2959,7 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
             break;
           case PS_OUTPUT: case PS_RETURN:
             {
-              int32_t d = dims_spec[pspec_dims_ix].size_remove;
+              int32_t d = dspec[pspec_dims_ix].size_remove;
               if (d && refDescr.dimension(ref_dims_ix) != d) {
                 returnSym = luxerror("Expected size %d for dimension %d "
                                      "but found %d", ps[param_ix],
@@ -2969,8 +2968,8 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
                 goto error;
               } // end if (d && ref_dims[ref_dims_ix] != d)
             }
-            if (dims_spec[pspec_dims_ix].type == DS_ADD_REMOVE)
-              tgt_dims.push_back(dims_spec[pspec_dims_ix].size_add);
+            if (dspec[pspec_dims_ix].type == DS_ADD_REMOVE)
+              tgt_dims.push_back(dspec[pspec_dims_ix].size_add);
             break;
           } // end switch (pspec->logical_type)
           ref_dims_ix++;
@@ -2988,10 +2987,10 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
         default:
           returnSym = luxerror("Dimension specification type %d "
                                "not implemented yet", ps[param_ix],
-                               dims_spec[pspec_dims_ix].type);
+                               dspec[pspec_dims_ix].type);
           goto error;
           break;
-        } // end switch (dims_spec[pspec_dims_ix].type)
+        } // end switch (dspec[pspec_dims_ix].type)
       } // end for (pspec_dims_ix = 0, tgt_dims_ix = 0, src_dims_ix = 0,...)
 
       switch (pspec->logical_type) {

@@ -63,7 +63,7 @@ enum dim_spec_type {
 
 /// Represents a single dimension specification from a standard_args()
 /// format specification.
-struct dims_spec {
+struct Dims_spec {
   /// How to handle the dimension.
   enum dim_spec_type type;
 
@@ -140,17 +140,17 @@ struct Param_spec {
   /// The data type.
   Symboltype data_type;
 
-  /// The count of dimension specifications in \p dims_spec.
+  /// The count of dimension specifications in \p Dims_spec.
   size_t num_dims_spec;
 
   /// A pointer to the beginning of the array of dimension
   /// specifications.
-  struct dims_spec *dims_spec;
+  Dims_spec *dims_spec;
 
-  /// The reference parameter index in \p dims_spec.
+  /// The reference parameter index in \p Dims_spec.
   int32_t ref_par;
 
-  /// The axis parameter index in \p dims_spec.
+  /// The axis parameter index in \p Dims_spec.
   int32_t axis_par;
 
   /// How to handle dimensions that aren't explicitly specified.

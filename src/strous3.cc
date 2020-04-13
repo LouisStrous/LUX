@@ -60,7 +60,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
   Pointer	src, trgt, level, ptr, rightedge, left, width, x;
   csplineInfo	cspl;
-  loopInfo	srcinfo;
+  LoopInfo	srcinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -447,7 +447,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   int32_t	result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   Pointer	src, level;
   csplineInfo	cspl;
-  loopInfo	srcinfo;
+  LoopInfo	srcinfo;
   Bytestack b;
   struct c { double v; int32_t l; int32_t c; } *c;
   int32_t csize;
@@ -654,7 +654,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
-  loopInfo* infos;
+  LoopInfo* infos;
   int32_t iq = standard_args(narg, ps, "i>D*;i>D&;i>D*;rD[2]&",
                              &ptrs, &infos);
   if (iq < 0)
@@ -1057,7 +1057,7 @@ LS 9nov98 */
   float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
   Pointer	src, trgt, src0;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */
@@ -1376,7 +1376,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
   float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
   Pointer	src, trgt, src0;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */
@@ -2604,7 +2604,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
     return cerror(NEED_INT_ARG, ps[1]);
 
   Pointer* ptrs;
-  loopInfo* infos;
+  LoopInfo* infos;
   int32_t iq;
   if (symbolIsInteger(ps[0])) {
     if ((iq = standard_args(narg, ps, "iL*;iL*?;rD+3&", &ptrs, &infos)) < 0)
@@ -2689,7 +2689,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
     return cerror(NEED_INT_ARG, ps[1]);
 
   Pointer* ptrs;
-  loopInfo* infos;
+  LoopInfo* infos;
   int32_t iq;
   int32_t level;
   if (narg > 1) {
@@ -2735,3 +2735,62 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
   return iq;
 }
 REGISTER(polar_to_ssfc, f, polartossfc, 1, 2, 0);
+
+/// maxspan(<condition>[, <axis>][, /cycle])
+///
+/// Returns the maximum length of a consecutive span of elements of
+/// <condition> for which the value is non-zero.  If <axis> is
+/// specified, then searches along the indicated axis and returns a
+/// value for each combination of indexes of the other dimensions.
+/// Otherwise treats <condition> as a one-dimensional array.  If
+/// /cycle is specified, then the data is assumed to repeat itself,
+/// and a span may consist of some elements at the end of the data
+/// plus some elements at the beginning of the data.  If all elements
+/// meet the condition, then the number of elements is returned.
+///
+/// LS 2020-04-12
+int32_t lux_maxspan(int32_t narg, int32_t ps[]) {
+  if (!symbolIsNumerical(ps[0]))
+    return luxerror("Need a numerical argument", ps[0]);
+  if (narg > 1 && !symbolIsInteger(ps[1]))
+    return cerror(NEED_INT_ARG, ps[1]);
+
+  StandardArguments sa(narg, ps, "iL*;iL?;rL{1}");
+  if (sa.result() < 0)
+    return LUX_ERROR;
+
+  if (sa.datainfo(1).nelem > 0) {
+    // have an axis parameter
+    sa.datainfo(0).setAxes(sa.datainfo(1).ndim, sa.datainfo(1).dims,
+                           SL_AXESBLOCK);
+  } else {
+    sa.datainfo(0).setOneDimensional();
+  }
+
+  int n;
+  do {
+    int maxspan = 0;            // maximum span so far
+    int thisspan;               // current span
+    bool inspan = false;        // are we inside a span?
+    do {
+      if (sa.datapointer(0).l) {         // condition is met
+        if (!inspan) {
+          inspan = true;
+          thisspan = 1;
+        } else
+          ++thisspan;
+      } else                    // condition not met
+        if (inspan) {
+          if (thisspan > maxspan)
+            maxspan = thisspan;
+          inspan = false;       // not in a span
+        }
+    } while ((n = sa.advanceLoop(0)) < 1);
+    if (inspan && thisspan > maxspan)
+      maxspan = thisspan;
+    *sa.datapointer(2).l = maxspan;
+  } while (sa.advanceLoop(2), n < sa.datainfo(0).rndim);
+
+  return sa.result();
+}
+REGISTER(maxspan, f, maxspan, 1, 2, "1cycle");

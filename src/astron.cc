@@ -782,7 +782,7 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
 {
   int32_t result, input_elem_per_date, output_elem_per_date, iq;
   int32_t *dims = NULL, ndim = 0;
-  loopInfo tgtinfo, srcinfo;
+  LoopInfo tgtinfo, srcinfo;
   Pointer src, tgt;
   /* enum Calendar_order fromorder, toorder; */
   enum Calendar fromcalendar, tocalendar;
@@ -2284,7 +2284,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
 {
   double JDfrom, JDto, alpha, delta;
   Pointer src, tgt;
-  loopInfo srcinfo, tgtinfo;
+  LoopInfo srcinfo, tgtinfo;
   int32_t n, result, done;
   Symboltype outtype;
 
@@ -2442,7 +2442,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
 {
   int32_t n, result, done;
   double equinox, alpha, delta;
-  loopInfo srcinfo, tgtinfo;
+  LoopInfo srcinfo, tgtinfo;
   Pointer src, tgt;
   int32_t vocal;
 
@@ -3977,7 +3977,7 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
    By default, /FROMEQUATORIAL, /TOECLIPTICAL is assumed.
    LS 2004may30
 */
-  loopInfo srcinfo, tgtinfo;
+  LoopInfo srcinfo, tgtinfo;
   Pointer src, tgt;
   int32_t result, from, to;
   double pos[2], ceps, seps, epsilon, equinox;

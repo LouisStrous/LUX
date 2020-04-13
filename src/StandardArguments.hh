@@ -24,20 +24,70 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef STANDARDARGUMENTS_HH_
 #define STANDARDARGUMENTS_HH_
 
+#include <string>
+#include <vector>
+
+int32_t standard_args(int32_t, int32_t [], char const *, Pointer **,
+                      LoopInfo **, size_t* = 0);
+
 class StandardArguments {
 public:
-  StandardArguments();
-  ~StandardArguments();
-  int32_t set(int32_t narg, int32_t ps[], char const* fmt, Pointer** ptrs,
-              loopInfo** infos);
-  Pointer* pointer();
-  loopInfo* loop_info();
+  StandardArguments(int32_t narg, int32_t ps[], const std::string& fmt);
+  Pointer& datapointer(size_t index);
+  LoopInfo& datainfo(size_t index);
+  int32_t result() const;
+  int32_t advanceLoop(size_t index);
 private:
-  /// Points to the beginning of a list of Pointer for all arguments.
-  Pointer* m_pointer;
+  /// A collection with a Pointer for each argument.
+  std::vector<Pointer> m_pointers;
 
-  /// Points to the beginning of a list of loopInfo for all arguments.
-  loopInfo* m_loop_info;
+  /// A collection with a LoopInfo for each argument.
+  std::vector<LoopInfo> m_loop_infos;
+
+  /// The return symbol -- the symbol representing the result of the
+  /// call of the LUX subroutine or function.
+  int32_t m_return_symbol;
+};
+
+/// A class to prepare for looping through input and output variables
+/// based on a standard arguments specification.  Does the same as
+/// standard_args() but frees dynamically allocated memory
+/// automatically when the object goes out of scope.
+///
+/// The intention is to replace all standard_args() calls by
+/// corresponding uses of class StandardArguments.  That requires more
+/// work, so an interim solution is to use the current class.  Replace
+/// every call
+///
+///    {
+///      iq = standard_args(narg, ps, fmt, ptrs, infos);
+///      ...
+///      free(ptrs);
+///      free(infos);
+///    }
+///
+/// with
+///
+///    {
+///      StandardArguments_RAII sa(narg, ps, fmt, ptrs, infos);
+///      iq = sa.result();
+///      ...
+///    }
+///
+/// The problem with the old code is that the free() calls are often
+/// forgotten.  With the new code, when the StandardArguments_RAII
+/// object goes out of scope, then the dynamically allocated memory
+/// associated with `ptrs` and `infos` is released automatically.
+class StandardArguments_RAII {
+public:
+  StandardArguments_RAII(int32_t narg, int32_t ps[], const std::string& fmt,
+                         Pointer** ptrs, LoopInfo** infos);
+  ~StandardArguments_RAII();
+  int32_t result() const;
+private:
+  Pointer* m_pointers;
+  LoopInfo* m_loopInfos;
+  int32_t m_result_symbol;
 };
 
 #endif

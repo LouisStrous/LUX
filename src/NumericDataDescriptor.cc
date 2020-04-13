@@ -48,6 +48,12 @@ NumericDataDescriptor::dimension(int index) const
   }
 }
 
+std::vector<DimensionSize_tp>
+NumericDataDescriptor::dimensions() const
+{
+  return m_dimensions;
+}
+
 Pointer
 NumericDataDescriptor::data() const
 {

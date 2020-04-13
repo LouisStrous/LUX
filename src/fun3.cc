@@ -637,7 +637,7 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
 int32_t lux_fft_expand(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
@@ -905,7 +905,7 @@ int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
   int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
     rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
     rffti(int32_t *, float *), rfftid(int32_t *, double *), lux_indgen(int32_t, int32_t *);
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   iq = ps[0];			/* <data> */
   if (!symbolIsArray(iq))
@@ -1118,7 +1118,7 @@ int32_t lux_power(int32_t narg, int32_t ps[])
   int32_t	rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
     rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
     rffti(int32_t *, float *), rfftid(int32_t *, double *);
-  loopInfo	srcinfo;
+  LoopInfo	srcinfo;
 
   iq = ps[0];
   if (!symbolIsArray(iq))
@@ -2441,7 +2441,7 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
    3 -> min location */
 {
   int32_t	mode, minloc, maxloc, n, result, n1;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   Pointer	src, trgt;
   Scalar	min, max;
   double	value;
@@ -4220,7 +4220,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
 {
   int32_t	iq, dims[MAX_DIMS], ndim, step, pos, i, mode;
   double	thisextpos, thisext, x1, x2;
-  loopInfo	yinfo;
+  LoopInfo	yinfo;
   Pointer	y, x, minpos, min, maxpos, max, rightedge, ptr, q;
   csplineInfo	cspl = { NULL, NULL, NULL, NULL };
 

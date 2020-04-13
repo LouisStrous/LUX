@@ -165,7 +165,7 @@ int32_t lux_lic(int32_t narg, int32_t ps[])
   float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws;
   Pointer	src, trgt, src0;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   iq0 = ps[0];			/* data */
   if (symbol_class(iq0) != LUX_ARRAY /* not an array */

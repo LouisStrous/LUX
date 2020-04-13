@@ -91,31 +91,30 @@ int32_t approximately_equal_z(doubleComplex, doubleComplex, double),
   essentially_equal_z(doubleComplex, doubleComplex, double),
   essentially_equal_z_f(floatComplex, floatComplex, float);
 
-int32_t	standardLoop(int32_t, int32_t, int32_t, Symboltype, loopInfo *,
-                     Pointer *, int32_t *, loopInfo *, Pointer *),
-  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, Pointer *, int32_t,
+int32_t	standardLoop(int32_t, int32_t, int32_t, Symboltype, LoopInfo *,
+                     Pointer *, int32_t *, LoopInfo *, Pointer *),
+  standardLoopX(int32_t, int32_t, int32_t, LoopInfo *, Pointer *, int32_t,
                 int32_t const*, int32_t, int32_t const*, Symboltype, int32_t,
-                int32_t*, loopInfo*, Pointer*),
+                int32_t*, LoopInfo*, Pointer*),
   standardLoop0(int32_t, int32_t, int32_t *, int32_t, Symboltype,
-                loopInfo *, Pointer *, int32_t *, loopInfo *, Pointer *),
-  advanceLoop(loopInfo *, Pointer *),
-  nextLoop(loopInfo *),
-  nextLoops(loopInfo *, loopInfo *),
-  prepareDiagonals(int32_t, loopInfo *, int32_t, int32_t **, int32_t **, int32_t **, int32_t **),
-  moveLoop(loopInfo *, int32_t, int32_t),
-  standardLoopX(int32_t, int32_t, int32_t, loopInfo *, Pointer *, int32_t, int32_t const *,
-                int32_t, int32_t const *, Symboltype, int32_t, int32_t *, loopInfo *,
+                LoopInfo *, Pointer *, int32_t *, LoopInfo *, Pointer *),
+  advanceLoop(LoopInfo *, Pointer *),
+  nextLoop(LoopInfo *),
+  nextLoops(LoopInfo *, LoopInfo *),
+  prepareDiagonals(int32_t, LoopInfo *, int32_t, int32_t **, int32_t **, int32_t **, int32_t **),
+  moveLoop(LoopInfo *, int32_t, int32_t),
+  standardLoopX(int32_t, int32_t, int32_t, LoopInfo *, Pointer *, int32_t, int32_t const *,
+                int32_t, int32_t const *, Symboltype, int32_t, int32_t *, LoopInfo *,
                 Pointer *),
-  loopIsAtStart(loopInfo const *), setAxes(loopInfo *, int32_t, int32_t *, int32_t),
-  standard_args(int32_t, int32_t [], char const *, Pointer **, loopInfo **);
+  loopIsAtStart(LoopInfo const *), setAxes(LoopInfo *, int32_t, int32_t *, int32_t);
 
-void	subdataLoop(int32_t *, loopInfo *), addVerify(char *, char),
+void	subdataLoop(int32_t *, LoopInfo *), addVerify(char *, char),
   *seekFacts(int32_t symbol, int32_t type, int32_t flag),
   *setFacts(int32_t symbol, int32_t type, int32_t flag),
-  deleteFacts(int32_t symbol, int32_t type), returnLoop(loopInfo *, Pointer *, int32_t),
-  setAxisMode(loopInfo *, int32_t mode),
+  deleteFacts(int32_t symbol, int32_t type), returnLoop(LoopInfo *, Pointer *, int32_t),
+  setAxisMode(LoopInfo *, int32_t mode),
   standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t,
-                       int32_t *, int32_t, Pointer *, loopInfo *);
+                       int32_t *, int32_t, Pointer *, LoopInfo *);
 void convertWidePointer(wideScalar *, int32_t, int32_t);
 
 void	newStack(int32_t), push(int32_t), deleteStack(void);
@@ -141,13 +140,13 @@ void	clearToPopTempVariable(int32_t), pushTempVariable(int32_t), printw(char con
 
 const csplineInfo empty_cubic_spline(void);
 
-int setupDimensionLoop(loopInfo *info, int32_t ndim, int32_t const *dims,
+int setupDimensionLoop(LoopInfo *info, int32_t ndim, int32_t const *dims,
                         Symboltype type, int32_t naxes, int32_t const *axes,
                        Pointer *data, int32_t mode);
 
 void endian(void *, int32_t, int32_t),
-  rearrangeDimensionLoop(loopInfo*),
-  rearrangeEdgeLoop(loopInfo *, loopInfo *, int32_t);
+  rearrangeDimensionLoop(LoopInfo*),
+  rearrangeEdgeLoop(LoopInfo *, LoopInfo *, int32_t);
 
 float	float_arg(int32_t);
 double	double_arg(int32_t), cspline_value(double, csplineInfo *),

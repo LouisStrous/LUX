@@ -58,6 +58,9 @@ public:
   /// Returns the number of dimensions.
   size_t dimensions_count() const;
 
+  /// Returns the collection of dimensions.
+  std::vector<DimensionSize_tp> dimensions() const;
+
   /// Returns the number of elements, obtained by multiplying all of
   /// the dimensions together, or 0 if the instance wasn't
   /// successfully set based on a symbol yet.

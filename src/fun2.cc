@@ -984,7 +984,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
   int32_t	result, n, i, done, n2, save[MAX_DIMS], haveWeights;
   Pointer	xsrc, ysrc, trgt, xsrc0, ysrc0, weight, weight0;
   double	xmean, ymean, xtemp, ytemp, cov, nn;
-  loopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
+  LoopInfo	xsrcinfo, ysrcinfo, trgtinfo, winfo;
   Symboltype outtype;
   extern Scalar	lastmean;
   extern int32_t	lastsdev_sym, lastmean_sym;
@@ -1706,7 +1706,7 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
   Pointer	src, trgt, src0, trgt0, weight, weight0;
   double	mean, sdev, temp, nn;
   doubleComplex	cmean;
-  loopInfo	srcinfo, trgtinfo, winfo;
+  LoopInfo	srcinfo, trgtinfo, winfo;
   Symboltype outtype;
   extern Scalar	lastsdev, lastmean;
   extern int32_t	lastsdev_sym, lastmean_sym;
@@ -2797,7 +2797,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
   float	width, gsum;
   char	haveKernel = 0;
   int32_t	stride, result, loop, mode = 0;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   iq = 0;
   if (narg >= 3 && ps[2])	/* have <axes> */
@@ -4598,7 +4598,7 @@ int32_t lux_strtok(int32_t narg, int32_t ps[])
   return iq;
 }
 /*------------------------------------------------------------------------- */
-void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkernel)
+void ksmooth(LoopInfo *srcinfo, LoopInfo *trgtinfo, float *kernel, int32_t nkernel)
 {
   int32_t	nx, n2, dataindex, kernelindex, di, ki, npoints, ncalc, np, i, stride;
   float	sum, norm;
@@ -5257,7 +5257,7 @@ void ksmooth(loopInfo *srcinfo, loopInfo *trgtinfo, float *kernel, int32_t nkern
 int32_t lux_ksmooth(int32_t narg, int32_t ps[])
 /* y = KSMOOTH(x, kernel [, axis] [, /BALANCED]) */
 {
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   Pointer	src, trgt;
   int32_t	result, iq, nkernel;
   float	*kernel;
@@ -5301,7 +5301,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
   double	meanx, meany, kx, ky, pxy, tempx, tempy;
   doubleComplex	cmeanx, cmeany, cpxy, ctempx, ctempy;
   Pointer	src1, src2, src1save, src2save, trgt;
-  loopInfo	srcinfo1, srcinfo2, trgtinfo;
+  LoopInfo	srcinfo1, srcinfo2, trgtinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);

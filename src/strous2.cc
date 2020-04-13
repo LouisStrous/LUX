@@ -550,7 +550,7 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   int32_t	output, width, w, med, nelem, range[2*MAX_DIMS], *index,
     *offset, i, j;
   float	order;
-  loopInfo	srcinfo, trgtinfo, tmpinfo, tmpinfo2;
+  LoopInfo	srcinfo, trgtinfo, tmpinfo, tmpinfo2;
   /* we use a global pointer src */
   Pointer	trgt, tmpsrc, tmptrgt;
 
@@ -688,7 +688,7 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
 {
   int32_t	output, t, nelem, i;
   double	order, f;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   /* we use a global pointer src */
   Pointer	trgt, tmp, tmp0;
 
@@ -815,7 +815,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
     nWidth;
   Pointer	src, trgt, width;
   Scalar	value;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
 		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_INT8,
@@ -1102,7 +1102,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
     iq, three=3, nWidth;
   Pointer	src, trgt, width;
   Scalar	value;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
 		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_INT8,
@@ -1389,7 +1389,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   float	*center, temp, temptot, zerocenter[MAX_DIMS], *stretch,
 	onestretch[MAX_DIMS];
   Pointer	trgt;
-  loopInfo	trgtinfo;
+  LoopInfo	trgtinfo;
 
   iq = lux_long(1, &ps[0]);	/* DIMS */
   switch (symbol_class(iq))
@@ -1695,7 +1695,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
   int32_t	axesSym, offset, i, step, j, distSym, iq, *ptr;
   Pointer	src, trgt, shift, src0, trgt0, blank;
   char	*tmp, *tmp0 = NULL;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   int32_t	lux_indgen(int32_t, int32_t []);
   double	zero = 0.0;
 
@@ -1998,7 +1998,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	*diagonal, nDiagonal, nDoDim, index, subgrid, ready, done;
   Pointer	src, trgt, trgt0, srcl, srcr, trgt00;
   float	*grad, *grad2, *hessian, value;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_ARR, ps[0]);
@@ -3100,7 +3100,7 @@ Theory:
   double oned = 1.0, chi2, f, errv, fwhm, norm;
   Scalar	value;
   Pointer	px, py, pl, pr, p2, pw, pc, err, chisq, pk;
-  loopInfo	xinfo, yinfo, p2info, winfo;
+  LoopInfo	xinfo, yinfo, p2info, winfo;
 
   if (isComplexType(symbol_type(ps[0])))
     return cerror(NO_COMPLEX, ps[0]);
@@ -3458,7 +3458,7 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
   int32_t	n, result;
   Scalar	value;
   Pointer	src, trgt;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 1? ps[1]: 0,
 		   SL_SAMEDIMS | SL_UPGRADE | SL_ONEAXIS | SL_NEGONED,

@@ -636,7 +636,7 @@ typedef struct {
 } csplineInfo;
 
 /// axis loop information
-struct loopInfo {
+struct LoopInfo {
   /// A pointer to a `pointer` to the current data element.  For
   /// example, if the data type is LUX_DOUBLE, then the current data
   /// element is at `data->d`.  Gets updated as appropriate when the
@@ -674,6 +674,9 @@ struct loopInfo {
   int32_t advanceaxis;              //!< how many axes not to advance (from start)
   int32_t raxes[MAX_DIMS];          //!< from rearranged to old axes
   int32_t iraxes[MAX_DIMS];         //!< from old to rearranged axes
+
+  void setAxes(int32_t nAxes, int32_t* axes, int32_t mode);
+  void setOneDimensional();
 };
 
 /// for nextCompileLevel

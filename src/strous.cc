@@ -896,7 +896,7 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
   int32_t	result, nOrder, loop, o, ww, stride, offset1, offset3,
     w1, one = 1, iq, n, i, old, circular;
   Symboltype type;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (standardLoop(ps[0], narg > 2? ps[1]: 0,
 		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_INT8,
@@ -1263,7 +1263,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
   float	weight;
   Pointer	src, trgt, width, width0;
   Scalar	sum;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   switch (narg) {
     case 3:			/* data, axis, widths */
@@ -1853,7 +1853,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
     iq, jq;
   Pointer	src, trgt, width;
   Scalar	value;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
   int32_t mode;
 
   mode = 0;

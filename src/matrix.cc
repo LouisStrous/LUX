@@ -31,7 +31,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t lux_matrix_product(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;i>D*;rD1", &ptrs, &infos)) < 0)
@@ -246,7 +246,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
 int32_t lux_svd(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
@@ -317,7 +317,7 @@ int32_t matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow
 int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
   int32_t n;
   int32_t *dims;
@@ -356,7 +356,7 @@ REGISTER(transpose_matrix, f, transpose, 1, 1, NULL);
 int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
-  loopInfo *infos;
+  LoopInfo *infos;
   int32_t iq;
 
   if ((iq = standard_args(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)

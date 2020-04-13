@@ -820,12 +820,12 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
    the mask is nonzero.
 */
 {
-  StandardArguments standard_args;
   int32_t iq;
   Pointer *data;
-  loopInfo *info;
+  LoopInfo *info;
 
-  if ((iq = standard_args.set(narg, ps, "i*;i&?;r&", &data, &info)) < 0)
+  StandardArguments_RAII sa(narg, ps, "i*;i&?;r&", &data, &info);
+  if (sa.result() < 0)
     return LUX_ERROR;
 
   if (narg == 1) {
@@ -880,12 +880,13 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
 // copy is promoted to type FLOAT.
 int32_t lux_setnan(int32_t narg, int32_t ps[])
 {
-  StandardArguments standard_args;
   int32_t iq;
   Pointer* data;
-  loopInfo* info;
+  LoopInfo* info;
 
-  if ((iq = standard_args.set(narg, ps, "i^*;i&;r>F^&", &data, &info)) < 0)
+  StandardArguments_RAII sa(narg, ps, "i^*;i&;r>F^&", &data, &info);
+  iq = sa.result();
+  if (iq < 0)
     return iq;
 
   size_t nelem = info[0].nelem;
@@ -954,7 +955,7 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 {
   Pointer	src, trgt;
   int32_t	result;
-  loopInfo	srcinfo, trgtinfo;
+  LoopInfo	srcinfo, trgtinfo;
 
   if (isFunc) {
     if (standardLoop(ps[0], narg > 1? ps[1]: 0,
@@ -3481,7 +3482,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
   float	temp2f;
   double	temp2d;
   Pointer	src, trgt, weights;
-  loopInfo	srcinfo, trgtinfo, winfo;
+  LoopInfo	srcinfo, trgtinfo, winfo;
 
 #if DEBUG_VOCAL
   debugout1("in total(), %d arg(s)", narg);

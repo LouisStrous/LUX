@@ -340,11 +340,11 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
   }
 
   if (narg) {
-    StandardArguments standard_args;
     Pointer *data;
-    loopInfo *info;
+    LoopInfo *info;
 
-    if (standard_args.set(ndata, myps, "iD*;iD&?;iD&?", &data, &info) < 0)
+    StandardArguments_RAII sa(ndata, myps, "iD*;iD&?;iD&?", &data, &info);
+    if (sa.result() < 0)
       return LUX_ERROR;
 
     // send the data to a gnuplot data block
@@ -516,11 +516,11 @@ REGISTER(gaplot, s, gaplot, 0, 12, ":::linetype:pointtype:dashtype:color:xtitle:
 
 int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
                                std::string gnuplot_command_fmt) {
-  StandardArguments standard_args;
   Pointer *data;
-  loopInfo *info;
+  LoopInfo *info;
 
-  if (standard_args.set(narg, ps, "i>B>1,>1", &data, &info) < 0)
+  StandardArguments_RAII sa(narg, ps, "i>B>1,>1", &data, &info);
+  if (sa.result() < 0)
     return LUX_ERROR;
 
   const char* gnuplot_type = GnuPlot::gnuplot_type(info[0].type);
@@ -767,15 +767,16 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
        "notitle with pm3d;");
   case 3:
     {
-      StandardArguments standard_args;
       Pointer *data;
-      loopInfo *info;
+      LoopInfo *info;
       int32_t myps[3];
 
       // gnuplot expects 32-bit IEEE floating-point values
       for (int i = 0; i < ndata; ++i)
         myps[i] = lux_float(1, &ps[i]);
-      if (standard_args.set(ndata, myps, "iF*;iF*;iF>1,*", &data, &info) < 0)
+
+      StandardArguments_RAII sa(ndata, myps, "iF*;iF*;iF>1,*", &data, &info);
+      if (sa.result()< 0)
         return LUX_ERROR;
 
       if (info[0].ndim < 1 || info[0].ndim > 2)

@@ -17,4 +17,4 @@
 # You should have received a copy of the GNU General Public License
 # along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = sofa src . test doc
+SUBDIRS = sofa historicephemerides src . test doc

@@ -3,6 +3,7 @@
 
 AC_PREREQ([2.68])
 AC_INIT([lux], [1.2.0], [lux@quae.nl])
+AM_EXTRA_RECURSIVE_TARGETS([debug])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/lux.cc])
 AC_CONFIG_MACRO_DIR([m4])
@@ -22,7 +23,6 @@ AC_DEFINE_UNQUOTED([PLATFORM], "${host}", [The canonical host type])
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_11
 AC_PROG_RANLIB
 AC_PROG_YACC
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
@@ -78,6 +78,7 @@ AC_SUBST([CPPUTESTLIBS])
 AC_CONFIG_FILES([Makefile
                  sofa/Makefile
                  sofa/src/Makefile
+                 historicephemerides/Makefile
                  src/Makefile
                  src/fonts/Makefile
                  doc/Makefile

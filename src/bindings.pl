@@ -28,6 +28,7 @@ print $ofh <<EOD;
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
 #include "sofa.h"
+#include "historicephemerides.h"
 
 int32_t luxerror(char const*, int32_t, ...);
 

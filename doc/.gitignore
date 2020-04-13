@@ -22,3 +22,8 @@ lux.doxy
 
 # generated from Doxyfile.in
 Doxyfile
+
+# output
+lux.htp/
+lux.cps
+lux.fns

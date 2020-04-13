@@ -19,7 +19,7 @@
 
 SUBDIRS = fonts
 
-AM_CPPFLAGS = -I$(top_srcdir)/sofa/src
+AM_CPPFLAGS = -I$(top_srcdir)/sofa/src -I$(top_srcdir)/historicephemerides
 AM_YFLAGS = -d
 ACLOCAL_AMFLAGS = -I m4
 
@@ -58,7 +58,6 @@ nonbind_sources = \
 	contour.cc\
 	coord.cc\
 	crunch.cc\
-	debug.hh\
 	decomp.cc\
 	dmalloc.hh\
 	editor.cc\
@@ -102,6 +101,7 @@ nonbind_sources = \
 	lux_structures.hh\
 	luxcon.cc\
 	luxdefs.hh\
+	luxhistoricephemerides.cc\
 	luxparser.hh\
 	luxparser.yy\
 	luxsofa.cc\
@@ -150,7 +150,12 @@ nonbind_sources = \
 
 bin_PROGRAMS = lux
 lux_SOURCES = lux.cc
-lux_LDADD = liblux.a $(top_builddir)/sofa/src/libsofa_c.a
+lux_LDADD = \
+	liblux.a\
+	$(top_builddir)/sofa/src/libsofa_c.a\
+	$(top_builddir)/historicephemerides/libhistoricephemerides_c.a
+
+#lux$(EXEEXT): $(top_builddir)/historicephemerides/libhistoricephemerides_c.a
 
 luxparser.cc: luxparser.yy
 
@@ -162,6 +167,5 @@ noinst_LIBRARIES = liblux.a
 liblux_a_SOURCES = $(nonbind_sources) thebindings.cc
 #liblux_a_LIBADD = $(top_builddir)/sofa/src/libsofa_c.a
 
-debug:
-	$(MAKE) CPPFLAGS=-g CFLAGS= CXXFLAGS=
-
+debug-local:
+	$(MAKE) CPPFLAGS=-g CFLAGS= CXXFLAGS= all

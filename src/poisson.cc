@@ -491,7 +491,7 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
   case LUX_FLOAT:
     tgt.f = pyramid->data.f;
     memcpy(tgt.f, src.f, nx*ny*sizeof(*src.f));
-    for (i = 0; i < nlevel; i++) { 
+    for (i = 0; i < nlevel; i++) {
       pyramid->levels[i].f = tgt.f;
       pyramid->nx[i] = nx2;
       pyramid->ny[i] = ny2;

@@ -87,7 +87,7 @@ int32_t strpcmp(const void *arg1, const void *arg2)
    <arg2> is lexographically after, equal to, or before <arg1>.  LS 1jun99 */
 {
   char	*s1, *s2;
-  
+
   s1 = (char *) arg1;
   s2 = *(char **) arg2;
   while (*s1 == *s2 && *s2) {	// while equal and not at end of s2
@@ -346,7 +346,7 @@ int32_t callig2(char *s)
 					// setup font
   if (fontchange(ifont) < 0)
     return LUX_ERROR;	// propagate errors
-  dx = dy = 0; 
+  dx = dy = 0;
   while ((ic = *s++) != 0) {		// decode string
 	// either a command or a char. to draw
     switch (ic) {
@@ -542,7 +542,7 @@ int32_t fontchange(int32_t font)
   uint8_t	*p;
   char	name1[PATH_MAX], *name2;
   FILE	*fin;
-  
+
   font = MAX(font, 3);
   if (font > 39)
     font = 3;

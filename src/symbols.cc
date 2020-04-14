@@ -107,7 +107,7 @@ int32_t structPtrTarget(int32_t symbol)
 {
   int32_t	base, index = -1, i, n;
   char	*key;
-  
+
   base = list_ptr_target(symbol); // the enveloping structure
   if (base < 0) {		// numerical label
     base = -base;
@@ -3559,7 +3559,7 @@ void *seekFacts(int32_t symbol, int32_t type, int32_t flag)
   if (!symbolIsNumericalArray(symbol) // not a numerical symbol
       || !array_facts(symbol))	// no associated facts
     return NULL;
-  
+
   n = array_num_facts(symbol);
   facts = array_facts(symbol);
   while (n--) {
@@ -3582,7 +3582,7 @@ void *setFacts(int32_t symbol, int32_t type, int32_t flag)
 
   if (!symbolIsNumericalArray(symbol)) // not a numerical symbol
     return NULL;
-  
+
   if (array_facts(symbol)) {
     facts = seekFacts(symbol, type, LUX_ANY_FACT);
     if (facts) {		// it exists already
@@ -3615,7 +3615,7 @@ void deleteFacts(int32_t symbol, int32_t type)
 
   if (!symbolIsNumericalArray(symbol))
     return;
-  
+
   if (array_facts(symbol)) {
     facts = seekFacts(symbol, type, LUX_ANY_FACT);
     if (facts) {

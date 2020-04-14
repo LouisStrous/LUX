@@ -182,7 +182,7 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   d[1] = d[0];
   ps[3] = array_scratch(LUX_DOUBLE, 2, d);
   memcpy(array_data(ps[3]), a + n, d[0]*d[0]);
-  
+
   Free(a);
   Free(z);
   return 1;

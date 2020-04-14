@@ -26,7 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // END HEADERS
 
 /** \file
-  Calendrical calculations. 
+  Calendrical calculations.
 
     The functions that work with only integer numbers express dates in
     terms of the Chronological Julian Day Number (CJDN).  Every
@@ -37,7 +37,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     The first year of each calendar is year 1.  The year preceding
     that year is called year 0, and the year before that is called
     year -1, and so on.
-    
+
     The functions that work with fractional days are mostly in terms
     of the Chronological Julian Day (CJD).  A CJD begins at midnight
     local time and runs until the next midnight local time.  NOTE that
@@ -69,8 +69,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
     The Egyptian calendar is according to the era of Seleukos, with
     the epoch corresponding to 26 February -747 on the Julian
-    calendar.  
-    
+    calendar.
+
     The function names are built up as follows:
     \li \c CJDNtoCal = from CJDN to calendar date
     \li \c CJDtoCal = from CJD to calendar date
@@ -97,7 +97,7 @@ int32_t CJDN_now(void);
 
 // GREGORIAN CALENDAR
 
-/**    
+/**
     Translates a Chronological Julian Day Number to a Gregorian
     calendar date.
 
@@ -291,7 +291,7 @@ void   GregorianStoCJDA(char * const *date, double *CJD);
 
 // JULIAN CALENDAR
 
-/**    
+/**
     Translates a Chronological Julian Day Number to a Julian
     calendar date.
 
@@ -485,7 +485,7 @@ void   JulianStoCJDA(char * const *date, double *CJD);
 
 // COMMON CALENDAR
 
-/**    
+/**
     Translates a Chronological Julian Day Number to a Common
     calendar date.
 
@@ -679,7 +679,7 @@ void   CommonStoCJDA(char * const *date, double *CJD);
 
 // HEBREW CALENDAR
 
-/**    
+/**
     Translates a Chronological Julian Day Number to a Hebrew
     calendar date.
 
@@ -873,7 +873,7 @@ void   HebrewStoCJDA(char * const *date, double *CJD);
 
 // ISLAMIC CALENDAR
 
-/**    
+/**
     Translates a Chronological Julian Day Number to a Islamic
     calendar date.
 
@@ -1067,7 +1067,7 @@ void   IslamicStoCJDA(char * const *date, double *CJD);
 
 // EGYPTIAN CALENDAR
 
-/**    
+/**
     Translates a Chronological Julian Day Number to a Egyptian
     calendar date.
 
@@ -1282,7 +1282,7 @@ void JDtoCJDA(double const *JD, double *CJD);
 
 /** Translates Chronological Julian Day for the current time zone to
     Julian Day.
-    
+
     \param[in] CJD the Chronological Julian Day to translate
 
     \return the corresponding Julian Day
@@ -1328,7 +1328,7 @@ void CJDtoCJDA(double const *in, double *out);
 
     \param[in] CJD the Chronological Julian Day
     \return the corresponding lunar month
- */ 
+ */
 double CJDtoLunar(double CJD);
 
 /** Translates a Chronological Julian Day to a (fractional) count of
@@ -1339,7 +1339,7 @@ double CJDtoLunar(double CJD);
 
     \param[out] lunar a pointer to the corresponding lunar month.
     Must not be NULL!
- */ 
+ */
 void CJDtoLunarA(double const *CJD, double *lunar);
 
 /** Translates a (fractional) count of lunar months to a Chronological
@@ -1347,7 +1347,7 @@ void CJDtoLunarA(double const *CJD, double *lunar);
 
     \param[in] lunar the lunar month
     \return the corresponding Chronological Julian Day
- */ 
+ */
 double LunartoCJD(double lunar);
 
 /** Translates a (fractional) count of lunar months to a Chronological
@@ -1357,7 +1357,7 @@ double LunartoCJD(double lunar);
 
     \param[out] CJD a pointer to the corresponding Chronological
     Julian Day.  Must not be NULL!
- */ 
+ */
 void LunartoCJDA(double const *lunar, double *CJD);
 
 // MAYAN TZOLKIN/HAAB CALENDAR

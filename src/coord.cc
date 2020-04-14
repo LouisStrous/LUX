@@ -70,14 +70,14 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
 	break;
       // else fall-thru
     case LUX_DVI:
-      if (x) 
+      if (x)
 	*x *= xfac;
       if (y)
 	*y *= yfac;
       break;
 #if HAVE_LIBX11
     case LUX_RIM:
-      if (x) 
+      if (x)
 	*x = tvix + *x * (tvixb - tvix);
       if (y) {
 	if (setup & 8)
@@ -122,7 +122,7 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
 	  else
 	    *y = 0;
 	} else {
-	  if (ymin != ymax) 
+	  if (ymin != ymax)
 	    *y = (*y - ymin)/(ymax - ymin);
 	  else
 	    *y = 0.0;

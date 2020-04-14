@@ -178,8 +178,8 @@ int32_t site(int32_t narg, int32_t ps[])
     printnice(c_down);
     putchar('\n');
     printf(" Clear Down : ");
-    printnice(cl_eos); 
-    putchar('\n'); 
+    printnice(cl_eos);
+    putchar('\n');
     printf(" Save Position   : ");
     printnice(c_save);
     putchar('\n');

@@ -144,7 +144,7 @@ int32_t fmt_entry(formatInfo *fmi)
   if (*p == '%' && p[1] != '%' && p[1] != ')') { // a format specification
     uint8_t done = 0;
     p++;			// skip the initial %
-    
+
     // service any modifier
     do {
       switch (*p++) {
@@ -279,7 +279,7 @@ int32_t fmt_entry(formatInfo *fmi)
     }
   }
   fmi->end = p;
- 
+
   if (*p == '%' && p[1] == ')') { // a group end
     if (fmi->active_group < 0) { /* group ending but no corresponding
 				    group beginning */
@@ -311,7 +311,7 @@ int32_t fmt_entry(formatInfo *fmi)
     fmi->next = fmi->end;
 
   fmi->type = type;
-  fmi->only_whitespace = 
+  fmi->only_whitespace =
     (fmi->type == FMT_PLAIN
      && fmi->start == fmi->plain
      && strspn(fmi->plain, " ") == fmi->next - fmi->plain);
@@ -396,7 +396,7 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
 
   if (fmi->type == FMT_ERROR)	// some error
     return LUX_ERROR;
-  
+
   // first we initialize
   switch (*fmi->spec_char) {
     case 'z':
@@ -433,7 +433,7 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
       }
       break;
   }
-  
+
   switch (*fmi->spec_char) {
   default:			// let vsprintf handle it
     n = vsprintf(str, fmi->start, ap);

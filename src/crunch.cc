@@ -185,7 +185,7 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])		// decrunch subroutine
   slice = *q1.b++;	ctype = *q1.b++;
   //printf("ctype = %d\n", ctype);
 #if WORDS_BIGENDIAN
-  swapl(&bsize,1); swapl(&nx,1); swapl(&outer,1); 
+  swapl(&bsize,1); swapl(&nx,1); swapl(&outer,1);
 #endif
   // the result array
   iq = ps[1];
@@ -300,7 +300,7 @@ int32_t anacrunch32(uint8_t *x, int32_t array[], int32_t slice, int32_t nx, int3
     y.i=array[in]; x[i]=y.b[3]; x[i+1]=y.b[2]; x[i+2]=y.b[1]; x[i+3]=y.b[0];
 #else
     y.i=array[in]; x[i]=y.b[0]; x[i+1]=y.b[1]; x[i+2]=y.b[2]; x[i+3]=y.b[3];
-#endif 
+#endif
     r1=r1+32;
     ixa=1+iy*nx;    ixb=(iy+1)*nx;
     for (in=ixa; in<ixb; in++)      {               // start of ix (inner) loop
@@ -376,7 +376,7 @@ int32_t anacrunch32(uint8_t *x, int32_t array[], int32_t slice, int32_t nx, int3
   /* we have to put these in a form readable by the Vax (these may be used
      by fcwrite) */
 #if WORDS_BIGENDIAN
-  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1); 
+  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1);
 #endif
   // printf("number of big ones for this I*4 = %d\n", big);
   return  i;      //return # of bytes used
@@ -420,7 +420,7 @@ int32_t anacrunch(uint8_t *x, short array[], int32_t slice, int32_t nx, int32_t 
     y.w=array[in]   ;x[i]=y.b[1]    ;x[i+1]=y.b[0];
 #else
     y.w=array[in]   ;x[i]=y.b[0]    ;x[i+1]=y.b[1];
-#endif 
+#endif
     r1=r1+16;
     ixa=1+iy*nx;    ixb=(iy+1)*nx;
     for (in=ixa; in<ixb; in++)      {               // start of ix (inner) loop
@@ -492,7 +492,7 @@ int32_t anacrunch(uint8_t *x, short array[], int32_t slice, int32_t nx, int32_t 
   /* we have to put these in a form readable by the Vax (these may be used
      by fcwrite) */
 #if WORDS_BIGENDIAN
-  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1); 
+  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1);
 #endif
   return  i;      //return # of bytes used
 }       // end of routine
@@ -547,11 +547,11 @@ int32_t anacrunch8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, int32
       if (j == 0) {y.i=(y.i & mask); x[i]=y.b[3];}
       else { y.i=(y.i & mask)<<j; x[i]=x[i] | y.b[3];}
       if (nb>1) { x[i+1]=y.b[2]; }
-#else 
+#else
       if (j == 0) {y.i=(y.i & mask); x[i]=y.b[0];}
       else { y.i=(y.i & mask)<<j; x[i]=x[i] | y.b[0];}
       if (nb>1) { x[i+1]=y.b[1]; }
-#endif 
+#endif
       r1=r1+slice;       // bump r1 pass the fixed part
       i=r1>>3;                j=r1%8;
       // note that r3 is the # of bits required minus 1
@@ -592,7 +592,7 @@ int32_t anacrunch8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, int32
   /* we have to put these in a form readable by the Vax (these may be used
      by fcwrite) */
 #if WORDS_BIGENDIAN
-  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1); 
+  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1);
 #endif
   return  i;      //return # of bytes used
 }       // end of routine
@@ -774,7 +774,7 @@ int32_t anadecrunch32(uint8_t *x, int32_t array[], int32_t r9, int32_t nx, int32
 				  if ((xq&16) != 0) r0+=5; else {
 				    if ((xq&32) != 0) r0+=6; else {
 				      if ((xq&64) != 0) r0+=7; else {
-					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
+					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8;
 					// add 8 bits for each all zero uint8_t
 					if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 					printf("i = %d, r1 = %d, ix= %d, iy = %d\n",i,r1,ix,iy);
@@ -782,13 +782,13 @@ int32_t anadecrunch32(uint8_t *x, int32_t array[], int32_t r9, int32_t nx, int32
       r1=r1+r0;       // update pointer
       // r0 even or odd determines sign of difference
       //printf("r0 = %d\n", r0);
-      if ((r0&1) != 0) { 
+      if ((r0&1) != 0) {
 	// positive case
 	//printf("plus case, r0, r2, iq = %d %d %d\n", r0, r2, iq);
 	r0=(r0/2)<<r9;  iq=iq+r2;       iq=iq+r0;       array[in]=iq;
 	//printf("r0 now = %d\n", r0);
       } else
-	{ if (r0 == 32) { 
+	{ if (r0 == 32) {
 	  // a long one, yank out the next 33 bits and use as difference
 	  i=r1/8;         j=r1%8;
 #if WORDS_BIGENDIAN
@@ -887,18 +887,18 @@ int32_t anadecrunch(uint8_t *x, short array[], int32_t r9, int32_t nx, int32_t n
 				  if ((xq&16) != 0) r0+=5; else {
 				    if ((xq&32) != 0) r0+=6; else {
 				      if ((xq&64) != 0) r0+=7; else {
-					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
+					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8;
 					// add 8 bits for each all zero uint8_t
 					if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 					printf("i = %d, r1 = %d, ix= %d, iy = %d\n",i,r1,ix,iy);
 					return -1; }       }       }       }
       r1=r1+r0;       // update pointer
       // r0 even or odd determines sign of difference
-      if ((r0&1) != 0) { 
+      if ((r0&1) != 0) {
 	// positive case
 	r0=(r0/2)<<r9;  iq=iq+r2;       iq=iq+r0;       array[in]=iq;
       } else
-	{ if (r0 == 32) { 
+	{ if (r0 == 32) {
 	  // a long one, yank out the next 17 bits and use as difference
 	  i=r1/8;         j=r1%8;
 #if WORDS_BIGENDIAN
@@ -984,17 +984,17 @@ int32_t anadecrunch8(uint8_t *x, uint8_t array[], int32_t r9, int32_t nx, int32_
 				  if ((xq&16) != 0) r0+=5; else {
 				    if ((xq&32) != 0) r0+=6; else {
 				      if ((xq&64) != 0) r0+=7; else {
-					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
+					if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8;
 					// add 8 bits for each all zero uint8_t
 					if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue");
 					return -1; }       }       }       }
       r1=r1+r0;       // update pointer
       // r0 even or odd determines sign of difference
-      if ((r0&1) != 0) { 
+      if ((r0&1) != 0) {
 	// positive case
 	r0=(r0/2)<<r9;  iq=iq+r2;       iq=iq+r0;       array[in]=iq;
       } else
-	{ if (r0 == 32) { 
+	{ if (r0 == 32) {
 	  // a long one, yank out the next 9 bits and use as difference
 	  i=r1/8;         j=r1%8;
 #if WORDS_BIGENDIAN
@@ -1058,7 +1058,7 @@ int32_t anacrunchrun(uint8_t *x, short array[], int32_t slice, int32_t nx, int32
     y.w=array[iy*nx]   ;x[i++]=y.b[1]    ;x[i++]=y.b[0];
 #else
     y.w=array[iy*nx]   ;x[i++]=y.b[0]    ;x[i++]=y.b[1];
-#endif 
+#endif
     // compute and store the first differences for this line
     p = (array+nx*iy);	nc=nx-1;
     d=dif; yq=(int32_t) *p++;	zq=(int32_t) *p++;
@@ -1139,7 +1139,7 @@ int32_t anacrunchrun(uint8_t *x, short array[], int32_t slice, int32_t nx, int32
       if (j == 0) {y.i=(y.i & mask); x[i]=y.b[0];}
       else { y.i=(y.i & mask)<<j; x[i]=x[i] | y.b[0];}
       if (nb>1) { x[i+1]=y.b[1]; if (nb>2) x[i+2]=y.b[2]; }
-#endif 
+#endif
       r1=r1+slice;       			// bump r1 pass the fixed part
       i=r1>>3;                j=r1 & 7;
       // note that r3 is the # of bits required minus 1
@@ -1189,7 +1189,7 @@ int32_t anacrunchrun(uint8_t *x, short array[], int32_t slice, int32_t nx, int32
   /* we have to put these in a form readable by the Vax (these may be used
      by fcwrite) */
 #if WORDS_BIGENDIAN
-  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1); 
+  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1);
 #endif
   free(dif);
   return  i;      //return # of bytes used
@@ -1230,7 +1230,7 @@ int32_t anacrunchrun8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, in
   for (iy=0;iy<ny;iy++) {                 	// start of iy (outer) loop
     // load the first value
     x[i++] = array[iy*nx];
- 
+
     // compute and store the first differences for this line
     p = (array+nx*iy);	nc=nx-1;
     d=dif; yq=(int32_t) *p++;	zq=(int32_t) *p++;
@@ -1313,7 +1313,7 @@ int32_t anacrunchrun8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, in
       else { y.i=(y.i & mask)<<j; x[i]=x[i] | y.b[0];}
       if (nb>1) { x[i+1]=y.b[1]; if (nb>2) x[i+2]=y.b[2]; }
 #endif
- 
+
       r1=r1+slice;       			// bump r1 pass the fixed part
       i=r1>>3;                j=r1 & 7;
       // note that r3 is the # of bits required minus 1
@@ -1362,7 +1362,7 @@ int32_t anacrunchrun8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, in
   /* we have to put these in a form readable by the Vax (these may be used
      by fcwrite) */
 #if WORDS_BIGENDIAN
-  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1); 
+  swapl(&(ch->tsize),1); swapl(&(ch->bsize),1); swapl(&(ch->nblocks),1);
 #endif
   free(dif);
   return  i;      //return # of bytes used
@@ -1461,19 +1461,19 @@ int32_t anadecrunchrun(uint8_t *x, short array[], int32_t r9, int32_t nx, int32_
 				      if ((xq&16) != 0) r0+=5; else {
 					if ((xq&32) != 0) r0+=6; else {
 					  if ((xq&64) != 0) r0+=7; else {
-					    if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8; 
+					    if ((xq&128) != 0) r0+=8; }}}}}}} break; } else { r0=r0+8;
 					    // add 8 bits for each all zero uint8_t
 					    if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 					    printf("i = %d, r1 = %d, iy = %d\n",i,r1,iy);
 					    return -1; }       }       }       }
 	  r1=r1+r0;       // update pointer
 	  // r0 even or odd determines sign of difference
-	  if ((r0&1) != 0) { 
+	  if ((r0&1) != 0) {
 	    // positive case
 	    r0=(r0/2)<<r9;  iq=iq+r2;       iq=iq+r0;       array[in]=iq;
 	    // printf("r0,r2,iq = %d %d %d\n", r0,r2,iq);
 	  } else
-	    { if (r0 == 32) { 
+	    { if (r0 == 32) {
 	      // a long one, yank out the next 17 bits and use as difference
 	      i=r1/8;         j=r1%8;
 #if WORDS_BIGENDIAN
@@ -1505,7 +1505,7 @@ int32_t anadecrunchrun(uint8_t *x, short array[], int32_t r9, int32_t nx, int32_
     }   	    // end of ix loop
     if (nc < 0) {
       printf("bad loop in decrunchrun, nc=%d, iy=%d, in= %d\n",nc,iy,in);  return -1; }
- 
+
     i=(r1+7)/8;     r1=8*i;                 }   	    // end of iy loop
   return 1;
 }  						     // end of routine
@@ -1615,19 +1615,19 @@ int32_t anadecrunchrun8(uint8_t x[], uint8_t array[], int32_t r9, int32_t nx, in
 	      }
 	      break;
 	    } else {
-	      r0=r0+8; 
+	      r0=r0+8;
 	      // add 8 bits for each all zero uint8_t
 	      if (r0 > 32) { printf("DECRUNCH -- bad bit sequence, cannot continue\n");
 	      printf("i = %d, r1 = %d, iy = %d\n",i,r1,iy);
 	      return -1; }       }       }       }
 	  r1=r1+r0;       // update pointer
 	  // r0 even or odd determines sign of difference
-	  if ((r0&1) != 0) { 
+	  if ((r0&1) != 0) {
 	    // positive case
 	    r0=(r0/2)<<r9;  iq=iq+r2;       iq=iq+r0;       array[in]=iq;
 	    // printf("r0,r2,iq = %d %d %d\n", r0,r2,iq);
 	  } else
-	    { if (r0 == 32) { 
+	    { if (r0 == 32) {
 	      // a long one, yank out the next 9 bits and use as difference
 	      i=r1/8;         j=r1%8;
 #if WORDS_BIGENDIAN
@@ -1660,7 +1660,7 @@ int32_t anadecrunchrun8(uint8_t x[], uint8_t array[], int32_t r9, int32_t nx, in
     if (nc < 0) {
       printf("bad loop in decrunchrun8, nc=%d, iy=%d, in= %d\n",nc,iy,in);
       return -1; }
- 
+
     i=(r1+7)/8;     r1=8*i;                 }   	    // end of iy loop
   return 1;
 }  						     // end of routine

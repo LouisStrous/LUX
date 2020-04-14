@@ -59,7 +59,7 @@ int32_t lux_subshift(int32_t narg, int32_t ps[]) // LCT for a cell
     return cerror(INCMP_DIMS, jq);
   jq = lux_double(1, &jq);
   x2 = (double *) array_data(jq);
-  
+
   subshift(x1, x2, d[0], d[1]);
 
   // expect result in xoff and yoff
@@ -206,7 +206,7 @@ void getsxsy(void)
  syz = syvalue(sxz);
  if ( syz < -0.5 || syz > 1.5) { subdx = subdy = 0.0;  return; }
  // printf("      sxz, syz = %g %g\n", sxz,syz);
- 
+
  }
  /* for small shifts, let values very close to the line but on the
  other side remain as contenders */
@@ -232,7 +232,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  {
  int32_t     nxs;
  double  sum, cs0, cs1, cs2, cs3, t2, t1, t0, t3;
- double  parts[5][5], xx[3][3], xdx[3][2], xdy[2][3], xmmpp[2][2], xppmm[2][2]; 
+ double  parts[5][5], xx[3][3], xdx[3][2], xdy[2][3], xmmpp[2][2], xppmm[2][2];
  double  partsdx[5][3], partsdy[3][5], partsppmm[3][3], partsmmpp[3][3];
  double  cmm,c0m,cpm,cm0,c00,cp0,cmp,c0p,cpp,sumxx;
  double	 qbest, qcur, outside, qd;
@@ -242,7 +242,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  nxs = nx;
  nxm2 = nx - 2;
  nym2 = ny - 2;
-  
+
  // the sums of squares
  /* first rearrange as 25 pieces in an array of 5x5, mostly to have
  it semi organized, may be faster to do it differently */
@@ -766,19 +766,19 @@ double  subshiftc(double* xa, double* xb, int32_t nx, int32_t ny)
 
  nxs = nx;
  stride = nxs - nx;
- a1=a2=a3=a4=a5=a6=a7=a8=a9=a10=0.0; 
+ a1=a2=a3=a4=a5=a6=a7=a8=a9=a10=0.0;
  xpa1 = xa;
  xpa2 = xa + nxs;
  xpb1 = xb;
  xpb2 = xb + nxs;
- 
+
  j = ny - 1;
  while (j--) {
  x0 = *xpa1++;
  y0 = *xpb1++;
  x2 = *xpa2++;
  y2 = *xpb2++;
- 
+
  i = nx -1;
  while (i--) {
  y3 = *xpb2++;
@@ -822,7 +822,7 @@ double  subshiftc(double* xa, double* xb, int32_t nx, int32_t ny)
  a8 = .5 * a8;
  // 3/4/97 changed a7 to be a7+a8
  a7 = a7 + a8;
- 
+
  // only 1 quad here so do the MAX find in line
  xoff = yoff = 0.0;
  n = 11;
@@ -837,7 +837,7 @@ double  subshiftc(double* xa, double* xb, int32_t nx, int32_t ny)
  // printf("      sxz, syz = %g %g\n", sxz,syz);
  }
  xoff = 2.*sxz;	yoff = 2.*syz;
- 
+
  return mertc(sxz, syz);
  }
 //-------------------------------------------------------------------------
@@ -854,19 +854,19 @@ double  subshiftc_apod(double* xa, double* xb, double* gg, int32_t nx, int32_t n
 
  nxs = nx;
  stride = nxs - nx;
- a1=a2=a3=a4=a5=a6=a7=a8=a9=a10=0.0; 
+ a1=a2=a3=a4=a5=a6=a7=a8=a9=a10=0.0;
  xpa1 = xa;
  xpa2 = xa + nxs;
  xpb1 = xb;
  xpb2 = xb + nxs;
- 
+
  j = ny - 1;
  while (j--) {
  x0 = *xpa1++;
  y0 = *xpb1++;
  x2 = *xpa2++;
  y2 = *xpb2++;
- 
+
  i = nx -1;
  while (i--) {
  y3 = *xpb2++;
@@ -914,7 +914,7 @@ double  subshiftc_apod(double* xa, double* xb, double* gg, int32_t nx, int32_t n
  a8 = .5 * a8;
  // 3/4/97 changed a7 to be a7+a8
  a7 = a7 + a8;
- 
+
  // only 1 quad here so do the max find in line
  xoff = yoff = 0.0;
  n = 11;
@@ -929,7 +929,7 @@ double  subshiftc_apod(double* xa, double* xb, double* gg, int32_t nx, int32_t n
  // printf("      sxz, syz = %g %g\n", sxz,syz);
  }
  xoff = 2.*sxz;	yoff = 2.*syz;
- 
+
  return mertc(sxz, syz);
  }
  //-------------------------------------------------------------------------

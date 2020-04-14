@@ -283,7 +283,7 @@ xf = (double *) ((char *)h + sizeof(array));
 yf = xf + nf;
 				// scratch storage for 3 double arrays
 st = (double *) malloc( 24 * n );
-iq = kurv1_( &n, p[0].d, p[1].d, &der_left, &der_right, st,(st+n),(st+n+n), 
+iq = kurv1_( &n, p[0].d, p[1].d, &der_left, &der_right, st,(st+n),(st+n+n),
 	&sigma, p[2].d, xf, yf, &nf);
 free( st);
 if ( iq == 1) return result_sym; else return -1;
@@ -335,7 +335,7 @@ yf = xf + nf;
 				// scratch storage for 3 double arrays
 				// one of which is 2*nf long
 st = (double *) malloc( 32 * n );
-iq = kurvp1_( &n, p[0].d, p[1].d, st,(st+n),(st+n+n), 
+iq = kurvp1_( &n, p[0].d, p[1].d, st,(st+n),(st+n+n),
 	&sigma, p[2].d, xf, yf, &nf);
 free( st);
 if ( iq == 1) return result_sym; else return -1;
@@ -558,7 +558,7 @@ int32_t hilbert(double *data, size_t n, size_t stride)
 {
   if (!update_rwave(n) || !update_hwave(n) || !update_rwork(n))
     return 1;
-  
+
   int32_t result = gsl_fft_real_transform(data, stride, n, rwave, rwork);
   if (result)
     return 1;
@@ -579,7 +579,7 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
 {
   if (!update_rwave(scount) || !update_hwave(tcount))
     return 1;
-  
+
   int32_t i, result;
   double *sdata2 = sdata;
   double *tdata2 = tdata;
@@ -973,7 +973,7 @@ int32_t fftshift(int32_t narg, int32_t ps[], int32_t subroutine)
     sines.f = (float*) malloc(j);
     cosines.f = (float*) malloc(j);
     if (!work.l || !sines.f || !cosines.f) {
-      if (!subroutine) 
+      if (!subroutine)
 	zap(result);
       result = cerror(ALLOC_ERR, 0);
       break;
@@ -1429,7 +1429,7 @@ int32_t findint(int32_t current, int32_t *value, int32_t nValue)
  is not found. */
 {
   int32_t	low, mid, high;
-  
+
   low = 0;
   high = nValue - 1;
   while (low <= high) {
@@ -2784,7 +2784,7 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
 	   void *dest, double trgtlow, double trgthigh)
 /* returns a copy of the data at <data>, linearly transformed such that
  <datalow> maps to <trgtlow> and <datahigh> to <trgthigh>.  Data that falls
- outside of this range is mapped to the nearest valid result. 
+ outside of this range is mapped to the nearest valid result.
  LS 20sep98 */
 // <trgt> is assumed to point to data of type <colorIndexType>.  LS 23mar99
 {
@@ -3197,11 +3197,11 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
 }
 //-------------------------------------------------------------------------
 int32_t lux_scalerange(int32_t narg, int32_t ps[])
-/* scale an array and put in BYTE result 
+/* scale an array and put in BYTE result
    SCALERANGE(<data>, <lowgrey>, <higrey> [, <lowvalue>, <hivalue>, /BYTE,
               /ZOOM])
    by default, scales min data value to a relative grey level of <lowgrey>
-   and max data value to a relative grey level of <higrey>.  
+   and max data value to a relative grey level of <higrey>.
    0 must be less than or equal to <logrey>, which must be less than or
    equal to <higrey>, which must be less than or equal to 1.
    If <lovalue> and <hivalue> are specified, then data values are restricted
@@ -4316,7 +4316,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
     max.f = NULL;
 
   step = yinfo.step[0];
-  
+
   // now do the work
   switch (yinfo.type) {
     case LUX_FLOAT:
@@ -4368,7 +4368,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
 	  if (min.f)
 	    *min.f++ = thisext;
 	}
-	  
+	
 	if (max.f || maxpos.f) {
 	  // then, we go for the maximum
 	  if (pos >= 0) {
@@ -4460,7 +4460,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
 	  if (min.d)
 	    *min.d++ = thisext;
 	}
-	  
+	
 	if (max.d || maxpos.d) {
 	  // then, we go for the maximum
 	  if (pos >= 0) {
@@ -4569,7 +4569,7 @@ int32_t extract_bits(int32_t narg, int32_t ps[], int32_t *value)// internal rout
 {
   int32_t	n, start, width, iq, j, sign_flag, type;
   Pointer	q;
-  
+
   iq = ps[0];
   if (numerical(iq, NULL, NULL, &n, &q) == LUX_ERROR)
     return LUX_ERROR;
@@ -4642,7 +4642,7 @@ int32_t lux_fade_init(int32_t narg, int32_t ps[])
   while (n--) { *q1++ = ( (short) *p2) << 8 ;
   *q2++ = (( (short) *p1++) - ( (short) *p2++));
   }
- 
+
   /*
     while (n--) { *q1++ = ( (short) *p1++);
     *q2++ = ( (short) *p1++);

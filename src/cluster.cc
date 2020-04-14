@@ -1039,9 +1039,9 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       printf("distance calculations/element: %g (total %g)\n",
 	     (float) nDistCal/nSample, (float) allDistCal/nSample);
     }
-    
+
     nDistCal = 0;
-    
+
 				// reinitialize for a next iteration
     clusterNumber.b -= nSample*lux_type_size[indexType];
     if (iterate && nChanged) {

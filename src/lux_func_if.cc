@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
   An interface to allow a user-defined LUX function to be called as a
   C function.  Example for a user-defined function called MYFUNC that
   takes 2 parameters:
-  
+
   lux_func_if *afif = lux_func_if_alloc("MYFUNC", 2);
   lux_func_if_set_param(afif, 0, par0);
   lux_func_if_set_param(afif, 1, par1);

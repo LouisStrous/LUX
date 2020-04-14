@@ -70,7 +70,7 @@ VSOPdata *planetIndicesForTolerance(VSOPdata *data, double tolerance)
 }
 #endif
 //--------------------------------------------------------------------------
-static void gatherVSOP(double T, struct planetIndex *index, double *terms, 
+static void gatherVSOP(double T, struct planetIndex *index, double *terms,
                        double *value)
 /* calculates one coordinate of one object, as indicated by <index>,
    at time <T> in Julian centuries since J2000.0, using the VSOP87

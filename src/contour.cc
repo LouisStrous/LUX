@@ -30,7 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
 // contour parameters and flags
-extern	int32_t	current_pen, autocon, contour_mode, contour_box, 
+extern	int32_t	current_pen, autocon, contour_mode, contour_box,
 	contour_nlev, contour_border, contour_tick_pen,	contour_ticks,
 	contour_style, iorder;
 extern	float	wxb, wxt, wyb, wyt, contour_dash_lev, contour_tick_fac;
@@ -245,7 +245,7 @@ int32_t tkdash(float *aa, float *bb, int32_t *ndsh, int32_t *ntimes)
   float	x, y;
 
   nc = *ntimes;
-  while (nc-- > 0) 
+  while (nc-- > 0)
   { x = *aa++;	y = *bb++;	tkplot(x,y, 0, 0);
     x = *aa++;	y = *bb++;	tkplot(x,y, contour_style, 0); }
   return 1;

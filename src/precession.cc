@@ -81,7 +81,7 @@ void matmul3(double *front, double *back, double *result)
 static double s11c[] = {  0,               0, F(-538867722),  F(-270670), F(1138205),  F(8604), F(-813) };
 static double c11c[] = {  1,               0,     F(-20728),   F(-19147), F(-149390),   F(-34),  F(617) };
 static double s12c[] = { -1,               0,    F(2575043),   F(-56157),  F(140001),   F(383), F(-613) };
-static double c12c[] = {  0,               0, F(-539329786),  F(-479046), F(1144883),  F(8884), F(-830) }; 
+static double c12c[] = {  0,               0, F(-539329786),  F(-479046), F(1144883),  F(8884), F(-830) };
 static double s13c[] = {  0, F(2269380040LL),  F(-24745348), F(-2422542),   F(78247),  F(-468), F(-134) };
 static double c13c[] = {  0,   F(-203607820),  F(-94040878),  F(2307025),   F(37729), F(-4862),   F(25) };
 static double a31c[] = {  0,    F(203607820),   F(94040878), F(-1083606),  F(-50218),   F(929),   F(11) };
@@ -154,7 +154,7 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
 
     /* because we go in the opposite direction from the "to" case,
        we need the transposed matrix
-       
+
        a[0] a[1] a[2]     a[0] a[3] a[6]
        a[3] a[4] a[5]  => a[1] a[4] a[7]
        a[6] a[7] a[8]     a[2] a[5] a[8]

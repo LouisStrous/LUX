@@ -576,7 +576,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  follow = !follow;
 		  if (follow)
 		    sprintf(menu[mid].text[ZOOM_MOVE], "> Moving...     ");
-		  else 
+		  else
 		    sprintf(menu[mid].text[ZOOM_MOVE], "Move            ");
 		  paint_pane(mid, ZOOM_MOVE, WHITE);
 		  selected = ZOOM_MOVE;
@@ -806,7 +806,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		    }
 		    zoom_xc = (x1 + x2)*0.5;
 		    zoom_yc = (y1 + y2)*0.5;
-		      
+		
 		    offset = 0;
 		    for (i = 0; i < ndim; i++)
 		      if (axes[0] == i) {
@@ -906,7 +906,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 	}	// end of if (event.xany.window == win[wid])
       } // end of if (event.xany.window)
     } while (loop);
-    
+
     if (play && axes[0] != axes[1]) {
       zoom_frame += play;
       if (zoom_frame < 0)

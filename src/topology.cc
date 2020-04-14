@@ -50,7 +50,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 
   nx = srcinfo.dims[0];
   ny = srcinfo.dims[1];
-  
+
   // top row: always zero
   zerobytes(trgt.l, nx*sizeof(int32_t));
   trgt.l += nx;
@@ -67,7 +67,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
 	    value.w = *src.b * 2;
 	    *trgt.l++ = ((int16_t) src.b[-1] + (int16_t) src.b[1] < value.w
 			 && (int16_t) src.b[nx] + (int16_t) src.b[-nx] < value.w
-			 && (int16_t) src.b[1 + nx] + (int16_t) src.b[-1 - nx] 
+			 && (int16_t) src.b[1 + nx] + (int16_t) src.b[-1 - nx]
 			 < value.w
 			 && (int16_t) src.b[1 - nx] + (int16_t) src.b[-1 + nx]
 			 < value.w);
@@ -305,7 +305,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
 		       NULL);
   if (n == LUX_ERROR)
     return LUX_ERROR;
-  
+
   // set the edges to zero
   for (i = 0; i < 2*srcinfo.ndim; i++) {
     if (edge[i]) {
@@ -331,7 +331,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
       case LUX_INT8:
 	do {
 	  value.w = 2 * (int16_t) *src.b;
-	  for (j = 0; j < n; j++) {	/* all directions */	  
+	  for (j = 0; j < n; j++) {	/* all directions */	
 	    k = offset[j];
 	    srcl.b = src.b + k;
 	    srcr.b = src.b - k;
@@ -1169,11 +1169,11 @@ int32_t area_2d(int32_t narg, int32_t ps[])
   int32_t	*ptr, *ptr0, *ptr1, *ptrend, nx, ny, n, areaNumber, *ptr2,
     offsets[8], **stack, **stack0, **stackend, nStack, onEdge, ix = 0, iy = 0,
     ix2, iy2, direction;
-  int32_t	rcoords[8][2] = { 
+  int32_t	rcoords[8][2] = {
     { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 },
     { -1, 0 }, { -1, -1 }, { 0, -1 }, { 1, -1 }
   };
-		      
+		
   nx = array_dims(ps[0])[0];	// width
   ny = array_dims(ps[0])[1];	// height
 
@@ -1190,7 +1190,7 @@ int32_t area_2d(int32_t narg, int32_t ps[])
 
   ptr0 = ptr = (int32_t*) array_data(ps[0]); // data start
   ptrend = ptr0 + array_size(ps[0]); // points one beyond data end
-  
+
   /* The numbers in the input data <image> are interpreted as follows:
      Values equal to zero or greater than one indicate positions that
      are ignored.  Ones indicate positions that are to be labeled.
@@ -1198,7 +1198,7 @@ int32_t area_2d(int32_t narg, int32_t ps[])
      during execution of the subroutine: If negative values are
      present in <image> upon entry into the routine, then unexpected
      results may be obtained.
-     
+
      Unfortunately, we cannot treat the data elements in a linear
      fashion, because the segments may not be convex in shape, so the
      intersection of a segment and any curve may have disjoint parts.
@@ -1276,7 +1276,7 @@ int32_t area_2d(int32_t narg, int32_t ps[])
        other segment elements onto a stack.  Then we assign a label to
        the current position and start treating the elements that are
        on the stack.  If the stack becomes empty, then we are done
-       with the current segment. 
+       with the current segment.
 
        We use a width-first rather than a depth-first method because
        in the former method we only need check once if the current
@@ -1361,10 +1361,10 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
    Syntax:  AREA,image[,seeds,NUMBERS=numbers,DIAGONAL=diagonal]
    All elements of each distinct area are replaced by a number (larger than
    1) which labels the area. <flag> indicates whether the call is a
-   function call (non-zero) or a subroutine call (zero). 
+   function call (non-zero) or a subroutine call (zero).
    Arrays of arbitrary dimension are allowed.
    If <seeds> is specified, then only the areas in which the seeds
-   (indices to the image, after conversion to LONG) lie are identified.  
+   (indices to the image, after conversion to LONG) lie are identified.
    If <numbers> is a scalar, then the area numbers start with the
    specified value.  If <numbers> is an array, then it must have the
    same size as <seeds>, and contains area numbers for the areas
@@ -1443,7 +1443,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 		     seed[i], i);
       }
   }
-  
+
   /* treat all elements that are on an edge: if they are equal to 1, then
      set them to EDGE */
   for (i = 0; i < 2*srcinfo.ndim; i++) {
@@ -1485,7 +1485,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
 
   ptr0 = ptr = src.l;
   ptrend = ptr0 + array_size(ps[0]);
-  
+
   ptr = ptr0;
   stackend = stack0 + nStack;
 
@@ -1524,7 +1524,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
        other segment elements onto a stack.  Then we assign a label to
        the current position and start treating the elements that are
        on the stack.  If the stack becomes empty, then we are done
-       with the current segment. 
+       with the current segment.
 
        We use a width-first rather than a depth-first method because
        in the former method we only need check once if the current
@@ -1618,7 +1618,7 @@ int32_t lux_area(int32_t narg, int32_t ps[])
 {
   if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_INT32)
     return luxerror("Need LONG array", ps[0]);
-  
+
   if (array_num_dims(ps[0]) == 2
       && narg == 1)
     return area_2d(narg, ps);
@@ -2074,10 +2074,10 @@ int32_t area2_general(int32_t narg, int32_t ps[])
    Syntax:  AREA,image,data,[,seeds,NUMBERS=numbers,DIAGONAL=diagonal]
    All elements of each distinct area are replaced by a number (larger than
    1) which labels the area. <flag> indicates whether the call is a
-   function call (non-zero) or a subroutine call (zero). 
+   function call (non-zero) or a subroutine call (zero).
    Arrays of arbitrary dimension are allowed.
    If <seeds> is specified, then only the areas in which the seeds
-   (indices to the image, after conversion to LONG) lie are identified.  
+   (indices to the image, after conversion to LONG) lie are identified.
    If <numbers> is a scalar, then the area numbers start with the
    specified value.  If <numbers> is an array, then it must have the
    same size as <seeds>, and contains area numbers for the areas
@@ -2126,7 +2126,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
   stride = lux_type_size[type];
   maximum = (narg > 5 && ps[5])? (int_arg(ps[5]) >= 0 ? 1: 0): 1;
   maximum *= SEEK_MAXIMUM;
- 
+
   nSeed = nNumber = nDirection = 0;		// defaults
   seed = NULL;
   if (narg > 2 && ps[2]) {	// have <seeds>
@@ -2194,7 +2194,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     areaNumber = 2;		// default start value
 
   ptrend = ptr0 + array_size(ps[0]);
-  
+
   ptr = ptr0;
   stackend = stack0 + nStack;
 
@@ -2234,7 +2234,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
        other segment elements onto a stack.  Then we assign a label to
        the current position and start treating the elements that are
        on the stack.  If the stack becomes empty, then we are done
-       with the current segment. 
+       with the current segment.
 
        We use a width-first rather than a depth-first method because
        in the former method we only need check once if the current
@@ -2553,7 +2553,7 @@ int32_t lux_area2(int32_t narg, int32_t ps[])
     return cerror(NEED_ARR, ps[1]);
   if (array_size(ps[0]) != array_size(ps[1]))
     return cerror(INCMP_ARG, ps[1]);
-  
+
   if (array_num_dims(ps[0]) == 2
       && narg == 2)
     return area2_2d(narg, ps);
@@ -2773,7 +2773,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   trgt0 = trgt;
   nel = array_size(ps[0]);
-  
+
   if (narg > 1 && ps[1]) {	// SIGN
     sign = int_arg(ps[1]);
     sign = (sign < 0)? 0: 0x20;
@@ -4319,7 +4319,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
     t.d = &zero;
     haveThreshold = 0;
   }
-      
+
   /* now calculate the number of directions to treat;
      equal to (3^nDiagonal - 1)/2 + nDoDim - nDiagonal */
   n = 1;
@@ -4338,7 +4338,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   for (i = 0; i < srcinfo.ndim; i++)
     srcinfo.coords[i] = 0;
   srcinfo.coords[0] = 1;
-    
+
   n0 = n1 = 0;
   n2 = 1;			// defaults for when diagonal == 0
   for (k = 0; k < n; ) {
@@ -4414,7 +4414,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.b++;
 	    for (i = i1; i < i2; i++) { // center data points
 	      *trgt.b = 0;
-	      for (j = 0; j < n; j++) {	/* all directions */	  
+	      for (j = 0; j < n; j++) {	/* all directions */	
 		k = offset[j];
 		srcl.b = src.b + k;
 		srcr.b = src.b - k;
@@ -4444,7 +4444,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.w++;
 	    for (i = i1; i < i2; i++) { // center data points
 	      *trgt.b = 0;
-	      for (j = 0; j < n; j++) {	/* all directions */	  
+	      for (j = 0; j < n; j++) {	/* all directions */	
 		k = offset[j];
 		srcl.w = src.w + k;
 		srcr.w = src.w - k;
@@ -4474,7 +4474,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.l++;
 	    for (i = i1; i < i2; i++) { // center data points
 	      *trgt.b = 0;
-	      for (j = 0; j < n; j++) {	/* all directions */	  
+	      for (j = 0; j < n; j++) {	/* all directions */	
 		k = offset[j];
 		srcl.l = src.l + k;
 		srcr.l = src.l - k;
@@ -4564,7 +4564,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	    src.d++;
 	    for (i = i1; i < i2; i++) { // center data points
 	      *trgt.b = 0;
-	      for (j = 0; j < n; j++) {	/* all directions */	  
+	      for (j = 0; j < n; j++) {	/* all directions */	
 		k = offset[j];
 		srcl.d = src.d + k;
 		srcr.d = src.d - k;
@@ -4599,7 +4599,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	      for (i = i1; i < i2; i++) { // center data points
 		*trgt.b = 0;
-		for (j = 0; j < n; j++) { /* all directions */	  
+		for (j = 0; j < n; j++) { /* all directions */	
 		  k = offset[j];
 		  srcl.b = src.b + k;
 		  srcr.b = src.b - k;
@@ -4637,7 +4637,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	      for (i = i1; i < i2; i++) { // center data points
 		*trgt.b = 0;
-		for (j = 0; j < n; j++) { /* all directions */	  
+		for (j = 0; j < n; j++) { /* all directions */	
 		  k = offset[j];
 		  srcl.w = src.w + k;
 		  srcr.w = src.w - k;
@@ -4675,7 +4675,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	      for (i = i1; i < i2; i++) { // center data points
 		*trgt.b = 0;
-		for (j = 0; j < n; j++) { /* all directions */	  
+		for (j = 0; j < n; j++) { /* all directions */	
 		  k = offset[j];
 		  srcl.l = src.l + k;
 		  srcr.l = src.l - k;
@@ -4751,7 +4751,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	      for (i = i1; i < i2; i++) { // center data points
 		*trgt.b = 0;
-		for (j = 0; j < n; j++) { /* all directions */	  
+		for (j = 0; j < n; j++) { /* all directions */	
 		  k = offset[j];
 		  srcl.f = src.f + k;
 		  srcr.f = src.f - k;
@@ -4789,7 +4789,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
 	      }
 	      for (i = i1; i < i2; i++) { // center data points
 		*trgt.b = 0;
-		for (j = 0; j < n; j++) { /* all directions */	  
+		for (j = 0; j < n; j++) { /* all directions */	
 		  k = offset[j];
 		  srcl.d = src.d + k;
 		  srcr.d = src.d - k;
@@ -5208,7 +5208,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
   // points to one beyond the end of the $SPLIT2 array
   if (v2)
     *list = v2;
-  
+
   // Those areas in image 2 that have more than one connection to
   // non-background areas in image 1 have undergone merging.  We find them.
   i = j = v1 = v2 = 0;
@@ -5513,7 +5513,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       free(order);
       free(order2);
       return result;		// so we're done
-    }    
+    }
     j = 0;
     for ( ; i < n2; i++)
       if (ptr2[order[i]] != j)  // a new area number

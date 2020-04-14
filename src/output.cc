@@ -68,7 +68,7 @@ int32_t Vprintf(const char *format, va_list arg)
     vfprintf(recordFile, format, arg);
   result = vprintf(format, arg);
   return result;
-}  
+}
 //----------------------------------------------------------------------
 int32_t Vfprintf(FILE *stream, const char *format, va_list arg)
 {

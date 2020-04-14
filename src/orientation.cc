@@ -293,7 +293,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 		 t, xdims[2] - 1, j, xdims[1] - 1);
 	else
 	  printf("\rORIENTATION - working on y %1d of %1d  ",
-		 j, xdims[1] - 1);	  
+		 j, xdims[1] - 1);	
 	fflush(stdout);
       }
       w2 = n2 + order - j;	// first row of integration volume
@@ -722,5 +722,5 @@ II. The Wavenumber
   specific eigenvector, e.g., U_1, we find
 
    (17)  w(U_1)^2 = (sum_i s_ii - lambda_1)/N.
-  
+
    */

@@ -54,7 +54,7 @@ static Bytestack stack = NULL;
 /** Returns the default Byte stack.  The default Byte stack is
     (re)created if it does not currently exist. */
 static Bytestack
-default_Bytestack(void) 
+default_Bytestack(void)
 {
   if (!stack)
     stack = Bytestack_create();
@@ -62,13 +62,13 @@ default_Bytestack(void)
 }
 
 /** Creates an empty Byte stack.
- * 
+ *
  * @return The Byte stack, or \c NULL if a problem occurred.
  *
  * The caller is responsible for (eventually) deleting the Byte stack
  * again, using Bytestack_delete().
  */
-Bytestack 
+Bytestack
 Bytestack_create(void)
 {
   Bytestack b;
@@ -96,8 +96,8 @@ Bytestack_create(void)
  *
  * @see Bytestack_create()
  */
-void 
-Bytestack_delete(Bytestack b) 
+void
+Bytestack_delete(Bytestack b)
 {
   if (!b)
     b = default_Bytestack();
@@ -137,10 +137,10 @@ enlarge(Bytestack b, size_t n)
 
 /**
  * Pushes text unto a Byte stack.
- * 
+ *
  * @param b the Byte stack to push unto.  May be \c NULL, which
  * indicates the default Byte stack.
- * 
+ *
  * @param text the text to push.
  *
  * Pushes bytes from \p text until but excluding the next following
@@ -150,9 +150,9 @@ enlarge(Bytestack b, size_t n)
  * text on the Byte stack, or #BYTESTACK_INDEX_ERROR if an error
  * occurred.
  */
-Bytestack_index 
+Bytestack_index
 Bytestack_push_text(Bytestack b,
-		       const char *text) 
+		       const char *text)
 {
   return Bytestack_push_data(b, text, NULL);
 }
@@ -174,12 +174,12 @@ Bytestack_strcat(Bytestack b,
 
 /**
  * Pushes data unto a Byte stack.
- * 
+ *
  * @param b the Byte stack to push unto.  May be \c NULL, which
  * indicates the default Byte stack.
- * 
+ *
  * @param begin the first Byte to push.
- * 
+ *
  * @param end one beyond the last Byte to push.  Must be greater than
  * \p begin.
  *
@@ -227,10 +227,10 @@ Bytestack_push_data(Bytestack b,
 
 /**
  * Pops data from a Byte stack.
- * 
+ *
  * @param b the Byte stack to pop from.  May be \c NULL, which
  * indicates the default Byte stack.
- * 
+ *
  * @param index the Byte stack index that indicates the beginning of
  * the data to pop.
  *
@@ -247,7 +247,7 @@ Bytestack_push_data(Bytestack b,
  * @return a pointer to the beginning of the popped data.
  */
 char *
-Bytestack_pop(Bytestack b, Bytestack_index index) 
+Bytestack_pop(Bytestack b, Bytestack_index index)
 {
   if (!b)
     b = default_Bytestack();
@@ -265,10 +265,10 @@ char *Bytestack_pop_all(Bytestack b)
 
 /**
  * Restores data to a Byte stack.
- * 
+ *
  * @param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param size the number of bytes to restore.  Must be non-negative.
  *
  * Shifts the stack pointer over the indicated number \p size of
@@ -283,8 +283,8 @@ char *Bytestack_pop_all(Bytestack b)
  * negative or larger than the number of bytes available for
  * restoring).
  */
-int32_t 
-Bytestack_restore(Bytestack b, int32_t size) 
+int32_t
+Bytestack_restore(Bytestack b, int32_t size)
 {
   if (!b)
     b = default_Bytestack();
@@ -296,10 +296,10 @@ Bytestack_restore(Bytestack b, int32_t size)
 
 /**
  * Temporarily stores a text string on a Byte stack.
- * 
+ *
  * @param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param text the text to temporarily store on the Byte stack.
  *
  * Pushes and immediately pops the \p text from Byte stack \p stack
@@ -312,17 +312,17 @@ Bytestack_restore(Bytestack b, int32_t size)
  * @return a pointer to the temporary copy of the text.
  */
 char *
-Bytestack_temp_text(Bytestack stack, const char *text) 
+Bytestack_temp_text(Bytestack stack, const char *text)
 {
   return Bytestack_pop(stack, Bytestack_push_text(stack, text));
 }
 
 /**
  * Temporarily stores data on a Byte stack.
- * 
+ *
  * @param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param begin the location of the first Byte to store.
  * @param end one beyond the location of the last Byte to store.
  *
@@ -338,20 +338,20 @@ Bytestack_temp_text(Bytestack stack, const char *text)
  */
 void *
 Bytestack_temp_data(Bytestack stack, const void *begin,
-		       const void *end) 
+		       const void *end)
 {
   return Bytestack_pop(stack, Bytestack_push_data(stack, begin, end));
 }
 
 /**
  * Temporarily stores text on a Byte stack.
- * 
+ *
  * @param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param fmt the printf-style format string to guide the printing of
  * text to the Byte stack.
- * 
+ *
  * @param ap the list of arguments to print.
  *
  * Pushes (under guidance of the format \p fmt) and immediately pops
@@ -365,17 +365,17 @@ Bytestack_temp_data(Bytestack stack, const void *begin,
  * @return a pointer to the temporary copy of the text.
  */
 char *
-Bytestack_temp_vsprintf(Bytestack stack, const char *fmt, va_list ap) 
+Bytestack_temp_vsprintf(Bytestack stack, const char *fmt, va_list ap)
 {
   return Bytestack_pop(stack, Bytestack_vsprintf(stack, fmt, ap));
 }
 
 /**
  * Temporarily stores text on a Byte stack.
- * 
+ *
  * @param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param fmt the printf-style format string to guide the printing of
  * text to the Byte stack.
  *
@@ -390,7 +390,7 @@ Bytestack_temp_vsprintf(Bytestack stack, const char *fmt, va_list ap)
  * @return a pointer to the temporary copy of the text.
  */
 char *
-Bytestack_temp_sprintf(Bytestack stack, const char *fmt, ...) 
+Bytestack_temp_sprintf(Bytestack stack, const char *fmt, ...)
 {
   va_list ap;
 
@@ -412,7 +412,7 @@ char *temp_sprintf(const char *format, ...)
 
 /**
  * Returns the top of the stack.
- * 
+ *
  * @param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
@@ -421,8 +421,8 @@ char *temp_sprintf(const char *format, ...)
  *
  * @return the Byte stack index of the top of the Byte stack.
  */
-Bytestack_index 
-Bytestack_top(Bytestack b) 
+Bytestack_index
+Bytestack_top(Bytestack b)
 {
   if (!b)
     b = default_Bytestack();
@@ -431,10 +431,10 @@ Bytestack_top(Bytestack b)
 
 /**
  * Peeks at Byte stack data without popping it.
- * 
+ *
  * @param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param index the Byte stack index of the data to peek at.
  *
  * Returns a pointer to some data on the stack \p b, without popping
@@ -445,7 +445,7 @@ Bytestack_top(Bytestack b)
  * Byte stack.
  */
 char *
-Bytestack_peek(Bytestack b, Bytestack_index index) 
+Bytestack_peek(Bytestack b, Bytestack_index index)
 {
   if (!b)
     b = default_Bytestack();
@@ -468,10 +468,10 @@ Bytestack_bytes(Bytestack b, Bytestack_index bi)
 
 /**
  * Prints data unto a Byte stack.
- * 
+ *
  * @param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param fmt the printf-style format string to guide the printing.
  *
  * Prints text to the Byte stack \p b under guidance of the format
@@ -480,8 +480,8 @@ Bytestack_bytes(Bytestack b, Bytestack_index bi)
  * @return the Byte stack index that points at the beginning of the
  * newly printed data.
  */
-Bytestack_index 
-Bytestack_sprintf(Bytestack b, const char *fmt, ...) 
+Bytestack_index
+Bytestack_sprintf(Bytestack b, const char *fmt, ...)
 {
   va_list ap;
 
@@ -493,12 +493,12 @@ Bytestack_sprintf(Bytestack b, const char *fmt, ...)
 
 /**
  * Prints data unto a Byte stack.
- * 
+ *
  * @param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param fmt: the printf-style format string to guide the printing.
- * 
+ *
  * @param ap: the list of arguments to print.
  *
  * Prints text to the Byte stack \p b under guidance of the format
@@ -507,7 +507,7 @@ Bytestack_sprintf(Bytestack b, const char *fmt, ...)
  * @return the Byte stack index that points at the beginning of the
  * newly printed data.
  */
-Bytestack_index 
+Bytestack_index
 Bytestack_vsprintf(Bytestack b, const char *fmt, va_list ap)
 {
   size_t n1, n2;
@@ -667,7 +667,7 @@ typedef struct {
  *
  * @return the number of read bytes.
  * */
-static ssize_t 
+static ssize_t
 Bytestack_stream_read(void *cookie, char *buffer, size_t size)
 {
   Bytestack_cookie lc = (Bytestack_cookie) cookie;
@@ -693,10 +693,10 @@ Bytestack_stream_read(void *cookie, char *buffer, size_t size)
  *
  * Reads \p size bytes from the \p buffer and writes them to the
  * stream identified by the \p cookie.
- * 
+ *
  * @return the number of bytes written.
  */
-static ssize_t 
+static ssize_t
 Bytestack_stream_write(void *cookie, const char *buffer,
 			  size_t size)
 {
@@ -727,7 +727,7 @@ Bytestack_stream_write(void *cookie, const char *buffer,
  *
  * @return 0 for success, -1 for failure.
  */
-static int32_t 
+static int32_t
 Bytestack_stream_seek(void *cookie, off64_t *position, int32_t whence)
 {
   Bytestack_cookie lc = (Bytestack_cookie) cookie;
@@ -764,7 +764,7 @@ static void Bytestack_delete_cookie(Bytestack_cookie cookie);
  *
  * @return 0
  */
-static int32_t 
+static int32_t
 Bytestack_stream_close(void *cookie)
 {
   Bytestack_cookie lc = (Bytestack_cookie) cookie;
@@ -775,7 +775,7 @@ Bytestack_stream_close(void *cookie)
 /** Identifies functions that implement activities relevant for a
  *  custom stream.
  */
-cookie_io_functions_t Bytestack_stream_funcs = 
+cookie_io_functions_t Bytestack_stream_funcs =
   {
     Bytestack_stream_read,
     Bytestack_stream_write,
@@ -789,7 +789,7 @@ cookie_io_functions_t Bytestack_stream_funcs =
  *
  * @return the cookie, or \c NULL if an error occurred.
  */
-static Bytestack_cookie 
+static Bytestack_cookie
 Bytestack_create_cookie(Bytestack stack)
 {
   if (!stack)
@@ -811,7 +811,7 @@ Bytestack_create_cookie(Bytestack stack)
  *
  * @param cookie the Byte stack stream cookie to delete.
  */
-static void 
+static void
 Bytestack_delete_cookie(Bytestack_cookie cookie)
 {
   if (cookie)
@@ -820,10 +820,10 @@ Bytestack_delete_cookie(Bytestack_cookie cookie)
 
 /**
  * Opens a Byte stack as a \c FILE.
- * 
+ *
  * @param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
- * 
+ *
  * @param opentype the type of access that is requested, similar to
  * the access specified in calls to \c fopen, e.g., "r" for reading,
  * "w" for writing.
@@ -841,7 +841,7 @@ FILE *
 Bytestack_open(Bytestack stack, const char *opentype)
 {
   Bytestack_cookie cookie = Bytestack_create_cookie(stack);
-  return cookie? fopencookie(cookie, opentype, Bytestack_stream_funcs): 
+  return cookie? fopencookie(cookie, opentype, Bytestack_stream_funcs):
     NULL;
 }
 

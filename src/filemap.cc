@@ -139,7 +139,7 @@ int32_t lux_i_file_output(FILE *fp, Pointer q, int32_t assoctype,
   while (dindx--)
   { if (*qi < 0 || *qi >= fsize)
       error++;
-    else if (fseek(fp, *qi*size + baseOffset, SEEK_SET)) 
+    else if (fseek(fp, *qi*size + baseOffset, SEEK_SET))
     { fclose(fp);
       return cerror(POS_ERR, -1); }
     if (fwrite(q.b, size, 1, fp) != 1)

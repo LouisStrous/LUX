@@ -1476,7 +1476,7 @@ int32_t lux_complexsquare(int32_t narg, int32_t ps[])
       }
       break;
   }
-  return result;  
+  return result;
 }
 //-------------------------------------------------------------------------
 int32_t lux_conjugate(int32_t narg, int32_t ps[])
@@ -1488,7 +1488,7 @@ int32_t lux_conjugate(int32_t narg, int32_t ps[])
 
   if (!symbolIsNumerical(*ps))
     return cerror(ILL_CLASS, *ps);
-  
+
   if (isRealType(symbol_type(*ps)))
     return *ps;			// conjugate equals original
 
@@ -5664,7 +5664,7 @@ doubleComplex c_tan(double real, double imaginary)
 {
   doubleComplex result;
   double	factor;
-  
+
   factor = 1.0/(cos(2*real) + cosh(2*imaginary));
   result.real = sin(2*real)*factor;
   result.imaginary = sinh(2*imaginary)*factor;
@@ -6950,7 +6950,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
   // get sizes and pointers
   if (getNumerical(sym1, LUX_INT8, &n1, &src1, 0, NULL, NULL) < 0
       || getNumerical(sym2, LUX_INT8, &n2, &src2, 0, NULL, NULL) < 0
-      || getNumerical(sym3, LUX_INT8, &n3, &src3, 0, NULL, NULL) < 0) 
+      || getNumerical(sym3, LUX_INT8, &n3, &src3, 0, NULL, NULL) < 0)
     return LUX_ERROR;
 				// crude check on sizes
   if ((n1 != n2 && n1 > 1 && n2 > 1)
@@ -7420,7 +7420,7 @@ double bessel_i0(double x)
 // if internalMode & 1 then returns I0(x)*exp(-x).  LS 3dec95
 {
   double	t;
-  
+
   if (x < 0)
     x = -x;
   if (x < 3.75)
@@ -7483,7 +7483,7 @@ double bessel_k1(double x)
 // LS 3dec96.  uses Abramowitz & Stegun approximations.
 {
   double	t;
-  
+
   if (x <= 0)
     return sqrt(-1);		// generate domain error
   if (x <= 2)

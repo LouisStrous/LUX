@@ -62,22 +62,22 @@ int32_t	nd, ipltyp, ifz = 0, ifzx = 1, ndxs, ndys, ier = 1;
 int32_t	ifont = 3, ndlabx = 2, ndlaby = 2, iblank = 1, ndot = 1, ifirstflag;
 float	xmin, xmax, ymin, ymax;
 float	wxb = 0.15, wxt = 0.9, wyb = 0.1, wyt = 0.7;
-float	ticx = 0.01, ticy = 0.01, plims[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, 
+float	ticx = 0.01, ticy = 0.01, plims[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
 	xlimit = 0.9999, ylimit = 0.9999;
 float	fsized = 1, symsize = 1.0, dashsize = 1.0, theDashSize = 1.0;
 float	symratio = 1.0, ticxr = 0.5, ticyr = 0.5, dvx, dv;
  // end of VMS  common plots
 int32_t	useProjection = 0, oldLineStyle = 0;
 static float	zero = 0.0, one = 0.99999999;
-float	*plotWindow[4] = { &wxb, &wxt, &wyb, &wyt }, 
+float	*plotWindow[4] = { &wxb, &wxt, &wyb, &wyt },
 	*screenWindow[4] = { &zero, &one, &zero, &one };
 int32_t	tkCoordSys = LUX_DEP;
 extern int32_t	projectTk;
 extern float	*projectMatrix;
-int32_t	createFullProjection(float *, float *, float *), 
+int32_t	createFullProjection(float *, float *, float *),
 	coordTrf(float *, float *, int32_t, int32_t);
  // for bounding box LS 18jan95:
-float	postXBot = FLT_MAX, postXTop = -FLT_MAX, 
+float	postXBot = FLT_MAX, postXTop = -FLT_MAX,
 	postYBot = FLT_MAX, postYTop = -FLT_MAX;
 int32_t	updateBoundingBox = 1;	// if 1, then everything counts
 // bounding box control is necessary for PLOT, XYMOV, TV
@@ -102,10 +102,10 @@ int32_t fixPlotStyle(int32_t *symbol, int32_t *line)
   static char	types[] =
     // -9..-1: NEGSYM, 0: ZEROS, 1: POSLINE, 2..9: POSSYM,
     // 10..19: POSLINE, 20..29: POSSYM
-  { NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, 
-      ZEROS, POSLINE, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM, 
-      POSSYM, POSLINE, POSLINE, POSLINE, POSLINE, POSLINE, POSLINE, POSLINE, 
-      POSLINE, POSLINE, POSLINE, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM, 
+  { NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM, NEGSYM,
+      ZEROS, POSLINE, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM,
+      POSSYM, POSLINE, POSLINE, POSLINE, POSLINE, POSLINE, POSLINE, POSLINE,
+      POSLINE, POSLINE, POSLINE, POSSYM, POSSYM, POSSYM, POSSYM, POSSYM,
       POSSYM, POSSYM, POSSYM, POSSYM, POSSYM };
   char	sym, lin, ok = 1;
   int32_t	temp;
@@ -174,7 +174,7 @@ int32_t fixPlotStyle(int32_t *symbol, int32_t *line)
 	  ok = 0;
 	  break;
 	case NONE: case ZEROS:
-	  *line = *symbol; 
+	  *line = *symbol;
 	  *symbol = 0;
 	  break;
       }
@@ -205,14 +205,14 @@ int32_t fixPlotStyle(int32_t *symbol, int32_t *line)
 	case NONE:
 	  *line = 1;
 	case POSLINE: case ZEROS:
-	  *symbol = 0; 
+	  *symbol = 0;
 	  break;
       }
       break;
   }
   if (!ok)
     return
-      luxerror("Illegal combination of symbol type (%d) and line style (%d)\n", 
+      luxerror("Illegal combination of symbol type (%d) and line style (%d)\n",
 	    0, *symbol, *line);
   return 1;
 }
@@ -231,7 +231,7 @@ int32_t lux_plot(int32_t narg, int32_t ps[]) // plot routine
        //       && (labels() == LUX_OK)
     );
   ier = oldIer;
-  return n? 1: LUX_ERROR; 
+  return n? 1: LUX_ERROR;
 }
  //-------------------------------------------------------------------------
 int32_t lux_oplot(int32_t narg, int32_t ps[]) // oplot routine
@@ -291,7 +291,7 @@ int32_t preplot(int32_t narg, int32_t ps[])
 	      printf("too many scalars in list\n");	
 	      return cerror(ILL_ARG_LIST, iq);
 	  } else switch (i) {
-	    case 2: 
+	    case 2:
 	      symStyle = int_arg(iq);
 	      break;
 	    case 3:
@@ -307,7 +307,7 @@ int32_t preplot(int32_t narg, int32_t ps[])
 	      yerrsize = fabs(float_arg(iq));
 	      break;
 	    default:
-	      printf("non-scalar argument expected for %s\n", 
+	      printf("non-scalar argument expected for %s\n",
 		     keyName(subroutine, curRoutineNum, i));
 	      return cerror(ILL_ARG_LIST, iq);
 	  }
@@ -353,7 +353,7 @@ int32_t preplot(int32_t narg, int32_t ps[])
 	    yfmtsym = iq;
 	    break;
 	  default:
-	    printf("non-string argument expected for %s\n", 
+	    printf("non-string argument expected for %s\n",
 		   keyName(subroutine, curRoutineNum, i));
 	    return cerror(ILL_ARG_LIST, iq);
 	  }
@@ -399,7 +399,7 @@ int32_t preplot(int32_t narg, int32_t ps[])
 	      isym = iq;
 	      break;
 	    default:
-	      printf("non-array argument expected for %s\n", 
+	      printf("non-array argument expected for %s\n",
 		     keyName(subroutine, curRoutineNum, i));
 	      return cerror(ILL_ARG_LIST, iq);
 	  }
@@ -807,30 +807,30 @@ int32_t positionClassWindow(float x, float y, float **w)
 #define SECOND_IN	3
 #define PART_IN		4
 int32_t clipToWindow(float *xo, float *yo, float x[2], float y[2], float **w)
-/* restricts the line between (*xo, *yo) and (x[0], y[0]) to the part within 
- the window.  returns the coordinates of the moved points in 
- (x[0], y[0]) and, if necessary, (x[1], y[1]), and returns NONE_IN if no 
- part of the line lies within the window, FIRST_IN if (*xo, *yo) was 
- already in the window, SECOND_IN if (x[0], y[0]) was already in the 
- window, ALL_IN if both (*xo, *yo) and (x[0], y[0]) were inside the 
- window, and PART_IN if none of the two points was in the window, 
+/* restricts the line between (*xo, *yo) and (x[0], y[0]) to the part within
+ the window.  returns the coordinates of the moved points in
+ (x[0], y[0]) and, if necessary, (x[1], y[1]), and returns NONE_IN if no
+ part of the line lies within the window, FIRST_IN if (*xo, *yo) was
+ already in the window, SECOND_IN if (x[0], y[0]) was already in the
+ window, ALL_IN if both (*xo, *yo) and (x[0], y[0]) were inside the
+ window, and PART_IN if none of the two points was in the window,
  but a part of the connecting line was.  The clipped line segment runs
- from (x[0], y[0]) to (x[1], y[1]).  the entry values of x[0] and y[0], 
+ from (x[0], y[0]) to (x[1], y[1]).  the entry values of x[0] and y[0],
  made finite if necessary, are stored in *xo and *yo on exit.  */
 // LS 25jun94
 {
   float	dx, dy, *xx, *yy, savex, savey;
   int32_t	c1, c2;
   int32_t	result = NONE_IN;
-  static char	action[9][9] = 
-  { { 0, 0, 0, 0, 1, 2, 0, 2, 2 }, 
-    { 0, 0, 0, 2, 1, 2, 2, 2, 2 }, 
-    { 0, 0, 0, 2, 1, 0, 2, 2, 0 }, 
-    { 0, 2, 2, 0, 1, 2, 0, 2, 2 }, 
-    { 1, 1, 1, 1, 1, 1, 1, 1, 1 }, 
-    { 2, 2, 0, 2, 1, 0, 2, 2, 0 }, 
-    { 0, 2, 2, 0, 1, 2, 0, 0, 0 }, 
-    { 2, 2, 2, 2, 1, 2, 0, 0, 0 }, 
+  static char	action[9][9] =
+  { { 0, 0, 0, 0, 1, 2, 0, 2, 2 },
+    { 0, 0, 0, 2, 1, 2, 2, 2, 2 },
+    { 0, 0, 0, 2, 1, 0, 2, 2, 0 },
+    { 0, 2, 2, 0, 1, 2, 0, 2, 2 },
+    { 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+    { 2, 2, 0, 2, 1, 0, 2, 2, 0 },
+    { 0, 2, 2, 0, 1, 2, 0, 0, 0 },
+    { 2, 2, 2, 2, 1, 2, 0, 0, 0 },
     { 2, 2, 0, 2, 1, 0, 0, 0, 0 } };
 
 				// transform infinite to huge finite
@@ -1128,7 +1128,7 @@ int32_t dashload(int32_t id, int32_t *ndash, float *sm, float dashsize)
  return 1;
 }
  //-------------------------------------------------------------------------
-int32_t setl(float *ymax, float *ymin, int32_t *nq, float *dv, int32_t ilog, float wyb, 
+int32_t setl(float *ymax, float *ymin, int32_t *nq, float *dv, int32_t ilog, float wyb,
 	 float wyt)
 /*
  *ymin: minimum y value on input, minimum plot limit on output
@@ -1163,7 +1163,7 @@ int32_t setl(float *ymax, float *ymin, int32_t *nq, float *dv, int32_t ilog, flo
    *nq = xq;
    // Note, NQ is 1 cycle too big if YMAX is exactly a power of 10
    if (log10((double) *ymax) == floor(log10((double) *ymax)))
-     (*nq)--; 
+     (*nq)--;
    if (*nq <= 0) {
      printf("internal error in setl,  plot may be very strange\n");
      *nq = 1;
@@ -1343,7 +1343,7 @@ int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
   static float	s;
   float	dx, dy, s0, sd, xc, yc, xx[2], yy[2];
   int32_t	result, ix, iy;
-  int32_t	symplot(float, float, int32_t, int32_t), 
+  int32_t	symplot(float, float, int32_t, int32_t),
   	postvec(float, float, int32_t);
 #if HAVE_LIBX11
   int32_t	xwindow_plot(int32_t, int32_t, int32_t);
@@ -1375,7 +1375,7 @@ int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
     if (useProjection || projectTk) {
       int32_t	project(float, float, float);
       extern float	projected[];
-      
+
       project(x, y, 0);
       x = projected[0];
       y = projected[1];
@@ -1389,7 +1389,7 @@ int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
 	tkplot(*xx, *yy, 0, 0);
 	break;
       case NONE_IN:		// just quit
-	depth--;  
+	depth--;
 	if (callig_update) {
 	  callig_xb = x;
 	  callig_yb = y;
@@ -1399,14 +1399,14 @@ int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
   } else {
     xx[1] = x;
     yy[1] = y;
-    xx[0] = xLast; 
+    xx[0] = xLast;
     yy[0] = yLast;
     depth++;
   }
   if (lineStyle >= 10) {	// dashed line
     if (lineStyle != oldLineStyle) {
       dashload(lineStyle - 10, &ndash, dashes, theDashSize);
-      oldLineStyle = lineStyle; 
+      oldLineStyle = lineStyle;
       id = 0;
       s = 0;
       penState = 1;
@@ -1414,7 +1414,7 @@ int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
     dx = xx[1] - xx[0];
     dy = yy[1] - yy[0];
     sd = sqrt(dx*dx+dy*dy);
-    dx = dx/sd; 
+    dx = dx/sd;
     dy = dy/sd;
     xc = xx[0];
     yc = yy[0];
@@ -1457,7 +1457,7 @@ int32_t tkplot(float x, float y, int32_t lineStyle, int32_t symStyle)
     if (yy[1] < postYBot)
       postYBot = yy[1];
     else if (yy[1] > postYTop)
-      postYTop = y; 
+      postYTop = y;
   }
   switch (lunplt) {
     case 0:			// to screen
@@ -1498,7 +1498,7 @@ int32_t lux_pen(int32_t narg, int32_t ps[])
     standardGray = internalMode & 1;
     set_cur_pen();
   } else
-    printf("Current pen: width = %d; grey level = %f\n", current_pen, 
+    printf("Current pen: width = %d; grey level = %f\n", current_pen,
 	   current_gray);
   return 1;
 }
@@ -1597,9 +1597,9 @@ void set_cur_pen(void)
   int32_t lux_xpen(int32_t, float);
 #endif
   int32_t postpen(int32_t, float);
-  
+
   switch (lunplt) {
-#if HAVE_LIBX11 
+#if HAVE_LIBX11
     case 0:
       lux_xpen(current_pen, current_gray);
       return;
@@ -1615,10 +1615,10 @@ int32_t set_pen(int32_t pen)
   int32_t lux_xpen(int32_t, float);
 #endif
   int32_t postpen(int32_t, float);
-  
+
   switch (lunplt) {
     case 0:
-#if HAVE_LIBX11 
+#if HAVE_LIBX11
       return lux_xpen(pen, current_gray);
 #else
       return cerror(NO_X11, 0);
@@ -1652,9 +1652,9 @@ int32_t lux_erase(int32_t narg, int32_t ps[])
   // reset bounding box
   postXBot = FLT_MAX;
   postXTop = -FLT_MAX;
-  postYBot = FLT_MAX; 
+  postYBot = FLT_MAX;
   postYTop = -FLT_MAX;
-  switch (lunplt) 
+  switch (lunplt)
   { case 0:
 #if HAVE_LIBX11
       return lux_xerase(narg, ps);
@@ -1703,13 +1703,13 @@ int32_t lux_window(int32_t narg, int32_t ps[]) //set or examine window
     printf("              (z axis %f to %f)\n", wzb, wzt);
 #endif
     return 1; }
-  if (narg > 0) 
+  if (narg > 0)
     wxb = float_arg(ps[0]);
   if (narg > 1)
     wxt = float_arg(ps[1]);
-  if (narg > 2) 
+  if (narg > 2)
     wyb = float_arg(ps[2]);
-  if (narg > 3) 
+  if (narg > 3)
     wyt = float_arg(ps[3]);
 #ifdef DEVELOP
   if (narg > 4)
@@ -1727,7 +1727,7 @@ int32_t lux_window(int32_t narg, int32_t ps[]) //set or examine window
     wyt = tmp; }
 #ifdef DEVELOP
   if (wzb > wzt)
-  { tmp = wzb; 
+  { tmp = wzb;
     wzb = wzt;
     wzt = tmp; }
 #endif
@@ -1745,7 +1745,7 @@ int32_t lux_pdev(int32_t narg, int32_t ps[])
     postXBot = postYBot = FLT_MAX;
     postXTop = postYTop = -FLT_MAX;
   } else {
-    printf(" 0   X window terminal\n 1   postscript file (%s)\n", 
+    printf(" 0   X window terminal\n 1   postscript file (%s)\n",
 	   (landscape)? "landscape": "portrait");
     printf("current setting = %d\n", lunplt);
   }
@@ -1798,36 +1798,36 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
   { 1, 5,9, 14, 18, 23, 27, 35, 76, 76};
   static float	poly[] =
   { 0.0085, .01, 0,0, 0,0, 0.01, 0.0075, 0,0 };
-  static uint8_t	mode[] = 
-  { 0, 1,0, 1,0, 1,0, 1,0, 1,1, 1,1, 0,1, 1,1, 0,1, 1,1, 1,0, 1,1, 1,0, 1,0, 1,0, 1,0, 
+  static uint8_t	mode[] =
+  { 0, 1,0, 1,0, 1,0, 1,0, 1,1, 1,1, 0,1, 1,1, 0,1, 1,1, 1,0, 1,1, 1,0, 1,0, 1,0, 1,0,
       1, 0,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,
       1, 1,1, 1,1, 1,1, 1,1, 1};
   static float	dx[] =
-  {0, 0,.005, -.005, .005, -.005, -.005, .005, .005, .005, -.005, 
-     -.005, .005, -.007, 0,.007, -.007, -.007, 0,.007, 0,-.007, 
-     -.007, 0,.007, -.007, 0,0, .005, -.005, -.007, .007, -.005, .005, 
-     0.00000, 0.00110, 0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624, 
-     0.00666, 0.00691, 0.00700, 0.00691, 0.00666, 0.00624, 0.00566, 0.00495, 
-     0.00411, 0.00318, 0.00216, 0.00110, 0.00000, -.00110, -.00216, -.00318, 
-     -.00411, -.00495, -.00566, -.00624, -.00666, -.00691, -.00700, -.00691, 
-     -.00666, -.00624, -.00566, -.00495, -.00411, -.00318, -.00216, -.00110, 
+  {0, 0,.005, -.005, .005, -.005, -.005, .005, .005, .005, -.005,
+     -.005, .005, -.007, 0,.007, -.007, -.007, 0,.007, 0,-.007,
+     -.007, 0,.007, -.007, 0,0, .005, -.005, -.007, .007, -.005, .005,
+     0.00000, 0.00110, 0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624,
+     0.00666, 0.00691, 0.00700, 0.00691, 0.00666, 0.00624, 0.00566, 0.00495,
+     0.00411, 0.00318, 0.00216, 0.00110, 0.00000, -.00110, -.00216, -.00318,
+     -.00411, -.00495, -.00566, -.00624, -.00666, -.00691, -.00700, -.00691,
+     -.00666, -.00624, -.00566, -.00495, -.00411, -.00318, -.00216, -.00110,
      0 };
   static float	dy[] =
-  {.005, -.005, 0,0, .005, -.005, .005, -.005, .005, -.005, -.005, 
+  {.005, -.005, 0,0, .005, -.005, .005, -.005, .005, -.005, -.005,
      .005, .005, -.005, .007, -.005, -.005, 0,.007, 0,-.007, 0,
-     .005, -.007, .005, .005, .007, -.007, .005, -.005, 0,0, .005, -.005, 
-     0.00700, 0.00691, 0.00666, 0.00624, 0.00566, 0.00495, 0.00411, 0.00318, 
-     0.00216, 0.00110, 0.00000, -.00110, -.00216, -.00318, -.00411, -.00495, 
-     -.00566, -.00624, -.00666, -.00691, -.00700, -.00691, -.00666, -.00624, 
-     -.00566, -.00495, -.00411, -.00318, -.00216, -.00110, 0.00000, 0.00110, 
-     0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624, 0.00666, 0.00691, 
+     .005, -.007, .005, .005, .007, -.007, .005, -.005, 0,0, .005, -.005,
+     0.00700, 0.00691, 0.00666, 0.00624, 0.00566, 0.00495, 0.00411, 0.00318,
+     0.00216, 0.00110, 0.00000, -.00110, -.00216, -.00318, -.00411, -.00495,
+     -.00566, -.00624, -.00666, -.00691, -.00700, -.00691, -.00666, -.00624,
+     -.00566, -.00495, -.00411, -.00318, -.00216, -.00110, 0.00000, 0.00110,
+     0.00216, 0.00318, 0.00411, 0.00495, 0.00566, 0.00624, 0.00666, 0.00691,
      .007 };
   static float	xp, yp;
   int32_t	nsym = 8, ns, nsm, ia, ib, icept, i, iq;
   float	tol = 1.e-5, delx, xq, yq, zq, xq2, yq2, slope, x2, y2, sq, pr;
   float	x1, y1;
   char	thing[2];
- 
+
   xp = callig_xb;
   yp = callig_yb; // addition LS 7oct93
   coordTrf(&x, &y, tkCoordSys, LUX_DVI); // transform to LUX_DVI  LS 28jul94
@@ -1841,7 +1841,7 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
   { if (iblank == 0)
       tkplot(x, y, lineStyle, 0); // easy if no blanking
     else                                 // blanking case
-    { if (ifirstflag != 1) 
+    { if (ifirstflag != 1)
       { if (nsm <= nsym || ns > 20)
 	{ if (nsm <= nsym)
 	    pr = poly[nsm-1]*symsize;
@@ -1875,18 +1875,18 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
 	     if (y > yp)
 	     { yq = yp + zq;
 	       yq2 = y - zq; }
-	     else 
+	     else
 	     { yq = yp - zq;
 	       yq2 = y + zq;}
 	   }
          }
 	 else				// a polygon symbol, more work
-	 { 
+	 {
 	   ia = is[nsm - 1];
 	   ib = is[ns - 1] - 1;
 		 // we assume that this is a connected series of lines
            icept = 0;
-           for (i = ia; i < ib; i++) 
+           for (i = ia; i < ib; i++)
 			 // compute intercepts and exit after finding both
            { x1 = dx[i - 1]*symsize;
 	     x2 = dx[i]*symsize;
@@ -1900,7 +1900,7 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
 		 xq = x1; }
              else
              { sq = (y2 - y1)/sq;
-               if (sq == 0) 
+               if (sq == 0)
 	       { if (delx == 0)
 		 { xq = 0.0;
 		   yq = y1; }
@@ -1914,7 +1914,7 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
                { if (delx == 0)
 		 { xq = 0;
 		   yq = y1 - sq*x1; }
-	         else 
+	         else
                  { zq = slope - sq;
                    if (zq)
 		     xq = (y1 - sq*x1)/zq;
@@ -1927,7 +1927,7 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
 		 && (MIN(x1, x2) - xq) < tol )
 	       // at least x checks out, now compute YQ
              { if (delx)
-		 yq = slope*xq; 
+		 yq = slope*xq;
                if ((yq - MAX(y1, y2)) < tol
 		   && (MIN(y1, y2) - yq) < tol)
 			 // we have an intercept, still some more work
@@ -1960,7 +1960,7 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
            if (icept != 2)
            { printf("internal error in SYMPLOT, icept = %d\n", icept);
              return -1; }
-         }  
+         }
      /*	ready to plot the line
 	but we need to check if these points are really within the line
 	(i.e., the symbols could be bigger than the spacing) */
@@ -1975,9 +1975,9 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
       xp = x;	yp = y; }
   }
 					 // draw the symbol if in range
-  if (nsm <= nsym) 
-  { 
-    ia = is[nsm - 1] - 1; 
+  if (nsm <= nsym)
+  {
+    ia = is[nsm - 1] - 1;
     ib = is[ns - 1] - 1;
     for (i = ia; i < ib; i++)
     { xq = dx[i]*symsize;
@@ -2030,7 +2030,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			// xymov routine
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
       nx = 1;
-      iq = lux_float(1, &iq); 
+      iq = lux_float(1, &iq);
       dx = 0;
       x = &scalar_value(iq).f;
       break;
@@ -2054,7 +2054,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			// xymov routine
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
-      ny = 1; 
+      ny = 1;
       iq = lux_float(1, &iq);
       dy = 0;
       y = &scalar_value(iq).f;
@@ -2084,7 +2084,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			// xymov routine
       case LUX_SCAL_PTR:
 	iq = dereferenceScalPointer(iq);
       case LUX_SCALAR:
-	nm = 1; 
+	nm = 1;
 	iq = lux_long(1, &iq);
 	dm = 0;
 	mp = &scalar_value(iq).l;
@@ -2148,7 +2148,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			// xymov routine
 #endif
   // ready for series (or just 1) of tkplot calls
   ifirstflag = 1;	// added 1oct93  LS
-  xc = *x; 
+  xc = *x;
   yc = *y;
   mode = *mp;
   line = LUX_UNSPECIFIED;
@@ -2161,7 +2161,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			// xymov routine
     tkplot(xc, yc, line, mode);
   }
   ifirstflag = 0;
-  x += dx; 
+  x += dx;
   y += dy;
   mp += dm;
   nc = nm - dm;
@@ -2193,7 +2193,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])			// xymov routine
       }
     } else
       isbreak = 0;
-    tkplot(xc, yc, isbreak? 0: line, isbreak? 0: mode); 
+    tkplot(xc, yc, isbreak? 0: line, isbreak? 0: mode);
     x += dx;
     y += dy;
     mp += dm;
@@ -2206,7 +2206,7 @@ int32_t lux_postimage(int32_t narg, int32_t ps[])			// postimage routine
  // subroutine, call is postimage(image, x0, x1, y0, y1)
 {
   extern	int32_t	scalemax, scalemin;
-  int32_t	lux_scale(int32_t, int32_t *), postgray(char *, int32_t, int32_t, float, float, float, 
+  int32_t	lux_scale(int32_t, int32_t *), postgray(char *, int32_t, int32_t, float, float, float,
 					float, int32_t);
   float	x0, x1, y0, y1;
   int32_t	iq, nd, nx, ny, s1, s2;
@@ -2230,8 +2230,8 @@ int32_t lux_postimage(int32_t narg, int32_t ps[])			// postimage routine
     scalemax = s2;	}
   h = (array *) sym[iq].spec.array.ptr;
   nd = h->ndim;
-  if (nd != 2) 
-  { printf("xtv - array must be 2-D\n"); 
+  if (nd != 2)
+  { printf("xtv - array must be 2-D\n");
     return -1; }
   nx = h->dims[0];
   ny = h->dims[1];
@@ -2242,7 +2242,7 @@ int32_t lux_postimage(int32_t narg, int32_t ps[])			// postimage routine
     x1 = float_arg(ps[2]);
   if (narg > 3)
     y0 = float_arg(ps[3]);
-  if (narg > 4) 
+  if (narg > 4)
     y1 = float_arg(ps[4]);
   printf("postimage mode: %d\n", landscape);
   return postgray(ptr, nx, ny, x0, x1, y0, y1, iorder);

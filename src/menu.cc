@@ -124,7 +124,7 @@ int32_t placeEvent(XEvent *event)
      }
  }
  return 0;
-} 
+}
 //------------------------------------------------------------------------
 void paint_pane(int32_t menu_num, int32_t menu_item, int32_t mode)
 // paints a menu item
@@ -162,7 +162,7 @@ int32_t lux_menu_hide(int32_t narg, int32_t ps[])
  int32_t	num, i1, i2;
 
  num = int_arg(ps[0]);
- if (num < -1 || num >= MAXMENU) 
+ if (num < -1 || num >= MAXMENU)
    return luxerror("Menu number out of range", 0);
  if (!text_menus) {
    if (num < 0) {
@@ -202,7 +202,7 @@ int32_t lux_menu_kill(int32_t narg, int32_t ps[])
  if (!text_menus)
    XFlush(display);
  return LUX_OK;
-} 
+}
  //------------------------------------------------------------------------
 Bool menuButtonPress(Display *display, XEvent *event, XPointer arg)
 // returns True if the event is a ButtonPress, EnterNotify, or LeaveNotify
@@ -277,7 +277,7 @@ int32_t lux_check_menu(int32_t narg, int32_t ps[])
    return LUX_ONE;
  } else
    return LUX_ZERO;
-} 
+}
  //------------------------------------------------------------------------
 char getMenuChar(int32_t menu_num)
 // reads the next character from menu #menu_num
@@ -357,7 +357,7 @@ char *readPane(int32_t menu_num, int32_t item_num, char const* query)
     }
   }
   XSetWindowBackground(display, menu[menu_num].window[item_num - 1],
-		       WhitePixel(display,screen_num)); 
+		       WhitePixel(display,screen_num));
   XClearWindow(display, menu[menu_num].window[item_num - 1]);
   menu[menu_num].text[item_num] = old; // restore old text
   XDrawString(display, menu[menu_num].window[item_num - 1], menugc, 2, y + 2,
@@ -368,7 +368,7 @@ char *readPane(int32_t menu_num, int32_t item_num, char const* query)
 }
 //---------------------------------------------------------------------
 int32_t lux_menu_read(int32_t narg, int32_t ps[])
-     /* read string through menu item; 
+     /* read string through menu item;
 	Syntax:  menuread,menu#,item#,query,answer */
 {
   int32_t	menu_num, item_num, result;
@@ -377,7 +377,7 @@ int32_t lux_menu_read(int32_t narg, int32_t ps[])
   if (text_menus)
     return luxerror("lux_menu_read not yet upgraded for text menus!", 0);
   menu_num = int_arg(*ps++);
-  if (menu_num < 0 || menu_num >= MAXMENU) 
+  if (menu_num < 0 || menu_num >= MAXMENU)
     return luxerror("Menu number %1d out of range", 0, menu_num);
   if (!menu_win[menu_num])
     return luxerror("Selected menu %1d does not exist", 0, menu_num);
@@ -540,7 +540,7 @@ int32_t lux_menu(int32_t narg, int32_t ps[])
  if (narg > 1) {
    iq = ps[1];
    if (symbolIsNumerical(symbol_type(iq))) { // no string: MENU,num,x,y,...
-     if (narg == 2) 
+     if (narg == 2)
        return luxerror("Need x and y coordinates", 0);
      x = int_arg(iq);
      y = int_arg(ps[2]);
@@ -566,7 +566,7 @@ int32_t lux_menu(int32_t narg, int32_t ps[])
 }
 //------------------------------------------------------------------------
 int32_t redefine_menu(int32_t narg, int32_t ps[])
-/* store new menu items in existing Menu struct. 
+/* store new menu items in existing Menu struct.
    ps[]:  menu_number, menu_item, ... */
 {
  int32_t	num, n_new, i;
@@ -589,7 +589,7 @@ int32_t redefine_menu(int32_t narg, int32_t ps[])
    Free(menu[num].text[i]);	// delete individual entries
    if (string_array) {
      if (*ptr)
-       text = *ptr++; 
+       text = *ptr++;
      else {
        text = zilch;
        ptr++;
@@ -665,7 +665,7 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
   for (i = 0; i < narg; i++) {		// all menu items and title
     if (string_array) {
       if (*ptr.sp)
-	text = *ptr.sp++; 
+	text = *ptr.sp++;
       else {
 	text = NULL;
 	ptr.sp++;
@@ -678,7 +678,7 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
     *item++ = text;
   }
   item -= narg;
-  if (createMenu(num, x, y, narg, item) == LUX_ERROR) 
+  if (createMenu(num, x, y, narg, item) == LUX_ERROR)
     return LUX_ERROR;
   if (text_menus) {
     printf("Menu %1d: %s\n", num, menu[num].text[0]);
@@ -1214,7 +1214,7 @@ char const* eventName(int32_t type)
 int32_t lux_event_name(int32_t narg, int32_t ps[])
 {
   int32_t	type, result;
-  
+
   type = int_arg(*ps);
   result = string_scratch(strlen(eventName(type)) + 1);
   string_value(result) = strsave(eventName(type));

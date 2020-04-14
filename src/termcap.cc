@@ -39,7 +39,7 @@ void getTermCaps(void)
       char	*tgetstr(char *cap, char **buf); */
   char	*term, *ptr, *cscrat = (char *) scrat;
   int32_t	n, keycode(char *);
-  
+
   term = getenv("TERM");
   if (!term)
   { puts("getTermCaps - environment variable TERM is not set.");

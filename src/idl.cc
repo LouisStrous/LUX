@@ -224,7 +224,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 	  return luxerror("Unsupported data type %d in IDL Save file %s\n", ps[0],
 		       type, expname);
       }
-    }	  
+    }	
   } while (1);
 }
 //-----------------------------------------------------------------------
@@ -275,7 +275,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
   endian(ints, 4, LUX_INT32);
 #endif
   fseek(fp, ints[0], SEEK_SET);	// go to the indicated offset
-  
+
   do {
     fread(ints, 4, 2, fp);	// read 2 ints
 #if LITTLEENDIAN
@@ -290,12 +290,12 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
     }
     break;
   } while (1);
-    
+
   fread(ints, 4, 3, fp);	// read 3 ints
 #if LITTLEENDIAN
   endian(ints, 12, LUX_INT32);
 #endif
-    
+
   n = ints[2];			// size of name
   fseek(fp, n, SEEK_CUR);	// skip name
 
@@ -312,7 +312,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 #endif
   if (ints[1] == 20) {		// array
     type = ints[0];
-    
+
     fseek(fp, 12, SEEK_CUR);
     fread(ints, 4, 1, fp);
 #if LITTLEENDIAN
@@ -411,7 +411,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 	fclose(fp);
 	return LUX_ZERO;
     }
-  }	  
+  }	
 
   fclose(fp);
   return LUX_ONE;

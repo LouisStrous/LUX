@@ -1720,7 +1720,7 @@ void cleanUpRoutine(int32_t context, char keepBase)
 	  // or parameters, then we need to free the memory that was used to
 	  // store them in
 	  free(routine_parameters(context));
-	break; 
+	break;
     }
   } else
     zap(context);
@@ -1802,7 +1802,7 @@ int32_t nextFreeTempExecutable(void)
   extern int32_t	compileLevel;
 
   while (symbol_class(tempExecutableIndex)) {
-    if (++tempExecutableIndex == EXE_END) 
+    if (++tempExecutableIndex == EXE_END)
       tempExecutableIndex = EXE_START;
     if (tempExecutableIndex == oldIndex) // nothing free
       return luxerror("Too many temporary executables - symbol table full", 0);
@@ -2295,10 +2295,10 @@ int32_t newSymbol(Symbolclass kind, ...)
 	}
 	if (isStruct) {
 	  listElem	*p;
-	 
+	
 	  i = narg*(sizeof(listElem));
 	  if (!(list_symbols(n) = (listElem *) malloc(i))) {
-	    va_end(ap); 
+	    va_end(ap);
 	    return luxerror("Could not allocate memory for a struct", 0);
 	  }
 	  symbol_memory(n) = i;
@@ -2317,7 +2317,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  symbol_class(n) = LUX_PRE_CLIST;
 	  if (narg) {
 	    if (!(arg = (int16_t *) malloc(narg*sizeof(int16_t)))) {
-	      va_end(ap); 
+	      va_end(ap);
 	      return luxerror("Could not allocate memory for a list", 0);
 	    }
 	  } else
@@ -2539,7 +2539,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    if (nStatement &&
 		!(routine_parameters(n) =
 		  (int16_t *) malloc(nStatement*sizeof(int16_t)))) {
-	      va_end(ap); 
+	      va_end(ap);
 	      curContext = oldContext;	// restore context
 	      ignoreSymbols = 0;
 	      return
@@ -2605,7 +2605,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    i = 3;
 	    break;
 	  case EVB_FOR:
-	    i = 4; 
+	    i = 4;
 	    break;
 	  case EVB_USR_CODE:
 	    usr_code_routine_num(n) = va_arg(ap, int32_t); // routine number
@@ -2623,7 +2623,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
 	  case LUX_INT_FUNC: case LUX_USR_FUNC:
 	    sym[n].xx = va_arg(ap, int32_t); // routine number (SUB) or target
-	  case EVB_CASE: case EVB_NCASE: case EVB_BLOCK: 
+	  case EVB_CASE: case EVB_NCASE: case EVB_BLOCK:
 	    i = stackListLength();		// # of expr and statements
 	    if (i) {			// only if there are any elements
 	      if (!(arg = (int16_t *) malloc(i*sizeof(int16_t)))) {
@@ -2676,7 +2676,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	i = va_arg(ap, int32_t);	// struct number
 	i = va_arg(ap, int32_t);	// key
 	if (i >= 0)		// non-numerical key
-	  freeString(i); 
+	  freeString(i);
 	break;
       case LUX_LIST:  case LUX_PRE_LIST:
 	narg = stackListLength()/2;
@@ -2770,7 +2770,7 @@ int32_t hash(char const* string)
 int32_t ircmp(const void *a, const void *b)
 {
   internalRoutine *ra, *rb;
-  
+
   ra = (internalRoutine *) a;
   rb = (internalRoutine *) b;
   return strcmp(ra->name, rb->name);
@@ -2851,7 +2851,7 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
  disableNewline--;
  if (echo || traceMode & T_ROUTINEIO) {
    if (fp)
-     printf("Done compiling file %s\n", name);     
+     printf("Done compiling file %s\n", name);
    else
      printf("Done compiling string\n", inputString);
    printf("back in %s\n", (cur_c_info > 1)? curCompileInfo[-1].name: "main");
@@ -2879,10 +2879,10 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
    else
      luxerror("*** error in execution string \"%s\"", 0, inputString);
  }
- /* if (fp) 
+ /* if (fp)
    free(name); */
  return n;
-} 
+}
 //----------------------------------------------------------------
 static int32_t	compileCount = 0;
 int32_t compile(char *string)
@@ -2948,7 +2948,7 @@ int32_t newBlockSymbol(int32_t index)
 {
   int32_t	n, result;
   extern char	reportBody;
-  
+
   if (reportBody) {		// remove name from stack
     freeString(index);
     return 0;
@@ -2987,7 +2987,7 @@ int32_t newSubrSymbol(int32_t index)
   and user-defined subroutines.  if not found, then searches for an
   appropriate file to find a definition.  if such a file is found,
   then installs name as new subroutine in user-defined subroutine list,
-  and a new symbol with appropriate class (LUX_EVB) and type (EVB_INT_SUB 
+  and a new symbol with appropriate class (LUX_EVB) and type (EVB_INT_SUB
   or EVB_USR_SUB) is returned.  if such a file is not found, then
   an error is generated. */
 {
@@ -3505,13 +3505,13 @@ int32_t convertRange(int32_t range)
 //            element is requested.
 {
   int32_t	subsc, eval(int32_t), j1, j2;
-  
+
   if ((subsc = newSymbol(LUX_SUBSC_PTR)) < 0) return -1;
   j1 = range_start(range);
   if (j1 == -LUX_ONE)		// (*)
   { subsc_ptr_start(subsc) = 0;
     subsc_ptr_end(subsc) = -1; }
-  else 
+  else
   { if (j1 >= 0)		// (X:...)
     { j2 = int_arg(eval(j1));
       if (j2 < 0)

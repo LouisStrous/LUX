@@ -66,7 +66,7 @@ int32_t lux_distr(int32_t narg, int32_t ps[])
  CK_ARR(iq, 2);
  h = HEAD(iq);
  GET_SIZE(n, h->dims, h->ndim);
- bin = LPTR(h); 
+ bin = LPTR(h);
  iq = lux_convert(1, ps++, targettype, 1); // value
  if (iq < 0)
    return LUX_ERROR;		// some error
@@ -510,7 +510,7 @@ int32_t lux_readarr(int32_t narg, int32_t ps[])
  }
  fclose(tp);
  return 1;
-}  
+}
 //-------------------------------------------------------------------------
 int32_t lux_find(int32_t narg, int32_t ps[])
 /* for each element of <key>, finds first occurrence of that
@@ -558,7 +558,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
       iq = lux_int64(1, &iq);  break;
     case LUX_FLOAT:
       iq = lux_float(1, &iq);  break;
-    case LUX_DOUBLE: 
+    case LUX_DOUBLE:
       iq = lux_double(1, &iq);  break; }
   class_id = symbol_class(iq);
   GET_NUMERICAL(theKey, nkey);
@@ -1277,7 +1277,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
     case 1:			// data
       axisSym = widthSym = 0;
       break; }
-  
+
   if (symbol_class(ps[0]) != LUX_ARRAY)	// <data> not an array
     return cerror(NEED_ARR, ps[0]);
 
@@ -1311,7 +1311,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 
   outType = symbol_type(result);
   type = symbol_type(ps[0]);
-  
+
   axis = srcinfo.axes[0];
   step = srcinfo.step[0];
 
@@ -1338,7 +1338,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
 	    for (i = i1; i < i2; i += step)
 	      sum.l += (int32_t) src.b[i];
 	    *trgt.l = sum.l;
-	    done = advanceLoop(&trgtinfo, &trgt), 
+	    done = advanceLoop(&trgtinfo, &trgt),
 	      advanceLoop(&srcinfo, &src);
 	    width.l++;
 	    if (done == widthNDim)	// done with indicated axis
@@ -1898,7 +1898,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
       tgt[3] ← src[2..4]                         3 3
       tgt[4] ← src[4] (/PW) ∨ src[2..4] (/NOPW)  4 3
       w1 = 2, w2 = 4
-      
+
       n = 5 ∧ ww = 4
       tgt[0] ← src[0..1] (/PW) ∨ src[0..3] (/NOPW)  ½ 1½
       tgt[1] ← src[0..3]                           1½ 1½
@@ -1906,7 +1906,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
       tgt[3] ← src[3..4] (/PW) ∨ src[1..4] (/NOPW) 3½ 2½
       tgt[4] ← src[4] (/PW) ∨ src[1..4] (/NOPW)    4  2½
       w1 = 2, w2 = 3
-      
+
       n = 6 ∧ ww = 3
       tgt[0] ← src[0] (/PW) ∨ src[0..2] (/NOPW) 0 1
       tgt[1] ← src[0..2]                        1 1
@@ -1915,9 +1915,9 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
       tgt[4] ← src[3..5]                        4 4
       tgt[5] ← src[5] (/PW) ∨ src[3..5] (/NOPW) 5 4
       w1 = 2, w2 = 5
-      
+
       n = 6 ∧ ww = 4
-      tgt[0] ← src[0..1] (/PW) ∨ src[0..3] (/NOPW)  ½ 1½ 
+      tgt[0] ← src[0..1] (/PW) ∨ src[0..3] (/NOPW)  ½ 1½
       tgt[1] ← src[0..3]                           1½ 1½
       tgt[2] ← src[1..4]                           2½ 2½
       tgt[3] ← src[2..5]                           3½ 3½
@@ -1925,12 +1925,12 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
       tgt[5] ← src[5] (/PW) ∨ src[2..5] (/NOPW)    5  3½
       w1 = 2, w2 = 4
 
-      n ww w1 w2  
+      n ww w1 w2
       5  3  2  4
       5  4  2  3
       6  3  2  5
       6  4  2  4
-      
+
       w1 = ⌊(ww + 1)/2⌋
       w2 = ⌊n - ww/2⌋
     */
@@ -1968,12 +1968,12 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  } else {		// full width
 	    for (i = 0; i < ww; i++) { // do the left edge
 	      value.l += *src.b;
-	      src.b += stride; 
+	      src.b += stride;
 	    }
 	    uint8_t v = (uint8_t) (value.l/norm);
 	    for (i = 0; i < w1; i++) {
 	      *trgt.b = v;
-	      trgt.b += stride; 
+	      trgt.b += stride;
 	    }
 	  }
 	  // middle part
@@ -2042,12 +2042,12 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  } else {		// full width
 	    for (i = 0; i < ww; i++) { // do the left edge
 	      value.l += *src.w;
-	      src.w += stride; 
+	      src.w += stride;
 	    }
 	    int16_t v = (int16_t) (value.l/norm);
 	    for (i = 0; i < w1; i++) {
 	      *trgt.w = v;
-	      trgt.w += stride; 
+	      trgt.w += stride;
 	    }
 	  }
 	  // middle part
@@ -2116,12 +2116,12 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  } else {		// full width
 	    for (i = 0; i < ww; i++) { // do the left edge
 	      value.l += *src.l;
-	      src.l += stride; 
+	      src.l += stride;
 	    }
 	    int32_t v = value.l/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.l = v;
-	      trgt.l += stride; 
+	      trgt.l += stride;
 	    }
 	  }
 	  // middle part
@@ -2266,12 +2266,12 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  } else {		// full width
 	    for (i = 0; i < ww; i++) { // do the left edge
 	      kahan_sum_f(*src.f, value.f, c);
-	      src.f += stride; 
+	      src.f += stride;
 	    }
 	    double v = value.f/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.f = v;
-	      trgt.f += stride; 
+	      trgt.f += stride;
 	    }
 	  }
 	  // middle part
@@ -2342,12 +2342,12 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 	  } else {		// full width
 	    for (i = 0; i < ww; i++) { // do the left edge
 	      kahan_sum_d(*src.d, value.d, c);
-	      src.d += stride; 
+	      src.d += stride;
 	    }
 	    double v = value.d/norm;
 	    for (i = 0; i < w1; i++) {
 	      *trgt.d = v;
-	      trgt.d += stride; 
+	      trgt.d += stride;
 	    }
 	  }
 	  // middle part
@@ -2738,7 +2738,7 @@ int32_t lux_table(int32_t narg, int32_t ps[])
        y.d += nTable;  if (y.d == ny.d) y.d = oy.d;
      }
    }
-   break; 
+   break;
  }
  return symr;
 }
@@ -2856,7 +2856,7 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
  nTable = hx->dims[0];		// number of elements per table
  ox.l = LPTR(hx);
  oy.l = LPTR(hy);
- if (symbol_class(nsymf) == LUX_ARRAY) 
+ if (symbol_class(nsymf) == LUX_ARRAY)
  { of.l = xf.l = LPTR(hf);
    nf.b = of.b + sym[symf].spec.array.bstore - sizeof(array); }
  else
@@ -2953,7 +2953,7 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
 int32_t lux_push(int32_t narg, int32_t ps[])
 /* Push a number of variables onto the user stack
    LS 27may94 3aug99 */
-{ 
+{
   int32_t	iq;
 
   while (narg--) {
@@ -3039,7 +3039,7 @@ int32_t lux_dump_stack(int32_t narg, int32_t ps[])
 {
   int32_t	iq, count = 0;
   int16_t	*p;
-  
+
   if (stackPointer == stack + STACKSIZE) {
     puts("The stack is empty.");
     return 1;
@@ -3054,7 +3054,7 @@ int32_t lux_dump_stack(int32_t narg, int32_t ps[])
 //----------------------------------------------------------------------
 int32_t peek(int32_t narg, int32_t ps[])
 // display memory contents
-{ 
+{
   int32_t	start, nr;
   uint8_t	*adr, i;
   char	s;
@@ -3285,7 +3285,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
      nextIndex /= dims[i];
    }
    nextIndex = currentIndex;
-     
+
 	/* now comparisonIndex points at first value to be compared
 	   and step[] contains step sizes to move around currentIndex */
 		// now do the search
@@ -3416,7 +3416,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	     for (i = 0; i < ndim; i++)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
-		   hessian[i + i*ndim] = hessian2[i] = 
+		   hessian[i + i*ndim] = hessian2[i] =
 		     (float) extr.b[size[i]] + (float) extr.b[-size[i]] - 2*v;
 		 else {
 		   x = ((float) extr.b[size[i] + size[j]]
@@ -3490,7 +3490,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	     for (i = 0; i < ndim; i++)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
-		   hessian[i + i*ndim] = hessian2[i] = 
+		   hessian[i + i*ndim] = hessian2[i] =
 		     (float) extr.w[size[i]] + (float) extr.w[-size[i]] - 2*v;
 		 else {
 		   x = ((float) extr.w[size[i] + size[j]]
@@ -3564,7 +3564,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	     for (i = 0; i < ndim; i++)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
-		   hessian[i + i*ndim] = hessian2[i] = 
+		   hessian[i + i*ndim] = hessian2[i] =
 		     (float) extr.l[size[i]] + (float) extr.l[-size[i]] - 2*v;
 		 else {
 		   x = ((float) extr.l[size[i] + size[j]]
@@ -3712,7 +3712,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	     for (i = 0; i < ndim; i++)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
-		   hessian[i + i*ndim] = hessian2[i] = 
+		   hessian[i + i*ndim] = hessian2[i] =
 		     (float) extr.f[size[i]] + (float) extr.f[-size[i]] - 2*v;
 		 else {
 		   x = ((float) extr.f[size[i] + size[j]]
@@ -3786,7 +3786,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	     for (i = 0; i < ndim; i++)
 	       for (j = 0; j <= i; j++) {
 		 if (i == j)
-		   hessian[i + i*ndim] = hessian2[i] = 
+		   hessian[i + i*ndim] = hessian2[i] =
 		     (float) extr.d[size[i]] + (float) extr.d[-size[i]] - 2*v;
 		 else {
 		   x = ((float) extr.d[size[i] + size[j]]
@@ -3855,7 +3855,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
 	     break;
 	   }
 	 if (ready) {
-	   f_solve(hessian, grad2, ndim, ndim); 
+	   f_solve(hessian, grad2, ndim, ndim);
 	   if (code & 4) {		// force closeness
 	     j = 0;
 	     for (i = 0; !j && i < ndim; i++)

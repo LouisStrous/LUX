@@ -46,7 +46,7 @@ METHODDEF void get_input_row (compress_info_ptr cinfo, JSAMPARRAY pixel_row)
 {
   register JSAMPROW ptr0;
   register long col;
-  
+
   ptr0 = pixel_row[0];
   for (col = 0; col < cinfo->image_width; col++) {
     *ptr0++ = (JSAMPLE) *q1.b++; // gray
@@ -76,7 +76,7 @@ int32_t lux_write_jpeg_f(int32_t narg, int32_t ps[])
 {
   int32_t	lux_write_jpeg(int32_t, int32_t []);
 
-  if (lux_write_jpeg(narg, ps) == LUX_OK) 
+  if (lux_write_jpeg(narg, ps) == LUX_OK)
     return LUX_ONE;
   else
     return LUX_ZERO;
@@ -104,7 +104,7 @@ int32_t lux_write_jpeg(int32_t narg, int32_t ps[])	// jpeg write subroutine
  if (!symbolIsString(ps[1]))
    return cerror(NEED_STR, ps[1]);
  name = string_value(ps[1]);
- 
+
  nx = array_dims(iq)[0];
  ny = array_dims(iq)[1];
  		// optional third argument is the quality level
@@ -121,7 +121,7 @@ int32_t lux_write_jpeg(int32_t narg, int32_t ps[])	// jpeg write subroutine
  c_methods.get_input_row = get_input_row;
  c_methods.input_term = input_term;
  c_methods.c_ui_method_selection = c_ui_method_selection;
- 
+
  // Set up default JPEG parameters in the cinfo data structure.
  j_c_defaults(&cinfo, jqual, FALSE);
  cinfo.input_file = NULL;	// if no actual input file involved
@@ -212,7 +212,7 @@ put_pixel_rows (decompress_info_ptr cinfo, int32_t num_rows, JSAMPIMAGE pixel_da
  register JSAMPROW ptr0;
  register long col;
  register int32_t row;
-  
+
  /* printf("put_pixel_rows: num_rows, cinfo->image_width = %d, %d\n",
  	num_rows, cinfo->image_width); */
  // printf("base, q1.b = %d, %d\n", base, q1.b);

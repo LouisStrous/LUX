@@ -30,7 +30,7 @@ void getTermCaps(void)
   extern char	expname[];
   FILE	*fp;
   int32_t	i, n;
-  
+
   term = getenv("TERM");
   if (!term)
   { puts("getTermCaps - No translation for environment variable TERM.");

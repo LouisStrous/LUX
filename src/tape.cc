@@ -183,7 +183,7 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
 {
   int32_t	fd, nbr, iq, n, type, nread, cur;
   Pointer q1;
-  
+
   if ( (fd = tape_setup(narg,ps)) < 0)
     return LUX_ERROR;
 				// get the size of the input array to load
@@ -382,7 +382,7 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])// read tape record
      if (errno == 12) {  // record larger than requested recsize,
 			 // OK if last one
        if (ic == recsize)
-	 nbr = recsize; 
+	 nbr = recsize;
        else {
 	 printf("record sizes seem to be larger than the specified max size\n");
 	 printf("try again with a larger record size parameter\n");

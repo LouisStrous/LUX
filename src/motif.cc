@@ -84,7 +84,7 @@ extern Colormap	colorMap;	// from color.c
 void destroy_cb(Widget, XtPointer, void *);		// LS 20jan99
  Widget PostDialog(Widget parent, int32_t dialog_type, char *msg);
  Widget	lux_command_widget;
- 
+
 //#define MAXWIDGETS       4000
 //#define MAXPIXMAPS       20
  int32_t	motif_flag = 1, motif_realized_flag = 0, motif_init_flag = 0;
@@ -144,7 +144,7 @@ Widget xmtoplevel_form(width, height, title, hs, vs, mx, my)
  XtSetArg(wargs[n], XmNcolormap, colorMap); n++; // added LS 12mar99
  toplevel_form = XtAppCreateShell(NULL, "Class",
 	topLevelShellWidgetClass, disp, wargs, n);
- 
+
  n=0;
  XtSetArg(wargs[n], XmNwidth, width); n++;
  XtSetArg(wargs[n], XmNheight, height); n++;
@@ -176,7 +176,7 @@ Widget xmtoplevel_board(width, height, title, mx, my)
  XtSetArg(wargs[n], XmNcolormap, colorMap); n++; // added LS 12mar99
  toplevel_board = XtAppCreateShell(NULL, "Class",
 	topLevelShellWidgetClass, disp, wargs, n);
- 
+
  n=0;
  XtSetArg(wargs[n], XmNwidth, width); n++;
  XtSetArg(wargs[n], XmNheight, height); n++;
@@ -365,7 +365,7 @@ int32_t lux_xmcommand(narg, ps) //see next line for args
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  if (int_arg_stat(ps[2], &nvisible) != 1) return -1;
  if (narg > 3) { if (int_arg_stat(ps[3], &hmax) != 1) return -1; }
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNhistoryVisibleItemCount, nvisible); n++;
  XtSetArg(wargs[n], XmNhistoryMaxItems, hmax); n++;
@@ -477,7 +477,7 @@ int32_t lux_xmdialog_board(narg, ps)	// see next line for args
  board = n_widgets++;
  lux_widget_id[board] = wb =
  	XmCreateBulletinBoardDialog(lux_widget_id[parent], "board",wargs, n);
- 
+
  /* this didn't work
  if (narg > 8) {
   if (int_arg_stat(ps[8], &close_flag) != 1) return -1; }
@@ -535,7 +535,7 @@ int32_t lux_xmdialog_form(narg, ps)	// see next line for args
  form = n_widgets++;
  lux_widget_id[form] = wb =
  	XmCreateFormDialog(lux_widget_id[parent], "form",wargs, n);
- 
+
  XmStringFree(title);
  result_sym = scalar_scratch(2);		//for widget id
  sym[result_sym].spec.scalar.l = form;
@@ -569,7 +569,7 @@ int32_t lux_xmtoplevel_form(narg, ps)	// see next line for args
  if (ck_widget_count() < 0) return -1;
  form = n_widgets++;
  lux_widget_id[form] = xmtoplevel_form(dx, dy, s, hs, vs, mx, my);
- 
+
  result_sym = scalar_scratch(2);		//for widget id
  sym[result_sym].spec.scalar.l = form;
  return result_sym;
@@ -614,7 +614,7 @@ int32_t lux_xmboard(narg, ps)	// (parent, [width, height, lr_margin, tb_margin])
  // get parent widget
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
  // get the arguments
- 
+
  if (narg >1 )  {if (int_arg_stat(ps[1], &dx) != 1) return -1; }
  if (narg >2 )  {if (int_arg_stat(ps[2], &dy) != 1) return -1; }
  n = 0;
@@ -777,7 +777,7 @@ int32_t rows_or_columns(narg, ps,mode)	//(parent, width, height, [ncolumns],[p_f
  n++;
  if (mode == 0) XtSetArg(wargs[n], XmNorientation, XmVERTICAL);
  	else	XtSetArg(wargs[n], XmNorientation, XmHORIZONTAL);
- 
+
  n++;
  if (narg > 3) { XtSetArg(wargs[n], XmNnumColumns, ncol); n++; }
  if (ck_widget_count() < 0) return -1;
@@ -922,7 +922,7 @@ int32_t lux_xmscrollbarsetvalues(narg, ps)//(widget,value,max,slidersize,dpage)
  if (max>0)		{ XtSetArg(wargs[n], XmNmaximum, max); n++; }
  if (slidersize>0)	{  XtSetArg(wargs[n], XmNsliderSize, slidersize); n++; }
  if (dpage>0)		{ XtSetArg(wargs[n], XmNpageIncrement, dpage); n++; }
- 
+
  if (n>0)	XtSetValues(lux_widget_id[w], wargs, n);
  return 1;
  }
@@ -1054,7 +1054,7 @@ int32_t lux_xmdrawinglink(narg, ps)	// (widget, lux_win)
  	0,NULL);
  XSetForeground(display, gc[lux_win], BlackPixel(display, screen_num));
 
- XSelectInput( display, win[lux_win], ExposureMask | KeyPressMask | 
+ XSelectInput( display, win[lux_win], ExposureMask | KeyPressMask |
     ButtonPressMask | StructureNotifyMask | FocusChangeMask );
  /*
  cursor = XCreateFontCursor(display, XC_crosshair);
@@ -1091,10 +1091,10 @@ int32_t lux_xmtextfromfile(narg, ps)//(parent, filename, [rows, cols, font,color
  i = fread(buffer,1,file_info.st_size, fin);
  buffer[file_info.st_size] = 0;
  fclose(fin);
- 
+
  if (narg > 2) if (int_arg_stat(ps[2], &rows) != 1) return -1;
  if (narg > 3) if (int_arg_stat(ps[3], &cols) != 1) return -1;
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNrows, rows); n++;
  XtSetArg(wargs[n], XmNcolumns, cols); n++;
@@ -1133,10 +1133,10 @@ int32_t lux_xmtext(narg, ps)//(parent, rows, cols, [font,color])
  if (ck_motif() != 1) return -1;
  // get parent widget
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
- 
+
  if (narg > 1) if (int_arg_stat(ps[1], &rows) != 1) return -1;
  if (narg > 2) if (int_arg_stat(ps[2], &cols) != 1) return -1;
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNrows, rows); n++;
  XtSetArg(wargs[n], XmNcolumns, cols); n++;
@@ -1170,10 +1170,10 @@ int32_t lux_xmtextbox(narg, ps)//(parent, rows, cols, [font,color])
  if (ck_motif() != 1) return -1;
  // get parent widget
  if ( get_widget_id( ps[0], &parent) != 1 ) return -1;
- 
+
  if (narg > 1) if (int_arg_stat(ps[1], &rows) != 1) return -1;
  if (narg > 2) if (int_arg_stat(ps[2], &cols) != 1) return -1;
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNrows, rows); n++;
  XtSetArg(wargs[n], XmNcolumns, cols); n++;
@@ -1231,7 +1231,7 @@ int32_t lux_xmtextgetstring(narg, ps) // (widget)
  char    *s, *p, *pt;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
- 
+
  pt = XmTextGetString(lux_widget_id[w]);
  mq = strlen(pt);
  result_sym = string_scratch(mq);		//for resultant string
@@ -1254,7 +1254,7 @@ int32_t lux_xmtextsetstring(narg, ps) // (widget, value)
  iq = ps[1];
  if (symbol_class(iq) != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
- 
+
  XmTextSetString(lux_widget_id[w], s);
  return 1;
  }
@@ -1266,7 +1266,7 @@ int32_t lux_xmtextsetposition(narg, ps) // (widget, position)
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &i) != 1) return -1;
- 
+
  XmTextSetInsertionPosition(lux_widget_id[w], (XmTextPosition) i);
  return 1;
  }
@@ -1277,7 +1277,7 @@ int32_t lux_xmtextgetlastposition(narg, ps) // (widget)
  int32_t	w, i, result_sym;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
- 
+
  i = XmTextGetLastPosition(lux_widget_id[w]);
  result_sym = scalar_scratch(2);		//for position
  sym[result_sym].spec.scalar.l = i;
@@ -1290,7 +1290,7 @@ int32_t lux_xmtextgetinsertposition(narg, ps) // (widget)
  int32_t	w, i, result_sym;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
- 
+
  i = XmTextGetInsertionPosition(lux_widget_id[w]);
  result_sym = scalar_scratch(2);		//for position
  sym[result_sym].spec.scalar.l = i;
@@ -1304,10 +1304,10 @@ int32_t lux_xmtextgetselection(narg, ps) // (widget, [left, right])
  {
  int32_t	w, mq, result_sym;
  char    *s, *p, *pt;
- 
+
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
- 
+
  pt = XmTextGetSelection(lux_widget_id[w]);
  mq = strlen(pt);
  result_sym = string_scratch(mq);		//for resultant string
@@ -1390,7 +1390,7 @@ int32_t lux_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see ne
  }
  if (narg > 5) {
   if (setup_colors (ps[5] ) != 1) return -1; }	// do colors based on bg
-  
+
  if (ck_widget_count() < 0) return -1;
  textfield = n_widgets++;
  lux_widget_id[textfield] =
@@ -1433,7 +1433,7 @@ int32_t lux_xmtextfieldsetstring(narg, ps) // (widget, string, [cursor])
  iq = ps[1];
  if (symbol_class(iq) != 2) return execute_error(70);
  s = (char *) sym[iq].spec.array.ptr;
- 
+
  XmTextFieldSetString(lux_widget_id[w], s);
  // set the cursor at the end if cursor argument is not 0
  if (narg > 2) { if (int_arg_stat(ps[2], &cflag) != 1) return -1;
@@ -1453,7 +1453,7 @@ int32_t lux_xmtextfieldseteditable(narg, ps) // (widget, value)
  if (get_widget_id(ps[0], &w) != 1) return -1;
  // get the condition
  if (int_arg_stat(ps[1], &iq) != 1) return -1;
- 
+
  if (iq != 0) XmTextFieldSetEditable(lux_widget_id[w], True);  else
  	XmTextFieldSetEditable(lux_widget_id[w], False);
  return 1;
@@ -1467,7 +1467,7 @@ int32_t lux_xmtextfieldsetmaxlength(narg, ps) // (widget, value)
  if (get_widget_id(ps[0], &w) != 1) return -1;
  // get the condition
  if (int_arg_stat(ps[1], &iq) != 1) return -1;
- 
+
  XmTextFieldSetMaxLength(lux_widget_id[w], iq);
  return 1;
  }
@@ -1480,7 +1480,7 @@ int32_t lux_xmtextseteditable(narg, ps) // (widget, value)
  if (get_widget_id(ps[0], &w) != 1) return -1;
  // get the condition
  if (int_arg_stat(ps[1], &iq) != 1) return -1;
- 
+
  if (iq != 0) XmTextSetEditable(lux_widget_id[w], True);  else
  	XmTextSetEditable(lux_widget_id[w], False);
  return 1;
@@ -1493,7 +1493,7 @@ int32_t lux_xmtextfieldgetstring(narg, ps) // (widget)
  char    *s, *p, *pt;
  if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
- 
+
  pt = XmTextFieldGetString(lux_widget_id[w]);
  mq = strlen(pt);
  result_sym = string_scratch(mq);		//for resultant string
@@ -1550,7 +1550,7 @@ int32_t lux_xmtextfieldarray(narg, ps)  // lots of arguments
  pass back this ID as first element in returned array */
  n = 0;
  wg = XmCreateBulletinBoard(lux_widget_id[w], "board",wargs, n);
- 
+
  i = narg - 8;	j = 8;
  /* i is the count of labels, we are going to store the widget id's of the
  adjacent textfields in an array returned, but the first element will be the
@@ -1587,7 +1587,7 @@ int32_t lux_xmtextfieldarray(narg, ps)  // lots of arguments
  XmStringFree(ms);
  n = n - 6;	iy += ny;
  }
- 
+
  // now the textfield
  n = 0;	// be careful, n is bumped by set_fontlist and setup_colors
  // 3/21/98 - modified to not set colors of labels, hence 2 loops
@@ -1607,7 +1607,7 @@ int32_t lux_xmtextfieldarray(narg, ps)  // lots of arguments
  lux_widget_id[text] =
  	XmCreateTextField(wg, "textfield", wargs, n);
  XtManageChild(lux_widget_id[text]);
- 
+
  n = n -4;	iy += ny;
 
  // call backs, 2 of them, one sets the textfield number
@@ -1654,7 +1654,7 @@ int32_t lux_xmlistfromfile(narg, ps) /*(parent, callback, filename,
  	{ printf("could not open list file\n"); fclose(fin);
 	return 2; } // for bad file, return a -1 as widget result
  if (int_arg_stat(ps[3], &nvisible) != 1) return -1;
- 
+
  nlist = 0;
  n = 0;
  XtSetArg(wargs[n], XmNselectionPolicy, XmBROWSE_SELECT); n++;
@@ -1707,7 +1707,7 @@ int32_t lux_xmaddfiletolist(narg, ps) //(list_widget, filename)
  if ((fin = fopen(filename, "r")) == NULL)
  	{ printf("could not open list file: %s\n", filename); fclose(fin);
 	return 4; } // for bad file, return a 0
- 
+
  // load the lines as items
  while ( fgets(line, 200, fin) != NULL) {
   // strip out the new line or we get a symbol in list
@@ -1732,7 +1732,7 @@ int32_t lux_xmlistsubr(narg, ps) //(list_widget)
  XmString	ms;
  // get list widget
  if ( get_widget_id( ps[0], &list_widget) != 1 ) return -1;
- 
+
  // load the subr names as items
  for (i=0; i < num_lux_subr; i++ ) {
   sprintf(line, "%s",lux_subr[i].name);
@@ -1754,7 +1754,7 @@ int32_t lux_xmlistfunc(narg, ps) //(list_widget)
  XmString	ms;
  // get list widget
  if ( get_widget_id( ps[0], &list_widget) != 1 ) return -1;
- 
+
  // load the subr names as items
  // note that we skip over the specials, currently 9 of them
  for (i=9; i < num_lux_func; i++ ) {
@@ -1786,7 +1786,7 @@ int32_t lux_xmlist(narg, ps) //(parent, callback, nvisible,[font,color, resize_f
  if (strlen(s) == 0 )  nsym = 0;  else	nsym = lux_execute_symbol(s,1);
  // printf("nsym for call back = %d\n", nsym);
  if (int_arg_stat(ps[2], &nvisible) != 1) return -1;
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNselectionPolicy, XmBROWSE_SELECT); n++;
  XtSetArg(wargs[n], XmNvisibleItemCount, nvisible); n++;
@@ -2013,7 +2013,7 @@ int32_t lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next 
  if (symbol_class(iq) != 2) { return execute_error(70); }
  s = (char *) sym[iq].spec.array.ptr;
  if (strlen(s) == 0) nsym_cancel = 0; else nsym_cancel=lux_execute_symbol(s,1);
- 
+
  // need to set fonts, colors for children
  n = 0;
  if (narg > 6) {
@@ -2062,7 +2062,7 @@ int32_t lux_xmfilegetlist(narg, ps)	// (widget_id)
  int32_t	w, result_sym, fcount, dim[8];
  XmString	*names;
  char	**q, *text, *strsave();
- 
+
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  n = 0;
  XtSetArg(wargs[n], XmNfileListItems, &names); n++;
@@ -2092,7 +2092,7 @@ int32_t set_fontlist(nsym)
 	  return 1; }
  fontlist = XmFontListCreate(font, cset);
  XtSetArg(wargs[n], XmNfontList, fontlist); n++;
- return 1; 
+ return 1;
  }
  //-------------------------------------------------------------------------
 int32_t set_textfontlist(nsym)
@@ -2109,7 +2109,7 @@ int32_t set_textfontlist(nsym)
 	  return 1; }
  fontlist = XmFontListCreate(font, cset);
  XtSetArg(wargs[n], XmNtextFontList, fontlist); n++;
- return 1; 
+ return 1;
  }
  //-------------------------------------------------------------------------
 int32_t set_labelfontlist(nsym)
@@ -2126,7 +2126,7 @@ int32_t set_labelfontlist(nsym)
 	  return 1; }
  fontlist = XmFontListCreate(font, cset);
  XtSetArg(wargs[n], XmNlabelFontList, fontlist); n++;
- return 1; 
+ return 1;
  }
  //-------------------------------------------------------------------------
 int32_t set_defaultfontlist(nsym)
@@ -2175,14 +2175,14 @@ int32_t setup_colors(int32_t nsym)
   installPixel(sc);
 
  // and set them
-  XtSetArg(wargs[n], XmNforeground, fc); n++; 
-  XtSetArg(wargs[n], XmNbackground, color->pixel); n++; 
-  XtSetArg(wargs[n], XmNborderColor, fc); n++; 
-  XtSetArg(wargs[n], XmNtopShadowColor, ts); n++; 
-  XtSetArg(wargs[n], XmNarmColor, sc); n++; 
-  XtSetArg(wargs[n], XmNbottomShadowColor, bs); n++; 
+  XtSetArg(wargs[n], XmNforeground, fc); n++;
+  XtSetArg(wargs[n], XmNbackground, color->pixel); n++;
+  XtSetArg(wargs[n], XmNborderColor, fc); n++;
+  XtSetArg(wargs[n], XmNtopShadowColor, ts); n++;
+  XtSetArg(wargs[n], XmNarmColor, sc); n++;
+  XtSetArg(wargs[n], XmNbottomShadowColor, bs); n++;
   XtSetArg(wargs[n], XmNselectColor, sc); n++;
-  return 1; 
+  return 1;
  }
  //-------------------------------------------------------------------------
 int32_t lux_xmbutton(narg, ps) // (parent, label, callback, [font,color])
@@ -2276,7 +2276,7 @@ int32_t lux_xmsetpixmap(narg, ps) // (widget, pixmap_file)
  pixmap = XmGetPixmap(XtScreen(lux_widget_id[toplevel]), s, fg, bg);
  if ( pixmap == 0) { printf("error reading pixmap file %s\n", s);
 	return -1;	}
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNlabelType, XmPIXMAP); n++;
  XtSetArg(wargs[n], XmNlabelPixmap, pixmap); n++;
@@ -2307,7 +2307,7 @@ int32_t lux_xmpixmapbutton(narg, ps) // (parent, pixmap_file, callback)
  pixmap = XmGetPixmap(XtScreen(lux_widget_id[toplevel]), s, fg, bg);
  if ( pixmap == 0) { printf("error reading pixmap file %s\n", s);
 	return -1;	}
-  
+
  // get callback string
  iq = ps[2];
  if (symbol_class(iq) != 2) { return execute_error(70); }
@@ -2370,7 +2370,7 @@ int32_t lux_xmradiobox(narg, ps) // (parent,callback,font,color,l1,[l2, l3 ...])
  if ( radiobox == 0 ) XtSetArg(wargs[n], XmNradioBehavior, False); n++;
  XtSetArg(wargs[n], XmNnumColumns, ncolumns); n++;
  wg = XmCreateRadioBox(lux_widget_id[w], "radio_box",wargs,n);
- 
+
  // now the semi-optional font and color
  n = 0;	/* be careful, n is bumped by set_fontlist and setup_colors
  	and is then then used for each of the toggle buttons */
@@ -2513,7 +2513,7 @@ int32_t lux_xmpixmapoptionmenu(narg, ps) // (parent,callback,font,color,s,p1,[p2
  narg--;	// decrease for the new # of labels
  dmenu = MAX(dmenu ,0);		dmenu = MIN(dmenu, narg - 6);
  }
- 
+
  i = narg - 5;	j = 5; k = 0;
  /* i is the count of push buttons, we are going to store the widget id's
  for these in an array returned, but the first element will be the
@@ -2540,10 +2540,10 @@ int32_t lux_xmpixmapoptionmenu(narg, ps) // (parent,callback,font,color,s,p1,[p2
  if (ck_widget_count() < 0) return -1;
  option = n_widgets++;
  // note that each of these use the font and color set above
- 
+
  lux_widget_id[option] = XtCreateManagedWidget( s, xmPushButtonGadgetClass, wg,
  	wargs, n);
- 
+
  XtAddCallback(lux_widget_id[option], XmNactivateCallback, menu_which,
  	(XtPointer) k);
  k++;
@@ -2634,7 +2634,7 @@ int32_t lux_xmoptionmenu(narg, ps) // (parent,callback,font,color,s,l1,[l2 ...])
  narg--;	// decrease for the new # of labels
  dmenu = MAX(dmenu ,0);		dmenu = MIN(dmenu, narg - 6);
  }
- 
+
  i = narg - 5;	j = 5; k = 0;
  /* i is the count of push buttons, we are going to store the widget id's
  for these in an array returned, but the first element will be the
@@ -2709,7 +2709,7 @@ int32_t lux_xmgetoptionselection(narg, ps)
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  // this should be a row/column type but we aren't checking here
  if (ck_widget_count() < 0) return -1;
- wm = n_widgets++; 
+ wm = n_widgets++;
  n = 0;
  XtSetArg(wargs[n], XmNmenuHistory, &lux_widget_id[wm]); n++;
  XtGetValues(lux_widget_id[w], wargs, n);
@@ -2752,7 +2752,7 @@ int32_t lux_xmmenubar(narg, ps) // (parent,font,color,l1,[l2 ...])
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  if (ck_widget_count() < 0) return -1;
  menu = n_widgets++;
- 
+
  // create the menu bar
  n = 0;	/* be careful, n is bumped by set_fontlist and setup_colors
  	and is then then used for each of the toggle buttons */
@@ -2816,7 +2816,7 @@ int32_t lux_xmpulldownmenu(narg, ps) // (parent,casc,callback,font,color,l1,[l2 
  // get parent widget and some checks
  if (ck_motif() != 1) return -1;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- 
+
  // get the cascade button widget
  if (int_arg_stat(ps[1], &c_button) != 1) {
   printf("XMPULLDOWNMENU, cascade widget id is not a scalar\n");
@@ -2891,7 +2891,7 @@ int32_t lux_xmgetwidgetaddress(narg, ps)
  {
  int32_t	w, result_sym, wm;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
- wm = (int32_t) lux_widget_id[w]; 
+ wm = (int32_t) lux_widget_id[w];
  result_sym = scalar_scratch(2);		//for widget id
  sym[result_sym].spec.scalar.l = wm;
  return result_sym;
@@ -3006,7 +3006,7 @@ int32_t lux_xmscalesetvalue(narg, ps) // (widget, value)
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &value) != 1) return -1;
- 
+
  XmScaleSetValue(lux_widget_id[w], value);
  return 1;
  }
@@ -3017,7 +3017,7 @@ int32_t lux_xmscalegetvalue(narg, ps) // (widget)
  int32_t	w, result_sym, value;
   if (ck_motif() != 1) return -1;
  if (get_widget_id(ps[0], &w) != 1) return -1;
- 
+
  XmScaleGetValue(lux_widget_id[w], &value);
  result_sym = scalar_scratch(2);		// for returned value
  sym[result_sym].spec.scalar.l = value;
@@ -3035,7 +3035,7 @@ int32_t lux_xmscaleresetlimits(narg, ps) // (widget, min, max,[dshift])
  if (int_arg_stat(ps[2], &max) != 1) return -1;
  // get decimal shift, optional
  if (narg>3)  { if (int_arg_stat(ps[3], &dshift) != 1) return -1; }
- 
+
  XtUnmanageChild(lux_widget_id[w]);
  n = 0;
  XtSetArg(wargs[n], XmNminimum, min); n++;
@@ -3142,7 +3142,7 @@ int32_t lux_xmposition(narg, ps) // (widget, x, y, [sx, sy])
  if (int_arg_stat(ps[2], &y) != 1) return -1;
  if (narg > 3) if (int_arg_stat(ps[3], &dx) != 1) return -1;
  if (narg > 4) if (int_arg_stat(ps[4], &dy) != 1) return -1;
- 
+
  n = 0;
  if (x >= 0) { XtSetArg(wargs[n], XmNx, x); n++; }
  if (y >= 0) { XtSetArg(wargs[n], XmNy, y); n++; }
@@ -3199,7 +3199,7 @@ int32_t lux_xmsetmodal(narg, ps) // (widget, modal_flag)
  // get the arguments
  if (get_widget_id(ps[0], &w1) != 1) return -1;
  if (int_arg_stat(ps[1], &modal_flag) != 1) return -1;
- 
+
  n = 0;
  if (modal_flag != 0)
   { XtSetArg(wargs[n], XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL); n++;}
@@ -3240,7 +3240,7 @@ int32_t lux_xmborderwidth(narg, ps) // (widget, width)
  // get the arguments
  if (get_widget_id(ps[0], &w1) != 1) return -1;
  if (int_arg_stat(ps[1], &wq) != 1) return -1;
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNborderWidth, wq); n++;
  XtSetValues(lux_widget_id[w1], wargs, n);
@@ -3288,7 +3288,7 @@ int32_t lux_xmalignment(narg, ps) // (widget, mode)
  // get the widget
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &mode) != 1) return -1;
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNisAligned, True); n++;
  switch (mode) {
@@ -3311,7 +3311,7 @@ int32_t lux_xmsensitive(narg, ps) // (widget, mode)
  // get the widget
  if (get_widget_id(ps[0], &w) != 1) return -1;
  if (int_arg_stat(ps[1], &mode) != 1) return -1;
- 
+
  n = 1;
  if (mode != 0) XtSetArg(wargs[n], XmNsensitive, True); else
  	XtSetArg(wargs[n], XmNsensitive, False);
@@ -3334,7 +3334,7 @@ int32_t lux_xmfont(narg, ps) // (widget, font_string)
  leak here, not sure if these should be freed after each use */
  if ( (font = XLoadQueryFont(disp, fontname)) == NULL)
   { font_not_available();  return 1; }
- 
+
  n = 0;
  fontlist = XmFontListCreate(font, cset);
  XtSetArg(wargs[n], XmNfontList, fontlist); n++;
@@ -3477,7 +3477,7 @@ int32_t colorset(narg, ps, mode) // internal routine
  if ( strlen(pc) <= 0 ) return 1;	// a null, do nothing
  if ( XAllocNamedColor(disp, cmap, pc, &colorcell, &rgb_def) == 0 )
 	{ color_not_available(); return 1; }
- 
+
  n = 0;
  switch (mode)
  {
@@ -3706,8 +3706,8 @@ void lux_xminit(void) 	// the motif initialization
 
  n=0;
  if ((font =
-      XLoadQueryFont(disp, "-adobe-helvetica-bold-r-normal--14*")) == NULL) 
-   font_not_available(); 
+      XLoadQueryFont(disp, "-adobe-helvetica-bold-r-normal--14*")) == NULL)
+   font_not_available();
  else {
    fontlist = XmFontListCreate(font, cset);
    XtSetArg(wargs[n], XmNfontList, fontlist); n++;
@@ -3758,7 +3758,7 @@ int32_t lux_xtloop(narg, ps)
 	motif_realized_flag = 1; }
 
  // 6/13/95, accepts a single argument and sets !motif to the value
- 
+
  motif_flag = 1;
  if (narg>0) if (int_arg_stat(ps[0], &motif_flag) != 1) return -1;
  /* 8/26/94 changed again
@@ -3789,7 +3789,7 @@ int32_t lux_xtloop(narg, ps)
   XtDispatchEvent(&event);
   } break;
  }
- 
+
  //printf("escaped motif\n");
  xtloop_running = 0;	// to indicate we are done in here
  return 1;
@@ -4213,11 +4213,11 @@ int32_t lux_motif_input(narg, ps) // get our commands via motif widget
  result_sym = array_scratch(2, 1, &nq);
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
  wids = (int32_t *) ((char *)h + sizeof(struct ahead));
- 
+
  if (narg > 1) { if (int_arg_stat(ps[1], &width) != 1) return -1; }
  if (narg > 2) { if (int_arg_stat(ps[2], &nvisible) != 1) return -1; }
  if (narg > 3) { if (int_arg_stat(ps[3], &hmax) != 1) return -1; }
- 
+
  n = 0;
  XtSetArg(wargs[n], XmNhistoryVisibleItemCount, nvisible); n++;
  XtSetArg(wargs[n], XmNhistoryMaxItems, hmax); n++;
@@ -4270,7 +4270,7 @@ void wprint(char *fmt, ...)
  char	msgbuf[256];	// should be coordinated with maximum size elsewhere
  int32_t	i;
  va_list args;
- 
+
  va_start(args, fmt);
  (void) vsprintf(msgbuf, fmt, args);
  va_end(args);

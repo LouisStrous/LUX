@@ -133,7 +133,7 @@ int32_t copyToSym(int32_t target, int32_t source)
         symbol_class(target) = LUX_SCALAR;
       }
       break;
-    case LUX_SCALAR: 
+    case LUX_SCALAR:
       memcpy(&scalar_value(target), &scalar_value(source),
              sizeof(scalar_value(source)));
       break;
@@ -208,7 +208,7 @@ int32_t copyToSym(int32_t target, int32_t source)
       symbol_memory(target) = size;
       memcpy(array_header(target), array_header(source), sizeof(array));
       size = array_size(source);
-      if (array_type(source) == LUX_STRING_ARRAY) { 
+      if (array_type(source) == LUX_STRING_ARRAY) {
         ptr.sp = (char **) array_data(target);
         optr.sp = (char **) array_data(source);
         while (size--) {
@@ -561,7 +561,7 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
       symbol_memory(rhs) = 0;   // or memory gets deallocated
       if (rhs < tempVariableIndex)
         tempVariableIndex = rhs;
-      nTempVariable--; 
+      nTempVariable--;
     }
   // in structures, lists and ranges, the context of the elements must be
   // modified to reflect the new situation
@@ -670,7 +670,7 @@ int32_t matchUserKey(char *name, int32_t routineNum)
       return i;
     else if (l > 2 && !strncmp(name, "NO", 2) &&
              !strncmp(name + 2, *keys, l - 2)) return -i - 1;
-    keys++; 
+    keys++;
   }
   return NOKEY;
 }
@@ -901,7 +901,7 @@ int32_t internal_routine(int32_t symbol, internalRoutine *routine)
      free(evalArgs);
      return LUX_ERROR;
    }
- 
+
  switch (routineNum) {
    case LUX_SUBSC_FUN:
      n = -1;
@@ -943,7 +943,7 @@ int32_t internal_routine(int32_t symbol, internalRoutine *routine)
      if (i == maxArg - 1)       // last one
        maxArg--;
    }
- 
+
  // scalar pointers shall be evaluated during execution of the routine
  evalScalPtr = 1;
                 // execute
@@ -976,7 +976,7 @@ int32_t getBody(int32_t routine)
  isFunction = (symbol_class(routine) == LUX_DEFERRED_FUNC);
  if (!(fp = openPathFile(name, (isFunction? FIND_FUNC: FIND_SUBR) | FIND_LOWER)))
    if (isFunction)
-     fp = openPathFile(name, FIND_SUBR | FIND_LOWER); 
+     fp = openPathFile(name, FIND_SUBR | FIND_LOWER);
  if (!fp)
    return luxerror("Could not open file %s.", 0,
                 deferred_routine_filename(routine));
@@ -1037,7 +1037,7 @@ int32_t usr_routine(int32_t symbol)
      break;
    case LUX_DEFERRED_SUBR:
      if (getBody(routineNum) < 0) { // compilation failed
-       if ((traceMode & T_ROUTINE) == 0) 
+       if ((traceMode & T_ROUTINE) == 0)
          noTrace--;             // restore
        return LUX_ERROR;
      }
@@ -1045,7 +1045,7 @@ int32_t usr_routine(int32_t symbol)
      break;
    case LUX_DEFERRED_FUNC:
      if (getBody(routineNum) < 0) { // compilation failed
-       if ((traceMode & T_ROUTINE) == 0) 
+       if ((traceMode & T_ROUTINE) == 0)
          noTrace--;             // restore
        return LUX_ERROR;
      }
@@ -1053,7 +1053,7 @@ int32_t usr_routine(int32_t symbol)
      break;
    case LUX_DEFERRED_BLOCK:
      if (getBody(routineNum) < 0) { // compilation failed
-       if ((traceMode & T_ROUTINE) == 0) 
+       if ((traceMode & T_ROUTINE) == 0)
          noTrace--;             // restore
        return LUX_ERROR;
      }
@@ -1196,7 +1196,7 @@ int32_t usr_routine(int32_t symbol)
      } // end for (i = 0; i < thisNArg; i++)
    } // end if (thisNArg)
  } // end if (symbol_class(routineNum != LUX_BLOCKROUTINE)
- 
+
  // did an error occur during evaluation of the arguments?
  isError = 0;
  for (i = 0; i < nPar; i++)
@@ -1217,7 +1217,7 @@ int32_t usr_routine(int32_t symbol)
    // evaluating all arguments first and only linking them to parameters
    // later is insufficient in the following example:
    // subr foo,x d,x if x eq 0 then return foo,x-1 d,x endsubr foo,5
-   /* The response without parameter copies is as follows: 
+   /* The response without parameter copies is as follows:
       201 FOO.X     pointer, points at <25000>
       *25000 (unnamed)  scalar, LONG, value = 5
       201 FOO.X     pointer, points at <5000>
@@ -1245,7 +1245,7 @@ int32_t usr_routine(int32_t symbol)
      oldpars = NULL;
    for (i = 0; i < nPar; i++)
      memcpy(oldpars + i, &sym[par[i]], sizeof(symTableEntry));
-   
+
    for (i = 0; i < nPar; i++) {
      if (evalArg[i]) {          // have an argument
        if (symbol_class(*par) != LUX_TRANSFER) {
@@ -1515,7 +1515,7 @@ int32_t lux_for(int32_t nsym)
          *counter.b += inc.b;
          n = forward? (*counter.b > end.b? 0: 1): (*counter.b < end.b? 0: 1);
        }
-     else 
+     else
        while (n) {
          n = execute(temp);
          switch (n) {
@@ -1554,7 +1554,7 @@ int32_t lux_for(int32_t nsym)
          *counter.w += inc.w;
          n = forward? (*counter.w > end.w? 0: 1): (*counter.w < end.w? 0: 1);
        }
-     else 
+     else
        while (n) {
          n = execute(temp);
          switch (n) {
@@ -1710,7 +1710,7 @@ int32_t lux_for(int32_t nsym)
          *counter.d += inc.d;
          n = forward? (*counter.d > end.d? 0: 1): (*counter.d < end.d? 0: 1);
        }
-     else 
+     else
        while (n) {
          n = execute(temp);
          switch (n) {
@@ -1919,7 +1919,7 @@ int32_t execute(int32_t symbol)
             case 'q':           // stop this calculation
               puts("Aborting this calculation");
               step = 0;
-              go = 0; 
+              go = 0;
               return LUX_ERROR;
           } // end of switch (c)
         } // end of while (c == '?')
@@ -3143,7 +3143,7 @@ int32_t insert(int32_t narg, int32_t ps[])
           }
           fwrite(&value.b, unit, 1, fp);
           if (ferror(fp)) {
-            fclose(fp); 
+            fclose(fp);
             return cerror(WRITE_ERR, target);
           }
           src.b += onestep;
@@ -3192,7 +3192,7 @@ int32_t insert(int32_t narg, int32_t ps[])
       for (i = 0; i < narg; i++)
         if (size[i] > 1)
           j++;
-    
+
     if (!j)                     // all subscripts are scalars:
       // they indicate the start address.  If there is only one subscript,
       // or if the number of subscripts is greater than the number of
@@ -3269,16 +3269,16 @@ int32_t insert(int32_t narg, int32_t ps[])
         offset0 += start[i]*n;
       n *= dims[i];
     }
-    
+
     if (subsc_type[0] == LUX_RANGE) // ??
       tstep[0] = stride[0];
     else
       tstep[0] = 0;
-    
+
     for (i = 1; i < narg; i++)
       tstep[i] = (subsc_type[i] == LUX_RANGE? stride[i]: 0)
         - (subsc_type[i - 1] == LUX_RANGE? size[i - 1]*stride[i - 1]: 0);
-    
+
     switch (class_id) {
       case LUX_ARRAY: case LUX_CARRAY:
         do {
@@ -4091,7 +4091,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       iq = target;
       goto einsert_1;
   }
-  
+
   /* get here if source is a (numerical, string, or file) array or a
      string */
 
@@ -4111,7 +4111,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
     srcType = LUX_STRING_ARRAY;
 
   onestep = lux_type_size[srcType];
-    
+
   switch (internalMode & 48) {
     case 0:                     // none
       if (narg > 1 && narg != ndim) {
@@ -4590,7 +4590,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
           }
           fwrite(&value.b, unit, 1, fp);
           if (ferror(fp)) {
-            fclose(fp); 
+            fclose(fp);
             iq = cerror(WRITE_ERR, target);
             goto einsert_1;
           }
@@ -4648,7 +4648,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       for (i = 0; i < narg; i++)
         if (size[i] > 1)
           j++;
-    
+
     if (!j)                     // all subscripts are scalars:
       // they indicate the start address.  If there is only one subscript,
       // or if the number of subscripts is greater than the number of
@@ -4732,16 +4732,16 @@ int32_t einsert(int32_t lhs, int32_t rhs)
         offset0 += start[i]*n;
       n *= dims[i];
     }
-    
+
     if (subsc_type[0] == LUX_RANGE) // ??
       tstep[0] = stride[0];
     else
       tstep[0] = 0;
-    
+
     for (i = 1; i < narg; i++)
       tstep[i] = (subsc_type[i] == LUX_RANGE? stride[i]: 0)
         - (subsc_type[i - 1] == LUX_RANGE? size[i - 1]*stride[i - 1]: 0);
-    
+
     switch (class_id) {
       case LUX_ARRAY: case LUX_CARRAY:
         do {

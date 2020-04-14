@@ -57,7 +57,7 @@ int32_t anacon(float *xarr, int32_t nx, int32_t ny, float *xlev, int32_t numlev,
 //   nx,ny  is size of xarr
 //   xlev   is a table of contour levels float*4
 //   numlev are the number of levels to contour
-/*  itvord  is the desired flip of the array - see inccon below for 
+/*  itvord  is the desired flip of the array - see inccon below for
 details*/
 //   xsc,ysc are the coords. of the upper rhs
 //   xl,yl are the coordinates of the lower left corner for the contour
@@ -82,7 +82,7 @@ details*/
   xz = xl + xsc / (float)2.;
   yz = yl + ysc / (float)2.;
 
-/* set up increments and limits for array processing according to itvord 
+/* set up increments and limits for array processing according to itvord
 */
 
   inccon(itvord, nx, ny, &ibase, &ibindx, &incr, &ninc, &n2, &n3, &n4);
@@ -131,7 +131,7 @@ details*/
 		|| (xlev[k] < cell[l - 1] && xlev[k] >= cell[l])) {
 
 
-/*  calculate endpoints of line segment on the 
+/*  calculate endpoints of line segment on the
 side of the cell */
 
 	      ++ns;
@@ -158,11 +158,11 @@ side of the cell */
 	      }
 	    }
 	  }
-	  
+	
 	  if (ns > 2) {
 	    ntim = 2;
 	    xmean = cellavg(cell, 4);
-/*  if the present level is greater than the mean, 
+/*  if the present level is greater than the mean,
 then the contour */
 /*  is drawn between the max point and the center. (
 imax gives max */
@@ -178,7 +178,7 @@ imax gives max */
 	      }
 	    }
 	    if (xlev[k] <= xmean) {
-/* switch 2 and 4 so that point 1 connects to 
+/* switch 2 and 4 so that point 1 connects to
 point 2 and point 3 to 4. */
 	      tmp = aa[3];
 	      aa[3] = aa[1];
@@ -218,7 +218,7 @@ float cellavg(float *cell, int32_t nav)
 {
   float ret_val;
   int32_t ii;
-  
+
   // Parameter adjustments
   --cell;
 
@@ -262,9 +262,9 @@ int32_t inccon(int32_t itv, int32_t nx, int32_t ny, int32_t *ibase, int32_t *ibi
 
 // from the bottom of the screen to the top.
 
-/* --	7/7/86        orders 1 and 5 seem to be reversed, patch to 
+/* --	7/7/86        orders 1 and 5 seem to be reversed, patch to
 fix */
-/* 	the comments and logic in parts of this seem wrong, should be cleaned 
+/* 	the comments and logic in parts of this seem wrong, should be cleaned
 */
 // 	up someday, beware !
   if (itv % 2 == 0) {
@@ -316,7 +316,7 @@ fix */
     *ibase = nx;
 // upper right
   }
-/* now need to fill the cell properly - figure offsets from base address 
+/* now need to fill the cell properly - figure offsets from base address
 */
   if (itv == 0) {
     *n2 = 1;

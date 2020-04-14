@@ -117,13 +117,13 @@ int32_t evalBinOp(int32_t lhs, int32_t rhs,
 
       while (repeat--) {
 	function(&lp, &rp, &tp, lhsType, rhsType, topType);
-	lp.b += 
+	lp.b +=
     }
     return result;
   } else {				// implicit dimensions
     int32_t	lStride, rStride;
     char	done = 0;
-    
+
     // create result array: first calculate its number of elements
     nRepeat = 1;
     for (i = 0; i < nAction; i++)

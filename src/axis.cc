@@ -1187,7 +1187,7 @@ int32_t standardLoop1(int32_t source,
     else
       tgtinf->type = tgtType;   // take specified output type
 
-    *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type, 
+    *target = dimensionLoopResult1(srcinf, tgtMode, tgtinf->type,
                                    nMore, more, nLess, less, tgtinf,
                                    tgtptr);
     if (*target == LUX_ERROR)

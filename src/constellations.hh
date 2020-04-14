@@ -43,7 +43,7 @@ char const* constellation_names[] = {
 struct constellation_struct {
   double alpha1;
   double alpha2;
-  double delta; 
+  double delta;
   CONSTELLATION constellation;
 };
 

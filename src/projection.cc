@@ -41,13 +41,13 @@ int32_t	tkplot(float, float, int32_t, int32_t),
 // arbitrary non-zero k.  The projection of X according to matrix P is
 // PX in homogeneous coordinates.
 
-float	defaultProjection[16] = 
+float	defaultProjection[16] =
 { 1.0, 0.0, 0.0, 0.0,
   0.0, 1.0, 0.0, 0.0,
   0.0, 0.0, 1.0, 0.0,
   0.0, 0.0, 0.0, 1.0 };
 float	perspective[3] = { 0.5, 0.5, 0.0 }, oblique[2], projection[16],
-  projectMatrix[16] = 
+  projectMatrix[16] =
 { 1.0, 0.0, 0.0, 0.0,
   0.0, 1.0, 0.0, 0.0,
   0.0, 0.0, 1.0, 0.0,
@@ -148,7 +148,7 @@ int32_t rotateProjection(float *projection, float ax, float ay, float az)
 	*q++ += *++r * *(p += 4);
 	p -= 7;
 	r -= 2;
-      } 
+      }
       p = projection;
       r += 3;
     }
@@ -280,7 +280,7 @@ int32_t lux_projection(int32_t narg, int32_t ps[])
       return cerror(NEED_3_ARR, iq);
     arg = (float *) array_data(iq);
     translateProjection(projectMatrix, arg[0], arg[1], arg[2]);
-  }    
+  }
   /* rotation over angle a1 around the x axis:
          1       0        0 0
     R =  0 cos(a1) -sin(a1) 0
@@ -298,7 +298,7 @@ int32_t lux_projection(int32_t narg, int32_t ps[])
              0        0 0 1
      in all cases,  new = R . old */
   if (narg && (iq = *ps++)) {	// rotation
-    narg--; 
+    narg--;
     if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
     iq = lux_float(1, &iq);
@@ -458,7 +458,7 @@ int32_t transform4(float x, float y, float z, float t)
   p = projected;
   pm = currentProjection;
   for (i = 0; i < 4; i++) {
-    *p = *pm++ * x; 
+    *p = *pm++ * x;
     *p += *pm++ * y;
     *p += *pm++ * z;
     *p++ += *pm++ * t;
@@ -690,13 +690,13 @@ int32_t lux_plot3d(int32_t narg, int32_t ps[])
   ixlog = ipltyp % 2;
   iylog = (ipltyp/2) % 2;
   izlog = (ipltyp/4) % 2;
-  if (!ifz && !iylog) 
+  if (!ifz && !iylog)
     ymin = MIN(ymin, 0.0);
   if (!ifzx && !ixlog)
     xmin = MIN(xmin, 0.0);
   if (!ifzz && !izlog)
     zmin = MIN(zmin, 0.0);
-  if (!plims[0]) 
+  if (!plims[0])
     xmin = 0;
   if (!plims[1])
     xmax = nx - 1;
@@ -708,14 +708,14 @@ int32_t lux_plot3d(int32_t narg, int32_t ps[])
     mm(src, nx*ny, &zmax, &zmin);
   i = 0;
   if (zmin < -FLT_MAX) {
-    zmin = -PLOT_INFTY; 
+    zmin = -PLOT_INFTY;
     i = 1;
   }
   if (zmax > FLT_MAX) {
-    zmax = PLOT_INFTY; 
+    zmax = PLOT_INFTY;
     i = 1;
   }
-  if (i) 
+  if (i)
     puts("WARNING - Infinity in plot data");
   if (zmax == zmin)
     zmax = zmin + 1.0;
@@ -756,14 +756,14 @@ int32_t lux_plot3d(int32_t narg, int32_t ps[])
 
   if (internalMode & 2) {	// /CUBE
     // for debugging purposes: draw unit cube
-    tkproj(0,0,0,0); 
+    tkproj(0,0,0,0);
     tkproj(1,0,0,1);
     tkproj(1,1,0,1);
-    tkproj(0,1,0,1); 
+    tkproj(0,1,0,1);
     tkproj(0,0,0,1);
     tkproj(0,0,1,1);
     tkproj(0,1,1,1);
-    tkproj(1,1,1,1); 
+    tkproj(1,1,1,1);
     tkproj(1,0,1,1);
     tkproj(0,0,1,1);
     tkproj(0,1,0,0);

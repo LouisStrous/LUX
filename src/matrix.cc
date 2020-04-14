@@ -171,7 +171,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
     v = gsl_matrix_alloc(nmin, nmin);
     s = gsl_vector_alloc(nmin);
     w = gsl_vector_alloc(nmin);
-    
+
     result = gsl_linalg_SV_decomp(a, v, s, w);
 
     if (!result) {
@@ -189,13 +189,13 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
     for (i = 0; i < nmax; i++)
       for (j = 0; j < nmin; j++)
 	a->data[i*a->tda + j] = a_in[i + j*nmax];
-    
+
     v = gsl_matrix_alloc(nmin, nmin);
     s = gsl_vector_alloc(nmin);
     w = gsl_vector_alloc(nmin);
 
     result = gsl_linalg_SV_decomp(a, v, s, w);
-    
+
     if (!result) {
       for (i = 0; i < nmax; i++)
 	for (j = 0; j < nmin; j++)
@@ -213,9 +213,9 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
   return result;
 }
 //--------------------------------------------------------------------
-/* 
+/*
    SVD,A,U2,S2,V2
-   
+
    Calculates the 'thin' singular value decomposition of matrix A,
    which is easier to calculate and takes less storage than the 'full'
    singular value decomposition.  If A is an m-by-n matrix (has m rows

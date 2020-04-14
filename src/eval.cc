@@ -21317,7 +21317,7 @@ int32_t evalArrayBinOp(void)
   } else {                              // implicit dimensions
     int32_t lStride, rStride;
     char        done = 0;
-    
+
     // create result array: first calculate its number of elements
     nRepeat = 1;
     for (i = 0; i < nAction; i++)
@@ -21428,7 +21428,7 @@ int32_t evalStringBinOp(void)
      // binary operation with two string arguments
 {
   int32_t   result, i;
-  
+
   lp.s = string_value(lhs);
   rp.s = string_value(rhs);
   if (binOp == LUX_ADD)
@@ -21732,7 +21732,7 @@ int32_t evalListPtr(int32_t symbol)
 {
   int32_t   base, index = -1, n;
   char  *key;
-  
+
   base = list_ptr_target(symbol); // the enveloping structure
   if (base < 0) {               // numerical label
     index = list_ptr_tag_number(symbol);
@@ -21756,7 +21756,7 @@ int32_t evalStructPtr(int32_t symbol)
     *dims, ndim, nms, i1, i2, j, k, nelem, *p, ne, type, total_ndim;
   structElem    *se;
   structPtr     *spe;
-  
+
   target = struct_ptr_target(symbol); // target is assumed to be a STRUCT
   se = struct_elements(target);
   nms = struct_ptr_n_elements(symbol); // number of member specifications
@@ -21983,7 +21983,7 @@ int32_t evalLhs(int32_t symbol)
   if (target > 0)
     target = transfer(target);
   modified = (target != extract_target(symbol));
-  
+
   depth = extract_num_sec(symbol);
   if (!depth)                   // empty parentheses
     return luxerror("No empty parentheses allowed here", symbol);
@@ -22021,7 +22021,7 @@ int32_t evalLhs(int32_t symbol)
       return luxerror("Cannot insert into an internal function", symbol);
   }
   class_id = symbol_class(target);
-  
+
   while (depth--) {
     if (eptr->type == LUX_LIST) { // tags
       nitem = eptr->number;
@@ -23166,7 +23166,7 @@ int32_t eval(int32_t symbol)
 int32_t evals(int32_t nsym)
      // always evaluate LUX_SCAL_PTR to LUX_SCALAR or LUX_TEMP_STRING
 { int32_t   temp;
-  
+
   temp = evalScalPtr;
   evalScalPtr = 1;
   nsym = eval(nsym);
@@ -23184,7 +23184,7 @@ branchInfo checkBranch(int32_t lhs, int32_t rhs)
   static int32_t    depth, lhsSize;
   int16_t  *args;
   int32_t   n;
-  
+
   if (!rhs)                     // initialization
   { depth = 0;
     if (symbol_class(lhs) == LUX_ARRAY)
@@ -23194,7 +23194,7 @@ branchInfo checkBranch(int32_t lhs, int32_t rhs)
   depth++;
   switch (symbol_class(rhs))
   { case LUX_ARRAY:
-      
+
       result.size = symbol_memory(rhs);
       if (result.size == lhsSize) // this array does not need to be
         // evaluated, so start piping (if any)
@@ -23209,7 +23209,7 @@ branchInfo checkBranch(int32_t lhs, int32_t rhs)
       break;
     case LUX_SCALAR:
     case LUX_SCAL_PTR:
-      
+
       result.depth = -1;        // no piping for scalars.
       result.symbol = 0;
       result.containLHS = (rhs == lhs)? 1:
@@ -23224,7 +23224,7 @@ branchInfo checkBranch(int32_t lhs, int32_t rhs)
       result.size = UNKNOWN;    // unknown size, so no piping
       break;
     case LUX_INT_FUNC:
-      
+
       /* functions that allow piping have:
          a keyList structure with */
       // the pipe member unequal to zero

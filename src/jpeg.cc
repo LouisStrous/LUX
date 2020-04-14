@@ -230,7 +230,7 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
     fclose(outfile);
     return LUX_ERROR;
   }
-  
+
   jpeg_create_compress(&cinfo);	// compression structure
 
   // 2. specify data target

@@ -235,7 +235,7 @@ void dump_allocs(int32_t max_count)
     for (j = 0; j < 12; j++)
       printf("%02x ", p[j]);
     putchar('\n');
-    
+
     iter = luxIter_next(iter);
   }
   luxMap_delete(map);

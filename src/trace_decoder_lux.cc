@@ -84,7 +84,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  static	int32_t	n_restarts_found = 0, n_unexpected = 0;
 
  // zag[i] is the natural-order position of the i'th element of zigzag order.
- 
+
  static const int32_t zag[64] = {
    0,  1,  8, 16,  9,  2,  3, 10,
   17, 24, 32, 25, 18, 11,  4,  5,
@@ -133,12 +133,12 @@ int32_t huff_setups(uint8_t* packed_huffman)
  format for Huffman files:
 
  304 bytes consisting of
- 
+
  dcbits		0:15
  dcvalues	16:31
  acbits		32:47
  acvalues	48:303
- 
+
  first 3 are 16 Byte arrays, last is 156 Byte array
  */
   p = dc_bits;
@@ -186,7 +186,7 @@ int32_t huff_setups(uint8_t* packed_huffman)
  /* generate lookup tables to speed up the process for Huffman codes of
  length 8 or less, one set for dc and ac, follows technique in jpeg-5a but
  not the same code so some variables may look similar but beware ! */
- 
+
  bzero(look_nbits, 256);
  iq = 0;
  for (k = 0; k < 8; k++) {
@@ -201,7 +201,7 @@ int32_t huff_setups(uint8_t* packed_huffman)
       lookbits++;
     }
   }
- } 
+ }
  bits = ac_bits;	valptr = ac_valptr;	mincode = ac_mincode;
  maxcode = ac_maxcode;	look_nbits = ac_look_nbits;
  look_sym = ac_look_sym;	huffval = ac_huffval;
@@ -212,7 +212,7 @@ int32_t huff_setups(uint8_t* packed_huffman)
 static int32_t huff_decode_err(int32_t n)
  {
  printf("Huffman decoding error # %d\n", n);
- return -1; 
+ return -1;
  }
  //-------------------------------------------------------------------------
 static int32_t dct_buffer_decode_err(int32_t limit)
@@ -244,7 +244,7 @@ static int32_t huff_decode_dct(int16_t dct[], int32_t nblocks, uint8_t x[], int3
  bzero(dct, 128);	// pre-zero this block
  /* start dc decode, grab 8 bits and use lookup shortcut to see if we
  got a short Huffman code */
- 
+
  i=r1>>3;	j=r1%8;		// our Byte and bit addresses
  if (i > limit) return dct_buffer_decode_err(limit);
  px = x + i;
@@ -421,7 +421,7 @@ static int32_t rdct(int16_t* image, int32_t nx, int32_t ny, int32_t nblocks,
  if (nblocks != n) return dct_err(0);
  ncx = nx/8;	ystride = nx;
  dctstart = dct_array;
- 
+
  for (i=0; i < n; i++) {
  short	*start;
  // note that we access image by 8x8 blocks but dct is stored seq.
@@ -709,10 +709,10 @@ int32_t trace_scan(uint8_t x[], int32_t limit)
      } else iblock +=  restart_interval;
      /* but that was all for the next one, only reason we do it above is to
      make sure the pre-fill gets done for the first gap */
-     
+
      stat = huff_decode_dct(dct_ptr, restart_interval, pb, n);
      if (stat != 1) printf("error at iblock = %d\n", iblock);
- 
+
      // if the code was the end of image, we should be done
      if (code == 0xd9) {
        /* printf("got the EOI\n");
@@ -1038,8 +1038,8 @@ int32_t trace_scan(uint8_t x[], int32_t limit)
        break;
      }
      PrevRestartNumber = (RestartNumber+1)& 0x07;
-     n = 0;	pb = pt = px; 
-    
+     n = 0;	pb = pt = px;
+
      } else {
      // check ahead to see if there is a restart message next
      if ( *px != 0xff || ( (*(px+1) & 0xf8) != 0xd0) ) {

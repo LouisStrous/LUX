@@ -59,7 +59,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  codetype *codetable;                // LZW compression code data
  int32_t datasize,codesize,codemask;     // Decoder working variables
  int32_t clear,eoi;                      // Special code values
- 
+
  void readextension(FILE *), readimage(FILE *, int32_t, char *),
    loadcolortable(FILE *, int32_t, int32_t), readraster(int32_t, FILE *, unsigned char *);
  static	int32_t	quit = 0, status = 1, gcmflag;
@@ -86,14 +86,14 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
  char   *p, *name, *data;
  struct ahead   *h;
  struct GIFScreen gh;
- 
+
  		// first arg is the variable to load, second is name of file
  if (!symbolIsStringScalar(ps[1]))
    return cerror(NEED_STR, ps[1]);
  name = expand_name(string_value(ps[1]), NULL);
  // try to open the file
  if ((fin=fopen(name,"r")) == NULL) return file_open_error();
- 
+
  // ck if output colormap wanted, set cmsym = 0 if not
  if (narg > 2) { cmsym = ps[2]; } else cmsym = 0;
 
@@ -108,7 +108,7 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
  	if (strncmp(((gh.id))+3,"89a",3) != 0) {
  	printf("invalid GIF version #\n"); return -1; } else {
 	printf("version 89a, warning, not all options supported\n"); }
-	} 
+	}
  // yank out the screen size
  nxs = ( (gh.width_msb << 8) | gh.width_lsb );
  nys = ( (gh.height_msb << 8) | gh.height_lsb );
@@ -131,10 +131,10 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
  and load into 3rd arg if it exists */
  loadcolortable(fin, pixel, cmsym);
  }
- 
+
  quit = 0;	status = 1;
  //  read the next separator and try to process
- 
+
  do {
   sep = getc(fin);
   //  printf("separator %#x\n", sep);
@@ -157,7 +157,7 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
 	readimage(fin, cmsym, data);
  	quit = 1;
  	break;
-   default: 
+   default:
  	quit = 1;
 	printf("illegal GIF block type\n");
    	status = -1;
@@ -208,7 +208,7 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
  might be several images and load each into the screen array, this requires
  scratch storage for each image; if the same size, we just use the already
  allocated screen array */
- 
+
  if (ix && iy) fflag = 0; else { if (nx != nxs || ny != nys) fflag = 0;
  	else fflag =1; }
  if (fflag) image = data; else { image = (char*) malloc(nx * ny);

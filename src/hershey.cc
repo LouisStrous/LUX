@@ -94,10 +94,10 @@ static int32_t hershey_load(char *filename)
   hershey_numbers_count = 0;
   free(hershey_indices);
   hershey_indices = NULL;
- err_3: 
+ err_3:
  err_2:
   fclose(fp);
- err_1:  
+ err_1:
   return 1;
 }
 
@@ -208,7 +208,7 @@ int32_t test_hershey(void)
     bad += assertEqualTexts("foo.bar", f);
     bad += assertEqualTexts("foo.bar", hershey_filename);
     f = hershey_set_filename(NULL);
-    bad += assertNULL(f); 
+    bad += assertNULL(f);
     bad += assertEqualTexts("foo.bar", hershey_filename);
   }
   return bad;

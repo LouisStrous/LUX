@@ -41,12 +41,12 @@ int32_t curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 
     // Local variables
     static int32_t ibak;
-    static double deln, dels, exps, diag1, diag2, delx1, delx2, slpp1, 
+    static double deln, dels, exps, diag1, diag2, delx1, delx2, slpp1,
 	    exps1;
     static int32_t i, j;
     static double t, delx12, delnn, sinhs, c1, c2, c3;
     static int32_t i1;
-    static double slppn, delnm1, sinhd1, sinhd2, diagin, spdiag, sigmap, 
+    static double slppn, delnm1, sinhd1, sinhd2, diagin, spdiag, sigmap,
 	    sinhin;
     static int32_t nm1;
     static double dx1, dx2;
@@ -55,7 +55,7 @@ int32_t curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
 
 
 // --	generates spline under tension for monotonic x
-/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR 
+/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR
 FAILURE */
     // Parameter adjustments
     --yf;
@@ -125,7 +125,7 @@ L10:
 	exps = exp(dels);
 	sinhs = (exps - (float)1. / exps) * (float).5;
 	sinhin = (float)1. / (delx2 * sinhs);
-	diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) - 
+	diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) -
 		sinhs);
 	diagin = (float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
 	yp[i] = diagin * (dx2 - dx1 - spdiag * yp[i - 1]);
@@ -231,19 +231,19 @@ int32_t kurv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
     int32_t s_wsle(), do_lio(), e_wsle();
 
     // Local variables
-    static double deln, dels, delx, dely, exps, diag1, diag2, dels1, 
+    static double deln, dels, delx, dely, exps, diag1, diag2, dels1,
 	    dels2, delx1, dely1, delx2, dely2, slpp1, exps1;
     static int32_t i, k;
     static double s, dels12, delnn, c1, c2, c3, sinhs;
     static int32_t i1;
-    static double slppn, delnm1, sinhd1, sinhd2, diagin, tn, spdiag, 
+    static double slppn, delnm1, sinhd1, sinhd2, diagin, tn, spdiag,
 	    sx, sy, sigmap, sinhin;
     static int32_t nm1;
     static double dx1, dy1, dx2, dy2, sum, del1, del2;
 
 
 // --	generates spline under tension for any open (x,y) curve
-/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR 
+/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR
 FAILURE */
     // Parameter adjustments
     --ys;
@@ -277,7 +277,7 @@ FAILURE */
     } else {
 // determine slopes
 	if (*n == 2) {
-/* --	if only 2 points and no slopes, we have to assume a 
+/* --	if only 2 points and no slopes, we have to assume a
 straight line */
 	    xp[1] = (float)0.;
 	    xp[2] = (float)0.;
@@ -362,7 +362,7 @@ straight line */
 // 	TYPE *,'DELS,EXPS =',DELS,EXPS
 	    sinhs = (exps - (float)1. / exps) * (float).5;
 	    sinhin = (float)1. / (temp[i] * sinhs);
-	    diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) 
+	    diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5)
 		    - sinhs);
 	    diagin = (float)1. / (diag1 + diag2 - spdiag * temp[i - 1]);
 	    xp[i] = diagin * (xp[i] - spdiag * xp[i - 1]);
@@ -458,12 +458,12 @@ int32_t kurvp1_(int32_t *n, double *x, double *y, double *xp, double *yp,
 
     // Local variables
     static int32_t ibak;
-    static double dels, delx, dely, exps, diag1, diag2, dels1, dels2, 
+    static double dels, delx, dely, exps, diag1, diag2, dels1, dels2,
 	    delx1, dely1, delx2, dely2, exps1;
     static int32_t i, k;
     static double s, sinhs;
     static int32_t i1;
-    static double sinhd1, spdig1, sinhd2, diagin, tn, spdiag, sigmap, 
+    static double sinhd1, spdig1, sinhd2, diagin, tn, spdiag, sigmap,
 	    sinhin;
     static int32_t im1, ip1, nm1;
     static double dx1, dy1;
@@ -471,9 +471,9 @@ int32_t kurvp1_(int32_t *n, double *x, double *y, double *xp, double *yp,
     static double dx2, dy2, sum, del1, del2;
 
 
-/* --	generates spline under tension for any closed loop (x,y) 
+/* --	generates spline under tension for any closed loop (x,y)
 curve */
-/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR 
+/* --	NOTE THAT THIS IS A LUX_FUNCTION IN ORDER TO RETURN SUCCESS OR
 FAILURE */
     // Parameter adjustments
     --ys;
@@ -541,7 +541,7 @@ FAILURE */
 	exps = exp(dels);
 	sinhs = (exps - (float)1. / exps) * (float).5;
 	sinhin = (float)1. / (temp[i] * sinhs);
-	diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) - 
+	diag2 = sinhin * (dels * ((exps + (float)1. / exps) * (float).5) -
 		sinhs);
 	if (i == *n) {
 	    goto L30;
@@ -571,9 +571,9 @@ L30:
 	temp[ibak] = temp[*n + ibak] - temp[ibak] * temp[ibak + 1];
     }
 L50:
-    xp[*n] = (xp[*n] - spdig1 * xp[1] - spdiag * xp[nm1]) / (diag1 + diag2 + 
+    xp[*n] = (xp[*n] - spdig1 * xp[1] - spdiag * xp[nm1]) / (diag1 + diag2 +
 	    spdig1 * temp[1] + spdiag * temp[nm1]);
-    yp[*n] = (yp[*n] - spdig1 * yp[1] - spdiag * yp[nm1]) / (diag1 + diag2 + 
+    yp[*n] = (yp[*n] - spdig1 * yp[1] - spdiag * yp[nm1]) / (diag1 + diag2 +
 	    spdig1 * temp[1] + spdiag * temp[nm1]);
     i_1 = nm1;
     for (i = 1; i <= i_1; ++i) {
@@ -607,7 +607,7 @@ L10:
 		sum -= dels;
 		goto L10;
 	    } else {
-/* --	I was 1, we must have dels since we never start with 
+/* --	I was 1, we must have dels since we never start with
 1 */
 		i = *n;
 		sum -= dels;
@@ -648,9 +648,9 @@ L40:
 	sinhd2 = (exps - (float)1. / exps) * (float).5;
 	exps = exps1 * exps;
 	sinhs = (exps - (float)1. / exps) * (float).5;
-	xs[k] = (xp[i] * sinhd1 + xp[im1] * sinhd2) / sinhs + ((x[i] - xp[i]) 
+	xs[k] = (xp[i] * sinhd1 + xp[im1] * sinhd2) / sinhs + ((x[i] - xp[i])
 		* del1 + (x[im1] - xp[im1]) * del2) / dels;
-	ys[k] = (yp[i] * sinhd1 + yp[im1] * sinhd2) / sinhs + ((y[i] - yp[i]) 
+	ys[k] = (yp[i] * sinhd1 + yp[im1] * sinhd2) / sinhs + ((y[i] - yp[i])
 		* del1 + (y[im1] - yp[im1]) * del2) / dels;
     }
     return ret_val;

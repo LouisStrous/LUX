@@ -71,7 +71,7 @@ int32_t lux_gridmatch(int32_t narg, int32_t ps[])/* gridmatch function */
  Pointer p1, p2;
 
  // <m1> must be a 2D numerical array
- if (!symbolIsNumericalArray(ps[0])) 
+ if (!symbolIsNumericalArray(ps[0]))
    return cerror(NEED_NUM_ARR, ps[0]);
  if (array_num_dims(ps[0]) != 2)
    return cerror(NEED_2D_ARR, ps[0]);
@@ -195,7 +195,7 @@ void match_1(int32_t *p1, int32_t *p2, int32_t nxa, int32_t nxb, int32_t nya, in
   for (i = 0; i < 9; i++)
     done[i] = 0;
   idelx = rint(xoffset);
-  idely = rint(yoffset); 
+  idely = rint(yoffset);
   unbias(p1, p2, nxa, nxb, nya, nyb, nx, ny, gwx, gwy, &av1, &av2, &cx, &cy,
 	 &cxx, &cxy, &cyy, idelx, idely);
   /* look at a 3x3 matrix of residuals centered at 0 offset, find the location
@@ -216,7 +216,7 @@ void match_1(int32_t *p1, int32_t *p2, int32_t nxa, int32_t nxb, int32_t nya, in
     t = res[4];
     i = 4;			// if we're in an all-zero area, then
 				// return a zero. LS 28aug2000
-    for (k=0;k<9;k++) 
+    for (k=0;k<9;k++)
       if (res[k] < t) {
 	t = res[k];
 	i = k;
@@ -248,7 +248,7 @@ void match_1(int32_t *p1, int32_t *p2, int32_t nxa, int32_t nxb, int32_t nya, in
       if (in >= 0 && jn >= 0 && in < 3 && jn < 3) { // in range
 	done[k] = 1;
 	buf[k] = res[k + dd];
-      } else 
+      } else
 	done[k] = 0;		// not in range, mark undone
     }
     for (k = 0;k < 9; k++)
@@ -279,24 +279,24 @@ void gwind0(float *gwx, float *gwy, float gwid, int32_t nxa, int32_t nxb, int32_
 {
   float	wid, xcen, ycen, xq;
   int32_t	i;
-  
+
   wid = gwid*0.6005612;		// from FWHM to decay scale
   if (wid > 0) {
     xcen = (nxa + nxb)/2;
-    ycen = (nya + nyb)/2; 
+    ycen = (nya + nyb)/2;
     for (i = nxa; i <= nxb; i++) {
       xq = (i - xcen)/wid;
       gwx[i] = exp(-(xq*xq));
-    } 
+    }
     for (i = nya; i <= nyb; i++) {
       xq = (i - ycen)/wid;
       gwy[i] = exp(-(xq*xq));
-    } 
+    }
   } else {
     for (i = nxa; i <= nxb; i++)
-      gwx[i] = 1.0; 
+      gwx[i] = 1.0;
     for (i = nya; i <= nyb; i++)
-      gwy[i] = 1.0; 
+      gwy[i] = 1.0;
   }
 }
 //-------------------------------------------------------------------------
@@ -307,20 +307,20 @@ void unbias(void *m1, void *m2, int32_t nxa, int32_t nxb, int32_t nya, int32_t n
 {
   float	t0, t1, t2, t3, t4, t5;
 
-  /*  find weighted means of m1 & m2 over the window 
+  /*  find weighted means of m1 & m2 over the window
       sets up quadratic fit to average of m2 as a fcn. of offsets */
-  *av1 = averag(m1, nxa, nxb, nya, nyb, nxs, nys, 0, 0, gx, gy); 
-  t0 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx, idely, gx, gy); 
-  t1 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx + 1, idely, gx, gy); 
-  t2 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx - 1, idely, gx, gy); 
-  t3 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx, idely + 1, gx, gy); 
-  t4 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx, idely - 1, gx, gy); 
-  t5 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx + 1, idely + 1, gx, gy); 
-  *av2 = t0; 
-  *cx = 0.5*(t1 - t2); 
-  *cy = 0.5*(t3 - t4); 
-  *cxx = 0.5*(t1 - 2*t0 + t2); 
-  *cyy = 0.5*(t3 - 2*t0 + t4); 
+  *av1 = averag(m1, nxa, nxb, nya, nyb, nxs, nys, 0, 0, gx, gy);
+  t0 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx, idely, gx, gy);
+  t1 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx + 1, idely, gx, gy);
+  t2 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx - 1, idely, gx, gy);
+  t3 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx, idely + 1, gx, gy);
+  t4 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx, idely - 1, gx, gy);
+  t5 = averag(m2, nxa, nxb, nya, nyb, nxs, nys, idelx + 1, idely + 1, gx, gy);
+  *av2 = t0;
+  *cx = 0.5*(t1 - t2);
+  *cy = 0.5*(t3 - t4);
+  *cxx = 0.5*(t1 - 2*t0 + t2);
+  *cyy = 0.5*(t3 - 2*t0 + t4);
   *cxy = t5 + t0 - t1 - t3;
 }
 //-------------------------------------------------------------------------
@@ -350,7 +350,7 @@ float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_
     nyd = nys - idy;
   else
     nyd = nyb;
-  sum = sumg = sumgx = 0.0; 
+  sum = sumg = sumgx = 0.0;
   for (i = nxc; i < nxd; i++)
     sumgx += gx[i];
   // weighted sum in window, note switch on case before inner loop
@@ -409,7 +409,7 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
   nyc = nya;
   if (nyc + idy < 0)
     nyc = -idy;
-  nxd = nxb; 
+  nxd = nxb;
   if (nxd + idx >= nxs)
     nxd = nxs - idx - 1;
   nyd = nyb;
@@ -670,9 +670,9 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])// stretch function
       i1 += 1;  i2 += 1;
       yl = w1 * *(jbase+i1) + w2 * *(jbase+i2) + w3 * *(jpbase+i1)
 	+ w4 * *(jpbase+i2) + (float) iy;
-      
+
       // xl, yl is the place, now do a cubic interpolation for value
-      
+
       i2 = xl;
       j2 = yl;
       if (i2 >= 1 && i2 < nm2) {// normal interior
@@ -1173,7 +1173,7 @@ int32_t lux_expand(int32_t narg, int32_t ps[])
     break;
   case 2:
     smt = 0;			// /NEAREST
-    break; 
+    break;
   case 0:			// none: use !TVSMT
     smt = tvsmt;
     break;
@@ -1384,7 +1384,7 @@ void bicubic_fc()	// internal routine for single pixel
     i3 = i3 - i1;
     i4 = i4 - i1;
   }
-  
+
   dx1 = 1.0 - dx0;		// Ax
   dx4 = -dx0*dx1;		// -Ax Bx
   c1 = dx4 * dx1;		// -Ax^2 Bx
@@ -1441,7 +1441,7 @@ void bicubic_fc()	// internal routine for single pixel
     j3 = (j3 - j2) * n;
     j2 = (j2 - j1) *n;
   }
-  
+
   dx1 = 1.0 - dx0;		// Ay
   dx4 = -dx0*dx1;		// -Ay By
   b1 = dx4 * dx1;		// -Ay^2 By
@@ -1749,7 +1749,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
 	ind += ngrun;
       }
       break;			// end of nearest neighbor regrid case
-      
+
     case 1:
     	// bicubic with or without stretchmarks case
       mm1 = m-1;
@@ -2940,7 +2940,7 @@ int32_t compress4(uint8_t *ain, int32_t n, int32_t m, int32_t *symout, int32_t *
  p4 = p3 + n;
  while (ny--) {
    nx = ns;
-   while (nx--) { 
+   while (nx--) {
      // sum the 16 pixels here
      xq = *p1++;
      xq += *p2++;
@@ -2977,7 +2977,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
   double	cd1, cd2, cd3, cd4, ddx0, ddx1, ddx2, ddx3, ddx4;
   int32_t	nzone2, nzone3, nzone4, nz2;
   int32_t	nz3, nz4, rflag;
-  
+
   nm1 = nx -1; rflag = 0;
   // get the fraction shift and the integer shift
   if (dx<0) {
@@ -2989,7 +2989,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
   }
   i2 = (int32_t) dx;
   dx0 = dx - i2;
-  
+
   // 3 zones, zone 1 gone with reversal technique
   nzone2 = nzone3 = nzone4 = 0;
   if (i2 == 0) {
@@ -2999,7 +2999,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
     nzone4 =  MIN(i2 + 1, nx);
     if (nzone4 < nx) nzone3 = 1; else nzone3 = 0;
     nzone2 = nx - nzone4 - nzone3;
-  } 
+  }
   // get the first 4 values we will need, start at (i2-1)>0
   i2 = MIN(i2, nm1);	i2 = MAX( i2, 0);
   i1 = MIN(i2-1, nm1);	i1 = MAX( i1, 0);
@@ -3011,7 +3011,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
     dx1 = 1.0 - dx0;
     switch (resample_type) {
       case BI_CUBIC_SMOOTH:
- 
+
 	dx2 = -dx0 * 0.5;  dx3 = dx0 * dx2;
 	dx4 = 3. * dx0 * dx3;
 	c1 = dx2*dx1*dx1; c2 = 1.-dx4+5.*dx3; c3 = dx4-(dx2+4.*dx3); c4 = dx3*dx1;
@@ -3022,8 +3022,8 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
 	dx2 = dx0 * dx0; dx3 = dx0 * dx2; c2 = 1.-2.*dx2+dx3; c3 = dx0*(1.0+dx0-dx2);
 	break;
     }
-    
-    
+
+
   } else {
     // the F*8 case, use alternate coefficients
     ddx0 = (double) dx0;
@@ -3043,8 +3043,8 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
 	cd3 = ddx0*(1.0+ddx0-ddx2);
 	break;
     }
-    
-    
+
+
   }
   switch (type) {
     case LUX_INT8:	// I*1 image
@@ -3232,7 +3232,7 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
       }
     }
      break;
-     
+
     case LUX_DOUBLE:	// F*8, double precision
     {
       double	z4, z1, z2, z3, yq;
@@ -3602,7 +3602,7 @@ int32_t bigger235(int32_t x)
       x = x2;
     }
   }
-      
+
   ilo = 0;
   ihi = n - 1;
   while (ilo <= ihi) {
@@ -3614,9 +3614,9 @@ int32_t bigger235(int32_t x)
     else			// found in table
       return x*fac;
   }
-  
+
   x = table[ilo]*fac;
-  
+
   return x;
 }
 //-------------------------------------------------------------------------

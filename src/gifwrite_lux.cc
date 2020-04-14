@@ -58,7 +58,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  //-------------------------------------------------------------------------
 int32_t lux_gifwrite(int32_t narg, int32_t ps[]) // gifwrite subroutine
  // write a very plain gif file, 8 bit deep
- /* call is gifwrite,array,file,[map] where map is the color map 
+ /* call is gifwrite,array,file,[map] where map is the color map
  and must be (3,256) I*1 in rgb triplets */
  {
  FILE	*fout;
@@ -111,7 +111,7 @@ int32_t lux_gifwrite(int32_t narg, int32_t ps[]) // gifwrite subroutine
  gh.height_lsb = ny & 0xff;
  gh.height_msb = ny >> 8;
  // note that we use 8 bit color map and 8 bit pixels
- 
+
  // stream out the GIF id and screen descriptor
  if (fwrite(&gh, 1, sizeof(gh), fout) != sizeof(gh) )
          { execute_error(90);   fclose(fout);   return -1; }
@@ -130,7 +130,7 @@ int32_t lux_gifwrite(int32_t narg, int32_t ps[]) // gifwrite subroutine
  putc(codesize, fout);
  // could probably use anybody's lzw compressor here
  compress(codesize+1, fout, (uint8_t *) data, nx*ny);
- 
+
  putc(0, fout);
  putc(';', fout);
  fclose(fout);
@@ -152,7 +152,7 @@ int32_t lux_gifwrite_f(int32_t narg, int32_t ps[])
 #define HSIZE  5003            // 80% occupancy
 
  typedef unsigned char   char_type;
- 
+
  static int32_t n_bits;                    // number of bits/code
  static int32_t maxbits = XV_BITS;         // user settable max # bits/code
  static int32_t maxcode;                   // maximum code, given n_bits
@@ -193,7 +193,7 @@ static int32_t free_ent = 0;       // first unused entry
  /*
  * compress stdin to stdout
  *
- * Algorithm:  use open addressing double hashing (no chaining) on the 
+ * Algorithm:  use open addressing double hashing (no chaining) on the
  * prefix code / next character combination.  We do a variant of Knuth's
  * algorithm D (vol. 3, sec. 6.4) along with G. Knott's relatively-prime
  * secondary probe.  Here, the modular division first probe is gives way
@@ -208,7 +208,7 @@ static int32_t free_ent = 0;       // first unused entry
 
  static int32_t g_init_bits;
  static FILE *g_outfile;
- 
+
  static int32_t ClearCode;
  static int32_t EOFCode;
 
@@ -266,7 +266,7 @@ static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t le
   cl_hash( (int32_t) hsize_reg);            // clear hash table
 
   output(ClearCode);
-    
+
   while (len) {
     c = *data++;  len--;
     in_count++;
@@ -295,7 +295,7 @@ static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t le
       continue;
     }
 
-    if ( (long)HashTabOf (i) >= 0 ) 
+    if ( (long)HashTabOf (i) >= 0 )
       goto probe;
 
  nomatch:
@@ -347,7 +347,7 @@ static void output(int32_t code)
     cur_accum |= ((long)code << cur_bits);
   else
     cur_accum = code;
-        
+
   cur_bits += n_bits;
 
   while( cur_bits >= 8 ) {
@@ -375,7 +375,7 @@ static void output(int32_t code)
         maxcode = MAXCODE(n_bits);
     }
   }
-        
+
   if( code == EOFCode ) {
     // At EOF, write the rest of the buffer
     while( cur_bits > 0 ) {
@@ -385,11 +385,11 @@ static void output(int32_t code)
     }
 
     flush_char();
-        
+
     fflush( g_outfile );
 
 #ifdef FOO
-    if( ferror( g_outfile ) ) 
+    if( ferror( g_outfile ) )
       FatalError("unable to write GIF file");
 #endif
   }
@@ -466,7 +466,7 @@ static void char_init()
 static void char_out(int32_t c)
  {
   accum[ a_count++ ] = c;
-  if( a_count >= 254 ) 
+  if( a_count >= 254 )
     flush_char();
  }
 
@@ -480,4 +480,4 @@ static void flush_char(void)
     fwrite( accum, 1, a_count, g_outfile );
     a_count = 0;
   }
- }       
+ }

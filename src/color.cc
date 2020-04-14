@@ -156,7 +156,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
 
   if (connect_flag)		// already did this earlier
     return LUX_OK;
-  
+
   // 1. open the display
   display = XOpenDisplay(display_name);
   if (!display)
@@ -170,7 +170,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
   // 3. get defaults
   screen_num     = DefaultScreen(display);
   display_cells  = DisplayCells(display, screen_num);
-  display_width  = DisplayWidth(display, screen_num); 
+  display_width  = DisplayWidth(display, screen_num);
   display_height = DisplayHeight(display, screen_num);
   visual         = DefaultVisual(display, screen_num);
 
@@ -348,7 +348,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
       nColorCells -= 32;
       XFreeColors(display, colorMap, pixels + nColorCells, 32, 0);
     } // end of if (private_colormap) else
-    
+
     /* we now have <nColorCells> color cells from either the default
        or the private colormap.  We allocate an XColor entry for
        all color cells in the colormap, because we may allocate more
@@ -361,11 +361,11 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
 	luxerror("Could not allocate memory for XColor entries in setup_x()",
 	      0);
     } // end of (!colors)
-    
+
     nColors = nColorCells;	// currently all of them are for the ramp
     colormin = 0;
     colormax = nColors - 1;
-    
+
     // we fill the ramp colors with a default linear greyscale ramp
     for (i = 0; i < nColors; i++) {
       colors[i].pixel = pixels[i];
@@ -376,7 +376,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     // indicate that we are not using the remaining cells for LUX (yet)
     for (i = nColors; i < display_cells; i++)
       colors[i].flags = 0;
-    
+
     XStoreColors(display, colorMap, colors, nColorCells);
     // Not all bits of the RGB values may have been significant for
     // specifying the colors; we want to know the exact RGB values
@@ -390,7 +390,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     // we are unable to allocate incidental colors afterwards -
     // at least on our mips-sgi-irix6.3 system.  We just explicitly
     // allocate black and white, too.
-    
+
     // get black
     if (anaAllocNamedColor("black", &tempColor))
       black_pixel = tempColor->pixel;
@@ -400,11 +400,11 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
       white_pixel = tempColor->pixel;
     else
       white_pixel = colors[1].pixel; // just pick one
-    
+
     free(pixels);		// don't need it anymore
     if (private_colormap)
       XInstallColormap(display, colorMap);
-    
+
     // 6. set up a lookup table of fixed size into the colormap
     // our display routines are most portable if they do not need to worry
     // about the exact number of colorcells we got, so we use a lookup
@@ -424,7 +424,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
       colorMap = XCreateColormap(display, RootWindow(display, screen_num),
 				 visual, AllocNone);
     nColorCells = display_cells;
- 
+
     // 5. get black and white
     anaAllocNamedColor("black", &tempColor);
     black_pixel = tempColor->pixel;
@@ -490,7 +490,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
   XSetFunction(display, gcnot, GXinvert);
 
   wm_delete = XInternAtom(display, "WM_DELETE_WINDOW", False);
-  
+
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
@@ -1092,7 +1092,7 @@ int32_t lux_colorComponents(int32_t narg, int32_t ps[])
 int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
  /* pixelsto8bit,pixels,bits,colormap
     returns 8-bit pixel values in <bits> and a color map in <colormap>
-    based on the pixel values in <pixels>.  
+    based on the pixel values in <pixels>.
   */
 {
   int32_t result, ncolors, iq;

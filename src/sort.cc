@@ -415,7 +415,7 @@ void indexx_s(int32_t n, char *ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   char	*q;
- 
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);
@@ -450,7 +450,7 @@ void indexx_d(int32_t n, double ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
   double	q;
- 
+
   for (i = 0; i < n; i++)
     indx[i] = i;
   l = (n/2);

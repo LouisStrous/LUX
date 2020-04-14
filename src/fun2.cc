@@ -82,7 +82,7 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
    case LUX_ARRAY:
      h = HEAD(iq);
      if (axis >= 0)					// axis specified
-     { dims = h->dims; ndim = h->ndim; 
+     { dims = h->dims; ndim = h->ndim;
        if (axis >= ndim) return cerror(ILL_DIM, ps[1]); }
      else
      { dims = &m; ndim = 1; axis = 0; }
@@ -988,7 +988,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
   Symboltype outtype;
   extern Scalar	lastmean;
   extern int32_t	lastsdev_sym, lastmean_sym;
-  
+
   // return values by class?
 #ifdef IMPLEMENT_LATER
   if (narg > 2 && ps[2] && symbolIsNumericalArray(ps[2])
@@ -1023,7 +1023,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
   for (i = 0; i < array_num_dims(ps[0]); i++)
     if (array_dims(ps[1])[i] != array_dims(ps[0])[i])
       return cerror(INCMP_DIMS, ps[1]);
-  
+
   if (narg > 3 && ps[3]) {	// have <weights>
     if (!symbolIsNumericalArray(ps[3])	// but it's not a numerical array
 	|| array_size(ps[3]) != array_size(ps[0])) // or has wrong size
@@ -1034,7 +1034,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
     haveWeights = 1;
   } else
     haveWeights = 0;
-    
+
   // set up for traversing the data, and create an output symbol, too
   if (standardLoop(ps[0], (narg > 2 && ps[2])? ps[2]: 0,
 		   SL_COMPRESSALL // omit all axis dimensions from result
@@ -1046,7 +1046,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
 		   | ((internalMode & 2)? SL_ONEDIMS: 0), // omit -> 1
                    outtype, &xsrcinfo, &xsrc, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
-  
+
   if (standardLoop(ps[1], (narg > 2 && ps[2])? ps[2]: 0,
 		   SL_COMPRESSALL // omit all axis dimensions from result
 		   | (haveWeights? 0: SL_ALLAXES)
@@ -1097,7 +1097,7 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
             ymean += (double) *ysrc.b * *weight.b;
 	    nn += (double) *weight.b;
 	  }
-	  while (advanceLoop(&winfo, &weight), 
+	  while (advanceLoop(&winfo, &weight),
 		 advanceLoop(&ysrcinfo, &ysrc),
                  advanceLoop(&xsrcinfo, &xsrc) < xsrcinfo.naxes);
 	  memcpy(xsrcinfo.coords, save, xsrcinfo.ndim*sizeof(int32_t));
@@ -2596,7 +2596,7 @@ int32_t lux_esmooth(int32_t narg, int32_t ps[])
       do			// main loop
       { switch (outtype)
 	{ case LUX_FLOAT:
-	    sum.f = sum.f*damping + *src.f; 
+	    sum.f = sum.f*damping + *src.f;
 	    weight.f = weight.f*damping + 1.0;
 	    *trgt.f = sum.f/weight.f;  break;
 	  case LUX_DOUBLE:
@@ -2844,13 +2844,13 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
     nWidth = 0;
     width = 1;
   }
-  
+
   if (!srcinfo.naxes) {
     if (nWidth > 1)
       return luxerror("No axis -> 1D, but more than one width??", ps[1]);
     srcinfo.naxes++;
   }
-  
+
   iq = ps[0];			// <data>
   for (loop = 0; loop < srcinfo.naxes; loop++) {
     nx = srcinfo.rdims[0];
@@ -2859,7 +2859,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
       width = nWidth? 0.6005612 * *widths.f: 1.8; //  fwhm to gaussian
       if (nWidth > 1)
 	widths.f++;
-      
+
       if (width >= 0.25) {
 	// set up the gaussian convolution kernel
 	n2 = MIN( 4*width, nx - 1);// maximum half-length
@@ -3097,7 +3097,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	    if (internalMode & 4) // /BALANCED
 	      i2 += 2;		// add new points in pairs
 	    else 		// unbalanced
-	      if (i2 < nx) 
+	      if (i2 < nx)
 		i2++;		// add one more
 	  }
 	  // zone 2
@@ -3191,7 +3191,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	    if (internalMode & 4) // /BALANCED
 	      i2 += 2;		// add new points in pairs
 	    else 		// unbalanced
-	      if (i2 < nx) 
+	      if (i2 < nx)
 		i2++;		// add one more
 	  }
 	  // zone 2
@@ -3473,7 +3473,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	    if (internalMode & 4) // /BALANCED
 	      i2 += 2;		// add new points in pairs
 	    else 		// unbalanced
-	      if (i2 < nx) 
+	      if (i2 < nx)
 		i2++;		// add one more
 	  }
 	  // zone 2
@@ -3567,7 +3567,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 	    if (internalMode & 4) // /BALANCED
 	      i2 += 2;		// add new points in pairs
 	    else 		// unbalanced
-	      if (i2 < nx) 
+	      if (i2 < nx)
 		i2++;		// add one more
 	  }
 	  // zone 2
@@ -3837,7 +3837,7 @@ p3 = strstr( p1, p2);
 mq = 0; off = (p3 - p1) + sym[ps[1]].spec.array.bstore - 1;
 if ( p3 != NULL )
  mq = sym[ps[0]].spec.array.bstore - 1 - off;
-if (mq < 0)  mq = 0; 
+if (mq < 0)  mq = 0;
 result_sym = string_scratch(mq);		//for resultant string
 p3 = (char *) sym[result_sym].spec.array.ptr;
 if (mq != 0)  memcpy(p3, p1 + off, mq);
@@ -4203,7 +4203,7 @@ h = (array *) sym[symy].spec.array.ptr;
 nd = h->ndim;	nxq = h->dims[0];	outer = 1;
 if (nd > 1) for(j=1;j<nd;j++) outer *= h->dims[j];
 					// check x if specified
-if (symx > 0) { CK_ARR(symx, -1); 
+if (symx > 0) { CK_ARR(symx, -1);
  toptype = (int32_t) sym[symx].type > toptype ? sym[symx].type : toptype;
  h = (array *) sym[symx].spec.array.ptr;
 			// a specified x must match y in some regards
@@ -4409,7 +4409,7 @@ int32_t lux_trend(int32_t narg, int32_t ps[]) //trend function
 	  // because the order in which the assignment and the updating
 	  // of qzbase.f are done is not defined in the C standard.
 	  // LS 18jun97
-	  while (nd--) 
+	  while (nd--)
 	  { *qzbase.f = *qybase.f++ - *qzbase.f;
 	    qzbase.f++; }
 	  break;
@@ -4594,7 +4594,7 @@ int32_t lux_strtok(int32_t narg, int32_t ps[])
     iq = string_scratch(0);
     *string_value(iq) = '\0';
   }
-  
+
   return iq;
 }
 //-------------------------------------------------------------------------

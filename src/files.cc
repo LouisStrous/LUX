@@ -111,7 +111,7 @@ int32_t	type_ascii(int32_t, int32_t [], FILE *),
   redef_string(int32_t, int32_t);
 void	zerobytes(void *, int32_t), endian(void *, int32_t, int32_t),
   fprintw(FILE *fp, char const* string);
-extern	int32_t scrat[];				/* scratch storage, also used 
+extern	int32_t scrat[];				/* scratch storage, also used
 						 in anatest.c */
 // some tables for lun type files
 FILE	*lux_file[MAXFILES];
@@ -555,7 +555,7 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
  (LUX_INT32 etc) in <*datatype>, and the number of repeats in <*number>.
  Returns a positive number if all is OK (1 plus the number of chars of
  explicit text before the actual format entry), -1 if an illegal format
- is found, and 0 if explicit text but no data type specification is found. 
+ is found, and 0 if explicit text but no data type specification is found.
  Allowed formats:
    [anything] % [*] [digits] [-digits...] [.digits] [any of hlL]
    {one of dioxefgcsS} [digits #]
@@ -2851,7 +2851,7 @@ int32_t lux_freadf(int32_t narg, int32_t ps[])
   fp = lux_file[lun];
   if (read_formatted_ascii(narg - 1, &ps[1], (void *) fp, 1, 0) == LUX_ERROR)
     return luxerror("Error reading file %s", 0, lux_file_name[lun]);
-  else 
+  else
     return LUX_OK;
 }
 //-------------------------------------------------------------------------
@@ -2911,7 +2911,7 @@ int32_t lux_freadf_f(int32_t narg, int32_t ps[])
 }
 //-------------------------------------------------------------------------
 int32_t lux_assoc_input(int32_t narg, int32_t ps[])
-     /* use an associated variable as a guide to reading a file 
+     /* use an associated variable as a guide to reading a file
 	syntax:  y = x(record_offset)
 	y = x(subsc)
 	x is an associated variable.
@@ -3122,7 +3122,7 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
 	 return cerror(INCMP_DIMS, offsym); }
        off = LPTR(h);
        CK_SGN(off, doff, 1, iq); }
-     else 
+     else
      { offset = int_arg(offsym);
        doff = 0; }
    } else
@@ -3139,12 +3139,12 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
    if (daxes != ddat)
    { puts("Wrong number of axes");
      return cerror(INCMP_DIMS, axsym); }
-   axes = LPTR(h); 
+   axes = LPTR(h);
    CK_SGN(axes, daxes, 2, iq);			// nonnegative?
    CK_MAG(dfile, axes, daxes, 2, iq); }		// within rearrange bounds?
  else daxes = 0;
- for (i = 0; i < ddat; i++) tally[i] = 1; 
- n = *ystep = 1; 
+ for (i = 0; i < ddat; i++) tally[i] = 1;
+ n = *ystep = 1;
  for (i = 1; i < dfile; i++) ystep[i] = (n *= file[i - 1]);
  n = lux_type_size[assoctype];
  if (doff)
@@ -3235,7 +3235,7 @@ int32_t ck_synch_hd(FILE *fin, fzHead *fh, int32_t *wwflag)
     *wwflag = 0;
   if (MSBfirst ^ *wwflag)
     endian(fh->dim, fh->ndim*sizeof(int32_t), LUX_INT32);
-  return 1; 
+  return 1;
 }
 //-------------------------------------------------------------------------
 void fz_get_header(FILE *fin, int32_t nsym, int32_t n) // internal utility
@@ -3337,7 +3337,7 @@ int32_t lux_fzinspect(int32_t narg, int32_t ps[])		// fzinspect subroutine
     fz_get_header(fin, ps[2], fh->nhb);
   else
     fz_print_header(fin, fh->nhb);
- 
+
   if (stat(expname, &statbuf) != 0) {
     perror("stat");
     return 1;
@@ -3382,7 +3382,7 @@ int32_t fzhead(int32_t narg, int32_t ps[], int32_t flag) // fzhead subroutine
  fh = (fzHead *) scrat;
  if (ck_synch_hd(fin, fh, &wwflag) < 0)
    return LUX_ERROR;
- 
+
  if (narg > 1)
    fz_get_header(fin, ps[1], fh->nhb);
  else
@@ -3709,7 +3709,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) // fzwrite subroutine
     if (fwrite(fh, 1, 512, fout) != 512)
       goto fzwrite_1;
   }
-  
+
   if (type == LUX_STRING_ARRAY) {
     /* a string array is special: we write for each string in succession
        the string size and then the string itself.  LS 22jan99 */
@@ -3731,7 +3731,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) // fzwrite subroutine
     }
   } else {
     j = fwrite(q1.l, 1, n, fout);	// write data
-  
+
     if (j != n) {			// not all data was written
       if (!flag)
 	cerror(WRITE_ERR, 0);
@@ -4050,7 +4050,7 @@ int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
 }
 //-------------------------------------------------------------------------
 int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
-/* write unformatted data from a variable into a file. 
+/* write unformatted data from a variable into a file.
    syntax: writeu,lun,x [,y,...]
    LS 12may93 */
 /* Headers:
@@ -4327,7 +4327,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
       p.w[j] = iq2;
     }
     break;
-  }	  
+  }	
   return 0;
 }
 //-------------------------------------------------------------------------
@@ -4350,7 +4350,7 @@ int32_t arestore(int32_t narg, int32_t ps[], int32_t flag)
   int32_t	iq, i, intro[2], n, nvalue;
   char	*file, *name, reverseOrder;
   FILE	*fp;
-  
+
   iq = ps[narg - 1];		// file name
   if (symbol_class(iq) != LUX_STRING) // filename is not a string
     return flag? cerror(NEED_STR, iq): LUX_ZERO;
@@ -4563,7 +4563,7 @@ int32_t lux_get_lun(int32_t narg, int32_t ps[])
     if (!lux_file_open[i]) {
       n = scalar_scratch(LUX_INT32);
       scalar_value(n).l = i;
-      return n; 
+      return n;
     }
   // if we get here then there were no free luns
   return luxerror("No free LUNs available", 0);
@@ -4701,7 +4701,7 @@ int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
   n = ftell(fp);		// length of the file, in bytes
   fseek(fp, 0, SEEK_SET);
   n -= 512;			// minus header length
-  
+
   m = lux_type_size[type];	// get desired size
   for (i = 0; i < nd; i++)
     m *= dims[i];
@@ -4951,7 +4951,7 @@ int32_t file_get(char *startpath, int match_flag)
 
     /* we don't stat the file unless we have to, we have to if it is
        a potential match or if we are checking for sub-directories */
-    
+
     // are we matching to a regular expression ?
     matches = 1;		// everybody a match for get all case
     if (match_flag) {
@@ -4963,7 +4963,7 @@ int32_t file_get(char *startpath, int match_flag)
       if (!matches && !recursive_flag)
 	continue;
     }
-  
+
     // make a full path to file so we can stat it
     mq = strlen(dp->d_name) + strlen(startpath) + 2;
     sq = (char *) malloc(mq);
@@ -5029,7 +5029,7 @@ int32_t directs_get(char *startpath)
     if (strcmp(dp->d_name, "..") == 0) continue;
 
     // we have to stat the file since we are checking for sub-directories
-  
+
     // make a full path to file so we can stat it
     mq = strlen(dp->d_name) + strlen(startpath) + 2;
     sq = (char *) malloc(mq);
@@ -5529,8 +5529,8 @@ char *bigger_header(int32_t n, char *head)
   // we want 2880*n bytes
   int32_t	nb;
   char	*p;
-  
-  nb = n*2880; 
+
+  nb = n*2880;
   if (nb <= scratSize())
     p = curScrat;
   else {
@@ -5746,7 +5746,7 @@ int32_t lux_fits_read_general(int32_t narg, int32_t ps[], int32_t func)// read f
     xhsym = ps[3];
   }
   if (narg >= 6) {
-    mode = mode + 64; 
+    mode = mode + 64;
     if (!symbolIsStringScalar(ps[5]))
       return func? LUX_ZERO: cerror(NEED_STR, ps[5]);
     preamble = string_value(ps[5]);
@@ -5787,7 +5787,7 @@ int32_t lux_fits_header_f(int32_t narg, int32_t ps[])// read fits header
     xhsym = ps[2];
   }
   if (narg >= 4) {
-    mode = mode + 64; 
+    mode = mode + 64;
     if (!symbolIsStringScalar(ps[3]))
       return cerror(NEED_STR, ps[3]);
     preamble = string_value(ps[3]);
@@ -6741,7 +6741,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
       }
     }
       // one way or another, the entire table is now at ext_ptr
- 
+
     npreamble = strlen(preamble);
     row_bytes = 0;
     lptr = ext_ptr;
@@ -6838,7 +6838,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
     }
     if (ext_ptr_malloc_flag)
       free(ext_ptr);
-  } 
+  }
     // should be done with any malloc for a long header
   if (fits_head_malloc_flag) free(fitshead);
   if (ext_stuff_malloc_flag) free(ext_stuff);
@@ -7093,7 +7093,7 @@ int32_t lux_fits_write_general(int32_t narg, int32_t ps[], int32_t func)
 	nlines++;
       }
       break;
-    default:    
+    default:
       fprintf(fp, "%-80s", "END");
       nlines++;
   }
@@ -7228,7 +7228,7 @@ int32_t lux_filewrite(int32_t narg, int32_t ps[])
   if (lux_file_open[lun] == 0)
     return cerror(LUN_CLOSED, ps[0]);
   fp = lux_file[lun];
-  iq = ps[1]; 
+  iq = ps[1];
   type = symbol_type(iq);
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
@@ -7260,10 +7260,10 @@ int32_t lux_filewrite(int32_t narg, int32_t ps[])
     j = typesize * start;
     //printf("j,n,start = %d %d %d\n", j,n, start);
     if (fseek(fp, j, 0) == -1) {
-      perror("filewrite"); 
+      perror("filewrite");
       return LUX_ERROR;
     }
-  } 
+  }
   // now write the file
   if ((j = fwrite(p, 1, num, fp)) != num) {
     if (j <= 0)

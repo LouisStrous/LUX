@@ -79,7 +79,7 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
     if (result) {
       int32_t size;
       char errbuf[256];
-    
+
       size = regerror(result, &preg, errbuf, 256);
       return luxerror("REGEX error: %s", -1, errbuf);
     }
@@ -94,7 +94,7 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
   result = regexec(&preg, text, nmatch, pmatch, 0);
   if (result) 			// no match
     result = LUX_ZERO;
-  else 
+  else
     if (nmatch > 1) {
       char **p;
 

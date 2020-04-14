@@ -82,7 +82,7 @@ int32_t postreset(int32_t landscape)
      fputs("90 rotate .05 -.825 translate\n", postScriptFp);
    fprintf(postScriptFp, "%f setlinewidth\n", current_pen*0.00033333);
    // The next line implicitly selects the DeviceGray color space
-   fprintf(postScriptFp, "%f setgray \n", 1 - current_gray); 
+   fprintf(postScriptFp, "%f setgray \n", 1 - current_gray);
    icnt = nline = 0;
    updateBoundingBox = 1;
  }
@@ -414,7 +414,7 @@ int32_t postrelease(int32_t narg, int32_t ps[])
       bb4 = float_arg(*ps++);
     fputs("\n", postScriptFp);
     icnt = 0;
-    if (nline) 
+    if (nline)
       fputs(" stroke\n", postScriptFp);
     fputs(" showpage\n", postScriptFp);
     // now insert bounding box  LS 18jan95
@@ -448,7 +448,7 @@ int32_t postrelease(int32_t narg, int32_t ps[])
 	  bb2 = (int32_t) (720*(0.025+ postYBot));
 	  bb3 = (int32_t) (720*(0.05 + postXTop));
 	  bb4 = (int32_t) (720*(0.025 + postYTop));
-	}	  
+	}	
       }
       fprintf(postScriptFp, "% 4.4d % 4.4d % 4.4d % 4.4d", bb1, bb2, bb3, bb4);
     }

@@ -55,7 +55,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     tmp3 = tmp10 - tmp13;
     tmp1 = tmp11 + tmp12;
     tmp2 = tmp11 - tmp12;
-    
+
     // Odd part
 
     tmp4 = wsptr[8];
@@ -98,7 +98,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
   register float *wsptr;
   register short *elemptr;
   int32_t	nq = 8;
-  
+
   wsptr = ws;
   elemptr = start;
   while (nq--) {
@@ -246,7 +246,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  nxc = nx/8;
  nyc = ny/8;
  niter = ABS(niter);
- if (niter > 20) 
+ if (niter > 20)
    return luxerror("DESPIKE - error, excessive # of iterations = %d\n", niter);
 
  // add internal iteration 10/8/98
@@ -326,7 +326,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
       // now get the indicated one using level
       *q++ = arr[level];  p++;
      }
-    
+
     } else {
     *q++ = *p++;    // looks OK (this time)
     }
@@ -340,7 +340,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  while (m--) {
  p = ptr;  n = nx;  while(n--) *q++ = *p++;
  ptr = ptr + nx;
- } 
+ }
  /* end of this iteration, reconfigure for next one, note that for
  a single iteration we don't need out2 */
  ntotal += nc;
@@ -401,7 +401,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     if (jc>0) joff[0] = jc - 1; else joff[0] = jc+1;
     joff[1] = jc;
     if (jc < (nyc-1)) joff[2] = jc+1; else joff[2] = jc-1;
-    
+
     for (ii=0;ii<3;ii++) {
      ix = ioff[ii]*8;
      for (jj=0;jj<3;jj++) {
@@ -434,7 +434,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
       }
     else
       while (nc--) { m = 8; while(m--) *q++ = 0; q += stride; }
-    
+
     break;
     case 1:
     {
@@ -565,7 +565,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 	      inc = 2*nx;
 	      while (mm--) {
 		nn = nxx;
-		while (nn) { 
+		while (nn) {
 		  *qq++ = *--pp;
 		  nn--;
 		}
@@ -622,7 +622,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
-	  } 
+	  }
 	  while (mm--) {
 	    nn= nx;
 	    while (nn) {
@@ -678,7 +678,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 		}
 	      }
 	      break;
-	  } 
+	  }
 	} else {
 	  register  short *pp, *qq;
 	  register  int32_t  nyy, nn, mm;
@@ -713,7 +713,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 	      *qq++ = *pp;
 	      pp += nyy;
 	      nn--;
-	    }	    
+	    }	
 	    pp += inc;
 	  }
 	}
@@ -765,11 +765,11 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 		}
 	      }
 	      break;
-	  } 
+	  }
 	} else {
 	  register  int32_t *pp, *qq;
 	  register  int32_t  nn, mm, nyy;
-	  
+	
 	  mm = ny;
 	  qq = (int32_t *) q;
 	  switch (iorder) {
@@ -793,7 +793,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
-	  } 
+	  }
 	  while (mm--) {
 	    nn= nx;
 	    while (nn) {
@@ -936,11 +936,11 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 		}
 	      }
 	      break;
-	  } 
+	  }
 	} else {
 	  register  float *pp, *qq;
 	  register  int32_t  nn, mm, nyy;
-	  
+	
 	  mm = ny;
 	  qq = (float *) q;
 	  switch (iorder) {
@@ -964,7 +964,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
-	  } 
+	  }
 	  while (mm--) {
 	    nn= nx;
 	    while (nn) {
@@ -1020,11 +1020,11 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 		}
 	      }
 	      break;
-	  } 
+	  }
 	} else {
 	  register  double *pp, *qq;
 	  register  int32_t  nn, mm, nyy;
-	  
+	
 	  mm = ny;
 	  qq = (double *) q;
 	  switch (iorder) {
@@ -1048,7 +1048,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 	      inc = nx*ny - 1;
 	      nyy = -ny;
 	      break;
-	  } 
+	  }
 	  while (mm--) {
 	    nn= nx;
 	    while (nn) {
@@ -1060,7 +1060,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 	  }
 	}
 	break;
-    } 
+    }
   }
   return result_sym;
 }

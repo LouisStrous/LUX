@@ -91,7 +91,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
     } else
       return cerror(ILL_CLASS, ps[2]);
   }
-  
+
   subdataLoop(offset, &trgtinfo);
   do {
     nelem = trgtinfo.rdims[0];
@@ -509,12 +509,12 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
       if (numerical(ps[2], NULL, NULL, &i, NULL) == LUX_ERROR)
 	return LUX_ERROR;
       if (i != srcinfo.naxes)
-	return cerror(INCMP_ARG, ps[2]); 
+	return cerror(INCMP_ARG, ps[2]);
       iq = lux_float(1, ps + 2);
       numerical(iq, NULL, NULL, NULL, &center);
     } else
       center.v = NULL;
-    
+
     inplace = 0;		// 1 -> in-place reversal
 
     do {
@@ -2082,7 +2082,7 @@ int32_t string_sub(int32_t narg, int32_t ps[])
 	  return -1; }
         ns = ns - i + 1; }
                  // if the compression or rearrange are set, flag an error
- 
+
       if (subsc_ptr_sum(iq) || subsc_ptr_redirect(iq) != -1)
       { cerror(ILL_W_STR, iq);
 	return -1; }

@@ -75,7 +75,7 @@ int32_t lux_zap(int32_t narg, int32_t ps[])
 }
 //---------------------------------------------------------
 int32_t showstats(int32_t narg, int32_t ps[])
-{ 
+{
   extern int16_t	listStack[], *listStackItem, curContext;
   extern int32_t	nNamedVariable, nTempVariable, markIndex,
   		tempExecutableIndex, executeLevel,
@@ -1441,7 +1441,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   { for (i = 0; i < ndim; i++)
       onestretch[i] = 1.0;
     stretch = onestretch; }
-  
+
 				// check output dimensions
   for (i = 0; i < ndim; i++)
     if (dims[i] <= 0)
@@ -1501,7 +1501,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
     iq = lux_convert(1, ps + 1, maxType, 1);
     getSimpleNumerical(iq, &xData, &nx);
   }
-  
+
   nTemp = 1000;			// start with 1000 elements
   nnTemp = nTemp - 2;
   ALLOCATE(temp, nTemp, int32_t);
@@ -1645,7 +1645,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
       return cerror(ALLOC_ERR, 0);
     }
     zerobytes((char *) number, ny*sizeof(int32_t));
-    
+
     temp = base + 1;
     while (ix) {
       step = *temp++;		// offset
@@ -1898,7 +1898,7 @@ int32_t lux_swaphalf(int32_t narg, int32_t ps[])
     n *= dims[i];
     step[i] = n;
   }
-  
+
   dims[ndim - 1] /= 2;
 
   jump = 0;
@@ -2289,7 +2289,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
-		  hessian[i + i*nDiagonal] 
+		  hessian[i + i*nDiagonal]
 		    = (float) srcl.b[srcinfo.step[i]]
 		    + (float) srcl.b[-srcinfo.step[i]] - 2*value;
 		else
@@ -2318,7 +2318,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
-		  hessian[i + i*nDiagonal] 
+		  hessian[i + i*nDiagonal]
 		    = (float) srcl.w[srcinfo.step[i]]
 		    + (float) srcl.w[-srcinfo.step[i]] - 2*value;
 		else
@@ -2347,7 +2347,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
-		  hessian[i + i*nDiagonal] 
+		  hessian[i + i*nDiagonal]
 		    = (float) srcl.l[srcinfo.step[i]]
 		    + (float) srcl.l[-srcinfo.step[i]] - 2*value;
 		else
@@ -2405,7 +2405,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
-		  hessian[i + i*nDiagonal] 
+		  hessian[i + i*nDiagonal]
 		    = (float) srcl.f[srcinfo.step[i]]
 		    + (float) srcl.f[-srcinfo.step[i]] - 2*value;
 		else
@@ -2434,7 +2434,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
 		if (i == j)
-		  hessian[i + i*nDiagonal] 
+		  hessian[i + i*nDiagonal]
 		    = (float) srcl.d[srcinfo.step[i]]
 		    + (float) srcl.d[-srcinfo.step[i]] - 2*value;
 		else
@@ -2568,7 +2568,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
     return cerror(INCMP_ARG, ps[2]);
 
   type = symbol_type(ps[0]);
-  
+
   switch (type) {
   case LUX_INT8:
     mid = 0;
@@ -2744,7 +2744,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 //---------------------------------------------------------
 int32_t lux_lsq(int32_t narg, int32_t ps[])
 /* linear least squares fit.
-   a = LSQ(x,y[,w,COV=cov,ERR=err,CHISQ=chisq,/FORMAL]) 
+   a = LSQ(x,y[,w,COV=cov,ERR=err,CHISQ=chisq,/FORMAL])
    The model is that y = a(0)*x(...,0) + a(1)*x(...,1) + ... + error term
    The parameters <a> are those that minimize the weighted rms of the
    error term. <w> contains (optional) weights to assign to each of the <x>
@@ -3061,7 +3061,7 @@ Theory:
       }
       break;
   }
-  
+
   free(pl.f);
   return result;
 }
@@ -3123,7 +3123,7 @@ Theory:
     axisSym = array_scratch(LUX_INT32, 1, &axisSym);
     axisSym = lux_indgen(1, &axisSym);
   }
-  
+
   type = combinedType(array_type(ps[0]), array_type(ps[1]));
   if (type < LUX_FLOAT)
     type = LUX_FLOAT;
@@ -3143,7 +3143,7 @@ Theory:
   for (i = 0; i < yinfo.ndim; i++)
     if (xinfo.dims[i] != yinfo.dims[i])
       return cerror(INCMP_ARG, ps[1]);
-  
+
   // find the number of parameters to fit
   if (xinfo.ndim == yinfo.ndim)
     nPar = 1;
@@ -3209,7 +3209,7 @@ Theory:
     j = fwhm? nRepeat: yinfo.nelem;
     switch (type) {		// fill with identity matrix
       case LUX_FLOAT:
-	while (j--) { 
+	while (j--) {
 	  for (i = 0; i < nPar*nPar; i += nPar + 1)
 	    pc.f[i] = 1;
 	  pc.f += nPar*nPar;
@@ -3312,7 +3312,7 @@ Theory:
       p2info = xinfo;
       p2info.data = &p2;
       p2.f = px.f;
-      
+
       if (fwhm) {
 	i1 = MAX(cc - nkernel, 0);
 	i2 = MIN(cc + nkernel, nData - 1);
@@ -3325,7 +3325,7 @@ Theory:
 	  pw.f += i1;
 	pk.f += nkernel - cc + i1;
       }
-      
+
       switch (type) {
 	case LUX_FLOAT:
 	  // get (X'X) in pl
@@ -3350,7 +3350,7 @@ Theory:
 	  } while (moveLoop(&p2info, yinfo.rndim, 1) <= yinfo.rndim);
 	  moveLoop(&p2info, yinfo.rndim, -nPar);
 	  pl.f -= nPar*nPar;	// back to the start
-	  
+	
 	  // get (X'y) in pr
 	  j = yinfo.naxes - 1;
 	  do {
@@ -3373,7 +3373,7 @@ Theory:
 	  pr.f -= nPar;		// back to the start
 	  f_decomp(pl.f, nPar, nPar); // LU decomposition of pl
 	  f_solve(pl.f, pr.f, nPar, nPar); // solve: pr gets parameters <a>
-	  
+	
 	  if (chisq.f != NULL || err.f != NULL
 	      || (pc.f != NULL && (internalMode & 1))) { // need chi-square
 	    chi2 = f = norm = 0.0;

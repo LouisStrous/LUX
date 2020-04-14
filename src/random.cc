@@ -107,7 +107,7 @@ uint32_t random_bits(void)
   static uint32_t	mask = 0x9, mask1 = 0x80000000;
   int32_t	n = 32;
   uint32_t	result = 0;
-  
+
   while (n--) {
     if (currentBitSeed & mask1) {
       currentBitSeed = ((currentBitSeed ^ mask) << 1) | 1;
@@ -165,7 +165,7 @@ void randome(void *output, int32_t number, double limit)
  if (limit < 0)
    limit = 0;
  fp = (double *) output;
- /* 
+ /*
     We want only numbers whose magnitude is at least |λ| = <limit>.
     random_one() returns uniformly distributed pseudorandom numbers
     ρ between 0 and 1.  -log(ρ) is exponentially distributed from 0
@@ -285,7 +285,7 @@ void randomn(int32_t seed, double *output, int32_t number, char hasUniform)
     a = extra[1]*2*M_PI;
     *output++ = r*cos(a);
   }
-}  
+}
 //----------------------------------------------------------------------
 int32_t lux_randomu(int32_t narg, int32_t ps[])
  //create an array of random elements in the [0,1.0] range (exclusive)
@@ -543,7 +543,7 @@ int32_t lux_randoml(int32_t narg, int32_t ps[])
   // a representable FLOAT number generates a representable DOUBLE
   // number.
   while (n--) {
-    do 
+    do
       *p.l = random_bits();	// get one int32_t-full of bits
     while (isnan(*p.f));
     p.l++;

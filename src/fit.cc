@@ -979,7 +979,7 @@ void denan(uint8_t *data, int32_t size, int32_t partype)
   }
 }
 
-void printgene(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits, 
+void printgene(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits,
                double *quality) {
   int32_t j;
   uscalar p;
@@ -1020,7 +1020,7 @@ void printgene(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits,
   putchar(']');
 }
 
-void printgenenl(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits, 
+void printgenenl(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits,
                  double *quality) {
   printgene(gene, nPar, partype, showbits, quality);
   putchar('\n');
@@ -1051,11 +1051,11 @@ int32_t hasnan(uint8_t *gene, int32_t nPar, int32_t partype) {
   return 0;
 }
 
-/* 
+/*
    fitness = 1/deviation
    avg fitness => reproduction probability = 1/nPopulation
    greatest fitness => reproduction probability = mu/nPopulation < 1
-   linear relation; P < 0 => 0; P > 1 => 1 
+   linear relation; P < 0 => 0; P > 1 => 1
    p(avg) = 1/nPopulation
    p(best) = mu/nPopulation
    p ~ (fitness - avg)/(best - avg) * (mu - 1) + 1
@@ -1131,7 +1131,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   };
   int32_t *crossoversites, *mutationsites;
   void indexxr_d(int32_t, double *, int32_t *);
- 
+
   iq = ps[3];                   // fit
   if (!symbolIsStringScalar(iq))
     return cerror(NEED_STR, ps[3]);

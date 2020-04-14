@@ -111,7 +111,7 @@ int32_t xerr(Display *display, XErrorEvent *err)
 // Expanded 9 oct 97 - LS
 {
   char    msg[80];
-  
+
   XGetErrorText(display, err->error_code, msg, 80);
   printwf("X window error: %s\n", msg);
   printwf("Request code: %1d (%1d)\n", err->request_code,
@@ -128,7 +128,7 @@ void eventType(int32_t type)
   count++;
   printf("%d: ", count);
   switch (type) {
-    case KeyPress: 
+    case KeyPress:
       puts("KeyPress");
       break;
     case KeyRelease:
@@ -161,7 +161,7 @@ void eventType(int32_t type)
     case Expose:
       puts("Expose");
       break;
-    case GraphicsExpose: 
+    case GraphicsExpose:
       puts("GraphicsExpose");
       break;
     case NoExpose:
@@ -258,16 +258,16 @@ int32_t lux_show_visuals(int32_t narg, int32_t ps[])
 
   mask = VisualScreenMask;
   vTemplate.screen = screen_num;
-  
+
   vInfo = XGetVisualInfo(display, mask, &vTemplate, &nVisual);
   if (!vInfo)
     nVisual = 0;
-  
+
   if (!nVisual)
     return luxerror("No color representation is available", 0);
 
   printf("%1d visuals available on this screen\n", nVisual);
-  
+
   printf("%6s %11s %2s %3s %6s %6s %6s %3s\n", "number", "class", "d",
 	 "csz", "red", "green", "blue", "bpc");
   for (i = 0; i < nVisual; i++) {
@@ -280,7 +280,7 @@ int32_t lux_show_visuals(int32_t narg, int32_t ps[])
       j = i;
   }
   printf("current visual: %d\n", j + 1);
-  
+
 #ifdef DEBUG
   printf("current width, height, cells, depth = %d %d %d %d\n",
 	display_width, display_height, display_cells,
@@ -397,7 +397,7 @@ int32_t lux_xopen(int32_t narg, int32_t ps[])
     case 2: case 0:		// /DEFAULT_COLORMAP
       if (private_colormap != 0)
 	lux_xclose(0, NULL);	// get rid of old
-      private_colormap = 0; 
+      private_colormap = 0;
       break;
     default:
       return luxerror("Illegal keyword combination", 0);
@@ -443,7 +443,7 @@ int32_t lux_xport(int32_t narg, int32_t ps[])	// open a window or pixmap
   int32_t	ck_window(int32_t), set_defw(int32_t), lux_xdelete(int32_t, int32_t []),
     lux_xcreat(int32_t, uint32_t, uint32_t, int32_t, int32_t, int32_t, char *,
 	       char *);
-  
+
   if (narg > 0)
     wid = int_arg(ps[0]);
   else
@@ -526,7 +526,7 @@ int32_t ck_events(void)         // checks events for focus and size changes
    int32_t     nev, i, j, iq;
    Window wq;
    int32_t	set_defw(int32_t);
-   
+
    if (setup_x() < 0)
      return LUX_ERROR;
    XFlush(display);
@@ -634,7 +634,7 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
  // start execution here
  if (setup_x() < 0)
    return LUX_ERROR;
- 
+
  if (ck_window(wid) != LUX_OK)
    return LUX_ERROR;
 
@@ -676,7 +676,7 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
 	 strcat(icon_name, ": ");
        strncat(icon_name, ititle, 15 - strlen(icon_name)); // add title
      }
-     
+
      // NOTE: need border pixel or else XCreateWindow generates a
      // BadMatch error when using a visual other than the default one
      valuemask = CWBackPixel | CWColormap | CWBackingStore | CWBitGravity
@@ -689,7 +689,7 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
      /* note that contents still disappear when window is iconized, may need
 	to use our own pixmap to store and not count on server */
      attributes.bit_gravity = StaticGravity;
-     
+
      /*
      win[wid] = XCreateWindow(display, RootWindow(display, screen_num), xpos,
 			      ypos, width, height, border_width, depth,
@@ -704,35 +704,35 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
      icon_pixmap =
        XCreateBitmapFromData(display, win[wid], (const char*) icon_bitmap_bits,
 			     icon_bitmap_width, icon_bitmap_height);
-     
+
      wm_hints.initial_state = NormalState;
      wm_hints.input = True;
      wm_hints.icon_pixmap = icon_pixmap;
      wm_hints.flags = StateHint | IconPixmapHint | InputHint;
-     
+
      if (pflag)
        size_hints.flags = USPosition | USSize;
      else
        size_hints.flags = PPosition | PSize;
-     
+
      XStringListToTextProperty(&icon_name, 1, &icon);
      XStringListToTextProperty(&window_name, 1, &window);
-     
+
      XSetWMProperties(display, win[wid], &window, &icon, NULL, 0, &size_hints,
 		      &wm_hints, NULL);
-     
+
      XSetWMProtocols(display, win[wid], &wm_delete, 1);	
 
-     XSelectInput(display, win[wid], KeyPressMask | ButtonPressMask 
+     XSelectInput(display, win[wid], KeyPressMask | ButtonPressMask
 		  | ButtonReleaseMask | PointerMotionMask | ExposureMask |
 		  FocusChangeMask | EnterWindowMask | LeaveWindowMask);
 
 #ifdef MOTIF
-   } else {     
+   } else {
      // a motif drawing area, if window not already created, return an error
-     
+
      // assume we are using same display for X and motif
-     if ((win[wid] = XtWindowOfObject(lux_widget_id[drawingareas[wid]])) == 0) 
+     if ((win[wid] = XtWindowOfObject(lux_widget_id[drawingareas[wid]])) == 0)
        return luxerror("cannot get window number from motif drawing area", 0);
      if (XGetWindowAttributes(display, win[wid], &wat) == False)
        return luxerror("cannot get window attributes for motif drawing area", 0);
@@ -761,7 +761,7 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
 
    gc[wid] = XCreateGC(display, win[wid], valuemask, &xgcv);
  }
-   
+
    cursor = XCreateFontCursor(display, XC_crosshair);
    XDefineCursor(display, win[wid], cursor);
    XFreeCursor(display, cursor);
@@ -828,7 +828,7 @@ int32_t lux_xcursor(int32_t narg, int32_t ps[]) // set the cursor
       return cerror(NEED_STR, ps[3]);
     pc = string_value(ps[3]);
   } else
-    pc = cback_default; 
+    pc = cback_default;
   if (anaAllocNamedColor(pc, &cback) != 1)
     return luxerror("error in background color", 0);
   XRecolorCursor(display, cursor, cfore, cback);
@@ -849,7 +849,7 @@ int32_t lux_xsetbackground(int32_t narg, int32_t ps[])// set the background colo
   char	*pc;
   float	*value;
   XColor	*color;
-  
+
   ck_events();
   if (narg == 1)
     wid = last_wid;
@@ -858,7 +858,7 @@ int32_t lux_xsetbackground(int32_t narg, int32_t ps[])// set the background colo
   if (ck_window(wid) != 1)
     return LUX_ERROR;
   if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
-    lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
+    lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
 
   // try to figure out the color
   switch (symbol_class(*ps)) {
@@ -907,7 +907,7 @@ int32_t lux_xsetforeground(int32_t narg, int32_t ps[])// set the foreground colo
   char	*pc;
   float	*value;
   XColor	*color;
-  
+
   ck_events();
   if (narg == 1)
     wid = last_wid;
@@ -916,7 +916,7 @@ int32_t lux_xsetforeground(int32_t narg, int32_t ps[])// set the foreground colo
   if (ck_window(wid) != 1)
     return LUX_ERROR;
   if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
-    lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
+    lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
 
   // try to figure out the color
   switch (symbol_class(*ps)) {
@@ -955,7 +955,7 @@ int32_t lux_xsetforeground(int32_t narg, int32_t ps[])// set the foreground colo
 int32_t lux_xdelete(int32_t narg, int32_t ps[]) // delete a window or a pixmap
 {
   int32_t    wid;
-  
+
   ck_events();
   wid = int_arg( ps[0] );
   if (ck_window(wid) != 1)
@@ -983,7 +983,7 @@ int32_t lux_xerase(int32_t narg, int32_t ps[])
 
  x = y = h = w = 0.0;		// defaults
  wid = last_wid;
- switch (narg) { 
+ switch (narg) {
    case 0:			// OK
      break;
    case 1:
@@ -1218,7 +1218,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     coordTrf(float *, float *, int32_t, int32_t),
     postgray(char *, int32_t, int32_t, float, float, float, float, int32_t),
     postcolor(char *, int32_t, int32_t, float, float, float, float, int32_t);
-  
+
   toscreen = (internalMode & (TV_SCREEN | TV_POSTSCRIPT | TV_PDEV));
   switch (toscreen) {
     case TV_SCREEN: case 0:
@@ -1382,7 +1382,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
      > 0  -> the data type of the image; we must scale the image contrast
      0,-1 -> image contains BYTE data already scaled to pixel indices
      -2   -> image contains BYTE data already scaled to raw pixel values */
-  
+
   if (!(mode & (TV_MAP | TV_RAW))) {
     // must scale the image contrast
     if (clo == chi) {		// no contrast -> use full contrast in
@@ -1705,7 +1705,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
   tvixb = sx + nxx;
   tviy = hq - sy - nyy;
   tviyb = hq - sy;
-  
+
   // update bounding box
   if (postXBot > tvix/(float) wq)
     postXBot = tvix/(float) wq;
@@ -3335,7 +3335,7 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
   extern int32_t	bits_per_pixel;
   extern unsigned long	red_mask, green_mask, blue_mask;
 
-  bpp = bits_per_pixel? bits_per_pixel: 
+  bpp = bits_per_pixel? bits_per_pixel:
     ((internalMode & TV_24)? 24: 8); /* bits_per_pixel is zero if we haven't
 					yet connected to the X server (e.g.,
 					tv,x,/post) */
@@ -3622,7 +3622,7 @@ int32_t lux_xcopy(int32_t narg, int32_t ps[])
  if (id1 < 0 ) { src = &(maps[-id1]);
 	 ws = wdmap[-id1];  hs = htmap[-id1]; }
 	 else { src = &(win[id1]);
-	 ws = wd[id1];  hs = ht[id1]; }  
+	 ws = wd[id1];  hs = ht[id1]; }
  if (id2 < 0 ) { dest = &(maps[-id2]); cgc = &gcmap[-id2]; }
 	 else { dest = &(win[id2]); cgc = &gc[id2]; }
  w = ws; h = hs;
@@ -3788,7 +3788,7 @@ int32_t xwindow_plot(int32_t ix, int32_t iy, int32_t mode)
 
  wid = last_wid;
  if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
-   lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL); 
+   lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
 
  if (mode == 0) {
    if (alternateDash)
@@ -3829,7 +3829,7 @@ int32_t lux_xpen(int32_t pen, float gray)
      pen width. */
 // LS 12jul94
  if (pen)
-   pen /= 2; 
+   pen /= 2;
  ck_events();
  wid = last_wid;
  // does window exist? If not create a default size
@@ -3844,7 +3844,7 @@ int32_t lux_xpen(int32_t pen, float gray)
 
  if ((setup & WHITE_BACKGR) && !standardGray)
    gray = 1 - gray;
- 
+
  seek_color.red = seek_color.green = seek_color.blue = gray*65535;
  return_color = anaFindBestRGB(&seek_color, 1);
  XSetForeground(display, gc[wid], return_color->pixel);
@@ -4072,7 +4072,7 @@ int32_t lux_check_window(int32_t narg, int32_t ps[])
 {
   int32_t	num, w, i;
   XEvent	event;
-  
+
   if (setup_x() < 0)
     return LUX_ERROR;
   if (narg >= 1) num = int_arg(*ps); else num = -1;
@@ -4087,7 +4087,7 @@ int32_t lux_check_window(int32_t narg, int32_t ps[])
     last_time = (double) event.xbutton.time / 1000.0;
     return 1; }
   return 4;
-} 
+}
 //------------------------------------------------------------------------
 int32_t lux_xraise(int32_t narg, int32_t ps[]) // raise (popup) a window
 {
@@ -4208,7 +4208,7 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
   // a clean slate
   while (XCheckWindowEvent(display, win[wid],
 			   PointerMotionMask | ButtonPressMask, &event));
-  
+
   while (1) {			// loop
     XWindowEvent(display, win[wid],
                  PointerMotionMask | ButtonPressMask, &event);
@@ -4299,7 +4299,7 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
   ix = iy = ip = 0;
   if (narg > 1)
     ip = int_arg(ps[1]);
-  if (ip >= nz || ip < 0) 
+  if (ip >= nz || ip < 0)
     return luxerror("TVPLANE - out of range plane (%d)", ps[1]);
   if (narg > 2)
     ix = int_arg(ps[2]);
@@ -4403,7 +4403,7 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
 
   ptr0 = ptr2;
   wq = nx*ny;			// size of final image
-  while (wq--) 
+  while (wq--)
     *ptr2++ = pixels[(uint8_t) *ptr++];
 
 		 // create image structure
@@ -4498,7 +4498,7 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
     fx = float_arg(ps[3]);
   } else
     fx = 0;
-  
+
   if (narg > 4 && ps[4]) {	// <y>
     if (!symbolIsScalar(ps[4]))
       return cerror(NEED_SCAL, ps[4]);
@@ -4579,7 +4579,7 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
 	|| int_arg_stat(ps[2], &ix) != 1
 	|| int_arg_stat(ps[3], &iy) != 1)
       return LUX_ERROR;
-    
+
     switch (invert_flag) {
       case 0:
 	XDrawLine(display, dq, gq, ixs, iys, ix, iy);

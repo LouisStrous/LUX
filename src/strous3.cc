@@ -155,7 +155,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   }
 
   step = srcinfo.step[0];
-  
+
   // now do the work
   switch (srcinfo.type) {
     case LUX_FLOAT:
@@ -411,7 +411,7 @@ static int32_t cmp0(const void *a, const void *b)
 {
   struct c { double v; int32_t l; } aa, bb;
   int32_t d;
-  
+
   aa = *(struct c *) a;
   bb = *(struct c *) b;
   d = aa.l - bb.l;
@@ -598,13 +598,13 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   {
     int32_t n;
     struct c *d;
-    
+
     n = Bytestack_bytes(b, 0)/csize; // number of found data points
     if (n > 0) {
       Bytestack_index bi;
       union {
-        struct c *c; 
-        uint8_t *b; 
+        struct c *c;
+        uint8_t *b;
       } q;
 
       d = (struct c *) Bytestack_peek(b, 0); // beginning of data
@@ -924,7 +924,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
       return iq;
       break;
   }
-  
+
   iq = string_scratch(strlen(scr));
   strcpy(string_value(iq), scr); // copy string
   return iq;
@@ -1359,7 +1359,7 @@ LS 9nov98 */
       if (!total)
 	value /= ws;
       *trgt.f = value;
-    } while (advanceLoop(&trgtinfo, &trgt), 
+    } while (advanceLoop(&trgtinfo, &trgt),
 	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   return iq;
 }
@@ -1890,9 +1890,9 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	  continue;
 	}
       }
-      
+
       index = ix + iy*nx;	// index relative to data start
-    
+
       switch (type) {
 	case LUX_INT8:
 	  vx = (double) vx0.b[index*dv]; // x velocity
@@ -1919,11 +1919,11 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	  vy = (double) vy0.d[index*dv]; // y velocity
 	  break;
       }
-    
+
       s0 = 0.5*hypot(vx, vy);	// length indicates desired distance
       s1 = s0;
       s = 0.0;
-    
+
       while (s < s1) {		// go the distance
 	c = traverseElement(x1, y1, vx, vy, &x2, &y2);
 	// calculate distance inside the current pixel

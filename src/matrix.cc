@@ -17,10 +17,10 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* HEADERS */
-#include <malloc.h> /* for malloc free */
-#include <string.h> /* for memcpy */
-/* END HEADERS */
+// HEADERS
+#include <malloc.h> // for malloc free
+#include <string.h> // for memcpy
+// END HEADERS
 #ifndef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -52,7 +52,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
     goto error_2;
   }
 
-  /* the elements are stored in column-major order */
+  // the elements are stored in column-major order
   /* dimsX[0] = number of columns
      dimsX[1] = number of rows
      the number of columns of argument 1 must equal the number of rows
@@ -65,7 +65,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   }
 
   int32_t i, *tdims, tndim;
-  if (internalMode & 1) {	/* /OUTER */
+  if (internalMode & 1) {	// /OUTER
     tndim = infos[0].ndim + infos[1].ndim - 2;
     if (tndim > MAX_DIMS) {
       iq = luxerror("Result would have %d dimensions, but at most %d"
@@ -76,7 +76,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
     memcpy(tdims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
     memcpy(tdims + 2 + infos[0].ndim - 2, infos[1].dims + 2,
            (infos[1].ndim - 2)*sizeof(int32_t));
-  } else {                      /* /INNER */
+  } else {                      // /INNER
     tndim = infos[0].ndim;
     tdims = (int32_t*) malloc(tndim*sizeof(int32_t));
     if (infos[1].ndim != infos[0].ndim) {
@@ -103,14 +103,14 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   setAxes(&infos[2], 2, NULL, SL_EACHBLOCK);
 
   int32_t j, k;
-  if (internalMode & 1) {	/* /OUTER */
+  if (internalMode & 1) {	// /OUTER
     do {
       do {
-        for (i = 0; i < dims1[1]; i++) /* rows of #1 */
-          for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
+        for (i = 0; i < dims1[1]; i++) // rows of #1
+          for (j = 0; j < dims2[0]; j++) { // columns of #2
             double *p = &ptrs[2].d[j + i*dims2[0]];
             *p = 0.0;
-            for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
+            for (k = 0; k < dims1[0]; k++) // columns of #1 = rows of #2
               *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
           }
         ptrs[0].d += infos[0].singlestep[2];
@@ -120,13 +120,13 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
       ptrs[0].d -= infos[0].ndim > 3? infos[0].singlestep[3]: infos[0].nelem;
       ptrs[1].d += infos[1].singlestep[2];
     } while (advanceLoop(&infos[1], &ptrs[1]) < infos[1].ndim);
-  } else {                      /* /INNER */
+  } else {                      // /INNER
     do {
-      for (i = 0; i < dims1[1]; i++) /* rows of #1 */
-        for (j = 0; j < dims2[0]; j++) { /* columns of #2 */
+      for (i = 0; i < dims1[1]; i++) // rows of #1
+        for (j = 0; j < dims2[0]; j++) { // columns of #2
           double *p = &ptrs[2].d[j + i*dims2[0]];
           *p = 0.0;
-          for (k = 0; k < dims1[0]; k++) /* columns of #1 = rows of #2 */
+          for (k = 0; k < dims1[0]; k++) // columns of #1 = rows of #2
             *p += ptrs[0].d[k + i*dims1[0]]*ptrs[1].d[j + k*dims2[0]];
         }
       ptrs[0].d += infos[0].singlestep[2];
@@ -144,7 +144,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   return iq;
 }
 REGISTER(matrix_product, f, mproduct, 2, 2, "0inner:1outer");
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
 				 double *u_out, double *s_out,
 				 double *v_out)
@@ -179,7 +179,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
       memcpy(s_out, s->data, nmin*sizeof(*s_out));
       memcpy(v_out, v->data, nmin*nmin*sizeof(*v_out));
     }
-  } else {			/* ncol > nrow */
+  } else {			// ncol > nrow
     nmin = nrow;
     nmax = ncol;
     a = gsl_matrix_alloc(nmax, nmin);
@@ -212,7 +212,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
   gsl_vector_free(w);
   return result;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 /* 
    SVD,A,U2,S2,V2
    
@@ -259,17 +259,17 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   int32_t dims[MAX_DIMS];
   memcpy(dims, infos[0].dims, infos[0].ndim*sizeof(int32_t));
   if (infos[0].dims[0] <= infos[0].dims[1]) {
-    dims[1] = dims[0];          /* # columns */
-    /* S (vector) */
+    dims[1] = dims[0];          // # columns
+    // S (vector)
     standard_redef_array(ps[2], LUX_DOUBLE, infos[0].ndim - 1, dims + 1,
                          0, NULL, infos[2].mode, &ptrs[2], &infos[2]);
     standard_redef_array(ps[3], LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
-                         infos[3].mode, &ptrs[3], &infos[3]); /* Vt */
+                         infos[3].mode, &ptrs[3], &infos[3]); // Vt
   } else {
     standard_redef_array(ps[3], LUX_DOUBLE, infos[0].ndim, infos[0].dims,
-                         0, NULL, infos[3].mode, &ptrs[3], &infos[3]); /* Vt */
-    dims[0] = dims[1];                                  /* # rows */
-    /* S (vector) */
+                         0, NULL, infos[3].mode, &ptrs[3], &infos[3]); // Vt
+    dims[0] = dims[1];                                  // # rows
+    // S (vector)
     standard_redef_array(ps[2], LUX_DOUBLE, infos[0].ndim - 1, dims + 1,
                          0, NULL, infos[2].mode, &ptrs[2], &infos[2]);
     standard_redef_array(ps[1], LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
@@ -280,8 +280,8 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   setAxes(&infos[2], 2, NULL, SL_EACHBLOCK);
   setAxes(&infos[3], 2, NULL, SL_EACHBLOCK);
   do {
-    if (singular_value_decomposition(ptrs[0].d, infos[0].dims[0], /* # cols */
-                                     infos[0].dims[1],          /* # rows */
+    if (singular_value_decomposition(ptrs[0].d, infos[0].dims[0], // # cols
+                                     infos[0].dims[1],          // # rows
                                      ptrs[1].d, ptrs[2].d, ptrs[3].d)) {
       return luxerror("SVD decomposition failed", ps[0]);
     }
@@ -297,7 +297,7 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   return iq;
 }
 REGISTER(svd, s, svd, 4, 4, NULL);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow)
 {
   int32_t i, j;
@@ -311,7 +311,7 @@ int32_t matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow
       out[j + i*in_nrow] = in[i + j*in_ncol];
   return 0;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
@@ -347,7 +347,7 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
   return iq;
 }
 REGISTER(transpose_matrix, f, transpose, 1, 1, NULL);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
@@ -368,4 +368,4 @@ int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
   return iq;
 }
 REGISTER(diagonal_matrix, f, mdiagonal, 1, 1, NULL);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------

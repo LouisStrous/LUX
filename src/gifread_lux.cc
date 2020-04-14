@@ -18,7 +18,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* experimental gif reader, learning .... */
+// experimental gif reader, learning ....
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,9 +56,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
             struct codestruct *prefix;
             unsigned char first,suffix;
         } codetype;
- codetype *codetable;                /* LZW compression code data */
- int32_t datasize,codesize,codemask;     /* Decoder working variables */
- int32_t clear,eoi;                      /* Special code values */
+ codetype *codetable;                // LZW compression code data
+ int32_t datasize,codesize,codemask;     // Decoder working variables
+ int32_t clear,eoi;                      // Special code values
  
  void readextension(FILE *), readimage(FILE *, int32_t, char *),
    loadcolortable(FILE *, int32_t, int32_t), readraster(int32_t, FILE *, unsigned char *);
@@ -68,15 +68,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t	lux_gifread(int32_t, int32_t []);
 void	process(int32_t, unsigned char **);
 
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 int32_t lux_gifread_f(int32_t narg, int32_t ps[])
- /* a function version that returns 1 if read OK */
+ // a function version that returns 1 if read OK
  {
  if ( lux_gifread(narg, ps) == 1 ) return 1; else return 4;
  }
- /*------------------------------------------------------------------------- */
-int32_t lux_gifread(int32_t narg, int32_t ps[])       /* gifread subroutine */
- /* read a "simple" gif file, 8 bit deep */
+ //-------------------------------------------------------------------------
+int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
+ // read a "simple" gif file, 8 bit deep
  /* call is gifread,array,file,map where map is the color map, if
  map not in argument list, you don't get it! */
  {
@@ -87,14 +87,14 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       /* gifread subroutine */
  struct ahead   *h;
  struct GIFScreen gh;
  
- 		/* first arg is the variable to load, second is name of file */
+ 		// first arg is the variable to load, second is name of file
  if (!symbolIsStringScalar(ps[1]))
    return cerror(NEED_STR, ps[1]);
  name = expand_name(string_value(ps[1]), NULL);
- /* try to open the file */
+ // try to open the file
  if ((fin=fopen(name,"r")) == NULL) return file_open_error();
  
- /* ck if output colormap wanted, set cmsym = 0 if not */
+ // ck if output colormap wanted, set cmsym = 0 if not
  if (narg > 2) { cmsym = ps[2]; } else cmsym = 0;
 
  /* gif files must have a 6 Byte signature followed by a screen descriptor and
@@ -109,23 +109,23 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       /* gifread subroutine */
  	printf("invalid GIF version #\n"); return -1; } else {
 	printf("version 89a, warning, not all options supported\n"); }
 	} 
- /* yank out the screen size */
+ // yank out the screen size
  nxs = ( (gh.width_msb << 8) | gh.width_lsb );
  nys = ( (gh.height_msb << 8) | gh.height_lsb );
- /* printf("screen size %d %d\n", nxs, nys); */
+ // printf("screen size %d %d\n", nxs, nys);
 
- /* define the output array as a Byte of the screen size */
+ // define the output array as a Byte of the screen size
  iq = ps[0];	dim[0] = nxs;	dim[1] = nys;
  if ( redef_array(iq, LUX_INT8, 2, dim) != 1) { fclose(fin); return -1; }
  h = (struct ahead *) sym[iq].spec.array.ptr;
  data = ((char *)h + sizeof(struct ahead));
 
- /* global color map stuff */
- gcmflag = gh.mask >> 7;	/* top bit in mask */
+ // global color map stuff
+ gcmflag = gh.mask >> 7;	// top bit in mask
  if (gcmflag) {
  cr = (gh.mask >> 4) & 0x7;	cr += 1;	cr = 1 << cr;
  pixel = gh.mask & 0x7;	pixel += 1;	pixel = 1 << pixel;
- /* set the data array to the background color */
+ // set the data array to the background color
  p = data; n = nxs*nys; while (n--) *p++ = gh.background;
  /* still in global color table exist conditional, read the color table
  and load into 3rd arg if it exists */
@@ -133,27 +133,27 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       /* gifread subroutine */
  }
  
  quit = 0;	status = 1;
- /*  read the next separator and try to process */
+ //  read the next separator and try to process
  
  do {
   sep = getc(fin);
-  /*  printf("separator %#x\n", sep); */
+  //  printf("separator %#x\n", sep);
   switch (sep) {
    case EOF: perror("gifread, separator");
  	quit = 1;
    	status = -1;
    	break;
    case 0x3b:
-	/* must be the end */
-     /*	printf("end of image\n"); */
+	// must be the end
+     //	printf("end of image\n");
 	quit = 1;
 	break;
    case 0x21:
-	/* an extension of some sort */
-	readextension(fin);	/* currently nothing is done */
+	// an extension of some sort
+	readextension(fin);	// currently nothing is done
 	break;
    case 0x2c:
-	/* normal, read image descriptor and image */
+	// normal, read image descriptor and image
 	readimage(fin, cmsym, data);
  	quit = 1;
  	break;
@@ -166,19 +166,19 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       /* gifread subroutine */
  } while (!quit);
 
  fclose(fin);
- return status;		/* normally a 1 */
+ return status;		// normally a 1
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void readextension(FILE *fin)
- /* Read a GIF extension block (and do nothing with it). */
+ // Read a GIF extension block (and do nothing with it).
  {
  unsigned char count;
  char buf[255];
  getc(fin);
  while ((count = getc(fin))) fread(buf, 1, count, fin);
- /* printf("note , extension with code = %c ignored\n"); */
+ // printf("note , extension with code = %c ignored\n");
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void readimage(FILE *fin, int32_t cmsym, char *data)
  {
  struct GIFImage gimage;
@@ -188,14 +188,14 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
  if (fread(&gimage.left_lsb,1,9,fin) != 9) {
  perror("gifread in image descriptor");
  quit = 1;	status = -1;	return; }
- /* get offsets, etc */
+ // get offsets, etc
  ix = ( (gimage.left_msb << 8) | gimage.left_lsb );
  iy = ( (gimage.top_msb << 8) | gimage.top_lsb );
  nx = ( (gimage.width_msb << 8) | gimage.width_lsb );
  ny = ( (gimage.height_msb << 8) | gimage.height_lsb );
  local = gimage.mask & 0x80;
- /* printf("ix, iy, nx, ny = %d %d %d %d\n", ix, iy, nx, ny); */
- /* printf("mask = %#x\n", gimage.mask); */
+ // printf("ix, iy, nx, ny = %d %d %d %d\n", ix, iy, nx, ny);
+ // printf("mask = %#x\n", gimage.mask);
  if (local) {
  /* a local color table, not too common, we just replace the global if
  there was one */
@@ -215,12 +215,12 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
 	if (!image) { printf("malloc error in GIFREAD\n"); quit=1; status=-1;
    	return; }
  }
- /* now read in */
+ // now read in
  readraster(nx * ny, fin, (unsigned char *) image);
  if (status != 1) { quit = 1; return; }
- /* handle interleaf/interlace, make a note of it */
- /* if not the screen size, load into screen image and free temp */
- /* printf("fflag = %d\n", fflag); */
+ // handle interleaf/interlace, make a note of it
+ // if not the screen size, load into screen image and free temp
+ // printf("fflag = %d\n", fflag);
  if (!fflag) {
  p2 = image;	p = data + ix + iy*nxs;
  m = ny;	stride = nxs - nx;
@@ -228,7 +228,7 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
  free(image);
  }
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void loadcolortable(FILE *fin, int32_t nc, int32_t cmsym)
  {
  int32_t	dim[8], ncolmap;
@@ -248,17 +248,17 @@ void loadcolortable(FILE *fin, int32_t nc, int32_t cmsym)
  	{ perror("gifread, colormap"); status = -1;  quit = 1; return; }
  return;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void fatal(char const* s)
- /* well, not really, in LUX we like to stick around */
+ // well, not really, in LUX we like to stick around
  {
         fprintf(stderr,"giftops: %s\n",s);
         quit = 1;	status = -1;
  }
 
 
- /*------------------------------------------------------------------------- */
- /* Output the bytes associated with a code to the raster array */
+ //-------------------------------------------------------------------------
+ // Output the bytes associated with a code to the raster array
 
 void outcode(register codetype *p, register unsigned char **fill)
  {
@@ -270,7 +270,7 @@ void outcode(register codetype *p, register unsigned char **fill)
    make a new code table entry, and output the bytes associated with the
    code. */
 
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void process(int32_t code, unsigned char **fill)
  {
         static int32_t avail,oldcode;
@@ -309,7 +309,7 @@ void process(int32_t code, unsigned char **fill)
             fatal("illegal code in raster data");
         }
 }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void readraster(int32_t nsize, FILE *fin, unsigned char *raster)
  {
 	unsigned char *fill;
@@ -352,4 +352,4 @@ void readraster(int32_t nsize, FILE *fin, unsigned char *raster)
         if (fill != raster +nsize) fatal("raster has the wrong size");
         free(codetable);
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------

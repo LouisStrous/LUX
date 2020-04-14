@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* LUX routines about memory use statistics. */
+// LUX routines about memory use statistics.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -26,9 +26,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include "action.hh"
 
-/*-------------------------------------------------------------------*/
+//-------------------------------------------------------------------
 int32_t lux_memstat(int32_t narg, int32_t ps[])
-/* returns some info on memory usage */
+// returns some info on memory usage
 {
  char		*p;
  extern char	*firstbreak;
@@ -38,9 +38,9 @@ int32_t lux_memstat(int32_t narg, int32_t ps[])
   p, p - firstbreak);
  return 1;
 }
-/*-------------------------------------------------------------------*/
+//-------------------------------------------------------------------
 int32_t lux_memory(int32_t narg, int32_t ps[])
-     /* returns size of allocated memory */
+     // returns size of allocated memory
 {
   int32_t	result;
   char	*p;
@@ -51,4 +51,4 @@ int32_t lux_memory(int32_t narg, int32_t ps[])
   sym[result].spec.scalar.l = p - firstbreak;
   return result;
 }
-/*-------------------------------------------------------------------*/
+//-------------------------------------------------------------------

@@ -29,11 +29,11 @@ char	*c_left, *c_right, *c_up, *c_down, *cl_eos,
 	*k_left, *k_right, *k_up, *k_down, *special[7], bs = '\010';
 static char	termcaps[1024];
 extern int32_t	scrat[];
-/*----------------------------------------------------*/
+//----------------------------------------------------
 void getTermCaps(void)
-/* reads terminal capabilities of terminal type TERM (environment variable) */
-/* from file /etc/termcap. Uses vt100 defaults for capabilities that */
-/* could not be found. */
+// reads terminal capabilities of terminal type TERM (environment variable)
+// from file /etc/termcap. Uses vt100 defaults for capabilities that
+// could not be found.
 {
   /*  int32_t	tgetent(char *buffer, char *name);
       char	*tgetstr(char *cap, char **buf); */
@@ -53,7 +53,7 @@ void getTermCaps(void)
       printf("getTermCaps - No termcap entry for '%s' terminal.", term);
     n = 2; }
   ptr = termcaps;
-  if (n == 1)			/* termcaps found */
+  if (n == 1)			// termcaps found
   { c_left = tgetstr("le", &ptr);
     k_left = tgetstr("kl", &ptr);
     c_down = tgetstr("do", &ptr);
@@ -127,4 +127,4 @@ void getTermCaps(void)
   special[5] = k_down;
   special[6] = k_insert;
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------

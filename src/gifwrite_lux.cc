@@ -18,7 +18,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* experimental gif writer, learning .... */
+// experimental gif writer, learning ....
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -26,7 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <errno.h>
 #include <math.h>
-#include <strings.h>		/* for bzero */
+#include <strings.h>		// for bzero
 #include "lux_structures.hh"
  extern struct sym_desc sym[];
  struct GIFScreen {
@@ -55,9 +55,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    cl_block(void), cl_hash(register int32_t) /*, char_init()*/;
  static void char_out(int32_t), flush_char(void);
 
- /*------------------------------------------------------------------------- */
-int32_t lux_gifwrite(int32_t narg, int32_t ps[]) /* gifwrite subroutine */
- /* write a very plain gif file, 8 bit deep */
+ //-------------------------------------------------------------------------
+int32_t lux_gifwrite(int32_t narg, int32_t ps[]) // gifwrite subroutine
+ // write a very plain gif file, 8 bit deep
  /* call is gifwrite,array,file,[map] where map is the color map 
  and must be (3,256) I*1 in rgb triplets */
  {
@@ -70,7 +70,7 @@ int32_t lux_gifwrite(int32_t narg, int32_t ps[]) /* gifwrite subroutine */
  struct GIFScreen gh = {"GIF87a", 0,0,0,0,247,0,0};
  struct GIFImage gimage = {',', 0,0,0,0,0,0,0,0,0};
 
-                                         /* first arg. must be an array */
+                                         // first arg. must be an array
  iq = ps[0];
  if ( symbol_class(iq) != 4 ) return execute_error(66);
  type = sym[iq].type;
@@ -80,55 +80,55 @@ int32_t lux_gifwrite(int32_t narg, int32_t ps[]) /* gifwrite subroutine */
  if ( nd != 2 || type != 0 )
   { printf("GIFWRITE only supports 2-D Byte arrays\n");
   return -1; }
-                        /* second argument must be a string, file name */
+                        // second argument must be a string, file name
  if ( symbol_class( ps[1] ) != 2 ) return execute_error(70);
  name = (char *) sym[ps[1] ].spec.array.ptr;
-                        /* third arg. must be an array, color map */
- ncolmap = 256*3;       /* length in bytes */
+                        // third arg. must be an array, color map
+ ncolmap = 256*3;       // length in bytes
  if (narg > 2) {
  iq = ps[2];
  if ( symbol_class(iq) != 4 ) return execute_error(66);
  type = sym[iq].type;
  h2 = (struct ahead *) sym[iq].spec.array.ptr;
  colormap = ((char *)h2 + sizeof(struct ahead));
- /* we are fussy about the organization of the color map, must be 3x256 */
+ // we are fussy about the organization of the color map, must be 3x256
  if (h2->ndim != 2 || h2->dims[0] != 3 || h2->dims[1] != 256 || type != 0)
   { printf("GIFWRITE requires a 3 by 256 I*1 color map\n");
   return -1; }
  } else {
- /* if no colormap passed, we provide a b/w one */
+ // if no colormap passed, we provide a b/w one
    colormap = (char*) malloc(ncolmap);
  if (colormap == NULL) { printf("malloc error in gifwrite\n"); return -1;}
  p = colormap;
  for (i=0; i < 256; i++) { *p++ = i; *p++ = i; *p++ = i; }
  }
  nx = h->dims[0];       ny = h->dims[1];
-                                                 /* try to open the file */
+                                                 // try to open the file
  if ((fout=fopen(name,"w")) == NULL) return file_open_error();
 
  gh.width_lsb = nx & 0xff;
  gh.width_msb = nx >> 8;
  gh.height_lsb = ny & 0xff;
  gh.height_msb = ny >> 8;
- /* note that we use 8 bit color map and 8 bit pixels */
+ // note that we use 8 bit color map and 8 bit pixels
  
- /* stream out the GIF id and screen descriptor */
+ // stream out the GIF id and screen descriptor
  if (fwrite(&gh, 1, sizeof(gh), fout) != sizeof(gh) )
          { execute_error(90);   fclose(fout);   return -1; }
- /* now the color map */
+ // now the color map
  if (fwrite(colormap, 1, ncolmap, fout) != ncolmap) {
          execute_error(90);     fclose(fout);   return -1; }
- /* the image descriptor, some things already as they should be */
- /* image width and height same as screen */
+ // the image descriptor, some things already as they should be
+ // image width and height same as screen
  gimage.width_lsb = nx & 0xff;
  gimage.width_msb = nx >> 8;
  gimage.height_lsb = ny & 0xff;
  gimage.height_msb = ny >> 8;
  if (fwrite(&gimage, 1, sizeof(gimage), fout) != sizeof(gimage) )
          { execute_error(90);   fclose(fout);   return -1; }
- /* our code size is 8 */
+ // our code size is 8
  putc(codesize, fout);
- /* could probably use anybody's lzw compressor here */
+ // could probably use anybody's lzw compressor here
  compress(codesize+1, fout, (uint8_t *) data, nx*ny);
  
  putc(0, fout);
@@ -136,27 +136,27 @@ int32_t lux_gifwrite(int32_t narg, int32_t ps[]) /* gifwrite subroutine */
  fclose(fout);
  return 1;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 int32_t lux_gifwrite_f(int32_t narg, int32_t ps[])
- /* a function version that returns 1 if read OK */
+ // a function version that returns 1 if read OK
  {
  if ( lux_gifwrite(narg, ps) == 1 ) return 1; else return 4;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
  static unsigned long cur_accum = 0;
  static int32_t           cur_bits = 0;
 
 #define min(a,b)        ((a>b) ? b : a)
-#define XV_BITS 12    /* BITS was already defined on some systems */
+#define XV_BITS 12    // BITS was already defined on some systems
 #define MSDOS   1
-#define HSIZE  5003            /* 80% occupancy */
+#define HSIZE  5003            // 80% occupancy
 
  typedef unsigned char   char_type;
  
- static int32_t n_bits;                    /* number of bits/code */
- static int32_t maxbits = XV_BITS;         /* user settable max # bits/code */
- static int32_t maxcode;                   /* maximum code, given n_bits */
- static int32_t maxmaxcode = 1 << XV_BITS; /* NEVER generate this */
+ static int32_t n_bits;                    // number of bits/code
+ static int32_t maxbits = XV_BITS;         // user settable max # bits/code
+ static int32_t maxcode;                   // maximum code, given n_bits
+ static int32_t maxmaxcode = 1 << XV_BITS; // NEVER generate this
 
 #define MAXCODE(n_bits)     ( (1 << (n_bits)) - 1)
 
@@ -165,7 +165,7 @@ int32_t lux_gifwrite_f(int32_t narg, int32_t ps[])
 #define HashTabOf(i)   htab[i]
 #define CodeTabOf(i)   codetab[i]
 
- static int32_t hsize = HSIZE;            /* for dynamic table sizing */
+ static int32_t hsize = HSIZE;            // for dynamic table sizing
 
  /*
  * To save much memory, we overlay the table used by compress() with those
@@ -180,15 +180,15 @@ int32_t lux_gifwrite_f(int32_t narg, int32_t ps[])
 #define tab_suffixof(i)        ((char_type *)(htab))[i]
 #define de_stack               ((char_type *)&tab_suffixof(1<<XV_BITS))
 
-static int32_t free_ent = 0;       /* first unused entry */
+static int32_t free_ent = 0;       // first unused entry
 
  /*
  * block compression parameters -- after all codes are used up,
  * and compression rate changes, start over.
  */
  static int32_t clear_flg = 0;
- static int64_t in_count = 1;            /* length of input */
- static int64_t out_count = 0;           /* # of codes output (for debugging) */
+ static int64_t in_count = 1;            // length of input
+ static int64_t out_count = 0;           // # of codes output (for debugging)
 
  /*
  * compress stdin to stdout
@@ -212,7 +212,7 @@ static int32_t free_ent = 0;       /* first unused entry */
  static int32_t ClearCode;
  static int32_t EOFCode;
 
- /********************************************************/
+ //******************************************************
 static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t len)
  {
   register long fcode;
@@ -230,7 +230,7 @@ static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t le
   g_init_bits = init_bits;
   g_outfile   = outfile;
 
-  /* initialize 'compress' globals */
+  // initialize 'compress' globals
   maxbits = XV_BITS;
   maxmaxcode = 1<<XV_BITS;
   bzero((char *) htab,    sizeof(htab));
@@ -260,10 +260,10 @@ static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t le
   hshift = 0;
   for ( fcode = (long) hsize;  fcode < 65536L; fcode *= 2L )
     hshift++;
-  hshift = 8 - hshift;                /* set hash code range bound */
+  hshift = 8 - hshift;                // set hash code range bound
 
   hsize_reg = hsize;
-  cl_hash( (int32_t) hsize_reg);            /* clear hash table */
+  cl_hash( (int32_t) hsize_reg);            // clear hash table
 
   output(ClearCode);
     
@@ -272,17 +272,17 @@ static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t le
     in_count++;
 
     fcode = (long) ( ( (long) c << maxbits) + ent);
-    i = (((int32_t) c << hshift) ^ ent);    /* xor hashing */
+    i = (((int32_t) c << hshift) ^ ent);    // xor hashing
 
     if ( HashTabOf (i) == fcode ) {
       ent = CodeTabOf (i);
       continue;
     }
 
-    else if ( (long)HashTabOf (i) < 0 )      /* empty slot */
+    else if ( (long)HashTabOf (i) < 0 )      // empty slot
       goto nomatch;
 
-    disp = hsize_reg - i;           /* secondary hash (after G. Knott) */
+    disp = hsize_reg - i;           // secondary hash (after G. Knott)
     if ( i == 0 )
       disp = 1;
 
@@ -304,14 +304,14 @@ static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t le
     ent = c;
 
     if ( free_ent < maxmaxcode ) {
-      CodeTabOf (i) = free_ent++; /* code -> hashtable */
+      CodeTabOf (i) = free_ent++; // code -> hashtable
       HashTabOf (i) = fcode;
     }
     else
       cl_block();
   }
 
-  /* Put out the final code */
+  // Put out the final code
   output(ent);
   out_count++;
   output(EOFCode);
@@ -377,7 +377,7 @@ static void output(int32_t code)
   }
         
   if( code == EOFCode ) {
-    /* At EOF, write the rest of the buffer */
+    // At EOF, write the rest of the buffer
     while( cur_bits > 0 ) {
       char_out( (uint32_t)(cur_accum & 0xff) );
       cur_accum >>= 8;
@@ -394,10 +394,10 @@ static void output(int32_t code)
 #endif
   }
  }
- /********************************/
-static void cl_block(void)	/* table clear for block compress */
+ //******************************
+static void cl_block(void)	// table clear for block compress
  {
-  /* Clear out the hash table */
+  // Clear out the hash table
 
   cl_hash ( (int32_t) hsize );
   free_ent = ClearCode + 2;
@@ -405,15 +405,15 @@ static void cl_block(void)	/* table clear for block compress */
 
   output(ClearCode);
  }
- /********************************/
-static void cl_hash(register int32_t hsize)          /* reset code table */
+ //******************************
+static void cl_hash(register int32_t hsize)          // reset code table
  {
   register int32_t *htab_p = htab+hsize;
   register long i;
   register long m1 = -1;
 
   i = hsize - 16;
-  do {                            /* might use Sys V memset(3) here */
+  do {                            // might use Sys V memset(3) here
     *(htab_p-16) = m1;
     *(htab_p-15) = m1;
     *(htab_p-14) = m1;

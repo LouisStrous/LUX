@@ -28,13 +28,13 @@ char	*c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
 	*k_delete, *k_insert, *k_up, *k_down, *k_right, *k_left, *c_save,
 	*c_restore, *special[7], isSpecial[256];
 
-/* dummyterm assumes vt100-like defaults for the special key codes. */
-/* The delete and backspace keys on PCs are often different from those */
-/* on workstations, so we have a "PC" mode and a "workstation" mode. */
-/* The PC mode is triggered by certain TERM specifications; currently */
-/* only "linux".  */
+// dummyterm assumes vt100-like defaults for the special key codes.
+// The delete and backspace keys on PCs are often different from those
+// on workstations, so we have a "PC" mode and a "workstation" mode.
+// The PC mode is triggered by certain TERM specifications; currently
+// only "linux".
 void dummyTerm(void)
-/* Use this if terminfo doesn't work. LS 12jul96 31jul97 */
+// Use this if terminfo doesn't work. LS 12jul96 31jul97
 {
   char const *termName[] = {
     "linux"
@@ -48,8 +48,8 @@ void dummyTerm(void)
     { isPCterm = 1;
       break; }
 
-  /* we use strsave() because manualTerm() uses realloc() on these */
-  /* strings */
+  // we use strsave() because manualTerm() uses realloc() on these
+  // strings
   if (isPCterm)
   { k_backspace = strsave("\177");
     k_delete = strsave("\033[3~"); }
@@ -80,8 +80,8 @@ void dummyTerm(void)
   for (i = 0; i < 7; i++)
     isSpecial[(unsigned char) special[i][0]] = 1;
 }
-/*--------------------------------------------------------------------*/
-/* This routine reads the specifications from a user-generated file. */
+//--------------------------------------------------------------------
+// This routine reads the specifications from a user-generated file.
 #define	nNames  (sizeof(names)/sizeof(char *))
 void manualTerm(int32_t number)
 {
@@ -101,7 +101,7 @@ void manualTerm(int32_t number)
   FILE	*fp;
   int32_t	n, i;
 
-  dummyTerm();			/* default; */
+  dummyTerm();			// default;
   p = getenv("LUXDIR");
   if (p) {
     strcpy(curScrat, p);
@@ -116,16 +116,16 @@ void manualTerm(int32_t number)
   }
   fp = fopen(curScrat, "r");
   if (!fp)
-    return;			/* not found; using dummyterm instead */
+    return;			// not found; using dummyterm instead
   n = scratSize();
   do {
-    if (fgets(curScrat, n, fp)) { /* get line from file */
-      p = strtok(curScrat, "="); /* find code name */
+    if (fgets(curScrat, n, fp)) { // get line from file
+      p = strtok(curScrat, "="); // find code name
       for (i = 0; i < nNames; i++)
-	if (!strcmp(names[i], p)) /* found code name in list */
+	if (!strcmp(names[i], p)) // found code name in list
 	  break;
       p = strtok(NULL, "\n");
-      if (i < nNames) {		/* found code name in list */
+      if (i < nNames) {		// found code name in list
 	translateEscapes(p);
 	*codes[i] = (char*) realloc(*codes[i], strlen(p) + 1);
 	memcpy(*codes[i], p, strlen(p) + 1);
@@ -145,9 +145,9 @@ void manualTerm(int32_t number)
   for (i = 0; i < 7; i++)
     isSpecial[(unsigned char) special[i][0]] = 1;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_manualterm(int32_t narg, int32_t ps[])
-/* select a manual terminal specification */
+// select a manual terminal specification
 {
   int32_t	i;
 
@@ -157,5 +157,5 @@ int32_t lux_manualterm(int32_t narg, int32_t ps[])
   manualTerm(i);
   return LUX_OK;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 

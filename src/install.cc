@@ -18,29 +18,29 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File install.c */
+// File install.c
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
 #include "install.hh"
-#include <ctype.h> /* for toupper(11) isdigit(3) */
-#include <errno.h> /* for errno(2) */
-#include <error.h> /* for luxerror(58) */
-#include <float.h> /* for FLT_MAX(2) DBL_MAX(2) DBL_MIN(1) FLT_MIN(1) */
-#include <limits.h> /* for UINT8_MAX(3) INT32_MAX(1) INT16_MAX(1) INT16_MIN(1) INT32_MIN(1) */
-#include <malloc.h> /* for malloc(25) free(18) realloc(4) */
-#include <math.h> /* for j1(12) */
-#include <setjmp.h> /* for longjmp(1) jmp_buf(1) setjmp(1) */
-#include <signal.h> /* for signal(7) SIG_ERR(6) SIGCONT(3) SIGINT(2) SIGSEGV(2) ... */
-#include <stdarg.h> /* for va_arg(39) va_end(14) va_start(2) va_list(2) */
-#include <stddef.h> /* for NULL(20) */
-#include <stdio.h> /* for printf(44) puts(16) FILE(6) fclose(4) sprintf(3) ... */
-#include <stdlib.h> /* for strtol(4) atol(1) */
-#include <string.h> /* for index(41) strlen(17) memcpy(12) strcpy(4) strcmp(4) ... */
-#include <time.h> /* for CLK_TCK(1) clock(1) time(1) */
-#include <unistd.h> /* for pipe(2) execl(1) sbrk(1) */
+#include <ctype.h> // for toupper(11) isdigit(3)
+#include <errno.h> // for errno(2)
+#include <error.h> // for luxerror(58)
+#include <float.h> // for FLT_MAX(2) DBL_MAX(2) DBL_MIN(1) FLT_MIN(1)
+#include <limits.h> // for UINT8_MAX(3) INT32_MAX(1) INT16_MAX(1) INT16_MIN(1) INT32_MIN(1)
+#include <malloc.h> // for malloc(25) free(18) realloc(4)
+#include <math.h> // for j1(12)
+#include <setjmp.h> // for longjmp(1) jmp_buf(1) setjmp(1)
+#include <signal.h> // for signal(7) SIG_ERR(6) SIGCONT(3) SIGINT(2) SIGSEGV(2) ...
+#include <stdarg.h> // for va_arg(39) va_end(14) va_start(2) va_list(2)
+#include <stddef.h> // for NULL(20)
+#include <stdio.h> // for printf(44) puts(16) FILE(6) fclose(4) sprintf(3) ...
+#include <stdlib.h> // for strtol(4) atol(1)
+#include <string.h> // for index(41) strlen(17) memcpy(12) strcpy(4) strcmp(4) ...
+#include <time.h> // for CLK_TCK(1) clock(1) time(1)
+#include <unistd.h> // for pipe(2) execl(1) sbrk(1)
 #include <obstack.h>
-/* clock() on mips-sgi-irix64-6.2 is in unistd.h rather than in ANSI time.h */
+// clock() on mips-sgi-irix64-6.2 is in unistd.h rather than in ANSI time.h
 
 #include "editor.hh"
 #include "editorcharclass.hh"
@@ -55,7 +55,7 @@ extern int32_t		keepEVB;
 extern char		*currentChar, line[];
 extern FILE		*inputStream, *outputStream;
 extern int32_t		nExecuted;
-/* extern internalRoutine	subroutine[], function[]; */
+// extern internalRoutine	subroutine[], function[];
 internalRoutine *subroutine, *function;
 
 int32_t	luxerror(char const*, int32_t, ...),
@@ -90,7 +90,7 @@ int32_t	nexInfo = 0;
 extern int32_t	compileLevel, curLineNumber;
 static char	installing = 1;
 
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 typedef int32_t LuxRoutine(int32_t, int32_t*);
 
 extern LuxRoutine lux_area, lux_area2, lux_arestore, lux_astore,
@@ -196,7 +196,7 @@ extern LuxRoutine insert;
 LuxRoutine lux_restart;
 
 #if MOTIF
-int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
+int32_t	lux_zeroifnotdefined(), lux_compile_file();	// browser
 #endif
 
 #define MAX_ARG	100
@@ -274,407 +274,407 @@ int32_t	lux_zeroifnotdefined(), lux_compile_file();	/* browser */
                   FOO,3,SPECIAL=1 yields 1,3 */
 
 internalRoutine	subroutine_table[] = {
-  { "%insert",	3, MAX_ARG, insert, /* execute.c */
+  { "%insert",	3, MAX_ARG, insert, // execute.c
     "1inner:2outer:4onedim:8skipspace:16zero:32all:64separate" },
-  { "area",	1, 4, lux_area, ":seed:numbers:diagonal" }, /* topology.c */
-  { "area2",	2, 6, lux_area2, /* toplogy.c */
+  { "area",	1, 4, lux_area, ":seed:numbers:diagonal" }, // topology.c
+  { "area2",	2, 6, lux_area2, // toplogy.c
     "::seed:numbers:diagonal:sign" },
-  { "arestore",	1, MAX_ARG, lux_arestore, 0 }, /* files.c */
-  { "astore",	2, MAX_ARG, lux_astore, 0 }, /* files.c */
-  { "atomize", 	1, 1, lux_atomize, "1tree:2line" }, /* strous.c */
-  { "batch",	0, 1, lux_batch, "1quit" }, /* symbols.c */
-  { "breakpoint", 0, 1, lux_breakpoint, /* install.c */
+  { "arestore",	1, MAX_ARG, lux_arestore, 0 }, // files.c
+  { "astore",	2, MAX_ARG, lux_astore, 0 }, // files.c
+  { "atomize", 	1, 1, lux_atomize, "1tree:2line" }, // strous.c
+  { "batch",	0, 1, lux_batch, "1quit" }, // symbols.c
+  { "breakpoint", 0, 1, lux_breakpoint, // install.c
     "0set:1enable:2disable:3delete:4list:8variable" },
-  { "byte",	1, MAX_ARG, lux_byte_inplace, 0, }, /* symbols.c */
-  { "c",	1, 7, lux_callig, /* hersh.c */
+  { "byte",	1, MAX_ARG, lux_byte_inplace, 0, }, // symbols.c
+  { "c",	1, 7, lux_callig, // hersh.c
     "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
 #if CALCULATOR
-  { "calculator",	0, 0, lux_calculator, 0 }, /* calculator.c */
+  { "calculator",	0, 0, lux_calculator, 0 }, // calculator.c
 #endif
-  { "callig",	1, 7, lux_callig, /* hersh.c */
+  { "callig",	1, 7, lux_callig, // hersh.c
     "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
-  { "cdouble",	1, MAX_ARG, lux_cdouble_inplace, 0 }, /* symbols.c */
-  { "cfloat",	1, MAX_ARG, lux_cfloat_inplace, 0 }, /* symbols.c */
-  { "chdir",	0, 1, lux_chdir, "1show" }, /* files.c */
+  { "cdouble",	1, MAX_ARG, lux_cdouble_inplace, 0 }, // symbols.c
+  { "cfloat",	1, MAX_ARG, lux_cfloat_inplace, 0 }, // symbols.c
+  { "chdir",	0, 1, lux_chdir, "1show" }, // files.c
 #if DEBUG
-  { "checklist", 0, 1, checkList, 0 }, /* debug.c */
+  { "checklist", 0, 1, checkList, 0 }, // debug.c
 #endif
-  { "close",	1, 1, lux_close, 0 }, /* files.c */
-  { "cluster",	2, 8, lux_cluster, /* cluster.c */
+  { "close",	1, 1, lux_close, 0 }, // files.c
+  { "cluster",	2, 8, lux_cluster, // cluster.c
     "|32|:centers:index:size:sample:empty:maxit:rms:1update:2iterate:4vocal:8quick:16record:32ordered" },
 #if HAVE_LIBX11
-  { "colorcomponents", 4, 4, lux_colorComponents, 0 }, /* color.c */
-  { "colorstogrey", 1, 1, lux_colorstogrey, 0 }, /* color.c */
+  { "colorcomponents", 4, 4, lux_colorComponents, 0 }, // color.c
+  { "colorstogrey", 1, 1, lux_colorstogrey, 0 }, // color.c
 #endif
 #if MOTIF
-  { "compile_file", 1, 1, lux_compile_file, 0 }, /* motifextra.c */
+  { "compile_file", 1, 1, lux_compile_file, 0 }, // motifextra.c
 #endif
-  { "contour",	1, 6, lux_contour, /* contour.c */
+  { "contour",	1, 6, lux_contour, // contour.c
     "image:levels:xmin:xmax:ymin:ymax:style:dashsize:1autocontour:2usercontour" },
-  { "coordtrf",	2, 4, lux_coordtrf, /* coord.c */
+  { "coordtrf",	2, 4, lux_coordtrf, // coord.c
    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:8todvi:16todev:24toimg:32toplt:40torim:48torpl:56tox11" },
-  { "crunch",	3, 3, lux_crunch, 0 }, /* crunch.c */
-  { "crunchrun",	3, 3, lux_crunchrun, 0 }, /* crunch.c */
-  { "cspline_extr", 5, 8, lux_cubic_spline_extreme, "1keepdims:2periodic:4akima::::pos:minpos:minval:maxpos:maxval" }, /* fun3.c */
-  { "d",	0, MAX_ARG, lux_dump, /* fun1.c */
+  { "crunch",	3, 3, lux_crunch, 0 }, // crunch.c
+  { "crunchrun",	3, 3, lux_crunchrun, 0 }, // crunch.c
+  { "cspline_extr", 5, 8, lux_cubic_spline_extreme, "1keepdims:2periodic:4akima::::pos:minpos:minval:maxpos:maxval" }, // fun3.c
+  { "d",	0, MAX_ARG, lux_dump, // fun1.c
     "+|36|1fixed:2system:4zero:8local:24context:32follow:64full" },
-  { "decomp",	1, 1, lux_decomp, 0 }, /* fun2.c */
-  { "decrunch",	2, 2, lux_decrunch, 0 }, /* crunch.c */
-  { "default",	2, MAX_ARG, lux_default, "+" }, /* strous.c */
-  { "delete", 	1, MAX_ARG, lux_delete, "+1pointer" }, /* fun1.c */
-  { "diagnostic", 0, 1, lux_redirect_diagnostic, 0 }, /* strous.c */
-  { "distr",	3, 3, lux_distr, 0 }, /* strous.c */
-  { "doub",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
-  { "double",	1, MAX_ARG, lux_double_inplace, 0 }, /* symbols.c */
-  { "dsolve",	2, 2, lux_dsolve, 0 }, /* fun2.c */
-  { "dump", 	0, MAX_ARG, lux_dump, /* fun1.c */
+  { "decomp",	1, 1, lux_decomp, 0 }, // fun2.c
+  { "decrunch",	2, 2, lux_decrunch, 0 }, // crunch.c
+  { "default",	2, MAX_ARG, lux_default, "+" }, // strous.c
+  { "delete", 	1, MAX_ARG, lux_delete, "+1pointer" }, // fun1.c
+  { "diagnostic", 0, 1, lux_redirect_diagnostic, 0 }, // strous.c
+  { "distr",	3, 3, lux_distr, 0 }, // strous.c
+  { "doub",	1, MAX_ARG, lux_double_inplace, 0 }, // symbols.c
+  { "double",	1, MAX_ARG, lux_double_inplace, 0 }, // symbols.c
+  { "dsolve",	2, 2, lux_dsolve, 0 }, // fun2.c
+  { "dump", 	0, MAX_ARG, lux_dump, // fun1.c
     "+|36|1fixed:2system:4zero:8local:24context:32follow:64full" },
-  { "dump_lun",	0, 0, lux_dump_lun, 0 }, /* files.c */
-  { "dump_stack", 0, 0, lux_dump_stack, 0 }, /* strous.c */
-  { "echo",	0, 1, lux_echo, 0 }, /* symbols.c */
-  { "endian",	1, 1, lux_endian, 0 }, /* strous.c */
-  { "erase",	0, 5, lux_erase, /* plots.c */
+  { "dump_lun",	0, 0, lux_dump_lun, 0 }, // files.c
+  { "dump_stack", 0, 0, lux_dump_stack, 0 }, // strous.c
+  { "echo",	0, 1, lux_echo, 0 }, // symbols.c
+  { "endian",	1, 1, lux_endian, 0 }, // strous.c
+  { "erase",	0, 5, lux_erase, // plots.c
     "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev" },
-  { "error",	0, 2, lux_error, "1store:2restore" }, /* error.c */
-  { "execute",	1, 1, lux_execute, "1main" }, /* execute.c */
-  { "exit",	0, 1, lux_quit, 0 }, /* fun1.c */
-  { "extract_bits", 4, 4, lux_extract_bits, 0 }, /* fun3.c */
-  { "f0h",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "f0head",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "f0r",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
-  { "f0read",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
-  { "f0w",	2, 3, lux_fzwrite, 0 }, /* files.c */
-  { "f0write",	2, 3, lux_fzwrite, 0 }, /* files.c */
-  { "fade",	2, 2, lux_fade, 0 }, /* fun3.c */
-  { "fade_init", 2, 2, lux_fade_init, 0 }, /* fun3.c */
-  { "fcrunwrite", 2, 3, lux_fcrunwrite, 0 }, /* files.c */
-  { "fcrw",	2, 3, lux_fcrunwrite, 0 }, /* files.c */
-  { "fcw",	2, 3, lux_fcwrite, "1runlength" }, /* files.c */
-  { "fcwrite",	2, 3, lux_fcwrite, "1runlength" }, /* files.c */
-  { "fftshift",	2, 2, lux_fftshift, 0 }, /* fun3.c */
-  { "fileptr",	1, 2, lux_fileptr, "1start:2eof:4advance" }, /* files.c */
-  { "fileread", 5, 5, lux_fileread, 0 }, /* files.c */
-  { "filetofz",	3, 3, lux_file_to_fz, 0 }, /* files.c */
-  { "filewrite", 2, 3, lux_filewrite, 0 }, /* files.c */
+  { "error",	0, 2, lux_error, "1store:2restore" }, // error.c
+  { "execute",	1, 1, lux_execute, "1main" }, // execute.c
+  { "exit",	0, 1, lux_quit, 0 }, // fun1.c
+  { "extract_bits", 4, 4, lux_extract_bits, 0 }, // fun3.c
+  { "f0h",	1, 2, lux_fzhead, 0 }, // files.c
+  { "f0head",	1, 2, lux_fzhead, 0 }, // files.c
+  { "f0r",	2, 3, lux_fzread, "|1|1printheader" }, // files.c
+  { "f0read",	2, 3, lux_fzread, "|1|1printheader" }, // files.c
+  { "f0w",	2, 3, lux_fzwrite, 0 }, // files.c
+  { "f0write",	2, 3, lux_fzwrite, 0 }, // files.c
+  { "fade",	2, 2, lux_fade, 0 }, // fun3.c
+  { "fade_init", 2, 2, lux_fade_init, 0 }, // fun3.c
+  { "fcrunwrite", 2, 3, lux_fcrunwrite, 0 }, // files.c
+  { "fcrw",	2, 3, lux_fcrunwrite, 0 }, // files.c
+  { "fcw",	2, 3, lux_fcwrite, "1runlength" }, // files.c
+  { "fcwrite",	2, 3, lux_fcwrite, "1runlength" }, // files.c
+  { "fftshift",	2, 2, lux_fftshift, 0 }, // fun3.c
+  { "fileptr",	1, 2, lux_fileptr, "1start:2eof:4advance" }, // files.c
+  { "fileread", 5, 5, lux_fileread, 0 }, // files.c
+  { "filetofz",	3, 3, lux_file_to_fz, 0 }, // files.c
+  { "filewrite", 2, 3, lux_filewrite, 0 }, // files.c
 #if DEVELOP
-  { "fit3dcube", 0, 0, lux_fitUnitCube, 0 }, /* projection.c */
+  { "fit3dcube", 0, 0, lux_fitUnitCube, 0 }, // projection.c
 #endif
-  { "fits_read", 2, 7, lux_fits_read, "|1|1translate:2rawvalues::::::blank" }, /* files.c */
-  { "fits_write", 2, 4, lux_fits_write, "1vocal" }, /* files.c */
-  { "fix",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
-  { "float",	1, MAX_ARG, lux_float_inplace, 0 }, /* symbols.c */
-  { "format_set", 0, 1, lux_format_set, 0 }, /* files.c */
-  { "fprint",	1, MAX_ARG, lux_fprint, "1element" }, /* files.c */
-  { "fprintf",	2, MAX_ARG, lux_fprintf, "1element" }, /* files.c */
-  { "fread",	2, MAX_ARG, lux_fread, "1countspaces" }, /* files.c */
-  { "freadf",	3, MAX_ARG, lux_freadf, "1countspaces" }, /* files.c */
-  { "freads",	2, MAX_ARG, lux_freads, "1countspaces" }, /* files.c */
-  { "fzh",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "fzhead",	1, 2, lux_fzhead, 0 }, /* files.c */
-  { "fzinspect", 2, 3, lux_fzinspect, 0 }, /* files.c */
-  { "fzr",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
-  { "fzread",	2, 3, lux_fzread, "|1|1printheader" }, /* files.c */
-  { "fzw",	2, 3, lux_fzwrite, "1safe" }, /* files.c */
-  { "fzwrite",	2, 3, lux_fzwrite, "1safe" }, /* files.c */
-  { "getmin9",	3, 3, lux_getmin9, 0 }, /* fun4.c */
-  { "gifread",	2, 3, lux_gifread, 0 }, /* gifread_ana.c */
-  { "gifwrite",	2, 3, lux_gifwrite, 0 }, /* gifwrite_ana.c */
+  { "fits_read", 2, 7, lux_fits_read, "|1|1translate:2rawvalues::::::blank" }, // files.c
+  { "fits_write", 2, 4, lux_fits_write, "1vocal" }, // files.c
+  { "fix",	1, MAX_ARG, lux_long_inplace, 0 }, // symbols.c
+  { "float",	1, MAX_ARG, lux_float_inplace, 0 }, // symbols.c
+  { "format_set", 0, 1, lux_format_set, 0 }, // files.c
+  { "fprint",	1, MAX_ARG, lux_fprint, "1element" }, // files.c
+  { "fprintf",	2, MAX_ARG, lux_fprintf, "1element" }, // files.c
+  { "fread",	2, MAX_ARG, lux_fread, "1countspaces" }, // files.c
+  { "freadf",	3, MAX_ARG, lux_freadf, "1countspaces" }, // files.c
+  { "freads",	2, MAX_ARG, lux_freads, "1countspaces" }, // files.c
+  { "fzh",	1, 2, lux_fzhead, 0 }, // files.c
+  { "fzhead",	1, 2, lux_fzhead, 0 }, // files.c
+  { "fzinspect", 2, 3, lux_fzinspect, 0 }, // files.c
+  { "fzr",	2, 3, lux_fzread, "|1|1printheader" }, // files.c
+  { "fzread",	2, 3, lux_fzread, "|1|1printheader" }, // files.c
+  { "fzw",	2, 3, lux_fzwrite, "1safe" }, // files.c
+  { "fzwrite",	2, 3, lux_fzwrite, "1safe" }, // files.c
+  { "getmin9",	3, 3, lux_getmin9, 0 }, // fun4.c
+  { "gifread",	2, 3, lux_gifread, 0 }, // gifread_ana.c
+  { "gifwrite",	2, 3, lux_gifwrite, 0 }, // gifwrite_ana.c
 #if HAVE_LIBX11
-  { "hairs",	0, 0, lux_xplace, 0 }, /* xport.c */
+  { "hairs",	0, 0, lux_xplace, 0 }, // xport.c
 #endif
-  { "help",	0, 1, lux_help,	"1manual" }, /* strous.c */
-  { "hex",	1, MAX_ARG, lux_hex, 0 }, /* files.c */
-  { "idlrestore", 1, 1, lux_idlrestore, 0 }, /* idl.c */
-  { "info",	0, 0, site, /* site.c */
+  { "help",	0, 1, lux_help,	"1manual" }, // strous.c
+  { "hex",	1, MAX_ARG, lux_hex, 0 }, // files.c
+  { "idlrestore", 1, 1, lux_idlrestore, 0 }, // idl.c
+  { "info",	0, 0, site, // site.c
     "1table:2time:4platform:8packages:16warranty:32copy:64bugs:128keys:255all" },
-  { "insert", 	2, 4, lux_inserter, 0 }, /* subsc.c */
-  { "int",	1, MAX_ARG, lux_word_inplace, 0 }, /* symbols.c */
-  { "int64",    1, MAX_ARG, lux_int64_inplace, 0 }, /* symbols.c */
+  { "insert", 	2, 4, lux_inserter, 0 }, // subsc.c
+  { "int",	1, MAX_ARG, lux_word_inplace, 0 }, // symbols.c
+  { "int64",    1, MAX_ARG, lux_int64_inplace, 0 }, // symbols.c
 #if HAVE_LIBJPEG
-  { "jpegread", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, /* jpeg.c */
-  { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },/* jpeg.c */
+  { "jpegread", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
+  { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },// jpeg.c
 #endif
-  { "limits",	0, 4, lux_limits, 0 }, /* plots.c */
-  { "list",	1, 1, lux_list, 0 }, /* ident.c */
-  { "long",	1, MAX_ARG, lux_long_inplace, 0 }, /* symbols.c */
+  { "limits",	0, 4, lux_limits, 0 }, // plots.c
+  { "list",	1, 1, lux_list, 0 }, // ident.c
+  { "long",	1, MAX_ARG, lux_long_inplace, 0 }, // symbols.c
 #if HAVE_LIBX11
-  { "menu",	1, MAX_ARG, lux_menu, 0 }, /* menu.c */
-  { "menuhide",	1, 1, lux_menu_hide, 0 }, /* menu.c */
-  { "menuitem",	3, 3, lux_menu_item, 0 }, /* menu.c */
-  { "menupop",	1, MAX_ARG, lux_menu_pop, 0 }, /* menu.c */
-  { "menuread",	4, 4, lux_menu_read, 0 }, /* menu.c */
-  { "menuzap",	1, 1, lux_menu_kill, 0 }, /* menu.c */
+  { "menu",	1, MAX_ARG, lux_menu, 0 }, // menu.c
+  { "menuhide",	1, 1, lux_menu_hide, 0 }, // menu.c
+  { "menuitem",	3, 3, lux_menu_item, 0 }, // menu.c
+  { "menupop",	1, MAX_ARG, lux_menu_pop, 0 }, // menu.c
+  { "menuread",	4, 4, lux_menu_read, 0 }, // menu.c
+  { "menuzap",	1, 1, lux_menu_kill, 0 }, // menu.c
 #endif
-  { "multisieve", 4, 4, lux_multisieve, 0 }, /* strous2.c */
+  { "multisieve", 4, 4, lux_multisieve, 0 }, // strous2.c
 #if DEBUG
-  { "newallocs", 0, 1, lux_newallocs, "1reset" }, /* debug.c */
+  { "newallocs", 0, 1, lux_newallocs, "1reset" }, // debug.c
 #endif
-  { "noecho",	0, 0, lux_noecho, 0 }, /* symbols.c */
-  { "noop",	0, 0, lux_noop, 0 }, /* strous2.c */
-  { "one",	1, 1, lux_one, 0 }, /* fun1.c */
-  { "openr",	2, 2, lux_openr, "1get_lun" }, /* files.c */
-  { "openu",	2, 2, lux_openu, "1get_lun" }, /* files.c */
-  { "openw",	2, 2, lux_openw, "1get_lun" }, /* files.c */
-  { "oplot",	1, 13, lux_oplot, /* plots.c */
+  { "noecho",	0, 0, lux_noecho, 0 }, // symbols.c
+  { "noop",	0, 0, lux_noop, 0 }, // strous2.c
+  { "one",	1, 1, lux_one, 0 }, // fun1.c
+  { "openr",	2, 2, lux_openr, "1get_lun" }, // files.c
+  { "openu",	2, 2, lux_openu, "1get_lun" }, // files.c
+  { "openw",	2, 2, lux_openw, "1get_lun" }, // files.c
+  { "oplot",	1, 13, lux_oplot, // plots.c
     "1dvi:2dev:3img:4plt:5rim:6rpl:128whole:256clipbars:xdata:ydata:symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize:ybarsize" },
-  { "orientation", 3, 8, lux_orientation, /* orientation.c */
+  { "orientation", 3, 8, lux_orientation, // orientation.c
   "1vocal:2getj:0parallel:4perpendicular:::orientation:values:wavenumber:grid:aspect:order" },
-  { "pdev",	0, 1, lux_pdev, 0 }, /* plots.c */
-  { "peek",	1, 2, peek, 0 }, /* strous.c */
-  { "pen",	0, 2, lux_pen, "width:color:1standardgray" }, /* plots.c */
-  { "pencolor", 0, 1, lux_pencolor, 0 }, /* plots.c */
+  { "pdev",	0, 1, lux_pdev, 0 }, // plots.c
+  { "peek",	1, 2, peek, 0 }, // strous.c
+  { "pen",	0, 2, lux_pen, "width:color:1standardgray" }, // plots.c
+  { "pencolor", 0, 1, lux_pencolor, 0 }, // plots.c
 #if HAVE_LIBX11
-  { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 }, /* color.c */
+  { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 }, // color.c
 #endif
-  { "plot",	1, 15, lux_plot, /* plots.c */
+  { "plot",	1, 15, lux_plot, // plots.c
     "1dvi:2dev:3img:4plt:5rim:6rpl:64keep:128whole:256clipbars:1024lii:1280lio:1536loi:1792loo:xdata:ydata:symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize:ybarsize:xfmt:yfmt" },
 #if DEVELOP
-  { "plot3d",	1, 1, lux_plot3d, "1hide:2cube" }, /* projection.c */
+  { "plot3d",	1, 1, lux_plot3d, "1hide:2cube" }, // projection.c
 #endif
-  { "pointer",	2, 2, lux_pointer, /* symbols.c */
+  { "pointer",	2, 2, lux_pointer, // symbols.c
     "+:1function:2subroutine:4internal:8main" },
-  { "pop",	1, MAX_ARG, lux_pop, "%1%num" }, /* strous.c */
-  { "postimage", 1, 5, lux_postimage, 0 }, /* plots.c */
-  { "postraw",	1, 1, lux_postraw, 0 }, /* plots.c */
-  { "postrel",	0, 4, postrelease, 0 }, /* plots.c */
-  { "postrelease", 0, 4, postrelease, 0 }, /* plots.c */
-  { "print", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
-  { "printf",	1, MAX_ARG, lux_printf, "1join:2raw:4separate" }, /* files.c */
+  { "pop",	1, MAX_ARG, lux_pop, "%1%num" }, // strous.c
+  { "postimage", 1, 5, lux_postimage, 0 }, // plots.c
+  { "postraw",	1, 1, lux_postraw, 0 }, // plots.c
+  { "postrel",	0, 4, postrelease, 0 }, // plots.c
+  { "postrelease", 0, 4, postrelease, 0 }, // plots.c
+  { "print", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
+  { "printf",	1, MAX_ARG, lux_printf, "1join:2raw:4separate" }, // files.c
 #if DEVELOP
-  { "projection", 0, MAX_ARG, lux_projection, /* projection.c */
+  { "projection", 0, MAX_ARG, lux_projection, // projection.c
 	"1reset:2original::translate:rotate:scale:perspective:oblique" },
 #endif
-  { "push",	1, MAX_ARG, lux_push, 0 }, /* strous.c */
-  { "quit", 	0, 1, lux_quit, 0 }, /* fun1.c */
-  { "read",	1, MAX_ARG, lux_read, "1askmore:2word:4flush" }, /* files.c */
-  { "readarr",	1, 1, lux_readarr, 0 }, /* strous.c */
-  { "readf",	2, MAX_ARG, lux_readf, "1askmore:2word" }, /* files.c */
-  { "readorbits", 0, 1, lux_readorbits, "1list:2replace" }, /* astron.c */
-  { "readu",	2, MAX_ARG, lux_readu, 0 }, /* files.c */
+  { "push",	1, MAX_ARG, lux_push, 0 }, // strous.c
+  { "quit", 	0, 1, lux_quit, 0 }, // fun1.c
+  { "read",	1, MAX_ARG, lux_read, "1askmore:2word:4flush" }, // files.c
+  { "readarr",	1, 1, lux_readarr, 0 }, // strous.c
+  { "readf",	2, MAX_ARG, lux_readf, "1askmore:2word" }, // files.c
+  { "readorbits", 0, 1, lux_readorbits, "1list:2replace" }, // astron.c
+  { "readu",	2, MAX_ARG, lux_readu, 0 }, // files.c
 #if HAVE_LIBJPEG
-  { "read_jpeg", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, /* jpeg.c */
+  { "read_jpeg", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
 #endif
-  { "record",	0, 1, lux_record, "1input:2output:4reset" }, /* symbols.c */
-  { "redim", 	2, 9, lux_redim, 0 }, /* subsc.c */
-  { "replace",	3, 3, lux_replace_values, 0 }, /* strous2.c */
-  { "restart",	0, 0, lux_restart, 0 }, /* install.c */
-  { "restore",	2, 3, lux_fzread, "1printheader" }, /* files.c */
+  { "record",	0, 1, lux_record, "1input:2output:4reset" }, // symbols.c
+  { "redim", 	2, 9, lux_redim, 0 }, // subsc.c
+  { "replace",	3, 3, lux_replace_values, 0 }, // strous2.c
+  { "restart",	0, 0, lux_restart, 0 }, // install.c
+  { "restore",	2, 3, lux_fzread, "1printheader" }, // files.c
 #if HAVE_SYS_MTIO_H
-  { "rewind",	1, 1, lux_rewind, 0 }, /* tape.c */
+  { "rewind",	1, 1, lux_rewind, 0 }, // tape.c
 #endif
-  { "rewindf",	1, 1, lux_rewindf, 0 }, /* files.c */
-  { "s",	0, 1, lux_show, 0 }, /* fun1.c */
-  { "sc",	3, 3, lux_sc, 0 }, /* fun3.c */
-  { "scanf",	2, MAX_ARG, lux_freadf, "+1countspaces" }, /* files.c */
-  { "scb",	3, 3, lux_scb, "1even:2odd" }, /* fun3.c */
-  { "set",	0, 1, lux_set,	/* symbols.c */
+  { "rewindf",	1, 1, lux_rewindf, 0 }, // files.c
+  { "s",	0, 1, lux_show, 0 }, // fun1.c
+  { "sc",	3, 3, lux_sc, 0 }, // fun3.c
+  { "scanf",	2, MAX_ARG, lux_freadf, "+1countspaces" }, // files.c
+  { "scb",	3, 3, lux_scb, "1even:2odd" }, // fun3.c
+  { "set",	0, 1, lux_set,	// symbols.c
     "visual:1set:2reset:4showalloc:8whitebackground:16ulimcoords:32yreverseimg:64oldversion:128zoom:1024allowprompts:2048xsynchronize:4096parsesilent" },
 #if HAVE_LIBX11
-  { "setbackground", 1, 2, lux_xsetbackground, 0 }, /* xport.c */
-  { "setbg",	1, 2, lux_xsetbackground, 0 }, /* xport.c */
+  { "setbackground", 1, 2, lux_xsetbackground, 0 }, // xport.c
+  { "setbg",	1, 2, lux_xsetbackground, 0 }, // xport.c
 #endif
-  { "setenv",	1, 1, lux_setenv, 0 }, /* files.c */
+  { "setenv",	1, 1, lux_setenv, 0 }, // files.c
 #if HAVE_LIBX11
-  { "setfg",	1, 2, lux_xsetforeground, 0 }, /* xport.c */
-  { "setforeground", 1, 2, lux_xsetforeground, 0 }, /* xport.c */
+  { "setfg",	1, 2, lux_xsetforeground, 0 }, // xport.c
+  { "setforeground", 1, 2, lux_xsetforeground, 0 }, // xport.c
 #endif
-  { "shift",	1, 4, lux_shift, ":::blank:1translate" }, /* strous2.c */
-  { "show", 	0, 1, lux_show, 0 }, /* fun1.c */
-  { "showorbits", 0, 0, lux_showorbits, 0 }, /* astron.c */
-  { "showstats", 0, 0, showstats, 0 }, /* strous2.c */
+  { "shift",	1, 4, lux_shift, ":::blank:1translate" }, // strous2.c
+  { "show", 	0, 1, lux_show, 0 }, // fun1.c
+  { "showorbits", 0, 0, lux_showorbits, 0 }, // astron.c
+  { "showstats", 0, 0, showstats, 0 }, // strous2.c
 #if DEBUG
-  { "show_files", 0, 0, show_files, 0 }, /* debug.c */
+  { "show_files", 0, 0, show_files, 0 }, // debug.c
 #endif
-  { "show_func", 0, 1, lux_show_func, "1parameters" }, /* symbols.c */
-  { "show_subr", 0, 1, lux_show_subr, "1parameters" }, /* symbols.c */
+  { "show_func", 0, 1, lux_show_func, "1parameters" }, // symbols.c
+  { "show_subr", 0, 1, lux_show_subr, "1parameters" }, // symbols.c
 #if DEBUG
-  { "show_temps", 0, 0, lux_show_temps, 0 }, /* symbols.c */
+  { "show_temps", 0, 0, lux_show_temps, 0 }, // symbols.c
 #endif
 #if HAVE_LIBX11
-  { "show_visuals", 0, 0, lux_show_visuals, 0 }, /* xport.c */
+  { "show_visuals", 0, 0, lux_show_visuals, 0 }, // xport.c
 #endif
 #if HAVE_SYS_MTIO_H
-  { "skipf",	1, 2, lux_skipf, 0 }, /* tape.c */
-  { "skipr",	1, 2, lux_skipr, 0 }, /* tape.c */
+  { "skipf",	1, 2, lux_skipf, 0 }, // tape.c
+  { "skipr",	1, 2, lux_skipr, 0 }, // tape.c
 #endif
-  { "spawn", 	1, 1, lux_spawn, "1silent" }, /* files.c */
-  { "sscanf",	2, MAX_ARG, lux_freads, "1countspaces" }, /* files.c */
-  { "step",	0, 1, lux_step, 0 }, /* symbols.c */
-  { "store",	2, 3, lux_fzwrite, "1safe" }, /* files.c */
-  { "string",	1, MAX_ARG, lux_string_inplace, 0 }, /* symbols.c */
-  { "subshift",	4, 4, lux_subshift, 0 }, /* fun5.c */
-  { "subshiftc", 4, 5, lux_subshiftc, 0 }, /* fun5.c */
-  { "swab",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
-  { "swapb",	1, MAX_ARG, lux_swab, 0 }, /* fun2.c */
-  { "swaphalf",	1, 1, lux_swaphalf, 0 }, /* strous2.c */
-  { "switch",	2, 2, lux_switch, 0 }, /* symbols.c */
-  { "t", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
+  { "spawn", 	1, 1, lux_spawn, "1silent" }, // files.c
+  { "sscanf",	2, MAX_ARG, lux_freads, "1countspaces" }, // files.c
+  { "step",	0, 1, lux_step, 0 }, // symbols.c
+  { "store",	2, 3, lux_fzwrite, "1safe" }, // files.c
+  { "string",	1, MAX_ARG, lux_string_inplace, 0 }, // symbols.c
+  { "subshift",	4, 4, lux_subshift, 0 }, // fun5.c
+  { "subshiftc", 4, 5, lux_subshiftc, 0 }, // fun5.c
+  { "swab",	1, MAX_ARG, lux_swab, 0 }, // fun2.c
+  { "swapb",	1, MAX_ARG, lux_swab, 0 }, // fun2.c
+  { "swaphalf",	1, 1, lux_swaphalf, 0 }, // strous2.c
+  { "switch",	2, 2, lux_switch, 0 }, // symbols.c
+  { "t", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
 #if HAVE_SYS_MTIO_H
-  { "tapebufin", 2, 5, lux_tapebufin, 0 }, /* tape.c */
-  { "tapebufout", 2, 5, lux_tapebufout, 0 }, /* tape.c */
-  { "tape_status", 0, 0, lux_tape_status, 0 }, /* tape.c */
-  { "taprd",	2, 2, lux_taprd, 0 }, /* tape.c */
-  { "tapwrt",	2, 2, lux_tapwrt, 0 }, /* tape.c */
+  { "tapebufin", 2, 5, lux_tapebufin, 0 }, // tape.c
+  { "tapebufout", 2, 5, lux_tapebufout, 0 }, // tape.c
+  { "tape_status", 0, 0, lux_tape_status, 0 }, // tape.c
+  { "taprd",	2, 2, lux_taprd, 0 }, // tape.c
+  { "tapwrt",	2, 2, lux_tapwrt, 0 }, // tape.c
 #endif
 #if HAVE_LIBX11
-  { "threecolors", 0, 1, lux_threecolors, 0 }, /* xport.c */
+  { "threecolors", 0, 1, lux_threecolors, 0 }, // xport.c
 #endif
-  { "tolookup",	3, 3, lux_tolookup, "1one" }, /* strous2.c */
-  { "trace",	0, 1, lux_trace, /* install.c */
+  { "tolookup",	3, 3, lux_tolookup, "1one" }, // strous2.c
+  { "trace",	0, 1, lux_trace, // install.c
     "1file:2loop:4braces:8routine:143all:16showstats:32cputime:64showexec:128enter" },
 #if DEVELOP
-  { "trajectory", 3, 7, lux_trajectory, 0 }, /* strous3.c */
+  { "trajectory", 3, 7, lux_trajectory, 0 }, // strous3.c
 #endif
 #if HAVE_LIBX11
-  { "tv",	1, 5, lux_xtv,	/* xport.c */
+  { "tv",	1, 5, lux_xtv,	// xport.c
     ":x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom:1024center:16384bit24" },
-  { "tv3",	1, 7, lux_tv3, /* xport.c */
+  { "tv3",	1, 7, lux_tv3, // xport.c
     ":two:three:x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom:1024center" },
-  { "tvlab",	3, 4, lux_xlabel, 0 }, /* xport.c */
-  { "tvlct",	3, 3, lux_xtvlct, "1fixedsize" }, /* xport.c */
-  { "tvmap",	1, 5, lux_xtvmap, /* xport.c */
+  { "tvlab",	3, 4, lux_xlabel, 0 }, // xport.c
+  { "tvlct",	3, 3, lux_xtvlct, "1fixedsize" }, // xport.c
+  { "tvmap",	1, 5, lux_xtvmap, // xport.c
     ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
-  { "tvplane",	1, 5, lux_xtvplane, 0 }, /* xport.c */
-  { "tvraw",	1, 5, lux_xtvraw, /* xport.c */
+  { "tvplane",	1, 5, lux_xtvplane, 0 }, // xport.c
+  { "tvraw",	1, 5, lux_xtvraw, // xport.c
     ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
-  { "tvread",	0, 5, lux_xtvread, "1greyscale" }, /* xport.c */
+  { "tvread",	0, 5, lux_xtvread, "1greyscale" }, // xport.c
 #endif
-  { "ty",	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
-  { "type", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, /* files.c */
-  { "ulib", 	0, 1, lux_ulib, 0 }, /* files.c */
+  { "ty",	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
+  { "type", 	1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
+  { "ulib", 	0, 1, lux_ulib, 0 }, // files.c
 #if HAVE_SYS_MTIO_H
-  { "unload",	1, 1, lux_unload, 0 }, /* tape.c */
+  { "unload",	1, 1, lux_unload, 0 }, // tape.c
 #endif
-  { "verify",	0, 1, lux_verify, 0 }, /* install.c */
-  { "wait",	1, 1, lux_wait, 0 }, /* fun2.c */
+  { "verify",	0, 1, lux_verify, 0 }, // install.c
+  { "wait",	1, 1, lux_wait, 0 }, // fun2.c
 #if HAVE_LIBX11
-  { "wait_for_menu", 0, 1, lux_wait_for_menu, 0 }, /* menu.c */
+  { "wait_for_menu", 0, 1, lux_wait_for_menu, 0 }, // menu.c
 #endif
 #if HAVE_SYS_MTIO_H
-  { "wait_for_tape", 1, 1, lux_wait_for_tape, 0 }, /* tape.c */
+  { "wait_for_tape", 1, 1, lux_wait_for_tape, 0 }, // tape.c
 #endif
-  { "watch",	1, 1, lux_watch, "1delete:2list" }, /* install.c */
+  { "watch",	1, 1, lux_watch, "1delete:2list" }, // install.c
 #if HAVE_SYS_MTIO_H
-  { "weof",	1, 1, lux_weof, 0 }, /* tape.c */
+  { "weof",	1, 1, lux_weof, 0 }, // tape.c
 #endif
 #if DEBUG
-  { "where",	1, 1, lux_whereisAddress, "1cut" }, /* debug.c */
+  { "where",	1, 1, lux_whereisAddress, "1cut" }, // debug.c
 #endif
 #if HAVE_LIBX11
-  { "window",	0, 6, lux_window, 0 }, /* plots.c */
+  { "window",	0, 6, lux_window, 0 }, // plots.c
 #endif
-  { "word",	1, 1, lux_word_inplace, 0 }, /* symbols.c */
-  { "writeu",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
+  { "word",	1, 1, lux_word_inplace, 0 }, // symbols.c
+  { "writeu",	2, MAX_ARG, lux_writeu, 0 }, // files.c
 #if HAVE_LIBJPEG
-  { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, /* jpeg.c */
+  { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, // jpeg.c
 #endif
 #if HAVE_LIBX11
-  { "xanimate",	1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, /* xport.c */
-  { "xclose",	0, 0, lux_xclose, 0 }, /* xport.c */
-  { "xcopy",	2, 8, lux_xcopy, 0 }, /* xport.c */
-  { "xcursor",	2, 4, lux_xcursor, 0 }, /* xport.c */
-  { "xdelete",	1, 1, lux_xdelete, 0 }, /* xport.c */
-  { "xdrawarc",	4, 7, lux_xdrawarc, 0 }, /* xport.c */
-  { "xdrawline", 4, 5, lux_xdrawline, 0 }, /* xport.c */
-  { "xevent",	0, 0, lux_xevent, 0 }, /* xport.c */
-  { "xflush",	0, 0, lux_xflush, 0 }, /* xport.c */
-  { "xfont",	1, 2, lux_xfont, 0 }, /* xport.c */
-  { "xinvertarc", 4, 7, lux_xinvertarc, 0 }, /* xport.c */
-  { "xinvertline", 4, 5, lux_xinvertline, 0 }, /* xport.c */
-  { "xlabel",	3, 4, lux_xlabel, 0 }, /* xport.c */
-  { "xloop",	0, 1, lux_xloop, 0 }, /* menu.c */
+  { "xanimate",	1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, // xport.c
+  { "xclose",	0, 0, lux_xclose, 0 }, // xport.c
+  { "xcopy",	2, 8, lux_xcopy, 0 }, // xport.c
+  { "xcursor",	2, 4, lux_xcursor, 0 }, // xport.c
+  { "xdelete",	1, 1, lux_xdelete, 0 }, // xport.c
+  { "xdrawarc",	4, 7, lux_xdrawarc, 0 }, // xport.c
+  { "xdrawline", 4, 5, lux_xdrawline, 0 }, // xport.c
+  { "xevent",	0, 0, lux_xevent, 0 }, // xport.c
+  { "xflush",	0, 0, lux_xflush, 0 }, // xport.c
+  { "xfont",	1, 2, lux_xfont, 0 }, // xport.c
+  { "xinvertarc", 4, 7, lux_xinvertarc, 0 }, // xport.c
+  { "xinvertline", 4, 5, lux_xinvertline, 0 }, // xport.c
+  { "xlabel",	3, 4, lux_xlabel, 0 }, // xport.c
+  { "xloop",	0, 1, lux_xloop, 0 }, // menu.c
 #if MOTIF
-  { "xmalignment", 2, 2, lux_xmalignment, 0 }, /* motif.c */
-  { "xmarmcolor", 2, 2, lux_xmarmcolor, 0 }, /* motif.c */
-  { "xmattach",	6, 6, lux_xmattach, 0 }, /* motif.c */
-  { "xmattach_relative", 5, 5, lux_xmattach_relative, 0 }, /* motif.c */
-  { "xmbackgroundcolor", 2, 2, lux_xmbackgroundcolor, 0 }, /* motif.c */
-  { "xmbordercolor", 2, 2, lux_xmbordercolor, 0 }, /* motif.c */
-  { "xmborderwidth", 2, 2, lux_xmborderwidth, 0 }, /* motif.c */
-  { "xmbottomshadowcolor", 2, 2, lux_xmbottomshadowcolor, 0 }, /* motif.c */
-  { "xmdestroy", 1, 1, lux_xmdestroy, 0 }, /* motif.c */
-  { "xmdrawinglink", 2, 2, lux_xmdrawinglink, 0 }, /* motif.c */
-  { "xmfont",	2, 2, lux_xmfont, 0 }, /* motif.c */
-  { "xmforegroundcolor", 2, 2, lux_xmforegroundcolor, 0 }, /* motif.c */
-  { "xmgetpixmap", 2, 2, lux_xmgetpixmap, 0 }, /* motif.c */
-  { "xmgetwidgetposition", 3, 3, lux_xmgetwidgetposition, 0 }, /* motif.c */
-  { "xmgetwidgetsize", 3, 3, lux_xmgetwidgetsize, 0 }, /* motif.c */
-  { "xminfo",	1, 1, lux_xminfo, 0 }, /* motif.c */
-  { "xmlistadditem", 2, 3, lux_xmlistadditem, 0 }, /* motif.c */
-  { "xmlistdeleteall", 1, 1, lux_xmlistdeleteall, 0 }, /* motif.c */
-  { "xmlistdeleteitem", 2, 2, lux_xmlistdeleteitem, 0 }, /* motif.c */
-  { "xmlistfunc", 1, 1, lux_xmlistfunc, 0 }, /* motif.c */
-  { "xmlistselect", 2, 3, lux_xmlistselect, 0 }, /* motif.c */
-  { "xmlistsubr", 1, 1, lux_xmlistsubr, 0 }, /* motif.c */
-  { "xmmessage", 1, 5, lux_xmmessage, 0 }, /* motif.c */
-  { "xmposition", 3, 5, lux_xmposition, 0 }, /* motif.c */
-  { "xmprompt",	3, 8, lux_xmprompt, 0 }, /* motif.c */
-  { "xmquery",	1, 1, lux_xmquery, 0 }, /* motif.c */
-  { "xmraise",	1, 1, lux_xmraise, 0 },  /* motif.c */
-  { "xmresizepolicy",	2, 2, lux_xmresizepolicy, 0 }, /* motif.c */
-  { "xmscaleresetlimits", 3, 4, lux_xmscaleresetlimits, 0 }, /* motif.c */
-  { "xmscalesetvalue", 2, 2, lux_xmscalesetvalue, 0 }, /* motif.c */
-  { "xmscrollbarsetvalues", 1, 5, lux_xmscrollbarsetvalues, 0 }, /* motif.c */
-  { "xmselectcolor", 2, 2, lux_xmselectcolor, 0 }, /* motif.c */
-  { "xmsensitive", 2, 2, lux_xmsensitive, 0 }, /* motif.c */
-  { "xmsetcolors", 2, 2, lux_xmsetcolors, 0 }, /* motif.c */
-  { "xmsetdirectory", 2, 2, lux_xmsetdirectory, 0 }, /* motif.c */
-  { "xmsetlabel", 2, 2, lux_xmsetlabel, 0 }, /* motif.c */
-  { "xmsetmargins", 3, 3, lux_xmsetmargins, 0 }, /* motif.c */
-  { "xmsetmnemonic", 2, 2, lux_xmsetmnemonic, 0 }, /* motif.c */
-  { "xmsetmodal", 2, 2, lux_xmsetmodal, 0 }, /* motif.c */
-  { "xmsetoptionselection", 2, 2, lux_xmsetoptionselection, 0 }, /* motif.c */
-  { "xmsetpixmap", 2, 2, lux_xmsetpixmap, 0 }, /* motif.c */
-  { "xmsettitle", 2, 2, lux_xmsettitle, 0 }, /* motif.c */
-  { "xmset_text_output", 1, 1, lux_xmset_text_output, 0 }, /* motif.c */
-  { "xmsize",	3, 3, lux_xmsize, 0 }, /* motif.c */
-  { "xmtextappend", 2, 3, lux_xmtextappend, 0 }, /* motif.c */
-  { "xmtexterase", 1, 1, lux_xmtexterase, 0 }, /* motif.c */
-  { "xmtextfieldseteditable", 2, 2, lux_xmtextfieldseteditable, 0 }, /* motif.c */
-  { "xmtextfieldsetmaxlength", 2, 2, lux_xmtextfieldsetmaxlength, 0 }, /* motif.c */
-  { "xmtextfieldsetstring", 2, 3, lux_xmtextfieldsetstring, 0 }, /* motif.c */
-  { "xmtextreplace",	3, 4, lux_xmtextreplace, 0 }, /* motif.c */
-  { "xmtextseteditable", 2, 2, lux_xmtextseteditable, 0 }, /* motif.c */
-  { "xmtextsetposition", 2, 2, lux_xmtextsetposition, 0 }, /* motif.c */
-  { "xmtextsetrowcolumnsize", 3, 3, lux_xmtextsetrowcolumnsize, 0 }, /* motif.c */
-  { "xmtextsetstring", 2, 2, lux_xmtextsetstring, 0 }, /* motif.c */
-  { "xmtogglesetstate", 2, 3, lux_xmtogglesetstate, 0 }, /* motif.c */
-  { "xmtopshadowcolor", 2, 2, lux_xmtopshadowcolor, 0 }, /* motif.c */
+  { "xmalignment", 2, 2, lux_xmalignment, 0 }, // motif.c
+  { "xmarmcolor", 2, 2, lux_xmarmcolor, 0 }, // motif.c
+  { "xmattach",	6, 6, lux_xmattach, 0 }, // motif.c
+  { "xmattach_relative", 5, 5, lux_xmattach_relative, 0 }, // motif.c
+  { "xmbackgroundcolor", 2, 2, lux_xmbackgroundcolor, 0 }, // motif.c
+  { "xmbordercolor", 2, 2, lux_xmbordercolor, 0 }, // motif.c
+  { "xmborderwidth", 2, 2, lux_xmborderwidth, 0 }, // motif.c
+  { "xmbottomshadowcolor", 2, 2, lux_xmbottomshadowcolor, 0 }, // motif.c
+  { "xmdestroy", 1, 1, lux_xmdestroy, 0 }, // motif.c
+  { "xmdrawinglink", 2, 2, lux_xmdrawinglink, 0 }, // motif.c
+  { "xmfont",	2, 2, lux_xmfont, 0 }, // motif.c
+  { "xmforegroundcolor", 2, 2, lux_xmforegroundcolor, 0 }, // motif.c
+  { "xmgetpixmap", 2, 2, lux_xmgetpixmap, 0 }, // motif.c
+  { "xmgetwidgetposition", 3, 3, lux_xmgetwidgetposition, 0 }, // motif.c
+  { "xmgetwidgetsize", 3, 3, lux_xmgetwidgetsize, 0 }, // motif.c
+  { "xminfo",	1, 1, lux_xminfo, 0 }, // motif.c
+  { "xmlistadditem", 2, 3, lux_xmlistadditem, 0 }, // motif.c
+  { "xmlistdeleteall", 1, 1, lux_xmlistdeleteall, 0 }, // motif.c
+  { "xmlistdeleteitem", 2, 2, lux_xmlistdeleteitem, 0 }, // motif.c
+  { "xmlistfunc", 1, 1, lux_xmlistfunc, 0 }, // motif.c
+  { "xmlistselect", 2, 3, lux_xmlistselect, 0 }, // motif.c
+  { "xmlistsubr", 1, 1, lux_xmlistsubr, 0 }, // motif.c
+  { "xmmessage", 1, 5, lux_xmmessage, 0 }, // motif.c
+  { "xmposition", 3, 5, lux_xmposition, 0 }, // motif.c
+  { "xmprompt",	3, 8, lux_xmprompt, 0 }, // motif.c
+  { "xmquery",	1, 1, lux_xmquery, 0 }, // motif.c
+  { "xmraise",	1, 1, lux_xmraise, 0 },  // motif.c
+  { "xmresizepolicy",	2, 2, lux_xmresizepolicy, 0 }, // motif.c
+  { "xmscaleresetlimits", 3, 4, lux_xmscaleresetlimits, 0 }, // motif.c
+  { "xmscalesetvalue", 2, 2, lux_xmscalesetvalue, 0 }, // motif.c
+  { "xmscrollbarsetvalues", 1, 5, lux_xmscrollbarsetvalues, 0 }, // motif.c
+  { "xmselectcolor", 2, 2, lux_xmselectcolor, 0 }, // motif.c
+  { "xmsensitive", 2, 2, lux_xmsensitive, 0 }, // motif.c
+  { "xmsetcolors", 2, 2, lux_xmsetcolors, 0 }, // motif.c
+  { "xmsetdirectory", 2, 2, lux_xmsetdirectory, 0 }, // motif.c
+  { "xmsetlabel", 2, 2, lux_xmsetlabel, 0 }, // motif.c
+  { "xmsetmargins", 3, 3, lux_xmsetmargins, 0 }, // motif.c
+  { "xmsetmnemonic", 2, 2, lux_xmsetmnemonic, 0 }, // motif.c
+  { "xmsetmodal", 2, 2, lux_xmsetmodal, 0 }, // motif.c
+  { "xmsetoptionselection", 2, 2, lux_xmsetoptionselection, 0 }, // motif.c
+  { "xmsetpixmap", 2, 2, lux_xmsetpixmap, 0 }, // motif.c
+  { "xmsettitle", 2, 2, lux_xmsettitle, 0 }, // motif.c
+  { "xmset_text_output", 1, 1, lux_xmset_text_output, 0 }, // motif.c
+  { "xmsize",	3, 3, lux_xmsize, 0 }, // motif.c
+  { "xmtextappend", 2, 3, lux_xmtextappend, 0 }, // motif.c
+  { "xmtexterase", 1, 1, lux_xmtexterase, 0 }, // motif.c
+  { "xmtextfieldseteditable", 2, 2, lux_xmtextfieldseteditable, 0 }, // motif.c
+  { "xmtextfieldsetmaxlength", 2, 2, lux_xmtextfieldsetmaxlength, 0 }, // motif.c
+  { "xmtextfieldsetstring", 2, 3, lux_xmtextfieldsetstring, 0 }, // motif.c
+  { "xmtextreplace",	3, 4, lux_xmtextreplace, 0 }, // motif.c
+  { "xmtextseteditable", 2, 2, lux_xmtextseteditable, 0 }, // motif.c
+  { "xmtextsetposition", 2, 2, lux_xmtextsetposition, 0 }, // motif.c
+  { "xmtextsetrowcolumnsize", 3, 3, lux_xmtextsetrowcolumnsize, 0 }, // motif.c
+  { "xmtextsetstring", 2, 2, lux_xmtextsetstring, 0 }, // motif.c
+  { "xmtogglesetstate", 2, 3, lux_xmtogglesetstate, 0 }, // motif.c
+  { "xmtopshadowcolor", 2, 2, lux_xmtopshadowcolor, 0 }, // motif.c
 #endif
-  { "xopen",	0, 1, lux_xopen, /* xport.c */
+  { "xopen",	0, 1, lux_xopen, // xport.c
     "1private_colormap:2default_colormap:4selectvisual" },
-  { "xplace",	0, 2, lux_xplace, /* xport.c */
+  { "xplace",	0, 2, lux_xplace, // xport.c
     "1dvi:2dev:3img:4plt:5rim:6rpl:7x11" },
-  { "xport",	0, 7, lux_xport, 0 }, /* xport.c */
-  { "xpurge",	0, 0, lux_xpurge, 0 }, /* xport.c */
-  { "xquery",	0, 1, lux_xquery, 0 }, /* xport.c */
-  { "xraise",	1, 1, lux_xraise, 0 }, /* xport.c */
-  { "xregister", 0, 3, lux_register_event , /* menu.c */
+  { "xport",	0, 7, lux_xport, 0 }, // xport.c
+  { "xpurge",	0, 0, lux_xpurge, 0 }, // xport.c
+  { "xquery",	0, 1, lux_xquery, 0 }, // xport.c
+  { "xraise",	1, 1, lux_xraise, 0 }, // xport.c
+  { "xregister", 0, 3, lux_register_event , // menu.c
     "1keypress:4buttonpress:8buttonrelease:16pointermotion:32enterwindow:64leavewindow:127allevents:128allwindows:256allmenus:512deselect::window:menu" },
-  { "xsetaction", 0, 2, lux_xsetaction, 0 }, /* xport.c */
+  { "xsetaction", 0, 2, lux_xsetaction, 0 }, // xport.c
 #if MOTIF
-  { "xtloop",	0, 1, lux_xtloop, 0 }, /* motif.c */
-  { "xtmanage",	1, 1, lux_xtmanage, 0 }, /* motif.c */
-  { "xtpopdown", 1, 1, lux_xtpopdown, 0 }, /* motif.c */
-  { "xtpopup",	1, 1, lux_xtpopup, 0 },	/* motif.c */
-  { "xtunmanage", 1, 1, lux_xtunmanage, 0 }, /* motif.c */
+  { "xtloop",	0, 1, lux_xtloop, 0 }, // motif.c
+  { "xtmanage",	1, 1, lux_xtmanage, 0 }, // motif.c
+  { "xtpopdown", 1, 1, lux_xtpopdown, 0 }, // motif.c
+  { "xtpopup",	1, 1, lux_xtpopup, 0 },	// motif.c
+  { "xtunmanage", 1, 1, lux_xtunmanage, 0 }, // motif.c
 #endif
-  { "xtv",	1, 4, lux_xtv,  /* xport.c */
+  { "xtv",	1, 4, lux_xtv,  // xport.c
     ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
-  { "xtvread",	0, 5, lux_xtvread, "1greyscale" }, /* xport.c */
-  { "xwin",	0, 7, lux_xport, 0 }, /* xport.c */
-  { "xwindow",	0, 7, lux_xport, 0 }, /* xport.c */
-  { "xymov",	2, 4, lux_xymov, /* plots.c */
+  { "xtvread",	0, 5, lux_xtvread, "1greyscale" }, // xport.c
+  { "xwin",	0, 7, lux_xport, 0 }, // xport.c
+  { "xwindow",	0, 7, lux_xport, 0 }, // xport.c
+  { "xymov",	2, 4, lux_xymov, // plots.c
     "|192|:::breaks:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64boundingbox:128movefirst:256altdash" },
 #endif
-  { "zap",	1, MAX_ARG, lux_zap, "+1pointer" }, /* strous2.c */
-  { "zero", 	1, MAX_ARG, lux_zero, 0 }, /* fun1.c */
+  { "zap",	1, MAX_ARG, lux_zap, "+1pointer" }, // strous2.c
+  { "zero", 	1, MAX_ARG, lux_zero, 0 }, // fun1.c
 #if MOTIF
-  { "zeroifnotdefined", 1, MAX_ARG, lux_zeroifnotdefined, 0}, /* motifextra.c */
+  { "zeroifnotdefined", 1, MAX_ARG, lux_zeroifnotdefined, 0}, // motifextra.c
 #endif
-  { "zeronans",	1, MAX_ARG, lux_zapnan, "*%1%value" }, /* fun1.c */
+  { "zeronans",	1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
 #if HAVE_LIBX11
-  { "zoom",	1, 3, lux_zoom, "1oldcontrast" }, /* zoom.c */
+  { "zoom",	1, 3, lux_zoom, "1oldcontrast" }, // zoom.c
 #endif
 };
 int32_t nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
@@ -771,7 +771,7 @@ extern LuxRoutine lux_check_menu, lux_check_window, lux_colorpixel,
   lux_event_name, lux_xlabelwidth, lux_xquery_f, lux_xexist;
 #endif
 
-extern LuxRoutine lux_calendar, lux_EasterDate, /* lux_orbitalElement, */
+extern LuxRoutine lux_calendar, lux_EasterDate, // lux_orbitalElement,
   lux_astropos, lux_precess, lux_constellation,
   lux_constellationname, lux_enhanceimage;
 
@@ -805,496 +805,496 @@ extern int32_t	vargsmooth;
 extern LuxRoutine lux_test;
 
 internalRoutine function_table[] = {
-  { "%a_unary_negative", 1, 1, lux_neg_func, "*" },	/* fun1.c */
+  { "%a_unary_negative", 1, 1, lux_neg_func, "*" },	// fun1.c
   { "%b_subscript", 1, MAX_ARG, lux_subsc_func, /* subsc.c */ "1inner:2outer:4zero:8subgrid:16keepdims:32all:64separate" },
-  { "%c_cputime", 0, 0, lux_cputime, 0 }, /* fun1.c */
-  { "%d_power",	2, 2, lux_pow, "*" }, /* fun1.c */
-  { "%e_concat", 1, MAX_ARG, lux_concat, "1sloppy" }, /* subsc.c */
-  { "%f_ctime", 0, 0, lux_ctime, 0 }, /* fun1.c */
-  { "%g_time", 	0, 0, lux_time, 0 }, /* fun1.c */
-  { "%h_date", 	0, 0, lux_date, 0 }, /* fun1.c */
-  { "%i_readkey", 0, 0, lux_readkey, 0 }, /* strous.c */
-  { "%j_readkeyne", 0, 0, lux_readkeyne, 0 }, /* strous.c */
-  { "%k_systime", 0, 0, lux_systime, 0 }, /* fun1.c */
-  { "%l_jd",	0, 0, lux_jd, 0 }, /* fun1.c */
-  { "%m_cjd",   0, 0, lux_cjd, 0 },                /* fun1.c */
-  { "abs",	1, 1, lux_abs, "*" }, /* fun1.c */
-  { "acos",	1, 1, lux_acos, "*" }, /* fun1.c */
-  { "acosh",	1, 1, lux_acosh, "*" }, /* fun1.c */
-  { "alog",	1, 1, lux_log, "*" }, /* fun1.c */
-  { "alog10",	1, 1, lux_log10, "*" }, /* fun1.c */
-  { "antilaplace2d", 2, 2, lux_antilaplace2d, 0 }, /* poisson.c */
-  { "areaconnect", 2, 3, lux_area_connect, "::compact:1raw" }, /* topology.c */
-  { "arestore",	1, MAX_ARG, lux_arestore_f, 0 }, /* files.c */
-  { "arg",	1, 1, lux_arg, 0 }, /* fun3.c */
-  { "array",	1, MAX_DIMS + 1, lux_array, 0 }, /* symbols.c */
-  { "asin",	1, 1, lux_asin, "*" }, /* fun1.c */
-  { "asinh",	1, 1, lux_asinh, "*" }, /* fun1.c */
-  { "assoc",	2, 3, lux_assoc, "::offset" }, /* symbols.c */
-  { "astore",	2, MAX_ARG, lux_astore_f, 0 }, /* files.c */
-  { "astrf",	1, 2, lux_astrf, "1fromequatorial:2fromecliptical:4fromgalactic:8toequatorial:16toecliptical:32togalactic:64julian:128besselian" }, /* astron.c */
+  { "%c_cputime", 0, 0, lux_cputime, 0 }, // fun1.c
+  { "%d_power",	2, 2, lux_pow, "*" }, // fun1.c
+  { "%e_concat", 1, MAX_ARG, lux_concat, "1sloppy" }, // subsc.c
+  { "%f_ctime", 0, 0, lux_ctime, 0 }, // fun1.c
+  { "%g_time", 	0, 0, lux_time, 0 }, // fun1.c
+  { "%h_date", 	0, 0, lux_date, 0 }, // fun1.c
+  { "%i_readkey", 0, 0, lux_readkey, 0 }, // strous.c
+  { "%j_readkeyne", 0, 0, lux_readkeyne, 0 }, // strous.c
+  { "%k_systime", 0, 0, lux_systime, 0 }, // fun1.c
+  { "%l_jd",	0, 0, lux_jd, 0 }, // fun1.c
+  { "%m_cjd",   0, 0, lux_cjd, 0 },                // fun1.c
+  { "abs",	1, 1, lux_abs, "*" }, // fun1.c
+  { "acos",	1, 1, lux_acos, "*" }, // fun1.c
+  { "acosh",	1, 1, lux_acosh, "*" }, // fun1.c
+  { "alog",	1, 1, lux_log, "*" }, // fun1.c
+  { "alog10",	1, 1, lux_log10, "*" }, // fun1.c
+  { "antilaplace2d", 2, 2, lux_antilaplace2d, 0 }, // poisson.c
+  { "areaconnect", 2, 3, lux_area_connect, "::compact:1raw" }, // topology.c
+  { "arestore",	1, MAX_ARG, lux_arestore_f, 0 }, // files.c
+  { "arg",	1, 1, lux_arg, 0 }, // fun3.c
+  { "array",	1, MAX_DIMS + 1, lux_array, 0 }, // symbols.c
+  { "asin",	1, 1, lux_asin, "*" }, // fun1.c
+  { "asinh",	1, 1, lux_asinh, "*" }, // fun1.c
+  { "assoc",	2, 3, lux_assoc, "::offset" }, // symbols.c
+  { "astore",	2, MAX_ARG, lux_astore_f, 0 }, // files.c
+  { "astrf",	1, 2, lux_astrf, "1fromequatorial:2fromecliptical:4fromgalactic:8toequatorial:16toecliptical:32togalactic:64julian:128besselian" }, // astron.c
   { "astron",	2, 7, lux_astropos, /* astron.c */ ":::observer:equinox:elements:tolerance:1ecliptical:2equatorial:3horizontal:4elongation:8xyz:16lighttime:32date:64tdt:256aberration:512nutation:2832apparent:1024qelements:2048fk5:8192conjspread:16384planetocentric:32768keepdimensions:65536vocal:~131072vsop87a:131072vsop87c:262144bare" },
-  { "atan",	1, 1, lux_atan, "*" }, /* fun1.c */
-  { "atan2",	2, 2, lux_atan2, "*" }, /* fun1.c */
-  { "atanh",	1, 1, lux_atanh, "*" }, /* fun1.c */
-  { "atol",	1, 2, lux_strtol, 0 }, /* fun3.c */
+  { "atan",	1, 1, lux_atan, "*" }, // fun1.c
+  { "atan2",	2, 2, lux_atan2, "*" }, // fun1.c
+  { "atanh",	1, 1, lux_atanh, "*" }, // fun1.c
+  { "atol",	1, 2, lux_strtol, 0 }, // fun3.c
   { "basin",	1, 2, lux_basin2, /* strous.c */ "*1number:2sink:4difference" },
 #if DEVELOP
-  { "bessel_i0",  1, 1, lux_bessel_i0, "*1deflate" }, /* fun1.c */
-  { "bessel_i1",  1, 1, lux_bessel_i1, "*" }, /* fun1.c */
+  { "bessel_i0",  1, 1, lux_bessel_i0, "*1deflate" }, // fun1.c
+  { "bessel_i1",  1, 1, lux_bessel_i1, "*" }, // fun1.c
 #endif
-  { "bessel_j0", 1, 1, lux_j0, "*" }, /* fun1.c */
-  { "bessel_j1", 1, 1, lux_j1, "*" }, /* fun1.c */
-  { "bessel_jn", 2, 2, lux_jn, "*" }, /* fun1.c */
+  { "bessel_j0", 1, 1, lux_j0, "*" }, // fun1.c
+  { "bessel_j1", 1, 1, lux_j1, "*" }, // fun1.c
+  { "bessel_jn", 2, 2, lux_jn, "*" }, // fun1.c
 #if DEVELOP
-  { "bessel_k0", 1, 1, lux_bessel_k0, "*" }, /* fun1.c */
-  { "bessel_k1", 1, 1, lux_bessel_k1, "*" }, /* fun1.c */
-  { "bessel_kn", 2, 2, lux_bessel_kn, "*" }, /* fun1.c */
+  { "bessel_k0", 1, 1, lux_bessel_k0, "*" }, // fun1.c
+  { "bessel_k1", 1, 1, lux_bessel_k1, "*" }, // fun1.c
+  { "bessel_kn", 2, 2, lux_bessel_kn, "*" }, // fun1.c
 #endif
-  { "bessel_y0", 1, 1, lux_y0, "*" }, /* fun1.c */
-  { "bessel_y1", 1, 1, lux_y1, "*" }, /* fun1.c */
-  { "bessel_yn", 2, 2, lux_yn, "*" }, /* fun1.c */
-  { "beta",	2, 2, lux_beta, "*1log" }, /* fun1.c */
+  { "bessel_y0", 1, 1, lux_y0, "*" }, // fun1.c
+  { "bessel_y1", 1, 1, lux_y1, "*" }, // fun1.c
+  { "bessel_yn", 2, 2, lux_yn, "*" }, // fun1.c
+  { "beta",	2, 2, lux_beta, "*1log" }, // fun1.c
 #if DEVELOP
-  { "bi0",	1, 1, lux_bessel_i0, "*1deflate" }, /* fun1.c */
-  { "bi1",	1, 1, lux_bessel_i1, "*" }, /* fun1.c */
-  { "bigger235", 1, 1, lux_bigger235, "*" }, /* fun4.c */
+  { "bi0",	1, 1, lux_bessel_i0, "*1deflate" }, // fun1.c
+  { "bi1",	1, 1, lux_bessel_i1, "*" }, // fun1.c
+  { "bigger235", 1, 1, lux_bigger235, "*" }, // fun4.c
 #endif
-  { "bisect",	2, 6, lux_bisect, ":::axis:pos:width" }, /* strous3.c */
-  { "bj0",	1, 1, lux_j0, "*" }, /* fun1.c */
-  { "bj1",	1, 1, lux_j1, "*" }, /* fun1.c */
-  { "bjn",	2, 2, lux_jn, "*" }, /* fun1.c */
+  { "bisect",	2, 6, lux_bisect, ":::axis:pos:width" }, // strous3.c
+  { "bj0",	1, 1, lux_j0, "*" }, // fun1.c
+  { "bj1",	1, 1, lux_j1, "*" }, // fun1.c
+  { "bjn",	2, 2, lux_jn, "*" }, // fun1.c
 #if DEVELOP
-  { "bk0",	1, 1, lux_bessel_k0, "*" }, /* fun1.c */
-  { "bk1",	1, 1, lux_bessel_k1, "*" }, /* fun1.c */
-  { "bkn",	2, 2, lux_bessel_kn, "*" }, /* fun1.c */
+  { "bk0",	1, 1, lux_bessel_k0, "*" }, // fun1.c
+  { "bk1",	1, 1, lux_bessel_k1, "*" }, // fun1.c
+  { "bkn",	2, 2, lux_bessel_kn, "*" }, // fun1.c
 #endif
-  { "bmap",	1, 1, lux_bmap, "*" }, /* subsc.c */
+  { "bmap",	1, 1, lux_bmap, "*" }, // subsc.c
 #if DEVELOP
-  { "bsmooth",	1, 3, lux_bsmooth, 0 }, /* strous.c */
+  { "bsmooth",	1, 3, lux_bsmooth, 0 }, // strous.c
 #endif
-  { "by0",	1, 1, lux_y0, "*" }, /* fun1.c */
-  { "by1",	1, 1, lux_y1, "*" }, /* fun1.c */
-  { "byn",	2, 2, lux_yn, "*" }, /* fun1.c */
-  { "bytarr",	1, MAX_DIMS, bytarr, 0 }, /* symbols.c */
-  { "byte",	1, 1, lux_byte, "*" }, /* symbols.c */
-  { "bytfarr",	3, MAX_DIMS + 1, bytfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */
+  { "by0",	1, 1, lux_y0, "*" }, // fun1.c
+  { "by1",	1, 1, lux_y1, "*" }, // fun1.c
+  { "byn",	2, 2, lux_yn, "*" }, // fun1.c
+  { "bytarr",	1, MAX_DIMS, bytarr, 0 }, // symbols.c
+  { "byte",	1, 1, lux_byte, "*" }, // symbols.c
+  { "bytfarr",	3, MAX_DIMS + 1, bytfarr, "%1%offset:1readonly:2swap" }, // filemap.c
   { "calendar",	1, 1, lux_calendar, /* astron.c */ "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew:6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan:11fromlongcount:12fromlatin:16tocommon:32togregorian:48toislamic:64tojulian:80tohebrew:96toegyptian:112tojd:128tocjd:144tolunar:160tomayan:176tolongcount:192tolatin:0tonumeric:256toint:512todouble:768totext:0fromutc:1024fromtai:2048fromtt:3072fromlt:0toutc:4096totai:8192tott:12288tolt:0fromymd:16384fromdmy:0toymd:32768todmy" },
-  { "cbrt",	1, 1, lux_cbrt, "*" }, /* fun1.c */
-  { "cdblarr",	1, MAX_ARG, cdblarr, 0 }, /* symbols.c */
-  { "cdblfarr", 3, MAX_DIMS + 1, cdblfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */
-  { "cdmap",	1, 1, lux_cdmap, 0 }, /* subsc.c */
-  { "cdouble",	1, 1, lux_cdouble, "*" }, /* fun1.c */
-  { "ceil",	1, 1, lux_ceil, "*" }, /* symbols.c */
-  { "cfloat",	1, 1, lux_cfloat, "*" }, /* fun1.c */
-  { "cfltarr",	1, MAX_ARG, cfltarr, 0 }, /* symbols.c */
-  { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, "%1%offset:1readonly:2swap" }, /* filemap.c */
-  { "cfmap",	1, 1, lux_cfmap, 0 }, /* subsc.c */
+  { "cbrt",	1, 1, lux_cbrt, "*" }, // fun1.c
+  { "cdblarr",	1, MAX_ARG, cdblarr, 0 }, // symbols.c
+  { "cdblfarr", 3, MAX_DIMS + 1, cdblfarr, "%1%offset:1readonly:2swap" }, // filemap.c
+  { "cdmap",	1, 1, lux_cdmap, 0 }, // subsc.c
+  { "cdouble",	1, 1, lux_cdouble, "*" }, // fun1.c
+  { "ceil",	1, 1, lux_ceil, "*" }, // symbols.c
+  { "cfloat",	1, 1, lux_cfloat, "*" }, // fun1.c
+  { "cfltarr",	1, MAX_ARG, cfltarr, 0 }, // symbols.c
+  { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, "%1%offset:1readonly:2swap" }, // filemap.c
+  { "cfmap",	1, 1, lux_cfmap, 0 }, // subsc.c
 #if HAVE_LIBX11
-  { "checkmenu", 0, 1, lux_check_menu, 0 }, /* menu.c */
-  { "checkwindow", 0, 1, lux_check_window, 0 }, /* xport.c */
+  { "checkmenu", 0, 1, lux_check_menu, 0 }, // menu.c
+  { "checkwindow", 0, 1, lux_check_window, 0 }, // xport.c
 #endif
-  { "chi2",	2, 2, lux_chi_square, "*1complement:2log" }, /* fun1.c */
-  { "classname", 1, 1, lux_classname, 0 }, /* install.c */
+  { "chi2",	2, 2, lux_chi_square, "*1complement:2log" }, // fun1.c
+  { "classname", 1, 1, lux_classname, 0 }, // install.c
 #if HAVE_LIBX11
-  { "colorpixel", 1, 1, lux_colorpixel, "*" }, /* xport.c */
+  { "colorpixel", 1, 1, lux_colorpixel, "*" }, // xport.c
 #endif
 #if DEVELOP
-  { "compile",	1, 1, lux_compile, 0 }, /* install.c */
+  { "compile",	1, 1, lux_compile, 0 }, // install.c
 #endif
-  { "complex",	1, 1, lux_complex, 0 },	/* fun3.c */
-  { "complexsquare", 1, 1, lux_complexsquare, 0 }, /* fun1.c */
-  { "compress",	2, 3, lux_compress, 0 }, /* fun4.c */
-  { "concat",	1, MAX_ARG, lux_concat, "1sloppy" }, /* subsc.c */
-  { "conjugate", 1, 1, lux_conjugate, "*" }, /* fun1.c */
-  { "constellation", 1, 2, lux_constellation, "1julian:2besselian:4vocal" }, /* astron.c */
-  { "constellationname", 1, 1, lux_constellationname, 0 }, /* astron.c */
-  { "convert",	2, 2, lux_convertsym, "*" }, /* symbols.c */
-  { "cos",	1, 1, lux_cos, "*" }, /* fun1.c */
-  { "cosh",	1, 1, lux_cosh, "*" }, /* fun1.c */
+  { "complex",	1, 1, lux_complex, 0 },	// fun3.c
+  { "complexsquare", 1, 1, lux_complexsquare, 0 }, // fun1.c
+  { "compress",	2, 3, lux_compress, 0 }, // fun4.c
+  { "concat",	1, MAX_ARG, lux_concat, "1sloppy" }, // subsc.c
+  { "conjugate", 1, 1, lux_conjugate, "*" }, // fun1.c
+  { "constellation", 1, 2, lux_constellation, "1julian:2besselian:4vocal" }, // astron.c
+  { "constellationname", 1, 1, lux_constellationname, 0 }, // astron.c
+  { "convert",	2, 2, lux_convertsym, "*" }, // symbols.c
+  { "cos",	1, 1, lux_cos, "*" }, // fun1.c
+  { "cosh",	1, 1, lux_cosh, "*" }, // fun1.c
   { "covariance", 2, 4, lux_covariance,
-    ":::weights:*0sample:1population:2keepdims:4double:8omitnans" }, /* fun2.c */
-  { "crosscorr", 2, 3, lux_crosscorr, 0 }, /* fun2.c */
-  { "crunch",	3, 3, lux_crunch_f, 0 }, /* crunch.c */
+    ":::weights:*0sample:1population:2keepdims:4double:8omitnans" }, // fun2.c
+  { "crosscorr", 2, 3, lux_crosscorr, 0 }, // fun2.c
+  { "crunch",	3, 3, lux_crunch_f, 0 }, // crunch.c
   { "cspline",	0, 6, lux_cubic_spline, /* fun3.c */ "1keep:2periodic:4akima:8getderivative:16getintegral" },
-  { "cspline_find", 2, 4, lux_cspline_find, ":::axis:index" }, /* strous3.c */
-  { "ctop",	1, 3, lux_cartesian_to_polar, 0 }, /* fun4.c */
-  { "date_from_tai", 1, 2, lux_date_from_tai, 0 }, /* ephem.c */
-  { "dblarr",	1, MAX_DIMS, dblarr, 0 }, /* symbols.c */
+  { "cspline_find", 2, 4, lux_cspline_find, ":::axis:index" }, // strous3.c
+  { "ctop",	1, 3, lux_cartesian_to_polar, 0 }, // fun4.c
+  { "date_from_tai", 1, 2, lux_date_from_tai, 0 }, // ephem.c
+  { "dblarr",	1, MAX_DIMS, dblarr, 0 }, // symbols.c
   { "dblfarr",	3, MAX_DIMS + 1, dblfarr, /* filemap.c */ "%1%offset:1readonly:2swap" },
-  { "defined",	1, 1, lux_defined, "+1target" }, /* fun1.c */
-  { "despike",  1, 6, lux_despike, ":frac:level:niter:spikes:rms" }, /* fun6.c */
-  { "detrend",	1, 2, lux_detrend, "*" }, /* fun2.c */
-  { "differ",	1, 3, lux_differ, "*1central:2circular" }, /* strous.c */
-  { "dilate",	1, 1, lux_dilate, 0 }, /* fun5.c */
-  { "dimen",	1, 2, lux_dimen, 0 }, /* subsc.c */
-  { "distarr",	1, 3, lux_distarr, 0 }, /* strous2.c */
+  { "defined",	1, 1, lux_defined, "+1target" }, // fun1.c
+  { "despike",  1, 6, lux_despike, ":frac:level:niter:spikes:rms" }, // fun6.c
+  { "detrend",	1, 2, lux_detrend, "*" }, // fun2.c
+  { "differ",	1, 3, lux_differ, "*1central:2circular" }, // strous.c
+  { "dilate",	1, 1, lux_dilate, 0 }, // fun5.c
+  { "dimen",	1, 2, lux_dimen, 0 }, // subsc.c
+  { "distarr",	1, 3, lux_distarr, 0 }, // strous2.c
   { "distr",	2, 2, lux_distr_f, /* strous.c */ "2ignorelimit:4increaselimit" },
-  { "dmap",	1, 1, lux_dmap, 0 }, /* subsc.c */
-  { "doub",	1, 1, lux_double, "*" }, /* symbols.c */
-  { "double",	1, 1, lux_double, "*" }, /* symbols.c */
-  { "dsmooth",	3, 3, lux_dir_smooth, "0twosided:0boxcar:1onesided:2gaussian:4total:8straight" }, /* strous3.c */
-  { "dsum",	1, 4, lux_total, "|1|::power:weights:2keepdims" }, /* fun1.c */
-  { "easterdate", 1, 1, lux_EasterDate, 0 }, /* astron.c */
-  { "enhanceimage", 1, 3, lux_enhanceimage, ":part:target:1symmetric" }, /* strous3.c */
-  { "equivalence", 2, 2, lux_equivalence, 0 }, /* strous2.c */
-  { "erf",	1, 1, lux_erf, "*" }, /* fun1.c */
-  { "erfc",	1, 1, lux_erfc, "*" }, /* fun1.c */
-  { "erode",	1, 1, lux_erode, "1zeroedge" }, /* fun5.c */
+  { "dmap",	1, 1, lux_dmap, 0 }, // subsc.c
+  { "doub",	1, 1, lux_double, "*" }, // symbols.c
+  { "double",	1, 1, lux_double, "*" }, // symbols.c
+  { "dsmooth",	3, 3, lux_dir_smooth, "0twosided:0boxcar:1onesided:2gaussian:4total:8straight" }, // strous3.c
+  { "dsum",	1, 4, lux_total, "|1|::power:weights:2keepdims" }, // fun1.c
+  { "easterdate", 1, 1, lux_EasterDate, 0 }, // astron.c
+  { "enhanceimage", 1, 3, lux_enhanceimage, ":part:target:1symmetric" }, // strous3.c
+  { "equivalence", 2, 2, lux_equivalence, 0 }, // strous2.c
+  { "erf",	1, 1, lux_erf, "*" }, // fun1.c
+  { "erfc",	1, 1, lux_erfc, "*" }, // fun1.c
+  { "erode",	1, 1, lux_erode, "1zeroedge" }, // fun5.c
   { "esegment",	1, 4, lux_extreme_general, /* topology.c */ ":sign:diagonal:threshold" },
-  { "esmooth",	1, 3, lux_esmooth, 0 }, /* fun2.c */
-  { "eval",	1, 2, lux_eval, "1allnumber" }, /* fun3.c */
+  { "esmooth",	1, 3, lux_esmooth, 0 }, // fun2.c
+  { "eval",	1, 2, lux_eval, "1allnumber" }, // fun3.c
 #if HAVE_LIBX11
-  { "eventname", 0, 1, lux_event_name, 0 }, /* menu.c */
+  { "eventname", 0, 1, lux_event_name, 0 }, // menu.c
 #endif
-  { "exp",	1, 1, lux_exp, "*" }, /* fun1.c */
-  { "expand",	2, 4, lux_expand, "1smooth:2nearest" }, /* fun4.c */
-  { "expm1",	1, 1, lux_expm1, "*" }, /* fun1.c */
-  { "extract_bits", 3, 3, lux_extract_bits_f, 0 }, /* fun3.c */
-  { "fcrunwrite", 2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
-  { "fcrw",	2, 3, lux_fcrunwrite_f, 0 }, /* files.c */
-  { "fcw",	2, 3, lux_fcwrite_f, "1runlength" }, /* files.c */
-  { "fcwrite",	2, 3, lux_fcwrite_f, "1runlength" }, /* files.c */
-  { "fftshift",	2, 2, lux_fftshift_f, 0 }, /* fun3.c */
-  { "fileptr",	1, 2, lux_fileptr_f, "1start:2eof:4advance" }, /* files.c */
-  { "filesize",	1, 1, lux_filesize, 0 }, /* files.c */
-  { "filetype",	1, 1, lux_identify_file, 0 }, /* files.c */
-  { "filetypename", 1, 1, lux_filetype_name, 0 }, /* install.c */
+  { "exp",	1, 1, lux_exp, "*" }, // fun1.c
+  { "expand",	2, 4, lux_expand, "1smooth:2nearest" }, // fun4.c
+  { "expm1",	1, 1, lux_expm1, "*" }, // fun1.c
+  { "extract_bits", 3, 3, lux_extract_bits_f, 0 }, // fun3.c
+  { "fcrunwrite", 2, 3, lux_fcrunwrite_f, 0 }, // files.c
+  { "fcrw",	2, 3, lux_fcrunwrite_f, 0 }, // files.c
+  { "fcw",	2, 3, lux_fcwrite_f, "1runlength" }, // files.c
+  { "fcwrite",	2, 3, lux_fcwrite_f, "1runlength" }, // files.c
+  { "fftshift",	2, 2, lux_fftshift_f, 0 }, // fun3.c
+  { "fileptr",	1, 2, lux_fileptr_f, "1start:2eof:4advance" }, // files.c
+  { "filesize",	1, 1, lux_filesize, 0 }, // files.c
+  { "filetype",	1, 1, lux_identify_file, 0 }, // files.c
+  { "filetypename", 1, 1, lux_filetype_name, 0 }, // install.c
   { "find",	2, 4, lux_find,	/* strous.c */ "0exact:1index_ge:2value_ge:4first" },
-  { "find2",    2, 2, lux_find2, "0exact" },    /* strous.c */
-  { "findfile",	2, 2, lux_findfile, 0 }, /* files.c */
+  { "find2",    2, 2, lux_find2, "0exact" },    // strous.c
+  { "findfile",	2, 2, lux_findfile, 0 }, // files.c
   { "find_max",	1, 3, lux_find_max, /* strous2.c */ "::diagonal:1degree:2subgrid" },
   { "find_maxloc", 1, 3, lux_find_maxloc, /* strous2.c */ "::diagonal:1degree:2subgrid:4coords:8old" },
   { "find_min",	1, 3, lux_find_min, /* strous2.c */ "::diagonal:1degree:2subgrid" },
   { "find_minloc", 1, 3, lux_find_minloc, /* strous2.c */ "::diagonal:1degree:2subgrid:4coords" },
   { "fit",	3, 17, lux_generalfit, /* fit.c */ "|4|::start:step:lowbound:highbound:weights:qthresh:pthresh:ithresh:dthresh:fac:niter:nsame:err:fit:tthresh:1vocal:4down:8pchi:16gaussians:32powerfunc:64onebyone:129verr" },
 #if DEVELOP
-  { "fit2",	4, 11, lux_geneticfit, "x:y:npar:fit:weights:mu:generations:population:pcross:pmutate:vocal:1elite:2byte:4word:6long:8float:10double" }, /* fit.c */
+  { "fit2",	4, 11, lux_geneticfit, "x:y:npar:fit:weights:mu:generations:population:pcross:pmutate:vocal:1elite:2byte:4word:6long:8float:10double" }, // fit.c
 #endif
-  { "fits_header", 1, 4, lux_fits_header_f, 0 }, /* files.c */
-  { "fits_key",	2, 2, lux_fitskey, "1comment" }, /* strous3.c */
-  { "fits_read", 2, 7, lux_fits_read_f, "|1|1translate:2rawvalues::::::blank" }, /* files.c */
-  { "fits_xread", 2, 6, lux_fits_xread_f, 0 }, /* files.c */
-  { "fix",	1, 1, lux_long, "*" }, /* symbols.c */
-  { "float",	1, 1, lux_float, "*" }, /* symbols.c */
-  { "floor",	1, 1, lux_floor, "*" }, /* symbols.c */
-  { "fltarr",	1, MAX_DIMS, fltarr, 0 }, /* symbols.c */
+  { "fits_header", 1, 4, lux_fits_header_f, 0 }, // files.c
+  { "fits_key",	2, 2, lux_fitskey, "1comment" }, // strous3.c
+  { "fits_read", 2, 7, lux_fits_read_f, "|1|1translate:2rawvalues::::::blank" }, // files.c
+  { "fits_xread", 2, 6, lux_fits_xread_f, 0 }, // files.c
+  { "fix",	1, 1, lux_long, "*" }, // symbols.c
+  { "float",	1, 1, lux_float, "*" }, // symbols.c
+  { "floor",	1, 1, lux_floor, "*" }, // symbols.c
+  { "fltarr",	1, MAX_DIMS, fltarr, 0 }, // symbols.c
   { "fltfarr",	3, MAX_DIMS + 1, fltfarr, /* filemap.c */ "%1%offset:1readonly:2swap" },
-  { "fmap",	1, 1, lux_fmap, 0 }, /* subsc.c */
-  { "fratio",	3, 3, lux_f_ratio, "*1complement:2log" }, /* fun1.c */
-  { "freadf",	2, MAX_ARG, lux_freadf_f, "|1|1eof" }, /* files.c */
-  { "freads",	3, MAX_ARG, lux_freads_f, "1countspaces" }, /* files.c */
-  { "fstring",	1, MAX_ARG, lux_fstring, "1skip_undefined" }, /* fun2.c */
-  { "fsum",	1, 4, lux_total, "::power:weights:1double:2keepdims" }, /* fun1.c */
-  { "fzarr",	1, 1, lux_fzarr, "1readonly" }, /* filemap.c */
-  { "fzh",	1, 2, lux_fzhead_f, 0 }, /* files.c */
-  { "fzhead",	1, 2, lux_fzhead_f, 0 }, /* files.c */
-  { "fzr",	2, 3, lux_fzread_f, "|1|1printheader" }, /* files.c */
-  { "fzread",	2, 3, lux_fzread_f, "|1|1printheader" }, /* files.c */
-  { "fzw",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
-  { "fzwrite",	2, 3, lux_fzwrite_f, 0 }, /* files.c */
-  { "gamma",	1, 1, lux_gamma, "*1log" }, /* fun1.c */
+  { "fmap",	1, 1, lux_fmap, 0 }, // subsc.c
+  { "fratio",	3, 3, lux_f_ratio, "*1complement:2log" }, // fun1.c
+  { "freadf",	2, MAX_ARG, lux_freadf_f, "|1|1eof" }, // files.c
+  { "freads",	3, MAX_ARG, lux_freads_f, "1countspaces" }, // files.c
+  { "fstring",	1, MAX_ARG, lux_fstring, "1skip_undefined" }, // fun2.c
+  { "fsum",	1, 4, lux_total, "::power:weights:1double:2keepdims" }, // fun1.c
+  { "fzarr",	1, 1, lux_fzarr, "1readonly" }, // filemap.c
+  { "fzh",	1, 2, lux_fzhead_f, 0 }, // files.c
+  { "fzhead",	1, 2, lux_fzhead_f, 0 }, // files.c
+  { "fzr",	2, 3, lux_fzread_f, "|1|1printheader" }, // files.c
+  { "fzread",	2, 3, lux_fzread_f, "|1|1printheader" }, // files.c
+  { "fzw",	2, 3, lux_fzwrite_f, 0 }, // files.c
+  { "fzwrite",	2, 3, lux_fzwrite_f, 0 }, // files.c
+  { "gamma",	1, 1, lux_gamma, "*1log" }, // fun1.c
 #if HAVE_REGEX_H
-  { "getdirectories", 1, 2, lux_getdirectories, 0 }, /* files.c */
-  { "getdirects", 1, 2, lux_getdirectories, 0 }, /* files.c */
+  { "getdirectories", 1, 2, lux_getdirectories, 0 }, // files.c
+  { "getdirects", 1, 2, lux_getdirectories, 0 }, // files.c
 #endif
-  { "getenv",	1, 1, lux_getenv, 0 }, /* files.c */
+  { "getenv",	1, 1, lux_getenv, 0 }, // files.c
 #if HAVE_REGEX_H
-  { "getfiles", 1, 2, lux_getfiles, 0 }, /* files.c */
-  { "getfiles_r", 1, 2, lux_getfiles_r, 0 }, /* files.c */
-  { "getmatchedfiles", 2, 3, lux_getmatchedfiles, 0 }, /* files.c */
-  { "getmatchedfiles_r", 2, 3, lux_getmatchedfiles_r, 0 }, /* files.c */
+  { "getfiles", 1, 2, lux_getfiles, 0 }, // files.c
+  { "getfiles_r", 1, 2, lux_getfiles_r, 0 }, // files.c
+  { "getmatchedfiles", 2, 3, lux_getmatchedfiles, 0 }, // files.c
+  { "getmatchedfiles_r", 2, 3, lux_getmatchedfiles_r, 0 }, // files.c
 #endif
-  { "get_lun",	0, 0, lux_get_lun, 0 }, /* files.c */
-  { "gifread",	2, 3, lux_gifread_f, 0 }, /* gifread_ana.c */
-  { "gifwrite",	2, 3, lux_gifwrite_f, 0 }, /* gifwrite_ana.c */
-  { "gridmatch", 7, 8, lux_gridmatch, "1vocal" }, /* fun4.c */
-  { "gsmooth",	1, 4, lux_gsmooth, /* fun2.c */
+  { "get_lun",	0, 0, lux_get_lun, 0 }, // files.c
+  { "gifread",	2, 3, lux_gifread_f, 0 }, // gifread_ana.c
+  { "gifwrite",	2, 3, lux_gifwrite_f, 0 }, // gifwrite_ana.c
+  { "gridmatch", 7, 8, lux_gridmatch, "1vocal" }, // fun4.c
+  { "gsmooth",	1, 4, lux_gsmooth, // fun2.c
     ":::kernel:1normalize:2fullnorm:4balanced:8all" },
-  { "hamming",  1, 2, lux_hamming, 0 }, /* strous3.c */
-  { "hist",	1, 2, lux_hist, /* fun3.c */
+  { "hamming",  1, 2, lux_hamming, 0 }, // strous3.c
+  { "hist",	1, 2, lux_hist, // fun3.c
     "1first:2ignorelimit:4increaselimit:8silent" },
-  { "histr",	1, 1, lux_histr, /* fun3.c */
+  { "histr",	1, 1, lux_histr, // fun3.c
     "1first:2ignorelimit:4increaselimit:8silent" },
-  { "ibeta",	3, 3, lux_incomplete_beta, "*1complement:2log" }, /* fun1.c */
-  { "idlread",	2, 2, lux_idlread_f, 0 }, /* strous3.c */
-  { "igamma",	2, 2, lux_incomplete_gamma, "*1complement:2log" }, /* fun1.c */
-  { "imaginary", 1, 1, lux_imaginary, 0 }, /* fun3.c */
-  { "index",	1, 1, lux_index, "*1axis:2rank" }, /* fun4.c */
-  { "indgen",	1, 2, lux_indgen, "*" }, /* fun1.c */
-  { "inpolygon", 4, 4, lux_inpolygon, 0 }, /* topology.c */
-  { "int",	1, 1, lux_word, "*" }, /* symbols.c */
-  { "int64",    1, 1, lux_int64, "*" },     /* symbols.c */
-  { "int64arr", 1, MAX_DIMS, int64arr, 0 }, /* symbols.c */
-  { "int64farr", 3, MAX_DIMS+1, int64farr, /* filemap.c */
+  { "ibeta",	3, 3, lux_incomplete_beta, "*1complement:2log" }, // fun1.c
+  { "idlread",	2, 2, lux_idlread_f, 0 }, // strous3.c
+  { "igamma",	2, 2, lux_incomplete_gamma, "*1complement:2log" }, // fun1.c
+  { "imaginary", 1, 1, lux_imaginary, 0 }, // fun3.c
+  { "index",	1, 1, lux_index, "*1axis:2rank" }, // fun4.c
+  { "indgen",	1, 2, lux_indgen, "*" }, // fun1.c
+  { "inpolygon", 4, 4, lux_inpolygon, 0 }, // topology.c
+  { "int",	1, 1, lux_word, "*" }, // symbols.c
+  { "int64",    1, 1, lux_int64, "*" },     // symbols.c
+  { "int64arr", 1, MAX_DIMS, int64arr, 0 }, // symbols.c
+  { "int64farr", 3, MAX_DIMS+1, int64farr, // filemap.c
     "%1%offset:1readonly:2swap" },
-  { "int64map",	1, 1, lux_int64map, 0 }, /* subsc.c */
-  { "intarr",	1, MAX_DIMS, intarr, 0 }, /* symbols.c */
-  { "intfarr",	3, MAX_DIMS + 1, intfarr, /* filemap.c */
+  { "int64map",	1, 1, lux_int64map, 0 }, // subsc.c
+  { "intarr",	1, MAX_DIMS, intarr, 0 }, // symbols.c
+  { "intfarr",	3, MAX_DIMS + 1, intfarr, // filemap.c
     "%1%offset:1readonly:2swap" },
-  { "isarray",	1, 1, lux_isarray, 0 }, /* subsc.c */
-  { "isnan",	1, 1, lux_isnan, 0 }, /* fun1.c; needs IEEE isnan! */
-  { "isscalar",	1, 1, lux_isscalar, 0 }, /* subsc.c */
-  { "isstring",	1, 1, lux_isstring, 0 }, /* subsc.c */
-  { "ist",	1, 3, lux_istring, 0 }, /* fun2.c */
-  { "istring",	1, 3, lux_istring, 0 }, /* fun2.c */
+  { "isarray",	1, 1, lux_isarray, 0 }, // subsc.c
+  { "isnan",	1, 1, lux_isnan, 0 }, // fun1.c; needs IEEE isnan!
+  { "isscalar",	1, 1, lux_isscalar, 0 }, // subsc.c
+  { "isstring",	1, 1, lux_isstring, 0 }, // subsc.c
+  { "ist",	1, 3, lux_istring, 0 }, // fun2.c
+  { "istring",	1, 3, lux_istring, 0 }, // fun2.c
 #if HAVE_LIBJPEG
-  { "jpegread",	2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, /* jpeg.c */
-  { "jpegwrite", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
+  { "jpegread",	2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.c
+  { "jpegwrite", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.c
 #endif
-  { "ksmooth",	2, 3, lux_ksmooth, "1balanced" }, /* fun2.c */
-  { "laplace2d",	1, 1, lux_laplace2d, 0 }, /* poisson.c */
-  { "legendre", 2, 2, lux_legendre, "1normalize" }, /* strous3.c */
-  { "llsq",	2, 9, lux_lsq2,	/* strous2.c */
+  { "ksmooth",	2, 3, lux_ksmooth, "1balanced" }, // fun2.c
+  { "laplace2d",	1, 1, lux_laplace2d, 0 }, // poisson.c
+  { "legendre", 2, 2, lux_legendre, "1normalize" }, // strous3.c
+  { "llsq",	2, 9, lux_lsq2,	// strous2.c
     ":::fwhm:weights:cov:err:chisq:1formal:2reduce" },
-  { "lmap",	1, 1, lux_lmap, 0 }, /* subsc.c */
-  { "local_max", 2, 2, lux_local_maxf, /* strous.c */
+  { "lmap",	1, 1, lux_lmap, 0 }, // subsc.c
+  { "local_max", 2, 2, lux_local_maxf, // strous.c
     "3subgrid:2bound" },
-  { "local_maxloc", 2, 2, lux_local_maxloc, /* strous.c */
+  { "local_maxloc", 2, 2, lux_local_maxloc, // strous.c
     "3subgrid:2bound:4relative" },
-  { "local_min", 2, 2, lux_local_minf, /* strous.c */
+  { "local_min", 2, 2, lux_local_minf, // strous.c
     "3subgrid:2bound" },
-  { "local_minloc", 2, 2, lux_local_minloc, /* strous.c */
+  { "local_minloc", 2, 2, lux_local_minloc, // strous.c
     "3subgrid:2bound:4relative" },
-  { "log",	1, 1, lux_log, "*" }, /* fun1.c */
-  { "log10",	1, 1, lux_log10, "*" }, /* fun1.c */
-  { "log1p",	1, 1, lux_log1p, "*" }, /* fun1.c */
-  { "lonarr",	1, MAX_DIMS, lonarr, 0 }, /* symbols.c */
-  { "lonfarr",	3, MAX_DIMS+1, lonfarr, /* filemap.c */
+  { "log",	1, 1, lux_log, "*" }, // fun1.c
+  { "log10",	1, 1, lux_log10, "*" }, // fun1.c
+  { "log1p",	1, 1, lux_log1p, "*" }, // fun1.c
+  { "lonarr",	1, MAX_DIMS, lonarr, 0 }, // symbols.c
+  { "lonfarr",	3, MAX_DIMS+1, lonfarr, // filemap.c
     "%1%offset:1readonly:2swap" },
-  { "long",	1, 1, lux_long, "*" }, /* symbols.c */
-  { "lowcase",	1, 1, lux_lower, 0 }, /* fun2.c */
-  { "lower",	1, 1, lux_lower, 0 }, /* fun2.c */
-  { "lsmooth",	3, 3, lux_dir_smooth2, /* strous3.c */
+  { "long",	1, 1, lux_long, "*" }, // symbols.c
+  { "lowcase",	1, 1, lux_lower, 0 }, // fun2.c
+  { "lower",	1, 1, lux_lower, 0 }, // fun2.c
+  { "lsmooth",	3, 3, lux_dir_smooth2, // strous3.c
     "0twosided:0boxcar:1onesided:2gaussian:4normalize:8straight" },
-  { "lsq",	2, 6, lux_lsq,	/* strous2.c */
+  { "lsq",	2, 6, lux_lsq,	// strous2.c
     "::weights:cov:err:chisq:1formal:2reduce" },
-  { "match",	2, 2, lux_match, 0 }, /* strous.c */
-  { "max",	1, 2, lux_maxf, "1keepdims" }, /* fun3.c */
-  { "maxdir",	2, 3, lux_max_dir, 0 },	/* topology.c */
-  { "maxfilter", 1, 3, lux_maxfilter, 0 }, /* strous2.c */
-  { "maxloc",	1, 2, lux_maxloc, "1keepdims" }, /* fun3.c */
-  { "mean", 	1, 4, lux_mean, "::power:weights:1double:2keepdims:4float:8omitnans" }, /* fun1.c */
-  { "medfilter", 1, 4, lux_medfilter, "%1%" }, /* strous2.c */
-  { "median",	1, 3, lux_median, "%1%" }, /* strous2.c */
-  { "memory",	0, 0, lux_memory, 0 }, /* memck.c */
-  { "min",	1, 2, lux_minf, "1keepdims" }, /* fun3.c */
-  { "minfilter", 1, 3, lux_minfilter, 0 }, /* strous2.c */
-  { "minloc",	1, 2, lux_minloc, "1keepdims" }, /* fun3.c */
-  { "ncchi2",	3, 3, lux_noncentral_chi_square, 0 }, /* fun1.c */
-  { "not",	1, 1, lux_not, "*" }, /* strous.c */
-  { "num_dim",	1, 1, lux_num_dimen, 0 }, /* subsc.c */
-  { "num_elem", 1, 2, lux_num_elem, 0 }, /* subsc.c */
-  { "one",	1, 1, lux_onef, 0 }, /* fun1.c */
-  { "openr",	2, 2, lux_openr_f, "1get_lun" }, /* files.c */
-  { "openu",	2, 2, lux_openu_f, "1get_lun" }, /* files.c */
-  { "openw",	2, 2, lux_openw_f, "1get_lun" }, /* files.c */
-  /* { "orbitelem",	3, 3, lux_orbitalElement, 0, */
-  { "ordfilter", 1, 4, lux_orderfilter, /* strous2.c */
+  { "match",	2, 2, lux_match, 0 }, // strous.c
+  { "max",	1, 2, lux_maxf, "1keepdims" }, // fun3.c
+  { "maxdir",	2, 3, lux_max_dir, 0 },	// topology.c
+  { "maxfilter", 1, 3, lux_maxfilter, 0 }, // strous2.c
+  { "maxloc",	1, 2, lux_maxloc, "1keepdims" }, // fun3.c
+  { "mean", 	1, 4, lux_mean, "::power:weights:1double:2keepdims:4float:8omitnans" }, // fun1.c
+  { "medfilter", 1, 4, lux_medfilter, "%1%" }, // strous2.c
+  { "median",	1, 3, lux_median, "%1%" }, // strous2.c
+  { "memory",	0, 0, lux_memory, 0 }, // memck.c
+  { "min",	1, 2, lux_minf, "1keepdims" }, // fun3.c
+  { "minfilter", 1, 3, lux_minfilter, 0 }, // strous2.c
+  { "minloc",	1, 2, lux_minloc, "1keepdims" }, // fun3.c
+  { "ncchi2",	3, 3, lux_noncentral_chi_square, 0 }, // fun1.c
+  { "not",	1, 1, lux_not, "*" }, // strous.c
+  { "num_dim",	1, 1, lux_num_dimen, 0 }, // subsc.c
+  { "num_elem", 1, 2, lux_num_elem, 0 }, // subsc.c
+  { "one",	1, 1, lux_onef, 0 }, // fun1.c
+  { "openr",	2, 2, lux_openr_f, "1get_lun" }, // files.c
+  { "openu",	2, 2, lux_openu_f, "1get_lun" }, // files.c
+  { "openw",	2, 2, lux_openw_f, "1get_lun" }, // files.c
+  // { "orbitelem",	3, 3, lux_orbitalElement, 0,
+  { "ordfilter", 1, 4, lux_orderfilter, // strous2.c
     "%1%order:1median:2minimum:3maximum" },
-  { "pit",	1, 3, lux_pit, 0 }, /* fun2.c */
-  { "polate",	3, 3, lux_table, 0 }, /* strous.c */
-  { "poly",	2, 2, lux_poly, "*" }, /* fun2.c */
-  { "power",	1, 2, lux_power, "1power:2shape:4onedim" }, /* fun3.c */
-  { "precess",	3, 3, lux_precess, "1julian:2besselian" }, /* astron.c */
-  { "printf",	1, MAX_ARG, lux_printf_f, 0 }, /* files.c */
+  { "pit",	1, 3, lux_pit, 0 }, // fun2.c
+  { "polate",	3, 3, lux_table, 0 }, // strous.c
+  { "poly",	2, 2, lux_poly, "*" }, // fun2.c
+  { "power",	1, 2, lux_power, "1power:2shape:4onedim" }, // fun3.c
+  { "precess",	3, 3, lux_precess, "1julian:2besselian" }, // astron.c
+  { "printf",	1, MAX_ARG, lux_printf_f, 0 }, // files.c
 #if DEVELOP
-  { "project",	1, 1, lux_project, 0 }, /* projection.c */
-  { "projectmap", 2, 8, lux_projectmap, "::hdist:angle:mag:xmap:ymap:size" }, /* projection.c */
+  { "project",	1, 1, lux_project, 0 }, // projection.c
+  { "projectmap", 2, 8, lux_projectmap, "::hdist:angle:mag:xmap:ymap:size" }, // projection.c
 #endif
-  { "psum",	2, 4, lux_psum, /* strous2.c */
+  { "psum",	2, 4, lux_psum, // strous2.c
     "1onedim:2vnormalize:4cnormalize:8single" },
-  { "ptoc",	1, 5, lux_polar_to_cartesian, 0 }, /* fun4.c */
-  { "quantile",	2, 3, lux_quantile, 0 }, /* strous2.c */
-  { "random",	1, MAX_DIMS, lux_random, /* random.c */
+  { "ptoc",	1, 5, lux_polar_to_cartesian, 0 }, // fun4.c
+  { "quantile",	2, 3, lux_quantile, 0 }, // strous2.c
+  { "random",	1, MAX_DIMS, lux_random, // random.c
     "%2%seed:period:1uniform:2normal:3sample:4shuffle:5bits" },
-  { "randomb",	3, MAX_DIMS, lux_randomb, "%2%seed:1long" }, /* random.c */
-  { "randomd",  3, MAX_DIMS, lux_randomd, "%1%seed" }, /* random.c */
-  { "randoml",	3, MAX_DIMS, lux_randoml, "%2%seed:1double" }, /* random.c */
-  { "randomn",	3, MAX_DIMS, lux_randomn, "%2%seed" }, /* random.c */
-  { "randomu",	3, MAX_DIMS, lux_randomu, "%2%seed:period" }, /* random.c */
-  { "readf",	2, MAX_ARG, lux_readf_f, "1askmore:2word" }, /* files.c */
-  { "readu",	2, MAX_ARG, lux_readu_f, 0 }, /* files.c */
+  { "randomb",	3, MAX_DIMS, lux_randomb, "%2%seed:1long" }, // random.c
+  { "randomd",  3, MAX_DIMS, lux_randomd, "%1%seed" }, // random.c
+  { "randoml",	3, MAX_DIMS, lux_randoml, "%2%seed:1double" }, // random.c
+  { "randomn",	3, MAX_DIMS, lux_randomn, "%2%seed" }, // random.c
+  { "randomu",	3, MAX_DIMS, lux_randomu, "%2%seed:period" }, // random.c
+  { "readf",	2, MAX_ARG, lux_readf_f, "1askmore:2word" }, // files.c
+  { "readu",	2, MAX_ARG, lux_readu_f, 0 }, // files.c
 #if HAVE_LIBJPEG
-  { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, /* jpeg.c */
+  { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.c
 #endif
-  { "real",	1, 1, lux_real, 0 }, /* fun3.c */
-  { "redim",	2, 9, lux_redim_f, 0 }, /* subsc.c */
+  { "real",	1, 1, lux_real, 0 }, // fun3.c
+  { "redim",	2, 9, lux_redim_f, 0 }, // subsc.c
 #if HAVE_REGEX_H
-  { "regex",	1, 2, lux_regex, "1case" }, /* regex.c */
+  { "regex",	1, 2, lux_regex, "1case" }, // regex.c
 #endif
-  { "regrid",	5, 5, lux_regrid, 0 }, /* fun4.c */
-  { "regrid3",	5, 5, lux_regrid3, 0 }, /* fun4.c */
-  { "regrid3ns", 5, 5, lux_regrid3ns, 0 }, /* fun4.c */
+  { "regrid",	5, 5, lux_regrid, 0 }, // fun4.c
+  { "regrid3",	5, 5, lux_regrid3, 0 }, // fun4.c
+  { "regrid3ns", 5, 5, lux_regrid3ns, 0 }, // fun4.c
 #if DEVELOP
-  { "regridls", 5, 5, lux_regridls, 0 }, /* fun4.c */
+  { "regridls", 5, 5, lux_regridls, 0 }, // fun4.c
 #endif
-  { "reorder",	2, 2, lux_reorder, 0 },	/* fun6.c */
-  { "restore",	2, 3, lux_fzread_f, "1printheader" }, /* files.c */
-  { "reverse",	1, MAX_ARG, lux_reverse, "1zero" }, /* subsc.c */
-  { "rfix",	1, 1, lux_rfix, "*" }, /* symbols.c */
-  { "roll",	2, 2, lux_roll, 0 }, /* subsc.c */
-  { "root3",	3, 3, lux_root3, 0 }, /* orientation.c */
-  { "runcum",	1, 3, lux_runcum, "*1partial_width:2varsum" }, /* strous.c */
-  { "runprod",	1, 2, lux_runprod, "*" }, /* strous2.c */
-  { "runsum",	1, 3, lux_runsum, "*" }, /* fun2.c */
-  { "scale",	1, 3, lux_scale, "*1fullrange:2zoom" }, /* fun3.c */
-  { "scalerange", 3, 5, lux_scalerange, "*1fullrange:2zoom" }, /* fun3.c */
-  { "scanf",	2, MAX_ARG, lux_freadf_f, "|1|1eof" }, /* files.c */
-  { "sdev",	1, 3, lux_sdev, /* fun2.c */
+  { "reorder",	2, 2, lux_reorder, 0 },	// fun6.c
+  { "restore",	2, 3, lux_fzread_f, "1printheader" }, // files.c
+  { "reverse",	1, MAX_ARG, lux_reverse, "1zero" }, // subsc.c
+  { "rfix",	1, 1, lux_rfix, "*" }, // symbols.c
+  { "roll",	2, 2, lux_roll, 0 }, // subsc.c
+  { "root3",	3, 3, lux_root3, 0 }, // orientation.c
+  { "runcum",	1, 3, lux_runcum, "*1partial_width:2varsum" }, // strous.c
+  { "runprod",	1, 2, lux_runprod, "*" }, // strous2.c
+  { "runsum",	1, 3, lux_runsum, "*" }, // fun2.c
+  { "scale",	1, 3, lux_scale, "*1fullrange:2zoom" }, // fun3.c
+  { "scalerange", 3, 5, lux_scalerange, "*1fullrange:2zoom" }, // fun3.c
+  { "scanf",	2, MAX_ARG, lux_freadf_f, "|1|1eof" }, // files.c
+  { "sdev",	1, 3, lux_sdev, // fun2.c
     "::weights:*0sample:1population:2keepdims:4double:8omitnans" },
-  { "segment",	1, 3, lux_segment, ":sign:diagonal:1degree" }, /* topology.c */
-  { "segmentdir", 2, 3, lux_segment_dir, "::sign" }, /* topology.c */
-  { "sgn",	1, 1, lux_sgn, "*" }, /* fun1.c */
-  { "shift",	1, 4, lux_shift_f, ":::blank:1translate" }, /* strous2.c */
-  { "shift3",	2, 3, lux_shift3, 0 }, /* fun4.c */
-  { "siderealtime", 1, 1, lux_siderealtime, "1atzerotime" }, /* astron.c */
-  { "sieve",	1, 2, lux_sieve, 0 }, /* fun3.c */
-  { "sin", 	1, 1, lux_sin, "*" }, /* fun1.c */
-  { "sinh",	1, 1, lux_sinh, "*" }, /* fun1.c */
-  { "skipc",	2, 2, lux_skipc, 0 }, /* fun2.c */
-  { "smap",	1, 1, lux_smap, "1truncate:2array" }, /* subsc.c */
-  { "smooth",	1, 3, lux_smooth, "1partial_width:4all" }, /* strous.c */
-  { "solar_b",	1, 1, lux_solar_b, "*2modern" }, /* ephem2.c */
-  { "solar_l",	1, 1, lux_solar_l, "*1full:2modern" }, /* ephem2.c */
-  { "solar_p",	1, 1, lux_solar_p, "*2modern" }, /* ephem2.c */
-  { "solar_r",	1, 1, lux_solar_r, "*" }, /* ephem2.c */
-  { "sort",	1, 1, lux_sort, "*1heap:2shell:4axis" }, /* fun4.c */
-  { "spawn",	1, 1, lux_spawn_f, 0 }, /* files.c */
-  { "sprintf",	1, MAX_ARG, lux_fstring, "1skip_undefined" }, /* fun2.c */
-  { "sqrt",	1, 1, lux_sqrt, "*" }, /* fun1.c */
-  { "sscanf",	3, MAX_ARG, lux_freads_f, "1countspaces" }, /* files.c */
-  { "store",	2, 3, lux_fzwrite_f, "1safe" }, /* files.c */
-  { "str",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
-  { "strarr",	2, 1 + MAX_DIMS, strarr, "%1%size" }, /* symbols.c */
-  { "strcount",	2, 2, lux_strcount, 0 }, /* fun2.c */
-  { "stretch",	2, 2, lux_stretch, 0 }, /* fun4.c */
-  { "string",	1, MAX_ARG, lux_string, 0 }, /* fun2.c */
-  { "strlen",	1, 1, lux_strlen, 0 }, /* fun2.c */
-  { "strloc",	2, 2, lux_strloc, 0 }, /* fun2.c */
-  { "strpbrk",	2, 2, lux_strpbrk, 0 },	/* fun2.c */
-  { "strpos",	2, 3, lux_strpos, 0 }, /* fun2.c */
-  { "strr",	3, 4, lux_strreplace, 0 }, /* fun2.c */
-  { "strreplace", 3, 4, lux_strreplace, 0 }, /* fun2.c */
-  { "strskp",	2, 2, lux_strskp, 0 }, /* fun2.c */
-  { "strsub",	3, 3, lux_strsub, 0 }, /* fun2.c */
-  { "strtok",	1, 2, lux_strtok, "1skip_final_delim" }, /* fun2.c */
-  { "strtol",	1, 2, lux_strtol, 0 }, /* fun3.c */
-  { "strtrim",	1, 1, lux_strtrim, 0 }, /* fun2.c */
+  { "segment",	1, 3, lux_segment, ":sign:diagonal:1degree" }, // topology.c
+  { "segmentdir", 2, 3, lux_segment_dir, "::sign" }, // topology.c
+  { "sgn",	1, 1, lux_sgn, "*" }, // fun1.c
+  { "shift",	1, 4, lux_shift_f, ":::blank:1translate" }, // strous2.c
+  { "shift3",	2, 3, lux_shift3, 0 }, // fun4.c
+  { "siderealtime", 1, 1, lux_siderealtime, "1atzerotime" }, // astron.c
+  { "sieve",	1, 2, lux_sieve, 0 }, // fun3.c
+  { "sin", 	1, 1, lux_sin, "*" }, // fun1.c
+  { "sinh",	1, 1, lux_sinh, "*" }, // fun1.c
+  { "skipc",	2, 2, lux_skipc, 0 }, // fun2.c
+  { "smap",	1, 1, lux_smap, "1truncate:2array" }, // subsc.c
+  { "smooth",	1, 3, lux_smooth, "1partial_width:4all" }, // strous.c
+  { "solar_b",	1, 1, lux_solar_b, "*2modern" }, // ephem2.c
+  { "solar_l",	1, 1, lux_solar_l, "*1full:2modern" }, // ephem2.c
+  { "solar_p",	1, 1, lux_solar_p, "*2modern" }, // ephem2.c
+  { "solar_r",	1, 1, lux_solar_r, "*" }, // ephem2.c
+  { "sort",	1, 1, lux_sort, "*1heap:2shell:4axis" }, // fun4.c
+  { "spawn",	1, 1, lux_spawn_f, 0 }, // files.c
+  { "sprintf",	1, MAX_ARG, lux_fstring, "1skip_undefined" }, // fun2.c
+  { "sqrt",	1, 1, lux_sqrt, "*" }, // fun1.c
+  { "sscanf",	3, MAX_ARG, lux_freads_f, "1countspaces" }, // files.c
+  { "store",	2, 3, lux_fzwrite_f, "1safe" }, // files.c
+  { "str",	1, MAX_ARG, lux_string, 0 }, // fun2.c
+  { "strarr",	2, 1 + MAX_DIMS, strarr, "%1%size" }, // symbols.c
+  { "strcount",	2, 2, lux_strcount, 0 }, // fun2.c
+  { "stretch",	2, 2, lux_stretch, 0 }, // fun4.c
+  { "string",	1, MAX_ARG, lux_string, 0 }, // fun2.c
+  { "strlen",	1, 1, lux_strlen, 0 }, // fun2.c
+  { "strloc",	2, 2, lux_strloc, 0 }, // fun2.c
+  { "strpbrk",	2, 2, lux_strpbrk, 0 },	// fun2.c
+  { "strpos",	2, 3, lux_strpos, 0 }, // fun2.c
+  { "strr",	3, 4, lux_strreplace, 0 }, // fun2.c
+  { "strreplace", 3, 4, lux_strreplace, 0 }, // fun2.c
+  { "strskp",	2, 2, lux_strskp, 0 }, // fun2.c
+  { "strsub",	3, 3, lux_strsub, 0 }, // fun2.c
+  { "strtok",	1, 2, lux_strtok, "1skip_final_delim" }, // fun2.c
+  { "strtol",	1, 2, lux_strtol, 0 }, // fun3.c
+  { "strtrim",	1, 1, lux_strtrim, 0 }, // fun2.c
 #if DEVELOP
-  { "struct",	2, MAX_ARG, lux_struct, 0 }, /* install.c */
+  { "struct",	2, MAX_ARG, lux_struct, 0 }, // install.c
 #endif
-  { "student",	2, 2, lux_student, "*1complement:2log" }, /* fun1.c */
-  { "sun_b",	2, 2, lux_sun_b, 0 }, /* ephem.c */
-  { "sun_d",	2, 2, lux_sun_d, 0 }, /* ephem.c */
-  { "sun_p",	2, 2, lux_sun_p, 0 }, /* ephem.c */
-  { "sun_r",	2, 2, lux_sun_r, 0 }, /* ephem.c */
-  { "symbol",	1, 1, lux_symbol, "1main" }, /* symbols.c */
-  { "symclass",	1, 1, lux_symclass, "+|1|1follow:2number" }, /* subsc.c */
-  { "symdtype",	1, 1, lux_symdtype, 0 }, /* subsc.c */
-  { "symmem",	0, 0, lux_symbol_memory, 0 }, /* install.c */
-  { "symnum",	1, 1, lux_symbol_number, 0 }, /* install.c */
-  { "table",	3, 4, lux_table, "|2|1all:2middle" }, /* strous.c */
-  { "tai_from_date", 5, 5, lux_tai_from_date, 0 }, /* ephem.c */
-  { "tan", 	1, 1, lux_tan, "*" }, /* fun1.c */
-  { "tanh", 	1, 1, lux_tanh, "*" }, /* fun1.c */
-  { "temporary", 1, 1, lux_temp, 0 }, /* strous2.c */
-  { "tense",	3, 6, lux_tense, 0 }, /* fun3.c */
-  { "tense_curve", 3, 6, lux_tense_curve, 0 }, /* fun3.c */
-  { "tense_loop", 3, 4, lux_tense_loop, 0 }, /* fun3.c */
+  { "student",	2, 2, lux_student, "*1complement:2log" }, // fun1.c
+  { "sun_b",	2, 2, lux_sun_b, 0 }, // ephem.c
+  { "sun_d",	2, 2, lux_sun_d, 0 }, // ephem.c
+  { "sun_p",	2, 2, lux_sun_p, 0 }, // ephem.c
+  { "sun_r",	2, 2, lux_sun_r, 0 }, // ephem.c
+  { "symbol",	1, 1, lux_symbol, "1main" }, // symbols.c
+  { "symclass",	1, 1, lux_symclass, "+|1|1follow:2number" }, // subsc.c
+  { "symdtype",	1, 1, lux_symdtype, 0 }, // subsc.c
+  { "symmem",	0, 0, lux_symbol_memory, 0 }, // install.c
+  { "symnum",	1, 1, lux_symbol_number, 0 }, // install.c
+  { "table",	3, 4, lux_table, "|2|1all:2middle" }, // strous.c
+  { "tai_from_date", 5, 5, lux_tai_from_date, 0 }, // ephem.c
+  { "tan", 	1, 1, lux_tan, "*" }, // fun1.c
+  { "tanh", 	1, 1, lux_tanh, "*" }, // fun1.c
+  { "temporary", 1, 1, lux_temp, 0 }, // strous2.c
+  { "tense",	3, 6, lux_tense, 0 }, // fun3.c
+  { "tense_curve", 3, 6, lux_tense_curve, 0 }, // fun3.c
+  { "tense_loop", 3, 4, lux_tense_loop, 0 }, // fun3.c
 #if DEVELOP
-  { "test",	2, 3, lux_test, 0 }, /* execute.c */
+  { "test",	2, 3, lux_test, 0 }, // execute.c
 #endif
-  { "total", 	1, 4, lux_total, "::power:weights:1double:2keepdims:4float:8omitnans" }, /* fun1.c */
-  { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, /* trace_decoder_ana.c */
-  { "trend",	1, 2, lux_trend, "*" }, /* fun2.c */
-  { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, /* ephem.c */
+  { "total", 	1, 4, lux_total, "::power:weights:1double:2keepdims:4float:8omitnans" }, // fun1.c
+  { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, // trace_decoder_ana.c
+  { "trend",	1, 2, lux_trend, "*" }, // fun2.c
+  { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, // ephem.c
 #if HAVE_LIBX11
-  { "tvread",	1, 5, lux_xtvread, "1greyscale" }, /* xport.c */
+  { "tvread",	1, 5, lux_xtvread, "1greyscale" }, // xport.c
 #endif
-  { "typename",	1, 1, lux_typeName, 0 }, /* install.c */
-  { "upcase",	1, 1, lux_upper, 0 }, /* fun2.c */
-  { "upper",	1, 1, lux_upper, 0 }, /* fun2.c */
-  { "variance", 1, 3, lux_variance, /* fun2.c */
+  { "typename",	1, 1, lux_typeName, 0 }, // install.c
+  { "upcase",	1, 1, lux_upper, 0 }, // fun2.c
+  { "upper",	1, 1, lux_upper, 0 }, // fun2.c
+  { "variance", 1, 3, lux_variance, // fun2.c
     "::weights:*0sample:1population:2keepdims:4double" },
-  { "varname",	1, 1, lux_varname, 0 }, /* symbols.c */
-  { "voigt",	2, 2, lux_voigt, "*" }, /* fun1.c */
-  { "wmap",	1, 1, lux_wmap, 0 }, /* subsc.c */
-  { "word",	1, 1, lux_word, "*" }, /* symbols.c */
-  { "writeu",	2, MAX_ARG, lux_writeu, 0 }, /* files.c */
+  { "varname",	1, 1, lux_varname, 0 }, // symbols.c
+  { "voigt",	2, 2, lux_voigt, "*" }, // fun1.c
+  { "wmap",	1, 1, lux_wmap, 0 }, // subsc.c
+  { "word",	1, 1, lux_word, "*" }, // symbols.c
+  { "writeu",	2, MAX_ARG, lux_writeu, 0 }, // files.c
 #if HAVE_LIBJPEG
-  { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, /* jpeg.c */
+  { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.c
 #endif
 #if HAVE_LIBX11
-  { "xexist",	1, 1, lux_xexist, 0 }, /* xport.c */
-  { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 }, /* xport.c */
+  { "xexist",	1, 1, lux_xexist, 0 }, // xport.c
+  { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 }, // xport.c
 #if MOTIF
-  { "xmaddfiletolist", 2, 2, lux_xmaddfiletolist, 0 }, /* motif.c */
-  { "xmarrow",	3, 4, lux_xmarrow, 0 }, /* motif.c */
-  { "xmboard",	1, 5, lux_xmboard, 0 }, /* motif.c */
-  { "xmbutton",	3, 5, lux_xmbutton, 0 }, /* motif.c */
-  { "xmcheckbox", 5, 32, lux_xmcheckbox, 0 }, /* motif.c */
-  { "xmcolumns", 3, 5, lux_xmcolumns, 0 }, /* motif.c */
-  { "xmcommand", 3, 7, lux_xmcommand, 0 }, /* motif.c */
-  { "xmdialog_board", 4, 9, lux_xmdialog_board, 0 }, /* motif.c */
-  { "xmdialog_form", 4, 8, lux_xmdialog_form, 0 }, /* motif.c */
-  { "xmdrawingarea", 2, 7, lux_xmdrawingarea, 0 }, /* motif.c */
-  { "xmfilegetlist",	1, 1, lux_xmfilegetlist, 0 }, /* motif.c */
-  { "xmfileselect", 3, 12, lux_xmfileselect, 0 }, /* motif.c */
-  { "xmform",	1, 7, lux_xmform, 0 }, /* motif.c */
-  { "xmframe",	1, 5, lux_xmframe, 0 }, /* motif.c */
-  { "xmgetoptionselection", 1, 1, lux_xmgetoptionselection, 0 }, /* motif.c */
-  { "xmgetwidgetaddress", 1, 1, lux_xmgetwidgetaddress, 0 }, /* motif.c */
-  { "xmhscale",	5, 8, lux_xmhscale, 0 }, /* motif.c */
-  { "xmhscrollbar",	5, 6, lux_xmhscrollbar, 0 }, /* motif.c */
-  { "xmlabel",	2, 5, lux_xmlabel, 0 }, /* motif.c */
-  { "xmlist",	3, 6, lux_xmlist, 0 }, /* motif.c */
-  { "xmlistcount", 1, 1, lux_xmlistcount, 0 }, /* motif.c */
-  { "xmlistfromfile", 4, 6, lux_xmlistfromfile, 0 }, /* motif.c */
-  { "xmmenubar", 4, 32, lux_xmmenubar, 0 }, /* motif.c */
-  { "xmoptionmenu", 6, 50, lux_xmoptionmenu, 0 }, /* motif.c */
-  { "xmpixmapbutton", 3, 3, lux_xmpixmapbutton, 0 }, /* motif.c */
-  { "xmpixmapoptionmenu", 6, 32, lux_xmpixmapoptionmenu, 0 }, /* motif.c */
-  { "xmpulldownmenu", 6, 32, lux_xmpulldownmenu, 0 }, /* motif.c */
-  { "xmradiobox", 5, 32, lux_xmradiobox, 0 }, /* motif.c */
-  { "xmrows",	3, 5, lux_xmrows, 0 }, /* motif.c */
-  { "xmscalegetvalue", 1, 1, lux_xmscalegetvalue, 0 }, /* motif.c */
-  { "xmscrolledwindow", 3, 3, lux_xmscrolledwindow, 0 }, /* motif.c */
-  { "xmscrolledwindowapp", 1, 4, lux_xmscrolledwindowapp, 0 }, /* motif.c */
-  { "xmseparator", 1, 4, lux_xmseparator, 0 }, /* motif.c */
-  { "xmtext",	1, 5, lux_xmtext, 0 }, /* motif.c */
-  { "xmtextbox", 1, 5, lux_xmtextbox, 0 }, /* motif.c */
-  { "xmtextfield", 4, 8, lux_xmtextfield, 0 }, /* motif.c */
-  { "xmtextfieldarray", 9, 40, lux_xmtextfieldarray, 0 }, /* motif.c */
-  { "xmtextfieldgetstring", 1, 1, lux_xmtextfieldgetstring, 0 }, /* motif.c */
-  { "xmtextfromfile", 2, 6, lux_xmtextfromfile, 0 }, /* motif.c */
-  { "xmtextgetinsertposition", 1, 1, lux_xmtextgetinsertposition, 0 }, /* motif.c */
-  { "xmtextgetlastposition",	1, 1, lux_xmtextgetlastposition, 0 }, /* motif.c */
-  { "xmtextgetselection",	1, 3, lux_xmtextgetselection, 0 }, /* motif.c */
-  { "xmtextgetstring", 1, 1, lux_xmtextgetstring, 0 }, /* motif.c */
-  { "xmtogglegetstate", 1, 1, lux_xmtogglegetstate, 0 }, /* motif.c */
-  { "xmtoplevel_board", 3, 5, lux_xmtoplevel_board, 0 }, /* motif.c */
-  { "xmtoplevel_form", 3, 7, lux_xmtoplevel_form, 0 }, /* motif.c */
-  { "xmvscale",	5, 8, lux_xmvscale, 0 }, /* motif.c */
-  { "xmvscrollbar",	5, 6, lux_xmvscrollbar, 0 }, /* motif.c */
+  { "xmaddfiletolist", 2, 2, lux_xmaddfiletolist, 0 }, // motif.c
+  { "xmarrow",	3, 4, lux_xmarrow, 0 }, // motif.c
+  { "xmboard",	1, 5, lux_xmboard, 0 }, // motif.c
+  { "xmbutton",	3, 5, lux_xmbutton, 0 }, // motif.c
+  { "xmcheckbox", 5, 32, lux_xmcheckbox, 0 }, // motif.c
+  { "xmcolumns", 3, 5, lux_xmcolumns, 0 }, // motif.c
+  { "xmcommand", 3, 7, lux_xmcommand, 0 }, // motif.c
+  { "xmdialog_board", 4, 9, lux_xmdialog_board, 0 }, // motif.c
+  { "xmdialog_form", 4, 8, lux_xmdialog_form, 0 }, // motif.c
+  { "xmdrawingarea", 2, 7, lux_xmdrawingarea, 0 }, // motif.c
+  { "xmfilegetlist",	1, 1, lux_xmfilegetlist, 0 }, // motif.c
+  { "xmfileselect", 3, 12, lux_xmfileselect, 0 }, // motif.c
+  { "xmform",	1, 7, lux_xmform, 0 }, // motif.c
+  { "xmframe",	1, 5, lux_xmframe, 0 }, // motif.c
+  { "xmgetoptionselection", 1, 1, lux_xmgetoptionselection, 0 }, // motif.c
+  { "xmgetwidgetaddress", 1, 1, lux_xmgetwidgetaddress, 0 }, // motif.c
+  { "xmhscale",	5, 8, lux_xmhscale, 0 }, // motif.c
+  { "xmhscrollbar",	5, 6, lux_xmhscrollbar, 0 }, // motif.c
+  { "xmlabel",	2, 5, lux_xmlabel, 0 }, // motif.c
+  { "xmlist",	3, 6, lux_xmlist, 0 }, // motif.c
+  { "xmlistcount", 1, 1, lux_xmlistcount, 0 }, // motif.c
+  { "xmlistfromfile", 4, 6, lux_xmlistfromfile, 0 }, // motif.c
+  { "xmmenubar", 4, 32, lux_xmmenubar, 0 }, // motif.c
+  { "xmoptionmenu", 6, 50, lux_xmoptionmenu, 0 }, // motif.c
+  { "xmpixmapbutton", 3, 3, lux_xmpixmapbutton, 0 }, // motif.c
+  { "xmpixmapoptionmenu", 6, 32, lux_xmpixmapoptionmenu, 0 }, // motif.c
+  { "xmpulldownmenu", 6, 32, lux_xmpulldownmenu, 0 }, // motif.c
+  { "xmradiobox", 5, 32, lux_xmradiobox, 0 }, // motif.c
+  { "xmrows",	3, 5, lux_xmrows, 0 }, // motif.c
+  { "xmscalegetvalue", 1, 1, lux_xmscalegetvalue, 0 }, // motif.c
+  { "xmscrolledwindow", 3, 3, lux_xmscrolledwindow, 0 }, // motif.c
+  { "xmscrolledwindowapp", 1, 4, lux_xmscrolledwindowapp, 0 }, // motif.c
+  { "xmseparator", 1, 4, lux_xmseparator, 0 }, // motif.c
+  { "xmtext",	1, 5, lux_xmtext, 0 }, // motif.c
+  { "xmtextbox", 1, 5, lux_xmtextbox, 0 }, // motif.c
+  { "xmtextfield", 4, 8, lux_xmtextfield, 0 }, // motif.c
+  { "xmtextfieldarray", 9, 40, lux_xmtextfieldarray, 0 }, // motif.c
+  { "xmtextfieldgetstring", 1, 1, lux_xmtextfieldgetstring, 0 }, // motif.c
+  { "xmtextfromfile", 2, 6, lux_xmtextfromfile, 0 }, // motif.c
+  { "xmtextgetinsertposition", 1, 1, lux_xmtextgetinsertposition, 0 }, // motif.c
+  { "xmtextgetlastposition",	1, 1, lux_xmtextgetlastposition, 0 }, // motif.c
+  { "xmtextgetselection",	1, 3, lux_xmtextgetselection, 0 }, // motif.c
+  { "xmtextgetstring", 1, 1, lux_xmtextgetstring, 0 }, // motif.c
+  { "xmtogglegetstate", 1, 1, lux_xmtogglegetstate, 0 }, // motif.c
+  { "xmtoplevel_board", 3, 5, lux_xmtoplevel_board, 0 }, // motif.c
+  { "xmtoplevel_form", 3, 7, lux_xmtoplevel_form, 0 }, // motif.c
+  { "xmvscale",	5, 8, lux_xmvscale, 0 }, // motif.c
+  { "xmvscrollbar",	5, 6, lux_xmvscrollbar, 0 }, // motif.c
 #endif
-  { "xquery",	0, 1, lux_xquery_f, 0 }, /* xport.c */
+  { "xquery",	0, 1, lux_xquery_f, 0 }, // xport.c
 #if MOTIF
-  { "xtparent",	1, 1, lux_xtparent, 0 }, /* motif.c */
+  { "xtparent",	1, 1, lux_xtparent, 0 }, // motif.c
 #endif
-  { "xtvread",	1, 5, lux_xtvread, "1greyscale" }, /* xport.c */
+  { "xtvread",	1, 5, lux_xtvread, "1greyscale" }, // xport.c
 #if MOTIF
-  { "xtwindow",	1, 1, lux_xtwindow, 0 }, /* motif.c */
+  { "xtwindow",	1, 1, lux_xtwindow, 0 }, // motif.c
 #endif
 #endif
-  { "zero", 	1, 2, lux_zerof, "*" }, /* fun1.c */
-  { "zeronans",	1, 2, lux_zapnan_f, "*%1%value" }, /* fun1.c */
-  { "zinv",	1, 1, lux_zinv, "*" }, /* strous.c */
+  { "zero", 	1, 2, lux_zerof, "*" }, // fun1.c
+  { "zeronans",	1, 2, lux_zapnan_f, "*%1%value" }, // fun1.c
+  { "zinv",	1, 1, lux_zinv, "*" }, // strous.c
 };
 int32_t nFunction = sizeof(function_table)/sizeof(internalRoutine);
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void undefine(int32_t symbol)
-/* free up memory allocated for <symbol> and make it undefined */
+// free up memory allocated for <symbol> and make it undefined
 {
   void	zap(int32_t), updateIndices(void);
   char	hasMem = 0;
@@ -1323,15 +1323,15 @@ void undefine(int32_t symbol)
       }
       break;
     case LUX_ARRAY:
-      if (isStringType(array_type(symbol))) { /* a string array */
-	/* must free the components' memory */
+      if (isStringType(array_type(symbol))) { // a string array
+	// must free the components' memory
         p2.sp = (char**) array_data(symbol);
 	n = array_size(symbol);
 	while (n--)
 	  free(*p2.sp++);
       }
-      /* fall through to generic case to take care of remaining */
-      /* array memory. */
+      // fall through to generic case to take care of remaining
+      // array memory.
     case LUX_STRING: case LUX_SUBSC_PTR: case LUX_FILEMAP:
     case LUX_ASSOC: case LUX_CSCALAR: case LUX_CARRAY: case LUX_STRUCT:
       hasMem = 1;
@@ -1361,7 +1361,7 @@ void undefine(int32_t symbol)
       break;
     case LUX_LIST_PTR:
       n = list_ptr_target(symbol);
-      if (n > 0) 		/* string key */
+      if (n > 0) 		// string key
 	free(list_ptr_tag_string(symbol));
       hasMem = 0;
       break;
@@ -1405,7 +1405,7 @@ void undefine(int32_t symbol)
 	zap(*ptr++);
       n = routine_num_statements(symbol);
       while (n--) {
-	if (*ptr > 0)		/* BREAK, CONTINUE, RETALL, RETURN are < 0 */
+	if (*ptr > 0)		// BREAK, CONTINUE, RETALL, RETURN are < 0
 	  zap(*ptr);
 	ptr++;
       }
@@ -1420,12 +1420,12 @@ void undefine(int32_t symbol)
     case LUX_EXTRACT: case LUX_PRE_EXTRACT:
       if (symbol_class(symbol) == LUX_EXTRACT) {
 	n = extract_target(symbol);
-	if (n > 0		/* an expression */
+	if (n > 0		// an expression
 	    && symbol_context(n) == symbol)
 	  zap(n);
 	eptr = eptr0 = extract_ptr(symbol);
 	n = extract_num_sec(symbol);
-      } else {			/* PRE_EXTRACT */
+      } else {			// PRE_EXTRACT
 	free(pre_extract_name(symbol));
 	eptr = eptr0 = pre_extract_ptr(symbol);
 	n = pre_extract_num_sec(symbol);
@@ -1450,11 +1450,11 @@ void undefine(int32_t symbol)
 		free(*p2.sp++);
 	      free(eptr->ptr.sp);
 	      break;
-	  } /* end of switch (eptr->type) */
+	  } // end of switch (eptr->type)
 	  eptr++;
-	} /* end of while (n--) */
+	} // end of while (n--)
 	free(eptr0);
-      }	/* end of if (n) */
+      }	// end of if (n)
       hasMem = 0;
       break;
     case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
@@ -1486,7 +1486,7 @@ void undefine(int32_t symbol)
 	    /* the subroutine has not yet been sought; it's name is
 	       stored in the usr_sub_routine_num symbol. */
 	    zap(usr_sub_routine_num(symbol));
-	  /* fall through to the below case */
+	  // fall through to the below case
 	case EVB_INT_SUB: case EVB_INSERT: case LUX_INT_FUNC: case
 	LUX_USR_FUNC: case EVB_CASE: case EVB_NCASE: case EVB_BLOCK:
 	  n = symbol_memory(symbol)/sizeof(int16_t);
@@ -1529,15 +1529,15 @@ void undefine(int32_t symbol)
     symbol_memory(symbol) = 0;
   }
   symbol_class(symbol) = LUX_UNDEFINED;
-  undefined_par(symbol) = (Symboltype) 0; /* used in usr_routine() (with value 1) */
-				/* to indicate unspecified parameters */
-				/* of user-defined routines. */
-/* context must remain the same, or local variables become global */
-/* when they are undefined (e.g. as lhs in a replacement) */
+  undefined_par(symbol) = (Symboltype) 0; // used in usr_routine() (with value 1)
+				// to indicate unspecified parameters
+				// of user-defined routines.
+// context must remain the same, or local variables become global
+// when they are undefined (e.g. as lhs in a replacement)
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void zap(int32_t nsym)
-/* undefine & remove name (if any) */
+// undefine & remove name (if any)
 {
  char const *name, *noName = "[]";
  int32_t	context, hashValue;
@@ -1560,7 +1560,7 @@ void zap(int32_t nsym)
    name = noName;
  context = sym[nsym].context;
  hashValue = sym[nsym].xx - 1;
- if (*name != '[' && hashValue >= 0) { /* has name */
+ if (*name != '[' && hashValue >= 0) { // has name
    switch (symbol_class(nsym)) {
      case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
        hashTable = subrHashTable;
@@ -1578,14 +1578,14 @@ void zap(int32_t nsym)
    hp = oldHp = hashTable[hashValue];
    while (hp) {
      if (!strcmp(hp->name, name) && sym[hp->symNum].context == context) {
-       free((void*) hp->name);		/* found name; remove */
+       free((void*) hp->name);		// found name; remove
        hp->name = 0;
        if (hp != oldHp)
 	 oldHp->next = hp->next;
        else
 	 hashTable[hashValue] = 0;
        free(hp);
-       oldHp = 0;		/* signal that name was found */
+       oldHp = 0;		// signal that name was found
        break;
      }
      oldHp = hp;
@@ -1624,13 +1624,13 @@ void zap(int32_t nsym)
  checkTemps();
 #endif
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void cleanUp(int32_t context, int32_t which)
-/* names in symbolStack are supposed to be removed after use by the */
-/* routines that use them.  only resetting of the index is done here. */
-/* all temporary variables that have the specified context are removed */ 
-/* <which> can be:  CLEANUP_VARS  CLEANUP_EDBS  CLEANUP_ALL */
-/* CLEANUP_COMP CLEANUP_ERROR */
+// names in symbolStack are supposed to be removed after use by the
+// routines that use them.  only resetting of the index is done here.
+// all temporary variables that have the specified context are removed
+// <which> can be:  CLEANUP_VARS  CLEANUP_EDBS  CLEANUP_ALL
+// CLEANUP_COMP CLEANUP_ERROR
 {
   char	comp;
   int32_t	i;
@@ -1665,10 +1665,10 @@ void cleanUp(int32_t context, int32_t which)
   else
     zapParseTemps();
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void cleanUpRoutine(int32_t context, char keepBase)
-/* completely removes all traces of the routine with the given context */
-/* keeps the LUX_SUBROUTINE, LUX_FUNCTION, or LUX_BLOCKROUTINE symbol */
+// completely removes all traces of the routine with the given context
+// keeps the LUX_SUBROUTINE, LUX_FUNCTION, or LUX_BLOCKROUTINE symbol
 /* itself if keepBase is unequal to zero.  If keepBase is unequal to
  zero, then an LUX_DEFERRED_SUBR is transformed into an (empty)
  LUX_SUBR, LUX_DEFERRED_FUNC into an LUX_FUNC, and LUX_DEFERRED_BLOCK
@@ -1703,32 +1703,32 @@ void cleanUpRoutine(int32_t context, char keepBase)
 	n = routine_num_parameters(context);
 	mem = n? 1: 0;
 	ptr = routine_parameters(context);
-	while (n--)		/* get rid of the parameters */
+	while (n--)		// get rid of the parameters
 	  zap(*ptr++);
 	routine_num_parameters(context) = 0;
 	n = routine_num_statements(context);
 	if (n)
 	  mem = 1;
 	ptr = routine_statements(context);
-	while (n--) {		/* get rid of the statements */
-	  if (*ptr > 0)		/* RETALL, RETURN, BREAK, CONTINUE < 0 */
+	while (n--) {		// get rid of the statements
+	  if (*ptr > 0)		// RETALL, RETURN, BREAK, CONTINUE < 0
 	    zap(*ptr);
 	  ptr++;
 	}
 	routine_num_statements(context) = 0;
-	if (mem)			/* if the routine had any statements */
-	  /* or parameters, then we need to free the memory that was used to */
-	  /* store them in */
+	if (mem)			// if the routine had any statements
+	  // or parameters, then we need to free the memory that was used to
+	  // store them in
 	  free(routine_parameters(context));
 	break; 
     }
   } else
     zap(context);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void updateIndices(void)
-/* moves tempVariableIndex and tempExecutableIndex as far back as */
-/* possible */
+// moves tempVariableIndex and tempExecutableIndex as far back as
+// possible
 {
   while (tempVariableIndex > TEMPS_START
 	 && symbol_class(tempVariableIndex - 1) == LUX_UNUSED)
@@ -1737,9 +1737,9 @@ void updateIndices(void)
 	 && symbol_class(tempExecutableIndex - 1) == LUX_UNUSED)
     tempExecutableIndex--;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t nextFreeStackEntry(void)
-     /* returns index to next free item in symbolStack.  May cycle. */
+     // returns index to next free item in symbolStack.  May cycle.
 {
   int32_t	oldIndex = symbolStackIndex;
 
@@ -1752,7 +1752,7 @@ int32_t nextFreeStackEntry(void)
   nSymbolStack++;
   return symbolStackIndex;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t nextFreeNamedVariable(void)
      /* returns index to next free named variable in symbol table.
 	some may have been zapped in the meantime, so cycle if at end of
@@ -1763,7 +1763,7 @@ int32_t nextFreeNamedVariable(void)
 
   while (symbol_class(namedVariableIndex)) {
     if (++namedVariableIndex == NAMED_END) namedVariableIndex = NAMED_START;
-    if (namedVariableIndex == oldIndex)    /* nothing free */
+    if (namedVariableIndex == oldIndex)    // nothing free
       return luxerror("Too many named variables - symbol table full", 0);
   }
   sym[namedVariableIndex].exec = nExecuted;
@@ -1772,9 +1772,9 @@ int32_t nextFreeNamedVariable(void)
   nNamedVariable++;
   return namedVariableIndex++;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t nextFreeTempVariable(void)
-/* returns index to next free temporary variable in symbol table */
+// returns index to next free temporary variable in symbol table
 {
  extern int32_t	compileLevel;
  int32_t oldIndex = tempVariableIndex;
@@ -1794,9 +1794,9 @@ int32_t nextFreeTempVariable(void)
  nTempVariable++;
  return tempVariableIndex++;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t nextFreeTempExecutable(void)
-/* returns index to next free temporary executable in symbol table */
+// returns index to next free temporary executable in symbol table
 {
   int32_t oldIndex = tempExecutableIndex;
   extern int32_t	compileLevel;
@@ -1804,7 +1804,7 @@ int32_t nextFreeTempExecutable(void)
   while (symbol_class(tempExecutableIndex)) {
     if (++tempExecutableIndex == EXE_END) 
       tempExecutableIndex = EXE_START;
-    if (tempExecutableIndex == oldIndex) /* nothing free */
+    if (tempExecutableIndex == oldIndex) // nothing free
       return luxerror("Too many temporary executables - symbol table full", 0);
   }
   sym[tempExecutableIndex].exec = nExecuted;
@@ -1813,7 +1813,7 @@ int32_t nextFreeTempExecutable(void)
   nTempExecutable++;
   return tempExecutableIndex++;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t nextFreeExecutable(void)
 /* returns index to next free executable in symbol table
    some may have been zapped in the meantime, so cycle if at end
@@ -1825,7 +1825,7 @@ int32_t nextFreeExecutable(void)
   while (symbol_class(executableIndex)) {
     if (++executableIndex == EXE_END)
       executableIndex = EXE_START;
-    if (executableIndex == oldIndex)    /* nothing free */
+    if (executableIndex == oldIndex)    // nothing free
       return luxerror("Too many permanent executables - symbol table full", 0);
   }
   sym[executableIndex].exec = nExecuted;
@@ -1834,22 +1834,22 @@ int32_t nextFreeExecutable(void)
   nExecutable++;
   return executableIndex++;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t nextFreeUndefined(void)
-/* returns a free undefined temporary variable */
+// returns a free undefined temporary variable
 {
   extern int32_t	compileLevel;
   int32_t	n;
 
   n = nextFreeTempVariable();
-  if (n < 0) return n;		/* some error */
+  if (n < 0) return n;		// some error
   symbol_class(n) = LUX_UNDEFINED;
   sym[n].context = -compileLevel;
   return n;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void pushList(int16_t symNum)
-/* pushes a symbol number unto the list stack */
+// pushes a symbol number unto the list stack
 {
  if (listStackItem - listStack < NLIST) {
    *listStackItem++ = symNum;
@@ -1858,17 +1858,17 @@ void pushList(int16_t symNum)
  luxerror("Too many elements (%d) in list; list stack full\n", 0,
        listStackItem - listStack);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int16_t popList(void)
-/* pops a symbol number from the list stack */
+// pops a symbol number from the list stack
 {
  if (listStackItem > listStack)
    return *--listStackItem;
  return luxerror("Attempt to read from empty list stack\n", 0);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t moveList(int32_t n)
-/* moves the topmost <n> entries on the list stack over by one */
+// moves the topmost <n> entries on the list stack over by one
 {
   if (listStackItem - listStack < NLIST)
   { memcpy(listStack + 1, listStack, n*sizeof(int16_t));
@@ -1877,9 +1877,9 @@ int32_t moveList(int32_t n)
   return luxerror("Too many elements (%d) in list; list stack full\n", 0,
 	       listStackItem - listStack);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void swapList(int32_t n1, int32_t n2)
-/* swaps the elements <n1> and <n2> positions down the list stack */
+// swaps the elements <n1> and <n2> positions down the list stack
 {
  int32_t	temp;
 
@@ -1887,25 +1887,25 @@ void swapList(int32_t n1, int32_t n2)
  listStackItem[-n2] = listStackItem[-n1];
  listStackItem[-n1] = temp;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t stackListLength(void)
-/* returns the number of elements in the topmost list in the stack */
-/* assumes that all lists are delimited by LUX_NEW_LIST */
+// returns the number of elements in the topmost list in the stack
+// assumes that all lists are delimited by LUX_NEW_LIST
 {
  int16_t	*i = listStackItem - 1;
  int32_t	n = 0;
 
  if (i < listStack)
-   return -1;		/* no list in stack */
+   return -1;		// no list in stack
  while (i >= listStack && *i != LUX_NEW_LIST) {
    i--;
    n++;
  }
  return n;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void dupList(void)
-/* duplicates the topmost list */
+// duplicates the topmost list
 {
   int32_t	n, n2;
 
@@ -1914,10 +1914,10 @@ void dupList(void)
   while (n2--)
     pushList(listStackItem[-n-1]);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void unlinkString(int32_t index)
-/* zero symbolStack[index] and update symbolStackIndex, */
-/* but do not free the memory */
+// zero symbolStack[index] and update symbolStackIndex,
+// but do not free the memory
 {
   symbolStack[index] = 0;
   if (index < symbolStackIndex)
@@ -1926,37 +1926,37 @@ void unlinkString(int32_t index)
     symbolStackIndex--;
   nSymbolStack--;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void freeString(int32_t index)
-     /* removes the string (if any) from index <index> in symbolStack[] */
-     /* and updates symbolStackIndex  */
+     // removes the string (if any) from index <index> in symbolStack[]
+     // and updates symbolStackIndex
 {
   free((void*) symbolStack[index]);
   unlinkString(index);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t installStruct(int32_t base, int32_t key)
-/* returns a struct pointer, supports variables, user-functions, */
-/* and user-routines as structures */
+// returns a struct pointer, supports variables, user-functions,
+// and user-routines as structures
 {
   int32_t	n;
 
-  n = lookForVar(base, curContext); /* seek user-defined item */
-  if (n < 0)			/* no such item found */
-    n = lookForSubr(base);	/* seek internal subroutine */
-  if (n < 0)			/* no such internal subroutine */
-    n = lookForFunc(base);	/* seek internal function */
-  if (n < 0)			/* no such internal function */
-    n = findVar(base, curContext); /* force variable */
-  else				/* found something already, remove name */
+  n = lookForVar(base, curContext); // seek user-defined item
+  if (n < 0)			// no such item found
+    n = lookForSubr(base);	// seek internal subroutine
+  if (n < 0)			// no such internal subroutine
+    n = lookForFunc(base);	// seek internal function
+  if (n < 0)			// no such internal function
+    n = findVar(base, curContext); // force variable
+  else				// found something already, remove name
     freeString(base);
   return newSymbol(LUX_LIST_PTR, n, key);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t copyElement(int32_t symbol, char *key)
-/* return a complete copy of variable <symbol>, with name (key) <key>, for */
-/* inclusion in a list, structure, or range.  such a variable must */
-/* not be a temporary, to prevent its premature deletion. */
+// return a complete copy of variable <symbol>, with name (key) <key>, for
+// inclusion in a list, structure, or range.  such a variable must
+// not be a temporary, to prevent its premature deletion.
 {
   int32_t	n;
   int32_t	lux_replace(int32_t, int32_t);
@@ -1966,7 +1966,7 @@ int32_t copyElement(int32_t symbol, char *key)
   if (lux_replace(n, symbol) < 0) return -1;
   return n;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t findTarget(char *name, int32_t *type, int32_t allowSubr)
 /* seeks identification of the name <*name> as a
    variable or a user-defined routine or an internal function.
@@ -1989,7 +1989,7 @@ int32_t findTarget(char *name, int32_t *type, int32_t allowSubr)
   FILE	*fp;
   int32_t	nextCompileLevel(FILE *, char const *);
 
-  /* seek a named variable */
+  // seek a named variable
   result = lookForName(name, varHashTable, curContext);
   if (result >= 0) {
     *type = symbol_class(result);
@@ -2001,34 +2001,34 @@ int32_t findTarget(char *name, int32_t *type, int32_t allowSubr)
     *type = LUX_ERROR;
     return luxerror("Subscripted variable %s is undefined", 0, name);
   }
-  /* seek a user-defined function */
+  // seek a user-defined function
   result = lookForName(name, funcHashTable, 0);
   if (result >= 0) {
-    *type = LUX_FUNCTION;	/* a user-defined function */
+    *type = LUX_FUNCTION;	// a user-defined function
     return result;
   }
   if (allowSubr) {
-    /* seek a user-defined subroutine */
+    // seek a user-defined subroutine
     result = lookForName(name, subrHashTable, 0);
     if (result >= 0) {
       *type = LUX_SUBROUTINE;
       return result;
     }
   }
-  /* seek a built-in function */
+  // seek a built-in function
   result = findInternalName(name, 0);
   if (result >= 0) {
-    *type = LUX_INT_FUNC;	/* an internal function */
+    *type = LUX_INT_FUNC;	// an internal function
     return result;
   }
   /* not a built-in function either.  Try to compile a
      user-defined function */
   fp = openPathFile(name, FIND_FUNC | FIND_LOWER);
   if (fp) {
-    /* found it */
-    nextCompileLevel(fp, name); /* compile it */
+    // found it
+    nextCompileLevel(fp, name); // compile it
     fclose(fp);
-    result = lookForName(name, funcHashTable, 0); /* seek again */
+    result = lookForName(name, funcHashTable, 0); // seek again
     if (result < 0) {
       *type = LUX_ERROR;
       return luxerror("Compiled file %s but function %s still is not compiled",
@@ -2038,11 +2038,11 @@ int32_t findTarget(char *name, int32_t *type, int32_t allowSubr)
       return result;
     }
   }
-  /* we did not find the target anywhere */
+  // we did not find the target anywhere
   *type = LUX_ERROR;
   return LUX_ERROR;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t newSymbol(Symbolclass kind, ...)
 /* returns index to symbol table for a new symbol.
    arguments depend on kind:
@@ -2088,32 +2088,32 @@ int32_t newSymbol(Symbolclass kind, ...)
 #if YYDEBUG
   extern int32_t	yydebug;
 #endif
-  /* static char	inDefinition = 0; */
+  // static char	inDefinition = 0;
   int16_t		*arg;
   va_list	ap;
   int32_t	int_arg(int32_t);
   void	fixContext(int32_t, int32_t);
 
- /* don't generate symbols in bodies of routines when using @@file */
- /* (reportBody) and when defining a routine (inDefinition).  */
-/* ignoreSymbols = (reportBody && inDefinition); */
+ // don't generate symbols in bodies of routines when using @@file
+ // (reportBody) and when defining a routine (inDefinition).
+// ignoreSymbols = (reportBody && inDefinition);
   va_start(ap, kind);
   n = -1;
-  if (!ignoreSymbols) {		/* really need a new symbol.  what kind? */
+  if (!ignoreSymbols) {		// really need a new symbol.  what kind?
     if (kind >= LUX_BIN_OP) {
-				/* executable */
+				// executable
       if (keepEVB)
 	n = nextFreeExecutable();
       else
 	n = nextFreeTempExecutable();
       if (n < 0) {
 	va_end(ap);
-	return LUX_ERROR;	/* didn't work */
+	return LUX_ERROR;	// didn't work
       }
       symbol_class(n) = kind;
       if (keepEVB)
 	symbol_context(n) = curContext;
-    } else if (kind < LUX_SUBROUTINE) {	/* named variable */
+    } else if (kind < LUX_SUBROUTINE) {	// named variable
       if (keepEVB)
 	n = nextFreeNamedVariable();
       else
@@ -2131,12 +2131,12 @@ int32_t newSymbol(Symbolclass kind, ...)
 	scalar_type(n) = (Symboltype) va_arg(ap, int);
 	break;
       case LUX_FIXED_NUMBER:
-	/* same as an ordinary scalar, but in EDB symbol space, so that it */
-	/* doesn't get overwritten as "just another temp" (i.e. isFreeTemp() */
-	/* returns 0).  otherwise, get problems e.g. in a for-loop, where */
-	/* temp numbers are used more than once.  */
+	// same as an ordinary scalar, but in EDB symbol space, so that it
+	// doesn't get overwritten as "just another temp" (i.e. isFreeTemp()
+	// returns 0).  otherwise, get problems e.g. in a for-loop, where
+	// temp numbers are used more than once.
 	symbol_type(n) = (Symboltype) va_arg(ap, int);
-	if (symbol_type(n) >= LUX_CFLOAT) { /* a complex scalar */
+	if (symbol_type(n) >= LUX_CFLOAT) { // a complex scalar
 	  symbol_class(n) = LUX_CSCALAR;
 	  complex_scalar_memory(n) = lux_type_size[symbol_type(n)];
 	  complex_scalar_data(n).f = (float*) malloc(complex_scalar_memory(n));
@@ -2146,12 +2146,12 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  symbol_class(n) = LUX_SCALAR;
 	break;
       case LUX_FIXED_STRING:
-	/* a literal string */
+	// a literal string
 	symbol_class(n) = LUX_STRING;
 	string_type(n) = LUX_LSTRING;
 	string_value(n) = (char*) symbolStack[i = va_arg(ap, int32_t)];
-	symbol_memory(n) = strlen(symbolStack[i]) + 1; /* count \0 */
-	unlinkString(i);		/* free position in stack */
+	symbol_memory(n) = strlen(symbolStack[i]) + 1; // count \0
+	unlinkString(i);		// free position in stack
 	break;
       case LUX_STRUCT_PTR:
 	symbol_class(n) = LUX_STRUCT_PTR;
@@ -2160,7 +2160,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	break;
       case LUX_EXTRACT:
 	target = popList();
-	if (target > 0) {	/* regular symbol */
+	if (target > 0) {	// regular symbol
 	  extract_target(n) = target;
           depth = popList();
           extract_num_sec(n) = (Symboltype) depth;
@@ -2173,7 +2173,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  symbol_memory(n) = sizeof(preExtract);
 	  symbol_data(n) = malloc(sizeof(preExtract));
 	  pre_extract_name(n) = (char*) symbolStack[i];
-	  unlinkString(i);	/* so it does not get zapped */
+	  unlinkString(i);	// so it does not get zapped
           depth = popList();
           pre_extract_num_sec(n) = (Symboltype) depth;
 	  pre_extract_ptr(n) = eptr = (extractSec*) (depth? malloc(depth*sizeof(extractSec)): NULL);
@@ -2181,12 +2181,12 @@ int32_t newSymbol(Symbolclass kind, ...)
 	if (!eptr && depth)
 	  return cerror(ALLOC_ERR, 0);
 	ptr = listStackItem;
-	eptr += depth;		/* start at end of list */
+	eptr += depth;		// start at end of list
 	if (!depth)
 	  popList();
 	while (depth--) {
-	  ptr--;		/* skip the (potential) LUX_NEW_LIST */
-	  eptr--;		/* go to previous entry */
+	  ptr--;		// skip the (potential) LUX_NEW_LIST
+	  eptr--;		// go to previous entry
 	  eptr->type = popList(); /* the type of the current list;
 				    either LUX_RANGE or LUX_LIST */
 	  eptr->number = stackListLength(); /* the number of entries in this
@@ -2195,7 +2195,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  switch (eptr->type) {
 	    case LUX_RANGE:
 	      eptr->ptr.w = (int16_t*) malloc(i*sizeof(int16_t));
-	      p.w = eptr->ptr.w + i; /* start at the end */
+	      p.w = eptr->ptr.w + i; // start at the end
 	      while (i--) {
 		*--p.w = popList();
 		embed(*p.w, n);
@@ -2203,7 +2203,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	      break;
 	    case LUX_LIST:
 	      eptr->ptr.sp = (char**) malloc(i*sizeof(char *));
-	      p.sp = eptr->ptr.sp + i; /* start at the end */
+	      p.sp = eptr->ptr.sp + i; // start at the end
 	      while (i--) {
 		j = popList();
 		*--p.sp = strsave(string_value(j));
@@ -2212,17 +2212,17 @@ int32_t newSymbol(Symbolclass kind, ...)
 	      }
 	      break;
 	  }
-	  popList();		/* remove the LUX_NEW_LIST */
+	  popList();		// remove the LUX_NEW_LIST
 	}
 	break;
-      case LUX_META:		/* a meta symbol, i.e. a string expression */
-				/* which points at a symbol */
+      case LUX_META:		// a meta symbol, i.e. a string expression
+				// which points at a symbol
 	meta_target(n) = va_arg(ap, int32_t);
 	embed(meta_target(n), n);
 	break;
-      case LUX_RANGE:  /* a range */
+      case LUX_RANGE:  // a range
 	isScalarRange = 1;
-	/* range start: */
+	// range start:
 	i = va_arg(ap, int32_t);
 	range_start(n) = i;
 	if (i < 0)
@@ -2230,7 +2230,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	embed(i, n);
 	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
-	/* range end: */
+	// range end:
 	i = va_arg(ap, int32_t);
 	range_end(n) = i;
 	if (i < 0)
@@ -2238,13 +2238,13 @@ int32_t newSymbol(Symbolclass kind, ...)
 	embed(i, n);
 	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
-	range_sum(n) = 0; /* default summation flag */
-	range_redirect(n) = -1; /* redirection flag */
+	range_sum(n) = 0; // default summation flag
+	range_redirect(n) = -1; // redirection flag
 	range_scalar(n) = (Symboltype) isScalarRange;
 	break;
       case LUX_PRE_RANGE:
 	isScalarRange = 1;
-	/* pre_range start: */
+	// pre_range start:
 	i = va_arg(ap, int32_t);
 	pre_range_start(n) = i;
 	if (i < 0)
@@ -2252,7 +2252,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	embed(i, n);
 	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
-	/* pre_range end: */
+	// pre_range end:
 	i = va_arg(ap, int32_t);
 	pre_range_end(n) = i;
 	if (i < 0)
@@ -2260,30 +2260,30 @@ int32_t newSymbol(Symbolclass kind, ...)
 	embed(i, n);
 	if (symbol_class(i) != LUX_SCALAR)
 	  isScalarRange = 0;
-	pre_range_sum(n) = 0; /* default summation flag */
-	pre_range_redirect(n) = -1; /* redirection flag */
+	pre_range_sum(n) = 0; // default summation flag
+	pre_range_redirect(n) = -1; // redirection flag
 	pre_range_scalar(n) = (Symboltype) isScalarRange;
 	break;
-      case LUX_LIST_PTR:		/* pointer to a struct element */
-	list_ptr_target(n) = va_arg(ap, int32_t); /* the struct */
-	if ((i = va_arg(ap, int32_t)) >= 0) { /* non-numerical key */
-	  list_ptr_tag_string(n) = (char*) symbolStack[i]; /* key */
+      case LUX_LIST_PTR:		// pointer to a struct element
+	list_ptr_target(n) = va_arg(ap, int32_t); // the struct
+	if ((i = va_arg(ap, int32_t)) >= 0) { // non-numerical key
+	  list_ptr_tag_string(n) = (char*) symbolStack[i]; // key
 	 list_ptr_tag_size(n) = strlen(symbolStack[i]) + 1;
-	 unlinkString(i);	/* unlink keyword from stack */
-       } else {			/* numerical key;  must be integer */
+	 unlinkString(i);	// unlink keyword from stack
+       } else {			// numerical key;  must be integer
 	 j = int_arg(-i);
 	 if (symbol_context(-i) == curContext
 	     && ((-i >= TEMP_EXE_START && -i < TEMP_EXE_END)
 		 || (-i >= EXE_START && -i < EXE_END)))
-	   /* a literal number */
+	   // a literal number
 	   zap(-i);
 	 list_ptr_target(n) = -list_ptr_target(n);
-				/* negative indicates numerical */
+				// negative indicates numerical
 	 list_ptr_tag_number(n) = j;
        }
 	break;
-      case LUX_LIST: case LUX_PRE_LIST: /* includes LISTs */
-	narg = stackListLength()/2; /* # of name-value pairs */
+      case LUX_LIST: case LUX_PRE_LIST: // includes LISTs
+	narg = stackListLength()/2; // # of name-value pairs
 	isStruct = 0;
 	arg = listStackItem - 2;
 	for (i = 0; i < narg; i++) {
@@ -2310,10 +2310,10 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    i = popList();
 	    p->key = (char*) ((i >= 0)? symbolStack[i]: NULL);
 	    if (i >= 0)
-	      unlinkString(i);	/* unlink from symbolStack */
+	      unlinkString(i);	// unlink from symbolStack
 	    p--;
 	  }
-	} else {		/* must be a list */
+	} else {		// must be a list
 	  symbol_class(n) = LUX_PRE_CLIST;
 	  if (narg) {
 	    if (!(arg = (int16_t *) malloc(narg*sizeof(int16_t)))) {
@@ -2331,9 +2331,9 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    popList();
 	  }
 	}
-	popList();				/* pop LUX_NEW_LIST */
+	popList();				// pop LUX_NEW_LIST
 	break;
-      case LUX_SUBSC_PTR:	/* subscript pointer */
+      case LUX_SUBSC_PTR:	// subscript pointer
 	if (!(symbol_data(n) = (int32_t *) malloc(4*sizeof(int32_t)))) {
 	  va_end(ap);
 	  printf("newSymbol: ");
@@ -2342,15 +2342,15 @@ int32_t newSymbol(Symbolclass kind, ...)
 	symbol_memory(n) = 4*sizeof(int32_t);
 	break;
       case LUX_POINTER:
-	transfer_is_parameter(n) = (Symboltype) 0; /* not a formal argument in a */
-					/* user-defined function or routine */
+	transfer_is_parameter(n) = (Symboltype) 0; // not a formal argument in a
+					// user-defined function or routine
 	narg = va_arg(ap, int32_t);
 	i = lookForSubr(narg);
 	if (i < 0)
 	  i = lookForFunc(narg);
 	if (i < 0)
 	  i = lookForBlock(narg);
-	if (i >= 0) {		/* found a routine */
+	if (i >= 0) {		// found a routine
 	  symbol_class(n) = LUX_FUNC_PTR;
 	  func_ptr_routine_num(n) = i;
 	  unlinkString(narg);
@@ -2362,7 +2362,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	  i = findInternalFunc(narg);
 	  kind = LUX_FUNCTION;
 	}
-	if (i >= 0) {		/* found an internal routine */
+	if (i >= 0) {		// found an internal routine
 	  symbol_class(n) = LUX_FUNC_PTR;
 	  func_ptr_routine_num(n) = -i;
           func_ptr_type(n) = (Symboltype) kind;
@@ -2371,7 +2371,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 	}
 	i = findVar(narg, curContext);
 	if (i < 0)
-	  return i;		/* some error */
+	  return i;		// some error
 	transfer_target(n) = i;
 	break;
       case LUX_KEYWORD:
@@ -2394,10 +2394,10 @@ int32_t newSymbol(Symbolclass kind, ...)
 	char ** key;
 
 	n = i = va_arg(ap, int32_t);
-	if (n >= 0) {		/* first pass: n = index of routine's name */
-				/* in symbolStack[] */
-	  switch (kind)	{	/* first see if the routine is already */
-				/* defined */
+	if (n >= 0) {		// first pass: n = index of routine's name
+				// in symbolStack[]
+	  switch (kind)	{	// first see if the routine is already
+				// defined
 	    case LUX_SUBROUTINE:
 	      n = lookForSubr(n);
 	      break;
@@ -2408,8 +2408,8 @@ int32_t newSymbol(Symbolclass kind, ...)
 	      n = lookForBlock(n);
 	      break;
 	  }
-	  if (n == -1)		/* the routine is not yet defined */
-	    switch (kind) {	/* so allocate a symbol for it */
+	  if (n == -1)		// the routine is not yet defined
+	    switch (kind) {	// so allocate a symbol for it
 	      case LUX_SUBROUTINE:
 		n = findSubr(i);
 		break;
@@ -2420,28 +2420,28 @@ int32_t newSymbol(Symbolclass kind, ...)
 		n = findBlock(i);
 		break;
 	    }
-	  else {		/* the routine is already known */
-	    if (!reportBody)	/* need to compile body */
-	      cleanUpRoutine(n, 1); /* get rid of old definition, */
-				     /* but keep routine symbol */
-	    freeString(i); 	/* deallocate symbolStack[i] */
+	  else {		// the routine is already known
+	    if (!reportBody)	// need to compile body
+	      cleanUpRoutine(n, 1); // get rid of old definition,
+				     // but keep routine symbol
+	    freeString(i); 	// deallocate symbolStack[i]
 	  }
-	  if (n == -1) {	/* couldn't get new symbol */
+	  if (n == -1) {	// couldn't get new symbol
 	    va_end(ap);
 	    reportBody = 0;
-	    return LUX_ERROR; 	/* pass on the error */
+	    return LUX_ERROR; 	// pass on the error
 	  }
 	  symbol_class(n) = kind;
 
-	  if (kind != LUX_BLOCKROUTINE) { /* has parameters */
-	    nArg = stackListLength();	/* # parameters */
-	    if (!reportBody) {	/* we're compiling the body */
-	      if (listStackItem[-1] == LUX_EXTEND) { /* extended parameter */
+	  if (kind != LUX_BLOCKROUTINE) { // has parameters
+	    nArg = stackListLength();	// # parameters
+	    if (!reportBody) {	// we're compiling the body
+	      if (listStackItem[-1] == LUX_EXTEND) { // extended parameter
 		routine_has_extended_param(n) = 1;
 		nArg--;
 	      } else
 		routine_has_extended_param(n) = 0;
-	      if (nArg > UINT8_MAX) { /* too many parameters */
+	      if (nArg > UINT8_MAX) { // too many parameters
 		va_end(ap);
 		reportBody = 0;
 		return luxerror("More than %1d parameters specified\n", n,
@@ -2451,73 +2451,73 @@ int32_t newSymbol(Symbolclass kind, ...)
 	      if (nArg
 		  && !(routine_parameters(n)
 		       = (int16_t *) malloc(nArg*sizeof(int16_t)))) {
-				/* could not allocate room for parameters */
+				// could not allocate room for parameters
 		va_end(ap);
 		reportBody = 0;
 		return luxerror("Routine-definition memory-allocation error", 0);
 	      }
-	    } else		/* deferred compilation */
+	    } else		// deferred compilation
 	      symbol_class(n) = (kind == LUX_SUBROUTINE)?
 		LUX_DEFERRED_SUBR: LUX_DEFERRED_FUNC;
-	  } else {		/* a block routine, which has no parametrs */
+	  } else {		// a block routine, which has no parametrs
 	    if (reportBody)
 	      symbol_class(n) = LUX_DEFERRED_BLOCK;
 	    routine_num_parameters(n) = nArg = 0;
 	    routine_has_extended_param(n) = 0;
 	  }
-	  if (!reportBody) {	/* compiling the body */
+	  if (!reportBody) {	// compiling the body
 	    if (nArg >= 1
-		&& routine_has_extended_param(n)) { /* extended arg */
+		&& routine_has_extended_param(n)) { // extended arg
 	      popList();
 	    }
 	    arg = routine_parameters(n) + nArg;
-	    /* now save parameters (start at back) */
+	    // now save parameters (start at back)
 	    if (kind != LUX_BLOCKROUTINE) {
 	      if (nArg &&
 		  !eallocate(routine_parameter_names(n), nArg, char *)) {
-		/* could not allocate memory to store the parameter names */
+		// could not allocate memory to store the parameter names
 		va_end(ap);
 		return luxerror("Memory allocation error", 0);
 	      }
 	      key = routine_parameter_names(n) + nArg;
 	      while (nArg--) {
-		*--arg = findVar(popList(), n); /* parameter's symbol # */
-		*--key = (char*) varName(*arg); /* parameter's name */
+		*--arg = findVar(popList(), n); // parameter's symbol #
+		*--key = (char*) varName(*arg); // parameter's name
 		symbol_class(*arg) = LUX_POINTER;
 		transfer_target(*arg) = 0;
 		transfer_temp_param(*arg) = 0;
 		transfer_is_parameter(*arg) = (Symboltype) 1;
 	      }
-	      popList(); 		/* remove list start marker */
+	      popList(); 		// remove list start marker
 	    }
-	    routine_num_statements(n) = curContext; /* temporarily store */
-						     /* current context */
-	     /* variables in SUBRs and FUNCs are local to that particular */
-	     /* SUBR or FUNC, whereas variables in BLOCKs are local to the */
-	     /* embedding SUBR or FUNC or main level. */
+	    routine_num_statements(n) = curContext; // temporarily store
+						     // current context
+	     // variables in SUBRs and FUNCs are local to that particular
+	     // SUBR or FUNC, whereas variables in BLOCKs are local to the
+	     // embedding SUBR or FUNC or main level.
 	    if (kind != LUX_BLOCKROUTINE)
 	      curContext = n;	/* make current function or subroutine
 				   the current context */
-	  } else {		/* not compiling the body */
+	  } else {		// not compiling the body
 	    if (kind != LUX_BLOCKROUTINE) {
-	      while (nArg--) {	/* discard the parameters */
+	      while (nArg--) {	// discard the parameters
 		i = popList();
 		freeString(i);
 	      }
 	      popList();
 	    }
-	    /* save the name of the file in which the definition of */
-	    /* this routine can be found if necessary */
+	    // save the name of the file in which the definition of
+	    // this routine can be found if necessary
 	    deferred_routine_filename(n) = strsave(currentInputFile);
 	  }
-	  keepEVB++;		/* executables must be preserved */
+	  keepEVB++;		// executables must be preserved
 	  if (reportBody)
-	    ignoreSymbols = 1;	/* ignore symbols during compilation of */
-				/* the routine */
+	    ignoreSymbols = 1;	// ignore symbols during compilation of
+				// the routine
 	  return n;
-	} else {		/* second pass */
-	  n = i = -n - 1;	/* routine # */
-	  oldContext = routine_num_statements(n); /* save for later */
+	} else {		// second pass
+	  n = i = -n - 1;	// routine #
+	  oldContext = routine_num_statements(n); // save for later
 	  nStatement = stackListLength();
 	  if (nStatement < 0)
 	    nStatement = 0;
@@ -2533,57 +2533,57 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    ignoreSymbols = 0;
 	    return luxerror("No statements in user routine or function", 0);
 	  }
-	  if (kind == LUX_BLOCKROUTINE) { /* allocate space for the */
-	    /* statements (since there are no parameters, this is at */
-	    /* the beginning of the combined parameters+statements list) */
+	  if (kind == LUX_BLOCKROUTINE) { // allocate space for the
+	    // statements (since there are no parameters, this is at
+	    // the beginning of the combined parameters+statements list)
 	    if (nStatement &&
 		!(routine_parameters(n) =
 		  (int16_t *) malloc(nStatement*sizeof(int16_t)))) {
 	      va_end(ap); 
-	      curContext = oldContext;	/* restore context */
+	      curContext = oldContext;	// restore context
 	      ignoreSymbols = 0;
 	      return
 		luxerror("Allocation error in 2nd pass of routine definition",
 		      0);
 	    }
-	    nArg = 0;		/* no parameters to a block routine */
-	  } else {			/* subroutine or function */
+	    nArg = 0;		// no parameters to a block routine
+	  } else {			// subroutine or function
 	    nArg = routine_num_parameters(n);
-	    if (nArg)		/* reallocate memory for combined */
-				/* parameters+statements list */
+	    if (nArg)		// reallocate memory for combined
+				// parameters+statements list
 	      routine_parameters(n) =
 		(int16_t *) realloc(routine_parameters(n),
 				 (nArg + nStatement)*sizeof(int16_t));
-	    else		/* no parameters, just allocate space for */
-				/* statements */
+	    else		// no parameters, just allocate space for
+				// statements
 	      routine_parameters(n) =
 		(int16_t *) malloc(nStatement*sizeof(int16_t));
-	    if (!routine_parameters(n)) { /* allocation failed */
+	    if (!routine_parameters(n)) { // allocation failed
 	      va_end(ap);
-	      curContext = oldContext;	/* restore context */
+	      curContext = oldContext;	// restore context
 	      ignoreSymbols = 0;
 	      return
 		luxerror("Allocation error in 2nd pass of routine definition",
 		      0);
 	    }
 	  }
-	  arg = routine_parameters(n) + nStatement + nArg; /* end of list */
+	  arg = routine_parameters(n) + nStatement + nArg; // end of list
 	  if (nStatement) {
-	    while (nStatement--) { /* store statements, starting at end */
+	    while (nStatement--) { // store statements, starting at end
 	      *--arg = popList();
-	      embed(*arg, n);	/* give the statement and all enclosed */
+	      embed(*arg, n);	// give the statement and all enclosed
 	    }
-	    /* symbols the context of the routine: this makes the */
-	    /* statement local to the routine */
-	    popList();		/* remove beginning-of-list marker */
+	    // symbols the context of the routine: this makes the
+	    // statement local to the routine
+	    popList();		// remove beginning-of-list marker
 	  }
-	  curContext = oldContext; /* restore context now definition is */
-				    /* done */
-	  ignoreSymbols = 0;	/* no longer ignore symbols - if we were */
-				/* doing that */
-	  keepEVB--;		/* executables are again more temporary */
-	  symbol_context(n) = 0; /* routines always have context 0 */
-	  usr_routine_recursion(n) = (Symboltype) 0; /* no recursion yet */
+	  curContext = oldContext; // restore context now definition is
+				    // done
+	  ignoreSymbols = 0;	// no longer ignore symbols - if we were
+				// doing that
+	  keepEVB--;		// executables are again more temporary
+	  symbol_context(n) = 0; // routines always have context 0
+	  usr_routine_recursion(n) = (Symboltype) 0; // no recursion yet
 	  return 0;
 	}
       }
@@ -2592,7 +2592,7 @@ int32_t newSymbol(Symbolclass kind, ...)
           kind = (Symbolclass) va_arg(ap, int);
 	  symbol_type(n) = (Symboltype) kind;
 	}
-	i = 0;			/* default: no more items to retrieve */
+	i = 0;			// default: no more items to retrieve
 	switch (kind) {
 	  case EVB_RETURN:
 	    i = 1;
@@ -2608,41 +2608,41 @@ int32_t newSymbol(Symbolclass kind, ...)
 	    i = 4; 
 	    break;
 	  case EVB_USR_CODE:
-	    usr_code_routine_num(n) = va_arg(ap, int32_t); /* routine number */
+	    usr_code_routine_num(n) = va_arg(ap, int32_t); // routine number
 	    break;
 	  case EVB_FILE:
-	    i = va_arg(ap, int32_t);	/* index to string */
+	    i = va_arg(ap, int32_t);	// index to string
 	    file_name(n) = (char*) symbolStack[i];
 	    symbol_memory(n) = strlen(symbolStack[i]) + 1;
 	    unlinkString(i);
 	    i = va_arg(ap, int32_t);	/* include type: INCLUDE -> always,
 					   REPORT -> only if necessary */
 	    file_include_type(n) = i;
-	    i = 0;		/* no more items to retrieve */
+	    i = 0;		// no more items to retrieve
 	    break;
 	  case EVB_INT_SUB: case EVB_USR_SUB: case EVB_INSERT:
 	  case LUX_INT_FUNC: case LUX_USR_FUNC:
-	    sym[n].xx = va_arg(ap, int32_t); /* routine number (SUB) or target */
+	    sym[n].xx = va_arg(ap, int32_t); // routine number (SUB) or target
 	  case EVB_CASE: case EVB_NCASE: case EVB_BLOCK: 
-	    i = stackListLength();		/* # of expr and statements */
-	    if (i) {			/* only if there are any elements */
+	    i = stackListLength();		// # of expr and statements
+	    if (i) {			// only if there are any elements
 	      if (!(arg = (int16_t *) malloc(i*sizeof(int16_t)))) {
 		va_end(ap);
 		return luxerror("Could not allocate memory for stacked elements",
 			     0);
 	      }
-	      symbol_data(n) = arg; /* the elements */
-	      symbol_memory(n) = i*sizeof(int16_t);	/* the memory size */
-	      arg += i;	/* start with the last element (which is */
-	      /* on top of the stack) */
-	      while (i--) {	/* all elements */
-		*--arg = popList(); /* pop element from stack */
-		embed(*arg, n);  /* context is enclosing statement */
+	      symbol_data(n) = arg; // the elements
+	      symbol_memory(n) = i*sizeof(int16_t);	// the memory size
+	      arg += i;	// start with the last element (which is
+	      // on top of the stack)
+	      while (i--) {	// all elements
+		*--arg = popList(); // pop element from stack
+		embed(*arg, n);  // context is enclosing statement
 	      }
 	    } else
-	      symbol_memory(n) = 0; /* no args */
-	    popList();		/* pop LUX_NEW_LIST marker */
-	    i = 0;		/* no more items to retrieve */
+	      symbol_memory(n) = 0; // no args
+	    popList();		// pop LUX_NEW_LIST marker
+	    i = 0;		// no more items to retrieve
 	    break;
 	}
 	if (i > 0) {
@@ -2666,24 +2666,24 @@ int32_t newSymbol(Symbolclass kind, ...)
 	embed(bin_op_rhs(n), n);
 	break;
     }
-  } else {			/* reportBody & in definition */
+  } else {			// reportBody & in definition
     switch (kind) {
       case LUX_FIXED_STRING:
-	i = va_arg(ap, int32_t);	/* index to symbolStack */
+	i = va_arg(ap, int32_t);	// index to symbolStack
 	freeString(i);
 	break;
       case LUX_LIST_PTR:
-	i = va_arg(ap, int32_t);	/* struct number */
-	i = va_arg(ap, int32_t);	/* key */
-	if (i >= 0)		/* non-numerical key */
+	i = va_arg(ap, int32_t);	// struct number
+	i = va_arg(ap, int32_t);	// key
+	if (i >= 0)		// non-numerical key
 	  freeString(i); 
 	break;
       case LUX_LIST:  case LUX_PRE_LIST:
 	narg = stackListLength()/2;
 	while (narg--) {
-	  popList();		/* value */
-	  i = popList();	/* key */
-	  if (i >= 0)		/* string key */
+	  popList();		// value
+	  i = popList();	// key
+	  if (i >= 0)		// string key
 	    freeString(i);
 	}
 	break;
@@ -2692,24 +2692,24 @@ int32_t newSymbol(Symbolclass kind, ...)
 	freeString(i);
 	break;
       case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
-	/* when we get here, a symbol has already been reserved for the */
-	/* routine, and the parameters have been ignored.  we only need to */
-	/* get rid of the routine body. */
+	// when we get here, a symbol has already been reserved for the
+	// routine, and the parameters have been ignored.  we only need to
+	// get rid of the routine body.
 	n = va_arg(ap, int32_t);
-	n = -n - 1;		/* routine # */
-	routine_num_statements(n) = 0; /* no statements */
+	n = -n - 1;		// routine #
+	routine_num_statements(n) = 0; // no statements
 	i = stackListLength();
 	while (i--)
 	  popList();
 	popList();
-	/*       inDefinition = 0; */
+	//       inDefinition = 0;
 	keepEVB--;
-	ignoreSymbols = 0;	/* no longer ignore symbols, if we were */
-				/* doing that. */
+	ignoreSymbols = 0;	// no longer ignore symbols, if we were
+				// doing that.
 	return 0;
       case LUX_EXTRACT:
 	target = popList();
-	if (target > 0) {	/* regular symbol */
+	if (target > 0) {	// regular symbol
 	  depth = popList();
 	} else {
 	  /* i = -target;
@@ -2726,7 +2726,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 					      one */
 	  while (i--)
 	    popList();
-	  popList();		/* remove the LUX_NEW_LIST */
+	  popList();		// remove the LUX_NEW_LIST
 	}
 	break;
       case LUX_EVB: case LUX_INT_FUNC: case LUX_USR_FUNC:
@@ -2758,7 +2758,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 #endif
   return n;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t hash(char const* string)
 {
  int32_t	i;
@@ -2766,7 +2766,7 @@ int32_t hash(char const* string)
  for (i = 0; *string; ) i += *string++;
  return i % HASHSIZE;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t ircmp(const void *a, const void *b)
 {
   internalRoutine *ra, *rb;
@@ -2775,7 +2775,7 @@ int32_t ircmp(const void *a, const void *b)
   rb = (internalRoutine *) b;
   return strcmp(ra->name, rb->name);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t findInternalName(char const* name, int32_t isSubroutine)
 /* searches for name in the appropriate subroutine
   or function table.  if found, returns
@@ -2795,7 +2795,7 @@ int32_t findInternalName(char const* name, int32_t isSubroutine)
   found = (internalRoutine*) bsearch(&key, table, n, sizeof(*table), ircmp);
   return found? found - table: -1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 static compileInfo	*c_info = NULL;
 int32_t	cur_c_info = 0, n_c_info = 0;
 compileInfo	*curCompileInfo;
@@ -2816,12 +2816,12 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
  void	pegParse(void), removeParseMarker(void), releaseCompileInfo(void);
 
  curCompileInfo = nextFreeCompileInfo();
- curCompileInfo->line = strsave(currentChar); /* save rest of line */
+ curCompileInfo->line = strsave(currentChar); // save rest of line
  curCompileInfo->charfunc = getChar;
  curCompileInfo->name = currentInputFile? strsave(currentInputFile): NULL;
 
  if (fp) {
-   name = fileName;		/* was strsave(fileName) */
+   name = fileName;		// was strsave(fileName)
    getChar = getStreamChar;
  } else {
    name = "(string)";
@@ -2831,10 +2831,10 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
  compileLevel++;
  oldZapContext = zapContext;
  zapContext = -compileLevel;
- *currentChar = '\0';		/* abort compilation of this line */
- curCompileInfo->stream = inputStream; /* save stream */
- inputStream = fp;		/* new input stream */
- inHistoryBuffer = 0;		/* don't save new stuff in history buffer */
+ *currentChar = '\0';		// abort compilation of this line
+ curCompileInfo->stream = inputStream; // save stream
+ inputStream = fp;		// new input stream
+ inHistoryBuffer = 0;		// don't save new stuff in history buffer
  currentInputFile = fileName;
  curCompileInfo->line_number = curLineNumber;
  curLineNumber = 0;
@@ -2845,9 +2845,9 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
    else
      printf("Compiling string \"%s\"\n", inputString);
  }
- disableNewline++;		/* ignore newlines during parsing */
- n = yyparse();			/* parse ; return 0 -> OK, 1 -> error */
-	/* now restore state before this interruption */
+ disableNewline++;		// ignore newlines during parsing
+ n = yyparse();			// parse ; return 0 -> OK, 1 -> error
+	// now restore state before this interruption
  disableNewline--;
  if (echo || traceMode & T_ROUTINEIO) {
    if (fp)
@@ -2869,7 +2869,7 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
  free(curCompileInfo->line);
  releaseCompileInfo();
  currentChar = tLine;
- *line = '\n';			/* must not be \0 or user input is asked for */
+ *line = '\n';			// must not be \0 or user input is asked for
  if (!compileLevel)
    inHistoryBuffer = 1;
  n = n? -1: 1;
@@ -2883,11 +2883,11 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
    free(name); */
  return n;
 } 
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 static int32_t	compileCount = 0;
 int32_t compile(char *string)
-/* compiles string <string> and store in BLOCKROUTINE.  Returns */
-/* but does not execute the block routine.  LS 5feb96 */
+// compiles string <string> and store in BLOCKROUTINE.  Returns
+// but does not execute the block routine.  LS 5feb96
 {
   int32_t	oldContext, n, getStringChar(void), getStreamChar(void), nsym, result;
   extern char	*inputString, compileOnly;
@@ -2909,7 +2909,7 @@ int32_t compile(char *string)
   curContext = nsym;
   n = nextCompileLevel(NULL, NULL);
   if (n < 0
-      || newSymbol(LUX_BLOCKROUTINE, -nsym - 1) < 0) { /* some error */
+      || newSymbol(LUX_BLOCKROUTINE, -nsym - 1) < 0) { // some error
     zap(nsym);
     return n;
   } else {
@@ -2924,7 +2924,7 @@ int32_t compile(char *string)
   getChar = getStreamChar;
   return result;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 #if DEVELOP
 int32_t lux_compile(int32_t narg, int32_t ps[])
 {
@@ -2941,7 +2941,7 @@ int32_t lux_compile(int32_t narg, int32_t ps[])
   return result;
 }
 #endif
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t newBlockSymbol(int32_t index)
 /* searches for user block symbolStack[index] in list of user-defined
   block routines.  treats function pointers */
@@ -2949,13 +2949,13 @@ int32_t newBlockSymbol(int32_t index)
   int32_t	n, result;
   extern char	reportBody;
   
-  if (reportBody) {		/* remove name from stack */
+  if (reportBody) {		// remove name from stack
     freeString(index);
     return 0;
   }
-  if ((n = lookForVar(index, curContext)) >= 0) { /* blockroutine pointer? */
+  if ((n = lookForVar(index, curContext)) >= 0) { // blockroutine pointer?
     if (symbol_class(n) == LUX_FUNC_PTR) {
-      if (func_ptr_routine_num(n) > 0) { /* user-defined */
+      if (func_ptr_routine_num(n) > 0) { // user-defined
 	if (symbol_class(n = func_ptr_routine_num(n)) == LUX_BLOCKROUTINE) {
 	  freeString(index);
 	  return newSymbol(LUX_EVB, EVB_USR_CODE, n);
@@ -2965,7 +2965,7 @@ int32_t newBlockSymbol(int32_t index)
     }
   }
   n = lookForBlock(index);
-  if (n < 0) {			/* block not yet defined */
+  if (n < 0) {			// block not yet defined
     n = nextFreeTempVariable();
     if (n < 0)
       return LUX_ERROR;
@@ -2981,7 +2981,7 @@ int32_t newBlockSymbol(int32_t index)
   }
   return result;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t newSubrSymbol(int32_t index)
 /* searches for subroutine symbolStack[index] in lists of internal
   and user-defined subroutines.  if not found, then searches for an
@@ -2995,49 +2995,49 @@ int32_t newSubrSymbol(int32_t index)
  extern char	reportBody;
  extern int32_t	findBody;
 
- /* In order, look for: */
- /* 1. function pointer to some user-defined or internal subroutine */
- /* 2. user-defined subroutine */
- /* 3. internal subroutine */
- /* 4. user-defined function */
+ // In order, look for:
+ // 1. function pointer to some user-defined or internal subroutine
+ // 2. user-defined subroutine
+ // 3. internal subroutine
+ // 4. user-defined function
 
- if (ignoreInput && findBody > 0) { /* not compiling this */
-   freeString(index);		/* remove name from stack */
-   /* take care of deleting arguments: */
+ if (ignoreInput && findBody > 0) { // not compiling this
+   freeString(index);		// remove name from stack
+   // take care of deleting arguments:
    return newSymbol(LUX_EVB, EVB_INT_SUB, 0);
  }
  if (findBody < 0)		/* we're at the end of the definition
 				   of a deferred routine */
    findBody = -findBody;
- n = lookForVar(index, curContext); /* look for variable */
- if (n >= 0 && symbol_class(n) == LUX_FUNC_PTR) { /* maybe subr pointer */
-   freeString(index);		/* remove name from stacke */
-   if (func_ptr_routine_num(n) < 0) {	/* internal routine/function */
+ n = lookForVar(index, curContext); // look for variable
+ if (n >= 0 && symbol_class(n) == LUX_FUNC_PTR) { // maybe subr pointer
+   freeString(index);		// remove name from stacke
+   if (func_ptr_routine_num(n) < 0) {	// internal routine/function
      if ((Symbolclass) func_ptr_type(n) == LUX_SUBROUTINE)
        return newSymbol(LUX_EVB, EVB_INT_SUB, -sym[n].spec.evb.args[0]);
    } else {
-     n = func_ptr_routine_num(n); /* user-defined routine */
+     n = func_ptr_routine_num(n); // user-defined routine
      return newSymbol(LUX_EVB, EVB_USR_SUB, n);
    }
  }
- /* no subroutine pointer */
- n = lookForSubr(index);	/* already defined user-defined routine? */
- if (n < 0) {			/* none found */
-   if ((n = findInternalSym(index, 1)) >= 0) { /* internal routine */
+ // no subroutine pointer
+ n = lookForSubr(index);	// already defined user-defined routine?
+ if (n < 0) {			// none found
+   if ((n = findInternalSym(index, 1)) >= 0) { // internal routine
      freeString(index);
      return newSymbol(LUX_EVB, EVB_INT_SUB, n);
-   } else {			/* no internal: assume user-defined */
+   } else {			// no internal: assume user-defined
      n = newSymbol(LUX_FIXED_STRING, index);
      i = newSymbol(LUX_EVB, EVB_USR_SUB, n);
      symbol_context(n) = i;
      return i;
    }
  }
-				/* user-defined routine */
+				// user-defined routine
  freeString(index);
  return newSymbol(LUX_EVB, EVB_USR_SUB, n);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lookForName(char const* name, hashTableEntry *hashTable[], int32_t context)
      /* searches name in hashTable[] for context.  if found,
 	returns symbol number, otherwise returns -1 */
@@ -3052,10 +3052,10 @@ int32_t lookForName(char const* name, hashTableEntry *hashTable[], int32_t conte
   { if (!strcmp(hp->name, name) && sym[hp->symNum].context == context)
       return hp->symNum;
     hp = hp->next; }
-  /* to distinguish between functions and subroutines with the same */
-  /* name (e.g. when creating a pointer to a function or subroutine), */
-  /* function names may be specified with an _F extension.  check if */
-  /* we're dealing with such a case here */
+  // to distinguish between functions and subroutines with the same
+  // name (e.g. when creating a pointer to a function or subroutine),
+  // function names may be specified with an _F extension.  check if
+  // we're dealing with such a case here
   if (hashTable == funcHashTable)
   { n = strlen(name);
     if (n > 2 && name[n - 2] == '_' && name[n - 1] == 'F')
@@ -3069,7 +3069,7 @@ int32_t lookForName(char const* name, hashTableEntry *hashTable[], int32_t conte
   }
   return -1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t findSym(int32_t index, hashTableEntry *hashTable[], int32_t context)
 /* searches symbolStack[index] in hashTable[] for context.  if found,
    returns symbol number, otherwise installs the name in hashTable[]
@@ -3088,9 +3088,9 @@ int32_t findSym(int32_t index, hashTableEntry *hashTable[], int32_t context)
  freeString(index);
  return n;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 char const* symName(int32_t symNum, hashTableEntry *hashTable[])
-/* returns the name of the symbol, if any, or "[symNum]" */
+// returns the name of the symbol, if any, or "[symNum]"
 {
  static char	name[7];
  int32_t		hashValue;
@@ -3110,9 +3110,9 @@ char const* symName(int32_t symNum, hashTableEntry *hashTable[])
  sprintf(name, "[%1d]", symNum);
  return name;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 char const* symbolName(int32_t symbol)
-/* returns the name of the symbol. */
+// returns the name of the symbol.
 {
   hashTableEntry	**hashTable;
 
@@ -3136,25 +3136,25 @@ char const* symbolName(int32_t symbol)
   }
   return symName(symbol, hashTable);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t suppressEvalRoutine(int32_t index)
-/* returns evaluation suppression associated with internal routine */
-/* symbolStack[index] */
+// returns evaluation suppression associated with internal routine
+// symbolStack[index]
 {
   int32_t	n;
   keyList	*keys;
 
-  n = findInternalSym(index, 1); /* >= 0 -> internal subroutine */
+  n = findInternalSym(index, 1); // >= 0 -> internal subroutine
   if (n < 0) return 0;
   keys = (keyList *) subroutine[n].keys;
   return keys->suppressEval;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 #define	IGNORE_SIG	1
 #define ASK_SIG		2
 #define SIG_BREAK	3
 void exception(int32_t sig)
-/* exception handler */
+// exception handler
 {
  int32_t	c, saveHistory(void);
  extern int32_t	curSymbol, executeLevel, step, statementDepth;
@@ -3199,7 +3199,7 @@ void exception(int32_t sig)
 	   c = IGNORE_SIG;
 	   break;
 	 case 'a': case 'A':
-	   Quit(1);		/* exit LUX completely */
+	   Quit(1);		// exit LUX completely
 	 case 'r': case 'R':
 	   saveHistory();
 	   lux_restart(0, NULL);
@@ -3241,9 +3241,9 @@ void exception(int32_t sig)
  }
  return;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 char const* typeName(int32_t type)
-/* returns the name that goes with the data type */
+// returns the name that goes with the data type
 {
   static char const* typeNames[] = {
     "BYTE", "WORD", "LONG", "INT64", "FLOAT", "DOUBLE",
@@ -3253,16 +3253,16 @@ char const* typeName(int32_t type)
   int32_t	index;
 
   if (type == LUX_UNDEFINED)
-    index = 10;			/* undefined */
+    index = 10;			// undefined
   else if (type < 0 || type > LUX_CDOUBLE)
-    index = sizeof(typeNames)/sizeof(*typeNames) - 1; /* unknown */
+    index = sizeof(typeNames)/sizeof(*typeNames) - 1; // unknown
   else
-    index = type;		/* OK */
+    index = type;		// OK
   return typeNames[index];
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 char const* className(int32_t class_id)
-/* returns the name of the class */
+// returns the name of the class
 {
   static struct classInfo {
     uint8_t number; char const* name;
@@ -3332,9 +3332,9 @@ char const* className(int32_t class_id)
  }
  return classes[hash].name;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_classname(int32_t narg, int32_t ps[])
-     /* returns name associated with class number */
+     // returns name associated with class number
 {
   int32_t	class_id, result;
   char	*name;
@@ -3347,9 +3347,9 @@ int32_t lux_classname(int32_t narg, int32_t ps[])
   symbol_memory(result) = strlen(name) + 1;
   return result;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_typeName(int32_t narg, int32_t ps[])
-     /* returns name associated with type number */
+     // returns name associated with type number
 {
   int32_t	type, result;
   char	*name;
@@ -3362,9 +3362,9 @@ int32_t lux_typeName(int32_t narg, int32_t ps[])
   symbol_memory(result) = strlen(name) + 1;
   return result;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 char const* evbName(int32_t evbType)
-     /* returns the name of an EVB type */
+     // returns the name of an EVB type
 {
   static char const* evbTypeNames[] = {
     "statement group", "replacement", "internal suboutine call",
@@ -3380,9 +3380,9 @@ char const* evbName(int32_t evbType)
 
   return evbTypeNames[evbType - 1];
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 char const* filetypeName(int32_t filetype)
-/* returns the name associated with a file type */
+// returns the name associated with a file type
 {
   static char const* filetypeNames[] = {
     "Unknown", "LUX fz", "IDL Save", "GIF", "LUX Astore", "JPEG", "TIFF",
@@ -3394,7 +3394,7 @@ char const* filetypeName(int32_t filetype)
     filetype = 0;
   return filetypeNames[filetype];
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_filetype_name(int32_t narg, int32_t ps[])
 {
   char const* name;
@@ -3405,9 +3405,9 @@ int32_t lux_filetype_name(int32_t narg, int32_t ps[])
   strcpy(string_value(result), name);
   return result;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void fixedValue(char const* name, Symboltype type, ...)
-/* install a numerical constant */
+// install a numerical constant
 {
  int32_t	n, iq;
  Pointer	p;
@@ -3463,10 +3463,10 @@ void fixedValue(char const* name, Symboltype type, ...)
    break;
  }
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t installSysFunc(char const* name, int32_t number)
-/* install a system function.  These are implemented as FUNC_PTRs to */
-/* the appropriate function */
+// install a system function.  These are implemented as FUNC_PTRs to
+// the appropriate function
 {
  int32_t	n, iq;
 
@@ -3477,9 +3477,9 @@ int32_t installSysFunc(char const* name, int32_t number)
  func_ptr_type(n) = (Symboltype) LUX_FUNCTION;
  return n;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t installPointer(char const* name, Symboltype type, void *ptr)
-/* install a LUX_SCAL_PTR system variable */
+// install a LUX_SCAL_PTR system variable
 {
  int32_t	n, iq;
 
@@ -3492,47 +3492,47 @@ int32_t installPointer(char const* name, Symboltype type, void *ptr)
    symbol_memory(n) = strlen((char*) ptr) + 1;
  return n;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t convertRange(int32_t range)
-/* convert a LUX_RANGE symbol to a LUX_SUBSC_PTR symbol. */
-/* elements:  #1:  range start */
-/*            #2:  range end */
-/*            #3:  summation flag (0 or 1) */
-/*            #4:  redirection flag (symbol, MINUSONE if none) */
-/*            for #1 and #2, if the symbol is > 0, then count from the */
-/*            start of the list/array; otherwise from one beyond the last */
-/*            element of the list/array.  if #2 == LUX_ZERO, then only one */
-/*            element is requested. */
+// convert a LUX_RANGE symbol to a LUX_SUBSC_PTR symbol.
+// elements:  #1:  range start
+//            #2:  range end
+//            #3:  summation flag (0 or 1)
+//            #4:  redirection flag (symbol, MINUSONE if none)
+//            for #1 and #2, if the symbol is > 0, then count from the
+//            start of the list/array; otherwise from one beyond the last
+//            element of the list/array.  if #2 == LUX_ZERO, then only one
+//            element is requested.
 {
   int32_t	subsc, eval(int32_t), j1, j2;
   
   if ((subsc = newSymbol(LUX_SUBSC_PTR)) < 0) return -1;
   j1 = range_start(range);
-  if (j1 == -LUX_ONE)		/* (*) */
+  if (j1 == -LUX_ONE)		// (*)
   { subsc_ptr_start(subsc) = 0;
     subsc_ptr_end(subsc) = -1; }
   else 
-  { if (j1 >= 0)		/* (X:...) */
+  { if (j1 >= 0)		// (X:...)
     { j2 = int_arg(eval(j1));
       if (j2 < 0)
 	return luxerror("Illegal range start", range_start(range)); }
-    else			/* (*-X:...) */
+    else			// (*-X:...)
     { j2 = -int_arg(eval(-j1));
       if (-j2 <= 0)
 	return luxerror("Illegal range start", range_start(range)); }
     subsc_ptr_start(subsc) = j2;
 
     j1 = range_end(range);
-    if (j1 == LUX_ZERO)		/* (X) */
+    if (j1 == LUX_ZERO)		// (X)
       subsc_ptr_end(subsc) = subsc_ptr_start(subsc);
-    else if (j1 == -LUX_ONE)	/* (...:*) */
+    else if (j1 == -LUX_ONE)	// (...:*)
       subsc_ptr_end(subsc) = -1;
     else
-    { if (j1 >= 0)		/* (...:Y) */
+    { if (j1 >= 0)		// (...:Y)
       { j2 = int_arg(eval(j1));
 	if (j2 < 0)
 	  return luxerror("Illegal range end", range_end(range)); }
-      else			/* (...:*-Y) */
+      else			// (...:*-Y)
       { j2 = -int_arg(eval(-j1));
 	if (-j2 <= 0)
 	  return luxerror("Illegal range end", range_end(range)); }
@@ -3554,9 +3554,9 @@ int32_t convertRange(int32_t range)
   { return luxerror("Illegal range redirection", range_redirect(range)); }
   return subsc;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
-/* converts value in target from inType to outType */
+// converts value in target from inType to outType
 {
   switch (outType) {
   case LUX_INT8:
@@ -3675,9 +3675,9 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
     break;
   }
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
-/* converts value in <target> from <inType> to <outType> */
+// converts value in <target> from <inType> to <outType>
 {
   switch (inType) {
   case LUX_INT8:
@@ -3914,9 +3914,9 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
     break;
   }
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
-/* returns scalar value of nsym, converted to proper type, in target */
+// returns scalar value of nsym, converted to proper type, in target
 {
  int32_t		n;
  Pointer	ptr;
@@ -4058,11 +4058,11 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
    break;
  }
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_symbol_memory(int32_t narg, int32_t ps[])
-/* returns the total of the memory allocated for each LUX symbol */
-/* - which is NOT the same as the total allocated memory. */
-/* Note:  some small stuff is not included. */
+// returns the total of the memory allocated for each LUX symbol
+// - which is NOT the same as the total allocated memory.
+// Note:  some small stuff is not included.
 {
  int32_t	i, mem = 0;
 
@@ -4092,9 +4092,9 @@ int32_t lux_symbol_memory(int32_t narg, int32_t ps[])
  scalar_value(i).l = mem;
  return i;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_trace(int32_t narg, int32_t ps[])
-/* activates/deactivates trace facility */
+// activates/deactivates trace facility
 {
   extern float	CPUtime;
 
@@ -4104,8 +4104,8 @@ int32_t lux_trace(int32_t narg, int32_t ps[])
     trace = 999;
   traceMode = internalMode;
   if (!traceMode)
-    traceMode = trace? 143: 0;	/* 128 + 8 + 4 + 2 + 1 */
-				/* /ENTER, /ROUTINE, /BRACES, /LOOP, /FILE */
+    traceMode = trace? 143: 0;	// 128 + 8 + 4 + 2 + 1
+				// /ENTER, /ROUTINE, /BRACES, /LOOP, /FILE
   if (trace < 0) {
     trace = 0;
     return luxerror("Negative Trace Level", ps[0]);
@@ -4137,7 +4137,7 @@ int32_t lux_trace(int32_t narg, int32_t ps[])
     puts("No tracing");
   return 1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 #define b_fix(name, value) { fixedValue(name, LUX_INT8, value);  nFixed++; }
 #define l_fix(name, value) { fixedValue(name, LUX_INT32, value);  nFixed++; }
 #define q_fix(name, value) { fixedValue(name, LUX_INT64, value);  nFixed++; }
@@ -4210,7 +4210,7 @@ extern double	last_time, zoom_clo, zoom_chi;
 extern int32_t	motif_flag;
 #endif
 
-char	*firstbreak;		/* for memck.c */
+char	*firstbreak;		// for memck.c
 
 enumElem	classesStruct[] = {
   { "SCALAR", LUX_SCALAR },
@@ -4248,7 +4248,7 @@ enumElem	typesStruct[] = {
   { "undefined", LUX_UNDEFINED }
 };
 
-enumElem	eventStruct[] =	{ /* see lux_register_event in menu.c */
+enumElem	eventStruct[] =	{ // see lux_register_event in menu.c
   { "KEYPRESS", 1 },
   { "BUTTONPRESS", 4 },
   { "BUTTONRELEASE", 8 },
@@ -4311,11 +4311,11 @@ void symbolInitialization(void)
   *curScrat, *printString;
  union { uint8_t b[2]; int16_t w; } whichendian;
 
- /* determine if the machine is little-endian or bigendian */
+ // determine if the machine is little-endian or bigendian
  whichendian.w = 1;
- MSBfirst = (int32_t) whichendian.b[1]; /* most significant Byte first? */
+ MSBfirst = (int32_t) whichendian.b[1]; // most significant Byte first?
 
- firstbreak = (char*) sbrk(0);		/* for memck.c */
+ firstbreak = (char*) sbrk(0);		// for memck.c
  curTEIndex = tempExecutableIndex;
  if (signal(SIGFPE, exception) == SIG_ERR
      || signal(SIGINT, exception) == SIG_ERR
@@ -4376,7 +4376,7 @@ void symbolInitialization(void)
  l_fix("#0", 		0);
  f_fix("#infty",	INFTY);
  f_fix("#nan",          acos(2));
- cf_fix("#i",		0.0, 1.0); /* imaginary unit */
+ cf_fix("#i",		0.0, 1.0); // imaginary unit
  l_fix("#max_args",	MAX_ARG);
  l_fix("#max_byte",	bounds.max.b);
  l_fix("#max_word",	bounds.max.w);
@@ -4415,7 +4415,7 @@ void symbolInitialization(void)
  d_fix("#d.r",		DEG);
 
  iq = installString("#class");
- stackSym = findVar(iq, 0);	/* stackSym is a dummy variable */
+ stackSym = findVar(iq, 0);	// stackSym is a dummy variable
  symbol_class(stackSym) = LUX_ENUM;
  enum_type(stackSym) = LUX_INT32;
  enum_list(stackSym) = classesStruct;
@@ -4474,15 +4474,15 @@ void symbolInitialization(void)
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_CLIST;
  clist_symbols(stackSym) = stackPointer;
- symbol_memory(stackSym) = 0;	/* or it will get deallocated sometime */
+ symbol_memory(stackSym) = 0;	// or it will get deallocated sometime
  nFixed++;
 
  iq = findVarName("#typesize", 0);
- i = LUX_NO_SYMBOLTYPE; /* lux_type_size[] # elements! */
+ i = LUX_NO_SYMBOLTYPE; // lux_type_size[] # elements!
  to_scratch_array(iq, LUX_INT32, 1, &i);
  memcpy(array_data(iq), lux_type_size, i*sizeof(int32_t));
 
- /* s_fix("#nl",		"\n"); */
+ // s_fix("#nl",		"\n");
  l_ptr("#col",		&termCol);
  l_ptr("#row",		&termRow);
 
@@ -4574,7 +4574,7 @@ void symbolInitialization(void)
 #endif
  l_ptr("!iyhigh",	&iyhigh);
  fnc_p("!jd",		11);
-#if HAVE_LIBX11			/* a non-X11 version of this is needed */
+#if HAVE_LIBX11			// a non-X11 version of this is needed
  l_ptr("!kb",		&kb);
  l_ptr("!keycode",	&lux_keycode);
  l_ptr("!keystate",	&lux_keystate);
@@ -4660,7 +4660,7 @@ void symbolInitialization(void)
  f_ptr("!symsize",	&symsize);
  fnc_p("!systime",	10);
 #if HAVE_LIBX11
- l_ptr("!textmenus",	&text_menus); /* development of text menus */
+ l_ptr("!textmenus",	&text_menus); // development of text menus
 #endif
  f_ptr("!tickx",	&ticx);
  f_ptr("!tickxr",	&ticxr);
@@ -4676,7 +4676,7 @@ void symbolInitialization(void)
  f_ptr("!tvixb",	&tvixb);
  f_ptr("!tviy",		&tviy);
  f_ptr("!tviyb",	&tviyb);
- l_ptr("!tvplanezoom",	&tvplanezoom); /* browser */
+ l_ptr("!tvplanezoom",	&tvplanezoom); // browser
 #endif
 #if HAVE_LIBX11
  f_ptr("!tvscale",	&tvscale);
@@ -4729,7 +4729,7 @@ void symbolInitialization(void)
 
 #if MOTIF
  l_ptr("$radio_button",	&radio_button);
- l_ptr("$radio_state",	&radio_state); /* browser */
+ l_ptr("$radio_state",	&radio_state); // browser
 #endif
 
 	/* create a "universal" variable to assign to
@@ -4748,7 +4748,7 @@ void symbolInitialization(void)
  printString = curScrat + FORMATSIZE;
  installing = 0;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t matchInternalName(char *name, internalRoutine *table, int32_t size, int32_t hi)
 /* matches name against the initial parts of all names in the table.
    returns index of first match (i.e., closest to the start of the table),
@@ -4771,21 +4771,21 @@ int32_t matchInternalName(char *name, internalRoutine *table, int32_t size, int3
  }
  return -1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void zerobytes(void *sp, int32_t len)
-/* zeros <len> bytes starting at <sp> */
+// zeros <len> bytes starting at <sp>
 {
   char	*p;
 
   p = (char *) sp;
   while (len--) *p++ = '\0';
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t strncasecmp_p(char *s1, char *s2, int32_t n)
-/* compares the first <n> bytes of strings <s1> and <s2> and returns 0 */
-/* if they are equal in both strings, a number > 0 if <s2> is later */
-/* that <s1> in the internal character set, or < 0 otherwise. */
-/* LS 17feb97 */
+// compares the first <n> bytes of strings <s1> and <s2> and returns 0
+// if they are equal in both strings, a number > 0 if <s2> is later
+// that <s1> in the internal character set, or < 0 otherwise.
+// LS 17feb97
 {
   char	c1, c2;
   int32_t	i = 0;
@@ -4797,12 +4797,12 @@ int32_t strncasecmp_p(char *s1, char *s2, int32_t n)
   while (c1 == c2 && c1 != '\0' && c2 != '\0' && i < n);
   return c2 - c1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t strcasecmp_p(char *s1, char *s2)
-/* compares strings <s1> and <s2> without regard to case and returns 0 */
-/* if they are equal, a number > 0 if <s2> is later */
-/* that <s1> in the internal character set, or < 0 otherwise. */
-/* LS 21feb97 */
+// compares strings <s1> and <s2> without regard to case and returns 0
+// if they are equal, a number > 0 if <s2> is later
+// that <s1> in the internal character set, or < 0 otherwise.
+// LS 21feb97
 {
   int32_t	c1, c2;
 
@@ -4812,14 +4812,14 @@ int32_t strcasecmp_p(char *s1, char *s2)
   while (c1 == c2 && c1 != '\0' && c2 != '\0');
   return c2 - c1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t	nBreakpoint = 0;
 breakpointInfo	breakpoint[NBREAKPOINTS];
 int32_t lux_breakpoint(int32_t narg, int32_t ps[])
-/* BREAKPOINT,string[,/SET,/VARIABLE] */
-/* BREAKPOINT,n[,/DISABLE,/ENABLE,/DELETE] */
-/* BREAKPOINT,/LIST */
-/* /LIST can be specified together with one of the other switches */
+// BREAKPOINT,string[,/SET,/VARIABLE]
+// BREAKPOINT,n[,/DISABLE,/ENABLE,/DELETE]
+// BREAKPOINT,/LIST
+// /LIST can be specified together with one of the other switches
 {
   static int32_t	curBreakpoint = 0;
   char	*s, *p;
@@ -4829,23 +4829,23 @@ int32_t lux_breakpoint(int32_t narg, int32_t ps[])
     switch (internalMode & 3) {
       case 0:
 	switch (symbol_class(ps[0])) {
-	  case LUX_STRING:	/* /SET */
+	  case LUX_STRING:	// /SET
 	    s = string_arg(ps[0]);
-	    if (!s)		/* empty string */
+	    if (!s)		// empty string
 	      return -1;
 	    if (nBreakpoint == NBREAKPOINTS) {
 	      printf("Maximum number of breakpoints (%1d) has been reached\n",
 		     NBREAKPOINTS);
 	      return luxerror("New breakpoint has been rejected.", ps[0]);
 	    }
-	    /* seek an empty breakpoint slot */
+	    // seek an empty breakpoint slot
 	    while (breakpoint[curBreakpoint].status & BP_DEFINED)
 	      if (++curBreakpoint == NBREAKPOINTS)
 		curBreakpoint = 0;
 	    p = strtok(s, ":");
 	    breakpoint[curBreakpoint].name = strsave(p);
 	    p = strtok(NULL, ":");
-	    if (!p)			/* no number */
+	    if (!p)			// no number
 	      breakpoint[curBreakpoint].line = 0;
 	    else {
 	      if (!isdigit((uint8_t) *p))
@@ -4862,50 +4862,50 @@ int32_t lux_breakpoint(int32_t narg, int32_t ps[])
 	    break;
 	  default:
 	    return cerror(ILL_CLASS, ps[0]);
-	  case LUX_SCALAR:		/* /ENABLE */
+	  case LUX_SCALAR:		// /ENABLE
 	    n = int_arg(ps[0]);
 
 	    if (n < 0 || n >= NBREAKPOINTS)
 	      return luxerror("Illegal breakpoint number", ps[0]);
 	    if (!(breakpoint[n].status & 1))
 	      return luxerror("Non-existent breakpoint", ps[0]);
-	    breakpoint[n].status |= BP_ENABLED; /* enable */
+	    breakpoint[n].status |= BP_ENABLED; // enable
 	    break;
 	}
 	break;
-      case 1:			/* /ENABLE */
+      case 1:			// /ENABLE
 	n = int_arg(ps[0]);
 	if (n < 0 || n >= NBREAKPOINTS)
 	  return luxerror("Illegal breakpoint number", ps[0]);
 	if (!(breakpoint[n].status & BP_DEFINED))
 	  return luxerror("Non-existent breakpoint", ps[0]);
-	breakpoint[n].status |= BP_ENABLED; /* enable */
+	breakpoint[n].status |= BP_ENABLED; // enable
 	break;
-      case 2:			/* /DISABLE */
+      case 2:			// /DISABLE
 	n = int_arg(ps[0]);
 	if (n < 0 || n >= NBREAKPOINTS)
 	  return luxerror("Illegal breakpoint number", ps[0]);
 	if (!(breakpoint[n].status & BP_DEFINED))
 	  return luxerror("Non-existent breakpoint", ps[0]);
-	breakpoint[n].status &= ~BP_ENABLED; /* disable */
+	breakpoint[n].status &= ~BP_ENABLED; // disable
 	break;
-      case 3:			/* /DELETE */
+      case 3:			// /DELETE
 	n = int_arg(ps[0]);
 	if (n < 0 || n >= NBREAKPOINTS)
 	  return luxerror("Illegal breakpoint number", ps[0]);
 	if (!(breakpoint[n].status & BP_DEFINED))
 	  return luxerror("Non-existent breakpoint", ps[0]);
 	free(breakpoint[n].name);
-	breakpoint[n].status = 0; /* delete */
+	breakpoint[n].status = 0; // delete
 	nBreakpoint--;
 	break;
     }
-  if (!narg || internalMode & 4) { /* /LIST */
+  if (!narg || internalMode & 4) { // /LIST
     if (nBreakpoint) {
       printf("Breakpoints:\n%2s: %4s %20s %4s %s\n", "nr", "type", "name",
 	     "line", "status");
       for (n = 0; n < NBREAKPOINTS; n++)
-	if (breakpoint[n].status & BP_DEFINED) { /* exists */
+	if (breakpoint[n].status & BP_DEFINED) { // exists
 	  if (breakpoint[n].line == BP_VARIABLE)
 	    printf("%2d: %4s %20s %4s %s\n", n, "var", breakpoint[n].name,
 		   "", (breakpoint[n].status & BP_ENABLED)? "enabled":
@@ -4920,11 +4920,11 @@ int32_t lux_breakpoint(int32_t narg, int32_t ps[])
   }
   return 1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int16_t	watchVars[NWATCHVARS];
 int32_t	nWatchVars = 0;
 int32_t lux_watch(int32_t narg, int32_t ps[])
-/* WATCH,<variable>[,/DELETE,/LIST] */
+// WATCH,<variable>[,/DELETE,/LIST]
 {
   static int32_t	curWatchVar = 0;
   int32_t	i;
@@ -4932,7 +4932,7 @@ int32_t lux_watch(int32_t narg, int32_t ps[])
   if (narg) {
     if (!symbolIsNamed(ps[0]))
       return luxerror("Need a named variable", ps[0]);
-    if (internalMode & 1) {	/* /DELETE */
+    if (internalMode & 1) {	// /DELETE
       for (i = 0; i < NWATCHVARS; i++) {
 	if (watchVars[i] == ps[0]) {
 	  watchVars[i] = 0;
@@ -4943,7 +4943,7 @@ int32_t lux_watch(int32_t narg, int32_t ps[])
       if (i == NWATCHVARS)
 	printf("Variable %s was not being watched.\n",
 	       symbolProperName(ps[0]));
-    } else {			/* install */
+    } else {			// install
       if (nWatchVars == NWATCHVARS - 1)
 	return luxerror("Maximum number of watched variables is already reached",
 		     ps[0]);
@@ -4953,7 +4953,7 @@ int32_t lux_watch(int32_t narg, int32_t ps[])
       nWatchVars++;
     }
   }
-  if (internalMode & 2) {	/* /LIST */
+  if (internalMode & 2) {	// /LIST
     printw("Watched variables: ");
     for (i = 0; i < NWATCHVARS; i++)
       if (watchVars[i]) {
@@ -4966,9 +4966,9 @@ int32_t lux_watch(int32_t narg, int32_t ps[])
   }
   return LUX_OK;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_symbol_number(int32_t narg, int32_t ps[])
-     /* returns the symbol number of the argument */
+     // returns the symbol number of the argument
 {
   int32_t	result;
 
@@ -4976,7 +4976,7 @@ int32_t lux_symbol_number(int32_t narg, int32_t ps[])
   sym[result].spec.scalar.l = *ps;
   return result;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void mark(int32_t symbol)
 {
   if (markIndex == MSSIZE - 1)
@@ -4984,7 +4984,7 @@ void mark(int32_t symbol)
     return; }
   markStack[markIndex++] = symbol;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void pegMark(void)
 {
   if (markIndex == MSSIZE - 1)
@@ -4992,7 +4992,7 @@ void pegMark(void)
     return; }
   markStack[markIndex++] = -1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void pegParse(void)
 {
   if (markIndex == MSSIZE - 1)
@@ -5000,19 +5000,19 @@ void pegParse(void)
     return; }
   markStack[markIndex++] = -2;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void zapParseTemps(void)
 {
   int32_t	iq;
 
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
-  markIndex++;			/* retain -2 on mark stack */
+  markIndex++;			// retain -2 on mark stack
   if (iq != -2)
   { luxerror("zapParseTemps: WARNING - Not at parse level", -1);
     return; }
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void removeParseMarker(void)
 {
   if (markIndex < 1 || markStack[markIndex - 1] != -2)
@@ -5020,7 +5020,7 @@ void removeParseMarker(void)
     return; }
   markIndex--;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void unMark(int32_t symbol)
 {
   int32_t	i;
@@ -5032,7 +5032,7 @@ void unMark(int32_t symbol)
       return; }
   }
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void zapMarked(void)
 {
   int32_t	iq;
@@ -5040,10 +5040,10 @@ void zapMarked(void)
   while (markIndex > 0 && (iq = markStack[--markIndex]) >= 0)
     zapTemp(iq);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void checkTemps(void)
-/* for debugging: checks that the number of temporary (unnamed) */
-/* variables is equal to what is expected. */
+// for debugging: checks that the number of temporary (unnamed)
+// variables is equal to what is expected.
 {
   int32_t	i, n;
   extern int32_t	nTempVariable;
@@ -5063,7 +5063,7 @@ void checkTemps(void)
     printf("WARNING - %1d temp executables expected, %1d found\n",
 	   nTempExecutable, n);
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 #include <unistd.h>
 int32_t lux_restart(int32_t narg, int32_t ps[])
 {
@@ -5078,15 +5078,15 @@ int32_t lux_restart(int32_t narg, int32_t ps[])
   }
   return 1;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t strccmp(char const* s1, char const* s2)
-/* checks strings s1 and s2 for equality disregarding upper/lower case */
-/* distinctions */
+// checks strings s1 and s2 for equality disregarding upper/lower case
+// distinctions
 {
   while (*s1 && toupper(*s1++) == toupper(*s2++)) ;
   return *s1 - *s2;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
 /* returns in <*nstruct> the number of structure descriptors that are
    required to describe <symbol>, and in <*nbyte> the total number of bytes
@@ -5113,7 +5113,7 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
       p.w = clist_symbols(symbol);
       n = clist_num_symbols(symbol);
       *nbyte = 0;
-      *nstruct = 1;		/* one extra for the struct info */
+      *nstruct = 1;		// one extra for the struct info
       while (n--) {
 	if (structSize(*p.w++, &ns, &nb) == LUX_ERROR)
 	  return LUX_ERROR;
@@ -5125,7 +5125,7 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
       l = list_symbols(symbol);
       n = list_num_symbols(symbol);
       *nbyte = 0;
-      *nstruct = 1;		/* one extra for the struct info */
+      *nstruct = 1;		// one extra for the struct info
       while (n--) {
 	if (structSize(l++->value, &ns, &nb) == LUX_ERROR)
 	  return LUX_ERROR;
@@ -5142,7 +5142,7 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
       return cerror(ILL_CLASS, symbol);
   }
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
                    char *data, int32_t *offset, int32_t descend)
 {
@@ -5155,44 +5155,44 @@ int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
     return LUX_OK;
   } else {
     (*se)->u.regular.tag = tag? strsave(tag): NULL;
-    (*se)->u.regular.offset = *offset; /* Byte offset from start */
+    (*se)->u.regular.offset = *offset; // Byte offset from start
     switch (symbol_class(symbol)) {
       case LUX_SCALAR: case LUX_CSCALAR:
-	(*se)->u.regular.type = scalar_type(symbol); /* data type */
-	(*se)->u.regular.spec.singular.ndim = 0; /* 0 -> scalar */
-	/* copy the value into the structure */
-	size = lux_type_size[scalar_type(symbol)];/* bytes per value */
+	(*se)->u.regular.type = scalar_type(symbol); // data type
+	(*se)->u.regular.spec.singular.ndim = 0; // 0 -> scalar
+	// copy the value into the structure
+	size = lux_type_size[scalar_type(symbol)];// bytes per value
 	memcpy(data + *offset, &scalar_value(symbol).b, size);
 	break;
       case LUX_STRING:
-	(*se)->u.regular.type = LUX_TEMP_STRING; /* data type */
-	(*se)->u.regular.spec.singular.ndim = 1; /* strings always have 1 */
+	(*se)->u.regular.type = LUX_TEMP_STRING; // data type
+	(*se)->u.regular.spec.singular.ndim = 1; // strings always have 1
 	if (!((*se)->u.regular.spec.singular.dims = (int32_t*) malloc(sizeof(int32_t))))
 	  return cerror(ALLOC_ERR, 0);
-	size = string_size(symbol); /* bytes per value */
-	(*se)->u.regular.spec.singular.dims[0] = size; /* first dimension */
-	memcpy(data + *offset, string_value(symbol), size); /* copy value */
+	size = string_size(symbol); // bytes per value
+	(*se)->u.regular.spec.singular.dims[0] = size; // first dimension
+	memcpy(data + *offset, string_value(symbol), size); // copy value
 	break;
       case LUX_ARRAY: case LUX_CARRAY:
 	(*se)->u.regular.type = array_type(symbol);
 	ndim = array_num_dims(symbol);
 	if (array_type(symbol) == LUX_STRING_ARRAY)
-	  ndim++;		/* add one for string arrays to hold the */
-				/* length of the strings */
+	  ndim++;		// add one for string arrays to hold the
+				// length of the strings
 	(*se)->u.regular.spec.singular.ndim = ndim;
 	if (!((*se)->u.regular.spec.singular.dims = (int32_t*) malloc(ndim*sizeof(int32_t))))
 	  return cerror(ALLOC_ERR, 0);
 	if (array_type(symbol) == LUX_STRING_ARRAY) {
 	  (*se)->u.regular.spec.singular.dims[0] =
-	    strlen(*(char **) array_data(symbol)); /* take length of first */
-						   /* one for all */
+	    strlen(*(char **) array_data(symbol)); // take length of first
+						   // one for all
 	  memcpy((*se)->u.regular.spec.singular.dims + 1,
 		 array_dims(symbol), array_num_dims(symbol)*sizeof(int32_t));
 	} else
 	  memcpy((*se)->u.regular.spec.singular.dims,
 		 array_dims(symbol), array_num_dims(symbol)*sizeof(int32_t));
 	size = lux_type_size[array_type(symbol)]*array_size(symbol);
-	memcpy(data + *offset, array_data(symbol), size); /* copy values */
+	memcpy(data + *offset, array_data(symbol), size); // copy values
 	break;
       case LUX_CLIST:
 	arg = clist_symbols(symbol);
@@ -5229,7 +5229,7 @@ int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
 	}
 	break;
       case LUX_STRUCT:
-	/* CONTINUE HERE */
+	// CONTINUE HERE
 	break;
     }
     *offset += size;
@@ -5237,7 +5237,7 @@ int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
   }
   return LUX_OK;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_struct(int32_t narg, int32_t ps[])
 /* definition of a structure.  Structures can contain values of all
    numerical and string types, with individual dimensional structures
@@ -5259,11 +5259,11 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
   if (structSize(ps[0], &nstruct, &size) == LUX_ERROR) /* check
 							  specification */
     return LUX_ERROR;
-  nstruct++;			/* one extra for the top-level description */
+  nstruct++;			// one extra for the top-level description
   ndim = narg - 1;
-  if (get_dims(&ndim, ps + 1, dims) == LUX_ERROR) /* read dimensions */
+  if (get_dims(&ndim, ps + 1, dims) == LUX_ERROR) // read dimensions
     return LUX_ERROR;
-  /* calculate the number of repetitions of the outer structure */
+  // calculate the number of repetitions of the outer structure
   n = 1;
   for (i = 0; i < ndim; i++)
     n *= dims[i];
@@ -5272,9 +5272,9 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
   if (result == LUX_ERROR)
     return LUX_ERROR;
   symbol_class(result) = LUX_STRUCT;
-  symbol_memory(result) = sizeof(int32_t) /* to store the number of elements */
-    + nstruct*sizeof(structElem) /* to store the structure information */
-    + size*n;			/* to store the data values */
+  symbol_memory(result) = sizeof(int32_t) // to store the number of elements
+    + nstruct*sizeof(structElem) // to store the structure information
+    + size*n;			// to store the data values
   data.v = malloc(symbol_memory(result));
   if (!data.v)
     return cerror(ALLOC_ERR, 0);
@@ -5283,7 +5283,7 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
   se = struct_elements(result);
   data.v = struct_data(result);
 
-  /* we must fill in the first descriptor */
+  // we must fill in the first descriptor
   switch (symbol_class(ps[0])) {
     case LUX_SCALAR: case LUX_CSCALAR: case LUX_STRING: case LUX_ARRAY:
     case LUX_CARRAY:
@@ -5305,18 +5305,18 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
   if (!(se->u.first.dims = (int32_t*) malloc(ndim*sizeof(int32_t))))
     return cerror(ALLOC_ERR, 0);
   memcpy(se->u.first.dims, dims, ndim*sizeof(int32_t));
-  se++;				/* point at the next one */
+  se++;				// point at the next one
   offset = 0;
 
-  /* now recursively fill in the deeper ones */
+  // now recursively fill in the deeper ones
   if (makeStruct(ps[0], NULL, &se, (char*) data.v, &offset, 0) == LUX_ERROR)
     return LUX_ERROR;
   return result;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t translateEscapes(char *p)
-/* replace explicit escape sequences \x by internal ones; returns */
-/* the final length of the string */
+// replace explicit escape sequences \x by internal ones; returns
+// the final length of the string
 {
   char	escapechars[] = "ntvbrfa\\?'\"", escapes[] = "\n\t\v\b\r\f\a\\?'\"",
     *p2, *p0;
@@ -5324,27 +5324,27 @@ int32_t translateEscapes(char *p)
 
   p0 = p;
   while (*p) {
-    if (*p == '\\') {		/* an escape sequence */
+    if (*p == '\\') {		// an escape sequence
       p2 = strchr(escapechars, p[1]);
       if (p2) {
 	*p = escapes[p2 - escapechars];
 	memcpy(p + 1, p + 2, strlen(p) - 1);
-      } else if (p[1] == 'x') {	/* a hex number */
+      } else if (p[1] == 'x') {	// a hex number
 	i = strtol(p + 2, &p2, 10);
 	*p = i;
 	memcpy(p + 1, p2, strlen(p2) + 1);
-      } else if (isdigit((uint8_t) p[1]) && p[1] < '8') { /* an octal number */
+      } else if (isdigit((uint8_t) p[1]) && p[1] < '8') { // an octal number
 	/* octal-number escape sequences have at most 3 octal digits.
 	   we cannot rely on strtol because it may find more than 3
 	   (e.g., when the user specifies '\000123' the \000 is an octal
 	   specification and the 123 is regular text; strtol would
 	   return 000123 as the number.  we must find the end of the
 	   octal number manually. */
-	p2 = p + 2;		/* just beyond the first octal digit */
+	p2 = p + 2;		// just beyond the first octal digit
 	for (i = 2; i < 4; i++)
-	  if (isdigit((uint8_t) *p2) && *p2 < '8')	/* an octal digit */
+	  if (isdigit((uint8_t) *p2) && *p2 < '8')	// an octal digit
 	    p2++;
-	c = *p2;		/* temporary storage */
+	c = *p2;		// temporary storage
 	*p2 = '\0';		/* temporary end to force strtol not to
 				   read beyond the first three octal digits */
 	i = strtol(p + 1, NULL, 8);
@@ -5357,9 +5357,9 @@ int32_t translateEscapes(char *p)
   }
   return p - p0;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t installString(char const* string)
-/* installs string in symbol stack; returns index to stack */
+// installs string in symbol stack; returns index to stack
 {
  int32_t	index, n;
  char	*p, *p0;
@@ -5368,7 +5368,7 @@ int32_t installString(char const* string)
 #endif
 
  if ((index = nextFreeStackEntry()) == LUX_ERROR)
-   return LUX_ERROR;		/* error */
+   return LUX_ERROR;		// error
  n = strlen(string) + 1;
  p = (char*) malloc(n);
  if (!p)
@@ -5376,7 +5376,7 @@ int32_t installString(char const* string)
  strcpy(p, string);
  p0 = p;
 
- if (translateEscapes(p) != n - 1) /* we shortened the string */
+ if (translateEscapes(p) != n - 1) // we shortened the string
    p0 = (char*) realloc(p0, n + 1);
 
  symbolStack[index] = p0;
@@ -5386,7 +5386,7 @@ int32_t installString(char const* string)
 #endif
  return index;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 /* we undefine malloc to ensure we pick up the regular version.
  memory allocated in installKeys() is not associated with any particular
  LUX symbol and would otherwise show up as an error in checkList.
@@ -5415,16 +5415,16 @@ void installKeys(void *keys)
  keyList	*theKeyList;
  int32_t	n = 1, i;
 
- if (!*(char **) keys)		/* empty key */
+ if (!*(char **) keys)		// empty key
    return;
- /* ANSI C does not allow string constants to be modified, so we */
- /* make a copy of the string and modify that */
+ // ANSI C does not allow string constants to be modified, so we
+ // make a copy of the string and modify that
  if (!(copy = (char *) malloc(strlen(*(char **) keys) + 1))) {
    luxerror("Memory allocation error in installKeys [%s]", 0, (char *) keys);
    return;
  }
  strcpy(copy, *(char **) keys);
-	/* count and null-terminate individual keywords */ 
+	// count and null-terminate individual keywords
  for (p = copy; *p; p++)
    if (*p == ':') {
      *p = '\0';
@@ -5437,33 +5437,33 @@ void installKeys(void *keys)
  }
  theKeyList->keys = result;
  p = copy;
- if (*p == '*') {		/* suitable for piping */
+ if (*p == '*') {		// suitable for piping
    theKeyList->pipe = 1;
    p++;
  } else
    theKeyList->pipe = 0;
- if (*p == '+') {		/* evaluation suppression */
+ if (*p == '+') {		// evaluation suppression
    theKeyList->suppressEval = 1;
    p++;
  } else
    theKeyList->suppressEval = 0;
- if (*p == '-') {		/* suppress unused arguments */
-				/* (see internal_routine()) */
+ if (*p == '-') {		// suppress unused arguments
+				// (see internal_routine())
    theKeyList->suppressUnused = 1;
    p++;
  } else
    theKeyList->suppressUnused = 0;
- if (*p == '|')	{		/* default internalMode */
+ if (*p == '|')	{		// default internalMode
    theKeyList->defaultMode = strtol(p + 1, &p, 10);
-   p++; 			/* skip final | */
+   p++; 			// skip final |
  } else
    theKeyList->defaultMode = 0;
- if (*p == '%')	{		/* default offset for plain arguments */
+ if (*p == '%')	{		// default offset for plain arguments
    theKeyList->offset = strtol(p + 1, &p, 10);
-   p++; 			/* skip final % */
+   p++; 			// skip final %
  } else
    theKeyList->offset = 0;
-	/* enter all keyword addresses in result list */
+	// enter all keyword addresses in result list
  *result++ = p;
  for (i = 1; i < n; i++) {
    while (*p++);
@@ -5472,11 +5472,11 @@ void installKeys(void *keys)
  *result = 0;
  *(keyList **) keys = theKeyList;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t findName(char const* name, hashTableEntry *hashTable[], int32_t context)
-/* searches for <name> in <hashTable[]> (with <context>).  if found, */
-/* returns symbol number, otherwise installs a copy of the name in */
-/* <hashTable[]> and sym[].  Returns -1 if an error occurs.  LS 6feb96 */
+// searches for <name> in <hashTable[]> (with <context>).  if found,
+// returns symbol number, otherwise installs a copy of the name in
+// <hashTable[]> and sym[].  Returns -1 if an error occurs.  LS 6feb96
 {
  int32_t		hashValue, i;
  hashTableEntry	*hp, *oldHp;
@@ -5498,17 +5498,17 @@ int32_t findName(char const* name, hashTableEntry *hashTable[], int32_t context)
  while (hp) {
    if (!strcmp(hp->name, name)
        && sym[hp->symNum].context == context)
-     return hp->symNum;		/* found name: variable already defined */
+     return hp->symNum;		// found name: variable already defined
    oldHp = hp;
    hp = hp->next;
  }
-		/* wasn't defined yet;  install if not !xxx */
+		// wasn't defined yet;  install if not !xxx
  if (*name == '!' && !installing)
    return luxerror("Non-existent system variable %s", 0, name);
  hp = (hashTableEntry *) malloc(sizeof(hashTableEntry));
  if (!hp)
    return cerror(ALLOC_ERR, 0);
- if (oldHp)			/* current hash chain wasn't empty */
+ if (oldHp)			// current hash chain wasn't empty
    oldHp->next = hp;
  else
    hashTable[hashValue] = hp;
@@ -5524,7 +5524,7 @@ int32_t findName(char const* name, hashTableEntry *hashTable[], int32_t context)
  sym[i].line = curLineNumber;
  return i;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 int32_t lux_verify(int32_t narg, int32_t ps[])
 /* verifies that all referenced subroutines, functions, and files
    actually exist */
@@ -5557,7 +5557,7 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
     n = nextCompileLevel(fp, expname);
     fclose(fp);
     if (n < 0
-	|| newSymbol(LUX_BLOCKROUTINE, -nsym - 1) < 0) { /* some error */
+	|| newSymbol(LUX_BLOCKROUTINE, -nsym - 1) < 0) { // some error
       zap(nsym);
       return LUX_OK;
     } else {
@@ -5575,8 +5575,8 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
 	switch (evb_type(i)) {
 	  case EVB_FILE:
 	    name = file_name(i);
-	    if ((p = strchr(name, ':'))) /* seek specific routine */
-	      *p++ = '\0';		/* temporary string end */
+	    if ((p = strchr(name, ':'))) // seek specific routine
+	      *p++ = '\0';		// temporary string end
 	    fp = openPathFile(name, FIND_EITHER);
 	    if (!fp && p) {
 	      *--p = ':';
@@ -5593,12 +5593,12 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
 	  case EVB_USR_SUB:
 	    n = usr_sub_routine_num(i);
 	    if (symbol_class(n) == LUX_STRING) {
-	      /* routine name was not yet evaluated */
+	      // routine name was not yet evaluated
 	      name = string_value(n);
 	      if ((n = lookForName(name, subrHashTable, 0)) < 0) {
-		/* not compiled in the meantime */
+		// not compiled in the meantime
 		fp = openPathFile(name, FIND_SUBR | FIND_LOWER);
-		if (fp)		/* file exists */
+		if (fp)		// file exists
 		  fclose(fp);
 		else {
                   char const* cp = symbolProperName(symbol_context(i));
@@ -5613,7 +5613,7 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
 	  case EVB_USR_CODE:
 	    n = usr_code_routine_num(i);
 	    if (symbol_class(n) == LUX_STRING) {
-	      /* routine name was not yet evaluated */
+	      // routine name was not yet evaluated
 	      name = string_value(n);
 	      if ((n = lookForName(name, blockHashTable, curContext)) < 0) {
 		char const* cp = symbolProperName(symbol_context(i));
@@ -5635,10 +5635,10 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
   }
   return LUX_OK;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 compileInfo *nextFreeCompileInfo(void)
 {
-  if (cur_c_info >= n_c_info) { /* need more room */
+  if (cur_c_info >= n_c_info) { // need more room
     n_c_info += 16;
     c_info = (compileInfo*) realloc(c_info, n_c_info*sizeof(compileInfo));
     if (!c_info) {
@@ -5649,7 +5649,7 @@ compileInfo *nextFreeCompileInfo(void)
   }
   return &c_info[cur_c_info++];
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void releaseCompileInfo(void)
 {
   if (--cur_c_info)
@@ -5657,12 +5657,12 @@ void releaseCompileInfo(void)
   else
     curCompileInfo = NULL;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 static executionLevelInfo	*e_info;
 static int32_t	n_e_info = 0, cur_e_info = 0;
 void pushExecutionLevel(int32_t line, int32_t target)
 {
-  if (cur_e_info + 1 >= n_e_info) { /* need more room */
+  if (cur_e_info + 1 >= n_e_info) { // need more room
     n_e_info += 16;
     e_info = (executionLevelInfo*) realloc(e_info, n_e_info*sizeof(executionLevelInfo));
     if (!e_info) {
@@ -5672,16 +5672,16 @@ void pushExecutionLevel(int32_t line, int32_t target)
     }
     e_info[0].target = 0;
   }
-  e_info[cur_e_info].line = line; /* remember the line number in the current */
-				  /* context */
-  e_info[++cur_e_info].target = target;/* remember the next target */
+  e_info[cur_e_info].line = line; // remember the line number in the current
+				  // context
+  e_info[++cur_e_info].target = target;// remember the next target
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void popExecutionLevel(void)
 {
   cur_e_info--;
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------
 void showExecutionLevel(int32_t symbol)
 {
   int32_t	i, target;
@@ -5695,7 +5695,7 @@ void showExecutionLevel(int32_t symbol)
 	printf("%4d", e_info[i].line);
       printf(" in ");
       target = e_info[i].target;
-      if (target > 0) {	/* something user-defined */
+      if (target > 0) {	// something user-defined
 	switch (symbol_class(target)) {
 	  case LUX_SUBROUTINE:
 	    printf("subr");
@@ -5710,7 +5710,7 @@ void showExecutionLevel(int32_t symbol)
 	    printf("unknown");
 	}
 	printf(" %s\n", symbolProperName(target));
-      } else {			/* a compiling file */
+      } else {			// a compiling file
 	if (c_info[-target].name)
 	  printf("file \"%s\"\n", c_info[-target].name);
 	else
@@ -5719,4 +5719,4 @@ void showExecutionLevel(int32_t symbol)
     } else
       printf("At line %4d in main\n", symbol_line(symbol));
 }
-/*----------------------------------------------------------------*/
+//----------------------------------------------------------------

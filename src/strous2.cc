@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File strous2.c */
-/* Various LUX routines by L. Strous. */
+// File strous2.c
+// Various LUX routines by L. Strous.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -29,26 +29,26 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>
 #include <float.h>
 #include "action.hh"
-#include <unistd.h>		/* for sbrk() */
+#include <unistd.h>		// for sbrk()
 
 int32_t	minmax(int32_t *, int32_t, int32_t),
   lux_convert(int32_t, int32_t [], Symboltype, int32_t),
   copySym(int32_t), f_decomp(float *, int32_t, int32_t),
   copyToSym(int32_t, int32_t),
   f_solve(float *, float *, int32_t, int32_t);
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_noop(int32_t narg, int32_t ps[])
      /* no operation - a dummy routine that provides an entry point
 	for debuggers */
 {
   return 1;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_zap(int32_t narg, int32_t ps[])
-/* remove the specified symbols completely: i.e. leave no trace */
-/* only allowed from main execution level, to prevent zapping of */
-/* a variable which may be referenced later on in an already-compiled */
-/* -and-now-executing piece of code */
+// remove the specified symbols completely: i.e. leave no trace
+// only allowed from main execution level, to prevent zapping of
+// a variable which may be referenced later on in an already-compiled
+// -and-now-executing piece of code
 {
   int32_t 	iq;
   void	cleanUpRoutine(int32_t context, char keepBase);
@@ -66,14 +66,14 @@ int32_t lux_zap(int32_t narg, int32_t ps[])
       zap(iq);
     else {
       iq = func_ptr_routine_num(iq);
-      if (iq < 0)		/* an internal routine or function */
+      if (iq < 0)		// an internal routine or function
 	return luxerror("Cannot zap an internal routine or function!", *ps);
       cleanUpRoutine(iq, 0);
     }
   }
   return 1;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t showstats(int32_t narg, int32_t ps[])
 { 
   extern int16_t	listStack[], *listStackItem, curContext;
@@ -100,9 +100,9 @@ int32_t showstats(int32_t narg, int32_t ps[])
 	 curContext, markIndex - 1);
   return 1;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_system(int32_t narg, int32_t ps[])
-/* pass a string to the operating system */
+// pass a string to the operating system
 {
   char	*name;
 
@@ -110,22 +110,22 @@ int32_t lux_system(int32_t narg, int32_t ps[])
   system(name);
   return LUX_OK;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_psum(int32_t narg, int32_t ps[])
 /* Y = PSUM(X, POWERS [,AXES, CLASS][,/ONEDIM,/NORMALIZE,/SINGLE]) returns a
    weighted sum of <x>. */
-/* The weights are equal to the coordinates in the dimensions given in */
-/* <axes> to the integer powers given in <powers>.  <powers> and <axes> */
-/* may be scalars or arrays and must have the same number of elements. */
+// The weights are equal to the coordinates in the dimensions given in
+// <axes> to the integer powers given in <powers>.  <powers> and <axes>
+// may be scalars or arrays and must have the same number of elements.
 /* If <axes> is not specified, then INDGEN(POWERS) is assumed.
    Keyword */
 /* /ONEDIM indicates that <x> should be treated as a 1D array.  LS
    8jan96 */
-/* If CLASS is specified, then the results are gathered separately */
-/* for each class.  /NORMALIZE forces normalization of the results. */
-/* LS 17feb97 */
-/* /SINGLE collects the results in a single scalar (unless CLASS is */
-/* specified) LS 17mar97 */
+// If CLASS is specified, then the results are gathered separately
+// for each class.  /NORMALIZE forces normalization of the results.
+// LS 17feb97
+// /SINGLE collects the results in a single scalar (unless CLASS is
+// specified) LS 17mar97
 {
   int32_t tally[MAX_DIMS], step[MAX_DIMS], *dims, done = 0, n, i, done2, done3,
   	ndim, type, *axes, naxes, result_sym = 0, size, iq, iStep[MAX_DIMS];
@@ -136,8 +136,8 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
   char	haveClass = '\0';
   extern Scalar	lastmin, lastmax;
 
-  iq = lux_long(1, &ps[1]);	/* integer exponents only */
-  switch (symbol_class(iq)) {	/* POWERS */
+  iq = lux_long(1, &ps[1]);	// integer exponents only
+  switch (symbol_class(iq)) {	// POWERS
     case LUX_SCALAR:
       nexponent = 1;
       exponent = &scalar_value(iq).l;
@@ -154,7 +154,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
     if (temp[i++] < 0)
       return luxerror("PSUM - Only nonnegative integer exponents allowed", ps[1]);
   }
-  switch (symbol_class(*ps)) {	/* X */
+  switch (symbol_class(*ps)) {	// X
     case LUX_SCALAR:
       ndim = 1;
       dims = &ndim;
@@ -170,13 +170,13 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
     default:
       return cerror(ILL_CLASS, *ps);
   }
-  if (internalMode & 1 && ndim > 1) { /* /ONEDIM */
+  if (internalMode & 1 && ndim > 1) { // /ONEDIM
     ndim = 1;
     dims = &size;
   }
   type = symbol_type(*ps);
   if (narg > 2) {
-    iq = lux_long(1, &ps[2]);	/* AXES */
+    iq = lux_long(1, &ps[2]);	// AXES
     switch (symbol_class(iq)) {
       case LUX_SCALAR:
 	naxes = 1;
@@ -196,7 +196,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       if (temp[i] < 0 || temp[i] >= ndim)
 	return cerror(ILL_DIM, ps[2]);
     }
-    /* determine the dimensions of the result */
+    // determine the dimensions of the result
     for (i = 0; i < ndim; i++)
       in[i] = 0;
     for (i = 0; i < naxes; i++)
@@ -206,16 +206,16 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
 	return luxerror("A dimension was specified multiple times", ps[2]);
     j = 0;
     for (i = 0; i < ndim; i++)
-      if (!in[i])		/* no summing this dim, so is in result */
+      if (!in[i])		// no summing this dim, so is in result
 	outdims[j++] = dims[i];
-    if (narg > 3) {		/* CLASS */
-      iq = lux_long(1, &ps[3]);	/* integer classes */
+    if (narg > 3) {		// CLASS
+      iq = lux_long(1, &ps[3]);	// integer classes
       haveClass = 1;
       index = (int32_t*) array_data(iq);
       nIndex = array_size(iq);
       if (nIndex != size)
 	return cerror(INCMP_ARR, ps[3]);
-      minmax(index, nIndex, LUX_INT32); /* determine range of indices */
+      minmax(index, nIndex, LUX_INT32); // determine range of indices
       size = lastmax.l + 1;
       offset = 0;
       if (lastmin.l < 0)
@@ -226,7 +226,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       ALLOCATE(bigweights, size, double);
       zerobytes(bigweights, size*sizeof(double));
     }
-  } else {			/* no AXES, assume INDGEN(POWERS) */
+  } else {			// no AXES, assume INDGEN(POWERS)
     axes = NULL;
     naxes = nexponent;
     if (ndim > naxes)
@@ -247,11 +247,11 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
     }
   }
 
-				/* initialize tally &c */
+				// initialize tally &c
   n = *step = lux_type_size[type];
   for (i = 1; i < ndim; i++)
     step[i] = (n *= dims[i - 1]);
-  if (axes) {			/* swap dims so requested ones are first */
+  if (axes) {			// swap dims so requested ones are first
     for (i = 0; i < naxes; i++) {
       outdims[i] = dims[axes[i]];
       tally[i] = step[axes[i]];
@@ -272,11 +272,11 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
   for (i = 0; i < ndim; i++)
     tally[i] = 0;
   if (ndim == 1)
-    done = 1;			/* only one go is needed */
+    done = 1;			// only one go is needed
   *trgt.d = bigweight = 0;
   done2 = (internalMode & 6) && !haveClass && !(internalMode & 8);
   done3 = !haveClass && !(internalMode & 8);
-  do {			      /* loop over all elements */
+  do {			      // loop over all elements
     switch (type) {
       case LUX_INT8:
 	value = (double) *src.b;
@@ -298,8 +298,8 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
 	break; }
     weight = 1.0;
     for (j = 0; j < nexponent; j++)
-      if (exponent[j]) {	/* not equal to 0 */
-	factor = tally[j];	/* current jth coordinate */
+      if (exponent[j]) {	// not equal to 0
+	factor = tally[j];	// current jth coordinate
 	if (exponent[j] % 2)
 	  weight *= factor;
 	k = exponent[j]/2;
@@ -311,28 +311,28 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
 	}
       }
     if (haveClass) {
-      if (internalMode & 2)	/* /VNORMALIZE */
+      if (internalMode & 2)	// /VNORMALIZE
 	bigweights[*index] += value;
-      else if (internalMode & 4) /* /CNORMALIZE */
+      else if (internalMode & 4) // /CNORMALIZE
 	bigweights[*index] += weight;
       trgt.d[*index] += value*weight;
       index += iStep[0];
     } else {
-      if (internalMode & 2)	/* /VNORMALIZE */
+      if (internalMode & 2)	// /VNORMALIZE
 	bigweight += value;
-      else if (internalMode & 4) /* /CNORMALIZE */
+      else if (internalMode & 4) // /CNORMALIZE
 	bigweight += weight;
       *trgt.d += value*weight;
     }
     src.b += step[0];
-    for (i = 0; i < ndim; i++) {  /* must another dimension be advanced? */
+    for (i = 0; i < ndim; i++) {  // must another dimension be advanced?
       if (tally[i]++ != outdims[i] - 1) {
 	done = 0;
-	break;			/* not yet finished with this dimension */
+	break;			// not yet finished with this dimension
       }
       tally[i] = 0;
-      done = 1;			/* done with this dimension anyway */
-      src.b += step[i + 1]; 	/* advance another dimension */
+      done = 1;			// done with this dimension anyway
+      src.b += step[i + 1]; 	// advance another dimension
       if (haveClass)
 	index += iStep[i + 1];
     }
@@ -352,15 +352,15 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       if (bigweights[i])
 	trgt.d[i] /= bigweights[i];
     free(bigweights);
-  } else if (internalMode & 8 && internalMode & 6) /* /SINGLE + /.NORMALIZE */
+  } else if (internalMode & 8 && internalMode & 6) // /SINGLE + /.NORMALIZE
     *trgt.d /= bigweight;
   return result_sym;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 Pointer	multiCompData;
 int32_t	multiCompNPoints, multiCompNCoord, multiCompType;
 int32_t multiCompare(const void *arg1, const void *arg2)
-/* comparison function for use with lux_tolookup.  LS 9nov95 */
+// comparison function for use with lux_tolookup.  LS 9nov95
 {
   int32_t	i1, i2, i;
   Scalar	d;
@@ -419,15 +419,15 @@ int32_t multiCompare(const void *arg1, const void *arg2)
   }
   return 0;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_tolookup(int32_t narg, int32_t ps[])
-/* TOLOOKUP,src,list,index rewrites <src> as <list(index)>, with */
-/* <list> a list of unique members of <src> (sorted in ascending */
-/* order) and <index> ranging between 0 and NUM_ELEM(list) - 1. */
-/* If <src> is multidimensional, then its last dimension is */
-/* taken to run along a vector and <list> will be a list of */
-/* vectors.  Keyword /ONE signals treatment of <src> as a big */
-/* 1D vector.  LS 9nov95 7may96 16oct97 */
+// TOLOOKUP,src,list,index rewrites <src> as <list(index)>, with
+// <list> a list of unique members of <src> (sorted in ascending
+// order) and <index> ranging between 0 and NUM_ELEM(list) - 1.
+// If <src> is multidimensional, then its last dimension is
+// taken to run along a vector and <list> will be a list of
+// vectors.  Keyword /ONE signals treatment of <src> as a big
+// 1D vector.  LS 9nov95 7may96 16oct97
 {
   int32_t	iq, *index, i, dims[2], curIndex, n, *order, size,
 	nd, j;
@@ -435,32 +435,32 @@ int32_t lux_tolookup(int32_t narg, int32_t ps[])
 
   if (symbol_class(*ps) != LUX_ARRAY)
     return cerror(NEED_ARR, *ps);
-  iq = *ps;			/* SRC */
+  iq = *ps;			// SRC
   multiCompData.l = (int32_t *) array_data(iq);
   multiCompType = array_type(iq);
   index = array_dims(iq);
   nd = array_num_dims(iq);
-  if (internalMode & 1)		/* /ONE */
+  if (internalMode & 1)		// /ONE
     multiCompNCoord = 1;
   else
-    multiCompNCoord = nd > 1? index[nd - 1]: 1; /* # dimensions */
-  multiCompNPoints = array_size(iq)/multiCompNCoord; /* # data points */
+    multiCompNCoord = nd > 1? index[nd - 1]: 1; // # dimensions
+  multiCompNPoints = array_size(iq)/multiCompNCoord; // # data points
   ALLOCATE(order, multiCompNPoints, int32_t);
   for (i = 0; i < multiCompNPoints; i++)
-    order[i] = i;		/* initialize */
-  qsort(order, multiCompNPoints, sizeof(int32_t), multiCompare); /* sort */
+    order[i] = i;		// initialize
+  qsort(order, multiCompNPoints, sizeof(int32_t), multiCompare); // sort
 
   n = 1;
-  for (i = 0; i < multiCompNPoints - 1; i++) /* count number of unique */
-					     /* members */
+  for (i = 0; i < multiCompNPoints - 1; i++) // count number of unique
+					     // members
     if (multiCompare(order + i, order + i + 1))
       n++;
   j = (multiCompNCoord > 1)? nd - 1: nd;
-  redef_array(ps[2], LUX_INT32, j, index); /* INDEX */
+  redef_array(ps[2], LUX_INT32, j, index); // INDEX
   index = (int32_t *) array_data(ps[2]);
   dims[0] = n;
   dims[1] = multiCompNCoord;
-  redef_array(ps[1], array_type(iq), dims[1] > 1? 2: 1, dims); /* LIST */
+  redef_array(ps[1], array_type(iq), dims[1] > 1? 2: 1, dims); // LIST
 
   list = (uint8_t *) array_data(ps[1]);
   size = lux_type_size[array_type(iq)];
@@ -469,7 +469,7 @@ int32_t lux_tolookup(int32_t narg, int32_t ps[])
 	   multiCompData.b + (order[0] + j*multiCompNPoints)*size, size);
   index[order[0]] = curIndex = 0;
   for (i = 1; i < multiCompNPoints; i++)
-    if (multiCompare(order + i - 1, order + i)) /* unequal */
+    if (multiCompare(order + i - 1, order + i)) // unequal
     { index[order[i]] = ++curIndex;
       for (j = 0; j < multiCompNCoord; j++)
 	memcpy(list + (curIndex + j*n)*size,
@@ -479,11 +479,11 @@ int32_t lux_tolookup(int32_t narg, int32_t ps[])
   free(order);
   return 1;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 Pointer	src;
 Symboltype type;
 int32_t mcmp(const void *x1, const void *x2)
-/* auxilliary for lux_medianfilter */
+// auxilliary for lux_medianfilter
 {
   extern Pointer	src;
   Scalar	d1, d2;
@@ -515,7 +515,7 @@ int32_t mcmp(const void *x1, const void *x2)
       return d1.d < d2.d? -1: (d1.d > d2.d? 1: 0); }
   return 1;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t cmp(const void *x1, const void *x2)
 {
   switch (type) {
@@ -538,41 +538,41 @@ int32_t cmp(const void *x1, const void *x2)
       return *(double *) x1 < *(double *) x2? -1:
 	(*(double *) x1 > *(double *) x2? 1: 0);
   }
-  return 1;			/* or some compilers complain */
+  return 1;			// or some compilers complain
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_orderfilter(int32_t narg, int32_t ps[])
-/* Applies an ordinal filter to a data set */
+// Applies an ordinal filter to a data set
 /* syntax:  Y = ORDFILTER([ORDER=ORDER,] X [[,AXES],WIDTH,
                 /MEDIAN,/MINIMUM,/MAXIMUM]) */
-/* LS 23oct98 */
+// LS 23oct98
 {
   int32_t	output, width, w, med, nelem, range[2*MAX_DIMS], *index,
     *offset, i, j;
   float	order;
   LoopInfo	srcinfo, trgtinfo, tmpinfo, tmpinfo2;
-  /* we use a global pointer src */
+  // we use a global pointer src
   Pointer	trgt, tmpsrc, tmptrgt;
 
-  if (!ps[1])			/* no <data> */
+  if (!ps[1])			// no <data>
     return luxerror("Need data array", 0);
 
-  if (narg > 2) {		/* have <width> */
+  if (narg > 2) {		// have <width>
     width = int_arg((narg == 4)? ps[3]: ps[2]);
     if (width < 3)
-      return ps[1];		/* nothing to do */
+      return ps[1];		// nothing to do
   } else
     width = 3;
   w = (width - 1)/2;
-  width = 2*w + 1;		/* ensure that <width> is odd */
+  width = 2*w + 1;		// ensure that <width> is odd
 
-  if (ps[0]) {			/* have <order> */
+  if (ps[0]) {			// have <order>
     order = float_arg(ps[0]);
     if (order < 0.0 || order > 1.0)
       return luxerror("Order fraction must be between 0 and 1, was %f",
 		   ps[0], order);
   } else
-    order = -1;			/* flag that we didn't have one */
+    order = -1;			// flag that we didn't have one
 
   if (standardLoop(ps[1], (narg == 4)? ps[2]: 0,
 		   (narg != 4? SL_ALLAXES: 0) | SL_UNIQUEAXES
@@ -580,16 +580,16 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
 		   &srcinfo, &src, &output, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  /* we calculate the number of elements that go into each sorting */
+  // we calculate the number of elements that go into each sorting
   nelem = 1;
   for (i = 0; i < srcinfo.naxes; i++)
     nelem *= width;
-  if (order != -1) 		/* we had an explicit <order> */
+  if (order != -1) 		// we had an explicit <order>
     med = (int32_t) (order*(nelem - 0.0001)); /* the index in the sorted
 					   data values of the value to be
 					   returned. */
   else switch (internalMode) {
-    case 0: case 1:		/* /MEDIAN or default */
+    case 0: case 1:		// /MEDIAN or default
       med = (nelem - 1)/2;
       break;
     case 2:
@@ -607,10 +607,10 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   // the data and then treat just the interior points.
   memcpy(trgt.b, src.b, srcinfo.stride*srcinfo.nelem);
 
-  /* we calculate the offsets of the elements to be considered */
+  // we calculate the offsets of the elements to be considered
   for (i = 0; i < srcinfo.naxes; i++)
     range[i] = width;
-  tmpsrc = src;			/* just to be safe */
+  tmpsrc = src;			// just to be safe
   setupDimensionLoop(&tmpinfo, srcinfo.naxes, range, LUX_INT32, srcinfo.naxes,
 		     NULL, &tmpsrc, SL_EACHCOORD);
 
@@ -633,18 +633,18 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
     range[2*i] = 0;
     range[2*i + 1] = srcinfo.dims[i] - 1;
   }
-  /* and then we modify those specified in <axis> */
+  // and then we modify those specified in <axis>
   for (i = 0; i < srcinfo.naxes; i++) {
     range[2*srcinfo.axes[i]] = w;
     range[2*srcinfo.axes[i] + 1] -= w;
   }
-  /* and then we modify the loops to reflect the reduced ranges */
+  // and then we modify the loops to reflect the reduced ranges
   subdataLoop(range, &srcinfo);
   subdataLoop(range, &trgtinfo);
 
-  type = srcinfo.type;		/* so mcmp() knows what type it is */
+  type = srcinfo.type;		// so mcmp() knows what type it is
 
-  /* now we do the actual filtering */
+  // now we do the actual filtering
   do {
     memcpy(index, offset, nelem*sizeof(int32_t));
     qsort(index, nelem, sizeof(*index), mcmp);
@@ -675,33 +675,33 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   free(offset);
   return output;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_medfilter(int32_t narg, int32_t ps[])
-     /* median filter */
+     // median filter
 {
   internalMode = 1;
   return lux_orderfilter(narg, ps);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_quantile(int32_t narg, int32_t ps[])
-/* QUANTILE([<order> ,] <data> [, <axes>]) */
+// QUANTILE([<order> ,] <data> [, <axes>])
 {
   int32_t	output, t, nelem, i;
   double	order, f;
   LoopInfo	srcinfo, trgtinfo;
-  /* we use a global pointer src */
+  // we use a global pointer src
   Pointer	trgt, tmp, tmp0;
 
-  if (!ps[1])			/* no <data> */
+  if (!ps[1])			// no <data>
     return luxerror("Need data array", 0);
 
-  if (ps[0]) {			/* have <order> */
+  if (ps[0]) {			// have <order>
     order = double_arg(ps[0]);
     if (order < 0.0 || order > 1.0)
       return luxerror("Order fraction must be between 0 and 1, was %g",
 		   ps[0], order);
   } else
-    order = -1;			/* flag that we didn't have one */
+    order = -1;			// flag that we didn't have one
 
   if (standardLoop(ps[1], (narg > 2)? ps[2]: 0,
 		   (narg <= 2? SL_ALLAXES: 0) | SL_UNIQUEAXES | SL_AXESBLOCK
@@ -709,13 +709,13 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
                    &src, &output, &trgtinfo, &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
-  /* we calculate the number of elements that go into each sorting */
+  // we calculate the number of elements that go into each sorting
   nelem = 1;
   for (i = 0; i < srcinfo.naxes; i++)
     nelem *= srcinfo.rdims[i];
   if (order == -1) {
     switch (internalMode) {
-    case 0: case 1:		/* /MEDIAN or default */
+    case 0: case 1:		// /MEDIAN or default
       order = 0.5;
       break;
     case 2:                     // min
@@ -734,13 +734,13 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
     f = target - t;
   }
 
-  type = srcinfo.type;		/* so mcmp() knows what type it is */
+  type = srcinfo.type;		// so mcmp() knows what type it is
 
   tmp0.b = (uint8_t*) malloc(nelem*srcinfo.stride);
   if (!tmp0.b)
     return cerror(ALLOC_ERR, 0);
 
-  /* now we do the actual filtering */
+  // now we do the actual filtering
   do {
     tmp.b = tmp0.b;
     do {
@@ -796,19 +796,19 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
   free(tmp0.b);
   return output;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_median(int32_t narg, int32_t ps[])
-     /* median filter */
+     // median filter
 {
   internalMode = 1;
   return lux_quantile(narg, ps);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_minfilter(int32_t narg, int32_t ps[])
-     /* minimum filter */
-/* Applies a running minimum filter to a data set */
-/* syntax:  Y = MINFILTER(X [[,AXIS], WIDTH]) */
-/* LS 31dec95 30jul97 */
+     // minimum filter
+// Applies a running minimum filter to a data set
+// syntax:  Y = MINFILTER(X [[,AXIS], WIDTH])
+// LS 31dec95 30jul97
 {
   Symboltype	type;
   int32_t	n, result, i, offset1, offset2, stride,	w1, j, ww, loop, iq, three=3,
@@ -821,8 +821,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_INT8,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
-  if (narg > 1) {		/* <width> */
-    /* check that it is numerical and ensure that it is LUX_INT32 */
+  if (narg > 1) {		// <width>
+    // check that it is numerical and ensure that it is LUX_INT32
     if (getNumerical(ps[narg - 1], LUX_INT32, &nWidth, &width,
 		     GN_UPDATE | GN_UPGRADE, NULL, NULL) < 0)
       return LUX_ERROR;
@@ -836,7 +836,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
     width.l = &three;
     nWidth = 1;
   }
-  iq = ps[0];			/* data */
+  iq = ps[0];			// data
   type = symbol_type(iq);
   if (!srcinfo.naxes)
     srcinfo.naxes++;
@@ -853,8 +853,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	return cerror(ILL_TYPE, ps[0]);
       case LUX_INT8:
 	do {
-	  value.b = bounds.max.b;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.b = bounds.max.b;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.b < value.b)
 	      value.b = *src.b;
 	    src.b += stride;
@@ -863,7 +863,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.b < value.b) {
 	      value.b = *src.b;
 	      src.b += stride;
@@ -881,7 +881,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
@@ -890,8 +890,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_INT16:
 	do {
-	  value.w = bounds.max.w;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.w = bounds.max.w;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.w < value.w)
 	      value.w = *src.w;
 	    src.w += stride;
@@ -900,7 +900,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.w < value.w) {
 	      value.w = *src.w;
 	      src.w += stride;
@@ -918,7 +918,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
@@ -927,8 +927,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_INT32:
 	do {
-	  value.l = bounds.max.l;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.l = bounds.max.l;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.l < value.l)
 	      value.l = *src.l;
 	    src.l += stride;
@@ -937,7 +937,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.l < value.l) {
 	      value.l = *src.l;
 	      src.l += stride;
@@ -955,7 +955,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
@@ -964,8 +964,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_INT64:
 	do {
-	  value.q = bounds.max.q;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.q = bounds.max.q;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.q < value.q)
 	      value.q = *src.q;
 	    src.q += stride;
@@ -974,7 +974,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.q = value.q;
 	    trgt.q += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.q < value.q) {
 	      value.q = *src.q;
 	      src.q += stride;
@@ -992,7 +992,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.q = value.q;
 	    trgt.q += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.q = value.q;
 	    trgt.q += stride;
 	  }
@@ -1001,8 +1001,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_FLOAT:
 	do {
-	  value.f = bounds.max.f;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.f = bounds.max.f;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.f < value.f)
 	      value.f = *src.f;
 	    src.f += stride;
@@ -1011,7 +1011,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.f < value.f) {
 	      value.f = *src.f;
 	      src.f += stride;
@@ -1029,7 +1029,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
@@ -1038,8 +1038,8 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_DOUBLE:
 	do {
-	  value.d = bounds.max.d;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.d = bounds.max.d;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.d < value.d)
 	      value.d = *src.d;
 	    src.d += stride;
@@ -1048,7 +1048,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.d < value.d) {
 	      value.d = *src.d;
 	      src.d += stride;
@@ -1066,7 +1066,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
@@ -1076,11 +1076,11 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
     }
     if (loop < srcinfo.naxes - 1) {
       nextLoops(&srcinfo, &trgtinfo);
-      if (isFreeTemp(iq)) {	/* can use iq to hold next result */
+      if (isFreeTemp(iq)) {	// can use iq to hold next result
 	n = result;
 	result = iq;
 	iq = n;
-      } else {			/* need new temp for next result */
+      } else {			// need new temp for next result
 	iq = result;
 	result = array_clone(iq, type);
       }
@@ -1090,12 +1090,12 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
   }
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_maxfilter(int32_t narg, int32_t ps[])
-/* maximum filter */
-/* Applies a running maximum filter to a data set */
-/* syntax:  Y = MAXFILTER(X [[,AXIS], WIDTH]) */
-/* LS 31dec95 30jul97 */
+// maximum filter
+// Applies a running maximum filter to a data set
+// syntax:  Y = MAXFILTER(X [[,AXIS], WIDTH])
+// LS 31dec95 30jul97
 {
   Symboltype	type;
   int32_t n, result, i, offset1, offset2, stride, w1, j, ww, loop,
@@ -1108,8 +1108,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 		   SL_SAMEDIMS | SL_UPGRADE | SL_EACHROW, LUX_INT8,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
-  if (narg > 1) {		/* <width> */
-    /* check that it is numerical and ensure that it is LUX_INT32 */
+  if (narg > 1) {		// <width>
+    // check that it is numerical and ensure that it is LUX_INT32
     if (getNumerical(ps[narg - 1], LUX_INT32, &nWidth, &width,
 		     GN_UPGRADE | GN_UPDATE, NULL, NULL) < 0)
       return LUX_ERROR;
@@ -1123,7 +1123,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
     width.l = &three;
     nWidth = 1;
   }
-  iq = ps[0];			/* data */
+  iq = ps[0];			// data
   type = symbol_type(iq);
   if (!srcinfo.naxes)
     srcinfo.naxes++;
@@ -1140,8 +1140,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	return cerror(ILL_TYPE, ps[0]);
       case LUX_INT8:
 	do {
-	  value.b = bounds.min.b;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.b = bounds.min.b;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.b > value.b)
 	      value.b = *src.b;
 	    src.b += stride;
@@ -1150,7 +1150,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.b > value.b) {
 	      value.b = *src.b;
 	      src.b += stride;
@@ -1168,7 +1168,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.b = value.b;
 	    trgt.b += stride;
 	  }
@@ -1177,8 +1177,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_INT16:
 	do {
-	  value.w = bounds.min.w;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.w = bounds.min.w;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.w > value.w)
 	      value.w = *src.w;
 	    src.w += stride;
@@ -1187,7 +1187,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.w > value.w) {
 	      value.w = *src.w;
 	      src.w += stride;
@@ -1205,7 +1205,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.w = value.w;
 	    trgt.w += stride;
 	  }
@@ -1214,8 +1214,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_INT32:
 	do {
-	  value.l = bounds.min.l;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.l = bounds.min.l;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.l > value.l)
 	      value.l = *src.l;
 	    src.l += stride;
@@ -1224,7 +1224,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.l > value.l) {
 	      value.l = *src.l;
 	      src.l += stride;
@@ -1242,7 +1242,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.l = value.l;
 	    trgt.l += stride;
 	  }
@@ -1251,8 +1251,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_INT64:
 	do {
-	  value.q = bounds.min.q;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.q = bounds.min.q;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.q > value.q)
 	      value.q = *src.q;
 	    src.q += stride;
@@ -1261,7 +1261,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.q = value.q;
 	    trgt.q += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.q > value.q) {
 	      value.q = *src.q;
 	      src.q += stride;
@@ -1279,7 +1279,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.q = value.q;
 	    trgt.q += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.q = value.q;
 	    trgt.q += stride;
 	  }
@@ -1288,8 +1288,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_FLOAT:
 	do {
-	  value.f = bounds.min.f;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.f = bounds.min.f;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.f > value.f)
 	      value.f = *src.f;
 	    src.f += stride;
@@ -1298,7 +1298,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.f > value.f) {
 	      value.f = *src.f;
 	      src.f += stride;
@@ -1316,7 +1316,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.f = value.f;
 	    trgt.f += stride;
 	  }
@@ -1325,8 +1325,8 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	break;
       case LUX_DOUBLE:
 	do {
-	  value.d = bounds.min.d;	/* initialize */
-	  for (i = 0; i < ww; i++) { /* do the left edge */
+	  value.d = bounds.min.d;	// initialize
+	  for (i = 0; i < ww; i++) { // do the left edge
 	    if (*src.d > value.d)
 	      value.d = *src.d;
 	    src.d += stride;
@@ -1335,7 +1335,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
-	  for (i = ww; i < srcinfo.rdims[0]; i++) { /* middle part */
+	  for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
 	    if (*src.d > value.d) {
 	      value.d = *src.d;
 	      src.d += stride;
@@ -1353,7 +1353,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
-	  for (i = w1; i < ww; i++) { /* right edge */
+	  for (i = w1; i < ww; i++) { // right edge
 	    *trgt.d = value.d;
 	    trgt.d += stride;
 	  }
@@ -1363,11 +1363,11 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
     }
     if (loop < srcinfo.naxes - 1) {
       nextLoops(&srcinfo, &trgtinfo);
-      if (isFreeTemp(iq)) {	/* can use iq to hold next result */
+      if (isFreeTemp(iq)) {	// can use iq to hold next result
 	n = result;
 	result = iq;
 	iq = n;
-      } else {			/* need new temp for next result */
+      } else {			// need new temp for next result
 	iq = result;
 	result = array_clone(iq, type);
       }
@@ -1377,13 +1377,13 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
   }
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_distarr(int32_t narg, int32_t ps[])
-/* DISTARR(dims[,center,stretch]) returns a FLOAT array of dimensions <dims> */
-/* wherein each element contains the distance of the coordinates of */
-/* that element to the point given in <center>, after stretching each */
-/* coordinate by the appropriate factor from <stretch>.  <dims>, <center>, */
-/* and <stretch> must have the same number of elements.  LS 9jan97 22may97 */
+// DISTARR(dims[,center,stretch]) returns a FLOAT array of dimensions <dims>
+// wherein each element contains the distance of the coordinates of
+// that element to the point given in <center>, after stretching each
+// coordinate by the appropriate factor from <stretch>.  <dims>, <center>,
+// and <stretch> must have the same number of elements.  LS 9jan97 22may97
 {
   int32_t	iq, *dims, ndim, i, result, done;
   float	*center, temp, temptot, zerocenter[MAX_DIMS], *stretch,
@@ -1391,7 +1391,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   Pointer	trgt;
   LoopInfo	trgtinfo;
 
-  iq = lux_long(1, &ps[0]);	/* DIMS */
+  iq = lux_long(1, &ps[0]);	// DIMS
   switch (symbol_class(iq))
   { case LUX_ARRAY:
       dims = (int32_t *) array_data(iq);
@@ -1404,7 +1404,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
     default:
       return cerror(ILL_CLASS, ps[0]); }
   if (narg > 1)
-  { iq = lux_float(1, &ps[1]);	/* CENTER */
+  { iq = lux_float(1, &ps[1]);	// CENTER
     switch (symbol_class(iq))
     { case LUX_ARRAY:
 	if (array_size(iq) != ndim)
@@ -1422,7 +1422,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   { zerobytes(zerocenter, ndim*sizeof(float));
     center = zerocenter; }
   if (narg > 2)
-  { iq = lux_float(1, &ps[2]);	/* STRETCH */
+  { iq = lux_float(1, &ps[2]);	// STRETCH
     switch (symbol_class(iq))
     { case LUX_ARRAY:
 	if (array_size(iq) != ndim)
@@ -1442,17 +1442,17 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
       onestretch[i] = 1.0;
     stretch = onestretch; }
   
-				/* check output dimensions */
+				// check output dimensions
   for (i = 0; i < ndim; i++)
     if (dims[i] <= 0)
       return cerror(ILL_DIM, ps[0]);
   result = array_scratch(LUX_FLOAT, ndim, dims);
-  if (result == LUX_ERROR)	/* some error */
+  if (result == LUX_ERROR)	// some error
     return LUX_ERROR;
   trgt.f = (float *) array_data(result);
   setupDimensionLoop(&trgtinfo, ndim, dims, LUX_FLOAT, ndim, NULL, &trgt,
 		     SL_EACHCOORD);
-  /* initialize walk through array */
+  // initialize walk through array
   temptot = 0.0;
   for (i = 1; i < ndim; i++)
   { temp = center[i]*stretch[i];
@@ -1460,7 +1460,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   do
   { temp = (trgtinfo.coords[0] - center[0])*stretch[0];
     *trgt.f = temp*temp + temptot;
-    *trgt.f = sqrt((double) *trgt.f); /* distance */
+    *trgt.f = sqrt((double) *trgt.f); // distance
     done = advanceLoop(&trgtinfo, &trgt);
     if (done && done < ndim)
     { temptot = 0.0;
@@ -1471,7 +1471,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   } while (done < ndim);
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_multisieve(int32_t narg, int32_t ps[])
 /*  MULTISIEVE, x, y, list, index
     returns <list> and <index> such that
@@ -1486,119 +1486,119 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
     *reallocbase, nMatch, *number, j;
 
   if (getSimpleNumerical(ps[0], &xData, &nx) < 0)
-    return -1;			/* some error occurred */
+    return -1;			// some error occurred
   if (getSimpleNumerical(ps[1], &yData, &ny) < 0)
     return -1;
 
-  /* make arguments have same data type */
+  // make arguments have same data type
   maxType = symbol_type(ps[0]);
-  if (symbol_type(ps[1]) > maxType) { /* need to upgrade ps[0] */
+  if (symbol_type(ps[1]) > maxType) { // need to upgrade ps[0]
     maxType = symbol_type(ps[1]);
     iq = lux_convert(1, ps, maxType, 1);
     getSimpleNumerical(iq, &yData, &ny);
-  } else if (symbol_type(ps[1]) < maxType) { /* upgrade ps[1] */
+  } else if (symbol_type(ps[1]) < maxType) { // upgrade ps[1]
     maxType = symbol_type(ps[0]);
     iq = lux_convert(1, ps + 1, maxType, 1);
     getSimpleNumerical(iq, &xData, &nx);
   }
   
-  nTemp = 1000;			/* start with 1000 elements */
+  nTemp = 1000;			// start with 1000 elements
   nnTemp = nTemp - 2;
   ALLOCATE(temp, nTemp, int32_t);
   base = temp;
   step = lux_type_size[maxType];
 
   n = ny + 1;
-  if (redef_array(ps[3], LUX_INT32, 1, &n) < 0) /* <indices> */
+  if (redef_array(ps[3], LUX_INT32, 1, &n) < 0) // <indices>
     return -1;
   indexData = (int32_t*) array_data(ps[3]);
   indexData[0] = 0;
   indexData++;
   zerobytes((char *) indexData, ny*sizeof(int32_t));
 
-  /* get results */
-  /* we maintain a list of matches as follows: the list consists of a */
-  /* set of ranges of matches.  Each range is specified by first the */
-  /* start index in <x>, then the number of matches that follow in the */
-  /* current range, and then the matches for that range.  if fewer than */
-  /* three no-matches follow the last match in the current range, then */
-  /* the no-matches and the current match are entered in the current */
-  /* range, otherwise a new range is started.  This scheme ensures that */
-  /* the list gets at most two elements longer than <x> itself. */
-  /* Example: if <x> = 1 2 3 7 1 6 7 5 7 5 and <y> = 1 5 7 then */
-  /* the matches are as follows: */
-  /*   x     1 2 3 3 7 1 6 7 5 7 5 */
-  /*   match 0 - - - 2 0 - 2 1 2 1 */
-  /* and the temporary match list comes out as follows: */
-  /*   0 1 0 4 7 2 0 -1 2 1 2 1 */
+  // get results
+  // we maintain a list of matches as follows: the list consists of a
+  // set of ranges of matches.  Each range is specified by first the
+  // start index in <x>, then the number of matches that follow in the
+  // current range, and then the matches for that range.  if fewer than
+  // three no-matches follow the last match in the current range, then
+  // the no-matches and the current match are entered in the current
+  // range, otherwise a new range is started.  This scheme ensures that
+  // the list gets at most two elements longer than <x> itself.
+  // Example: if <x> = 1 2 3 7 1 6 7 5 7 5 and <y> = 1 5 7 then
+  // the matches are as follows:
+  //   x     1 2 3 3 7 1 6 7 5 7 5
+  //   match 0 - - - 2 0 - 2 1 2 1
+  // and the temporary match list comes out as follows:
+  //   0 1 0 4 7 2 0 -1 2 1 2 1
   noMatch = 999;
   ix = nMatch = 0;
-  *temp = 0;			/* no matches so far */
+  *temp = 0;			// no matches so far
   while (1)
   { while (nnTemp > 3 && ix < nx)
-    { match = -1;		/* default: no match */
+    { match = -1;		// default: no match
       switch (maxType)
       { case LUX_INT8:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.b == yData.b[i])
 	    { match = i;
-	      indexData[match]++; /* count */
+	      indexData[match]++; // count
 	      break; }
 	  break;
 	case LUX_INT16:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.w == yData.w[i])
 	    { match = i;
-	      indexData[match]++; /* count */
+	      indexData[match]++; // count
 	      break; }
 	  break;
 	case LUX_INT32:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.l == yData.l[i])
 	    { match = i;
-	      indexData[match]++; /* count */
+	      indexData[match]++; // count
 	      break; }
 	  break;
 	case LUX_INT64:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.q == yData.q[i])
 	    { match = i;
-	      indexData[match]++; /* count */
+	      indexData[match]++; // count
 	      break; }
 	  break;
 	case LUX_FLOAT:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.f == yData.f[i])
 	    { match = i;
-	      indexData[match]++; /* count */
+	      indexData[match]++; // count
 	      break; }
 	  break;
 	case LUX_DOUBLE:
 	  for (i = 0; i < ny; i++)
 	    if (*xData.d == yData.d[i])
 	    { match = i;
-	      indexData[match]++; /* count */
+	      indexData[match]++; // count
 	      break; }
 	  break;
 	}
-      if (match >= 0) {	/* have a match */
+      if (match >= 0) {	// have a match
 	nMatch++;
 	switch (noMatch)
-	{ case 2:		/* two no-matches before */
+	{ case 2:		// two no-matches before
 	    temp[++(*temp)] = -1;
 	    nnTemp--;
-	    /* fall-thru */
-	  case 1:		/* one no-match before */
+	    // fall-thru
+	  case 1:		// one no-match before
 	    temp[++(*temp)] = -1;
 	    nnTemp--;
 	    noMatch = 0;
-	    /* fall-thru */
-	  case 0:		/* previous one was a match, too */
+	    // fall-thru
+	  case 0:		// previous one was a match, too
 	    temp[++(*temp)] = match;
 	    nnTemp--;
 	    break;
-	  default:		/* three or more no-matches before: */
-				/* start a new range */
+	  default:		// three or more no-matches before:
+				// start a new range
 	    temp += *temp + 1;
 	    *temp++ = ix;
 	    *temp = 1;
@@ -1610,7 +1610,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
       else ++noMatch;
       xData.b += step;
       ix++; }
-    if (ix != nx)		/* more to do */
+    if (ix != nx)		// more to do
     { nTemp += 1000;
       reallocbase = (int32_t*) Realloc(base, nTemp*sizeof(int32_t));
       if (reallocbase == NULL)
@@ -1621,14 +1621,14 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
       nnTemp += 1000; }
     else break; }
 
-  if (!nMatch)			/* no matches at all: return -1 */
+  if (!nMatch)			// no matches at all: return -1
   { undefine(ps[2]);
     symbol_class(ps[2]) = LUX_SCALAR;
     scalar_type(ps[2]) = LUX_INT32;
     scalar_value(ps[2]).l = -1; }
   else
-  { if (redef_array(ps[2], LUX_INT32, 1, &nMatch) < 0) /* <list> */
-      return -1;		/* some error */
+  { if (redef_array(ps[2], LUX_INT32, 1, &nMatch) < 0) // <list>
+      return -1;		// some error
     listData = (int32_t*) array_data(ps[2]);
 
     temp = indexData;
@@ -1648,10 +1648,10 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
     
     temp = base + 1;
     while (ix) {
-      step = *temp++;		/* offset */
-      n = *temp++;		/* number */
+      step = *temp++;		// offset
+      n = *temp++;		// number
       for (j = 0; j < n; j++) {
-	if (*temp < 0)		/* no match */
+	if (*temp < 0)		// no match
 	{ temp++;
 	  continue; }
 	ix--;
@@ -1666,10 +1666,10 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   free(base);
   return 1;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_temp(int32_t narg, int32_t ps[])
-/* experimental routine: returns temp copy of symbol if it is */
-/* a named symbol */
+// experimental routine: returns temp copy of symbol if it is
+// a named symbol
 {
   int32_t	result;
 
@@ -1678,7 +1678,7 @@ int32_t lux_temp(int32_t narg, int32_t ps[])
     return copyToSym(result, *ps); }
   else return *ps;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
 /* SHIFT(x[,axes],dist[,BLANK=blank][,/TRANSLATE]) shifts the data in
  <x> over distances <dist> (a scalar or an array containing one
@@ -1703,8 +1703,8 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
     return cerror(NEED_ARR, ps[0]);
 
   if (narg == 1 || (narg == 4 && !ps[1] && !ps[2])) {
-    /* SHIFT(x) */
-    /* create <dist> = DIMEN(<x>)/2 */
+    // SHIFT(x)
+    // create <dist> = DIMEN(<x>)/2
     iq = array_num_dims(ps[0]);
     distSym = array_scratch(LUX_INT32, 1, &iq);
     ptr = (int32_t*) array_data(distSym);
@@ -1713,22 +1713,22 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
       *ptr = *ptr/2;
       ptr++;
     }
-    axesSym = lux_indgen(1, &distSym); /* create <axes> = INDGEN(<dist>) */
+    axesSym = lux_indgen(1, &distSym); // create <axes> = INDGEN(<dist>)
   } else if (narg == 2 || (narg == 4 && !ps[2])) {
-    /* SHIFT(x,dist) */
-    axesSym = lux_indgen(1, ps + 1); /* <axes> = INDGEN(<dist>) */
-    distSym = ps[1];		/* <dist> */
+    // SHIFT(x,dist)
+    axesSym = lux_indgen(1, ps + 1); // <axes> = INDGEN(<dist>)
+    distSym = ps[1];		// <dist>
   } else if (narg > 2 && ps[2]) {
-    /* SHIFT(x,axes,dist) */
+    // SHIFT(x,axes,dist)
     axesSym = ps[1];
     distSym = ps[2];
   }
-  if (narg > 3 && ps[3]) {	/* <blank> */
+  if (narg > 3 && ps[3]) {	// <blank>
     if (!symbolIsScalar(ps[3]))
       return cerror(NEED_SCAL, ps[3]);
     iq = lux_converts[array_type(ps[0])](1, ps + 3);
     blank.l = &scalar_value(iq).l;
-    internalMode |= 1;		/* /TRANSLATE */
+    internalMode |= 1;		// /TRANSLATE
   } else
     blank.d = &zero;
 
@@ -1748,17 +1748,17 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
   }
   src0 = src;
   trgt0 = trgt;
-  if (numerical(distSym, NULL, NULL, &i, NULL) < 0) /* distance */
+  if (numerical(distSym, NULL, NULL, &i, NULL) < 0) // distance
     return LUX_ERROR;
-  if (i != srcinfo.naxes)	/* must have one distance for each axis */
+  if (i != srcinfo.naxes)	// must have one distance for each axis
     return cerror(INCMP_ARG, distSym);
-  i = lux_long(1, &distSym);	/* ensure LONG */
+  i = lux_long(1, &distSym);	// ensure LONG
   numerical(i, NULL, NULL, NULL, &shift);
-  if (internalMode & 1) {	/* non-circular shift */
+  if (internalMode & 1) {	// non-circular shift
     for (i = 0; i < srcinfo.naxes; i++)
       if (shift.l[i] >= srcinfo.rdims[0] || shift.l[i] <= -srcinfo.rdims[0]) {
-	/* the requested shift distance is so great that no part of the */
-	/* old image remains in the field of view */
+	// the requested shift distance is so great that no part of the
+	// old image remains in the field of view
 	zerobytes(trgt.v, srcinfo.nelem*lux_type_size[srcinfo.type]);
 	return isFunction? iq: LUX_OK;
       }
@@ -1779,8 +1779,8 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
 	  memcpy(tmp0 + (srcinfo.rdims[0] + i + j)*srcinfo.stride,
 		 blank.b, srcinfo.stride);
       do {
-	/* we assemble the shifted elements in some temporary storage */
-	if (offset > 0) {	/* we're shifting forward */
+	// we assemble the shifted elements in some temporary storage
+	if (offset > 0) {	// we're shifting forward
 	  tmp = tmp0 + offset;
 	  for (j = 0; j < srcinfo.rdims[0] - i; j++) {
 	    memcpy(tmp, src.b, srcinfo.stride);
@@ -1788,7 +1788,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
 	    src.b += step;
 	  }
 	  src.b += i*step;
-	} else {		/* we're shifting backward */
+	} else {		// we're shifting backward
 	  tmp = tmp0;
 	  src.b -= step*i;
 	  for (j = -i; j < srcinfo.rdims[0]; j++) {
@@ -1797,7 +1797,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
 	    src.b += step;
 	  }
 	}
-	/* and we move the finished elements to their final location */
+	// and we move the finished elements to their final location
 	tmp = tmp0;
 	for (j = 0; j < srcinfo.rdims[0]; j++) {
 	  memcpy(trgt.b, tmp, srcinfo.stride);
@@ -1806,13 +1806,13 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
 	}
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
-      src0.b = trgt0.b;		/* take result of previous loop as source */
-      /* of next one */
+      src0.b = trgt0.b;		// take result of previous loop as source
+      // of next one
     } while (nextLoops(&srcinfo, &trgtinfo));
-  } else			/* circular shift */
+  } else			// circular shift
     do {
-      i = *shift.l++;		/* shift distance in current dimension */
-      /* reduce shift distance to interval (0:srcinfo.rdims[0]-1) */
+      i = *shift.l++;		// shift distance in current dimension
+      // reduce shift distance to interval (0:srcinfo.rdims[0]-1)
       if (i < 0)
 	i += srcinfo.rdims[0]*(1 - i/srcinfo.rdims[0]);
       if (i >= srcinfo.rdims[0])
@@ -1825,22 +1825,22 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
       if (!tmp0)
 	return cerror(ALLOC_ERR, 0);
       do {
-	/* we assemble the shifted elements in some temporary storage */
-	/* first the elements that get shifted forward */
+	// we assemble the shifted elements in some temporary storage
+	// first the elements that get shifted forward
 	tmp = tmp0 + offset;
 	for (j = 0; j < srcinfo.rdims[0] - i; j++) {
 	  memcpy(tmp, src.b, srcinfo.stride);
 	  tmp += srcinfo.stride;
 	  src.b += step;
 	}
-	/* then the elements that get shifted backward */
+	// then the elements that get shifted backward
 	tmp = tmp0;
 	for (; j < srcinfo.rdims[0]; j++) {
 	  memcpy(tmp, src.b, srcinfo.stride);
 	  tmp += srcinfo.stride;
 	  src.b += step;
 	}
-	/* finally, we move the finished elements to their final location */
+	// finally, we move the finished elements to their final location
 	tmp = tmp0;
 	for (j = 0; j < srcinfo.rdims[0]; j++) {
 	  memcpy(trgt.b, tmp, srcinfo.stride);
@@ -1849,34 +1849,34 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
 	}
       } while (advanceLoop(&trgtinfo, &trgt),
 	       advanceLoop(&srcinfo, &src) < srcinfo.rndim);
-      src0.b = trgt0.b;		/* take result of previous loop as source */
-      /* of next one */
+      src0.b = trgt0.b;		// take result of previous loop as source
+      // of next one
     } while (nextLoops(&srcinfo, &trgtinfo));
   free(tmp0);
   return isFunction? iq: LUX_OK;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_shift_f(int32_t narg, int32_t ps[])
 {
   return shift(narg, ps, 1);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_shift(int32_t narg, int32_t ps[])
 {
   return shift(narg, ps, 0);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_swaphalf(int32_t narg, int32_t ps[])
-/* SWAPHALF,d  swaps elements of <d> such that new coordinate x_i' is */
-/* related to old coordinate x_i according to */
-/* x_i' = (x_i + n_i/2) mod n_i  where n_i is the size of <d> in */
-/* dimension i.  Such swapping is useful in conjunction with */
-/* Fourier and Hartley transforms which (at least in LUX) return */
-/* data such that wavevector 0 ends up in result element 0.  After */
-/* swapping with SWAPHALF, wavevector 0 is in the middle of the */
-/* array (at coordinates n_i/2) and the length of any wavevector */
-/* is given by its cartesian distance to the middle of the array. */
-/* LS 21may97 */
+// SWAPHALF,d  swaps elements of <d> such that new coordinate x_i' is
+// related to old coordinate x_i according to
+// x_i' = (x_i + n_i/2) mod n_i  where n_i is the size of <d> in
+// dimension i.  Such swapping is useful in conjunction with
+// Fourier and Hartley transforms which (at least in LUX) return
+// data such that wavevector 0 ends up in result element 0.  After
+// swapping with SWAPHALF, wavevector 0 is in the middle of the
+// array (at coordinates n_i/2) and the length of any wavevector
+// is given by its cartesian distance to the middle of the array.
+// LS 21may97
 {
   int32_t	i, dims[MAX_DIMS], ndim, tally[MAX_DIMS], step[MAX_DIMS],
 	n, width, jump;
@@ -1923,13 +1923,13 @@ int32_t lux_swaphalf(int32_t narg, int32_t ps[])
   } while (i < ndim);
   return 1;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_equivalence(int32_t narg, int32_t ps[])
-/* returns equivalence classes.  If <x1> and <x2> are equivalence relations */
-/* such that for all <i> elements <x1(i)> and <x2(i)> are in the same class */
-/* then <y> = EQUIVALENCE(<x1>,<x2>) returns in each <y(i)> the smallest */
-/* element of <x1> and <x2> that is in the same class as elements <x(i)> */
-/* and <y(i)>.  LS 30jul97 */
+// returns equivalence classes.  If <x1> and <x2> are equivalence relations
+// such that for all <i> elements <x1(i)> and <x2(i)> are in the same class
+// then <y> = EQUIVALENCE(<x1>,<x2>) returns in each <y(i)> the smallest
+// element of <x1> and <x2> that is in the same class as elements <x(i)>
+// and <y(i)>.  LS 30jul97
 {
   int32_t	result, n, *x1, *x2, *class_id, *trgt, mx, mn, nClass, i, a1, a2;
 
@@ -1964,11 +1964,11 @@ int32_t lux_equivalence(int32_t narg, int32_t ps[])
   for (i = 0; i < n; i++)
   { a1 = x1[i] - mn;
     a2 = x2[i] - mn;
-    while (class_id[a1] != a1)	/* find most remote "ancestor" */
+    while (class_id[a1] != a1)	// find most remote "ancestor"
       a1 = class_id[a1];
     while (class_id[a2] != a2)
       a2 = class_id[a2];
-    if (a1 < a2)		/* reclassify */
+    if (a1 < a2)		// reclassify
       class_id[a2] = a1;
     else
       class_id[a1] = a2; }
@@ -1982,7 +1982,7 @@ int32_t lux_equivalence(int32_t narg, int32_t ps[])
   free(class_id);
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 /* local extreme search in multiple dimensions
    (x [, diagonal], /DEGREE, /SUBGRID])
@@ -2013,7 +2013,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     return LUX_ERROR;
 
   subgrid = (internalMode & 2);
-  sign = (code & 2);		/* 1 -> seek maxima */
+  sign = (code & 2);		// 1 -> seek maxima
 
   n = prepareDiagonals(narg > 1? ps[1]: 0, &srcinfo, 2, &offset, &edge, NULL,
 		       &diagonal);
@@ -2022,8 +2022,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 
 
   if (!degree) {
-    /* allocate some memory; we guess how many hits we might find */
-    /* NOTE: must check that we don't run out of memory! */
+    // allocate some memory; we guess how many hits we might find
+    // NOTE: must check that we don't run out of memory!
     if (diagonal) {
       nDoDim = 0;
       for (i = 0; i < srcinfo.ndim; i++)
@@ -2042,7 +2042,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     zerobytes(trgt.l, i*sizeof(int32_t));
   }
 
-  /* we exclude the selected edges */
+  // we exclude the selected edges
   for (i = 0; i < srcinfo.ndim; i++)
     if (edge[2*i + 1]) {
       edge[2*i + 1] = srcinfo.dims[i] - 2;
@@ -2050,7 +2050,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
         edge[2*i + 1] = 0;
     }
   if (degree) {
-    /* we set the edges to zero */
+    // we set the edges to zero
     for (i = 0; i < trgtinfo.ndim; i++)
       if (edge[i]) {
 	rearrangeEdgeLoop(&trgtinfo, NULL, i);
@@ -2058,18 +2058,18 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  *trgt.l = 0;
 	while (advanceLoop(&trgtinfo, &trgt) < trgtinfo.ndim - 1);
       }
-    /* and exclude the edges from further dealings */
+    // and exclude the edges from further dealings
     subdataLoop(edge, &trgtinfo);
   }
   subdataLoop(edge, &srcinfo);
   free(edge);
 
-  /* now do the loop work */
+  // now do the loop work
   switch (array_type(ps[0])) {
     case LUX_INT8:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */
+	for (j = 0; j < n; j++) {	// all directions
 	  k = offset[j];
 	  srcl.b = src.b + k;
 	  srcr.b = src.b - k;
@@ -2080,8 +2080,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  else if (!ok) {
 	    nok = 0;
 	    break;
-	  }	/* end if (!ok) */
-	} /* end for (j = 0; j < n; j++) */
+	  }	// end if (!ok)
+	} // end for (j = 0; j < n; j++)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
@@ -2094,7 +2094,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_INT16:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */
+	for (j = 0; j < n; j++) {	// all directions
 	  k = offset[j];
 	  srcl.w = src.w + k;
 	  srcr.w = src.w - k;
@@ -2105,8 +2105,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  else if (!ok) {
 	    nok = 0;
 	    break;
-	  }	/* end if (!ok) */
-	} /* end for (j = 0; j < n; j++) */
+	  }	// end if (!ok)
+	} // end for (j = 0; j < n; j++)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
@@ -2119,7 +2119,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_INT32:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */
+	for (j = 0; j < n; j++) {	// all directions
 	  k = offset[j];
 	  srcl.l = src.l + k;
 	  srcr.l = src.l - k;
@@ -2130,8 +2130,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  else if (!ok) {
 	    nok = 0;
 	    break;
-	  }	/* end if (!ok) */
-	} /* end for (j = 0; j < n; j++) */
+	  }	// end if (!ok)
+	} // end for (j = 0; j < n; j++)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
@@ -2144,7 +2144,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_INT64:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */
+	for (j = 0; j < n; j++) {	// all directions
 	  k = offset[j];
 	  srcl.q = src.q + k;
 	  srcr.q = src.q - k;
@@ -2155,8 +2155,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  else if (!ok) {
 	    nok = 0;
 	    break;
-	  }	/* end if (!ok) */
-	} /* end for (j = 0; j < n; j++) */
+	  }	// end if (!ok)
+	} // end for (j = 0; j < n; j++)
 	if (degree)
 	  *trgt.q = nok;
 	else if (nok)
@@ -2169,7 +2169,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_FLOAT:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */
+	for (j = 0; j < n; j++) {	// all directions
 	  k = offset[j];
 	  srcl.f = src.f + k;
 	  srcr.f = src.f - k;
@@ -2180,8 +2180,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  else if (!ok) {
 	    nok = 0;
 	    break;
-	  }	/* end if (!ok) */
-	} /* end for (j = 0; j < n; j++) */
+	  }	// end if (!ok)
+	} // end for (j = 0; j < n; j++)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
@@ -2194,7 +2194,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     case LUX_DOUBLE:
       do {
 	nok = 1 - degree;
-	for (j = 0; j < n; j++) {	/* all directions */
+	for (j = 0; j < n; j++) {	// all directions
 	  k = offset[j];
 	  srcl.d = src.d + k;
 	  srcr.d = src.d - k;
@@ -2205,8 +2205,8 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	  else if (!ok) {
 	    nok = 0;
 	    break;
-	  }	/* end if (!ok) */
-	} /* end for (j = 0; j < n; j++) */
+	  }	// end if (!ok)
+	} // end for (j = 0; j < n; j++)
 	if (degree)
 	  *trgt.l = nok;
 	else if (nok)
@@ -2220,21 +2220,21 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 
   nDiagonal = 0;
   if (!degree) {
-    n = trgt.l - trgt0.l;	/* number of found extrema */
-    if (!n)			/* none found */
+    n = trgt.l - trgt0.l;	// number of found extrema
+    if (!n)			// none found
       return LUX_MINUS_ONE;
     switch (code) {
-      case 0: case 2:		/* find values */
+      case 0: case 2:		// find values
 	result = array_scratch(LUX_FLOAT, 1, &n);
 	trgt.f = (float *) array_data(result);
-      case 1: case 3:		/* find positions */
-	if (!(internalMode & 4) && !subgrid) {	/* not /COORDS, not /SUBGRID */
-	  srcinfo.coords[0] = n;	/* number of found extrema */
+      case 1: case 3:		// find positions
+	if (!(internalMode & 4) && !subgrid) {	// not /COORDS, not /SUBGRID
+	  srcinfo.coords[0] = n;	// number of found extrema
 	  result = array_scratch(LUX_INT32, 1, srcinfo.coords);
 	  trgt.l = (int32_t *) array_data(result);
 	} else {
-	  srcinfo.coords[0] = srcinfo.ndim; /* # dimensions in the data */
-	  srcinfo.coords[1] = n;	/* number of found extrema */
+	  srcinfo.coords[0] = srcinfo.ndim; // # dimensions in the data
+	  srcinfo.coords[1] = n;	// number of found extrema
 	  result = array_scratch(subgrid? LUX_FLOAT: LUX_INT32, 2,
 				 srcinfo.coords);
 	  trgt.l = (int32_t *) array_data(result);
@@ -2242,7 +2242,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     	break;
     }
     if (result < 0)
-      return LUX_ERROR;		/* some error */
+      return LUX_ERROR;		// some error
     if (subgrid) {
       /* count the number of dimensions that allow diagonal links:
 	 the quadratic fits involve only those dimensions */
@@ -2252,7 +2252,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	for (i = 0; i < srcinfo.ndim; i++)
 	  if (diagonal[i])
 	    nDiagonal++;
-      }	/* end of if (!diagonal) else */
+      }	// end of if (!diagonal) else
       if (nDiagonal) {
 	ALLOCATE(grad2, nDiagonal, float);
 	ALLOCATE(grad, nDiagonal, float);
@@ -2260,16 +2260,16 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	k = 0;
 	for (i = 0; i < srcinfo.ndim; i++)
 	  if (!diagonal || diagonal[i])
-	    srcinfo.step[k] = srcinfo.step[i]; /* participating dimensions */
-      }	/* end of if (nDiagonal) */
+	    srcinfo.step[k] = srcinfo.step[i]; // participating dimensions
+      }	// end of if (nDiagonal)
 
-      src.l = (int32_t *) array_data(ps[0]); /* data */
-      while (n--) {		/* all found extrema */
-	index = k = *trgt0.l++;	/* index of extremum */
-	for (i = 0; i < srcinfo.ndim; i++) { /* calculate coordinates */
+      src.l = (int32_t *) array_data(ps[0]); // data
+      while (n--) {		// all found extrema
+	index = k = *trgt0.l++;	// index of extremum
+	for (i = 0; i < srcinfo.ndim; i++) { // calculate coordinates
 	  srcinfo.coords[i] = k % srcinfo.dims[i];
 	  k /= srcinfo.dims[i];
-	} /* end of for (i = 0;...) */
+	} // end of for (i = 0;...)
 	switch (symbol_type(ps[0])) {
 	  case LUX_INT8:
 	    srcl.b = src.b + index;
@@ -2278,13 +2278,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	      grad[i] = grad2[i]
 		= ((float) srcl.b[srcinfo.step[i]]
 		   - (float) srcl.b[-srcinfo.step[i]])/2;
-	    ready = 1;	/* zero gradient? */
+	    ready = 1;	// zero gradient?
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
 		ready = 0;
 		break;
-	      } /* end of if (grad[i] != 0) */
-	    if (ready)	/* yes, zero gradient */
+	      } // end of if (grad[i] != 0)
+	    if (ready)	// yes, zero gradient
 	      break;
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
@@ -2307,13 +2307,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	      grad[i] = grad2[i]
 		= ((float) srcl.w[srcinfo.step[i]]
 		   - (float) srcl.w[-srcinfo.step[i]])/2;
-	    ready = 1;	/* zero gradient? */
+	    ready = 1;	// zero gradient?
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
 		ready = 0;
 		break;
-	      } /* end of if (grad[i] != 0) */
-	    if (ready)	/* yes, zero gradient */
+	      } // end of if (grad[i] != 0)
+	    if (ready)	// yes, zero gradient
 	      break;
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
@@ -2336,13 +2336,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	      grad[i] = grad2[i]
 		= ((float) srcl.l[srcinfo.step[i]]
 		   - (float) srcl.l[-srcinfo.step[i]])/2;
-	    ready = 1;	/* zero gradient? */
+	    ready = 1;	// zero gradient?
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
 		ready = 0;
 		break;
-	      } /* end of if (grad[i] != 0) */
-	    if (ready)	/* yes, zero gradient */
+	      } // end of if (grad[i] != 0)
+	    if (ready)	// yes, zero gradient
 	      break;
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
@@ -2365,13 +2365,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	      grad[i] = grad2[i]
 		= ((float) srcl.q[srcinfo.step[i]]
 		   - (float) srcl.q[-srcinfo.step[i]])/2;
-	    ready = 1;	/* zero gradient? */
+	    ready = 1;	// zero gradient?
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
 		ready = 0;
 		break;
-	      } /* end of if (grad[i] != 0) */
-	    if (ready)	/* yes, zero gradient */
+	      } // end of if (grad[i] != 0)
+	    if (ready)	// yes, zero gradient
 	      break;
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
@@ -2394,13 +2394,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	      grad[i] = grad2[i]
 		= ((float) srcl.f[srcinfo.step[i]]
 		   - (float) srcl.f[-srcinfo.step[i]])/2;
-	    ready = 1;	/* zero gradient? */
+	    ready = 1;	// zero gradient?
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
 		ready = 0;
 		break;
-	      } /* end of if (grad[i] != 0) */
-	    if (ready)	/* yes, zero gradient */
+	      } // end of if (grad[i] != 0)
+	    if (ready)	// yes, zero gradient
 	      break;
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
@@ -2423,13 +2423,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	      grad[i] = grad2[i]
 		= ((float) srcl.d[srcinfo.step[i]]
 		   - (float) srcl.d[-srcinfo.step[i]])/2;
-	    ready = 1;	/* zero gradient? */
+	    ready = 1;	// zero gradient?
 	    for (i = 0; i < nDiagonal; i++)
 	      if (grad[i] != 0) {
 		ready = 0;
 		break;
-	      } /* end of if (grad[i] != 0) */
-	    if (ready)	/* yes, zero gradient */
+	      } // end of if (grad[i] != 0)
+	    if (ready)	// yes, zero gradient
 	      break;
 	    for (i = 0; i < nDiagonal; i++)
 	      for (j = 0; j <= i; j++)
@@ -2445,47 +2445,47 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 		       - (float) srcl.d[srcinfo.step[j]
 				       - srcinfo.step[i]])/4;
 	    break;
-	} /* end of switch (type) */
+	} // end of switch (type)
 	if (ready)
 	  for (i = 0; i < nDiagonal; i++)
 	    grad2[i] = 0.0;
-	else {		/* solve hessian.x = gradient */
+	else {		// solve hessian.x = gradient
 	  f_decomp(hessian, nDiagonal, nDiagonal);
 	  ready = 1;
 	  for (i = nDiagonal*nDiagonal - 1; i >= 0; i -= nDiagonal + 1)
-	    if (!hessian[i]) { /* zero determinant, indeterminate fit */
+	    if (!hessian[i]) { // zero determinant, indeterminate fit
 	      ready = 0;
 	      for (i = 0; i < nDiagonal; i++)
 		grad2[i] = 0.0;
 	      break;
-	    }	/* end of if (!hessian[i]) */
+	    }	// end of if (!hessian[i])
 	  if (ready) {
 	    f_solve(hessian, grad2, nDiagonal, nDiagonal);
 	    for (i = 0; i < nDiagonal; i++)
 	      value -= 0.5*grad2[i]*grad[i];
-	  } /* end of if (ready) */
-	} /* end of if (ready) else */
-	if (code & 1) {		/* find position */
+	  } // end of if (ready)
+	} // end of if (ready) else
+	if (code & 1) {		// find position
 	  k = 0;
 	  for (i = 0; i < srcinfo.ndim; i++)
 	    *trgt.f++ = srcinfo.coords[i]
 	      - ((!diagonal || diagonal[i])? grad2[k++]: 0);
-	} else			/* find value */
+	} else			// find value
 	  *trgt.f++ = value;
-      }	/* end of while (n--) */
-    } else {			/* subgrid == 0 */
-      if (code & 1) {		/* positions */
+      }	// end of while (n--)
+    } else {			// subgrid == 0
+      if (code & 1) {		// positions
 	while (n--) {
 	  index = *trgt0.l++;
-	  if (internalMode & 4)	/* /COORDS */
+	  if (internalMode & 4)	// /COORDS
 	    for (i = 0; i < srcinfo.ndim; i++) {
 	      *trgt.l++ = index % srcinfo.dims[i];
 	      index /= srcinfo.dims[i];
-	    } /* end of for (i = 0;...) */
+	    } // end of for (i = 0;...)
 	  else
 	    *trgt.l++ = index;
-	} /* end of while (n--) */
-      } else {			/* values */
+	} // end of while (n--)
+      } else {			// values
 	while (n--) {
 	  index = *trgt0.l++;
 	  switch (symbol_type(ps[0])) {
@@ -2507,12 +2507,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
 	    case LUX_DOUBLE:
 	      value = (float) src.d[index];
 	      break;
-	  } /* end of switch (symbol_type(ps[0])) */
+	  } // end of switch (symbol_type(ps[0]))
 	  *trgt.f++ = value;
-	} /* end of while (n--) */
-      }	/* end of if (code & 1) */
-    } /* end of if (subgrid) */
-  } /* end of if (!degree) */
+	} // end of while (n--)
+      }	// end of if (code & 1)
+    } // end of if (subgrid)
+  } // end of if (!degree)
 	
   free(offset);
   free(trgt00.b);
@@ -2523,27 +2523,27 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   }
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_find_maxloc(int32_t narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 3);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_find_minloc(int32_t narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 1);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_find_max(int32_t narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 2);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_find_min(int32_t narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 0);
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_replace_values(int32_t narg, int32_t ps[])
 /* REPLACE,x,src,trgt
   replaces all occurrences in <x> of each element of <src> by
@@ -2564,7 +2564,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
       || numerical(ps1, NULL, NULL, &nSrc, &src) < 0
       || numerical(ps2, NULL, NULL, &nTrgt, &trgt) < 0)
     return LUX_ERROR;
-  if (nTrgt != nSrc) /* src and trgt must have same number of elements */
+  if (nTrgt != nSrc) // src and trgt must have same number of elements
     return cerror(INCMP_ARG, ps[2]);
 
   type = symbol_type(ps[0]);
@@ -2573,11 +2573,11 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   case LUX_INT8:
     mid = 0;
     v.b = *data.b + 1;
-    while (nData--) {		/* all data points */
-      if (*data.b != v.b) { /* we added this check because we */
-	/* hope there is coherence in the data so that the next data */
-	/* value has a fair chance of being equal to the previous one. */
-	/* In that case we can skip the binary search. */
+    while (nData--) {		// all data points
+      if (*data.b != v.b) { // we added this check because we
+	// hope there is coherence in the data so that the next data
+	// value has a fair chance of being equal to the previous one.
+	// In that case we can skip the binary search.
 	low = 0;
 	high = nSrc - 1;
 	v.b = *data.b;
@@ -2588,12 +2588,12 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 	  else if (v.b > src.b[mid])
 	    low = mid + 1;
 	  else {
-	    mid = -mid - 1;	/* flag that we found it */
+	    mid = -mid - 1;	// flag that we found it
 	    break;
 	  }
 	}
       }
-      if (mid < 0) 		/* found it */
+      if (mid < 0) 		// found it
 	*data.b = trgt.b[-mid - 1];
       data.b++;
     }
@@ -2601,11 +2601,11 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   case LUX_INT16:
     mid = 0;
     v.w = *data.w + 1;
-    while (nData--) {		/* all data points */
-      if (*data.w != v.w) { /* we added this check because we */
-	/* hope there is coherence in the data so that the next data */
-	/* value has a fair chance of being equal to the previous one. */
-	/* In that case we can skip the binary search. */
+    while (nData--) {		// all data points
+      if (*data.w != v.w) { // we added this check because we
+	// hope there is coherence in the data so that the next data
+	// value has a fair chance of being equal to the previous one.
+	// In that case we can skip the binary search.
 	low = 0;
 	high = nSrc - 1;
 	v.w = *data.w;
@@ -2616,12 +2616,12 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 	  else if (v.w > src.w[mid])
 	    low = mid + 1;
 	  else {
-	    mid = -mid - 1;	/* flag that we found it */
+	    mid = -mid - 1;	// flag that we found it
 	    break;
 	  }
 	}
       }
-      if (mid < 0) 		/* found it */
+      if (mid < 0) 		// found it
 	*data.w = trgt.w[-mid - 1];
       data.w++;
     }
@@ -2629,11 +2629,11 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   case LUX_INT32:
     mid = 0;
     v.l = *data.l + 1;
-    while (nData--) {		/* all data points */
-      if (*data.l != v.l) { /* we added this check because we */
-	/* hope there is coherence in the data so that the next data */
-	/* value has a fair chance of being equal to the previous one. */
-	/* In that case we can skip the binary search. */
+    while (nData--) {		// all data points
+      if (*data.l != v.l) { // we added this check because we
+	// hope there is coherence in the data so that the next data
+	// value has a fair chance of being equal to the previous one.
+	// In that case we can skip the binary search.
 	low = 0;
 	high = nSrc - 1;
 	v.l = *data.l;
@@ -2644,12 +2644,12 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 	  else if (v.l > src.l[mid])
 	    low = mid + 1;
 	  else {
-	    mid = -mid - 1;	/* flag that we found it */
+	    mid = -mid - 1;	// flag that we found it
 	    break;
 	  }
 	}
       }
-      if (mid < 0) 		/* found it */
+      if (mid < 0) 		// found it
 	*data.l = trgt.l[-mid - 1];
       data.l++;
     }
@@ -2657,11 +2657,11 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   case LUX_INT64:
     mid = 0;
     v.q = *data.q + 1;
-    while (nData--) {		/* all data points */
-      if (*data.q != v.q) { /* we added this check because we */
-	/* hope there is coherence in the data so that the next data */
-	/* value has a fair chance of being equal to the previous one. */
-	/* In that case we can skip the binary search. */
+    while (nData--) {		// all data points
+      if (*data.q != v.q) { // we added this check because we
+	// hope there is coherence in the data so that the next data
+	// value has a fair chance of being equal to the previous one.
+	// In that case we can skip the binary search.
 	low = 0;
 	high = nSrc - 1;
 	v.q = *data.q;
@@ -2672,12 +2672,12 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 	  else if (v.q > src.q[mid])
 	    low = mid + 1;
 	  else {
-	    mid = -mid - 1;	/* flag that we found it */
+	    mid = -mid - 1;	// flag that we found it
 	    break;
 	  }
 	}
       }
-      if (mid < 0) 		/* found it */
+      if (mid < 0) 		// found it
 	*data.q = trgt.q[-mid - 1];
       data.q++;
     }
@@ -2685,11 +2685,11 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   case LUX_FLOAT:
     mid = 0;
     v.f = *data.f + 1;
-    while (nData--) {		/* all data points */
-      if (*data.f != v.f) { /* we added this check because we */
-	/* hope there is coherence in the data so that the next data */
-	/* value has a fair chance of being equal to the previous one. */
-	/* In that case we can skip the binary search. */
+    while (nData--) {		// all data points
+      if (*data.f != v.f) { // we added this check because we
+	// hope there is coherence in the data so that the next data
+	// value has a fair chance of being equal to the previous one.
+	// In that case we can skip the binary search.
 	low = 0;
 	high = nSrc - 1;
 	v.f = *data.f;
@@ -2700,12 +2700,12 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 	  else if (v.f > src.f[mid])
 	    low = mid + 1;
 	  else {
-	    mid = -mid - 1;	/* flag that we found it */
+	    mid = -mid - 1;	// flag that we found it
 	    break;
 	  }
 	}
       }
-      if (mid < 0) 		/* found it */
+      if (mid < 0) 		// found it
 	*data.f = trgt.f[-mid - 1];
       data.f++;
     }
@@ -2713,11 +2713,11 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   case LUX_DOUBLE:
     mid = 0;
     v.d = *data.d + 1;
-    while (nData--) {		/* all data points */
-      if (*data.d != v.d) { /* we added this check because we */
-	/* hope there is coherence in the data so that the next data */
-	/* value has a fair chance of being equal to the previous one. */
-	/* In that case we can skip the binary search. */
+    while (nData--) {		// all data points
+      if (*data.d != v.d) { // we added this check because we
+	// hope there is coherence in the data so that the next data
+	// value has a fair chance of being equal to the previous one.
+	// In that case we can skip the binary search.
 	low = 0;
 	high = nSrc - 1;
 	v.d = *data.d;
@@ -2728,12 +2728,12 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
 	  else if (v.d > src.d[mid])
 	    low = mid + 1;
 	  else {
-	    mid = -mid - 1;	/* flag that we found it */
+	    mid = -mid - 1;	// flag that we found it
 	    break;
 	  }
 	}
       }
-      if (mid < 0) 		/* found it */
+      if (mid < 0) 		// found it
 	*data.d = trgt.d[-mid - 1];
       data.d++;
     }
@@ -2741,7 +2741,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   }
   return LUX_ONE;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_lsq(int32_t narg, int32_t ps[])
 /* linear least squares fit.
    a = LSQ(x,y[,w,COV=cov,ERR=err,CHISQ=chisq,/FORMAL]) 
@@ -2776,7 +2776,7 @@ Theory:
     f_solve(float *, float *, int32_t, int32_t),
     d_solve(double *, double *, int32_t, int32_t);
 
-  sx = ps[0];			/* <x>: independent data */
+  sx = ps[0];			// <x>: independent data
   if (symbol_class(sx) != LUX_ARRAY)
     return cerror(ILL_CLASS, sx);
   if (!symbolIsNumerical(sx))
@@ -2784,27 +2784,27 @@ Theory:
   dims = array_dims(sx);
   ndim = array_num_dims(sx);
 
-  sy = ps[1];			/* <y>: dependent data */
+  sy = ps[1];			// <y>: dependent data
   if (symbol_class(sy) != LUX_ARRAY)
     return cerror(ILL_CLASS, sy);
   if (!symbolIsNumerical(sy))
     return cerror(ILL_TYPE, sy);
-  if (array_num_dims(sy) == ndim) /* must have same # dims as <x>... */
-    nPar = 1;			/* number of parameters to fit */
-  else if (array_num_dims(sy) == ndim - 1) /* ... or one less */
+  if (array_num_dims(sy) == ndim) // must have same # dims as <x>...
+    nPar = 1;			// number of parameters to fit
+  else if (array_num_dims(sy) == ndim - 1) // ... or one less
     nPar = dims[ndim - 1];
   else
     return cerror(INCMP_ARG, sy);
-  nData = array_size(sy);	/* number of data points */
+  nData = array_size(sy);	// number of data points
 
-  for (i = 0; i < array_num_dims(sy); i++) /* dimensions must match */
+  for (i = 0; i < array_num_dims(sy); i++) // dimensions must match
     if (array_dims(sy)[i] != dims[i])
       return cerror(INCMP_ARG, sy);
 
   narg -= 2;
   ps += 2;
 
-  if (narg > 0 && *ps) {		/* have <w>: weights (if 1D) */
+  if (narg > 0 && *ps) {		// have <w>: weights (if 1D)
     sw = *ps;
     if (symbol_class(sw) != LUX_ARRAY)
       return cerror(ILL_CLASS, sw);
@@ -2846,7 +2846,7 @@ Theory:
       break;
   }
 
-  if (!dw) 			/* no <w>: default weights equal to 1 */
+  if (!dw) 			// no <w>: default weights equal to 1
     switch (type) {
       case LUX_FLOAT:
 	pw.f = &onef;
@@ -2859,12 +2859,12 @@ Theory:
     pw.f = (float *) array_data(sw);
 
   narg--; ps++;
-  if (narg > 0 && *ps) {	/* <cov>: place to return covariances */
+  if (narg > 0 && *ps) {	// <cov>: place to return covariances
     newDims[0] = newDims[1] = nPar;
-    to_scratch_array(*ps, type, 2, newDims); /* make into suitable array */
+    to_scratch_array(*ps, type, 2, newDims); // make into suitable array
     pc.f = (float *) array_data(*ps);
     zerobytes(pc.f, nPar*nPar*lux_type_size[type]);
-    switch (type) {		/* fill with identity matrix */
+    switch (type) {		// fill with identity matrix
       case LUX_FLOAT:
 	for (i = 0; i < nPar*nPar; i += nPar + 1)
 	  pc.f[i] = 1;
@@ -2875,19 +2875,19 @@ Theory:
 	break;
     }
   } else
-    pc.f = NULL;		/* no covariance return */
+    pc.f = NULL;		// no covariance return
 
   narg--; ps++;
-  if (narg > 0 && *ps) {	/* <err>: place to return residual error */
-    undefine(*ps);		/* make into suitable scalar */
+  if (narg > 0 && *ps) {	// <err>: place to return residual error
+    undefine(*ps);		// make into suitable scalar
     symbol_class(*ps) = LUX_SCALAR;
     symbol_type(*ps) = type;
     err.b = &scalar_value(*ps).b;
   } else
-    err.f = NULL;		/* no residual error return */
+    err.f = NULL;		// no residual error return
 
   narg--; ps++;
-  if (narg > 0 && *ps) {	/* <chisq>: place to return chi-square */
+  if (narg > 0 && *ps) {	// <chisq>: place to return chi-square
     undefine(*ps);
     symbol_class(*ps) = LUX_SCALAR;
     symbol_type(*ps) = type;
@@ -2895,21 +2895,21 @@ Theory:
   } else
     chisq.f = NULL;
 
-  px.f = (float *) array_data(sx); /* x data */
-  py.f = (float *) array_data(sy); /* y data */
+  px.f = (float *) array_data(sx); // x data
+  py.f = (float *) array_data(sy); // y data
 
-  /* now get some scratch space for intermediate results */
+  // now get some scratch space for intermediate results
   pl.f = (float *) malloc(nPar*nPar*lux_type_size[type]);
   zerobytes(pl.f, nPar*nPar*lux_type_size[type]);
 
-  result = array_scratch(type, 1, &nPar); /* return symbol: parameters <a> */
+  result = array_scratch(type, 1, &nPar); // return symbol: parameters <a>
   pr.f = (float *) array_data(result);
   zerobytes(pr.f, nPar*lux_type_size[type]);
 
-  /* now do the calculations */
+  // now do the calculations
   switch (type) {
     case LUX_FLOAT:
-      /* get (X'WX) in pl */
+      // get (X'WX) in pl
       for (i = 0; i < nPar; i++) {
 	p1.f = px.f + i*nData;
 	for (j = 0; j < nPar; j++) {
@@ -2919,52 +2919,52 @@ Theory:
 	    pw.f += dw;
 	  }
 	  pl.f++;
-	  pw.f -= dw*nData;	/* back to the start */
+	  pw.f -= dw*nData;	// back to the start
 	}
       }
-      pl.f -= nPar*nPar;	/* back to the start */
-      /* get (X'Wy) in pr */
+      pl.f -= nPar*nPar;	// back to the start
+      // get (X'Wy) in pr
       for (i = 0; i < nPar; i++) {
 	for (j = 0; j < nData; j++) {
 	  *pr.f += *px.f++ * *py.f++ * *pw.f;
 	  pw.f += dw;
 	}
 	pr.f++;
-	py.f -= nData;		/* back to the start */
+	py.f -= nData;		// back to the start
 	pw.f -= dw*nData;
       }
-      px.f -= nData*nPar;	/* back to the start */
+      px.f -= nData*nPar;	// back to the start
       pr.f -= nPar;
-      f_decomp(pl.f, nPar, nPar); /* LU decomposition of pl */
-      f_solve(pl.f, pr.f, nPar, nPar); /* solve: now pr has parameters <a> */
+      f_decomp(pl.f, nPar, nPar); // LU decomposition of pl
+      f_solve(pl.f, pr.f, nPar, nPar); // solve: now pr has parameters <a>
       if (chisq.f != NULL || err.f != NULL
-	  || (pc.f != NULL && (internalMode & 1))) { /* need chi-square */
+	  || (pc.f != NULL && (internalMode & 1))) { // need chi-square
 	chi2 = f = 0.0;
 	for (i = 0; i < nData; i++) {
 	  value.f = py.f[i];
 	  for (j = 0; j < nPar; j++)
 	    value.f -= pr.f[j]*px.f[j*nData];
 	  chi2 += value.f*value.f**pw.f;
-	  f += *pw.f;		/* collect weights for normalization */
+	  f += *pw.f;		// collect weights for normalization
 	  px.f++;
 	  pw.f += dw;
 	}
 	if (chisq.f != NULL)
 	  *chisq.f = (float) chi2;
-	errv = sqrt(chi2/f);	/* normalize and get rms */
+	errv = sqrt(chi2/f);	// normalize and get rms
 	if (err.f != NULL)
-	  *err.f = (float) errv; /* store */
+	  *err.f = (float) errv; // store
       } else
-	chi2 = 1.0;		/* don't calculate: assume 1. */
+	chi2 = 1.0;		// don't calculate: assume 1.
       if ((internalMode & 1) == 0)
 	chi2 = 1.0;
-      if (pc.f != NULL) {	/* get covariances */
+      if (pc.f != NULL) {	// get covariances
 	for (i = 0; i < nPar; i++) {
 	  f_solve(pl.f, pc.f, nPar, nPar); /* now pc contains
 					      the covariances */
 	  pc.f += nPar;
 	}
-	pc.f -= nPar*nPar;	/* back to the start */
+	pc.f -= nPar*nPar;	// back to the start
 	if (internalMode & 1) {
 	  if (chisq.f != NULL)
 	    *chisq.f = f - 1;
@@ -2985,7 +2985,7 @@ Theory:
       }
       break;
     case LUX_DOUBLE:
-      /* get (X'WX) in pl */
+      // get (X'WX) in pl
       for (i = 0; i < nPar; i++) {
 	p1.d = px.d + i*nData;
 	for (j = 0; j < nPar; j++) {
@@ -2995,52 +2995,52 @@ Theory:
 	    pw.d += dw;
 	  }
 	  pl.d++;
-	  pw.d -= dw*nData;	/* back to the start */
+	  pw.d -= dw*nData;	// back to the start
 	}
       }
-      pl.d -= nPar*nPar;	/* back to the start */
-      /* get (X'Wy) in pr */
+      pl.d -= nPar*nPar;	// back to the start
+      // get (X'Wy) in pr
       for (i = 0; i < nPar; i++) {
 	for (j = 0; j < nData; j++) {
 	  *pr.d += *px.d++ * *py.d++ * *pw.d;
 	  pw.d += dw;
 	}
 	pr.d++;
-	py.d -= nData;		/* back to the start */
+	py.d -= nData;		// back to the start
 	pw.d -= dw*nData;
       }
-      px.d -= nData*nPar;	/* back to the start */
+      px.d -= nData*nPar;	// back to the start
       pr.d -= nPar;
-      d_decomp(pl.d, nPar, nPar); /* LU decomposition of pl */
-      d_solve(pl.d, pr.d, nPar, nPar); /* solve: now pr has parameters <a> */
+      d_decomp(pl.d, nPar, nPar); // LU decomposition of pl
+      d_solve(pl.d, pr.d, nPar, nPar); // solve: now pr has parameters <a>
       if (chisq.d != NULL || err.d != NULL
-	  || (pc.d != NULL && (internalMode & 1))) { /* need chi-square */
+	  || (pc.d != NULL && (internalMode & 1))) { // need chi-square
 	chi2 = f = 0.0;
 	for (i = 0; i < nData; i++) {
 	  value.d = py.d[i];
 	  for (j = 0; j < nPar; j++)
 	    value.d -= pr.d[j]*px.d[j*nData];
 	  chi2 += value.d*value.d**pw.d;
-	  f += *pw.d;		/* collect weights for normalization */
+	  f += *pw.d;		// collect weights for normalization
 	  px.d++;
 	  pw.d += dw;
 	}
 	if (chisq.d != NULL)
 	  *chisq.d = (float) chi2;
-	errv = sqrt(chi2/f);	/* normalize and get rms */
+	errv = sqrt(chi2/f);	// normalize and get rms
 	if (err.d != NULL)
-	  *err.d = (float) errv; /* store */
+	  *err.d = (float) errv; // store
       } else
-	chi2 = 1.0;		/* don't calculate: assume 1. */
+	chi2 = 1.0;		// don't calculate: assume 1.
       if ((internalMode & 1) == 0)
 	chi2 = 1.0;
-      if (pc.d != NULL) {	/* get covariances */
+      if (pc.d != NULL) {	// get covariances
 	for (i = 0; i < nPar; i++) {
 	  d_solve(pl.d, pc.d, nPar, nPar); /* now pc contains
 					      the covariances */
 	  pc.d += nPar;
 	}
-	pc.d -= nPar*nPar;	/* back to the start */
+	pc.d -= nPar*nPar;	// back to the start
 	if (internalMode & 1) {
 	  if (chisq.f != NULL)
 	    *chisq.d = f - 1;
@@ -3065,7 +3065,7 @@ Theory:
   free(pl.f);
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t	lux_indgen(int32_t, int32_t []);
 int32_t lux_lsq2(int32_t narg, int32_t ps[])
 /* linear least squares fit.
@@ -3091,7 +3091,7 @@ Theory:
    where W is C^-1, C is the covariance matrix of <y>.
    */
 
-/* LSQ2(x, y [, axis, w]) */
+// LSQ2(x, y [, axis, w])
 {
   int32_t	i, j, k, nPar, nData, result, dims[MAX_DIMS], ndim, dw, ncc,
     axisSym, nRepeat, stride, bigstride, ysym, nkernel, n, i1, i2, cc, dk;
@@ -3106,19 +3106,19 @@ Theory:
     return cerror(NO_COMPLEX, ps[0]);
   if (isComplexType(symbol_type(ps[1])))
     return cerror(NO_COMPLEX, ps[1]);
-  if (!symbolIsRealArray(ps[0])) /* <x> */
+  if (!symbolIsRealArray(ps[0])) // <x>
     return cerror(NEED_NUM_ARR, ps[0]);
-  if (!symbolIsRealArray(ps[1])) /* <y> */
+  if (!symbolIsRealArray(ps[1])) // <y>
     return cerror(NEED_NUM_ARR, ps[1]);
 
-  /* we allow the user to specify zero or one axes.  If none are specified, */
-  /* then <y> and the corresponding dimensions of <x> are regarded as */
-  /* one-dimensional. */
-  if (narg > 2 && ps[2]) {	/* <axes> */
+  // we allow the user to specify zero or one axes.  If none are specified,
+  // then <y> and the corresponding dimensions of <x> are regarded as
+  // one-dimensional.
+  if (narg > 2 && ps[2]) {	// <axes>
     if (!symbolIsRealScalar(ps[2]))
       return cerror(NEED_SCAL, ps[2]);
     axisSym = ps[2];
-  } else {			/* default: all <y> axes */
+  } else {			// default: all <y> axes
     axisSym = array_num_dims(ps[1]);
     axisSym = array_scratch(LUX_INT32, 1, &axisSym);
     axisSym = lux_indgen(1, &axisSym);
@@ -3136,21 +3136,21 @@ Theory:
 
   ysym = ps[1];
 
-  /* <x> must have all the dimensions of <y>, and may have one more */
-  /* dimension at the end */
+  // <x> must have all the dimensions of <y>, and may have one more
+  // dimension at the end
   if (xinfo.ndim != yinfo.ndim && xinfo.ndim != yinfo.ndim + 1)
     return cerror(INCMP_ARG, ps[1]);
   for (i = 0; i < yinfo.ndim; i++)
     if (xinfo.dims[i] != yinfo.dims[i])
       return cerror(INCMP_ARG, ps[1]);
   
-  /* find the number of parameters to fit */
+  // find the number of parameters to fit
   if (xinfo.ndim == yinfo.ndim)
     nPar = 1;
   else
     nPar = xinfo.dims[xinfo.ndim - 1];
 
-  /* determine the number of data points that go in each fit */
+  // determine the number of data points that go in each fit
   nData = 1;
   for (i = 0; i < yinfo.naxes; i++)
     nData *= yinfo.rdims[i];
@@ -3160,7 +3160,7 @@ Theory:
   ps += 3;
   narg -= 3;
 
-  if (narg > 0 && *ps) {	/* have <fhwm> */
+  if (narg > 0 && *ps) {	// have <fhwm>
     if (!symbolIsRealScalar(*ps))
       return cerror(NEED_SCAL, *ps);
     fwhm = double_arg(*ps);
@@ -3170,7 +3170,7 @@ Theory:
     fwhm = 0.0;
 
   ps++; narg--;
-  if (narg > 0 && *ps) {	/* have <w>: weights */
+  if (narg > 0 && *ps) {	// have <w>: weights
     if (!symbolIsRealArray(*ps))
       return cerror(ILL_CLASS, *ps);
     if (array_num_dims(*ps) != array_num_dims(ysym))
@@ -3196,7 +3196,7 @@ Theory:
   k = fwhm? 0: yinfo.naxes;
 
   ps++; narg--;
-  if (narg > 0 && *ps) {	/* <cov>: place to return covariances */
+  if (narg > 0 && *ps) {	// <cov>: place to return covariances
     if (yinfo.ndim + 2 - k >= MAX_DIMS)
       return luxerror("Too many dimensions for COV", 0);
     dims[0] = dims[1] = nPar;
@@ -3207,7 +3207,7 @@ Theory:
     pc.f = (float *) array_data(*ps);
     zerobytes(pc.f, array_size(*ps)*lux_type_size[type]);
     j = fwhm? nRepeat: yinfo.nelem;
-    switch (type) {		/* fill with identity matrix */
+    switch (type) {		// fill with identity matrix
       case LUX_FLOAT:
 	while (j--) { 
 	  for (i = 0; i < nPar*nPar; i += nPar + 1)
@@ -3225,16 +3225,16 @@ Theory:
     }
     pc.f = (float*) array_data(*ps);
   } else
-    pc.f = NULL;		/* no covariance return */
+    pc.f = NULL;		// no covariance return
 
   narg--; ps++;
-  if (narg > 0 && *ps) {	/* <err>: place to return residual error */
-    if (nRepeat == 1 && !fwhm) { /* a scalar will do */
-      undefine(*ps);		/* make into suitable scalar */
+  if (narg > 0 && *ps) {	// <err>: place to return residual error
+    if (nRepeat == 1 && !fwhm) { // a scalar will do
+      undefine(*ps);		// make into suitable scalar
       symbol_class(*ps) = LUX_SCALAR;
       symbol_type(*ps) = type;
       err.b = &scalar_value(*ps).b;
-    } else {			/* we need an array */
+    } else {			// we need an array
       ndim = yinfo.ndim - k;
       memcpy(dims, yinfo.rdims + k, ndim*sizeof(int32_t));
       if (to_scratch_array(*ps, type, ndim, dims) == LUX_ERROR)
@@ -3242,16 +3242,16 @@ Theory:
       err.b = (uint8_t*) array_data(*ps);
     }
   } else
-    err.f = NULL;		/* no residual error return */
+    err.f = NULL;		// no residual error return
 
   narg--; ps++;
-  if (narg > 0 && *ps) {	/* <chisq>: place to return chi-square */
-    if (nRepeat == 1 && !fwhm) { /* a scalar will do */
-      undefine(*ps);		/* make into suitable scalar */
+  if (narg > 0 && *ps) {	// <chisq>: place to return chi-square
+    if (nRepeat == 1 && !fwhm) { // a scalar will do
+      undefine(*ps);		// make into suitable scalar
       symbol_class(*ps) = LUX_SCALAR;
       symbol_type(*ps) = type;
       chisq.b = &scalar_value(*ps).b;
-    } else {			/* we need an array */
+    } else {			// we need an array
       ndim = yinfo.ndim - k;
       memcpy(dims, yinfo.rdims + k, ndim*sizeof(int32_t));
       if (to_scratch_array(*ps, type, ndim, dims) == LUX_ERROR)
@@ -3259,9 +3259,9 @@ Theory:
       chisq.b = (uint8_t*) array_data(*ps);
     }
   } else
-    chisq.f = NULL;		/* no residual error return */
+    chisq.f = NULL;		// no residual error return
 
-  /* prepare the return symbol */
+  // prepare the return symbol
   dims[0] = nPar;
   memcpy(dims + 1, yinfo.rdims + k,
 	 (yinfo.ndim - k)*sizeof(int32_t));
@@ -3271,12 +3271,12 @@ Theory:
     return LUX_ERROR;
   pr.f = (float*) array_data(result);
 
-  /* prepare some scratch space */
+  // prepare some scratch space
   pl.f = (float*) malloc(nPar*nPar*lux_type_size[type]);
   if (!pl.f)
     return cerror(ALLOC_ERR, 0);
 
-  /* prepare smoothing kernel */
+  // prepare smoothing kernel
   if (fwhm) {
     nkernel = MAX(MIN(2*fwhm, nData), nPar);
     pk.f = (float*) malloc((2*nkernel + 1)*lux_type_size[type]);
@@ -3300,7 +3300,7 @@ Theory:
     dk = 0;
   }
 
-  /* now do the work */
+  // now do the work
   stride = yinfo.rsinglestep[0];
   bigstride = stride*nData;
   n = nData;
@@ -3328,7 +3328,7 @@ Theory:
       
       switch (type) {
 	case LUX_FLOAT:
-	  /* get (X'X) in pl */
+	  // get (X'X) in pl
 	  do {
 	    do {
 	      for (i = 0; i < n; i++) {
@@ -3349,9 +3349,9 @@ Theory:
 	    moveLoop(&xinfo, yinfo.rndim, -nPar);
 	  } while (moveLoop(&p2info, yinfo.rndim, 1) <= yinfo.rndim);
 	  moveLoop(&p2info, yinfo.rndim, -nPar);
-	  pl.f -= nPar*nPar;	/* back to the start */
+	  pl.f -= nPar*nPar;	// back to the start
 	  
-	  /* get (X'y) in pr */
+	  // get (X'y) in pr
 	  j = yinfo.naxes - 1;
 	  do {
 	    for (i = 0; i < n; i++) {
@@ -3370,14 +3370,14 @@ Theory:
 	    pk.f -= n*dk;
 	  } while (moveLoop(&xinfo, yinfo.rndim, 1) <= yinfo.rndim);
 	  moveLoop(&xinfo, yinfo.rndim, -nPar);
-	  pr.f -= nPar;		/* back to the start */
-	  f_decomp(pl.f, nPar, nPar); /* LU decomposition of pl */
-	  f_solve(pl.f, pr.f, nPar, nPar); /* solve: pr gets parameters <a> */
+	  pr.f -= nPar;		// back to the start
+	  f_decomp(pl.f, nPar, nPar); // LU decomposition of pl
+	  f_solve(pl.f, pr.f, nPar, nPar); // solve: pr gets parameters <a>
 	  
 	  if (chisq.f != NULL || err.f != NULL
-	      || (pc.f != NULL && (internalMode & 1))) { /* need chi-square */
+	      || (pc.f != NULL && (internalMode & 1))) { // need chi-square
 	    chi2 = f = norm = 0.0;
-	    /* calculate the deviations from the fit */
+	    // calculate the deviations from the fit
 	    k = nData*nRepeat;
 	    for (i = 0; i < n; i++) {
 	      value.d = *py.f;
@@ -3406,12 +3406,12 @@ Theory:
 	    chi2 = 1.0;
 	  if ((internalMode & 1) == 0)
 	    chi2 = 1.0;
-	  if (pc.f) {		/* get covariances */
+	  if (pc.f) {		// get covariances
 	    for (i = 0; i < nPar; i++) {
 	      f_solve(pl.f, pc.f, nPar, nPar);
 	      pc.f += nPar;
 	    }
-	    pc.f -= nPar*nPar;	/* back to the start */
+	    pc.f -= nPar*nPar;	// back to the start
 	    if (internalMode & 1) {
 	      if (chisq.f != NULL)
 		*chisq.f = f - 1;
@@ -3431,11 +3431,11 @@ Theory:
 	      pc.f += nPar*nPar;
 	    }
 	  }
-	  pr.f += nPar;		/* get ready for the next one */
+	  pr.f += nPar;		// get ready for the next one
 	  break;
-      }	/* end of switch (type) */
+      }	// end of switch (type)
 
-      /* restore */
+      // restore
       if (fwhm) {
 	px.f -= i1;
 	py.f -= i1;
@@ -3444,16 +3444,16 @@ Theory:
 	  pw.f -= i1;
 	pk.f -= nkernel - cc + i1;
       }
-    } /* end of for (cc = ...) */
+    } // end of for (cc = ...)
     moveLoop(&yinfo, yinfo.naxes, 1);
   } while (moveLoop(&xinfo, yinfo.naxes, 1) < yinfo.rndim);
   free(pl.f);
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------
 int32_t lux_runprod(int32_t narg, int32_t ps[])
-/* RUNPROD( data [, axis]) returns a running product of <data> */
-/* along the indicated <axis>.  LS 13jul98 */
+// RUNPROD( data [, axis]) returns a running product of <data>
+// along the indicated <axis>.  LS 13jul98
 {
   int32_t	n, result;
   Scalar	value;
@@ -3532,4 +3532,4 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
   }
   return result;
 }
-/*---------------------------------------------------------*/
+//---------------------------------------------------------

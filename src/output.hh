@@ -17,21 +17,21 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File output.h */
-/*  */
-/* $Id: output.h,v 4.0 2001/02/07 20:37:04 strous Exp $" */
-/* Replaces output routines with similar routines that also record the */
-/* output to a record file if so instructed. */
+// File output.h
+//
+// $Id: output.h,v 4.0 2001/02/07 20:37:04 strous Exp $"
+// Replaces output routines with similar routines that also record the
+// output to a record file if so instructed.
 #if STDC_HEADERS
 #include <stdio.h>
 #include <stdarg.h>
 
-/* we want to have the old output macros available */
+// we want to have the old output macros available
 #define oldputc		putc
 #define oldputchar	putchar
 #define oldfputc	fputc
 
-/* redefine the output routine names to point at the enhanced ones */
+// redefine the output routine names to point at the enhanced ones
 #define printf		Printf
 #define fprintf		Fprintf
 #define vprintf		Vprintf
@@ -51,8 +51,8 @@ int32_t Puts(const char *s);
 int32_t Fputs(const char *s, FILE *stream);
 int32_t Fputc(int32_t c, FILE *stream);
 
-/* also redefine the output macros: first undefine the old ones so no */
-/* warnings ensue during compilation */
+// also redefine the output macros: first undefine the old ones so no
+// warnings ensue during compilation
 #undef putc
 #undef putchar
 

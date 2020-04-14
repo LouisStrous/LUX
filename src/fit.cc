@@ -17,9 +17,9 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File fit.c */
-/* General fitting procedure */
-/* Started 22 October 1995.  Louis Strous */
+// File fit.c
+// General fitting procedure
+// Started 22 October 1995.  Louis Strous
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -28,8 +28,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
-#include <limits.h>             /* for LONG_MAX */
-#include <time.h>               /* for difftime */
+#include <limits.h>             // for LONG_MAX
+#include <time.h>               // for difftime
 #include "action.hh"
 #include "bindings.hh"
 #include "lux_func_if.hh"
@@ -37,19 +37,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <gsl/gsl_multimin.h>
 #include <limits.h>
 
-char    PoissonChiSq;           /* flag: Poisson chi-square fitting? */
+char    PoissonChiSq;           // flag: Poisson chi-square fitting?
 uint32_t random_bits(void);
 void indexxr_d(int32_t, double *, int32_t *);
 
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 double gaussians(double *par, int32_t nPar, double *x, double *y, double *w, int32_t nData)
-/* Returns the rms error (if PoissonChiSq is zero) or chi-square for */
-/* Poisson distributions (if PoissonChiSq is nonzero) in fitting y vs x */
-/* with a set of gaussians. */
-/* The fit profile is  par[0]+par[1]*exp(-((x - par[2])/par[3])^2) */
-/* [ + par[4]*exp(-((x - par[5])/par[6])^2) ... ].  par[] must have */
-/* at least 4 elements and for each three more another gaussian is */
-/* added.   LS 26oct95  31oct95 */
+// Returns the rms error (if PoissonChiSq is zero) or chi-square for
+// Poisson distributions (if PoissonChiSq is nonzero) in fitting y vs x
+// with a set of gaussians.
+// The fit profile is  par[0]+par[1]*exp(-((x - par[2])/par[3])^2)
+// [ + par[4]*exp(-((x - par[5])/par[6])^2) ... ].  par[] must have
+// at least 4 elements and for each three more another gaussian is
+// added.   LS 26oct95  31oct95
 {
   int32_t   j, wstep;
   double        rms, fit, arg, one = 1.0;
@@ -81,12 +81,12 @@ double gaussians(double *par, int32_t nPar, double *x, double *y, double *w, int
       x++;  y++;  w += wstep; }
     return sqrt(rms); }
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 double powerfunc(double *par, int32_t nPar, double *x, double *y, double *w, int32_t nData)
-/* returns the error in fitting y vs x with a general power function */
-/* superposed on a linear trend. */
-/* the fit profile is  par[0] + par[1]*x + par[2]*(x - par[3])^par[4] */
-/* LS 13nov95 */
+// returns the error in fitting y vs x with a general power function
+// superposed on a linear trend.
+// the fit profile is  par[0] + par[1]*x + par[2]*(x - par[3])^par[4]
+// LS 13nov95
 {
   int32_t   wstep;
   double        rms, dfit, one;
@@ -103,7 +103,7 @@ double powerfunc(double *par, int32_t nPar, double *x, double *y, double *w, int
     x++;  w += wstep; }
   return sqrt(rms);
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 void enforce_bounds(double *par, double *lowbound, double *hibound, int32_t nPar)
 {
   if (lowbound || hibound) {
@@ -116,14 +116,14 @@ void enforce_bounds(double *par, double *lowbound, double *hibound, int32_t nPar
     }
   }
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 int32_t lux_generalfit(int32_t narg, int32_t ps[])
 /* FIT([X,]Y,START,STEP[,LOWBOUND,HIGHBOUND][,WEIGHTS][,QTHRESH,PTHRESH,
    ITHRESH,DTHRESH][,FAC,NITER,NSAME][,ERR][,FIT][,TTHRESH][,/VOCAL,/DOWN,
    /PCHI][/GAUSSIANS,/POWERFUNC]) */
-/* This routine is intended to enable the user to fit iteratively */
-/* to any profile specification. */
-/* LS 24oct95 */
+// This routine is intended to enable the user to fit iteratively
+// to any profile specification.
+// LS 24oct95
 {
   int32_t ySym, xSym, nPoints, n, nPar, nIter, iThresh, nSame, size,
     iq, i, j, iter, same, fitSym, fitTemp, xTemp, nn, wSym;
@@ -143,8 +143,8 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   void  zap(int32_t);
   time_t starttime;
 
-  /* check input variables */
-  if (narg >= 15 && (iq = ps[15])) { /* FIT */
+  // check input variables
+  if (narg >= 15 && (iq = ps[15])) { // FIT
     if (symbol_class(iq) != LUX_STRING)
       return cerror(NEED_STR, iq);
     n = SP_USER_FUNC;
@@ -156,33 +156,33 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   } else
     fitSym = 0;
 
-  i = (internalMode/16 & 3);    /* fit function */
+  i = (internalMode/16 & 3);    // fit function
   if (i) {
     if (fitSym)
       return luxerror("Multiple fit functions specified", fitSym);
     i--;
   }
-  fitFunc = fitProfiles[i];     /* fit function */
+  fitFunc = fitProfiles[i];     // fit function
 
-  if (ps[1]) {                  /* X & Y */
+  if (ps[1]) {                  // X & Y
     ySym = ps[1];
     xSym = ps[0];
-  } else {                              /* only Y */
+  } else {                              // only Y
     ySym = ps[0];
     xSym = 0;
   }
   if (symbol_class(ySym) != LUX_ARRAY)
     return cerror(NEED_ARR, ySym);
-  ySym = lux_double(1, &ySym);  /* ensure LUX_DOUBLE */
-  nPoints = array_size(ySym);   /* number of data points */
-  yp = (double *) array_data(ySym); /* pointer to data */
+  ySym = lux_double(1, &ySym);  // ensure LUX_DOUBLE
+  nPoints = array_size(ySym);   // number of data points
+  yp = (double *) array_data(ySym); // pointer to data
 
-  if (xSym)                     /* X */
+  if (xSym)                     // X
     switch (symbol_class(xSym)) {
       case LUX_SCALAR:
         if (!fitSym)
           return luxerror("Need array in standard fit", xSym);
-        /* fall-thru to next case */
+        // fall-thru to next case
       case LUX_ARRAY:
         if (!fitSym) {
           n = array_size(xSym);
@@ -202,36 +202,36 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     xp = (double *) array_data(xTemp);
   }
 
-  iq = ps[2];                   /* START: initial parameter values */
+  iq = ps[2];                   // START: initial parameter values
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
   iq = lux_double(1, &iq);
   nPar = array_size(iq);
   start = (double *) array_data(iq);
 
-  iq = ps[3];                   /* STEP: initial parameter step sizes */
+  iq = ps[3];                   // STEP: initial parameter step sizes
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
   iq = lux_double(1, &iq);
   n = array_size(iq);
-  if (n == nPar - 1)            /* assume last element of START is quality */
+  if (n == nPar - 1)            // assume last element of START is quality
     nPar--;
   else if (n != nPar)
     return cerror(INCMP_ARG, ps[3]);
-  if (!fitSym)                  /* standard fit */
-    switch (i) {                /* check for proper number of arguments */
-      case 0:                   /* gaussians */
+  if (!fitSym)                  // standard fit
+    switch (i) {                // check for proper number of arguments
+      case 0:                   // gaussians
         if ((nPar - 1) % 3 != 0)
           return luxerror("Need one plus a multiple of three parameters for gaussian fits", ps[3]);
         break;
-      case 1:                   /* power function */
+      case 1:                   // power function
         if (nPar != 5)
           return luxerror("Need five parameters for power-function fits", ps[3]);
         break;
     }
   step = (double *) array_data(iq);
 
-  if (narg >= 5 && (iq = ps[4])) { /* LOWBOUND: lower bound on parameters */
+  if (narg >= 5 && (iq = ps[4])) { // LOWBOUND: lower bound on parameters
     if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
     iq = lux_double(1, &iq);
@@ -242,7 +242,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   } else
     lowbound = NULL;
 
-  if (narg >= 6 && (iq = ps[5])) { /* HIGHBOUND: upper bound on parameters */
+  if (narg >= 6 && (iq = ps[5])) { // HIGHBOUND: upper bound on parameters
     if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
     iq = lux_double(1, &iq);
@@ -259,7 +259,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
 	return luxerror("High bound %g of parameter %d is not greater than low bound %g", ps[5], hibound[i], i + 1, lowbound[i]);
   }
 
-  if (narg >= 7 && (iq = ps[6])) { /* WEIGHTS */
+  if (narg >= 7 && (iq = ps[6])) { // WEIGHTS
     if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
     wSym = lux_double(1, &iq);
@@ -270,12 +270,12 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   } else
     weights = NULL;
 
-  if (narg >= 8 && ps[7])       /* QTHRESH: quality value threshold */
+  if (narg >= 8 && ps[7])       // QTHRESH: quality value threshold
     qThresh = double_arg(ps[7]);
   else
     qThresh = 0.0;
 
-  if (narg >= 9 && (iq = ps[8])) { /* PTHRESH: parameter change threshold */
+  if (narg >= 9 && (iq = ps[8])) { // PTHRESH: parameter change threshold
     if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
     iq = lux_double(1, &iq);
@@ -286,17 +286,17 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   } else
     pThresh = NULL;
 
-  if (narg >= 10 && ps[9])      /* ITHRESH: iterations threshold */
+  if (narg >= 10 && ps[9])      // ITHRESH: iterations threshold
     iThresh = int_arg(ps[9]);
   else
     iThresh = 1000;
 
-  if (narg >= 11 && ps[10])     /* DTHRESH */
+  if (narg >= 11 && ps[10])     // DTHRESH
     dThresh = double_arg(ps[10]);
   else
     dThresh = 0.0;
 
-  if (narg >= 12 && ps[11]) {   /* FAC: step size reduction factor */
+  if (narg >= 12 && ps[11]) {   // FAC: step size reduction factor
     fac = double_arg(ps[11]);
     if (fac < 0)
       fac = -fac;
@@ -305,17 +305,17 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   } else
     fac = 0.9;
 
-  if (narg >= 13 && ps[12])     /* NITER: number of iterations per cycle */
+  if (narg >= 13 && ps[12])     // NITER: number of iterations per cycle
     nIter = int_arg(ps[12]);
   else
     nIter = 10;
 
-  if (narg >= 14 && ps[13])     /* NSAME: threshold on constant parameters */
+  if (narg >= 14 && ps[13])     // NSAME: threshold on constant parameters
     nSame = int_arg(ps[13]);
   else
     nSame = 5;
 
-  if (narg >= 15 && ps[14]) {   /* ERR: output variable for error estimates */
+  if (narg >= 15 && ps[14]) {   // ERR: output variable for error estimates
     if (ps[14] < nFixed || ps[14] >= NAMED_END) {
       if (xSym)
         free(xp);
@@ -330,37 +330,37 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
       return cerror(ALLOC_ERR, 0);
   }
 
-  if (narg >= 17 && ps[16])    /* TTHRESH: threshold on CPU time */
+  if (narg >= 17 && ps[16])    // TTHRESH: threshold on CPU time
     tThresh = double_arg(ps[16]);
   else
     tThresh = 3600;
 
-  vocal = (internalMode & 1)? 1: 0; /* /VOCAL */
-  vocal_err = ((internalMode & 129) == 129)? 1: 0; /* /VERR */
-  if (internalMode & 4)         /* /DOWN */
+  vocal = (internalMode & 1)? 1: 0; // /VOCAL
+  vocal_err = ((internalMode & 129) == 129)? 1: 0; // /VERR
+  if (internalMode & 4)         // /DOWN
     dir = 0.8;
   else
     dir = 1./0.8;
 
-  PoissonChiSq = internalMode & 8; /* get Poisson chi-squares fit (if */
-                                   /* applicable) */
+  PoissonChiSq = internalMode & 8; // get Poisson chi-squares fit (if
+                                   // applicable)
 
   i = nPar + 1;
-  fitPar = array_scratch(LUX_DOUBLE, 1, &i); /* fit parameters */
+  fitPar = array_scratch(LUX_DOUBLE, 1, &i); // fit parameters
   par = (double *) array_data(fitPar);
 
   size = nPar*sizeof(double);
 
-  /* copy start values into par */
+  // copy start values into par
   memcpy(par, start, size);
 
-  /* enforce upper and lower bounds */
+  // enforce upper and lower bounds
   enforce_bounds(par, lowbound, hibound, nPar);
 
-  if (fitSym) {                 /* prepare executable for user-defined */
-                                /* fit function */
+  if (fitSym) {                 // prepare executable for user-defined
+                                // fit function
     if (isFreeTemp(fitPar))
-      symbol_context(fitPar) = 1; /* so they won't be deleted */
+      symbol_context(fitPar) = 1; // so they won't be deleted
     if (isFreeTemp(xTemp))
       symbol_context(xTemp) = 1;
     if (isFreeTemp(ySym))
@@ -385,19 +385,19 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     starttime = 0;
 
   onebyone = (internalMode & 64? 1: 0);
-  /* internalMode is likely to change due to calling the user function */
+  // internalMode is likely to change due to calling the user function
 
-  /* get initial fit quality */
+  // get initial fit quality
   if (fitSym) {
     i = eval(fitTemp);
-    if (i < 0) {                /* some error */
+    if (i < 0) {                // some error
       if (narg <= 14 || !ps[14])
         free(err);
       if (!xSym)
         zap(xTemp);
       if (symbol_context(ySym) == 1)
-        symbol_context(ySym) = -compileLevel; /* so they'll be deleted */
-                                              /* when appropriate */
+        symbol_context(ySym) = -compileLevel; // so they'll be deleted
+                                              // when appropriate
       if (symbol_context(fitPar) == 1)
         symbol_context(fitPar) = -compileLevel;
       if (xSym && symbol_context(xSym) == 1)
@@ -427,14 +427,14 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   double qLag = 1.2*qBest2;
   if (!qLag)
     qLag = 1;
-  do {                          /* iterate */
+  do {                          // iterate
     qLast = qBest2;
     nn = onebyone? nPar: nIter;
     if (onebyone)
       randome(ran, nPar, 0);
     for (i = 0; i < nn; i++) {
       if (!onebyone)
-        randome(ran, nPar, 0);  /* get random numbers */
+        randome(ran, nPar, 0);  // get random numbers
       mu = 2 - mu/qLast;
       if (mu < 1)
         mu = 1;
@@ -442,37 +442,37 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
         par[i] = parBest1[i] + mu*meanShift[i] + err[i]*ran[i];
 	enforce_bounds(par, lowbound, hibound, nPar);
       } else {
-        for (j = 0; j < nPar; j++) /* update parameters */
+        for (j = 0; j < nPar; j++) // update parameters
           par[j] = parBest1[j] + mu*meanShift[j] + err[j]*ran[j];
 	enforce_bounds(par, lowbound, hibound, nPar);
       }
       if (fitSym) {
         j = eval(fitTemp);
-        if (j < 0) {            /* some error */
+        if (j < 0) {            // some error
           bad = 1;
           break;
         }
         qual = double_arg(j);
         zapTemp(j);
       } else
-        qual = fitFunc(par, nPar, xp, yp, weights, nPoints); /* fit quality */
-      if (qual < qBest1) {      /* this one is better */
+        qual = fitFunc(par, nPar, xp, yp, weights, nPoints); // fit quality
+      if (qual < qBest1) {      // this one is better
         qBest1 = qual;
         memcpy(parBest1, par, size);
-      } else {			/* restore parameter */
+      } else {			// restore parameter
 	if (onebyone)
 	  par[i] = parBest1[i];
       }
-    } /* end for (i = 0; i < nn; i++) */
+    } // end for (i = 0; i < nn; i++)
 
     if (bad)
       break;
 
-    if (qBest1 < qBest2) {      /* this cycle yielded a better one */
+    if (qBest1 < qBest2) {      // this cycle yielded a better one
       same = 0;
       for (j = 0; j < nPar; j++) {
 	temp = parBest1[j] - parBest2[j];
-	if (temp) {		/* some improvement due to this parameter */
+	if (temp) {		// some improvement due to this parameter
 	  meanShift[j] = meanShift[j]*fac + temp*(1 - fac);
 	  err[j] = (err[j]*fac + 2*fabs(temp)*(1 - fac))/dir;
 	} else {
@@ -499,7 +499,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
 	  if (vocal_err)
 	    printf("(%#8.2g)", err[j]);
           n++;
-          if (n >= 14/(vocal_err? 2: 1)) /* we show at most twenty */
+          if (n >= 14/(vocal_err? 2: 1)) // we show at most twenty
             break;
         }
     }
@@ -526,7 +526,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     par[nPar] = qBest2;
 
     if (qBest2) {
-      /* presumably we're close to a local minimum now; home in */
+      // presumably we're close to a local minimum now; home in
       double qualplus, qualmin;
       for (i = 0; i < nPar; i++) {
         if (step[i]) {
@@ -586,7 +586,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
           if (bad)
             break;
 
-          par[i] = parBest2[i];	/* restore */
+          par[i] = parBest2[i];	// restore
           err[i] = h;
         } else
           err[i] = 0;
@@ -610,7 +610,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
               if (vocal_err)
                 printf("(%#8.2g)", err[j]);
               n++;
-              if (n >= 14/(vocal_err? 2: 1)) /* we show at most fourteen */
+              if (n >= 14/(vocal_err? 2: 1)) // we show at most fourteen
                 break;
             }
         }
@@ -651,7 +651,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   free(meanShift);
   return j;
 }
-/*------------------------------------------------------------*/
+//------------------------------------------------------------
 gsl_vector *gsl_vector_from_lux_symbol(int32_t iq, int32_t axis)
 {
   gsl_vector *v;
@@ -666,7 +666,7 @@ gsl_vector *gsl_vector_from_lux_symbol(int32_t iq, int32_t axis)
   }
 
   v = (gsl_vector*) calloc(1, sizeof(gsl_vector));
-  /* v->owner = 0 is essential! */
+  // v->owner = 0 is essential!
   if (!v) {
     errno = ENOMEM;
     return NULL;
@@ -682,7 +682,7 @@ gsl_vector *gsl_vector_from_lux_symbol(int32_t iq, int32_t axis)
   v->data = data.d;
   return v;
 }
-/*------------------------------------------------------------*/
+//------------------------------------------------------------
 double fit2_func(const gsl_vector *a, void *p)
 {
   lux_func_if *afif = (lux_func_if *) p;
@@ -741,46 +741,46 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   {
     int32_t nx, *dims, ndim, nStep;
 
-    d_x_sym = lux_double(1, &ps[0]);	/* X */
+    d_x_sym = lux_double(1, &ps[0]);	// X
     if (isFreeTemp(d_x_sym))
-      symbol_context(d_x_sym) = 1;     /* avoid premature deletion */
-    d_y_sym = lux_double(1, &ps[1]);	/* Y */
+      symbol_context(d_x_sym) = 1;     // avoid premature deletion
+    d_y_sym = lux_double(1, &ps[1]);	// Y
     if (isFreeTemp(d_y_sym))
       symbol_context(d_y_sym) = 1;
-    d_par_sym = lux_double(1, &ps[2]); /* PAR */
+    d_par_sym = lux_double(1, &ps[2]); // PAR
     if (isFreeTemp(d_par_sym))
-      symbol_context(d_par_sym) = 1;	/* avoid premature deletion */
-    d_step_sym = lux_double(1, &ps[3]); /* STEP */
+      symbol_context(d_par_sym) = 1;	// avoid premature deletion
+    d_step_sym = lux_double(1, &ps[3]); // STEP
     if (isFreeTemp(d_step_sym))
       symbol_context(d_step_sym) = 1;
-    if (numerical(d_x_sym, &dims, &ndim, &nx, NULL) < 0 /* X */
-	|| numerical(d_y_sym, NULL, NULL, &nPoints, NULL) < 0 /* Y */
+    if (numerical(d_x_sym, &dims, &ndim, &nx, NULL) < 0 // X
+	|| numerical(d_y_sym, NULL, NULL, &nPoints, NULL) < 0 // Y
 	|| numerical(d_par_sym, NULL, NULL, &nPar, NULL) < 0
 	|| numerical(d_step_sym, NULL, NULL, &nStep, NULL) < 0)
       return LUX_ERROR;
     if (nStep == nPar - 1)
-      --nPar;			/* assume last element of START is quality */
+      --nPar;			// assume last element of START is quality
     if (nStep != nPar) {
       result = luxerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
     }
   }
   if (!result) {
-    if (!symbolIsString(ps[4])) {	/* FUNCNAME */
+    if (!symbolIsString(ps[4])) {	// FUNCNAME
       result = cerror(NEED_STR, ps[4]);
     }
   }
   if (!result) {
-    if (narg > 5 && ps[5]) {	/* ERR */
+    if (narg > 5 && ps[5]) {	// ERR
       redef_array(ps[5], LUX_DOUBLE, 1, &nPar);
       errors = (double *) array_data(ps[5]);
     }
-    if (narg > 6 && ps[6])	/* ITHRESH */
+    if (narg > 6 && ps[6])	// ITHRESH
       ithresh = int_arg(ps[6]);
     if (ithresh <= 0)
       ithresh = 10000;
-    if (narg > 7 && ps[7])	/* STHRESH */
+    if (narg > 7 && ps[7])	// STHRESH
       sthresh = double_arg(ps[7]);
-    if (narg > 8 && ps[8])	/* NITHRESH */
+    if (narg > 8 && ps[8])	// NITHRESH
       nithresh = int_arg(ps[8]);
     else
       nithresh = sqrt(nPar)*10;
@@ -807,9 +807,9 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   }
 
   if (!result) {
-    lux_func_if_set_param(afif, 0, d_par_sym);		 /* par */
-    lux_func_if_set_param(afif, 1, d_x_sym);		 /* x */
-    lux_func_if_set_param(afif, 2, d_y_sym);		 /* y */
+    lux_func_if_set_param(afif, 0, d_par_sym);		 // par
+    lux_func_if_set_param(afif, 1, d_x_sym);		 // x
+    lux_func_if_set_param(afif, 2, d_y_sym);		 // y
 
     minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
                                               nPar);
@@ -924,17 +924,17 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   gsl_multimin_fminimizer_free(minimizer);
   lux_func_if_free(afif);
   if (symbol_context(d_par_sym) == 1)
-    symbol_context(d_par_sym) = -compileLevel; /* so it is deleted when appropriate */
+    symbol_context(d_par_sym) = -compileLevel; // so it is deleted when appropriate
   if (symbol_context(d_x_sym) == 1)
-    symbol_context(d_x_sym) = -compileLevel; /* so it is deleted when appropriate */
+    symbol_context(d_x_sym) = -compileLevel; // so it is deleted when appropriate
   if (symbol_context(d_y_sym) == 1)
-    symbol_context(d_y_sym) = -compileLevel; /* so it is deleted when appropriate */
+    symbol_context(d_y_sym) = -compileLevel; // so it is deleted when appropriate
   if (symbol_context(d_step_sym) == 1)
-    symbol_context(d_step_sym) = -compileLevel; /* so it is deleted when appropriate */
+    symbol_context(d_step_sym) = -compileLevel; // so it is deleted when appropriate
   return result;
 }
 REGISTER(generalfit2, f, fit3, 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
-/*------------------------------------------------------------*/
+//------------------------------------------------------------
 typedef union {
   uint8_t  *b;
   unsigned short        *w;
@@ -943,7 +943,7 @@ typedef union {
   double        *d;
 } uscalar;
 
-/* replace NaN values by (other) random values */
+// replace NaN values by (other) random values
 void denan(uint8_t *data, int32_t size, int32_t partype)
 /* <data> = start of data
    <size> = size of data, in bytes
@@ -1132,7 +1132,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   int32_t *crossoversites, *mutationsites;
   void indexxr_d(int32_t, double *, int32_t *);
  
-  iq = ps[3];                   /* fit */
+  iq = ps[3];                   // fit
   if (!symbolIsStringScalar(iq))
     return cerror(NEED_STR, ps[3]);
   fitSym = stringpointer(string_value(iq), SP_USER_FUNC);
@@ -1142,7 +1142,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
             iq);
 
   if (symbolIsScalar(ps[2])) {
-    nPar = int_arg(ps[2]);      /* nPar */
+    nPar = int_arg(ps[2]);      // nPar
     if (nPar < 1)
       return luxerror("A positive value is required for the number of parameters",
                       ps[2]);
@@ -1164,28 +1164,28 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
       partype = LUX_DOUBLE;
       break;
     }
-  } else if (symbolIsArray(ps[2])) { /* start values */
+  } else if (symbolIsArray(ps[2])) { // start values
     int32_t iq = lux_double(1, &ps[2]);
     nPar = array_size(iq);
     start = (double *) array_data(iq);
     partype = symbol_type(iq);
   }
 
-  if (narg > 5 && (iq = ps[5])) { /* mu: selection pressure */
+  if (narg > 5 && (iq = ps[5])) { // mu: selection pressure
     mu = double_arg(iq);
     if (mu < 1.0)
       mu = 1.0;
   } else
     mu = 1.5;
 
-  if (narg > 6 && (iq = ps[6])) { /* generations: number of generations */
+  if (narg > 6 && (iq = ps[6])) { // generations: number of generations
     nGeneration = int_arg(iq);
     if (nGeneration < 1)
       nGeneration = 1;
   } else
     nGeneration = 50;
 
-  if (narg > 8 && (iq = ps[8])) { /* pcross: cross-over probability */
+  if (narg > 8 && (iq = ps[8])) { // pcross: cross-over probability
     pcross = double_arg(iq);
     if (pcross < 0.0)
       pcross = 0.0;
@@ -1195,17 +1195,17 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     pcross = 0.1;
   pcross /= 2;
 
-  if (narg > 7 && (iq = ps[7])) { /* population */
+  if (narg > 7 && (iq = ps[7])) { // population
     nPopulation = int_arg(iq);
     if (nPopulation < 1)
       nPopulation = 1;
-    /* we make sure that the population fills a number of ints exactly */
+    // we make sure that the population fills a number of ints exactly
     if (partype < LUX_INT32)
       nPopulation += (nPopulation % (sizeof(int32_t)/lux_type_size[partype]));
   } else
     nPopulation = 100;
 
-  if (narg > 9 && (iq = ps[9])) { /* pmutate: mutation probability */
+  if (narg > 9 && (iq = ps[9])) { // pmutate: mutation probability
     pmutate = double_arg(iq);
     if (pmutate < 0.0)
       pmutate = 0.0;
@@ -1215,14 +1215,14 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     pmutate = 1.0/nPopulation;
   pmutate /= 2;
 
-  if (!symbolIsNumericalArray(ps[0])) /* x */
+  if (!symbolIsNumericalArray(ps[0])) // x
     return cerror(NEED_NUM_ARR, ps[0]);
   xSym = lux_double(1, ps);
   if (isFreeTemp(xSym))
-    symbol_context(xSym) = 1;   /* so it doesn't get prematurely deleted */
+    symbol_context(xSym) = 1;   // so it doesn't get prematurely deleted
   nPoints = array_size(xSym);
 
-  if (!symbolIsNumericalArray(ps[1])) /* y */
+  if (!symbolIsNumericalArray(ps[1])) // y
     return cerror(NEED_NUM_ARR, ps[1]);
   if (array_size(ps[1]) != nPoints)
     return cerror(INCMP_ARG, ps[1]);
@@ -1230,7 +1230,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   if (isFreeTemp(ySym))
     symbol_context(ySym) = 1;
 
-  if (narg > 4 && (iq = ps[4])) { /* weights */
+  if (narg > 4 && (iq = ps[4])) { // weights
     int32_t n;
     if (symbol_class(iq) != LUX_ARRAY)
       return cerror(NEED_ARR, iq);
@@ -1244,7 +1244,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   } else
     weights = NULL;
 
-  if (narg > 10 && (iq = ps[10])) /* VOCAL */
+  if (narg > 10 && (iq = ps[10])) // VOCAL
     vocal = int_arg(iq);
   else
     vocal = 0;
@@ -1252,7 +1252,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   elite = (internalMode & 1);
 
   fitPar = array_scratch(partype, 1, &nPar);
-  symbol_context(fitPar) = 1;   /* so it doesn't get prematurely deleted */
+  symbol_context(fitPar) = 1;   // so it doesn't get prematurely deleted
   par = (int16_t*) array_data(fitPar);
   typesize = lux_type_size[partype];
   size = nPar*typesize;
@@ -1268,18 +1268,18 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   symbol_memory(fitTemp) = (weights? 4: 3)*sizeof(int16_t);
   usr_func_number(fitTemp) = fitSym;
 
-  /* create initial population */
+  // create initial population
   genes = (uint8_t*) malloc(nPopulation*size);
   genes2 = (uint8_t*) malloc(nPopulation*size);
   deviation = (double*) malloc(nPopulation*sizeof(double));
   deviation2 = (double*) malloc(nPopulation*sizeof(double));
   rtoi = (int32_t*) malloc(nPopulation*sizeof(int32_t));
-  /* itor = malloc(nPopulation*sizeof(int32_t)); */
+  // itor = malloc(nPopulation*sizeof(int32_t));
 
-  /* we fill <genes> with random bits.  <genes> exactly spans a number */
-  /* of ints, so we don't need to worry about the exact type */
+  // we fill <genes> with random bits.  <genes> exactly spans a number
+  // of ints, so we don't need to worry about the exact type
   p.l = (uint32_t *) genes;
-  if (start) {                  /* fill first member with start values */
+  if (start) {                  // fill first member with start values
     memcpy(p.d, start, nPar*sizeof(double));
     p.d += nPar;
     i = size/sizeof(int32_t);
@@ -1287,14 +1287,14 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     i = 0;
   for ( ; i < nPopulation*size/sizeof(int32_t); i++)
     *p.l++ = random_bits();
-  /* if the parameter type is FLOAT or DOUBLE, then some of the bit patterns */
-  /* may not correspond to representable values, but rather to NaNs. */
-  /* We must fix those elements. We use a single scheme for both FLOAT */
-  /* and DOUBLE values, assuming that when the bit patterns of a DOUBLE */
-  /* NaN are interpreted as the bit patterns of some FLOAT values instead, */
-  /* then at least one of those FLOATs is a FLOAT NaN, and replacing that */
-  /* FLOAT NaN with a representable FLOAT value generates a representable */
-  /* DOUBLE value. */
+  // if the parameter type is FLOAT or DOUBLE, then some of the bit patterns
+  // may not correspond to representable values, but rather to NaNs.
+  // We must fix those elements. We use a single scheme for both FLOAT
+  // and DOUBLE values, assuming that when the bit patterns of a DOUBLE
+  // NaN are interpreted as the bit patterns of some FLOAT values instead,
+  // then at least one of those FLOATs is a FLOAT NaN, and replacing that
+  // FLOAT NaN with a representable FLOAT value generates a representable
+  // DOUBLE value.
   denan(genes, nPopulation*size, partype);
 
   int bad = 0;
@@ -1303,12 +1303,12 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
      Less is better. */
   for (i = 0; i < nPopulation; i++) {
     memcpy(par, genes + i*size, size);
-    j = eval(fitTemp);          /* get deviation ("distance from goal") */
-    if (j == LUX_ERROR) {       /* some error occurred */
+    j = eval(fitTemp);          // get deviation ("distance from goal")
+    if (j == LUX_ERROR) {       // some error occurred
       bad = 1;
       break;
     }
-    deviation[i] = fabs(double_arg(j)); /* distance from goal */
+    deviation[i] = fabs(double_arg(j)); // distance from goal
     if (vocal) {
       printf("%d/%d: ", i, nPopulation);
       printgene(genes + i*size, nPar, partype, 0, &deviation[i]);
@@ -1321,8 +1321,8 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   uint8_t *child2 = NULL;
 
   if (!bad) {
-    internalMode = 0;             /* or we may get unexpected results */
-    indexxr_d(nPopulation, deviation, rtoi); /* get ranking */
+    internalMode = 0;             // or we may get unexpected results
+    indexxr_d(nPopulation, deviation, rtoi); // get ranking
     /* now deviation[rtoi[i]] is the i-th largest distance from goal;
        rtoi[0] is the worst fit, rtoi[nPopulation - 1] is the best fit */
 
@@ -1354,8 +1354,8 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
        and mutation probability equal to <pmutate>.
        We do crossover after <crossmark> pairs, and mutation
        after <mutatemark> pairs */
-    crossmark = pcross? random_one()/pcross: LONG_MAX; /* bytes */
-    mutatemark = pmutate? random_one()/pmutate: LONG_MAX; /* bits */
+    crossmark = pcross? random_one()/pcross: LONG_MAX; // bytes
+    mutatemark = pmutate? random_one()/pmutate: LONG_MAX; // bits
 
     child1 = (uint8_t*) malloc(size);
     child2 = (uint8_t*) malloc(size);
@@ -1373,9 +1373,9 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
        quality unchanged for a fixed number of iterations" */
 
     generation = nGeneration;
-    /* iterate over the desired number of generations */
-    while (generation--) {        /* all generations */
-      if (elite) {                /* always keep the best two */
+    // iterate over the desired number of generations
+    while (generation--) {        // all generations
+      if (elite) {                // always keep the best two
         memcpy(genes2, genes + size*rtoi[nPopulation - 1], size);
         genes2 += size;
         *deviation2++ = deviation[rtoi[nPopulation - 1]];
@@ -1383,8 +1383,8 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
         genes2 += size;
         *deviation2++ = deviation[rtoi[nPopulation - 2]];
       }
-      for (pair = elite; pair < nPopulation/2; pair++) { /* remaining pairs */
-        /* pick parents */
+      for (pair = elite; pair < nPopulation/2; pair++) { // remaining pairs
+        // pick parents
         i1 = random_distributed(nPopulation, distr);
         do {
           i2 = random_distributed(nPopulation, distr);
@@ -1398,38 +1398,38 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
         offspringcount += 2;
 
         changed = 0;
-        while (crossmark < size*8) { /* do cross-over */
+        while (crossmark < size*8) { // do cross-over
           ibit = crossmark;
           crossmark += random_one()/pcross;
           crossoversites[ibit]++;
-          w = ibit/8;             /* Byte index */
-          k = ibit - 8*w;         /* bit index */
-          for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
+          w = ibit/8;             // Byte index
+          k = ibit - 8*w;         // bit index
+          for (i = 0; i < w; i++) { // swap before cross-over int16_t
             t1 = child1[i];
             child1[i] = child2[i];
             child2[i] = t1;
-          } /* end of for (i = 0; ...) */
-          if (k) {                /* cross-over site is not on int16_t boundary */
+          } // end of for (i = 0; ...)
+          if (k) {                // cross-over site is not on int16_t boundary
             t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
             t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
             child1[w] = t1;
             child2[w] = t2;
-          } /* end of if (k) */
+          } // end of if (k)
           if (hasnan(child1, nPar, partype)
               || hasnan(child2, nPar, partype)) {
-            /* we generated one or two NaNs from regular numbers: */
-            /* undo the crossover */
-            for (i = 0; i < w; i++) { /* swap before cross-over int16_t */
+            // we generated one or two NaNs from regular numbers:
+            // undo the crossover
+            for (i = 0; i < w; i++) { // swap before cross-over int16_t
               t1 = child1[i];
               child1[i] = child2[i];
               child2[i] = t1;
-            } /* end of for (i = 0; ...) */
-            if (k) {              /* cross-over site is not on int16_t boundary */
+            } // end of for (i = 0; ...)
+            if (k) {              // cross-over site is not on int16_t boundary
               t1 = ((child1[w] & mask1[k]) | (child2[w] & mask2[k]));
               t2 = ((child2[w] & mask1[k]) | (child1[w] & mask2[k]));
               child1[w] = t1;
               child2[w] = t2;
-            } /* end of if (k) */
+            } // end of if (k)
           } else {
             changed++;
             crossovercount++;
@@ -1449,16 +1449,16 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
         }
         crossmark -= size*8;
 
-        /* do mutations */
+        // do mutations
         while (mutatemark < size*8) {
           ibit = mutatemark;
           mutatemark += random_one()/pmutate;
           mutationsites[ibit]++;
-          w = ibit/8;             /* Byte index */
-          k = ibit - 8*w;         /* bit index */
-          child1[w] ^= mask3[k]; /* flip bit */
+          w = ibit/8;             // Byte index
+          k = ibit - 8*w;         // bit index
+          child1[w] ^= mask3[k]; // flip bit
           if (hasnan(child1, nPar, partype))
-            /* the mutation generated a NaN; undo */
+            // the mutation generated a NaN; undo
             child1[w] ^= mask3[k];
           else {
             changed++;
@@ -1478,11 +1478,11 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
           ibit = mutatemark;
           mutatemark += random_one()/pmutate;
           mutationsites[ibit]++;
-          w = ibit/8;             /* Byte index */
-          k = ibit - 8*w;         /* bit index */
-          child2[w] ^= mask3[k]; /* flip bit */
+          w = ibit/8;             // Byte index
+          k = ibit - 8*w;         // bit index
+          child2[w] ^= mask3[k]; // flip bit
           if (hasnan(child2, nPar, partype))
-            /* the mutation generated a NaN; undo */
+            // the mutation generated a NaN; undo
             child2[w] ^= mask3[k];
           else {
             changed++;
@@ -1499,12 +1499,12 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
         }
         mutatemark -= size*8;
 
-        /* store processed genes in new population */
+        // store processed genes in new population
         memcpy(genes2, child1, size);
         genes2 += size;
         memcpy(genes2, child2, size);
         genes2 += size;
-        if (changed) { /* TODO: only reevaluate for the changed child, not both */
+        if (changed) { // TODO: only reevaluate for the changed child, not both
           memcpy(par, child1, size);
           j = eval(fitTemp);
           if (j == LUX_ERROR) {
@@ -1525,7 +1525,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
           *deviation2++ = deviation[rtoi[i1]];
           *deviation2++ = deviation[rtoi[i2]];
         }
-      } /* end of for (pair = 0; ...) */
+      } // end of for (pair = 0; ...)
 
       if (bad)
         break;
@@ -1536,7 +1536,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
       memcpy(genes, genes2, nPopulation*size);
       memcpy(deviation, deviation2, nPopulation*sizeof(double));
 
-      indexxr_d(nPopulation, deviation, rtoi); /* get ranking */
+      indexxr_d(nPopulation, deviation, rtoi); // get ranking
       calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
 
       if (vocal > 1) {
@@ -1558,7 +1558,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
       }
       /* memcpy(itor, rtoi, nPopulation*sizeof(int32_t));
          invertPermutation(itor, nPopulation); */
-    } /* end of while (generation--) */
+    } // end of while (generation--)
 
     if (!bad) {
       result = array_scratch(partype, 1, &nPar);
@@ -1588,8 +1588,8 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     deviation2 -= pair*2;
 
     if (symbol_context(ySym) == 1)
-      symbol_context(ySym) = -compileLevel; /* so they'll be deleted */
-    /* when appropriate */
+      symbol_context(ySym) = -compileLevel; // so they'll be deleted
+    // when appropriate
     if (symbol_context(fitPar) == 1)
       symbol_context(fitPar) = -compileLevel;
     if (xSym && symbol_context(xSym) == 1)
@@ -1608,7 +1608,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     zap(ySym);
   free(distr);
   free(rtoi);
-  /* free(itor); */
+  // free(itor);
   free(genes);
   free(deviation);
   free(genes2);

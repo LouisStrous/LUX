@@ -18,8 +18,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File tape.c */
-/* LUX routines for tape I/O. */
+// File tape.c
+// LUX routines for tape I/O.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -33,21 +33,21 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <fcntl.h>
 #include "action.hh"
-/* ioctl() is generally defined in sys/ioctl.h or in unistd.h */
+// ioctl() is generally defined in sys/ioctl.h or in unistd.h
 #include <sys/ioctl.h>
 #include <unistd.h>
-						/* tape things */
+						// tape things
 struct  mtop    rew = {MTREW, 1 };
 struct  mtop    unl = {MTOFFL, 1 };
 struct  mtop    mtweof = {MTWEOF, 1 };
 struct  mtop    tape_op = {MTFSR, 1 };
 struct  mtget   ti;
 int32_t	tape_lun, io_status;
-extern int32_t	byte_count;	/* defined in files.c */
+extern int32_t	byte_count;	// defined in files.c
 int32_t	tape_messages=1;
 static	int32_t	tape_fd[MAXTAPE], neof[MAXTAPE], neot[MAXTAPE];
-/*------------------------------------------------------------------------- */
-int32_t lux_tape_status(int32_t narg, int32_t ps[])/* print tape status */
+//-------------------------------------------------------------------------
+int32_t lux_tape_status(int32_t narg, int32_t ps[])// print tape status
 {
   int32_t   fd, j;
 
@@ -62,23 +62,23 @@ int32_t lux_tape_status(int32_t narg, int32_t ps[])/* print tape status */
   printf("\n");
   return 1;
 }
-/*------------------------------------------------------------------------- */
-int32_t tape_setup(int32_t narg, int32_t ps[])		/* for internal use */
+//-------------------------------------------------------------------------
+int32_t tape_setup(int32_t narg, int32_t ps[])		// for internal use
 {
   char	*name;
 
   name = strsave("$ANADRIVE0");
   errno = 0;
-  tape_lun = int_arg( ps[0] );		/* get tape logical unit number */
+  tape_lun = int_arg( ps[0] );		// get tape logical unit number
   if (tape_lun < 0 || tape_lun > MAXTAPE) {
     printf("illegal tape unit specified\n");
     return LUX_ERROR;
   }
-  if (tape_fd[tape_lun] == 0) {	/* new ? */
+  if (tape_fd[tape_lun] == 0) {	// new ?
     neof[tape_lun] = neot[tape_lun] = 0;
-    /* determine tape drive name.  Modified 10/5/92 LS */
+    // determine tape drive name.  Modified 10/5/92 LS
     sprintf(&name[9], "%1i", tape_lun);
-    if (*expand_name(name, NULL) == '$')  /* no translation */
+    if (*expand_name(name, NULL) == '$')  // no translation
       printf("Environment variable %s for tape drive %1d is not defined -- illegal tape drive?",
 	     name, tape_lun);
     else {
@@ -104,7 +104,7 @@ int32_t tape_setup(int32_t narg, int32_t ps[])		/* for internal use */
 
   return tape_fd[tape_lun];
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t check_tape_io(int32_t iq)
 {
   io_status = errno;
@@ -118,8 +118,8 @@ int32_t check_tape_io(int32_t iq)
     io_status = errno;
   return LUX_OK;
 }
-/*------------------------------------------------------------------------- */
-int32_t lux_rewind(int32_t narg, int32_t ps[])/* rewind a tape drive */
+//-------------------------------------------------------------------------
+int32_t lux_rewind(int32_t narg, int32_t ps[])// rewind a tape drive
 {
   int32_t	fd;
 
@@ -127,15 +127,15 @@ int32_t lux_rewind(int32_t narg, int32_t ps[])/* rewind a tape drive */
     return LUX_ERROR;
   return check_tape_io(ioctl(fd, MTIOCTOP, &rew));
 }
-/*------------------------------------------------------------------------- */
-int32_t lux_weof(int32_t narg, int32_t ps[]) /* write an eof on tape drive */
+//-------------------------------------------------------------------------
+int32_t lux_weof(int32_t narg, int32_t ps[]) // write an eof on tape drive
 {
 int32_t	fd;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
 return check_tape_io( ioctl(fd, MTIOCTOP, &mtweof) );
 }
-/*------------------------------------------------------------------------- */
-int32_t lux_unload(int32_t narg, int32_t ps[])/* unload a tape drive */
+//-------------------------------------------------------------------------
+int32_t lux_unload(int32_t narg, int32_t ps[])// unload a tape drive
 {
   int32_t	fd;
 
@@ -148,8 +148,8 @@ int32_t lux_unload(int32_t narg, int32_t ps[])/* unload a tape drive */
   tape_fd[tape_lun] = 0;
   return 1;
 }
-/*------------------------------------------------------------------------- */
-int32_t lux_skipr(int32_t narg, int32_t ps[]) /* skip records */
+//-------------------------------------------------------------------------
+int32_t lux_skipr(int32_t narg, int32_t ps[]) // skip records
 {
 int32_t	fd, nr;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
@@ -162,8 +162,8 @@ tape_op.mt_op = MTBSR;	tape_op.mt_count = -nr;
 }
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
-/*------------------------------------------------------------------------- */
-int32_t lux_skipf(int32_t narg, int32_t ps[]) /* skip records */
+//-------------------------------------------------------------------------
+int32_t lux_skipf(int32_t narg, int32_t ps[]) // skip records
 {
 int32_t	fd, nf;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
@@ -176,17 +176,17 @@ tape_op.mt_op = MTBSF;	tape_op.mt_count = -nf;
 }
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_taprd(int32_t narg, int32_t ps[])
-/* read tape record.  Modified LS 27mar98 to read records until the */
-/* requested number of bytes is read (or an error occurs) */
+// read tape record.  Modified LS 27mar98 to read records until the
+// requested number of bytes is read (or an error occurs)
 {
   int32_t	fd, nbr, iq, n, type, nread, cur;
   Pointer q1;
   
   if ( (fd = tape_setup(narg,ps)) < 0)
     return LUX_ERROR;
-				/* get the size of the input array to load */
+				// get the size of the input array to load
   iq = ps[1];
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
@@ -197,7 +197,7 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
   nread = 0;
   do {
     nbr = read(fd, q1.b, cur);
-    if (nbr < 0)		/* some error */
+    if (nbr < 0)		// some error
       break;
     q1.b += nbr;
     nread += nbr;
@@ -217,14 +217,14 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
     perror("taprd");
   return 1;
 }
- /*------------------------------------------------------------------------- */
-int32_t lux_tapwrt(int32_t narg, int32_t ps[]) /* read tape record */
+ //-------------------------------------------------------------------------
+int32_t lux_tapwrt(int32_t narg, int32_t ps[]) // read tape record
  {
  int32_t	fd, nbr, iq, j, nd, n, type;
  array	*h;
  Pointer q1;
  if ( (fd = tape_setup(narg,ps)) < 0) return -1;
-				 /* get the size of the input array to load */
+				 // get the size of the input array to load
  iq = ps[1];
  CK_ARR(iq, 1);
  h = (array *) sym[iq].spec.array.ptr;
@@ -238,16 +238,16 @@ int32_t lux_tapwrt(int32_t narg, int32_t ps[]) /* read tape record */
 #endif
  nbr = write(fd, q1.b, n);
 #if !WORDS_BIGENDIAN
- endian(q1.b, n, type);				/* restore original */
+ endian(q1.b, n, type);				// restore original
 #endif
- byte_count = nbr;				/* want this for write */
+ byte_count = nbr;				// want this for write
  io_status = errno;
  if (errno) perror("tapwrt");
  if (nbr != n) { printf("tape write problem\n");  return -1; }
  return 1;
  }
- /*------------------------------------------------------------------------- */
-int32_t lux_tapebufout(int32_t narg, int32_t ps[])			/* write tape record */
+ //-------------------------------------------------------------------------
+int32_t lux_tapebufout(int32_t narg, int32_t ps[])			// write tape record
  /*the call is TAPEBUFOUT,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 16384 bytes
@@ -261,7 +261,7 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])			/* write tape record */
 #endif
 
  if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
-				 /* get the size of the output array */
+				 // get the size of the output array
  iq = ps[1];
  CK_ARR(iq, 1);
  h = (array *) sym[iq].spec.array.ptr;
@@ -273,9 +273,9 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])			/* write tape record */
  for(j=0;j<nd;j++) n *= h->dims[j];
  recsize = 16384;  offset = 0;
  if (narg >2) recsize = int_arg(ps[2]);
- /* may want a different offset and/or length */
+ // may want a different offset and/or length
  if (narg >3) offset = int_arg(ps[3]);
- offset *= nb;		/* offset in bytes */
+ offset *= nb;		// offset in bytes
  if (offset > n) {printf("offset exceeds array size, %d %d\n",offset, n);
 	 return -1; }
  if (narg >4) { len = int_arg(ps[4]);  len = len * nb;
@@ -287,28 +287,28 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])			/* write tape record */
  p = (char *) q1.b;
  endian((uint8_t *) p, n, type);
 #endif
- q1.b += offset;	/* starting address for writing */
+ q1.b += offset;	// starting address for writing
  ic = n;
- /*printf("in tapebufout, fd = %d, n = %d, recordsize = %d\n",fd,n,recsize);*/
+ //printf("in tapebufout, fd = %d, n = %d, recordsize = %d\n",fd,n,recsize);
  while (ic > 0) {
  recsize = MIN(recsize, ic);
  nbr = write (fd, q1.b, recsize);
- byte_count = nbr;				/* want this for write */
+ byte_count = nbr;				// want this for write
  io_status = errno;
- /*printf("number written = %d\n",nbr);*/
+ //printf("number written = %d\n",nbr);
  if (errno) perror("tapbufout");
- if (nbr <= 0 ) {					/*problem */
+ if (nbr <= 0 ) {					//problem
 	 if (nbr == 0) { printf("returned 0 while writing array\n");  }
 	 else { perror("tapebufout"); } return 0; }
  ic -= nbr;	q1.b += nbr;
  }
 #if !WORDS_BIGENDIAN
- endian((uint8_t *) p, n, type);				/* restore original */
+ endian((uint8_t *) p, n, type);				// restore original
 #endif
  return 1;
  }
- /*------------------------------------------------------------------------- */
-int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
+ //-------------------------------------------------------------------------
+int32_t lux_tapebufin(int32_t narg, int32_t ps[])// read tape record
  /*the call is TAPEBUFIN,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 32768 bytes
@@ -325,7 +325,7 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
 
  if ((fd = tape_setup(narg,ps)) < 0)
    return LUX_ERROR;
-				 /* get the size of the input array to load */
+				 // get the size of the input array to load
  iq = ps[1];
  if (symbol_class(iq) != LUX_ARRAY)
    return cerror(NEED_ARR, iq);
@@ -338,10 +338,10 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
  offset = 0;
  if (narg > 2)
    recsize = int_arg(ps[2]);
- /* may want a different offset and/or length */
+ // may want a different offset and/or length
  if (narg > 3)
    offset = int_arg(ps[3]);
- offset *= nb;		/* offset in bytes */
+ offset *= nb;		// offset in bytes
  if (offset > n) {
    printf("offset exceeds array size, %d %d\n", offset, n);
    return LUX_ERROR;
@@ -357,19 +357,19 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
  }
 #if !WORDS_BIGENDIAN
  p = (char *) q1.b;
- if (offset != 0)		/* need proper imbedding */
+ if (offset != 0)		// need proper imbedding
    endian((uint8_t *) p, n, type);
 #endif
  q1.b += offset;
  ic = n;
- /*printf("in tapebuferin, fd = %d, n = %d, recordsize = %d\n",fd,n,recsize);*/
+ //printf("in tapebuferin, fd = %d, n = %d, recordsize = %d\n",fd,n,recsize);
  while (ic > 0) {
    recsize = MIN(recsize, ic);
    nbr = read (fd, q1.b, recsize);
- /*printf("number read in = %d\n",nbr);*/
+ //printf("number read in = %d\n",nbr);
  /* the number read will be -1 for errors but a record larger than recsize
  is also tagged as an error, this often happens on the last record */
- /*printf("errno = %d\n",errno);*/
+ //printf("errno = %d\n",errno);
    if (errno) {
      printf("(error %d) ",errno);
      perror("tapebufin");
@@ -379,8 +379,8 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
      perror("tapebufin");
    }
    if (nbr < 0 ) {
-     if (errno == 12) {  /* record larger than requested recsize, */
-			 /* OK if last one */
+     if (errno == 12) {  // record larger than requested recsize,
+			 // OK if last one
        if (ic == recsize)
 	 nbr = recsize; 
        else {
@@ -402,10 +402,10 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])/* read tape record */
 #endif
  return 1;
  }
- /*------------------------------------------------------------------------- */
-int32_t lux_wait_for_tape(int32_t narg, int32_t ps[]) /* read tape record */
+ //-------------------------------------------------------------------------
+int32_t lux_wait_for_tape(int32_t narg, int32_t ps[]) // read tape record
 {
-/* a dummy version, we'll need this when we do asynchronous tape i/o */
+// a dummy version, we'll need this when we do asynchronous tape i/o
 return 1;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------

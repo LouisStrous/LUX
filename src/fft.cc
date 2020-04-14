@@ -17,15 +17,15 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* LUX's FFT routines */
-/* Based on FFTPACK version 4 by Paul N. Swarztrauber (April 1985) */
-/* Copied from the Netlib CDROM (2nd edition) */
+// LUX's FFT routines
+// Based on FFTPACK version 4 by Paul N. Swarztrauber (April 1985)
+// Copied from the Netlib CDROM (2nd edition)
 /* Translated from fortran to C using f2c + manual changes
    by Louis Strous (15 June 1998) */
 
-/* FFTPACK intro (describing the fortran version; We do not use all of */
-/* the routines in FFTPACK, and we only include the description of */
-/* the ones we use): */
+// FFTPACK intro (describing the fortran version; We do not use all of
+// the routines in FFTPACK, and we only include the description of
+// the ones we use):
 
 /*
 
@@ -509,7 +509,7 @@ wsave   contains initialization calculations which must not be
      in floats anyway
  */
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -518,18 +518,18 @@ wsave   contains initialization calculations which must not be
 
 int32_t ezfft1(int32_t *n, float *wa, float *ifac)
 {
-    /* Initialized data */
+    // Initialized data
 
   int32_t ntryh[4] = { 4,2,3,5 };
   float tpi = (float)6.28318530717959;
 
-  /* System generated locals */
+  // System generated locals
   int32_t i__1, i__2, i__3;
 
-  /* Builtin functions */
+  // Builtin functions
   //  double cos(double), sin(double);
 
-  /* Local variables */
+  // Local variables
   float argh;
   int32_t ntry, i, j, k1, l1, l2, ib, ii, nf, ip, nl, is, nq, nr;
   float ch1, sh1;
@@ -537,11 +537,11 @@ int32_t ezfft1(int32_t *n, float *wa, float *ifac)
   float dch1, ch1h, arg1, dsh1;
   int32_t nfm1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
 
-    /* Function Body */
+    // Function Body
     nl = *n;
     nf = 0;
     j = 0;
@@ -579,7 +579,7 @@ L105:
     for (i = 2; i <= i__1; ++i) {
 	ib = nf - i + 2;
 	ifac[ib + 2] = ifac[ib + 1];
-/* L106: */
+// L106:
     }
     ifac[3] = 2;
 L107:
@@ -622,35 +622,35 @@ L107:
 		i += 2;
 		wa[i - 1] = ch1 * wa[i - 3] - sh1 * wa[i - 2];
 		wa[i] = ch1 * wa[i - 2] + sh1 * wa[i - 3];
-/* L108: */
+// L108:
 	    }
 L109:
 	    is += ido;
-/* L110: */
+// L110:
 	}
 	l1 = l2;
-/* L111: */
+// L111:
     }
     return 0;
-} /* ezfft1 */
-/*------------------------------------------------------------------------*/
+} // ezfft1
+//------------------------------------------------------------------------
 int32_t ezfftb(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t i;
   int32_t rfftb(int32_t *n, float *r, float *wsave);
   int32_t ns2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
     --b;
     --a;
     --r;
 
-    /* Function Body */
+    // Function Body
     if ((i__1 = *n - 2) < 0) {
 	goto L101;
     } else if (i__1 == 0) {
@@ -671,7 +671,7 @@ L103:
     for (i = 1; i <= i__1; ++i) {
 	r[i * 2] = a[i] * (float).5;
 	r[(i << 1) + 1] = b[i] * (float)-.5;
-/* L104: */
+// L104:
     }
     r[1] = *azero;
     if (*n % 2 == 0) {
@@ -679,14 +679,14 @@ L103:
     }
     rfftb(n, &r[1], &wsave[*n + 1]);
     return 0;
-} /* ezfftb */
-/*------------------------------------------------------------------------*/
+} // ezfftb
+//------------------------------------------------------------------------
 int32_t ezfftf(int32_t *n, float *r, float *azero, float *a, float *b, float *wsave)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t i;
   int32_t rfftf(int32_t *n, float *r, float *wsave);
   float cf;
@@ -695,15 +695,15 @@ int32_t ezfftf(int32_t *n, float *r, float *azero, float *a, float *b, float *ws
   int32_t ns2m;
 
 
-/*                       VERSION 3  JUNE 1979 */
+//                       VERSION 3  JUNE 1979
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
     --b;
     --a;
     --r;
 
-    /* Function Body */
+    // Function Body
     if ((i__1 = *n - 2) < 0) {
 	goto L101;
     } else if (i__1 == 0) {
@@ -722,7 +722,7 @@ L103:
     i__1 = *n;
     for (i = 1; i <= i__1; ++i) {
 	wsave[i] = r[i];
-/* L104: */
+// L104:
     }
     rfftf(n, &wsave[1], &wsave[*n + 1]);
     cf = (float)2. / (float) (*n);
@@ -734,7 +734,7 @@ L103:
     for (i = 1; i <= i__1; ++i) {
 	a[i] = cf * wsave[i * 2];
 	b[i] = cfm * wsave[(i << 1) + 1];
-/* L105: */
+// L105:
     }
     if (*n % 2 == 1) {
 	return 0;
@@ -742,34 +742,34 @@ L103:
     a[ns2] = cf * (float).5 * wsave[*n];
     b[ns2] = (float)0.;
     return 0;
-} /* ezfftf */
-/*------------------------------------------------------------------------*/
+} // ezfftf
+//------------------------------------------------------------------------
 int32_t ezffti(int32_t *n, float *wsave)
 {
   int32_t ezfft1(int32_t *n, float *wa, float *ifac);
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
     ezfft1(n, &wsave[(*n << 1) + 1], &wsave[*n * 3 + 1]);
     return 0;
-} /* ezffti */
-/*------------------------------------------------------------------------*/
+} // ezffti
+//------------------------------------------------------------------------
 int32_t radb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ti2, tr2;
   int32_t idp2;
   
-  /* Parameter adjustments */
+  // Parameter adjustments
   ch_dim1 = *ido;
   ch_dim2 = *l1;
   ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -779,14 +779,14 @@ int32_t radb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
   cc -= cc_offset;
   --wa1;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	ch[(k + ch_dim2) * ch_dim1 + 1] = cc[((k << 1) + 1) * cc_dim1 + 1] + 
 		cc[*ido + ((k << 1) + 2) * cc_dim1];
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 1] = cc[((k << 1) + 1) * cc_dim1 
 		+ 1] - cc[*ido + ((k << 1) + 2) * cc_dim1];
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -814,9 +814,9 @@ L102:
 		    wa1[i - 1] * ti2;
 	    ch[i + (k + (ch_dim2 << 1)) * ch_dim1] = wa1[i - 2] * ti2 + wa1[i 
 		    - 1] * tr2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -828,28 +828,28 @@ L105:
 		cc_dim1] + cc[*ido + ((k << 1) + 1) * cc_dim1];
 	ch[*ido + (k + (ch_dim2 << 1)) * ch_dim1] = -(float)(cc[((k << 1)
 		 + 2) * cc_dim1 + 1] + cc[((k << 1) + 2) * cc_dim1 + 1]);
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radb2 */
-/*------------------------------------------------------------------------*/
+} // radb2
+//------------------------------------------------------------------------
 int32_t radb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
-  /* Initialized data */
+  // Initialized data
   
   float taur = (float)-.5;
   float taui = (float).866025403784439;
 
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -860,7 +860,7 @@ int32_t radb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	tr2 = cc[*ido + (k * 3 + 2) * cc_dim1] + cc[*ido + (k * 3 + 2) * 
@@ -871,7 +871,7 @@ int32_t radb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float
 		cc_dim1 + 1]);
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 1] = cr2 - ci3;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr2 + ci3;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -908,30 +908,30 @@ int32_t radb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float
 		    i - 1] * di3;
 	    ch[i + (k + ch_dim2 * 3) * ch_dim1] = wa2[i - 2] * di3 + wa2[i - 
 		    1] * dr3;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radb3 */
-/*------------------------------------------------------------------------*/
+} // radb3
+//------------------------------------------------------------------------
 int32_t radb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3)
 {
-  /* Initialized data */
+  // Initialized data
 
   float sqrt2 = (float)1.414213562373095;
 
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -943,7 +943,7 @@ int32_t radb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	tr1 = cc[((k << 2) + 1) * cc_dim1 + 1] - cc[*ido + ((k << 2) + 4) * 
@@ -958,7 +958,7 @@ int32_t radb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 1] = tr1 - tr4;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = tr2 - tr3;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = tr1 + tr4;
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -1010,9 +1010,9 @@ L102:
 		    wa3[i - 1] * ci4;
 	    ch[i + (k + (ch_dim2 << 2)) * ch_dim1] = wa3[i - 2] * ci4 + wa3[i 
 		    - 1] * cr4;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -1033,32 +1033,32 @@ L105:
 	ch[*ido + (k + ch_dim2 * 3) * ch_dim1] = ti2 + ti2;
 	ch[*ido + (k + (ch_dim2 << 2)) * ch_dim1] = -(float)sqrt2 * (tr1 
 		+ ti1);
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radb4 */
-/*------------------------------------------------------------------------*/
+} // radb4
+//------------------------------------------------------------------------
 int32_t radb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3, float *wa4)
 {
-  /* Initialized data */
+  // Initialized data
   
   float tr11 = (float).309016994374947;
   float ti11 = (float).951056516295154;
   float tr12 = (float)-.809016994374947;
   float ti12 = (float).587785252292473;
   
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
   
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
     ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -1071,7 +1071,7 @@ int32_t radb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	ti5 = cc[(k * 5 + 3) * cc_dim1 + 1] + cc[(k * 5 + 3) * cc_dim1 + 1];
@@ -1090,7 +1090,7 @@ int32_t radb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr3 - ci4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = cr3 + ci4;
 	ch[(k + ch_dim2 * 5) * ch_dim1 + 1] = cr2 + ci5;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -1153,36 +1153,36 @@ int32_t radb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 		    i - 1] * di5;
 	    ch[i + (k + ch_dim2 * 5) * ch_dim1] = wa4[i - 2] * di5 + wa4[i - 
 		    1] * dr5;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radb5 */
-/*------------------------------------------------------------------------*/
+} // radb5
+//------------------------------------------------------------------------
 int32_t radbg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, float *c1,
 	  float *c2, float *ch, float *ch2, float *wa)
 {
-  /* Initialized data */
+  // Initialized data
 
   float tpi = (float)6.28318530717959;
 
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
 
-  /* Builtin functions */
+  // Builtin functions
   double cos(double), sin(double);
 
-  /* Local variables */
+  // Local variables
   int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   float dc2, ai1, ai2, ar1, ar2, ds2;
   int32_t nbd;
   float dcp, arg, dsp, ar1h, ar2h;
   int32_t idp2, ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -1203,7 +1203,7 @@ int32_t radbg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, 
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     arg = tpi / (float) (*ip);
     dcp = cos(arg);
     dsp = sin(arg);
@@ -1220,9 +1220,9 @@ int32_t radbg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, 
 	for (i = 1; i <= i__2; ++i) {
 	    ch[i + (k + ch_dim2) * ch_dim1] = cc[i + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L101: */
+// L101:
 	}
-/* L102: */
+// L102:
     }
     goto L106;
 L103:
@@ -1232,9 +1232,9 @@ L103:
 	for (k = 1; k <= i__2; ++k) {
 	    ch[i + (k + ch_dim2) * ch_dim1] = cc[i + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L104: */
+// L104:
 	}
-/* L105: */
+// L105:
     }
 L106:
     i__1 = ipph;
@@ -1248,9 +1248,9 @@ L106:
 		    cc_dim1];
 	    ch[(k + jc * ch_dim2) * ch_dim1 + 1] = cc[(j2 - 1 + k * cc_dim2) *
 		     cc_dim1 + 1] + cc[(j2 - 1 + k * cc_dim2) * cc_dim1 + 1];
-/* L107: */
+// L107:
 	}
-/* L108: */
+// L108:
     }
     if (*ido == 1) {
 	goto L116;
@@ -1278,11 +1278,11 @@ L106:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = cc[i + ((j << 1) - 1 + 
 			k * cc_dim2) * cc_dim1] + cc[ic + ((j << 1) - 2 + k * 
 			cc_dim2) * cc_dim1];
-/* L109: */
+// L109:
 	    }
-/* L110: */
+// L110:
 	}
-/* L111: */
+// L111:
     }
     goto L116;
 L112:
@@ -1306,11 +1306,11 @@ L112:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = cc[i + ((j << 1) - 1 + 
 			k * cc_dim2) * cc_dim1] + cc[ic + ((j << 1) - 2 + k * 
 			cc_dim2) * cc_dim1];
-/* L113: */
+// L113:
 	    }
-/* L114: */
+// L114:
 	}
-/* L115: */
+// L115:
     }
 L116:
     ar1 = (float)1.;
@@ -1326,7 +1326,7 @@ L116:
 	    c2[ik + l * c2_dim1] = ch2[ik + ch2_dim1] + ar1 * ch2[ik + (
 		    ch2_dim1 << 1)];
 	    c2[ik + lc * c2_dim1] = ai1 * ch2[ik + *ip * ch2_dim1];
-/* L117: */
+// L117:
 	}
 	dc2 = ar1;
 	ds2 = ai1;
@@ -1342,20 +1342,20 @@ L116:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		c2[ik + l * c2_dim1] += ar2 * ch2[ik + j * ch2_dim1];
 		c2[ik + lc * c2_dim1] += ai2 * ch2[ik + jc * ch2_dim1];
-/* L118: */
+// L118:
 	    }
-/* L119: */
+// L119:
 	}
-/* L120: */
+// L120:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += ch2[ik + j * ch2_dim1];
-/* L121: */
+// L121:
 	}
-/* L122: */
+// L122:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
@@ -1366,9 +1366,9 @@ L116:
 		    c1_dim1 + 1] - c1[(k + jc * c1_dim2) * c1_dim1 + 1];
 	    ch[(k + jc * ch_dim2) * ch_dim1 + 1] = c1[(k + j * c1_dim2) * 
 		    c1_dim1 + 1] + c1[(k + jc * c1_dim2) * c1_dim1 + 1];
-/* L123: */
+// L123:
 	}
-/* L124: */
+// L124:
     }
     if (*ido == 1) {
 	goto L132;
@@ -1395,11 +1395,11 @@ L116:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = c1[i + (k + j * 
 			c1_dim2) * c1_dim1] - c1[i - 1 + (k + jc * c1_dim2) * 
 			c1_dim1];
-/* L125: */
+// L125:
 	    }
-/* L126: */
+// L126:
 	}
-/* L127: */
+// L127:
     }
     goto L132;
 L128:
@@ -1422,11 +1422,11 @@ L128:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = c1[i + (k + j * 
 			c1_dim2) * c1_dim1] - c1[i - 1 + (k + jc * c1_dim2) * 
 			c1_dim1];
-/* L129: */
+// L129:
 	    }
-/* L130: */
+// L130:
 	}
-/* L131: */
+// L131:
     }
 L132:
     if (*ido == 1) {
@@ -1435,7 +1435,7 @@ L132:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L133: */
+// L133:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -1443,9 +1443,9 @@ L132:
 	for (k = 1; k <= i__2; ++k) {
 	    c1[(k + j * c1_dim2) * c1_dim1 + 1] = ch[(k + j * ch_dim2) * 
 		    ch_dim1 + 1];
-/* L134: */
+// L134:
 	}
-/* L135: */
+// L135:
     }
     if (nbd > *l1) {
 	goto L139;
@@ -1466,11 +1466,11 @@ L132:
 		c1[i + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i + (
 			k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i - 1 + (
 			k + j * ch_dim2) * ch_dim1];
-/* L136: */
+// L136:
 	    }
-/* L137: */
+// L137:
 	}
-/* L138: */
+// L138:
     }
     goto L143;
 L139:
@@ -1490,27 +1490,27 @@ L139:
 		c1[i + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i + (
 			k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i - 1 + (
 			k + j * ch_dim2) * ch_dim1];
-/* L140: */
+// L140:
 	    }
-/* L141: */
+// L141:
 	}
-/* L142: */
+// L142:
     }
 L143:
     return 0;
-} /* radbg */
-/*------------------------------------------------------------------------*/
+} // radbg
+//------------------------------------------------------------------------
 int32_t radf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ti2, tr2;
   int32_t idp2;
 
-  /* Parameter adjustments */
+  // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = ch_dim1 * 3 + 1;
     ch -= ch_offset;
@@ -1520,14 +1520,14 @@ int32_t radf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
     cc -= cc_offset;
     --wa1;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	ch[((k << 1) + 1) * ch_dim1 + 1] = cc[(k + cc_dim2) * cc_dim1 + 1] + 
 		cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1];
 	ch[*ido + ((k << 1) + 2) * ch_dim1] = cc[(k + cc_dim2) * cc_dim1 + 1] 
 		- cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1];
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -1555,9 +1555,9 @@ L102:
 		    cc_dim1] + tr2;
 	    ch[ic - 1 + ((k << 1) + 2) * ch_dim1] = cc[i - 1 + (k + cc_dim2) *
 		     cc_dim1] - tr2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -1569,28 +1569,28 @@ L105:
 		cc_dim2 << 1)) * cc_dim1];
 	ch[*ido + ((k << 1) + 1) * ch_dim1] = cc[*ido + (k + cc_dim2) * 
 		cc_dim1];
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radf2 */
-/*------------------------------------------------------------------------*/
+} // radf2
+//------------------------------------------------------------------------
 int32_t radf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
-  /* Initialized data */
+  // Initialized data
   
   float taur = (float)-.5;
   float taui = (float).866025403784439;
   
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
   
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ci2, di2, di3, cr2, dr2, dr3, ti2, ti3, tr2, tr3;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = (ch_dim1 << 2) + 1;
     ch -= ch_offset;
@@ -1601,7 +1601,7 @@ int32_t radf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	cr2 = cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1] + cc[(k + cc_dim2 * 3) * 
@@ -1611,7 +1611,7 @@ int32_t radf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float
 		cc_dim1 + 1] - cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1]);
 	ch[*ido + (k * 3 + 2) * ch_dim1] = cc[(k + cc_dim2) * cc_dim1 + 1] + 
 		taur * cr2;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -1644,30 +1644,30 @@ int32_t radf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float
 	    ch[ic - 1 + (k * 3 + 2) * ch_dim1] = tr2 - tr3;
 	    ch[i + (k * 3 + 3) * ch_dim1] = ti2 + ti3;
 	    ch[ic + (k * 3 + 2) * ch_dim1] = ti3 - ti2;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radf3 */
-/*------------------------------------------------------------------------*/
+} // radf3
+//------------------------------------------------------------------------
 int32_t radf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3)
 {
-  /* Initialized data */
+  // Initialized data
   
   float hsqt2 = (float).7071067811865475;
   
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = ch_dim1 * 5 + 1;
     ch -= ch_offset;
@@ -1679,7 +1679,7 @@ int32_t radf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	tr1 = cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1] + cc[(k + (cc_dim2 << 2))
@@ -1692,7 +1692,7 @@ int32_t radf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 		- cc[(k + cc_dim2 * 3) * cc_dim1 + 1];
 	ch[((k << 2) + 3) * ch_dim1 + 1] = cc[(k + (cc_dim2 << 2)) * cc_dim1 
 		+ 1] - cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1];
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -1736,9 +1736,9 @@ L102:
 	    ch[ic - 1 + ((k << 2) + 2) * ch_dim1] = tr3 - ti4;
 	    ch[i + ((k << 2) + 3) * ch_dim1] = tr4 + ti3;
 	    ch[ic + ((k << 2) + 2) * ch_dim1] = tr4 - ti3;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -1758,32 +1758,32 @@ L105:
 		 cc_dim1];
 	ch[((k << 2) + 4) * ch_dim1 + 1] = ti1 + cc[*ido + (k + cc_dim2 * 3) *
 		 cc_dim1];
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radf4 */
-/*------------------------------------------------------------------------*/
+} // radf4
+//------------------------------------------------------------------------
 int32_t radf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	  float *wa2, float *wa3, float *wa4)
 {
-  /* Initialized data */
+  // Initialized data
   
   float tr11 = (float).309016994374947;
   float ti11 = (float).951056516295154;
   float tr12 = (float)-.809016994374947;
   float ti12 = (float).587785252292473;
   
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
   
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   float ci2, di2, ci4, ci5, di3, di4, di5, ci3, cr2, cr3, dr2, dr3, 
     dr4, dr5, cr5, cr4, ti2, ti3, ti5, ti4, tr2, tr3, tr4, tr5;
   int32_t idp2;
   
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = ch_dim1 * 6 + 1;
     ch -= ch_offset;
@@ -1796,7 +1796,7 @@ int32_t radf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	cr2 = cc[(k + cc_dim2 * 5) * cc_dim1 + 1] + cc[(k + (cc_dim2 << 1)) * 
@@ -1815,7 +1815,7 @@ int32_t radf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	ch[*ido + (k * 5 + 4) * ch_dim1] = cc[(k + cc_dim2) * cc_dim1 + 1] + 
 		tr12 * cr2 + tr11 * cr3;
 	ch[(k * 5 + 5) * ch_dim1 + 1] = ti12 * ci5 - ti11 * ci4;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -1872,36 +1872,36 @@ int32_t radf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
 	    ch[ic - 1 + (k * 5 + 4) * ch_dim1] = tr3 - tr4;
 	    ch[i + (k * 5 + 5) * ch_dim1] = ti3 + ti4;
 	    ch[ic + (k * 5 + 4) * ch_dim1] = ti4 - ti3;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radf5 */
-/*------------------------------------------------------------------------*/
+} // radf5
+//------------------------------------------------------------------------
 int32_t radfg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, float *c1,
 	  float *c2, float *ch, float *ch2, float *wa)
 {
-  /* Initialized data */
+  // Initialized data
 
   float tpi = (float)6.28318530717959;
   
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
   
-  /* Builtin functions */
+  // Builtin functions
   double cos(double), sin(double);
 
-  /* Local variables */
+  // Local variables
   int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   float dc2, ai1, ai2, ar1, ar2, ds2;
   int32_t nbd;
   float dcp, arg, dsp, ar1h, ar2h;
   int32_t idp2, ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -1922,7 +1922,7 @@ int32_t radfg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, 
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     arg = tpi / (float) (*ip);
     dcp = cos(arg);
     dsp = sin(arg);
@@ -1936,7 +1936,7 @@ int32_t radfg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, 
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	ch2[ik + ch2_dim1] = c2[ik + c2_dim1];
-/* L101: */
+// L101:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -1944,9 +1944,9 @@ int32_t radfg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, 
 	for (k = 1; k <= i__2; ++k) {
 	    ch[(k + j * ch_dim2) * ch_dim1 + 1] = c1[(k + j * c1_dim2) * 
 		    c1_dim1 + 1];
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     if (nbd > *l1) {
 	goto L107;
@@ -1967,11 +1967,11 @@ int32_t radfg(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, float *cc, 
 		ch[i + (k + j * ch_dim2) * ch_dim1] = wa[idij - 1] * c1[i + (
 			k + j * c1_dim2) * c1_dim1] - wa[idij] * c1[i - 1 + (
 			k + j * c1_dim2) * c1_dim1];
-/* L104: */
+// L104:
 	    }
-/* L105: */
+// L105:
 	}
-/* L106: */
+// L106:
     }
     goto L111;
 L107:
@@ -1991,11 +1991,11 @@ L107:
 		ch[i + (k + j * ch_dim2) * ch_dim1] = wa[idij - 1] * c1[i + (
 			k + j * c1_dim2) * c1_dim1] - wa[idij] * c1[i - 1 + (
 			k + j * c1_dim2) * c1_dim1];
-/* L108: */
+// L108:
 	    }
-/* L109: */
+// L109:
 	}
-/* L110: */
+// L110:
     }
 L111:
     if (nbd < *l1) {
@@ -2019,11 +2019,11 @@ L111:
 		c1[i + (k + jc * c1_dim2) * c1_dim1] = ch[i - 1 + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i - 1 + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L112: */
+// L112:
 	    }
-/* L113: */
+// L113:
 	}
-/* L114: */
+// L114:
     }
     goto L121;
 L115:
@@ -2045,18 +2045,18 @@ L115:
 		c1[i + (k + jc * c1_dim2) * c1_dim1] = ch[i - 1 + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i - 1 + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L116: */
+// L116:
 	    }
-/* L117: */
+// L117:
 	}
-/* L118: */
+// L118:
     }
     goto L121;
 L119:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L120: */
+// L120:
     }
 L121:
     i__1 = ipph;
@@ -2068,9 +2068,9 @@ L121:
 		    ch_dim1 + 1] + ch[(k + jc * ch_dim2) * ch_dim1 + 1];
 	    c1[(k + jc * c1_dim2) * c1_dim1 + 1] = ch[(k + jc * ch_dim2) * 
 		    ch_dim1 + 1] - ch[(k + j * ch_dim2) * ch_dim1 + 1];
-/* L122: */
+// L122:
 	}
-/* L123: */
+// L123:
     }
 
     ar1 = (float)1.;
@@ -2086,7 +2086,7 @@ L121:
 	    ch2[ik + l * ch2_dim1] = c2[ik + c2_dim1] + ar1 * c2[ik + (
 		    c2_dim1 << 1)];
 	    ch2[ik + lc * ch2_dim1] = ai1 * c2[ik + *ip * c2_dim1];
-/* L124: */
+// L124:
 	}
 	dc2 = ar1;
 	ds2 = ai1;
@@ -2102,20 +2102,20 @@ L121:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		ch2[ik + l * ch2_dim1] += ar2 * c2[ik + j * c2_dim1];
 		ch2[ik + lc * ch2_dim1] += ai2 * c2[ik + jc * c2_dim1];
-/* L125: */
+// L125:
 	    }
-/* L126: */
+// L126:
 	}
-/* L127: */
+// L127:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += c2[ik + j * c2_dim1];
-/* L128: */
+// L128:
 	}
-/* L129: */
+// L129:
     }
 
     if (*ido < *l1) {
@@ -2127,9 +2127,9 @@ L121:
 	for (i = 1; i <= i__2; ++i) {
 	    cc[i + (k * cc_dim2 + 1) * cc_dim1] = ch[i + (k + ch_dim2) * 
 		    ch_dim1];
-/* L130: */
+// L130:
 	}
-/* L131: */
+// L131:
     }
     goto L135;
 L132:
@@ -2139,9 +2139,9 @@ L132:
 	for (k = 1; k <= i__2; ++k) {
 	    cc[i + (k * cc_dim2 + 1) * cc_dim1] = ch[i + (k + ch_dim2) * 
 		    ch_dim1];
-/* L133: */
+// L133:
 	}
-/* L134: */
+// L134:
     }
 L135:
     i__1 = ipph;
@@ -2154,9 +2154,9 @@ L135:
 		     * ch_dim1 + 1];
 	    cc[(j2 - 1 + k * cc_dim2) * cc_dim1 + 1] = ch[(k + jc * ch_dim2) *
 		     ch_dim1 + 1];
-/* L136: */
+// L136:
 	}
-/* L137: */
+// L137:
     }
     if (*ido == 1) {
 	return 0;
@@ -2185,11 +2185,11 @@ L135:
 		cc[ic + (j2 - 2 + k * cc_dim2) * cc_dim1] = ch[i + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L138: */
+// L138:
 	    }
-/* L139: */
+// L139:
 	}
-/* L140: */
+// L140:
     }
     return 0;
 L141:
@@ -2214,37 +2214,37 @@ L141:
 		cc[ic + (j2 - 2 + k * cc_dim2) * cc_dim1] = ch[i + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L142: */
+// L142:
 	    }
-/* L143: */
+// L143:
 	}
-/* L144: */
+// L144:
     }
     return 0;
-} /* radfg */
-/*------------------------------------------------------------------------*/
+} // radfg
+//------------------------------------------------------------------------
 int32_t rfftb(int32_t *n, float *r, float *wsave)
 {
   int32_t rfftb1(int32_t *n, float *c, float *ch, float *wa, float *ifac);
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
   --r;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
     rfftb1(n, &r[1], &wsave[1], &wsave[*n + 1], &wsave[(*n << 1) + 1]);
     return 0;
-} /* rfftb */
-/*------------------------------------------------------------------------*/
+} // rfftb
+//------------------------------------------------------------------------
 int32_t rfftb1(int32_t *n, float *c, float *ch, float *wa, float *ifac)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t radb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1),
     radb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2),
     radb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
@@ -2256,13 +2256,13 @@ int32_t rfftb1(int32_t *n, float *c, float *ch, float *wa, float *ifac)
 	  float *c2, float *ch, float *ch2, float *wa);
   int32_t k1, l1, l2, na, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 0;
     l1 = 1;
@@ -2353,7 +2353,7 @@ L114:
 L115:
 	l1 = l2;
 	iw += (ip - 1) * ido;
-/* L116: */
+// L116:
     }
     if (na == 0) {
 	return 0;
@@ -2361,33 +2361,33 @@ L115:
     i__1 = *n;
     for (i = 1; i <= i__1; ++i) {
 	c[i] = ch[i];
-/* L117: */
+// L117:
     }
     return 0;
-} /* rfftb1 */
-/*------------------------------------------------------------------------*/
+} // rfftb1
+//------------------------------------------------------------------------
 int32_t rfftf(int32_t *n, float *r, float *wsave)
 {
   int32_t rfftf1(int32_t *n, float *c, float *ch, float *wa, float *ifac);
   
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
   --r;
   
-  /* Function Body */
+  // Function Body
   if (*n == 1) {
     return 0;
   }
   rfftf1(n, &r[1], &wsave[1], &wsave[*n + 1], &wsave[(*n << 1) + 1]);
   return 0;
-} /* rfftf */
-/*------------------------------------------------------------------------*/
+} // rfftf
+//------------------------------------------------------------------------
 int32_t rfftf1(int32_t *n, float *c, float *ch, float *wa, float *ifac)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t radf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1),
     radf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2),
     radf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1,
@@ -2399,13 +2399,13 @@ int32_t rfftf1(int32_t *n, float *c, float *ch, float *wa, float *ifac)
 	  float *c2, float *ch, float *ch2, float *wa);
   int32_t k1, l1, l2, na, kh, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 1;
     l2 = *n;
@@ -2491,7 +2491,7 @@ L109:
 	na = 0;
 L110:
 	l2 = l1;
-/* L111: */
+// L111:
     }
     if (na == 1) {
 	return 0;
@@ -2499,39 +2499,39 @@ L110:
     i__1 = *n;
     for (i = 1; i <= i__1; ++i) {
 	c[i] = ch[i];
-/* L112: */
+// L112:
     }
     return 0;
-} /* rfftf1 */
-/*------------------------------------------------------------------------*/
+} // rfftf1
+//------------------------------------------------------------------------
 int32_t rffti(int32_t *n, float *wsave)
 {
   int32_t rffti1(int32_t *n, float *wa, float *ifac);
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
     rffti1(n, &wsave[*n + 1], &wsave[(*n << 1) + 1]);
     return 0;
-} /* rffti */
-/*------------------------------------------------------------------------*/
+} // rffti
+//------------------------------------------------------------------------
 int32_t rffti1(int32_t *n, float *wa, float *ifac)
 {
-  /* Initialized data */
+  // Initialized data
   
   int32_t ntryh[4] = { 4,2,3,5 };
   
-  /* System generated locals */
+  // System generated locals
   int32_t i__1, i__2, i__3;
   
-  /* Builtin functions */
+  // Builtin functions
   double cos(double), sin(double);
   
-  /* Local variables */
+  // Local variables
   float argh;
   int32_t ntry, i, j;
   float argld;
@@ -2543,11 +2543,11 @@ int32_t rffti1(int32_t *n, float *wa, float *ifac)
   float tpi;
   int32_t nfm1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
 
-    /* Function Body */
+    // Function Body
     nl = *n;
     nf = 0;
     j = 0;
@@ -2585,7 +2585,7 @@ L105:
     for (i = 2; i <= i__1; ++i) {
 	ib = nf - i + 2;
 	ifac[ib + 2] = ifac[ib + 1];
-/* L106: */
+// L106:
     }
     ifac[3] = 2;
 L107:
@@ -2622,34 +2622,34 @@ L107:
 		arg = fi * argld;
 		wa[i - 1] = cos(arg);
 		wa[i] = sin(arg);
-/* L108: */
+// L108:
 	    }
 	    is += ido;
-/* L109: */
+// L109:
 	}
 	l1 = l2;
-/* L110: */
+// L110:
     }
     return 0;
-} /* rffti1 */
-/*------------------------------------------------------------------------*/
-/* Below follow routines for complex ffts */
-/*------------------------------------------------------------------------*/
+} // rffti1
+//------------------------------------------------------------------------
+// Below follow routines for complex ffts
+//------------------------------------------------------------------------
 int32_t passf(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  float *cc, float *c1, float *c2, float *ch, float *ch2, float *wa)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
-    /* Local variables */
+    // Local variables
     int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int32_t ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -2670,7 +2670,7 @@ int32_t passf(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     idot = *ido / 2;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
@@ -2692,11 +2692,11 @@ int32_t passf(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L101: */
+// L101:
 	    }
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
@@ -2704,9 +2704,9 @@ int32_t passf(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L104: */
+// L104:
 	}
-/* L105: */
+// L105:
     }
     goto L112;
 L106:
@@ -2723,11 +2723,11 @@ L106:
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L107: */
+// L107:
 	    }
-/* L108: */
+// L108:
 	}
-/* L109: */
+// L109:
     }
     i__1 = *ido;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -2735,9 +2735,9 @@ L106:
 	for (k = 1; k <= i__2; ++k) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L110: */
+// L110:
 	}
-/* L111: */
+// L111:
     }
 L112:
     idl = 2 - *ido;
@@ -2751,7 +2751,7 @@ L112:
 	    c2[ik + l * c2_dim1] = ch2[ik + ch2_dim1] + wa[idl - 1] * ch2[ik 
 		    + (ch2_dim1 << 1)];
 	    c2[ik + lc * c2_dim1] = -wa[idl] * ch2[ik + *ip * ch2_dim1];
-/* L113: */
+// L113:
 	}
 	idlj = idl;
 	inc += *ido;
@@ -2768,20 +2768,20 @@ L112:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		c2[ik + l * c2_dim1] += war * ch2[ik + j * ch2_dim1];
 		c2[ik + lc * c2_dim1] -= wai * ch2[ik + jc * ch2_dim1];
-/* L114: */
+// L114:
 	    }
-/* L115: */
+// L115:
 	}
-/* L116: */
+// L116:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += ch2[ik + j * ch2_dim1];
-/* L117: */
+// L117:
 	}
-/* L118: */
+// L118:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
@@ -2796,9 +2796,9 @@ L112:
 		    c2_dim1];
 	    ch2[ik + jc * ch2_dim1] = c2[ik + j * c2_dim1] - c2[ik - 1 + jc * 
 		    c2_dim1];
-/* L119: */
+// L119:
 	}
-/* L120: */
+// L120:
     }
     *nac = 1;
     if (*ido == 2) {
@@ -2808,7 +2808,7 @@ L112:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L121: */
+// L121:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -2818,9 +2818,9 @@ L112:
 		    ch_dim1 + 1];
 	    c1[(k + j * c1_dim2) * c1_dim1 + 2] = ch[(k + j * ch_dim2) * 
 		    ch_dim1 + 2];
-/* L122: */
+// L122:
 	}
-/* L123: */
+// L123:
     }
     if (idot > *l1) {
 	goto L127;
@@ -2840,11 +2840,11 @@ L112:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] - wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L124: */
+// L124:
 	    }
-/* L125: */
+// L125:
 	}
-/* L126: */
+// L126:
     }
     return 0;
 L127:
@@ -2864,25 +2864,25 @@ L127:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] - wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L128: */
+// L128:
 	    }
-/* L129: */
+// L129:
 	}
-/* L130: */
+// L130:
     }
     return 0;
-} /* passf */
-/*------------------------------------------------------------------------*/
+} // passf
+//------------------------------------------------------------------------
 int32_t passf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -2892,7 +2892,7 @@ int32_t passf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
     cc -= cc_offset;
     --wa1;
 
-    /* Function Body */
+    // Function Body
     if (*ido > 2) {
 	goto L102;
     }
@@ -2906,7 +2906,7 @@ int32_t passf2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 		cc[((k << 1) + 2) * cc_dim1 + 2];
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = cc[((k << 1) + 1) * cc_dim1 
 		+ 2] - cc[((k << 1) + 2) * cc_dim1 + 2];
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -2926,28 +2926,28 @@ L102:
 		    wa1[i__] * tr2;
 	    ch[i__ - 1 + (k + (ch_dim2 << 1)) * ch_dim1] = wa1[i__ - 1] * tr2 
 		    + wa1[i__] * ti2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf2 */
-/*------------------------------------------------------------------------*/
+} // passf2
+//------------------------------------------------------------------------
 int32_t passf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
-    /* Initialized data */
+    // Initialized data
 
     double taur = (float)-.5;
     double taui = (float)-.866025403784439;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -2958,7 +2958,7 @@ int32_t passf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -2978,7 +2978,7 @@ int32_t passf3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr2 + ci3;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ci2 + cr3;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 2] = ci2 - cr3;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -3012,25 +3012,25 @@ L102:
 		    i__] * dr3;
 	    ch[i__ - 1 + (k + ch_dim2 * 3) * ch_dim1] = wa2[i__ - 1] * dr3 + 
 		    wa2[i__] * di3;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf3 */
-/*------------------------------------------------------------------------*/
+} // passf3
+//------------------------------------------------------------------------
 int32_t passf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -3042,7 +3042,7 @@ int32_t passf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -3072,7 +3072,7 @@ int32_t passf4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = tr1 - tr4;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ti1 + ti4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ti1 - ti4;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -3116,32 +3116,32 @@ L102:
 		    + wa3[i__] * ci4;
 	    ch[i__ + (k + (ch_dim2 << 2)) * ch_dim1] = wa3[i__ - 1] * ci4 - 
 		    wa3[i__] * cr4;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf4 */
-/*------------------------------------------------------------------------*/
+} // passf4
+//------------------------------------------------------------------------
 int32_t passf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3, float *wa4)
 {
-    /* Initialized data */
+    // Initialized data
 
     double tr11 = (float).309016994374947;
     double ti11 = (float)-.951056516295154;
     double tr12 = (float)-.809016994374947;
     double ti12 = (float)-.587785252292473;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -3154,7 +3154,7 @@ int32_t passf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -3188,7 +3188,7 @@ int32_t passf5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = cr3 + ci4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ci3 - cr4;
 	ch[(k + ch_dim2 * 5) * ch_dim1 + 2] = ci2 - cr5;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -3250,19 +3250,19 @@ L102:
 		    wa4[i__] * di5;
 	    ch[i__ + (k + ch_dim2 * 5) * ch_dim1] = wa4[i__ - 1] * di5 - wa4[
 		    i__] * dr5;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf5 */
-/*------------------------------------------------------------------------*/
+} // passf5
+//------------------------------------------------------------------------
 int32_t cfftf1(int32_t *n, float *c__, float *ch, float *wa, float *ifac)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t i__1;
 
-    /* Local variables */
+    // Local variables
     int32_t idot, i__;
     int32_t passf(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, float *, float *, float *,
 	      float *, float *, float *);
@@ -3274,13 +3274,13 @@ int32_t cfftf1(int32_t *n, float *c__, float *ch, float *wa, float *ifac)
 	     float *);
     int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c__;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 0;
     l1 = 1;
@@ -3372,7 +3372,7 @@ L114:
 L115:
 	l1 = l2;
 	iw += (ip - 1) * idot;
-/* L116: */
+// L116:
     }
     if (na == 0) {
 	return 0;
@@ -3381,21 +3381,21 @@ L115:
     i__1 = n2;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	c__[i__] = ch[i__];
-/* L117: */
+// L117:
     }
     return 0;
-} /* cfftf1 */
-/*------------------------------------------------------------------------*/
+} // cfftf1
+//------------------------------------------------------------------------
 int32_t cfftf(int32_t *n, float *c__, float *wsave)
 {
   int32_t cfftf1(int32_t *, float *, float *, float *, float *);
   int32_t iw1, iw2;
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
   --c__;
 
-  /* Function Body */
+  // Function Body
   if (*n == 1) {
     return 0;
   }
@@ -3403,23 +3403,23 @@ int32_t cfftf(int32_t *n, float *c__, float *wsave)
   iw2 = iw1 + *n + *n;
   cfftf1(n, &c__[1], &wsave[1], &wsave[iw1], &wsave[iw2]);
   return 0;
-} /* cfftf */
-/*------------------------------------------------------------------------*/
+} // cfftf
+//------------------------------------------------------------------------
 int32_t passb(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  float *cc, float *c1, float *c2, float *ch, float *ch2, float *wa)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
-    /* Local variables */
+    // Local variables
     int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int32_t ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -3440,7 +3440,7 @@ int32_t passb(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     idot = *ido / 2;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
@@ -3462,11 +3462,11 @@ int32_t passb(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L101: */
+// L101:
 	    }
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
@@ -3474,9 +3474,9 @@ int32_t passb(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L104: */
+// L104:
 	}
-/* L105: */
+// L105:
     }
     goto L112;
 L106:
@@ -3493,11 +3493,11 @@ L106:
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L107: */
+// L107:
 	    }
-/* L108: */
+// L108:
 	}
-/* L109: */
+// L109:
     }
     i__1 = *ido;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -3505,9 +3505,9 @@ L106:
 	for (k = 1; k <= i__2; ++k) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L110: */
+// L110:
 	}
-/* L111: */
+// L111:
     }
 L112:
     idl = 2 - *ido;
@@ -3521,7 +3521,7 @@ L112:
 	    c2[ik + l * c2_dim1] = ch2[ik + ch2_dim1] + wa[idl - 1] * ch2[ik 
 		    + (ch2_dim1 << 1)];
 	    c2[ik + lc * c2_dim1] = wa[idl] * ch2[ik + *ip * ch2_dim1];
-/* L113: */
+// L113:
 	}
 	idlj = idl;
 	inc += *ido;
@@ -3538,20 +3538,20 @@ L112:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		c2[ik + l * c2_dim1] += war * ch2[ik + j * ch2_dim1];
 		c2[ik + lc * c2_dim1] += wai * ch2[ik + jc * ch2_dim1];
-/* L114: */
+// L114:
 	    }
-/* L115: */
+// L115:
 	}
-/* L116: */
+// L116:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += ch2[ik + j * ch2_dim1];
-/* L117: */
+// L117:
 	}
-/* L118: */
+// L118:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
@@ -3566,9 +3566,9 @@ L112:
 		    c2_dim1];
 	    ch2[ik + jc * ch2_dim1] = c2[ik + j * c2_dim1] - c2[ik - 1 + jc * 
 		    c2_dim1];
-/* L119: */
+// L119:
 	}
-/* L120: */
+// L120:
     }
     *nac = 1;
     if (*ido == 2) {
@@ -3578,7 +3578,7 @@ L112:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L121: */
+// L121:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -3588,9 +3588,9 @@ L112:
 		    ch_dim1 + 1];
 	    c1[(k + j * c1_dim2) * c1_dim1 + 2] = ch[(k + j * ch_dim2) * 
 		    ch_dim1 + 2];
-/* L122: */
+// L122:
 	}
-/* L123: */
+// L123:
     }
     if (idot > *l1) {
 	goto L127;
@@ -3610,11 +3610,11 @@ L112:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L124: */
+// L124:
 	    }
-/* L125: */
+// L125:
 	}
-/* L126: */
+// L126:
     }
     return 0;
 L127:
@@ -3634,25 +3634,25 @@ L127:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L128: */
+// L128:
 	    }
-/* L129: */
+// L129:
 	}
-/* L130: */
+// L130:
     }
     return 0;
-} /* passb */
-/*------------------------------------------------------------------------*/
+} // passb
+//------------------------------------------------------------------------
 int32_t passb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -3662,7 +3662,7 @@ int32_t passb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
     cc -= cc_offset;
     --wa1;
 
-    /* Function Body */
+    // Function Body
     if (*ido > 2) {
 	goto L102;
     }
@@ -3676,7 +3676,7 @@ int32_t passb2(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1)
 		cc[((k << 1) + 2) * cc_dim1 + 2];
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = cc[((k << 1) + 1) * cc_dim1 
 		+ 2] - cc[((k << 1) + 2) * cc_dim1 + 2];
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -3696,28 +3696,28 @@ L102:
 		    wa1[i__] * tr2;
 	    ch[i__ - 1 + (k + (ch_dim2 << 1)) * ch_dim1] = wa1[i__ - 1] * tr2 
 		    - wa1[i__] * ti2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb2 */
-/*------------------------------------------------------------------------*/
+} // passb2
+//------------------------------------------------------------------------
 int32_t passb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2)
 {
-    /* Initialized data */
+    // Initialized data
 
     double taur = (float)-.5;
     double taui = (float).866025403784439;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -3728,7 +3728,7 @@ int32_t passb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -3748,7 +3748,7 @@ int32_t passb3(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr2 + ci3;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ci2 + cr3;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 2] = ci2 - cr3;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -3782,25 +3782,25 @@ L102:
 		    i__] * dr3;
 	    ch[i__ - 1 + (k + ch_dim2 * 3) * ch_dim1] = wa2[i__ - 1] * dr3 - 
 		    wa2[i__] * di3;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb3 */
-/*------------------------------------------------------------------------*/
+} // passb3
+//------------------------------------------------------------------------
 int32_t passb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -3812,7 +3812,7 @@ int32_t passb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -3842,7 +3842,7 @@ int32_t passb4(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = tr1 - tr4;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ti1 + ti4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ti1 - ti4;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -3886,32 +3886,32 @@ L102:
 		    - wa3[i__] * ci4;
 	    ch[i__ + (k + (ch_dim2 << 2)) * ch_dim1] = wa3[i__ - 1] * ci4 + 
 		    wa3[i__] * cr4;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb4 */
-/*------------------------------------------------------------------------*/
+} // passb4
+//------------------------------------------------------------------------
 int32_t passb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, float *wa2,
 	   float *wa3, float *wa4)
 {
-    /* Initialized data */
+    // Initialized data
 
     double tr11 = (float).309016994374947;
     double ti11 = (float).951056516295154;
     double tr12 = (float)-.809016994374947;
     double ti12 = (float).587785252292473;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -3924,7 +3924,7 @@ int32_t passb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -3958,7 +3958,7 @@ int32_t passb5(int32_t *ido, int32_t *l1, float *cc, float *ch, float *wa1, floa
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = cr3 + ci4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ci3 - cr4;
 	ch[(k + ch_dim2 * 5) * ch_dim1 + 2] = ci2 - cr5;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -4020,19 +4020,19 @@ L102:
 		    wa4[i__] * di5;
 	    ch[i__ + (k + ch_dim2 * 5) * ch_dim1] = wa4[i__ - 1] * di5 + wa4[
 		    i__] * dr5;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb5 */
-/*------------------------------------------------------------------------*/
+} // passb5
+//------------------------------------------------------------------------
 int32_t cfftb1(int32_t *n, float *c__, float *ch, float *wa, float *ifac)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t i__1;
 
-    /* Local variables */
+    // Local variables
     int32_t idot, i__;
     int32_t passb(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, float *, float *, float *,
 	      float *, float *, float *); 
@@ -4044,13 +4044,13 @@ int32_t cfftb1(int32_t *n, float *c__, float *ch, float *wa, float *ifac)
 	     float *);
     int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c__;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 0;
     l1 = 1;
@@ -4142,7 +4142,7 @@ L114:
 L115:
 	l1 = l2;
 	iw += (ip - 1) * idot;
-/* L116: */
+// L116:
     }
     if (na == 0) {
 	return 0;
@@ -4151,21 +4151,21 @@ L115:
     i__1 = n2;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	c__[i__] = ch[i__];
-/* L117: */
+// L117:
     }
     return 0;
-} /* cfftb1 */
-/*------------------------------------------------------------------------*/
+} // cfftb1
+//------------------------------------------------------------------------
 int32_t cfftb(int32_t *n, float *c__, float *wsave)
 {
   int32_t cfftb1(int32_t *, float *, float *, float *, float *);
     int32_t iw1, iw2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
     --c__;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
@@ -4173,21 +4173,21 @@ int32_t cfftb(int32_t *n, float *c__, float *wsave)
     iw2 = iw1 + *n + *n;
     cfftb1(n, &c__[1], &wsave[1], &wsave[iw1], &wsave[iw2]);
     return 0;
-} /* cfftb */
-/*------------------------------------------------------------------------*/
+} // cfftb
+//------------------------------------------------------------------------
 int32_t cffti1(int32_t *n, float *wa, float *ifac)
 {
-    /* Initialized data */
+    // Initialized data
 
     int32_t ntryh[4] = { 3,4,2,5 };
 
-    /* System generated locals */
+    // System generated locals
     int32_t i__1, i__2, i__3;
 
-    /* Builtin functions */
+    // Builtin functions
     double cos(double), sin(double);
 
-    /* Local variables */
+    // Local variables
     double argh;
     int32_t idot, ntry, i__, j;
     double argld;
@@ -4198,11 +4198,11 @@ int32_t cffti1(int32_t *n, float *wa, float *ifac)
     int32_t ido, ipm;
     double tpi;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
 
-    /* Function Body */
+    // Function Body
     nl = *n;
     nf = 0;
     j = 0;
@@ -4240,7 +4240,7 @@ L105:
     for (i__ = 2; i__ <= i__1; ++i__) {
 	ib = nf - i__ + 2;
 	ifac[ib + 2] = ifac[ib + 1];
-/* L106: */
+// L106:
     }
     ifac[3] = 2;
 L107:
@@ -4276,7 +4276,7 @@ L107:
 		arg = fi * argld;
 		wa[i__ - 1] = cos(arg);
 		wa[i__] = sin(arg);
-/* L108: */
+// L108:
 	    }
 	    if (ip <= 5) {
 		goto L109;
@@ -4287,20 +4287,20 @@ L109:
 	    ;
 	}
 	l1 = l2;
-/* L110: */
+// L110:
     }
     return 0;
-} /* cffti1 */
-/*------------------------------------------------------------------------*/
+} // cffti1
+//------------------------------------------------------------------------
 int32_t cffti(int32_t *n, float *wsave)
 {
   int32_t cffti1(int32_t *, float *, float *);
   int32_t iw1, iw2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
@@ -4308,27 +4308,27 @@ int32_t cffti(int32_t *n, float *wsave)
     iw2 = iw1 + *n + *n;
     cffti1(n, &wsave[iw1], &wsave[iw2]);
     return 0;
-} /* cffti */
-/*------------------------------------------------------------------------*/
+} // cffti
+//------------------------------------------------------------------------
 
 /* Below follow the double-precision forms of the above routines; adapted
    from the foregoing by Louis Strous 15 June 1998 */
 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t ezfft1d(int32_t *n, double *wa, double *ifac)
 {
-    /* Initialized data */
+    // Initialized data
 
   int32_t ntryh[4] = { 4,2,3,5 };
   double tpi = (double)6.28318530717959;
 
-  /* System generated locals */
+  // System generated locals
   int32_t i__1, i__2, i__3;
 
-  /* Builtin functions */
+  // Builtin functions
   double cos(double), sin(double);
 
-  /* Local variables */
+  // Local variables
   double argh;
   int32_t ntry, i, j, k1, l1, l2, ib, ii, nf, ip, nl, is, nq, nr;
   double ch1, sh1;
@@ -4336,11 +4336,11 @@ int32_t ezfft1d(int32_t *n, double *wa, double *ifac)
   double dch1, ch1h, arg1, dsh1;
   int32_t nfm1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
 
-    /* Function Body */
+    // Function Body
     nl = *n;
     nf = 0;
     j = 0;
@@ -4378,7 +4378,7 @@ L105:
     for (i = 2; i <= i__1; ++i) {
 	ib = nf - i + 2;
 	ifac[ib + 2] = ifac[ib + 1];
-/* L106: */
+// L106:
     }
     ifac[3] = 2;
 L107:
@@ -4421,35 +4421,35 @@ L107:
 		i += 2;
 		wa[i - 1] = ch1 * wa[i - 3] - sh1 * wa[i - 2];
 		wa[i] = ch1 * wa[i - 2] + sh1 * wa[i - 3];
-/* L108: */
+// L108:
 	    }
 L109:
 	    is += ido;
-/* L110: */
+// L110:
 	}
 	l1 = l2;
-/* L111: */
+// L111:
     }
     return 0;
-} /* ezfft1 */
-/*------------------------------------------------------------------------*/
+} // ezfft1
+//------------------------------------------------------------------------
 int32_t ezfftbd(int32_t *n, double *r, double *azero, double *a, double *b, double *wsave)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t i;
   int32_t rfftbd(int32_t *n, double *r, double *wsave);
   int32_t ns2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
     --b;
     --a;
     --r;
 
-    /* Function Body */
+    // Function Body
     if ((i__1 = *n - 2) < 0) {
 	goto L101;
     } else if (i__1 == 0) {
@@ -4470,7 +4470,7 @@ L103:
     for (i = 1; i <= i__1; ++i) {
 	r[i * 2] = a[i] * (double).5;
 	r[(i << 1) + 1] = b[i] * (double)-.5;
-/* L104: */
+// L104:
     }
     r[1] = *azero;
     if (*n % 2 == 0) {
@@ -4478,14 +4478,14 @@ L103:
     }
     rfftbd(n, &r[1], &wsave[*n + 1]);
     return 0;
-} /* ezfftb */
-/*------------------------------------------------------------------------*/
+} // ezfftb
+//------------------------------------------------------------------------
 int32_t ezfftfd(int32_t *n, double *r, double *azero, double *a, double *b, double *wsave)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t i;
   int32_t rfftfd(int32_t *n, double *r, double *wsave);
   double cf;
@@ -4494,15 +4494,15 @@ int32_t ezfftfd(int32_t *n, double *r, double *azero, double *a, double *b, doub
   int32_t ns2m;
 
 
-/*                       VERSION 3  JUNE 1979 */
+//                       VERSION 3  JUNE 1979
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
     --b;
     --a;
     --r;
 
-    /* Function Body */
+    // Function Body
     if ((i__1 = *n - 2) < 0) {
 	goto L101;
     } else if (i__1 == 0) {
@@ -4521,7 +4521,7 @@ L103:
     i__1 = *n;
     for (i = 1; i <= i__1; ++i) {
 	wsave[i] = r[i];
-/* L104: */
+// L104:
     }
     rfftfd(n, &wsave[1], &wsave[*n + 1]);
     cf = (double)2. / (double) (*n);
@@ -4533,7 +4533,7 @@ L103:
     for (i = 1; i <= i__1; ++i) {
 	a[i] = cf * wsave[i * 2];
 	b[i] = cfm * wsave[(i << 1) + 1];
-/* L105: */
+// L105:
     }
     if (*n % 2 == 1) {
 	return 0;
@@ -4541,34 +4541,34 @@ L103:
     a[ns2] = cf * (double).5 * wsave[*n];
     b[ns2] = (double)0.;
     return 0;
-} /* ezfftf */
-/*------------------------------------------------------------------------*/
+} // ezfftf
+//------------------------------------------------------------------------
 int32_t ezfftid(int32_t *n, double *wsave)
 {
   int32_t ezfft1d(int32_t *n, double *wa, double *ifac);
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
     ezfft1d(n, &wsave[(*n << 1) + 1], &wsave[*n * 3 + 1]);
     return 0;
-} /* ezffti */
-/*------------------------------------------------------------------------*/
+} // ezffti
+//------------------------------------------------------------------------
 int32_t radb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ti2, tr2;
   int32_t idp2;
   
-  /* Parameter adjustments */
+  // Parameter adjustments
   ch_dim1 = *ido;
   ch_dim2 = *l1;
   ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -4578,14 +4578,14 @@ int32_t radb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
   cc -= cc_offset;
   --wa1;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	ch[(k + ch_dim2) * ch_dim1 + 1] = cc[((k << 1) + 1) * cc_dim1 + 1] + 
 		cc[*ido + ((k << 1) + 2) * cc_dim1];
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 1] = cc[((k << 1) + 1) * cc_dim1 
 		+ 1] - cc[*ido + ((k << 1) + 2) * cc_dim1];
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -4613,9 +4613,9 @@ L102:
 		    wa1[i - 1] * ti2;
 	    ch[i + (k + (ch_dim2 << 1)) * ch_dim1] = wa1[i - 2] * ti2 + wa1[i 
 		    - 1] * tr2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -4627,28 +4627,28 @@ L105:
 		cc_dim1] + cc[*ido + ((k << 1) + 1) * cc_dim1];
 	ch[*ido + (k + (ch_dim2 << 1)) * ch_dim1] = -(double)(cc[((k << 1)
 		 + 2) * cc_dim1 + 1] + cc[((k << 1) + 2) * cc_dim1 + 1]);
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radb2 */
-/*------------------------------------------------------------------------*/
+} // radb2
+//------------------------------------------------------------------------
 int32_t radb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
-  /* Initialized data */
+  // Initialized data
   
   double taur = (double)-.5;
   double taui = (double).866025403784439;
 
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -4659,7 +4659,7 @@ int32_t radb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, d
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	tr2 = cc[*ido + (k * 3 + 2) * cc_dim1] + cc[*ido + (k * 3 + 2) * 
@@ -4670,7 +4670,7 @@ int32_t radb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, d
 		cc_dim1 + 1]);
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 1] = cr2 - ci3;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr2 + ci3;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -4707,30 +4707,30 @@ int32_t radb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, d
 		    i - 1] * di3;
 	    ch[i + (k + ch_dim2 * 3) * ch_dim1] = wa2[i - 2] * di3 + wa2[i - 
 		    1] * dr3;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radb3 */
-/*------------------------------------------------------------------------*/
+} // radb3
+//------------------------------------------------------------------------
 int32_t radb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3)
 {
-  /* Initialized data */
+  // Initialized data
 
   double sqrt2 = (double)1.414213562373095;
 
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -4742,7 +4742,7 @@ int32_t radb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	tr1 = cc[((k << 2) + 1) * cc_dim1 + 1] - cc[*ido + ((k << 2) + 4) * 
@@ -4757,7 +4757,7 @@ int32_t radb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 1] = tr1 - tr4;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = tr2 - tr3;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = tr1 + tr4;
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -4809,9 +4809,9 @@ L102:
 		    wa3[i - 1] * ci4;
 	    ch[i + (k + (ch_dim2 << 2)) * ch_dim1] = wa3[i - 2] * ci4 + wa3[i 
 		    - 1] * cr4;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -4832,32 +4832,32 @@ L105:
 	ch[*ido + (k + ch_dim2 * 3) * ch_dim1] = ti2 + ti2;
 	ch[*ido + (k + (ch_dim2 << 2)) * ch_dim1] = -(double)sqrt2 * (tr1 
 		+ ti1);
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radb4 */
-/*------------------------------------------------------------------------*/
+} // radb4
+//------------------------------------------------------------------------
 int32_t radb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3, double *wa4)
 {
-  /* Initialized data */
+  // Initialized data
   
   double tr11 = (double).309016994374947;
   double ti11 = (double).951056516295154;
   double tr12 = (double)-.809016994374947;
   double ti12 = (double).587785252292473;
   
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
   
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
     ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -4870,7 +4870,7 @@ int32_t radb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	ti5 = cc[(k * 5 + 3) * cc_dim1 + 1] + cc[(k * 5 + 3) * cc_dim1 + 1];
@@ -4889,7 +4889,7 @@ int32_t radb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr3 - ci4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = cr3 + ci4;
 	ch[(k + ch_dim2 * 5) * ch_dim1 + 1] = cr2 + ci5;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -4952,36 +4952,36 @@ int32_t radb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 		    i - 1] * di5;
 	    ch[i + (k + ch_dim2 * 5) * ch_dim1] = wa4[i - 2] * di5 + wa4[i - 
 		    1] * dr5;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radb5 */
-/*------------------------------------------------------------------------*/
+} // radb5
+//------------------------------------------------------------------------
 int32_t radbgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc, double *c1,
 	  double *c2, double *ch, double *ch2, double *wa)
 {
-  /* Initialized data */
+  // Initialized data
 
   double tpi = (double)6.28318530717959;
 
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
 
-  /* Builtin functions */
+  // Builtin functions
   double cos(double), sin(double);
 
-  /* Local variables */
+  // Local variables
   int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   double dc2, ai1, ai2, ar1, ar2, ds2;
   int32_t nbd;
   double dcp, arg, dsp, ar1h, ar2h;
   int32_t idp2, ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -5002,7 +5002,7 @@ int32_t radbgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     arg = tpi / (double) (*ip);
     dcp = cos(arg);
     dsp = sin(arg);
@@ -5019,9 +5019,9 @@ int32_t radbgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc
 	for (i = 1; i <= i__2; ++i) {
 	    ch[i + (k + ch_dim2) * ch_dim1] = cc[i + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L101: */
+// L101:
 	}
-/* L102: */
+// L102:
     }
     goto L106;
 L103:
@@ -5031,9 +5031,9 @@ L103:
 	for (k = 1; k <= i__2; ++k) {
 	    ch[i + (k + ch_dim2) * ch_dim1] = cc[i + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L104: */
+// L104:
 	}
-/* L105: */
+// L105:
     }
 L106:
     i__1 = ipph;
@@ -5047,9 +5047,9 @@ L106:
 		    cc_dim1];
 	    ch[(k + jc * ch_dim2) * ch_dim1 + 1] = cc[(j2 - 1 + k * cc_dim2) *
 		     cc_dim1 + 1] + cc[(j2 - 1 + k * cc_dim2) * cc_dim1 + 1];
-/* L107: */
+// L107:
 	}
-/* L108: */
+// L108:
     }
     if (*ido == 1) {
 	goto L116;
@@ -5077,11 +5077,11 @@ L106:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = cc[i + ((j << 1) - 1 + 
 			k * cc_dim2) * cc_dim1] + cc[ic + ((j << 1) - 2 + k * 
 			cc_dim2) * cc_dim1];
-/* L109: */
+// L109:
 	    }
-/* L110: */
+// L110:
 	}
-/* L111: */
+// L111:
     }
     goto L116;
 L112:
@@ -5105,11 +5105,11 @@ L112:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = cc[i + ((j << 1) - 1 + 
 			k * cc_dim2) * cc_dim1] + cc[ic + ((j << 1) - 2 + k * 
 			cc_dim2) * cc_dim1];
-/* L113: */
+// L113:
 	    }
-/* L114: */
+// L114:
 	}
-/* L115: */
+// L115:
     }
 L116:
     ar1 = (double)1.;
@@ -5125,7 +5125,7 @@ L116:
 	    c2[ik + l * c2_dim1] = ch2[ik + ch2_dim1] + ar1 * ch2[ik + (
 		    ch2_dim1 << 1)];
 	    c2[ik + lc * c2_dim1] = ai1 * ch2[ik + *ip * ch2_dim1];
-/* L117: */
+// L117:
 	}
 	dc2 = ar1;
 	ds2 = ai1;
@@ -5141,20 +5141,20 @@ L116:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		c2[ik + l * c2_dim1] += ar2 * ch2[ik + j * ch2_dim1];
 		c2[ik + lc * c2_dim1] += ai2 * ch2[ik + jc * ch2_dim1];
-/* L118: */
+// L118:
 	    }
-/* L119: */
+// L119:
 	}
-/* L120: */
+// L120:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += ch2[ik + j * ch2_dim1];
-/* L121: */
+// L121:
 	}
-/* L122: */
+// L122:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
@@ -5165,9 +5165,9 @@ L116:
 		    c1_dim1 + 1] - c1[(k + jc * c1_dim2) * c1_dim1 + 1];
 	    ch[(k + jc * ch_dim2) * ch_dim1 + 1] = c1[(k + j * c1_dim2) * 
 		    c1_dim1 + 1] + c1[(k + jc * c1_dim2) * c1_dim1 + 1];
-/* L123: */
+// L123:
 	}
-/* L124: */
+// L124:
     }
     if (*ido == 1) {
 	goto L132;
@@ -5194,11 +5194,11 @@ L116:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = c1[i + (k + j * 
 			c1_dim2) * c1_dim1] - c1[i - 1 + (k + jc * c1_dim2) * 
 			c1_dim1];
-/* L125: */
+// L125:
 	    }
-/* L126: */
+// L126:
 	}
-/* L127: */
+// L127:
     }
     goto L132;
 L128:
@@ -5221,11 +5221,11 @@ L128:
 		ch[i + (k + jc * ch_dim2) * ch_dim1] = c1[i + (k + j * 
 			c1_dim2) * c1_dim1] - c1[i - 1 + (k + jc * c1_dim2) * 
 			c1_dim1];
-/* L129: */
+// L129:
 	    }
-/* L130: */
+// L130:
 	}
-/* L131: */
+// L131:
     }
 L132:
     if (*ido == 1) {
@@ -5234,7 +5234,7 @@ L132:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L133: */
+// L133:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -5242,9 +5242,9 @@ L132:
 	for (k = 1; k <= i__2; ++k) {
 	    c1[(k + j * c1_dim2) * c1_dim1 + 1] = ch[(k + j * ch_dim2) * 
 		    ch_dim1 + 1];
-/* L134: */
+// L134:
 	}
-/* L135: */
+// L135:
     }
     if (nbd > *l1) {
 	goto L139;
@@ -5265,11 +5265,11 @@ L132:
 		c1[i + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i + (
 			k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i - 1 + (
 			k + j * ch_dim2) * ch_dim1];
-/* L136: */
+// L136:
 	    }
-/* L137: */
+// L137:
 	}
-/* L138: */
+// L138:
     }
     goto L143;
 L139:
@@ -5289,27 +5289,27 @@ L139:
 		c1[i + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i + (
 			k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i - 1 + (
 			k + j * ch_dim2) * ch_dim1];
-/* L140: */
+// L140:
 	    }
-/* L141: */
+// L141:
 	}
-/* L142: */
+// L142:
     }
 L143:
     return 0;
-} /* radbg */
-/*------------------------------------------------------------------------*/
+} // radbg
+//------------------------------------------------------------------------
 int32_t radf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ti2, tr2;
   int32_t idp2;
 
-  /* Parameter adjustments */
+  // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = ch_dim1 * 3 + 1;
     ch -= ch_offset;
@@ -5319,14 +5319,14 @@ int32_t radf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
     cc -= cc_offset;
     --wa1;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	ch[((k << 1) + 1) * ch_dim1 + 1] = cc[(k + cc_dim2) * cc_dim1 + 1] + 
 		cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1];
 	ch[*ido + ((k << 1) + 2) * ch_dim1] = cc[(k + cc_dim2) * cc_dim1 + 1] 
 		- cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1];
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -5354,9 +5354,9 @@ L102:
 		    cc_dim1] + tr2;
 	    ch[ic - 1 + ((k << 1) + 2) * ch_dim1] = cc[i - 1 + (k + cc_dim2) *
 		     cc_dim1] - tr2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -5368,28 +5368,28 @@ L105:
 		cc_dim2 << 1)) * cc_dim1];
 	ch[*ido + ((k << 1) + 1) * ch_dim1] = cc[*ido + (k + cc_dim2) * 
 		cc_dim1];
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radf2 */
-/*------------------------------------------------------------------------*/
+} // radf2
+//------------------------------------------------------------------------
 int32_t radf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
-  /* Initialized data */
+  // Initialized data
   
   double taur = (double)-.5;
   double taui = (double).866025403784439;
   
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_offset, cc_dim1, cc_dim2, cc_offset, i__1, i__2;
   
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ci2, di2, di3, cr2, dr2, dr3, ti2, ti3, tr2, tr3;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = (ch_dim1 << 2) + 1;
     ch -= ch_offset;
@@ -5400,7 +5400,7 @@ int32_t radf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, d
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	cr2 = cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1] + cc[(k + cc_dim2 * 3) * 
@@ -5410,7 +5410,7 @@ int32_t radf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, d
 		cc_dim1 + 1] - cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1]);
 	ch[*ido + (k * 3 + 2) * ch_dim1] = cc[(k + cc_dim2) * cc_dim1 + 1] + 
 		taur * cr2;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -5443,30 +5443,30 @@ int32_t radf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, d
 	    ch[ic - 1 + (k * 3 + 2) * ch_dim1] = tr2 - tr3;
 	    ch[i + (k * 3 + 3) * ch_dim1] = ti2 + ti3;
 	    ch[ic + (k * 3 + 2) * ch_dim1] = ti3 - ti2;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radf3 */
-/*------------------------------------------------------------------------*/
+} // radf3
+//------------------------------------------------------------------------
 int32_t radf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3)
 {
-  /* Initialized data */
+  // Initialized data
   
   double hsqt2 = (double).7071067811865475;
   
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
 
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
     tr3, tr4;
   int32_t idp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = ch_dim1 * 5 + 1;
     ch -= ch_offset;
@@ -5478,7 +5478,7 @@ int32_t radf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	tr1 = cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1] + cc[(k + (cc_dim2 << 2))
@@ -5491,7 +5491,7 @@ int32_t radf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 		- cc[(k + cc_dim2 * 3) * cc_dim1 + 1];
 	ch[((k << 2) + 3) * ch_dim1 + 1] = cc[(k + (cc_dim2 << 2)) * cc_dim1 
 		+ 1] - cc[(k + (cc_dim2 << 1)) * cc_dim1 + 1];
-/* L101: */
+// L101:
     }
     if ((i__1 = *ido - 2) < 0) {
 	goto L107;
@@ -5535,9 +5535,9 @@ L102:
 	    ch[ic - 1 + ((k << 2) + 2) * ch_dim1] = tr3 - ti4;
 	    ch[i + ((k << 2) + 3) * ch_dim1] = tr4 + ti3;
 	    ch[ic + ((k << 2) + 2) * ch_dim1] = tr4 - ti3;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     if (*ido % 2 == 1) {
 	return 0;
@@ -5557,32 +5557,32 @@ L105:
 		 cc_dim1];
 	ch[((k << 2) + 4) * ch_dim1 + 1] = ti1 + cc[*ido + (k + cc_dim2 * 3) *
 		 cc_dim1];
-/* L106: */
+// L106:
     }
 L107:
     return 0;
-} /* radf4 */
-/*------------------------------------------------------------------------*/
+} // radf4
+//------------------------------------------------------------------------
 int32_t radf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	  double *wa2, double *wa3, double *wa4)
 {
-  /* Initialized data */
+  // Initialized data
   
   double tr11 = (double).309016994374947;
   double ti11 = (double).951056516295154;
   double tr12 = (double)-.809016994374947;
   double ti12 = (double).587785252292473;
   
-  /* System generated locals */
+  // System generated locals
   int32_t cc_dim1, cc_dim2, cc_offset, ch_dim1, ch_offset, i__1, i__2;
   
-  /* Local variables */
+  // Local variables
   int32_t i, k, ic;
   double ci2, di2, ci4, ci5, di3, di4, di5, ci3, cr2, cr3, dr2, dr3, 
     dr4, dr5, cr5, cr4, ti2, ti3, ti5, ti4, tr2, tr3, tr4, tr5;
   int32_t idp2;
   
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_offset = ch_dim1 * 6 + 1;
     ch -= ch_offset;
@@ -5595,7 +5595,7 @@ int32_t radf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
 	cr2 = cc[(k + cc_dim2 * 5) * cc_dim1 + 1] + cc[(k + (cc_dim2 << 1)) * 
@@ -5614,7 +5614,7 @@ int32_t radf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	ch[*ido + (k * 5 + 4) * ch_dim1] = cc[(k + cc_dim2) * cc_dim1 + 1] + 
 		tr12 * cr2 + tr11 * cr3;
 	ch[(k * 5 + 5) * ch_dim1 + 1] = ti12 * ci5 - ti11 * ci4;
-/* L101: */
+// L101:
     }
     if (*ido == 1) {
 	return 0;
@@ -5671,36 +5671,36 @@ int32_t radf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
 	    ch[ic - 1 + (k * 5 + 4) * ch_dim1] = tr3 - tr4;
 	    ch[i + (k * 5 + 5) * ch_dim1] = ti3 + ti4;
 	    ch[ic + (k * 5 + 4) * ch_dim1] = ti4 - ti3;
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     return 0;
-} /* radf5 */
-/*------------------------------------------------------------------------*/
+} // radf5
+//------------------------------------------------------------------------
 int32_t radfgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc, double *c1,
 	  double *c2, double *ch, double *ch2, double *wa)
 {
-  /* Initialized data */
+  // Initialized data
 
   double tpi = (double)6.28318530717959;
   
-  /* System generated locals */
+  // System generated locals
   int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
     i__1, i__2, i__3;
   
-  /* Builtin functions */
+  // Builtin functions
   double cos(double), sin(double);
 
-  /* Local variables */
+  // Local variables
   int32_t idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
   double dc2, ai1, ai2, ar1, ar2, ds2;
   int32_t nbd;
   double dcp, arg, dsp, ar1h, ar2h;
   int32_t idp2, ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -5721,7 +5721,7 @@ int32_t radfgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     arg = tpi / (double) (*ip);
     dcp = cos(arg);
     dsp = sin(arg);
@@ -5735,7 +5735,7 @@ int32_t radfgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	ch2[ik + ch2_dim1] = c2[ik + c2_dim1];
-/* L101: */
+// L101:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -5743,9 +5743,9 @@ int32_t radfgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc
 	for (k = 1; k <= i__2; ++k) {
 	    ch[(k + j * ch_dim2) * ch_dim1 + 1] = c1[(k + j * c1_dim2) * 
 		    c1_dim1 + 1];
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     if (nbd > *l1) {
 	goto L107;
@@ -5766,11 +5766,11 @@ int32_t radfgd(int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1, double *cc
 		ch[i + (k + j * ch_dim2) * ch_dim1] = wa[idij - 1] * c1[i + (
 			k + j * c1_dim2) * c1_dim1] - wa[idij] * c1[i - 1 + (
 			k + j * c1_dim2) * c1_dim1];
-/* L104: */
+// L104:
 	    }
-/* L105: */
+// L105:
 	}
-/* L106: */
+// L106:
     }
     goto L111;
 L107:
@@ -5790,11 +5790,11 @@ L107:
 		ch[i + (k + j * ch_dim2) * ch_dim1] = wa[idij - 1] * c1[i + (
 			k + j * c1_dim2) * c1_dim1] - wa[idij] * c1[i - 1 + (
 			k + j * c1_dim2) * c1_dim1];
-/* L108: */
+// L108:
 	    }
-/* L109: */
+// L109:
 	}
-/* L110: */
+// L110:
     }
 L111:
     if (nbd < *l1) {
@@ -5818,11 +5818,11 @@ L111:
 		c1[i + (k + jc * c1_dim2) * c1_dim1] = ch[i - 1 + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i - 1 + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L112: */
+// L112:
 	    }
-/* L113: */
+// L113:
 	}
-/* L114: */
+// L114:
     }
     goto L121;
 L115:
@@ -5844,18 +5844,18 @@ L115:
 		c1[i + (k + jc * c1_dim2) * c1_dim1] = ch[i - 1 + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i - 1 + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L116: */
+// L116:
 	    }
-/* L117: */
+// L117:
 	}
-/* L118: */
+// L118:
     }
     goto L121;
 L119:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L120: */
+// L120:
     }
 L121:
     i__1 = ipph;
@@ -5867,9 +5867,9 @@ L121:
 		    ch_dim1 + 1] + ch[(k + jc * ch_dim2) * ch_dim1 + 1];
 	    c1[(k + jc * c1_dim2) * c1_dim1 + 1] = ch[(k + jc * ch_dim2) * 
 		    ch_dim1 + 1] - ch[(k + j * ch_dim2) * ch_dim1 + 1];
-/* L122: */
+// L122:
 	}
-/* L123: */
+// L123:
     }
 
     ar1 = (double)1.;
@@ -5885,7 +5885,7 @@ L121:
 	    ch2[ik + l * ch2_dim1] = c2[ik + c2_dim1] + ar1 * c2[ik + (
 		    c2_dim1 << 1)];
 	    ch2[ik + lc * ch2_dim1] = ai1 * c2[ik + *ip * c2_dim1];
-/* L124: */
+// L124:
 	}
 	dc2 = ar1;
 	ds2 = ai1;
@@ -5901,20 +5901,20 @@ L121:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		ch2[ik + l * ch2_dim1] += ar2 * c2[ik + j * c2_dim1];
 		ch2[ik + lc * ch2_dim1] += ai2 * c2[ik + jc * c2_dim1];
-/* L125: */
+// L125:
 	    }
-/* L126: */
+// L126:
 	}
-/* L127: */
+// L127:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += c2[ik + j * c2_dim1];
-/* L128: */
+// L128:
 	}
-/* L129: */
+// L129:
     }
 
     if (*ido < *l1) {
@@ -5926,9 +5926,9 @@ L121:
 	for (i = 1; i <= i__2; ++i) {
 	    cc[i + (k * cc_dim2 + 1) * cc_dim1] = ch[i + (k + ch_dim2) * 
 		    ch_dim1];
-/* L130: */
+// L130:
 	}
-/* L131: */
+// L131:
     }
     goto L135;
 L132:
@@ -5938,9 +5938,9 @@ L132:
 	for (k = 1; k <= i__2; ++k) {
 	    cc[i + (k * cc_dim2 + 1) * cc_dim1] = ch[i + (k + ch_dim2) * 
 		    ch_dim1];
-/* L133: */
+// L133:
 	}
-/* L134: */
+// L134:
     }
 L135:
     i__1 = ipph;
@@ -5953,9 +5953,9 @@ L135:
 		     * ch_dim1 + 1];
 	    cc[(j2 - 1 + k * cc_dim2) * cc_dim1 + 1] = ch[(k + jc * ch_dim2) *
 		     ch_dim1 + 1];
-/* L136: */
+// L136:
 	}
-/* L137: */
+// L137:
     }
     if (*ido == 1) {
 	return 0;
@@ -5984,11 +5984,11 @@ L135:
 		cc[ic + (j2 - 2 + k * cc_dim2) * cc_dim1] = ch[i + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L138: */
+// L138:
 	    }
-/* L139: */
+// L139:
 	}
-/* L140: */
+// L140:
     }
     return 0;
 L141:
@@ -6013,37 +6013,37 @@ L141:
 		cc[ic + (j2 - 2 + k * cc_dim2) * cc_dim1] = ch[i + (k + jc * 
 			ch_dim2) * ch_dim1] - ch[i + (k + j * ch_dim2) * 
 			ch_dim1];
-/* L142: */
+// L142:
 	    }
-/* L143: */
+// L143:
 	}
-/* L144: */
+// L144:
     }
     return 0;
-} /* radfg */
-/*------------------------------------------------------------------------*/
+} // radfg
+//------------------------------------------------------------------------
 int32_t rfftbd(int32_t *n, double *r, double *wsave)
 {
   int32_t rfftb1d(int32_t *n, double *c, double *ch, double *wa, double *ifac);
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
   --r;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
     rfftb1d(n, &r[1], &wsave[1], &wsave[*n + 1], &wsave[(*n << 1) + 1]);
     return 0;
-} /* rfftb */
-/*------------------------------------------------------------------------*/
+} // rfftb
+//------------------------------------------------------------------------
 int32_t rfftb1d(int32_t *n, double *c, double *ch, double *wa, double *ifac)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t radb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1),
     radb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2),
     radb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
@@ -6055,13 +6055,13 @@ int32_t rfftb1d(int32_t *n, double *c, double *ch, double *wa, double *ifac)
 	  double *c2, double *ch, double *ch2, double *wa);
   int32_t k1, l1, l2, na, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 0;
     l1 = 1;
@@ -6152,7 +6152,7 @@ L114:
 L115:
 	l1 = l2;
 	iw += (ip - 1) * ido;
-/* L116: */
+// L116:
     }
     if (na == 0) {
 	return 0;
@@ -6160,33 +6160,33 @@ L115:
     i__1 = *n;
     for (i = 1; i <= i__1; ++i) {
 	c[i] = ch[i];
-/* L117: */
+// L117:
     }
     return 0;
-} /* rfftb1 */
-/*------------------------------------------------------------------------*/
+} // rfftb1
+//------------------------------------------------------------------------
 int32_t rfftfd(int32_t *n, double *r, double *wsave)
 {
   int32_t rfftf1d(int32_t *n, double *c, double *ch, double *wa, double *ifac);
   
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
   --r;
   
-  /* Function Body */
+  // Function Body
   if (*n == 1) {
     return 0;
   }
   rfftf1d(n, &r[1], &wsave[1], &wsave[*n + 1], &wsave[(*n << 1) + 1]);
   return 0;
-} /* rfftf */
-/*------------------------------------------------------------------------*/
+} // rfftf
+//------------------------------------------------------------------------
 int32_t rfftf1d(int32_t *n, double *c, double *ch, double *wa, double *ifac)
 {
-  /* System generated locals */
+  // System generated locals
   int32_t i__1;
 
-  /* Local variables */
+  // Local variables
   int32_t radf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1),
     radf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2),
     radf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1,
@@ -6198,13 +6198,13 @@ int32_t rfftf1d(int32_t *n, double *c, double *ch, double *wa, double *ifac)
 	  double *c2, double *ch, double *ch2, double *wa);
   int32_t k1, l1, l2, na, kh, nf, ip, iw, ix2, ix3, ix4, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 1;
     l2 = *n;
@@ -6290,7 +6290,7 @@ L109:
 	na = 0;
 L110:
 	l2 = l1;
-/* L111: */
+// L111:
     }
     if (na == 1) {
 	return 0;
@@ -6298,39 +6298,39 @@ L110:
     i__1 = *n;
     for (i = 1; i <= i__1; ++i) {
 	c[i] = ch[i];
-/* L112: */
+// L112:
     }
     return 0;
-} /* rfftf1 */
-/*------------------------------------------------------------------------*/
+} // rfftf1
+//------------------------------------------------------------------------
 int32_t rfftid(int32_t *n, double *wsave)
 {
   int32_t rffti1d(int32_t *n, double *wa, double *ifac);
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
     rffti1d(n, &wsave[*n + 1], &wsave[(*n << 1) + 1]);
     return 0;
-} /* rffti */
-/*------------------------------------------------------------------------*/
+} // rffti
+//------------------------------------------------------------------------
 int32_t rffti1d(int32_t *n, double *wa, double *ifac)
 {
-  /* Initialized data */
+  // Initialized data
   
   int32_t ntryh[4] = { 4,2,3,5 };
   
-  /* System generated locals */
+  // System generated locals
   int32_t i__1, i__2, i__3;
   
-  /* Builtin functions */
+  // Builtin functions
   double cos(double), sin(double);
   
-  /* Local variables */
+  // Local variables
   double argh;
   int32_t ntry, i, j;
   double argld;
@@ -6342,11 +6342,11 @@ int32_t rffti1d(int32_t *n, double *wa, double *ifac)
   double tpi;
   int32_t nfm1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
 
-    /* Function Body */
+    // Function Body
     nl = *n;
     nf = 0;
     j = 0;
@@ -6384,7 +6384,7 @@ L105:
     for (i = 2; i <= i__1; ++i) {
 	ib = nf - i + 2;
 	ifac[ib + 2] = ifac[ib + 1];
-/* L106: */
+// L106:
     }
     ifac[3] = 2;
 L107:
@@ -6421,34 +6421,34 @@ L107:
 		arg = fi * argld;
 		wa[i - 1] = cos(arg);
 		wa[i] = sin(arg);
-/* L108: */
+// L108:
 	    }
 	    is += ido;
-/* L109: */
+// L109:
 	}
 	l1 = l2;
-/* L110: */
+// L110:
     }
     return 0;
-} /* rffti1 */
-/*------------------------------------------------------------------------*/
-/* Below follow routines for complex ffts */
-/*------------------------------------------------------------------------*/
+} // rffti1
+//------------------------------------------------------------------------
+// Below follow routines for complex ffts
+//------------------------------------------------------------------------
 int32_t passfd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  double *cc, double *c1, double *c2, double *ch, double *ch2, double *wa)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
-    /* Local variables */
+    // Local variables
     int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int32_t ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -6469,7 +6469,7 @@ int32_t passfd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *id
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     idot = *ido / 2;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
@@ -6491,11 +6491,11 @@ int32_t passfd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *id
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L101: */
+// L101:
 	    }
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
@@ -6503,9 +6503,9 @@ int32_t passfd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *id
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L104: */
+// L104:
 	}
-/* L105: */
+// L105:
     }
     goto L112;
 L106:
@@ -6522,11 +6522,11 @@ L106:
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L107: */
+// L107:
 	    }
-/* L108: */
+// L108:
 	}
-/* L109: */
+// L109:
     }
     i__1 = *ido;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -6534,9 +6534,9 @@ L106:
 	for (k = 1; k <= i__2; ++k) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L110: */
+// L110:
 	}
-/* L111: */
+// L111:
     }
 L112:
     idl = 2 - *ido;
@@ -6550,7 +6550,7 @@ L112:
 	    c2[ik + l * c2_dim1] = ch2[ik + ch2_dim1] + wa[idl - 1] * ch2[ik 
 		    + (ch2_dim1 << 1)];
 	    c2[ik + lc * c2_dim1] = -wa[idl] * ch2[ik + *ip * ch2_dim1];
-/* L113: */
+// L113:
 	}
 	idlj = idl;
 	inc += *ido;
@@ -6567,20 +6567,20 @@ L112:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		c2[ik + l * c2_dim1] += war * ch2[ik + j * ch2_dim1];
 		c2[ik + lc * c2_dim1] -= wai * ch2[ik + jc * ch2_dim1];
-/* L114: */
+// L114:
 	    }
-/* L115: */
+// L115:
 	}
-/* L116: */
+// L116:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += ch2[ik + j * ch2_dim1];
-/* L117: */
+// L117:
 	}
-/* L118: */
+// L118:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
@@ -6595,9 +6595,9 @@ L112:
 		    c2_dim1];
 	    ch2[ik + jc * ch2_dim1] = c2[ik + j * c2_dim1] - c2[ik - 1 + jc * 
 		    c2_dim1];
-/* L119: */
+// L119:
 	}
-/* L120: */
+// L120:
     }
     *nac = 1;
     if (*ido == 2) {
@@ -6607,7 +6607,7 @@ L112:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L121: */
+// L121:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -6617,9 +6617,9 @@ L112:
 		    ch_dim1 + 1];
 	    c1[(k + j * c1_dim2) * c1_dim1 + 2] = ch[(k + j * ch_dim2) * 
 		    ch_dim1 + 2];
-/* L122: */
+// L122:
 	}
-/* L123: */
+// L123:
     }
     if (idot > *l1) {
 	goto L127;
@@ -6639,11 +6639,11 @@ L112:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] - wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L124: */
+// L124:
 	    }
-/* L125: */
+// L125:
 	}
-/* L126: */
+// L126:
     }
     return 0;
 L127:
@@ -6663,25 +6663,25 @@ L127:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] - wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L128: */
+// L128:
 	    }
-/* L129: */
+// L129:
 	}
-/* L130: */
+// L130:
     }
     return 0;
-} /* passf */
-/*------------------------------------------------------------------------*/
+} // passf
+//------------------------------------------------------------------------
 int32_t passf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -6691,7 +6691,7 @@ int32_t passf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
     cc -= cc_offset;
     --wa1;
 
-    /* Function Body */
+    // Function Body
     if (*ido > 2) {
 	goto L102;
     }
@@ -6705,7 +6705,7 @@ int32_t passf2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 		cc[((k << 1) + 2) * cc_dim1 + 2];
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = cc[((k << 1) + 1) * cc_dim1 
 		+ 2] - cc[((k << 1) + 2) * cc_dim1 + 2];
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -6725,28 +6725,28 @@ L102:
 		    wa1[i__] * tr2;
 	    ch[i__ - 1 + (k + (ch_dim2 << 1)) * ch_dim1] = wa1[i__ - 1] * tr2 
 		    + wa1[i__] * ti2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf2 */
-/*------------------------------------------------------------------------*/
+} // passf2
+//------------------------------------------------------------------------
 int32_t passf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
-    /* Initialized data */
+    // Initialized data
 
     double taur = (double)-.5;
     double taui = (double)-.866025403784439;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -6757,7 +6757,7 @@ int32_t passf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -6777,7 +6777,7 @@ int32_t passf3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr2 + ci3;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ci2 + cr3;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 2] = ci2 - cr3;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -6811,25 +6811,25 @@ L102:
 		    i__] * dr3;
 	    ch[i__ - 1 + (k + ch_dim2 * 3) * ch_dim1] = wa2[i__ - 1] * dr3 + 
 		    wa2[i__] * di3;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf3 */
-/*------------------------------------------------------------------------*/
+} // passf3
+//------------------------------------------------------------------------
 int32_t passf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -6841,7 +6841,7 @@ int32_t passf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -6871,7 +6871,7 @@ int32_t passf4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = tr1 - tr4;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ti1 + ti4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ti1 - ti4;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -6915,32 +6915,32 @@ L102:
 		    + wa3[i__] * ci4;
 	    ch[i__ + (k + (ch_dim2 << 2)) * ch_dim1] = wa3[i__ - 1] * ci4 - 
 		    wa3[i__] * cr4;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf4 */
-/*------------------------------------------------------------------------*/
+} // passf4
+//------------------------------------------------------------------------
 int32_t passf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3, double *wa4)
 {
-    /* Initialized data */
+    // Initialized data
 
     double tr11 = (double).309016994374947;
     double ti11 = (double)-.951056516295154;
     double tr12 = (double)-.809016994374947;
     double ti12 = (double)-.587785252292473;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -6953,7 +6953,7 @@ int32_t passf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -6987,7 +6987,7 @@ int32_t passf5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = cr3 + ci4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ci3 - cr4;
 	ch[(k + ch_dim2 * 5) * ch_dim1 + 2] = ci2 - cr5;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -7049,19 +7049,19 @@ L102:
 		    wa4[i__] * di5;
 	    ch[i__ + (k + ch_dim2 * 5) * ch_dim1] = wa4[i__ - 1] * di5 - wa4[
 		    i__] * dr5;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passf5 */
-/*------------------------------------------------------------------------*/
+} // passf5
+//------------------------------------------------------------------------
 int32_t cfftf1d(int32_t *n, double *c__, double *ch, double *wa, double *ifac)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t i__1;
 
-    /* Local variables */
+    // Local variables
     int32_t idot, i__;
     int32_t passfd(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, double *, double *, double *,
 	      double *, double *, double *);
@@ -7073,13 +7073,13 @@ int32_t cfftf1d(int32_t *n, double *c__, double *ch, double *wa, double *ifac)
 	     double *);
     int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c__;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 0;
     l1 = 1;
@@ -7171,7 +7171,7 @@ L114:
 L115:
 	l1 = l2;
 	iw += (ip - 1) * idot;
-/* L116: */
+// L116:
     }
     if (na == 0) {
 	return 0;
@@ -7180,21 +7180,21 @@ L115:
     i__1 = n2;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	c__[i__] = ch[i__];
-/* L117: */
+// L117:
     }
     return 0;
-} /* cfftf1 */
-/*------------------------------------------------------------------------*/
+} // cfftf1
+//------------------------------------------------------------------------
 int32_t cfftfd(int32_t *n, double *c__, double *wsave)
 {
   int32_t cfftf1d(int32_t *, double *, double *, double *, double *);
   int32_t iw1, iw2;
 
-  /* Parameter adjustments */
+  // Parameter adjustments
   --wsave;
   --c__;
 
-  /* Function Body */
+  // Function Body
   if (*n == 1) {
     return 0;
   }
@@ -7202,23 +7202,23 @@ int32_t cfftfd(int32_t *n, double *c__, double *wsave)
   iw2 = iw1 + *n + *n;
   cfftf1d(n, &c__[1], &wsave[1], &wsave[iw1], &wsave[iw2]);
   return 0;
-} /* cfftf */
-/*------------------------------------------------------------------------*/
+} // cfftf
+//------------------------------------------------------------------------
 int32_t passbd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *idl1,
 	  double *cc, double *c1, double *c2, double *ch, double *ch2, double *wa)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t ch_dim1, ch_dim2, ch_offset, cc_dim1, cc_dim2, cc_offset, c1_dim1,
 	     c1_dim2, c1_offset, c2_dim1, c2_offset, ch2_dim1, ch2_offset, 
 	    i__1, i__2, i__3;
 
-    /* Local variables */
+    // Local variables
     int32_t idij, idlj, idot, ipph, i__, j, k, l, jc, lc, ik, idj, 
 	    idl, inc, idp;
     double wai, war;
     int32_t ipp2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -7239,7 +7239,7 @@ int32_t passbd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *id
     c2 -= c2_offset;
     --wa;
 
-    /* Function Body */
+    // Function Body
     idot = *ido / 2;
     ipp2 = *ip + 2;
     ipph = (*ip + 1) / 2;
@@ -7261,11 +7261,11 @@ int32_t passbd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *id
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L101: */
+// L101:
 	    }
-/* L102: */
+// L102:
 	}
-/* L103: */
+// L103:
     }
     i__1 = *l1;
     for (k = 1; k <= i__1; ++k) {
@@ -7273,9 +7273,9 @@ int32_t passbd(int32_t *nac, int32_t *ido, int32_t *ip, int32_t *l1, int32_t *id
 	for (i__ = 1; i__ <= i__2; ++i__) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L104: */
+// L104:
 	}
-/* L105: */
+// L105:
     }
     goto L112;
 L106:
@@ -7292,11 +7292,11 @@ L106:
 		ch[i__ + (k + jc * ch_dim2) * ch_dim1] = cc[i__ + (j + k * 
 			cc_dim2) * cc_dim1] - cc[i__ + (jc + k * cc_dim2) * 
 			cc_dim1];
-/* L107: */
+// L107:
 	    }
-/* L108: */
+// L108:
 	}
-/* L109: */
+// L109:
     }
     i__1 = *ido;
     for (i__ = 1; i__ <= i__1; ++i__) {
@@ -7304,9 +7304,9 @@ L106:
 	for (k = 1; k <= i__2; ++k) {
 	    ch[i__ + (k + ch_dim2) * ch_dim1] = cc[i__ + (k * cc_dim2 + 1) * 
 		    cc_dim1];
-/* L110: */
+// L110:
 	}
-/* L111: */
+// L111:
     }
 L112:
     idl = 2 - *ido;
@@ -7320,7 +7320,7 @@ L112:
 	    c2[ik + l * c2_dim1] = ch2[ik + ch2_dim1] + wa[idl - 1] * ch2[ik 
 		    + (ch2_dim1 << 1)];
 	    c2[ik + lc * c2_dim1] = wa[idl] * ch2[ik + *ip * ch2_dim1];
-/* L113: */
+// L113:
 	}
 	idlj = idl;
 	inc += *ido;
@@ -7337,20 +7337,20 @@ L112:
 	    for (ik = 1; ik <= i__3; ++ik) {
 		c2[ik + l * c2_dim1] += war * ch2[ik + j * ch2_dim1];
 		c2[ik + lc * c2_dim1] += wai * ch2[ik + jc * ch2_dim1];
-/* L114: */
+// L114:
 	    }
-/* L115: */
+// L115:
 	}
-/* L116: */
+// L116:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
 	i__2 = *idl1;
 	for (ik = 1; ik <= i__2; ++ik) {
 	    ch2[ik + ch2_dim1] += ch2[ik + j * ch2_dim1];
-/* L117: */
+// L117:
 	}
-/* L118: */
+// L118:
     }
     i__1 = ipph;
     for (j = 2; j <= i__1; ++j) {
@@ -7365,9 +7365,9 @@ L112:
 		    c2_dim1];
 	    ch2[ik + jc * ch2_dim1] = c2[ik + j * c2_dim1] - c2[ik - 1 + jc * 
 		    c2_dim1];
-/* L119: */
+// L119:
 	}
-/* L120: */
+// L120:
     }
     *nac = 1;
     if (*ido == 2) {
@@ -7377,7 +7377,7 @@ L112:
     i__1 = *idl1;
     for (ik = 1; ik <= i__1; ++ik) {
 	c2[ik + c2_dim1] = ch2[ik + ch2_dim1];
-/* L121: */
+// L121:
     }
     i__1 = *ip;
     for (j = 2; j <= i__1; ++j) {
@@ -7387,9 +7387,9 @@ L112:
 		    ch_dim1 + 1];
 	    c1[(k + j * c1_dim2) * c1_dim1 + 2] = ch[(k + j * ch_dim2) * 
 		    ch_dim1 + 2];
-/* L122: */
+// L122:
 	}
-/* L123: */
+// L123:
     }
     if (idot > *l1) {
 	goto L127;
@@ -7409,11 +7409,11 @@ L112:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L124: */
+// L124:
 	    }
-/* L125: */
+// L125:
 	}
-/* L126: */
+// L126:
     }
     return 0;
 L127:
@@ -7433,25 +7433,25 @@ L127:
 		c1[i__ + (k + j * c1_dim2) * c1_dim1] = wa[idij - 1] * ch[i__ 
 			+ (k + j * ch_dim2) * ch_dim1] + wa[idij] * ch[i__ - 
 			1 + (k + j * ch_dim2) * ch_dim1];
-/* L128: */
+// L128:
 	    }
-/* L129: */
+// L129:
 	}
-/* L130: */
+// L130:
     }
     return 0;
-} /* passb */
-/*------------------------------------------------------------------------*/
+} // passb
+//------------------------------------------------------------------------
 int32_t passb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -7461,7 +7461,7 @@ int32_t passb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
     cc -= cc_offset;
     --wa1;
 
-    /* Function Body */
+    // Function Body
     if (*ido > 2) {
 	goto L102;
     }
@@ -7475,7 +7475,7 @@ int32_t passb2d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1)
 		cc[((k << 1) + 2) * cc_dim1 + 2];
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = cc[((k << 1) + 1) * cc_dim1 
 		+ 2] - cc[((k << 1) + 2) * cc_dim1 + 2];
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -7495,28 +7495,28 @@ L102:
 		    wa1[i__] * tr2;
 	    ch[i__ - 1 + (k + (ch_dim2 << 1)) * ch_dim1] = wa1[i__ - 1] * tr2 
 		    - wa1[i__] * ti2;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb2 */
-/*------------------------------------------------------------------------*/
+} // passb2
+//------------------------------------------------------------------------
 int32_t passb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2)
 {
-    /* Initialized data */
+    // Initialized data
 
     double taur = (double)-.5;
     double taui = (double).866025403784439;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -7527,7 +7527,7 @@ int32_t passb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
     --wa1;
     --wa2;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -7547,7 +7547,7 @@ int32_t passb3d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 1] = cr2 + ci3;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ci2 + cr3;
 	ch[(k + ch_dim2 * 3) * ch_dim1 + 2] = ci2 - cr3;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -7581,25 +7581,25 @@ L102:
 		    i__] * dr3;
 	    ch[i__ - 1 + (k + ch_dim2 * 3) * ch_dim1] = wa2[i__ - 1] * dr3 - 
 		    wa2[i__] * di3;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb3 */
-/*------------------------------------------------------------------------*/
+} // passb3
+//------------------------------------------------------------------------
 int32_t passb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, 
 	    tr3, tr4;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -7611,7 +7611,7 @@ int32_t passb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
     --wa2;
     --wa3;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -7641,7 +7641,7 @@ int32_t passb4d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = tr1 - tr4;
 	ch[(k + (ch_dim2 << 1)) * ch_dim1 + 2] = ti1 + ti4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ti1 - ti4;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -7685,32 +7685,32 @@ L102:
 		    - wa3[i__] * ci4;
 	    ch[i__ + (k + (ch_dim2 << 2)) * ch_dim1] = wa3[i__ - 1] * ci4 + 
 		    wa3[i__] * cr4;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb4 */
-/*------------------------------------------------------------------------*/
+} // passb4
+//------------------------------------------------------------------------
 int32_t passb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, double *wa2,
 	   double *wa3, double *wa4)
 {
-    /* Initialized data */
+    // Initialized data
 
     double tr11 = (double).309016994374947;
     double ti11 = (double).951056516295154;
     double tr12 = (double)-.809016994374947;
     double ti12 = (double).587785252292473;
 
-    /* System generated locals */
+    // System generated locals
     int32_t cc_dim1, cc_offset, ch_dim1, ch_dim2, ch_offset, i__1, i__2;
 
-    /* Local variables */
+    // Local variables
     int32_t i__, k;
     double ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, 
 	    ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     ch_dim1 = *ido;
     ch_dim2 = *l1;
     ch_offset = ch_dim1 * (ch_dim2 + 1) + 1;
@@ -7723,7 +7723,7 @@ int32_t passb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
     --wa3;
     --wa4;
 
-    /* Function Body */
+    // Function Body
     if (*ido != 2) {
 	goto L102;
     }
@@ -7757,7 +7757,7 @@ int32_t passb5d(int32_t *ido, int32_t *l1, double *cc, double *ch, double *wa1, 
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 1] = cr3 + ci4;
 	ch[(k + (ch_dim2 << 2)) * ch_dim1 + 2] = ci3 - cr4;
 	ch[(k + ch_dim2 * 5) * ch_dim1 + 2] = ci2 - cr5;
-/* L101: */
+// L101:
     }
     return 0;
 L102:
@@ -7819,19 +7819,19 @@ L102:
 		    wa4[i__] * di5;
 	    ch[i__ + (k + ch_dim2 * 5) * ch_dim1] = wa4[i__ - 1] * di5 + wa4[
 		    i__] * dr5;
-/* L103: */
+// L103:
 	}
-/* L104: */
+// L104:
     }
     return 0;
-} /* passb5 */
-/*------------------------------------------------------------------------*/
+} // passb5
+//------------------------------------------------------------------------
 int32_t cfftb1d(int32_t *n, double *c__, double *ch, double *wa, double *ifac)
 {
-    /* System generated locals */
+    // System generated locals
     int32_t i__1;
 
-    /* Local variables */
+    // Local variables
     int32_t idot, i__;
     int32_t passbd(int32_t *, int32_t *, int32_t *, int32_t *, int32_t *, double *, double *, double *,
 	      double *, double *, double *); 
@@ -7843,13 +7843,13 @@ int32_t cfftb1d(int32_t *n, double *c__, double *ch, double *wa, double *ifac)
 	     double *);
     int32_t na, nf, ip, iw, ix2, ix3, ix4, nac, ido, idl1;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
     --ch;
     --c__;
 
-    /* Function Body */
+    // Function Body
     nf = ifac[2];
     na = 0;
     l1 = 1;
@@ -7941,7 +7941,7 @@ L114:
 L115:
 	l1 = l2;
 	iw += (ip - 1) * idot;
-/* L116: */
+// L116:
     }
     if (na == 0) {
 	return 0;
@@ -7950,21 +7950,21 @@ L115:
     i__1 = n2;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	c__[i__] = ch[i__];
-/* L117: */
+// L117:
     }
     return 0;
-} /* cfftb1 */
-/*------------------------------------------------------------------------*/
+} // cfftb1
+//------------------------------------------------------------------------
 int32_t cfftbd(int32_t *n, double *c__, double *wsave)
 {
   int32_t cfftb1d(int32_t *, double *, double *, double *, double *);
     int32_t iw1, iw2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
     --c__;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
@@ -7972,21 +7972,21 @@ int32_t cfftbd(int32_t *n, double *c__, double *wsave)
     iw2 = iw1 + *n + *n;
     cfftb1d(n, &c__[1], &wsave[1], &wsave[iw1], &wsave[iw2]);
     return 0;
-} /* cfftb */
-/*------------------------------------------------------------------------*/
+} // cfftb
+//------------------------------------------------------------------------
 int32_t cffti1d(int32_t *n, double *wa, double *ifac)
 {
-    /* Initialized data */
+    // Initialized data
 
     int32_t ntryh[4] = { 3,4,2,5 };
 
-    /* System generated locals */
+    // System generated locals
     int32_t i__1, i__2, i__3;
 
-    /* Builtin functions */
+    // Builtin functions
     double cos(double), sin(double);
 
-    /* Local variables */
+    // Local variables
     double argh;
     int32_t idot, ntry, i__, j;
     double argld;
@@ -7997,11 +7997,11 @@ int32_t cffti1d(int32_t *n, double *wa, double *ifac)
     int32_t ido, ipm;
     double tpi;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --ifac;
     --wa;
 
-    /* Function Body */
+    // Function Body
     nl = *n;
     nf = 0;
     j = 0;
@@ -8039,7 +8039,7 @@ L105:
     for (i__ = 2; i__ <= i__1; ++i__) {
 	ib = nf - i__ + 2;
 	ifac[ib + 2] = ifac[ib + 1];
-/* L106: */
+// L106:
     }
     ifac[3] = 2;
 L107:
@@ -8075,7 +8075,7 @@ L107:
 		arg = fi * argld;
 		wa[i__ - 1] = cos(arg);
 		wa[i__] = sin(arg);
-/* L108: */
+// L108:
 	    }
 	    if (ip <= 5) {
 		goto L109;
@@ -8086,20 +8086,20 @@ L109:
 	    ;
 	}
 	l1 = l2;
-/* L110: */
+// L110:
     }
     return 0;
-} /* cffti1 */
-/*------------------------------------------------------------------------*/
+} // cffti1
+//------------------------------------------------------------------------
 int32_t cfftid(int32_t *n, double *wsave)
 {
   int32_t cffti1d(int32_t *, double *, double *);
   int32_t iw1, iw2;
 
-    /* Parameter adjustments */
+    // Parameter adjustments
     --wsave;
 
-    /* Function Body */
+    // Function Body
     if (*n == 1) {
 	return 0;
     }
@@ -8107,5 +8107,5 @@ int32_t cfftid(int32_t *n, double *wsave)
     iw2 = iw1 + *n + *n;
     cffti1d(n, &wsave[iw1], &wsave[iw2]);
     return 0;
-} /* cffti */
-/*------------------------------------------------------------------------*/
+} // cffti
+//------------------------------------------------------------------------

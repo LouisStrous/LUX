@@ -23,19 +23,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "action.hh"
 #include "Bytestack.hh"
-/* HEADERS */
+// HEADERS
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-/* END HEADERS */
+// END HEADERS
 
 /** Internal representation of a stack of bytes whose size grows as
     needed when more data is pushed unto it.  This structure is not
     exposed; use <code>Bytestack</code> instead. */
 struct Bytestack_struct {
-  /** The beginning of the stack data. */
+  //* The beginning of the stack data.
   char *begin;
   /** The current location within the stack, represented as the offset
       from the beginning.  Newly pushed data will begin here. */
@@ -48,7 +48,7 @@ struct Bytestack_struct {
   size_t size;
 };
 
-/** The default Byte stack. */
+//* The default Byte stack.
 static Bytestack stack = NULL;
 
 /** Returns the default Byte stack.  The default Byte stack is
@@ -106,7 +106,7 @@ Bytestack_delete(Bytestack b)
     free(b);
   }
   if (b == stack)
-    stack = NULL;		/* undefined again */
+    stack = NULL;		// undefined again
 }
 
 /** Adds a minimum number of bytes of room to the Byte stack.
@@ -212,11 +212,11 @@ Bytestack_push_data(Bytestack b,
   }
   n = (size_t) ((char*) end - (char*) begin);
   p = -1;
-  if ((b->cur + n < b->size	/* enough room */
-       || enlarge(b, n + 1) == 0) /* or enlarged sufficiently */
+  if ((b->cur + n < b->size	// enough room
+       || enlarge(b, n + 1) == 0) // or enlarged sufficiently
       && end >= begin) {
     memcpy(b->begin + b->cur, begin, n);
-    b->begin[b->cur + n] = '\0'; /* always end with a '\0' */
+    b->begin[b->cur + n] = '\0'; // always end with a '\0'
     p = b->cur;
     b->cur += n;
     if (b->cur > b->max)
@@ -566,7 +566,7 @@ Bytestack_quotify(Bytestack b, Bytestack_index bi1, Bytestack_index bi2)
     }
   }
   c++;
-  /* we need to insert c extra characters */
+  // we need to insert c extra characters
   if (b->cur + c < b->size
       || enlarge(b, c + 1) == 0) {
     p = Bytestack_peek(b, bi2) + c;
@@ -640,7 +640,7 @@ Bytestack_unescapify(Bytestack b, Bytestack_index bi)
  * stack.  It uses GNU-specific stuff and is used in the unit tests
  * for Bytestack.c.
  */
-/*@{*/
+//@{
 
 #include <stdio.h>
 #include <unistd.h>
@@ -649,8 +649,8 @@ Bytestack_unescapify(Bytestack b, Bytestack_index bi)
     of the Byte stack and the current position within the Byte
     stack. */
 typedef struct {
-  Bytestack stack;		/**< The Byte stack */
-  Bytestack_index index;	/**< The Byte stack index */
+  Bytestack stack;		//*< The Byte stack
+  Bytestack_index index;	//*< The Byte stack index
 } *Bytestack_cookie;
 
 /** Reads from a Byte stack stream.
@@ -845,6 +845,6 @@ Bytestack_open(Bytestack stack, const char *opentype)
     NULL;
 }
 
-/*@}*/
+//@}
 
 #endif

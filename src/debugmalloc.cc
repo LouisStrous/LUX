@@ -17,12 +17,12 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* HEADERS */
+// HEADERS
 #include <ctype.h>
 #include <malloc.h>
 #include <stddef.h>
 #include <stdio.h>
-/* END HEADERS */
+// END HEADERS
 #include "debugmalloc.hh"
 #include "luxMap.hh"
 

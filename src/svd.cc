@@ -21,8 +21,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "luxdefs.hh"
 #include "action.hh"
 
-/* The following algorithm is due to Bryant Marks */
-/* (bryant@sioux.stanford.edu) 3 April 1993 */
+// The following algorithm is due to Bryant Marks
+// (bryant@sioux.stanford.edu) 3 April 1993
 
 /* This SVD routine is based on pgs 30-48 of "Compact Numerical Methods
    for Computers" by J.C. Nash (1990), used to compute the pseudoinverse.
@@ -110,15 +110,15 @@ void SVD(double *W, double *Z, int32_t nRow, int32_t nCol)
 }
 
 int32_t lux_svd(int32_t narg, int32_t ps[])
-/* calculates the singular value decomposition of matrix A, such that */
-/* A = U S V' */
-/* SVD,A,U,S,V */
+// calculates the singular value decomposition of matrix A, such that
+// A = U S V'
+// SVD,A,U,S,V
 {
   int32_t	iq, nRow, nCol, *d, n;
   double	*a, *z;
   Pointer	src;
 
-/*  void SVD(double *W, double *Z, int32_t nRow, int32_t nCol) */
+//  void SVD(double *W, double *Z, int32_t nRow, int32_t nCol)
 
   if (symbol_class(ps[0]) != LUX_ARRAY
       || array_num_dims(ps[0]) != 2)

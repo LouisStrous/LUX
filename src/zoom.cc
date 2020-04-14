@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File zoom.c */
-/* Image browser by L. Strous */
+// File zoom.c
+// Image browser by L. Strous
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -38,9 +38,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define BLACK           1
 
 struct Menu {
-  int32_t          n_items;		/* number of menu panes (including title) */
-  char         **text;		/* pointer to item strings */
-  Window       *window;		/* pointer to item windows */
+  int32_t          n_items;		// number of menu panes (including title)
+  char         **text;		// pointer to item strings
+  Window       *window;		// pointer to item windows
 };
 typedef        struct Menu     Menu;
 
@@ -53,7 +53,7 @@ extern int32_t	fontwidth;
 int32_t	extractNumerical(Pointer, Pointer, Symboltype, int32_t, int32_t *, int32_t *, int32_t, int32_t *),
   lux_xerase(int32_t, int32_t []);
 void	paint_pane(int32_t, int32_t, int32_t), delete_menu(int32_t);
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 void value_string(char *trgt, Pointer image, int32_t type, int32_t indx)
 {
   switch (type) {
@@ -75,9 +75,9 @@ void value_string(char *trgt, Pointer image, int32_t type, int32_t indx)
     case LUX_DOUBLE:
       sprintf(trgt, "Value:% #9.4g", image.d[indx]);
       break;
-  }	/* end of switch (type) */
+  }	// end of switch (type)
 }
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 
 enum menuItems { ZOOM_TITLE, ZOOM_MAG, ZOOM_STD, ZOOM_TWO,
 		 ZOOM_RECENTER, ZOOM_MOVE, ZOOM_CONTRAST,
@@ -92,7 +92,7 @@ double	zoom_clo = 0.0, zoom_chi = 0.0;
 int32_t	zoom_frame = 0;
 
 int32_t lux_zoom(int32_t narg, int32_t ps[])
-/* ZOOM,image[,bitmap] */
+// ZOOM,image[,bitmap]
 {
   extern int32_t	menu_setup_done, last_wid, threeColors;
   extern Scalar	lastmin, lastmax;
@@ -164,10 +164,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   if (zoom_frame >= nframe)
     zoom_frame = nframe;
 
-  if (win[wid]) {		/* window exists already */
+  if (win[wid]) {		// window exists already
     sx = sx0 = 0.5*wd[wid];
     sy = sy0 = 0.5*ht[wid];
-  } else {			/* window will have dimensions 512x512 */
+  } else {			// window will have dimensions 512x512
     sx = sx0 = 256;
     sy = sy0 = 256;
   }
@@ -215,9 +215,9 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   else if (zoom_frame >= nframe)
     zoom_frame = nframe - 1;
 
-  if ((internalMode & 1) == 0)	/* /oldcontrast */
+  if ((internalMode & 1) == 0)	// /oldcontrast
     zoom_clo = zoom_chi = 0.0;
-  /* prepare internalMode for tvraw() */
+  // prepare internalMode for tvraw()
   internalMode = TV_CENTER;
 
   stride = lux_type_size[type];
@@ -256,7 +256,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   }
   lux_xport(0, NULL);
   if ((bitmap1.b || bitmap2.b)
-      && !threeColors) {	/* must install three-colors color table */
+      && !threeColors) {	// must install three-colors color table
     z = 1.0;
     threecolors(&z, 1);
   }
@@ -299,7 +299,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   for (i = 0; i < ntext; i++)
     free(zoomText[i]);
   free(zoomText);
-  XMapWindow(display, menu_win[mid]); /* display window */
+  XMapWindow(display, menu_win[mid]); // display window
   XRaiseWindow(display, menu_win[mid]);
   x = zoom_xc;
   y = zoom_yc;
@@ -330,11 +330,11 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
       }
 
       if (event.xany.window) {
-	if (event.xany.window == win[wid]) { /* current LUX window */
+	if (event.xany.window == win[wid]) { // current LUX window
 	  switch (event.type) {
-	    case MotionNotify:	/* pointer movement */
-	      /* remove all pointer motion events - we really only want the */
-	      /* last one */
+	    case MotionNotify:	// pointer movement
+	      // remove all pointer motion events - we really only want the
+	      // last one
 	      if (mousepos) {
 		while (XCheckMaskEvent(display, PointerMotionMask, &event));
 		x = event.xbutton.x;
@@ -355,7 +355,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  value_string(menu[mid].text[ZOOM_VALUE], image, type,
 			       x + y*nx);
 		  paint_pane(mid, ZOOM_VALUE, WHITE);
-		} /* end of if (x < nx && y < ny) */
+		} // end of if (x < nx && y < ny)
 	      }
 	      if (follow) {
 		while (XCheckMaskEvent(display, PointerMotionMask, &event));
@@ -450,13 +450,13 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  break;
 	      }
 	      break;
-	  } /* end of switch (event.type) */
-	} else {			/* the zoom menu? */
+	  } // end of switch (event.type)
+	} else {			// the zoom menu?
 	  for (j = 0; j < menu[mid].n_items; j++)
 	    if (event.xany.window == menu[mid].window[j])
 	      break;
 	  if (j == menu[mid].n_items)
-	    continue;		/* no match */
+	    continue;		// no match
 	  j++;
 	  switch (event.type) {
 	    case EnterNotify:
@@ -467,7 +467,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 	      break;
 	    case ButtonPress:
 	      switch (j) {
-		case ZOOM_MAG:	/* magnification */
+		case ZOOM_MAG:	// magnification
 		  zoom_mag = atof(readPane(mid, ZOOM_MAG, "Magnify"));
 		  if (zoom_mag < 0)
 		    zoom_mag = -zoom_mag;
@@ -505,7 +505,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 			  zoom_mag);
 		  paint_pane(mid, ZOOM_MAG, BLACK);
 		  break;
-		case ZOOM_STD:	/* standard zoom */
+		case ZOOM_STD:	// standard zoom
 		  x1 = y1 = 0;
 		  x2 = nx;
 		  y2 = ny;
@@ -524,9 +524,9 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 			  zoom_mag);
 		  paint_pane(mid, ZOOM_MAG, WHITE);
 		  break;
-		case ZOOM_TWO:	/* zoom in/out by a factor of 2 */
+		case ZOOM_TWO:	// zoom in/out by a factor of 2
 		  z = (float) event.xbutton.x/((float) fontwidth);
-		  if (z < 10.5) {	/* zoom in */
+		  if (z < 10.5) {	// zoom in
 		    x1 = zoom_xc - sx/zoom_mag;
 		    x2 = zoom_xc + sx/zoom_mag;
 		    y1 = zoom_yc - sy/zoom_mag;
@@ -536,7 +536,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		    y1 = (y1 + zoom_yc)*0.5;
 		    y2 = (y2 + zoom_yc)*0.5;
 		    zoom_mag *= 2;
-		  } else {	/* zoom out */
+		  } else {	// zoom out
 		    x1 = zoom_xc - sx/zoom_mag;
 		    x2 = zoom_xc + sx/zoom_mag;
 		    y1 = zoom_yc - sy/zoom_mag;
@@ -594,7 +594,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  break;
 		case ZOOM_CONTRAST:
 		  i = event.xbutton.x/fontwidth;
-		  if (i < 8) {	/* take from current image */
+		  if (i < 8) {	// take from current image
 		    minmax(image.l, nx*ny, type);
 		    switch (type) {
 		      case LUX_INT8:
@@ -638,7 +638,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  break;
 		case ZOOM_CVALUES:
 		  i = event.xbutton.x/fontwidth;
-		  if (i < 8) 	/* take from current image */
+		  if (i < 8) 	// take from current image
 		    zoom_clo = atof(readPane(mid, ZOOM_CVALUES, "Low"));
 		  else
 		    zoom_chi = atof(readPane(mid, ZOOM_CVALUES, "High"));
@@ -667,19 +667,19 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  paint_pane(mid, ZOOM_THREE, WHITE);
 		case ZOOM_CHFRAME:
 		  i = event.xbutton.x/fontwidth;
-		  if (i < 2 && nframe > 5) { /* go back fast */
+		  if (i < 2 && nframe > 5) { // go back fast
 		    zoom_frame -= 5;
 		    if (zoom_frame < 0)
 		      zoom_frame += nframe;
-		  } else if (i < 8) { /* go back */
+		  } else if (i < 8) { // go back
 		    zoom_frame--;
 		    if (zoom_frame < 0)
 		      zoom_frame += nframe;
-		  } else if (i > 14 && nframe > 5) { /* go forward fast */
+		  } else if (i > 14 && nframe > 5) { // go forward fast
 		    zoom_frame += 5;
 		    if (zoom_frame >= nframe)
 		      zoom_frame -= nframe;
-		  } else {	/* go forward */
+		  } else {	// go forward
 		    zoom_frame++;
 		    if (zoom_frame == nframe)
 		      zoom_frame = 0;
@@ -735,7 +735,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  break;
 		case ZOOM_AXES:
 		  if (axes[0] != axes[1]) {
-		    for (i = 0; i < ndim; i++) /* determine current coords */
+		    for (i = 0; i < ndim; i++) // determine current coords
 		      if (axes[0] == i)
 			coords[2*i] = x;
 		      else if (axes[1] == i)
@@ -747,11 +747,11 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  }
 
 		  i = event.xbutton.x/fontwidth;
-		  if (i < 11) {	/* first dimension */
+		  if (i < 11) {	// first dimension
 		    axes[0]++;
 		    if (axes[0] == ndim)
 		      axes[0] = 0;
-		  } else {	/* second dimension */
+		  } else {	// second dimension
 		    axes[1]++;
 		    if (axes[1] == ndim)
 		      axes[1] = 0;
@@ -765,7 +765,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		    nx = dims[axes[0]];
 		    ny = dims[axes[1]];
 		    nframe = array_size(ps[0])/(nx*ny);
-		    /* now determine x, y, frame in the new system */
+		    // now determine x, y, frame in the new system
 		    x = zoom_xc = coords[2*axes[0]];
 		    y = zoom_yc = coords[2*axes[1]];
 		    zoom_frame = 0;
@@ -861,7 +861,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  break;
 		case ZOOM_PLAY:
 		  i = event.xbutton.x/fontwidth;
-		  if (i < 9) 	/* play backwards */
+		  if (i < 9) 	// play backwards
 		    play--;
 		  else if (i > 11)
 		    play++;
@@ -900,11 +900,11 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 		  delete_menu(mid);
 		  XFlush(display);
 		  return 1;
-	      } /* end of switch (j) */
+	      } // end of switch (j)
 	      break;
-	  } /* end of switch (event.type) */
-	}	/* end of if (event.xany.window == win[wid]) */
-      } /* end of if (event.xany.window) */
+	  } // end of switch (event.type)
+	}	// end of if (event.xany.window == win[wid])
+      } // end of if (event.xany.window)
     } while (loop);
     
     if (play && axes[0] != axes[1]) {
@@ -951,12 +951,12 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
 	  value_string(menu[mid].text[ZOOM_VALUE], image, type,
 		       x + y*nx);
 	  paint_pane(mid, ZOOM_VALUE, WHITE);
-	} /* end of if (x < nx && y < ny) */
+	} // end of if (x < nx && y < ny)
       }
     }
   } while (1);
 }
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 int32_t tvzoom(int32_t narg, int32_t ps[])
 {
   int32_t	*dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
@@ -990,10 +990,10 @@ int32_t tvzoom(int32_t narg, int32_t ps[])
   nx = sdims[0] = dims[axes[0]];
   ny = sdims[1] = dims[axes[1]];
 
-  if (win[wid]) {		/* window exists already */
+  if (win[wid]) {		// window exists already
     sx = 0.5*wd[wid];
     sy = 0.5*ht[wid];
-  } else {			/* window will have dimensions 512x512 */
+  } else {			// window will have dimensions 512x512
     sx = 256;
     sy = 256;
   }
@@ -1069,4 +1069,4 @@ int32_t tvzoom(int32_t narg, int32_t ps[])
   }
   return LUX_OK;
 }
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------

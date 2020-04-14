@@ -18,10 +18,10 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File sort.c */
-/* LUX sorting routines. */
-/* file sorts, various sort routines for different types of data */
- /* taken from Press etal */
+// File sort.c
+// LUX sorting routines.
+// file sorts, various sort routines for different types of data
+ // taken from Press etal
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -29,10 +29,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 #include "luxdefs.hh"
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void shell_s(int32_t n, char *arr[])
 {
   int32_t	nn,m,j,i,lognb2;
@@ -53,7 +53,7 @@ void shell_s(int32_t n, char *arr[])
     }
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void shell_f(int32_t n, float arr[])
 {
   int32_t	nn,m,j,i,lognb2;
@@ -74,7 +74,7 @@ void shell_f(int32_t n, float arr[])
     }
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void shell_b(int32_t n, uint8_t arr[])
 {
   int32_t	nn,m,j,i,lognb2;
@@ -95,7 +95,7 @@ void shell_b(int32_t n, uint8_t arr[])
     }
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void shell_l(int32_t n, int32_t arr[])
 {
  int32_t	nn,m,j,i,lognb2;
@@ -116,7 +116,7 @@ void shell_l(int32_t n, int32_t arr[])
    }
  }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void shell_int64(int64_t n, int64_t arr[])
 {
  int64_t	nn,m,j,i,lognb2;
@@ -137,7 +137,7 @@ void shell_int64(int64_t n, int64_t arr[])
    }
  }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void shell_w(int32_t n, int16_t arr[])
 {
   int32_t	nn,m,j,i,lognb2;
@@ -158,7 +158,7 @@ void shell_w(int32_t n, int16_t arr[])
     }
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void shell_d(int32_t n, double arr[])
 {
   int32_t	nn,m,j,i,lognb2;
@@ -179,7 +179,7 @@ void shell_d(int32_t n, double arr[])
     }
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void sort_s(int32_t n, char *ra[])
 {
   int32_t	l,j,ir,i;
@@ -212,7 +212,7 @@ void sort_s(int32_t n, char *ra[])
     ra[i] = rra;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void sort_f(int32_t n, float ra[])
 {
   int32_t	l,j,ir,i;
@@ -245,7 +245,7 @@ void sort_f(int32_t n, float ra[])
     ra[i] = rra;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void sort_b(int32_t n, uint8_t ra[])
 {
   int32_t	l,j,ir,i;
@@ -278,7 +278,7 @@ void sort_b(int32_t n, uint8_t ra[])
     ra[i] = rra;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void sort_w(int32_t n, int16_t ra[])
 {
   int32_t	l,j,ir,i;
@@ -311,7 +311,7 @@ void sort_w(int32_t n, int16_t ra[])
     ra[i] = rra;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void sort_l(int32_t n, int32_t ra[])
 {
   int32_t	l,j,ir,i;
@@ -344,7 +344,7 @@ void sort_l(int32_t n, int32_t ra[])
     ra[i] = rra;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void sort_int64(int64_t n, int64_t ra[])
 {
   int64_t	l,j,ir,i;
@@ -377,7 +377,7 @@ void sort_int64(int64_t n, int64_t ra[])
     ra[i] = rra;
   }
 }
-/*------------------------------------------------------------------------ */
+//------------------------------------------------------------------------
 void sort_d(int32_t n, double ra[])
 {
   int32_t	l,j,ir,i;
@@ -410,7 +410,7 @@ void sort_d(int32_t n, double ra[])
     ra[i] = rra;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexx_s(int32_t n, char *ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -445,7 +445,7 @@ void indexx_s(int32_t n, char *ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexx_d(int32_t n, double ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -480,7 +480,7 @@ void indexx_d(int32_t n, double ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexx_b(int32_t n, uint8_t ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -515,7 +515,7 @@ void indexx_b(int32_t n, uint8_t ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexx_w(int32_t n, int16_t ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -550,7 +550,7 @@ void indexx_w(int32_t n, int16_t ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexx_l(int32_t n, int32_t ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -585,7 +585,7 @@ void indexx_l(int32_t n, int32_t ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexx_int64(int64_t n, int64_t ra[], int64_t indx[])
 {
   int64_t	l,j,ir,i,indxt;
@@ -620,7 +620,7 @@ void indexx_int64(int64_t n, int64_t ra[], int64_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexx_f(int32_t n, float ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -655,7 +655,7 @@ void indexx_f(int32_t n, float ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexxr_f(int32_t n, float ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -690,7 +690,7 @@ void indexxr_f(int32_t n, float ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void indexxr_d(int32_t n, double ra[], int32_t indx[])
 {
   int32_t	l,j,ir,i,indxt;
@@ -725,15 +725,15 @@ void indexxr_d(int32_t n, double ra[], int32_t indx[])
     indx[i] = indxt;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 #undef ALN2I
 #undef TINY
 
 void invertPermutation(int32_t *data, int32_t n)
-/* assumes data[] contains a permutation of the numbers between 0 and */
-/* <n - 1> (inclusive), and rearranges them into the inverse permutation. */
-/* I.e., if beforehand data[i] = j, then afterwards data[j] = i. */
-/* LS 25aug2000 */
+// assumes data[] contains a permutation of the numbers between 0 and
+// <n - 1> (inclusive), and rearranges them into the inverse permutation.
+// I.e., if beforehand data[i] = j, then afterwards data[j] = i.
+// LS 25aug2000
 {
   int32_t	nloop, i, j, k;
 
@@ -759,4 +759,4 @@ void invertPermutation(int32_t *data, int32_t n)
     data++;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------

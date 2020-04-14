@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* file coord.c */
-/* coordinate transformations */
+// file coord.c
+// coordinate transformations
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -34,41 +34,41 @@ extern int32_t	iorder, iyhigh, ipltyp;
 
 int32_t	lux_replace(int32_t, int32_t);
 
-/* A bunch of coordinate transformation routines */
+// A bunch of coordinate transformation routines
 /* choices: LUX_DVI, LUX_DEV (xport), LUX_IMG, LUX_PLT (plot),
    LUX_RIM, LUX_RPL */
 int32_t fromCoordinateSystem, toCoordinateSystem;
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t coordMap(float *x, float *y)
-/* transforms (x,y) (in fromCoordinateSystem) to toCoordinateSystem */
+// transforms (x,y) (in fromCoordinateSystem) to toCoordinateSystem
 {
   int32_t coordTrf(float *, float *, int32_t, int32_t);
 
   return coordTrf(x, y, fromCoordinateSystem, toCoordinateSystem);
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
-     /* xfac,yfac are the pixel dimensions of the current window */
-     /* wxb,wxt is the DVI x range of the plot window */
-     /* wyb,wyt is the DVI y range of the plot window */
-     /* tvix,tvixb-1 is the DEV x range of the last image */
-     /* tviy,tviyb-1 is the DEV y range of the last image*/
-     /* tvscale is the current magnification factor */
-/* if <x> or <y> are equal to NULL, then the corresponding coordinate */
-/* is not treated. */
+     // xfac,yfac are the pixel dimensions of the current window
+     // wxb,wxt is the DVI x range of the plot window
+     // wyb,wyt is the DVI y range of the plot window
+     // tvix,tvixb-1 is the DEV x range of the last image
+     // tviy,tviyb-1 is the DEV y range of the last image
+     // tvscale is the current magnification factor
+// if <x> or <y> are equal to NULL, then the corresponding coordinate
+// is not treated.
 {
   extern int32_t	setup;
 
   if (from == to)
     return 1;
-  /* first, transform to LUX_DEV coordinate system */
+  // first, transform to LUX_DEV coordinate system
   switch (from) {
     case LUX_DEV:
       break;
     case LUX_DEP:
       if (!((x && *x < 1.0 && *x != 0.0) || (y && *y < 1.0 && *y != 0.0)))
 	break;
-      /* else fall-thru */
+      // else fall-thru
     case LUX_DVI:
       if (x) 
 	*x *= xfac;
@@ -128,7 +128,7 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
 	    *y = 0.0;
 	}
       }
-      /* fall-thru */
+      // fall-thru
     case LUX_RPL:
       if (x)
 	*x = (*x * (wxt - wxb) + wxb)*xfac;
@@ -138,7 +138,7 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
     default:
       return cerror(ILL_COORD_SYS, from);
   }
-  /* then, transform to desired coordinate system */
+  // then, transform to desired coordinate system
   switch (to) {
     case LUX_DEV:
       return 1;
@@ -214,20 +214,20 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
   }
   return 1;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t lux_coordtrf(int32_t narg, int32_t ps[])
-/* transform coordinates between various coordinate systems */
-/* syntax:  COORDTRF,xold,yold[,xnew,ynew] */
-/* specify the coordinate systems with keywords: */
-/* /DVI, /DEV, /IMG, /PLT, /RIM, /RPL, /DEP, /X11 */
-/* /TODVI, /TODEV, /TOIMG, /TOPLT, /TORIM, /TORPL, /TOX11 */
+// transform coordinates between various coordinate systems
+// syntax:  COORDTRF,xold,yold[,xnew,ynew]
+// specify the coordinate systems with keywords:
+// /DVI, /DEV, /IMG, /PLT, /RIM, /RPL, /DEP, /X11
+// /TODVI, /TODEV, /TOIMG, /TOPLT, /TORIM, /TORPL, /TOX11
 {
   int32_t	iq, n, n2, from, to;
   float	*xold, *yold, *xnew, *ynew, x, y;
 
   from = (internalMode & 7);
   to = (internalMode/8 & 7);
-  iq = lux_float(1, ps);	/* float xold */
+  iq = lux_float(1, ps);	// float xold
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
@@ -242,7 +242,7 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
     default:
       return cerror(ILL_CLASS, iq);
   }
-  iq = lux_float(1, &ps[1]);	/* float yold */
+  iq = lux_float(1, &ps[1]);	// float yold
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
@@ -259,7 +259,7 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
   }
   if (n != n2)
     return cerror(INCMP_DIMS, iq);
-  if (narg >= 3) {		/* xnew */
+  if (narg >= 3) {		// xnew
     lux_replace(ps[2], iq);
     iq = ps[2];
     if (symbol_class(iq) == LUX_SCALAR)
@@ -268,7 +268,7 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
       xnew = (float *) array_data(iq);
   } else
     xnew = xold;
-  if (narg >= 4) {		/* ynew */
+  if (narg >= 4) {		// ynew
     lux_replace(ps[3], iq);
     iq = ps[3];
     if (symbol_class(iq) == LUX_SCALAR)
@@ -286,4 +286,4 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
   }
   return 1;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------

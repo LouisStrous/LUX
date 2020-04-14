@@ -18,21 +18,21 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* fun6.c */
+// fun6.c
 #include <math.h>
-#include <strings.h>		/* for bzero */
+#include <strings.h>		// for bzero
 #include "action.hh"
 
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
- /* does reverse dct for one cell, specialize for a spike smooth */
+ // does reverse dct for one cell, specialize for a spike smooth
 {
   float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
   float	tmp10, tmp11, tmp12, tmp13;
   float	z5, z11, z13, z10, z12;
 
-  /* no de-zag and de-quantize here */
-  /* Pass 1: process columns. */
+  // no de-zag and de-quantize here
+  // Pass 1: process columns.
   /* we don't check for columns of zeroes since this usually uses full
      precision */
 {
@@ -45,37 +45,37 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     tmp2 = wsptr[8*4];
     tmp3 = wsptr[8*6];
 
-    tmp10 = tmp0 + tmp2;	/* phase 3 */
+    tmp10 = tmp0 + tmp2;	// phase 3
     tmp11 = tmp0 - tmp2;
 
-    tmp13 = tmp1 + tmp3;	/* phases 5-3 */
-    tmp12 = (tmp1 - tmp3) *  1.414213562 - tmp13; /* 2*c4 */
+    tmp13 = tmp1 + tmp3;	// phases 5-3
+    tmp12 = (tmp1 - tmp3) *  1.414213562 - tmp13; // 2*c4
 
-    tmp0 = tmp10 + tmp13;	/* phase 2 */
+    tmp0 = tmp10 + tmp13;	// phase 2
     tmp3 = tmp10 - tmp13;
     tmp1 = tmp11 + tmp12;
     tmp2 = tmp11 - tmp12;
     
-    /* Odd part */
+    // Odd part
 
     tmp4 = wsptr[8];
     tmp5 = wsptr[8*3];
     tmp6 = wsptr[8*5];
     tmp7 = wsptr[8*7];
 
-    z13 = tmp6 + tmp5;		/* phase 6 */
+    z13 = tmp6 + tmp5;		// phase 6
     z10 = tmp6 - tmp5;
     z11 = tmp4 + tmp7;
     z12 = tmp4 - tmp7;
 
-    tmp7 = z11 + z13;		/* phase 5 */
-    tmp11 = (z11 - z13) * ( 1.414213562); /* 2*c4 */
+    tmp7 = z11 + z13;		// phase 5
+    tmp11 = (z11 - z13) * ( 1.414213562); // 2*c4
 
-    z5 = (z10 + z12) * ( 1.847759065); /* 2*c2 */
-    tmp10 = ( 1.082392200) * z12 - z5; /* 2*(c2-c6) */
-    tmp12 = ( -2.613125930) * z10 + z5; /* -2*(c2+c6) */
+    z5 = (z10 + z12) * ( 1.847759065); // 2*c2
+    tmp10 = ( 1.082392200) * z12 - z5; // 2*(c2-c6)
+    tmp12 = ( -2.613125930) * z10 + z5; // -2*(c2+c6)
 
-    tmp6 = tmp12 - tmp7;	/* phase 2 */
+    tmp6 = tmp12 - tmp7;	// phase 2
     tmp5 = tmp11 - tmp6;
     tmp4 = tmp10 + tmp5;
 
@@ -88,12 +88,12 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     wsptr[8*4] = tmp3 + tmp4;
     wsptr[8*3] = tmp3 - tmp4;
 
-    /* fqtptr++; */
-    wsptr++;		/* advance pointers to next column */
+    // fqtptr++;
+    wsptr++;		// advance pointers to next column
   }
 }
 
-  /* Pass 2: process rows. */
+  // Pass 2: process rows.
 {
   register float *wsptr;
   register short *elemptr;
@@ -102,10 +102,10 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
   wsptr = ws;
   elemptr = start;
   while (nq--) {
-      /* Even part */
+      // Even part
 
-    /* tmp10 = wsptr[0] + wsptr[4] + bias; */
-    /* tmp11 = wsptr[0] - wsptr[4] + bias; */
+    // tmp10 = wsptr[0] + wsptr[4] + bias;
+    // tmp11 = wsptr[0] - wsptr[4] + bias;
     tmp10 = wsptr[0] + wsptr[4];
     tmp11 = wsptr[0] - wsptr[4];
 
@@ -117,7 +117,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     tmp1 = tmp11 + tmp12;
     tmp2 = tmp11 - tmp12;
 
-    /* Odd part */
+    // Odd part
 
     z13 = wsptr[5] + wsptr[3];
     z10 = wsptr[5] - wsptr[3];
@@ -127,16 +127,16 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     tmp7 = z11 + z13;
     tmp11 = (z11 - z13) * ( 1.414213562);
 
-    z5 = (z10 + z12) * ( 1.847759065); /* 2*c2 */
-    tmp10 = ( 1.082392200) * z12 - z5; /* 2*(c2-c6) */
-    tmp12 = ( -2.613125930) * z10 + z5; /* -2*(c2+c6) */
+    z5 = (z10 + z12) * ( 1.847759065); // 2*c2
+    tmp10 = ( 1.082392200) * z12 - z5; // 2*(c2-c6)
+    tmp12 = ( -2.613125930) * z10 + z5; // -2*(c2+c6)
 
     tmp6 = tmp12 - tmp7;
     tmp5 = tmp11 - tmp6;
     tmp4 = tmp10 + tmp5;
 
-    /* Final output stage, note bias was added in above */
-    /* we don't range limit since results should be near exact */
+    // Final output stage, note bias was added in above
+    // we don't range limit since results should be near exact
     elemptr[0] = (short) (tmp0 + tmp7);
     elemptr[7] = (short) (tmp0 - tmp7);
     elemptr[1] = (short) (tmp1 + tmp6);
@@ -147,17 +147,17 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     elemptr[3] = (short) (tmp3 - tmp4);
 
     wsptr += 8;
-    elemptr += ystride;		/* to next row */
+    elemptr += ystride;		// to next row
   }
 }
 }
-/*---------------------------------------------------------------------------*/
+//---------------------------------------------------------------------------
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
 int32_t	despike_count = 0, cell_smooth_type = 1;
 int32_t lux_despike(int32_t narg, int32_t ps[])
-/* despike function RAS */
-/* the call is x = despike(array, [frac, level, niter, cell_flag, rms]) */
+// despike function RAS
+// the call is x = despike(array, [frac, level, niter, cell_flag, rms])
 {
   int32_t	iq, result_sym, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
   Symboltype type;
@@ -199,13 +199,13 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
    }
  } else
    rms_flag = 0;
- /* get pointer to array, must be 2-D here */
+ // get pointer to array, must be 2-D here
  iq = ps[0];
  if (symbol_class(iq) != LUX_ARRAY)
    return cerror(NEED_ARR, iq);
  type = array_type(iq);
  if (type != LUX_INT16)
-   return luxerror("Need WORD argument", iq); /* must be I*2 */
+   return luxerror("Need WORD argument", iq); // must be I*2
  if (array_num_dims(iq) != 2)
    return cerror(NEED_2D_ARR, iq);
  nx = array_dims(iq)[0];
@@ -218,7 +218,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  for TRACE style JPEG data so we insist that the dimensions are multiples
  of 8. Extend to include two checks indicated by cell_flag and rms_flag,
  both need bad cells marked */
- bb_flag = cell_flag || rms_flag;	/* use bb_flag */
+ bb_flag = cell_flag || rms_flag;	// use bb_flag
  if (bb_flag && (nx%8 || ny%8))
    bb_flag = 0;
  /* if we survived that, get the cell count, we use scrat to store cell
@@ -238,9 +238,9 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  ptr = (int16_t*) array_data(iq);
  dim[0] = nx;
  dim[1] = ny;
- result_sym = array_scratch(type, 2, dim); /* for the result */
- out = (int16_t*) array_data(result_sym);	/* output */
- p = (short *) ptr;		/* input  */
+ result_sym = array_scratch(type, 2, dim); // for the result
+ out = (int16_t*) array_data(result_sym);	// output
+ p = (short *) ptr;		// input
  cfrac = 1.0 - frac;
  nc = ntotal = 0;
  nxc = nx/8;
@@ -249,7 +249,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  if (niter > 20) 
    return luxerror("DESPIKE - error, excessive # of iterations = %d\n", niter);
 
- /* add internal iteration 10/8/98 */
+ // add internal iteration 10/8/98
  /* if there are 2 or more iterations, we need an extra array, we can't do the
     despike step in place because it "erodes" from the low y direction. */
  if (niter > 1) {
@@ -264,16 +264,16 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  ptr substitution at the end of the loop, we ping pong between the two
  areas, always ending on the out array */
  if (niter%2) { q = out2; } else { q = out; }
- /* load top 2 rows */
+ // load top 2 rows
  m = 2;
  while (m--) {
  p = ptr;  n = nx;  while(n--) *q++ = *p++;
  ptr = ptr + nx;
  }
- /* skip the outer edges while testing algorithms */
- m = ny-4; jj = 2;  /* jj is used for cell addressing */
+ // skip the outer edges while testing algorithms
+ m = ny-4; jj = 2;  // jj is used for cell addressing
  while (m--) {
- /* skip the outer edges while testing algorithms */
+ // skip the outer edges while testing algorithms
  p = ptr;
  n = 2;
  while (n--) *q++ = *p++;
@@ -282,23 +282,23 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  p1 = p2 - nx;
  p3 = p2 + nx;
  while (n--) {
-  /* add the 8 */
+  // add the 8
   tq = (cfrac * (float) *p);
   sum = *p1 + *(p1+1) + *(p1+2) + *p2 + *(p2+2) + *p3 + *(p3+1) + *(p3+2);
   p1++;  p2++;  p3++;
   fsum = (float) sum * 0.125;
-  /* now the test */
-  if ( fsum <= tq) {  /* we have a bady, zap it */
+  // now the test
+  if ( fsum <= tq) {  // we have a bady, zap it
     nc++;
-  /* check if we are black balling cells */
+  // check if we are black balling cells
   if (bb_flag) {
-  /* get the cell index */
+  // get the cell index
   jc = jj/8;
   iq = (p-ptr)/8 + jc*(nxc);
   cell_status[iq] += 1;
   }
     if (level < 0) { *q++ = 0; p++; } else {
-     /* load up sortie and find the desired one */
+     // load up sortie and find the desired one
      ss = arr;	pps = p - 2*nx -2;
      *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++;
      *ss++ = *(p - nx -2);  *ss++ = *(p - nx +2);
@@ -306,7 +306,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
      *ss++ = *(p + nx -2);  *ss++ = *(p + nx +2);
      pps = p +2 *nx - 2;
      *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++;
-      /* a built in sorter here */
+      // a built in sorter here
       { int32_t nn,m,j,i,n=16;
         short t;
         m=n;
@@ -323,19 +323,19 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
        }
      }
      }
-      /* now get the indicated one using level */
+      // now get the indicated one using level
       *q++ = arr[level];  p++;
      }
     
     } else {
-    *q++ = *p++;    /* looks OK (this time) */
+    *q++ = *p++;    // looks OK (this time)
     }
  }
  n = 2;
  while (n--) *q++ = *p++;
  ptr = ptr + nx; jj++;
  }
- /* load last 2 rows */
+ // load last 2 rows
  m = 2;
  while (m--) {
  p = ptr;  n = nx;  while(n--) *q++ = *p++;
@@ -359,14 +359,14 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
    /* we can have a bad cell by the number of spikes (the strike out
    option) and/or we can check the rms, if doing both we check the
    strikes first of course */
-    if (!cell_status[i]) continue;  /* if no spikes at all, skip */
+    if (!cell_status[i]) continue;  // if no spikes at all, skip
     bad_flag = 0;
     if (cell_flag && (cell_status[i] >= cell_flag)) { bad_flag = 1;
     	sign_flag = cell_flag_sign; }
     if (rms_flag && !bad_flag) {
      short	*ps1, *ps2, *tmp;
      sign_flag = rms_flag_sign;
-     /* check the rms for any cell with a spike */
+     // check the rms for any cell with a spike
      jc = i/nxc;		ic = i%nxc;
       istart = ic*8 + jc*8*nx;
       q = out + istart;
@@ -374,7 +374,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
       fsum = 0.0;
       fdif = 0.0;
       nc = 8;
-      /* get the checkerboard metric */
+      // get the checkerboard metric
       while (nc--) { m = 4; while(m--) {
       	fsum += (float) *q++; fsum += (float) *q++;
 	fdif = fdif + *ps1 - *ps2;
@@ -382,19 +382,19 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
       	}
       tmp = ps1; ps1 = ps2 + stride;  ps2 = tmp + stride;
       q += stride; }
-      /* printf("rms/fsum = %12.2f,  i = %d\n", ABS(fdif)/fsum, i); */
+      // printf("rms/fsum = %12.2f,  i = %d\n", ABS(fdif)/fsum, i);
       if ( (ABS(fdif)/fsum) > rms) { bad_flag = 1;
       	/* printf("hit at i = %d\n", i); */ }
     }
     if (bad_flag) {
     badcells++;
     jc = i/nxc;		ic = i%nxc;
-    /* testing various cell smooth options */
+    // testing various cell smooth options
     if (sign_flag == 0) cell_smooth_type = 0; else cell_smooth_type = 1;
     switch (cell_smooth_type) {
     case 0:
     dc[4] = 0.0;
-    /* we need the means of the neighboring 8 cells */
+    // we need the means of the neighboring 8 cells
     if (ic>0) ioff[0] = ic - 1; else ioff[0] = ic+1;
     ioff[1] = ic;
     if (ic < (nxc-1)) ioff[2] = ic+1; else ioff[2] = ic-1;
@@ -413,16 +413,16 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
       fsum = 0.0;
       nc = 8;
       while (nc--) { m = 8; while(m--) fsum += (float) *q++; q += stride; }
-      dc[k] = fsum*0.015625; /* that's 1/64 */
+      dc[k] = fsum*0.015625; // that's 1/64
       dc[4] += dc[k];
       }
    } }
     dc[4] = dc[4]*0.125;
-    /* set target cell just to mean for next test */
+    // set target cell just to mean for next test
     q = out + ic*8 + jc*8*nx;
     nc = 8;
     if (sign_flag)
-      { /* try the AC predict trick for a smooth gradient over the cell */
+      { // try the AC predict trick for a smooth gradient over the cell
       nc = 64;  pf = ws; while (nc--) *pf++ = 0.0;
       ws[0] = dc[4];
       ws[1] = 1.13885*(dc[3] - dc[5]);
@@ -439,16 +439,16 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     case 1:
     {
     int32_t	a1, a2, acc, t1, t2, nxmo=nx-8 , nymo=ny-8;
-    /* get array index for start of cell */
+    // get array index for start of cell
     ix = ic*8;  jx = jc*8;
     istart = ix + jx*nx;
-    p = out + istart;  /* first point in cell */
+    p = out + istart;  // first point in cell
     q = p;
     /* do 2 passes, first in x then y, allows in place smnoothing but
     loses a bit in the accumulation */
-    nc = 8;	/* the 8 rows */
+    nc = 8;	// the 8 rows
     while (nc--) {
-    /* get a point to left of cell if available */
+    // get a point to left of cell if available
     if (ix) { p--;	
     	a2 = (int32_t)*p++;
     	a1 = (int32_t)*p++;
@@ -457,13 +457,13 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     	a1 = (int32_t)*p++;
     	a2 = a1 + a1;
      }
-     /* proceed over 7 points */
+     // proceed over 7 points
      m = 7;
      while (m--) {
      acc = *p++;  t1 = acc;  acc += a1;  a1 = t1;
      t2 = acc;  acc += a2;  a2 = t2;
      *q++ = (short) (acc>>2); }
-     /* for the last value, use a point to right of cell if available */
+     // for the last value, use a point to right of cell if available
      if (ix < nxmo ) {
      *q++ = (short) ((*p + a1 + a2)>>2);
      } else {
@@ -471,13 +471,13 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
      }
      p += stride;	q = p;
     }
-    /* now in the other direction */
-    p = out + istart;  /* first point in cell */
+    // now in the other direction
+    p = out + istart;  // first point in cell
     p2 = p;
     q = p;
-    nc = 8;	/* the 8 columns */
+    nc = 8;	// the 8 columns
     while (nc--) {
-    /* get a point to bottom of cell if available */
+    // get a point to bottom of cell if available
     if (jx) { p = p - nx;
    	a2 = (int32_t)*p;	p += nx;
     	a1 = (int32_t)*p;	p += nx;
@@ -486,13 +486,13 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     	a1 = (int32_t)*p;	p += nx;
     	a2 = a1 + a1;
      }
-     /* proceed over 7 points */
+     // proceed over 7 points
      m = 7;
      while (m--) {
      acc = *p;	p += nx;  t1 = acc;  acc += a1;  a1 = t1;
      t2 = acc;  acc += a2;  a2 = t2;
      *q = (short) (acc>>2); q += nx; }
-     /* for the last value, use a point to right of cell if available */
+     // for the last value, use a point to right of cell if available
      if (jx < nymo ) {
      *q = (short) ((*p + a1 + a2)>>2);
      } else {
@@ -511,8 +511,8 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  }
  return result_sym;
 }
-/*------------------------------------------------------------------------- */
-int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
+//-------------------------------------------------------------------------
+int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
 /* the call is x = reorder(array, order)
    where array must be a 2-D array, returns the re-ordered result */
 /* reordering is reversals and transposes of a 2-D array, there are
@@ -524,7 +524,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 
   if (int_arg_stat(ps[1], &iorder) != 1)
     return LUX_ERROR;
-  /* get pointer to array, must be 2-D here */
+  // get pointer to array, must be 2-D here
   iq = ps[0];
   if (!symbolIsArray(iq))
     return cerror(NEED_ARR, iq);
@@ -542,13 +542,13 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
   }
   dim[0] = nx;
   dim[1] = ny;
-  result_sym = array_scratch(type, 2, dim); /* for the result */
+  result_sym = array_scratch(type, 2, dim); // for the result
   q = (uint8_t*) array_data(result_sym);
   p = (uint8_t *) ptr;
-  if (iorder == 0)        /* no change, make a copy */
+  if (iorder == 0)        // no change, make a copy
     bcopy(p, q, nx*ny*lux_type_size[type]);
   else {
-    /* outer switch for type, inners for orientation */
+    // outer switch for type, inners for orientation
     switch (type) {
       case LUX_INT8:
 	if (iorder < 4) {
@@ -560,7 +560,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  qq = q;
 
 	  switch (iorder) {
-	    case 1:		/* reverse in x */
+	    case 1:		// reverse in x
 	      pp = p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
@@ -572,7 +572,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 2:		/* just reverse in y */
+	    case 2:		// just reverse in y
 	      pp = p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
@@ -584,7 +584,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 3:		/* reverse in x and y */
+	    case 3:		// reverse in x and y
 	      pp = p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
@@ -602,22 +602,22 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  mm = ny;
 	  qq = q;
 	  switch (iorder) {
-	    case 4:		/* transpose in x and y */
+	    case 4:		// transpose in x and y
 	      pp = p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
-	    case 5:		/* transpose plus reverse in y */
+	    case 5:		// transpose plus reverse in y
 	      pp = p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
-	    case 6:		/* transpose plus reverse in x */
+	    case 6:		// transpose plus reverse in x
 	      pp = p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
-	    case 7:		/* transpose plus reverse in x,y */
+	    case 7:		// transpose plus reverse in x,y
 	      pp = p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
@@ -644,7 +644,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  qq = (short *) q;
 
 	  switch (iorder) {
-	    case 1:		/* reverse in x */
+	    case 1:		// reverse in x
 	      pp = (short *) p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
@@ -656,7 +656,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 2:		/* just reverse in y */
+	    case 2:		// just reverse in y
 	      pp = (short *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
@@ -668,7 +668,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 3:		/* reverse in x and y */
+	    case 3:		// reverse in x and y
 	      pp = (short *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
@@ -684,22 +684,22 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  register  int32_t  nyy, nn, mm;
 
 	  switch (iorder) {
-	    case 4:		/* transpose in x and y */
+	    case 4:		// transpose in x and y
 	      pp = (short *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
-	    case 5:		/* transpose plus reverse in y */
+	    case 5:		// transpose plus reverse in y
 	      pp = (short *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
-	    case 6:		/* transpose plus reverse in x */
+	    case 6:		// transpose plus reverse in x
 	      pp = (short *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
-	    case 7:        /* transpose plus reverse in x,y */
+	    case 7:        // transpose plus reverse in x,y
 	      pp = (short *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
@@ -728,7 +728,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  qq = (int32_t *) q;
 
 	  switch (iorder) {
-	    case 1:		/* reverse in x */
+	    case 1:		// reverse in x
 	    {
 	      register  int32_t *pp = (int32_t *) p + nx;
 	      register  int32_t inc = 2*nx;
@@ -743,7 +743,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	      }
 	    }
 	    break;
-	    case 2:		/* just reverse in y */
+	    case 2:		// just reverse in y
 	      pp = (int32_t *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
@@ -755,7 +755,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 3:		/* reverse in x and y */
+	    case 3:		// reverse in x and y
 	      pp = (int32_t *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
@@ -773,22 +773,22 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  mm = ny;
 	  qq = (int32_t *) q;
 	  switch (iorder) {
-	    case 4:		/* transpose in x and y */
+	    case 4:		// transpose in x and y
 	      pp = (int32_t *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
-	    case 5:		/* transpose plus reverse in y */
+	    case 5:		// transpose plus reverse in y
 	      pp = (int32_t *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
-	    case 6:		/* transpose plus reverse in x */
+	    case 6:		// transpose plus reverse in x
 	      pp = (int32_t *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
-	    case 7:		/* transpose plus reverse in x,y */
+	    case 7:		// transpose plus reverse in x,y
 	      pp = (int32_t *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
@@ -815,7 +815,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  qq = (int64_t *) q;
 
 	  switch (iorder) {
-	    case 1:		/* reverse in x */
+	    case 1:		// reverse in x
 	    {
 	      pp = (int64_t *) p + nx;
 	      inc = 2*nx;
@@ -830,7 +830,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	      }
 	    }
 	    break;
-	    case 2:		/* just reverse in y */
+	    case 2:		// just reverse in y
 	      pp = (int64_t *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
@@ -842,7 +842,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 3:		/* reverse in x and y */
+	    case 3:		// reverse in x and y
 	      pp = (int64_t *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
@@ -860,22 +860,22 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  mm = ny;
 	  qq = (int64_t *) q;
 	  switch (iorder) {
-	    case 4:		/* transpose in x and y */
+	    case 4:		// transpose in x and y
 	      pp = (int64_t *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
-	    case 5:		/* transpose plus reverse in y */
+	    case 5:		// transpose plus reverse in y
 	      pp = (int64_t *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
-	    case 6:		/* transpose plus reverse in x */
+	    case 6:		// transpose plus reverse in x
 	      pp = (int64_t *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
-	    case 7:		/* transpose plus reverse in x,y */
+	    case 7:		// transpose plus reverse in x,y
 	      pp = (int64_t *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
@@ -902,7 +902,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  qq = (float *) q;
 
 	  switch (iorder) {
-	    case 1:		/* reverse in x */
+	    case 1:		// reverse in x
 	      pp = (float *) p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
@@ -914,7 +914,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 2:		/* just reverse in y */
+	    case 2:		// just reverse in y
 	      pp = (float *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
@@ -926,7 +926,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 3:		/* reverse in x and y */
+	    case 3:		// reverse in x and y
 	      pp = (float *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
@@ -944,22 +944,22 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  mm = ny;
 	  qq = (float *) q;
 	  switch (iorder) {
-	    case 4:		/* transpose in x and y */
+	    case 4:		// transpose in x and y
 	      pp = (float *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
-	    case 5:		/* transpose plus reverse in y */
+	    case 5:		// transpose plus reverse in y
 	      pp = (float *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
-	    case 6:		/* transpose plus reverse in x */
+	    case 6:		// transpose plus reverse in x
 	      pp = (float *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
-	    case 7:		/* transpose plus reverse in x,y */
+	    case 7:		// transpose plus reverse in x,y
 	      pp = (float *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
@@ -986,7 +986,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  qq = (double *) q;
 
 	  switch (iorder) {
-	    case 1:		/* reverse in x */
+	    case 1:		// reverse in x
 	      pp = (double *) p + nx;
 	      inc = 2*nx;
 	      while (mm--) {
@@ -998,7 +998,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 2:		/* just reverse in y */
+	    case 2:		// just reverse in y
 	      pp = (double *) p + nx * ny - nx;
 	      inc = -2*nx;
 	      while (mm--) {
@@ -1010,7 +1010,7 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 		pp += inc;
 	      }
 	      break;
-	    case 3:		/* reverse in x and y */
+	    case 3:		// reverse in x and y
 	      pp = (double *) p + nx*ny;
 	      while (mm--) {
 		nn = nxx;
@@ -1028,22 +1028,22 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
 	  mm = ny;
 	  qq = (double *) q;
 	  switch (iorder) {
-	    case 4:		/* transpose in x and y */
+	    case 4:		// transpose in x and y
 	      pp = (double *) p;
 	      inc = -nx*ny + 1;
 	      nyy = ny;
 	      break;
-	    case 5:		/* transpose plus reverse in y */
+	    case 5:		// transpose plus reverse in y
 	      pp = (double *) p +nx*ny - ny;
 	      inc = nx*ny + 1;
 	      nyy = -ny;
 	      break;
-	    case 6:		/* transpose plus reverse in x */
+	    case 6:		// transpose plus reverse in x
 	      pp = (double *) p + ny - 1;
 	      inc = -nx*ny - 1;
 	      nyy = ny;
 	      break;
-	    case 7:		/* transpose plus reverse in x,y */
+	    case 7:		// transpose plus reverse in x,y
 	      pp = (double *) p + ny*nx - 1;
 	      inc = nx*ny - 1;
 	      nyy = -ny;
@@ -1064,4 +1064,4 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])/* reorder function */
   }
   return result_sym;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------

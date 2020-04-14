@@ -17,18 +17,18 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* HEADERS */
-#include <float.h> /* for DBL_MAX */
-#include <math.h> /* for sin cos */
-#include <string.h> /* for memcpy */
-/* END HEADERS */
+// HEADERS
+#include <float.h> // for DBL_MAX
+#include <math.h> // for sin cos
+#include <string.h> // for memcpy
+// END HEADERS
 #include "action.hh"
 #include <gsl/gsl_poly.h>
 
-/* time in millennia since epoch 2000.0 */
+// time in millennia since epoch 2000.0
 #define TM2000(JD) ((JD - 2451545.0)/365250)
 
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 void matmul3(double *front, double *back, double *result)
 /* matrix multiplication of 3-by-3 matrices <front> and <back> into
    <result> */
@@ -76,7 +76,7 @@ void matmul3(double *front, double *back, double *result)
     + front[7]*back[5]
     + front[8]*back[8];
 }
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 #define F(x) (x*1e-12)
 static double s11c[] = {  0,               0, F(-538867722),  F(-270670), F(1138205),  F(8604), F(-813) };
 static double c11c[] = {  1,               0,     F(-20728),   F(-19147), F(-149390),   F(-34),  F(617) };
@@ -107,11 +107,11 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
     double c12 = gsl_poly_eval(c12c, sizeof(c12c)/sizeof(c12c[0]), T);
     double s13 = gsl_poly_eval(s13c, sizeof(s13c)/sizeof(s13c[0]), T);
     double c13 = gsl_poly_eval(c13c, sizeof(c13c)/sizeof(c13c[0]), T);
-    /* s2j = c1j */
+    // s2j = c1j
     double s21 = c11;
     double s22 = c12;
     double s23 = c13;
-    /* c2j = -s1j */
+    // c2j = -s1j
     double c21 = -s11;
     double c22 = -s12;
     double c23 = -s13;
@@ -139,11 +139,11 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
     double c12 = gsl_poly_eval(c12c, sizeof(c12c)/sizeof(c12c[0]), T);
     double s13 = gsl_poly_eval(s13c, sizeof(s13c)/sizeof(s13c[0]), T);
     double c13 = gsl_poly_eval(c13c, sizeof(c13c)/sizeof(c13c[0]), T);
-    /* s2j = c1j */
+    // s2j = c1j
     double s21 = c11;
     double s22 = c12;
     double s23 = c13;
-    /* c2j = -s1j */
+    // c2j = -s1j
     double c21 = -s11;
     double c22 = -s12;
     double c23 = -s13;
@@ -174,16 +174,16 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
   if (is_new)
     matmul3(a_fromJ2000, a_toJ2000, a_from_to);
 }
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 double *XYZ_eclipticPrecessionMatrix(void)
 {
   return a_from_to;
 }
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 void XYZ_eclipticPrecession(double *pos, double equinox1, double equinox2)
 /* precess the ecliptical cartesian coordinates <pos> from <equinox1>
    to <equinox2>, both measured in JDE. */
-/* From 1988A&A...202..309B */
+// From 1988A&A...202..309B
 {
   init_XYZ_eclipticPrecession(equinox1, equinox2);
 

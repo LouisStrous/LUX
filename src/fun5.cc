@@ -18,9 +18,9 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* internal lux subroutines and functions */
-/* mostly fft related stuff and solar mappings */
- /*this is file fun5.c */
+// internal lux subroutines and functions
+// mostly fft related stuff and solar mappings
+ //this is file fun5.c
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -34,10 +34,10 @@ static double	xoff, yoff;
 static double	a1, a2, a3,a4,a5, a6, a7, a8, a9 ,a10, a11, a12, a13, a14, a15;
 extern int32_t	badmatch;
 double	meritc;
-/*------------------------------------------------------------------------- */
-int32_t lux_subshift(int32_t narg, int32_t ps[]) /* LCT for a cell  */
-     /* wants 2 arrays, already F*8 and extracted, both the same size */
-     /* returns the shift */
+//-------------------------------------------------------------------------
+int32_t lux_subshift(int32_t narg, int32_t ps[]) // LCT for a cell
+     // wants 2 arrays, already F*8 and extracted, both the same size
+     // returns the shift
 {
   int32_t		iq, jq, *d;
   double	*x1, *x2;
@@ -62,19 +62,19 @@ int32_t lux_subshift(int32_t narg, int32_t ps[]) /* LCT for a cell  */
   
   subshift(x1, x2, d[0], d[1]);
 
-  /* expect result in xoff and yoff */
+  // expect result in xoff and yoff
   if (redef_scalar(ps[2], LUX_DOUBLE, &xoff) != 1)
     return -1;
   if (redef_scalar(ps[3], LUX_DOUBLE, &yoff) != 1)
     return -1;
   return 1;
 }
-/*------------------------------------------------------------------------- */
-int32_t lux_subshiftc(int32_t narg, int32_t ps[]) /* LCT for a cell, sym version */
- /* subshiftc, s1b, s2b, xoff, yoff, mask  */
- /* 3/4/97 added apodizer array, optional */
- /* wants 2 or 3 arrays, already F*8 and extracted, both the same size */
- /* returns the shift */
+//-------------------------------------------------------------------------
+int32_t lux_subshiftc(int32_t narg, int32_t ps[]) // LCT for a cell, sym version
+ // subshiftc, s1b, s2b, xoff, yoff, mask
+ // 3/4/97 added apodizer array, optional
+ // wants 2 or 3 arrays, already F*8 and extracted, both the same size
+ // returns the shift
 {
   int32_t	iq, jq, kq;
   double	*x1, *x2, *msk;
@@ -91,7 +91,7 @@ int32_t lux_subshiftc(int32_t narg, int32_t ps[]) /* LCT for a cell, sym version
   nx = array_dims(iq)[0];	ny = array_dims(iq)[1];
   if (array_dims(jq)[0] != nx || array_dims(jq)[1] != ny)
     return cerror(INCMP_ARG, jq);
- /* if a mask, also some rules */
+ // if a mask, also some rules
   if (narg > 4) {
     kq = ps[4];
     if (!symbolIsNumericalArray(kq) || array_num_dims(kq) != 2)
@@ -114,14 +114,14 @@ int32_t lux_subshiftc(int32_t narg, int32_t ps[]) /* LCT for a cell, sym version
       meritc = subshiftc_apod(x1, x2, msk, nx, ny);
       break;
   }
-  /* expect result in xoff and yoff */
+  // expect result in xoff and yoff
   if (redef_scalar( ps[2], LUX_DOUBLE, &xoff) != LUX_OK)
     return LUX_ERROR;
   if (redef_scalar( ps[3], LUX_DOUBLE, &yoff) != LUX_OK)
     return LUX_ERROR;
   return LUX_OK;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double mert(double sx, double sy)
  {
  double	w0, w1,w2,w3,mq;
@@ -134,14 +134,14 @@ double mert(double sx, double sy)
 	+ w2*a13 + w3*a14 + a15;
  return mq;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 double mertc(double sx, double sy)
  {
  double	xq;
  xq = a1 + sx*sx*a2 + sy*sy*a3 + sx*sx*sy*sy*a4 + sx*a5 + sy*a6 + sx*sy*a7 + sx*sx*sy*a9 + sx*sy*sy*a10;
  return xq;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 double sxvalue(double sy)
  {
  double	syc, c1, c2, xq;
@@ -149,8 +149,8 @@ double sxvalue(double sy)
  c1 = syc*syc*(a5-2.0*a1) +syc*sy*(a7-2.0*a6+a8) +sy*sy*(a10-2.0*a3) +syc*(a12-a11) +sy*(a14-a13);
  c2 = syc*syc*(a1+a2-a5) +sy*sy*(a3+a4-a10) +syc*sy*(a6-a7-a8+a9);
  if (c2 == 0.0) {
- /* no longer print this, it happens for 0 counts, instead bump up badmatch */
- /* printf("sxvalue singular, c1, c2 = %g %g\n", c1,c2);*/
+ // no longer print this, it happens for 0 counts, instead bump up badmatch
+ // printf("sxvalue singular, c1, c2 = %g %g\n", c1,c2);
  badmatch++;
  return -1.0;}
  if ( isnan(c1) == 1 || isnan(c2) ==1 ) {
@@ -165,7 +165,7 @@ double sxvalue(double sy)
  xq = -.5*c1/c2;
  return xq;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 double syvalue(double sx)
  {
  double	sxc, c1, c2, xq;
@@ -173,8 +173,8 @@ double syvalue(double sx)
  c1 = sxc*sxc*(a6-2.0*a1) +sx*sx*(a9-2.0*a2) +sxc*sx*(a7-2.0*a5+a8) +sxc*(a13-a11) +sx*(a14-a12);
  c2 =  sxc*sxc*(a1+a3-a6) +sx*sx*(a2+a4-a9) +sxc*sx*(a5-a7-a8+a10);
  if (c2 == 0.0) {
- /* no longer print this, it happens for 0 counts, instead bump up badmatch */
- /* printf("syvalue singular, c1, c2 = %g %g\n",c1,c2); */
+ // no longer print this, it happens for 0 counts, instead bump up badmatch
+ // printf("syvalue singular, c1, c2 = %g %g\n",c1,c2);
  badmatch++;
  return -1.0;}
  if ( isnan(c1) == 1 || isnan(c2) ==1 ) {
@@ -189,23 +189,23 @@ double syvalue(double sx)
  xq = -.5*c1/c2;
  return xq;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void getsxsy(void)
  {
- /* iterate to the min (if any), loading results in globals subdx and subdy */
- /* seed with syz = 0.5 */
+ // iterate to the min (if any), loading results in globals subdx and subdy
+ // seed with syz = 0.5
  int32_t	n;
  double	sxz, syz;
  syz=sxz=.5;
  n = 11;
  while (n--) {
- /* get new sxz */
+ // get new sxz
  sxz = sxvalue(syz);
  if ( sxz < -0.5 || sxz > 1.5) { subdx = subdy = 0.0;  return; }
- /* and get a new syz */
+ // and get a new syz
  syz = syvalue(sxz);
  if ( syz < -0.5 || syz > 1.5) { subdx = subdy = 0.0;  return; }
- /* printf("      sxz, syz = %g %g\n", sxz,syz); */
+ // printf("      sxz, syz = %g %g\n", sxz,syz);
  
  }
  /* for small shifts, let values very close to the line but on the
@@ -214,21 +214,21 @@ void getsxsy(void)
  and then we will compare on merit, this will allow 0's to be a result
  when the merit is really at a min along the line */
  if (sxz >= 0.0 && sxz <=1.0 && syz >= 0.0 && syz <=1.0 ) {
- /* these OK */
+ // these OK
  subdx = sxz;	subdy = syz; } else {
- /* maybe OK to use a zero or even a 1 if rather cloe to the line */
+ // maybe OK to use a zero or even a 1 if rather cloe to the line
  if (sxz >= -0.1 && sxz <=1.1 && syz >= -0.1 && syz <=1.1 ) {
- /* just range limit them, this should sort it out */
+ // just range limit them, this should sort it out
  subdx = MAX(subdx, 0.0);	subdy = MAX(subdy, 0.0);
  subdx = MIN(subdx, 1.0);	subdy = MIN(subdy, 1.0);
  } else { subdx =0;	subdy =0; } }
- /*printf("final sxz, syz = %g %g\n", sxz,syz);*/
+ //printf("final sxz, syz = %g %g\n", sxz,syz);
  return;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 void  subshift(double* x, double* r, int32_t nx, int32_t ny)
- /* q is the reference cell (old m1), r is the one we interpolate (old m2) */
- /* we assume that the arrays have already been converted to F*8 */
+ // q is the reference cell (old m1), r is the one we interpolate (old m2)
+ // we assume that the arrays have already been converted to F*8
  {
  int32_t     nxs;
  double  sum, cs0, cs1, cs2, cs3, t2, t1, t0, t3;
@@ -243,7 +243,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  nxm2 = nx - 2;
  nym2 = ny - 2;
   
- /* the sums of squares */
+ // the sums of squares
  /* first rearrange as 25 pieces in an array of 5x5, mostly to have
  it semi organized, may be faster to do it differently */
  rp = r;	t0 = *rp++;
@@ -268,7 +268,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  parts[1][3] = t0*t0;
  t0 = *rp++;
  parts[1][4] = t0*t0;
- /* third row has column sums and center sum */
+ // third row has column sums and center sum
  row = r + nxs+ nxs;
  j = ny-4;	cs0 = cs1 = cs2 = cs3 = sum = 0.0;
  while (j--) {
@@ -312,23 +312,23 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  t0 = *rp++;
  parts[4][4] = t0*t0;
 
- /* now each sum of squares is a sum of 9 parts */
+ // now each sum of squares is a sum of 9 parts
  for (j=0;j<3;j++) { for (i=0;i<3;i++) {
 	xx[j][i] = 0.0;
  	for (jj=0;jj<3;jj++) { for (ii=0;ii<3;ii++) {
 	xx[j][i] += parts[j+jj][i+ii]; }}}}
 
- /* the cross term cases with delta 1 in the x direction */
- /* we build 15 sums which are combined into 6 results */
+ // the cross term cases with delta 1 in the x direction
+ // we build 15 sums which are combined into 6 results
  rp = r;	t0 = *rp++;	t1 = *rp++;
  partsdx[0][0] = t0 * t1;
  i = nx-3;	sum = 0.0;
  while (i--) {  t0 = t1; t1 = *rp++;  sum += t0 * t1; }
  partsdx[0][1] = sum;
- /* one more for the top row */
+ // one more for the top row
  t0 = t1; t1 = *rp++;
  partsdx[0][2] = t0 * t1;
- /* second row much the same */
+ // second row much the same
  rp = r+nxs;	t0 = *rp++;	t1 = *rp++;
  partsdx[1][0] = t0 * t1;
  i = nx-3;	sum = 0.0;
@@ -336,13 +336,13 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  partsdx[1][1] = sum;
  t0 = t1; t1 = *rp++;
  partsdx[1][2] = t0 * t1;
- /* third row has larger areas, 2 columns and the center */
+ // third row has larger areas, 2 columns and the center
  row = r + nxs + nxs;
  j = ny-4;	cs0 = cs1 = sum = 0.0;
  while (j--) {
  rp = row;	t0 = *rp++;	t1 = *rp++;
  row = row + nxs;
- cs0 += t0 * t1;	/* left column sum */
+ cs0 += t0 * t1;	// left column sum
  i = nx-3;
  while (i--) {  t0 = t1; t1 = *rp++;  sum += t0 * t1; }
  t0 = t1; t1 = *rp++;
@@ -351,16 +351,16 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  partsdx[2][0] = cs0;
  partsdx[2][1] = sum;
  partsdx[2][2] = cs1;
- /* the last 2 rows are just one high again */
+ // the last 2 rows are just one high again
  rp = row;	t0 = *rp++;	t1 = *rp++;
  partsdx[3][0] = t0 * t1;
  i = nx-3;	sum = 0.0;
  while (i--) {  t0 = t1; t1 = *rp++;  sum += t0 * t1; }
  partsdx[3][1] = sum;
- /* one more for the top row */
+ // one more for the top row
  t0 = t1; t1 = *rp++;
  partsdx[3][2] = t0 * t1;
- /* second row much the same */
+ // second row much the same
  rp = row+nxs;	t0 = *rp++;	t1 = *rp++;
  partsdx[4][0] = t0 * t1;
  i = nx-3;	sum = 0.0;
@@ -368,14 +368,14 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  partsdx[4][1] = sum;
  t0 = t1; t1 = *rp++;
  partsdx[4][2] = t0 * t1;
- /* now each sum of cross terms is a sum of 9 parts */
+ // now each sum of cross terms is a sum of 9 parts
  for (j=0;j<3;j++) { for (i=0;i<2;i++) {
 	xdx[j][i] = 0.0;
  	for (jj=0;jj<3;jj++) { for (ii=0;ii<2;ii++) {
 	xdx[j][i] += partsdx[j+jj][i+ii]; }}}}
 
- /* the terms with a simple shift in y are similar in concept */
- /* we build 15 sums which are combined into 6 results */
+ // the terms with a simple shift in y are similar in concept
+ // we build 15 sums which are combined into 6 results
  rp = r;	rp2 = rp+nxs;
  partsdy[0][0] = *rp++ * *rp2++;
  partsdy[0][1] = *rp++ * *rp2++;
@@ -385,25 +385,25 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  partsdy[0][2] = sum;
  partsdy[0][3] = *rp++ * *rp2++;
  partsdy[0][4] = *rp++ * *rp2++;
- /* second row has column sums and center sum */
+ // second row has column sums and center sum
  row = r + nxs;
  j = ny-3;	cs0 = cs1 = cs2 = cs3 = sum = 0.0;
  while (j--) {
  rp = row;	rp2 = rp+nxs;
  row = row + nxs;
- cs0 += *rp++ * *rp2++;	/* left column sum */
- cs1 += *rp++ * *rp2++;	/* second column sum */
+ cs0 += *rp++ * *rp2++;	// left column sum
+ cs1 += *rp++ * *rp2++;	// second column sum
  i = nx-4;
- while (i--) {  sum += *rp++ * *rp2++; } /* center */
- cs2 += *rp++ * *rp2++;	/* second last column sum */
- cs3 += *rp++ * *rp2++;	/* last column sum */
+ while (i--) {  sum += *rp++ * *rp2++; } // center
+ cs2 += *rp++ * *rp2++;	// second last column sum
+ cs3 += *rp++ * *rp2++;	// last column sum
  }
  partsdy[1][0] = cs0;
  partsdy[1][1] = cs1;
  partsdy[1][2] = sum;
  partsdy[1][3] = cs2;
  partsdy[1][4] = cs3;
- /* the last row */
+ // the last row
  rp = row;	rp2 = rp+nxs;
  partsdy[2][0] = *rp++ * *rp2++;
  partsdy[2][1] = *rp++ * *rp2++;
@@ -412,13 +412,13 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  partsdy[2][2] = sum;
  partsdy[2][3] = *rp++ * *rp2++;
  partsdy[2][4] = *rp++ * *rp2++;
- /* now each sum of cross terms is a sum of 9 parts */
+ // now each sum of cross terms is a sum of 9 parts
  for (j=0;j<2;j++) { for (i=0;i<3;i++) {
 	xdy[j][i] = 0.0;
  	for (jj=0;jj<2;jj++) { for (ii=0;ii<3;ii++) {
 	xdy[j][i] += partsdy[j+jj][i+ii]; }}}}
- /* diagonal terms, 2 types, first the larger gap, mmpp type */
- /* we build 9 sums which are combined into 4 results */
+ // diagonal terms, 2 types, first the larger gap, mmpp type
+ // we build 9 sums which are combined into 4 results
  rp = r;	rp2 = rp+nxs+1;
  partsmmpp[0][0] = *rp++ * *rp2++;
  i = nx-3;	sum = 0.0;
@@ -430,10 +430,10 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  while (j--) {
  rp = row;	rp2 = rp+nxs+1;
  row = row + nxs;
- cs0 += *rp++ * *rp2++;	/* left column sum */
+ cs0 += *rp++ * *rp2++;	// left column sum
  i = nx-3;
  while (i--) {  sum += *rp++ * *rp2++; }
- cs1 += *rp++ * *rp2++;	/* right column sum */
+ cs1 += *rp++ * *rp2++;	// right column sum
  }
  partsmmpp[1][0] = cs0;
  partsmmpp[1][1] = sum;
@@ -444,14 +444,14 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  while (i--) {  sum += *rp++ * *rp2++; }
  partsmmpp[2][1] = sum;
  partsmmpp[2][2] = *rp++ * *rp2++;
- /* now each sum of cross terms is a sum of 4 parts */
+ // now each sum of cross terms is a sum of 4 parts
  for (j=0;j<2;j++) { for (i=0;i<2;i++) {
 	xmmpp[j][i] = 0.0;
  	for (jj=0;jj<2;jj++) { for (ii=0;ii<2;ii++) {
 	xmmpp[j][i] += partsmmpp[j+jj][i+ii]; }}}}
 
- /* diagonal terms, 2 types, first the larger gap, mmpp type */
- /* we build 9 sums which are combined into 4 results */
+ // diagonal terms, 2 types, first the larger gap, mmpp type
+ // we build 9 sums which are combined into 4 results
  rp = r+1;	rp2 = rp+nxs-1;
  partsppmm[0][0] = *rp++ * *rp2++;
  i = nx-3;	sum = 0.0;
@@ -463,10 +463,10 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  while (j--) {
  rp = row;	rp2 = rp+nxs-1;
  row = row + nxs;
- cs0 += *rp++ * *rp2++;	/* left column sum */
+ cs0 += *rp++ * *rp2++;	// left column sum
  i = nx-3;
  while (i--) {  sum += *rp++ * *rp2++; }
- cs1 += *rp++ * *rp2++;	/* right column sum */
+ cs1 += *rp++ * *rp2++;	// right column sum
  }
  partsppmm[1][0] = cs0;
  partsppmm[1][1] = sum;
@@ -477,13 +477,13 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  while (i--) {  sum += *rp++ * *rp2++; }
  partsppmm[2][1] = sum;
  partsppmm[2][2] = *rp++ * *rp2++;
- /* now each sum of cross terms is a sum of 4 parts */
+ // now each sum of cross terms is a sum of 4 parts
  for (j=0;j<2;j++) { for (i=0;i<2;i++) {
 	xppmm[j][i] = 0.0;
  	for (jj=0;jj<2;jj++) { for (ii=0;ii<2;ii++) {
 	xppmm[j][i] += partsppmm[j+jj][i+ii]; }}}}
 
- /* next the cases with values from both images */
+ // next the cases with values from both images
  cmm=c0m=cpm=cm0=c00=cp0=cmp=c0p=cpp=sumxx = 0.0;
  nym2 = ny-2;	j = nym2;	nxm2 = nx-2;
  row = r;
@@ -548,7 +548,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  cpp += t0 * t3;
  }
  }
- /* have all the terms, now collect ones needed for quad 1 */
+ // have all the terms, now collect ones needed for quad 1
  a1 = xx[1][1];  a4 = xx[0][0];  a2 = xx[1][0];  a3 = xx[0][1];
  a5 = 2.0*xdx[1][0];	 a10 = 2.0*xdx[0][0];
  a9 = 2.0*xdy[0][0];	 a6 = 2.0*xdy[0][1];
@@ -562,12 +562,12 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  printf("a12,a13,a14,a15 = %14.6e %14.6e %14.6e %14.6e\n",a12,a13,a14,a15);
  */
 
- mflag = 0;	/* counts the number of MINs */
- qbest = 0.0;	/* the best */
+ mflag = 0;	// counts the number of MINs
+ qbest = 0.0;	// the best
  outside = 0.0;
  xoff = yoff = 0.0;
  getsxsy();
- /* check if we got a MIN, only if somebody not zero */
+ // check if we got a MIN, only if somebody not zero
  if (subdx != 0 || subdy != 0) { xoff = - subdx;  yoff = -subdy;
  	qbest = mert(subdx, subdy); mflag += 1;
 	if (subdx<0) outside = -subdx;
@@ -590,10 +590,10 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  */
 
  getsxsy();
- /* check if we got a MIN, only if somebody not zero */
+ // check if we got a MIN, only if somebody not zero
  if (subdx != 0 || subdy != 0) {
  	qcur = mert(subdx, subdy);
-	/* find our outside status */
+	// find our outside status
 	qd = 0.0;
 	if (subdx<0) qd = -subdx;
 		else if (subdx>1.0) qd = subdx-1.0;
@@ -602,7 +602,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
 	if ( mflag == 0 )
 	 { xoff =  subdx;  yoff = -subdy; qbest = qcur; outside = qd;
 	 } else {
-	 /* we have competition */
+	 // we have competition
 	 if ( outside != 0.0) {
 	 /* we are a contender, we decide on the outside issue if the previous
 	 was outside without reference to merit */
@@ -632,10 +632,10 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  */
 
  getsxsy();
- /* check if we got a MIN, only if somebody not zero */
+ // check if we got a MIN, only if somebody not zero
  if (subdx != 0 || subdy != 0) {
  	qcur = mert(subdx, subdy);
-	/* find our outside status */
+	// find our outside status
 	qd = 0.0;
 	if (subdx<0) qd = -subdx;
 		else if (subdx>1.0) qd = subdx-1.0;
@@ -644,7 +644,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
 	if ( mflag == 0 )
 	 { xoff =  subdx;  yoff = subdy; qbest = qcur; outside = qd;
 	 } else {
-	 /* we have competition */
+	 // we have competition
 	 if ( outside != 0.0) {
 	 /* we are a contender, we decide on the outside issue if the previous
 	 was outside without reference to merit */
@@ -675,10 +675,10 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
  */
 
  getsxsy();
- /* check if we got a MIN, only if somebody not zero */
+ // check if we got a MIN, only if somebody not zero
  if (subdx != 0 || subdy != 0) {
     qcur = mert(subdx, subdy);
-    /* find our outside status */
+    // find our outside status
     qd = 0.0;
     if (subdx<0) qd = -subdx;
     	else if (subdx>1.0) qd = subdx-1.0;
@@ -687,7 +687,7 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
     if ( mflag == 0 )
      { xoff =  -subdx;  yoff = subdy; qbest = qcur; outside = qd;
      } else {
-     /* we have competition */
+     // we have competition
      if ( outside != 0.0) {
      /* we are a contender, we decide on the outside issue if the previous
      was outside without reference to merit */
@@ -704,20 +704,20 @@ void  subshift(double* x, double* r, int32_t nx, int32_t ny)
     }
  /* mflag contains the number of MINs in case we want to document that or
  use the no MIN condition to search further */
- if (mflag == 0) { xoff = yoff = 0.0; }  /* zero these for no MIN case */
+ if (mflag == 0) { xoff = yoff = 0.0; }  // zero these for no MIN case
 
  return;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 double sxvaluec(double sy)
  {
  double c1, c2, xq;
- /* 3/4/97 changed a7+a8 to just a7 */
+ // 3/4/97 changed a7+a8 to just a7
  c1 = a5 + sy*a7 + sy*sy*a10;
  c2 =  a2 + sy*sy*a4 +sy*a9;
  if (c2 == 0.0) {
- /* bump badmatch instead of printing */
- /* printf("sxvaluec singular, c1, c2 = %g %g\n", c1,c2); */
+ // bump badmatch instead of printing
+ // printf("sxvaluec singular, c1, c2 = %g %g\n", c1,c2);
  badmatch++;
  return 0.0;}
  if ( isnan(c1) == 1 || isnan(c2) ==1 ) {
@@ -731,16 +731,16 @@ double sxvaluec(double sy)
  xq = -.5*c1/c2;
  return xq;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 double syvaluec(double sx)
  {
  double	c1, c2, xq;
- /* 3/4/97 changed a7+a8 to just a7 */
+ // 3/4/97 changed a7+a8 to just a7
  c1 = a6 + sx*a7 + sx*sx*a9;
  c2 =  a3 + sx*sx*a4 +sx*a10;
  if (c2 == 0.0) {
- /* bump badmatch instead of printing */
- /* printf("syvalue singular, c1, c2 = %g %g\n",c1,c2); */
+ // bump badmatch instead of printing
+ // printf("syvalue singular, c1, c2 = %g %g\n",c1,c2);
  badmatch++;
  return 0.0;}
  if ( isnan(c1) == 1 || isnan(c2) ==1 ) {
@@ -754,9 +754,9 @@ double syvaluec(double sx)
  xq = -.5*c1/c2;
  return xq;
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 double  subshiftc(double* xa, double* xb, int32_t nx, int32_t ny)
- /* we assume that the arrays have already been converted to F*8 */
+ // we assume that the arrays have already been converted to F*8
  {
  int32_t     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
@@ -820,31 +820,31 @@ double  subshiftc(double* xa, double* xb, int32_t nx, int32_t ny)
  a6 = .25 * a6;
  a7 = .5 * a7;
  a8 = .5 * a8;
- /* 3/4/97 changed a7 to be a7+a8 */
+ // 3/4/97 changed a7 to be a7+a8
  a7 = a7 + a8;
  
- /* only 1 quad here so do the MAX find in line */
+ // only 1 quad here so do the MAX find in line
  xoff = yoff = 0.0;
  n = 11;
- syz = 0.0;	/* zero seed */
+ syz = 0.0;	// zero seed
  while (n--) {
- /* get new sxz */
+ // get new sxz
  sxz = sxvaluec(syz);
  if ( sxz < -0.5 || sxz > 0.5) { badmatch++; xoff = yoff = 0.0;  return 0.0; }
- /* and get a new syz */
+ // and get a new syz
  syz = syvaluec(sxz);
  if ( syz < -0.5 || syz > 0.5) { badmatch++; xoff = yoff = 0.0;  return 0.0; }
- /* printf("      sxz, syz = %g %g\n", sxz,syz); */
+ // printf("      sxz, syz = %g %g\n", sxz,syz);
  }
  xoff = 2.*sxz;	yoff = 2.*syz;
  
  return mertc(sxz, syz);
  }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double  subshiftc_apod(double* xa, double* xb, double* gg, int32_t nx, int32_t ny)
  /* this version includes an apodizing function already prepared in gg
  which must be dimensioned (nx-1) by (ny-1) */
- /* we assume that the arrays have already been converted to F*8 */
+ // we assume that the arrays have already been converted to F*8
  {
  int32_t     nxs;
  double  t2, t1, t4, t3, d1, d2, d3, d4, sxz, syz;
@@ -912,36 +912,36 @@ double  subshiftc_apod(double* xa, double* xb, double* gg, int32_t nx, int32_t n
  a6 = .25 * a6;
  a7 = .5 * a7;
  a8 = .5 * a8;
- /* 3/4/97 changed a7 to be a7+a8 */
+ // 3/4/97 changed a7 to be a7+a8
  a7 = a7 + a8;
  
- /* only 1 quad here so do the max find in line */
+ // only 1 quad here so do the max find in line
  xoff = yoff = 0.0;
  n = 11;
- syz = 0.0;	/* zero seed */
+ syz = 0.0;	// zero seed
  while (n--) {
- /* get new sxz */
+ // get new sxz
  sxz = sxvaluec(syz);
  if ( sxz < -0.5 || sxz > 0.5) { xoff = yoff = 0.0;  return 0.0; }
- /* and get a new syz */
+ // and get a new syz
  syz = syvaluec(sxz);
  if ( syz < -0.5 || syz > 0.5) { xoff = yoff = 0.0;  return 0.0; }
- /* printf("      sxz, syz = %g %g\n", sxz,syz); */
+ // printf("      sxz, syz = %g %g\n", sxz,syz);
  }
  xoff = 2.*sxz;	yoff = 2.*syz;
  
  return mertc(sxz, syz);
  }
- /*------------------------------------------------------------------------- */
+ //-------------------------------------------------------------------------
 int32_t lux_dilate(int32_t narg, int32_t ps[])
-/* dilates a 2D image.  LS 9nov98 */
+// dilates a 2D image.  LS 9nov98
 {
   int32_t	nx, ny, n, result;
   Symboltype type;
   Pointer	data, out;
 
-  if (!symbolIsNumericalArray(ps[0]) /* not a numerical array */
-      || array_num_dims(ps[0]) != 2) /* or isn't two-dimensionsal */
+  if (!symbolIsNumericalArray(ps[0]) // not a numerical array
+      || array_num_dims(ps[0]) != 2) // or isn't two-dimensionsal
     return cerror(NEED_2D_ARR, ps[0]);
 
   nx = array_dims(ps[0])[0];
@@ -957,12 +957,12 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 
   switch (type) {
     case LUX_INT8:
-      memcpy(out.b, data.b, nx*lux_type_size[type]); /* top row: just copy */
+      memcpy(out.b, data.b, nx*lux_type_size[type]); // top row: just copy
       ny -= 2;
       out.b += nx;
       data.b += nx;
       while (ny--) {
-	*out.b++ = *data.b++;	/* left edge: just copy */
+	*out.b++ = *data.b++;	// left edge: just copy
 	n = nx - 2;
 	while (n--) {
 	  *out.b++ = (*data.b || data.b[1] || data.b[1 + nx] || data.b[nx]
@@ -970,17 +970,17 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 		      || data.b[-nx] || data.b[-nx + 1]);
 	  data.b++;
 	}
-	*out.b++ = *data.b++;	/* right edge: just copy */
+	*out.b++ = *data.b++;	// right edge: just copy
       }
-      memcpy(out.b, data.b, nx*lux_type_size[type]); /* top row: just copy */
+      memcpy(out.b, data.b, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_INT16:
-      memcpy(out.w, data.w, nx*lux_type_size[type]); /* top row: just copy */
+      memcpy(out.w, data.w, nx*lux_type_size[type]); // top row: just copy
       ny -= 2;
       out.w += nx;
       data.w += nx;
       while (ny--) {
-	*out.w++ = *data.w++;	/* left edge: just copy */
+	*out.w++ = *data.w++;	// left edge: just copy
 	n = nx - 2;
 	while (n--) {
 	  *out.w++ = (*data.w || data.w[1] || data.w[1 + nx] || data.w[nx]
@@ -988,17 +988,17 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 		      || data.w[-nx] || data.w[-nx + 1]);
 	  data.w++;
 	}
-	*out.w++ = *data.w++;	/* right edge: just copy */
+	*out.w++ = *data.w++;	// right edge: just copy
       }
-      memcpy(out.w, data.w, nx*lux_type_size[type]); /* top row: just copy */
+      memcpy(out.w, data.w, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_INT32:
-      memcpy(out.l, data.l, nx*lux_type_size[type]); /* top row: just copy */
+      memcpy(out.l, data.l, nx*lux_type_size[type]); // top row: just copy
       ny -= 2;
       out.l += nx;
       data.l += nx;
       while (ny--) {
-	*out.l++ = *data.l++;	/* left edge: just copy */
+	*out.l++ = *data.l++;	// left edge: just copy
 	n = nx - 2;
 	while (n--) {
 	  *out.l++ = (*data.l || data.l[1] || data.l[1 + nx] || data.l[nx]
@@ -1006,9 +1006,9 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 		      || data.l[-nx] || data.l[-nx + 1]);
 	  data.l++;
 	}
-	*out.l++ = *data.l++;	/* right edge: just copy */
+	*out.l++ = *data.l++;	// right edge: just copy
       }
-      memcpy(out.l, data.l, nx*lux_type_size[type]); /* top row: just copy */
+      memcpy(out.l, data.l, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_INT64:
       n = nx;
@@ -1016,7 +1016,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
         *out.l++ = *data.q++;
       ny -= 2;
       while (ny--) {
-	*out.l++ = *data.q++;	/* left edge: just copy */
+	*out.l++ = *data.q++;	// left edge: just copy
 	n = nx - 2;
 	while (n--) {
 	  *out.l++ = (*data.q || data.q[1] || data.q[1 + nx] || data.q[nx]
@@ -1024,9 +1024,9 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 		      || data.q[-nx] || data.q[-nx + 1]);
 	  data.q++;
 	}
-	*out.l++ = *data.q++;	/* right edge: just copy */
+	*out.l++ = *data.q++;	// right edge: just copy
       }
-      memcpy(out.q, data.q, nx*lux_type_size[type]); /* top row: just copy */
+      memcpy(out.q, data.q, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_FLOAT:
       n = nx;
@@ -1034,7 +1034,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 	*out.l++ = (*data.f++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.l++ = (*data.f++ != 0); /* left edge: just copy */
+	*out.l++ = (*data.f++ != 0); // left edge: just copy
 	n = nx - 2;
 	while (n--) {
 	  *out.l++ = (*data.f || data.f[1] || data.f[1 + nx] || data.f[nx]
@@ -1042,7 +1042,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 		      || data.f[-nx] || data.f[-nx + 1]);
 	  data.f++;
 	}
-	*out.l++ = (*data.f++ != 0); /* right edge: just copy */
+	*out.l++ = (*data.f++ != 0); // right edge: just copy
       }
       n = nx;
       while (n--)
@@ -1054,7 +1054,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 	*out.l++ = (*data.d++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.d++ = (*data.d++ != 0); /* left edge: just copy */
+	*out.d++ = (*data.d++ != 0); // left edge: just copy
 	n = nx - 2;
 	while (n--) {
 	  *out.l++ = (*data.d || data.d[1] || data.d[1 + nx] || data.d[nx]
@@ -1062,7 +1062,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
 		      || data.d[-nx] || data.d[-nx + 1]);
 	  data.d++;
 	}
-	*out.l++ = (*data.d++ != 0); /* right edge: just copy */
+	*out.l++ = (*data.d++ != 0); // right edge: just copy
       }
       n = nx;
       while (n--)
@@ -1071,17 +1071,17 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
   }
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_erode(int32_t narg, int32_t ps[])
-/* erodes a 2D image.  LS 9nov98, 9may2000 */
+// erodes a 2D image.  LS 9nov98, 9may2000
 {
   int32_t	nx, ny, result, n;
   Symboltype type;
   Pointer	data, out;
   char	zeroedge;
 
-  if (!symbolIsNumericalArray(ps[0]) /* not a numerical array */
-      || array_num_dims(ps[0]) != 2) /* or isn't two-dimensionsal */
+  if (!symbolIsNumericalArray(ps[0]) // not a numerical array
+      || array_num_dims(ps[0]) != 2) // or isn't two-dimensionsal
     return cerror(NEED_2D_ARR, ps[0]);
 
   nx = array_dims(ps[0])[0];
@@ -1095,7 +1095,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
   result = array_clone(ps[0], type);
   out.b = (uint8_t*) array_data(result);
 
-  zeroedge = (internalMode & 1); /* /ZEROEDGE */
+  zeroedge = (internalMode & 1); // /ZEROEDGE
 
   switch (type) {
     case LUX_INT8:
@@ -1109,7 +1109,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	  *out.b++ = (*data.b++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.b++ = zeroedge? 0: (*data.b != 0); /* left edge */
+	*out.b++ = zeroedge? 0: (*data.b != 0); // left edge
 	data.b++;
 	n = nx - 2;
 	while (n--) {
@@ -1118,7 +1118,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 		      && data.b[-nx] && data.b[-nx + 1]);
 	  data.b++;
 	}
-	*out.b++ = zeroedge? 0: (*data.b != 0); /* right edge */
+	*out.b++ = zeroedge? 0: (*data.b != 0); // right edge
 	data.b++;
       }
       n = nx;
@@ -1140,7 +1140,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	  *out.w++ = (*data.w++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.w++ = zeroedge? 0: (*data.w != 0); /* left edge */
+	*out.w++ = zeroedge? 0: (*data.w != 0); // left edge
 	data.w++;
 	n = nx - 2;
 	while (n--) {
@@ -1149,7 +1149,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 		      && data.w[-nx] && data.w[-nx + 1]);
 	  data.w++;
 	}
-	*out.w++ = zeroedge? 0: (*data.w != 0); /* right edge */
+	*out.w++ = zeroedge? 0: (*data.w != 0); // right edge
 	data.w++;
       }
       n = nx;
@@ -1171,7 +1171,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	  *out.l++ = (*data.l++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.l++ = zeroedge? 0: (*data.l != 0); /* left edge */
+	*out.l++ = zeroedge? 0: (*data.l != 0); // left edge
 	data.l++;
 	n = nx - 2;
 	while (n--) {
@@ -1180,7 +1180,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 		      && data.l[-nx] && data.l[-nx + 1]);
 	  data.l++;
 	}
-	*out.l++ = zeroedge? 0: (*data.l != 0); /* right edge */
+	*out.l++ = zeroedge? 0: (*data.l != 0); // right edge
 	data.l++;
       }
       n = nx;
@@ -1202,7 +1202,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	  *out.l++ = (*data.q++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.l++ = zeroedge? 0: (*data.q != 0); /* left edge */
+	*out.l++ = zeroedge? 0: (*data.q != 0); // left edge
 	data.q++;
 	n = nx - 2;
 	while (n--) {
@@ -1211,7 +1211,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 		      && data.q[-nx] && data.q[-nx + 1]);
 	  data.q++;
 	}
-	*out.l++ = zeroedge? 0: (*data.q != 0); /* right edge */
+	*out.l++ = zeroedge? 0: (*data.q != 0); // right edge
 	data.q++;
       }
       n = nx;
@@ -1233,7 +1233,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	  *out.l++ = (*data.f++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.l++ = zeroedge? 0: (*data.f != 0); /* left edge */
+	*out.l++ = zeroedge? 0: (*data.f != 0); // left edge
 	data.f++;
 	n = nx - 2;
 	while (n--) {
@@ -1242,7 +1242,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 		      && data.f[-nx] && data.f[-nx + 1]);
 	  data.f++;
 	}
-	*out.l++ = zeroedge? 0: (*data.f != 0); /* right edge */
+	*out.l++ = zeroedge? 0: (*data.f != 0); // right edge
 	data.f++;
       }
       n = nx;
@@ -1264,7 +1264,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 	  *out.l++ = (*data.d++ != 0);
       ny -= 2;
       while (ny--) {
-	*out.l++ = zeroedge? 0: (*data.d != 0); /* left edge */
+	*out.l++ = zeroedge? 0: (*data.d != 0); // left edge
 	data.d++;
 	n = nx - 2;
 	while (n--) {
@@ -1273,7 +1273,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
 		      && data.d[-nx] && data.d[-nx + 1]);
 	  data.d++;
 	}
-	*out.l++ = zeroedge? 0: (*data.d != 0); /* right edge */
+	*out.l++ = zeroedge? 0: (*data.d != 0); // right edge
 	data.d++;
       }
       n = nx;
@@ -1287,4 +1287,4 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
   }
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------

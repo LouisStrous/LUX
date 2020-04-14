@@ -36,10 +36,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define calloctype(count, T) (T*) calloc(count, sizeof(T))
 #define realloctype(ptr, T) (T*) realloc(ptr, sizeof(T))
 
-/* tLine code */
+// tLine code
 #define TRANS_FIXED_STRING      1
 
-/* symbol classes */
+// symbol classes
 
 /// LUX symbol classes.
 enum Symbolclass {
@@ -87,8 +87,8 @@ enum Symbolclass {
   LUX_UNDEFINED = 255   //!< (255) an undefined symbol
 };
 
-/* note: do not change the relative order of these classes!  newSymbol */
-/* might not work properly if you do. */
+// note: do not change the relative order of these classes!  newSymbol
+// might not work properly if you do.
 
 /// LUX symbol types
 enum Symboltype {
@@ -131,7 +131,7 @@ enum includeType {
   FILE_REPORT                   //!< (1) @@file
 };
 
-/* special execution codes */
+// special execution codes
 #define LUX_ERROR       -1      //!< error state
 #define LUX_OK          1       //!< OK state
 #define LOOP_BREAK      -2      //!< BREAK state
@@ -139,13 +139,13 @@ enum includeType {
 #define LOOP_RETALL     -4      //!< RETALL state
 #define LOOP_RETURN     -5      //!< RETURN state
 
-/* breakpoints */
+// breakpoints
 #define BR_ENABLE       2       //!< enable breakpoint
 #define BR_EXIST        1       //!< create breakpoint
 #define BR_UNSET        0
 #define BR_ENABLED      (BR_EXIST | BR_ENABLE)
 
-/* bigendian/littleendian */
+// bigendian/littleendian
 #if WORDS_BIGENDIAN
 #define BIGENDIAN       1
 #else
@@ -165,7 +165,7 @@ enum fmtType {
   FMT_EMPTY                     //!< (8) empty format
 };
 
-/* binary operation classes */
+// binary operation classes
 /* don't change the order of these constants!  this order must
    correspond with the order in binOpName, binOpSign, binFunc* in
    eval.c, and the positions of LUX_EQ, LUX_OR, and LUX_POW relative
@@ -197,15 +197,15 @@ enum binaryOp {
   LUX_ANDIF,                    //!< (19) ANDIF
   LUX_ORIF                      //!< (20) ORIF
 };
-#define NUM_BIN_OP      19      /* note that this number does not */
-                                /* count LUX_ANDIF and LUX_ORIF */
+#define NUM_BIN_OP      19      // note that this number does not
+                                // count LUX_ANDIF and LUX_ORIF
 
- /* boundingBoxType (PLOT,BOUNDINGBOX=) stuff */
-#define BB_NONE         0       /* no bounding box */
-#define BB_ALL          1       /* get everything */
-#define BB_PLOT         2       /* plot window only */
+ // boundingBoxType (PLOT,BOUNDINGBOX=) stuff
+#define BB_NONE         0       // no bounding box
+#define BB_ALL          1       // get everything
+#define BB_PLOT         2       // plot window only
 
- /* cleanUp() stuff */
+ // cleanUp() stuff
 #define CLEANUP_VARS    1
 #define CLEANUP_EDBS    2
 #define CLEANUP_COMP    4
@@ -213,8 +213,8 @@ enum binaryOp {
 #define CLEANUP_ALL     7
 #define CLEANUP_ERROR   8
 
- /* special parser symbol numbers */
-#define LUX_NEW_LIST    -32766  /* must be negative */
+ // special parser symbol numbers
+#define LUX_NEW_LIST    -32766  // must be negative
 #define LUX_EXTEND      -32755
 #define LUX_LIST_DELIM  -32754
 #define LUX_ZERO                4
@@ -223,7 +223,7 @@ enum binaryOp {
 
 #define LUX_UNSPECIFIED -9999
 
- /* some special functions and routines */
+ // some special functions and routines
 #define LUX_NEG_FUN     0
 #define LUX_SUBSC_FUN   1
 #define LUX_CONCAT_FUN  4
@@ -231,32 +231,32 @@ enum binaryOp {
 
 #define LUX_INSERT_SUB  0
 
- /* openPathFile options */
+ // openPathFile options
 #define FIND_SUBR       0
 #define FIND_FUNC       1
 #define FIND_EITHER     2
 #define FIND_LOWER      4
 
-/* data file types */
+// data file types
 
-#define FILE_TYPE_ANA_FZ        1 /* lux fz file */
-#define FILE_TYPE_IDL_SAVE      2 /* IDL Save file */
-#define FILE_TYPE_GIF           3 /* GIF file */
-#define FILE_TYPE_ANA_ASTORE    4 /* LUX ASTORE file */
-#define FILE_TYPE_JPEG          5 /* JPEG file */
-#define FILE_TYPE_TIFF          6 /* TIFF file */
-#define FILE_TYPE_FITS          7 /* FITS file */
+#define FILE_TYPE_ANA_FZ        1 // lux fz file
+#define FILE_TYPE_IDL_SAVE      2 // IDL Save file
+#define FILE_TYPE_GIF           3 // GIF file
+#define FILE_TYPE_ANA_ASTORE    4 // LUX ASTORE file
+#define FILE_TYPE_JPEG          5 // JPEG file
+#define FILE_TYPE_TIFF          6 // TIFF file
+#define FILE_TYPE_FITS          7 // FITS file
 #define FILE_TYPE_PPM_RAW       8
 #define FILE_TYPE_PPM_ASCII     9
 #define FILE_TYPE_XPM           10
-#define FILE_TYPE_XBM           11 /* X11 bitmap */
+#define FILE_TYPE_XBM           11 // X11 bitmap
 #define FILE_TYPE_BMP           12
-#define FILE_TYPE_SUN_RAS       13 /* Sun raster file */
+#define FILE_TYPE_SUN_RAS       13 // Sun raster file
 #define FILE_TYPE_IRIS_RGB      14
 #define FILE_TYPE_TARGA_24      15
 #define FILE_TYPE_PM            16
 
-/* symbol identification options */
+// symbol identification options
 
 #define I_FILELEVEL     ((1<<0) | (1<<1))
 #define I_LINE          (1<<1)
@@ -270,7 +270,7 @@ enum binaryOp {
 #define I_SINGLEMODE    (~(I_PARENT | I_LINE | I_FILELEVEL))
 #define I_SINGLEEXEC    (~(I_PARENT | I_LINE | I_FILELEVEL | I_VALUE))
 
-/* traceMode definitions */
+// traceMode definitions
 #define T_FILE          (1 << 0)
 #define T_LOOP          (1 << 1)
 #define T_BLOCK         (1 << 2)
@@ -280,32 +280,32 @@ enum binaryOp {
 #define T_SHOWEXEC      (1 << 6)
 #define T_ROUTINEIO     (1 << 7)
 
-/* sprintf modes */
-#define FMT_LEFT_JUSTIFY        (1 << 0) /* - modifier */
-#define FMT_ALWAYS_SIGN         (1 << 1) /* + modifier */
-#define FMT_ZERO_PAD            (1 << 2) /* 0 modifier */
-#define FMT_ALTERNATIVE         (1 << 3) /* # modifier */
-#define FMT_POSITIVE_BLANK      (1 << 4) /* ' ' modifier */
-#define FMT_SUPPRESS            (1 << 5) /* * modifier */
-#define FMT_BIG                 (1 << 6) /* l modifier */
-#define FMT_SMALL               (1 << 7) /* h modifier */
-#define FMT_BIGINT              (1 << 8) /* j modifier */
-#define FMT_MIX                 (1 << 9) /* _ modifier */
-#define FMT_MIX2                (1 << 10) /* = modifier */
+// sprintf modes
+#define FMT_LEFT_JUSTIFY        (1 << 0) // - modifier
+#define FMT_ALWAYS_SIGN         (1 << 1) // + modifier
+#define FMT_ZERO_PAD            (1 << 2) // 0 modifier
+#define FMT_ALTERNATIVE         (1 << 3) // # modifier
+#define FMT_POSITIVE_BLANK      (1 << 4) // ' ' modifier
+#define FMT_SUPPRESS            (1 << 5) // * modifier
+#define FMT_BIG                 (1 << 6) // l modifier
+#define FMT_SMALL               (1 << 7) // h modifier
+#define FMT_BIGINT              (1 << 8) // j modifier
+#define FMT_MIX                 (1 << 9) // _ modifier
+#define FMT_MIX2                (1 << 10) // = modifier
 
-/* tv, tvraw modes */
-#define TV_SCREEN       (1 << 6) /* 64 */
-#define TV_POSTSCRIPT   (1 << 7) /* 128 */
-#define TV_PDEV         (TV_SCREEN | TV_POSTSCRIPT) /* 192 */
-#define TV_PLOTWINDOW   (1 << 8) /* 256 */
-#define TV_ZOOM         (1 << 9) /* 512 */
-#define TV_CENTER       (1 << 10) /* 1024 */
-#define TV_SCALE        (1 << 11) /* 2048 */
-#define TV_MAP          (1 << 12) /* 4096 */
-#define TV_RAW          (1 << 13) /* 8192 */
-#define TV_24           (1 << 14) /* 16384 */
+// tv, tvraw modes
+#define TV_SCREEN       (1 << 6) // 64
+#define TV_POSTSCRIPT   (1 << 7) // 128
+#define TV_PDEV         (TV_SCREEN | TV_POSTSCRIPT) // 192
+#define TV_PLOTWINDOW   (1 << 8) // 256
+#define TV_ZOOM         (1 << 9) // 512
+#define TV_CENTER       (1 << 10) // 1024
+#define TV_SCALE        (1 << 11) // 2048
+#define TV_MAP          (1 << 12) // 4096
+#define TV_RAW          (1 << 13) // 8192
+#define TV_24           (1 << 14) // 16384
 
-/* for inspecting X11 visual classes (e.g., in color.c) */
+// for inspecting X11 visual classes (e.g., in color.c)
 #define visualIsRW(code)                        (code % 2 == 1)
 #define visualIsRO(code)                        (code % 2 == 0)
 #define visualIsGray(code)                      (code < 3)
@@ -315,41 +315,41 @@ enum binaryOp {
 #define visualIsLegal(code)                     (code >= 0 && code < 6)
 
 #define PLOT_INFTY      (FLT_MAX/2)
-/* PLOT_INFTY cannot be as large as FLT_MAX or internal errors in SYMPLOT */
-/* occur  - LS 21mar94 */
+// PLOT_INFTY cannot be as large as FLT_MAX or internal errors in SYMPLOT
+// occur  - LS 21mar94
 
 const double PI = 3.141592653589793238463;
 const double TWOPI = 2*PI;
 const double DEG = PI/180;
 const double RAD = 180/PI;
 
-/* coordinate systems */
-#define LUX_DEP 0               /* LUX_DVI or LUX_DEV, depending on */
-                                /* coordinate magnitudes */
-#define LUX_DVI 1               /* device-independent */
-#define LUX_DEV 2               /* device-dependent (xport) */
-#define LUX_IMG 3               /* image coordinates (tv) */
-#define LUX_PLT 4               /* plot coordinates */
-#define LUX_RIM 5               /* relative image coordinates */
-#define LUX_RPL 6               /* relative plot coordinates */
-#define LUX_X11 7               /* X coordinate system */
-#define LUX_XLOG        64              /* logarithmic X */
-#define LUX_YLOG        128             /* logarithmic Y */
+// coordinate systems
+#define LUX_DEP 0               // LUX_DVI or LUX_DEV, depending on
+                                // coordinate magnitudes
+#define LUX_DVI 1               // device-independent
+#define LUX_DEV 2               // device-dependent (xport)
+#define LUX_IMG 3               // image coordinates (tv)
+#define LUX_PLT 4               // plot coordinates
+#define LUX_RIM 5               // relative image coordinates
+#define LUX_RPL 6               // relative plot coordinates
+#define LUX_X11 7               // X coordinate system
+#define LUX_XLOG        64              // logarithmic X
+#define LUX_YLOG        128             // logarithmic Y
 
-/* debug breakpoint modes */
+// debug breakpoint modes
 #define DEBUG_STEP      1
 
 #define PROTECT_CONTEXT INT16_MAX
 #define PROTECTED       (INT16_MAX - 2000)
-#define MAINTAIN        128     /* to mark symbols that may not be */
-                                /* overwritten */
+#define MAINTAIN        128     // to mark symbols that may not be
+                                // overwritten
 
-/* getNumerical() stuff */
-#define GN_UPDATE       1       /* update input symbol */
-#define GN_UPGRADE      2       /* output at least <minType> */
-#define GN_EXACT        4       /* output exactly <minType> */
+// getNumerical() stuff
+#define GN_UPDATE       1       // update input symbol
+#define GN_UPGRADE      2       // output at least <minType>
+#define GN_EXACT        4       // output exactly <minType>
 
-/* startStandardLoop() stuff */
+// startStandardLoop() stuff
 #define SL_SAMEDIMS     0 //!< 0x0 output needs same dimensions as input */
 #define SL_COMPRESS     1 //!< 0x1 output lacks first dimension from axis */
 #define SL_COMPRESSALL  2 //!< 0x2 output lacks all dimensions from axis */
@@ -371,7 +371,7 @@ const double RAD = 180/PI;
 #define SL_ALLAXES      (1<<13) //!< 0x2000 select all axes for treatment */
 #define SL_TAKEONED     (1<<14) //!< 0x4000 treat ax 1D array */
 
-/* stringpointer() stuff */
+// stringpointer() stuff
 #define SP_VAR          1
 #define SP_USER_FUNC    2
 #define SP_USER_SUBR    4
@@ -413,9 +413,9 @@ union Scalar {
   char **sp;
 };
 
-/* wideScalar is equal to scalar plus the complex data types; we have */
-/* separate scalar and wideScalars because wideScalar is wider, which is */
-/* not always desirable. */
+// wideScalar is equal to scalar plus the complex data types; we have
+// separate scalar and wideScalars because wideScalar is wider, which is
+// not always desirable.
 union wideScalar {
   uint8_t b;
   int16_t w;
@@ -457,7 +457,7 @@ typedef struct {
   int32_t defaultMode; uint8_t offset; char **keys;
 } keyList;
 
-/* kinds of facts */
+// kinds of facts
 enum {
   LUX_NO_FACT, LUX_STAT_FACTS
 };
@@ -549,25 +549,25 @@ typedef struct {
 } extractSec;
 
 typedef struct {
-  uint8_t  type;                   /* subscript type: scalar, range, index */
+  uint8_t  type;                   // subscript type: scalar, range, index
   union {
     struct {
-      int32_t       value;          /* the single integer subscript */
+      int32_t       value;          // the single integer subscript
     } scalar;
     struct {
-      int32_t       start;          /* the integer range start */
-      int32_t       end;            /* the integer range end */
+      int32_t       start;          // the integer range start
+      int32_t       end;            // the integer range end
     } range;
     struct {
-      int32_t       n_elem;         /* the number of index array elements */
-      int32_t       *ptr;           /* pointer to the index array elements */
+      int32_t       n_elem;         // the number of index array elements
+      int32_t       *ptr;           // pointer to the index array elements
     } array;
   } data;
 } structPtrMember;
 
 typedef struct structPtrStruct {
-  int32_t   desc;                   /* index of structure descriptor */
-  int32_t   n_subsc;                /* number of subscripts */
+  int32_t   desc;                   // index of structure descriptor
+  int32_t   n_subsc;                // number of subscripts
   structPtrMember       *member;
 } structPtr;
 
@@ -718,7 +718,7 @@ typedef struct {
   char only_whitespace;         //!< whitespace only?
 } formatInfo;
 
-/* for breakpoints: */
+// for breakpoints:
 typedef struct {
   int32_t   line;
   char  *name;
@@ -729,7 +729,7 @@ typedef struct {
 #define BP_VARIABLE     4
 
 
-/* for Dick's stuff */
+// for Dick's stuff
 #define types_ptr       Pointer
 #define ahead           arrayStruct
 #define sym_desc        symTableEntryStruct
@@ -819,7 +819,7 @@ extern char const* symbolStack[];
       break; \
     default:        return cerror(ILL_CLASS, iq); }
 
-        /* multi-type macro */
+        // multi-type macro
 #define multiSwitch2(type, first, second) \
  switch (type) \
  { case LUX_INT8:   first .b second ; break; \

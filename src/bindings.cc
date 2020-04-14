@@ -147,15 +147,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <obstack.h>
 #include "bindings.hh"
 
-/** Define which memory allocation routine to use for obstacks. */
+//* Define which memory allocation routine to use for obstacks.
 #define obstack_chunk_alloc malloc
 
-/** Define which memory freeing routine to use for obstacks. */
+//* Define which memory freeing routine to use for obstacks.
 #define obstack_chunk_free free
 
 struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ pointer-count-stride function to a LUX function of type
 /// `iD*;rD&` or `iD*;iL*;rD&`, or subroutine of type `iD*` or
 /// `iD*;iL*`.
@@ -264,7 +264,7 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
     free(axes);
   return iq;
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 double call_split_times(double t1, double t2,
                         double(*f)(double, double, double, double))
 {
@@ -275,7 +275,7 @@ double call_split_times(double t1, double t2,
   ttb = t2 - ttb;
   return f(uta, utb, tta, ttb);
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /** Bind a C function to a LUX function of type `i>L*;iD&;iD&;rD&`.
 
     The LUX function arguments are:
@@ -332,7 +332,7 @@ lux_d_dT3_iaiqiqrq_012_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type
 /// `iD*;iD&;iD&;iD&;rD&`.
 ///
@@ -371,7 +371,7 @@ lux_d_dT4_iaiqT3rq_0T3_4_f_(int32_t narg, int32_t ps[],
     *ptrs[4].d++ = f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, *ptrs[3].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD*;iD&;rD&`.
 ///
 /// The LUX function arguments are:
@@ -410,7 +410,7 @@ lux_d_dT4_iaiqrq_01_2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type
 /// `iD*;iD&;iD+3,+3&;rD&`.
 ///
@@ -466,7 +466,7 @@ lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type
 /// `i>L*;iD;iD;iD;iD;rD&`.
 ///
@@ -528,7 +528,7 @@ lux_d_dT6_iaiT4rq_0z1T4_5_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD*;rD&`.
 ///
 /// The LUX function arguments are:
@@ -563,7 +563,7 @@ lux_d_d_iarq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
     *ptrs[1].d++ = f(*ptrs[0].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD*;iD#;rD&`.
 ///
 /// The LUX function arguments are:
@@ -598,17 +598,17 @@ lux_d_dd_iaibrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
   if (sa.result() < 0)
     return LUX_ERROR;
   if (infos[1].nelem > 1) {
-    /* same number of elements in parameters 0 and 1 */
+    // same number of elements in parameters 0 and 1
     while (infos[0].nelem--)
       *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d++);
   } else {
-    /* parameter 1 is a scalar */
+    // parameter 1 is a scalar
     while (infos[0].nelem--)
       *ptrs[2].d++ = f(*ptrs[0].d++, *ptrs[1].d);
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD*;iD&;rD&`.
 ///
 /// The LUX function arguments are:
@@ -646,7 +646,7 @@ lux_d_dd_iaiqrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `i>L*;rD&`.
 ///
 /// The LUX function arguments are:
@@ -699,7 +699,7 @@ lux_d_dd_iarq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD3,3*;iD-,-&;rD[-]&`.
 ///
 /// The LUX function arguments are:
@@ -742,7 +742,7 @@ lux_d_dp33d_i33aimmqrcq_01_2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD3*;rD-3&`.
 ///
 /// The LUX function arguments are:
@@ -780,7 +780,7 @@ lux_d_dp3_i3arm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double [3]))
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD3*;iD&;rD-3&`.
 ///
 /// The LUX function arguments are:
@@ -823,7 +823,7 @@ lux_d_dp3dp3_i3aiqrm3q_01_2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD*;rD-&` or
 /// `iD*;iL*;rD{-}&`.
 ///
@@ -863,7 +863,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
 
   StandardArguments_RAII sa;
   switch (narg) {
-  case 1:                       /* source */
+  case 1:                       // source
     if ((iq = sa.set(narg, ps, "iD*;rD-&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     axes = oneaxis;
@@ -871,7 +871,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
     setAxes(&infos[0], 0, NULL, SL_EACHROW);
     iret = 1;
     break;
-  case 2:                       /* source, axes */
+  case 2:                       // source, axes
     if ((iq = sa.set(narg, ps, "iD*;iL*;rD{-}&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     axes = ptrs[1].l;
@@ -883,7 +883,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
     break;
   }
 
-  if (internalMode & 1) {       /* /ALLAXES */
+  if (internalMode & 1) {       // /ALLAXES
     naxes = infos[0].ndim;
     axes = (int32_t*) malloc(naxes*sizeof(int32_t));
     allaxes = 1;
@@ -908,7 +908,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
     free(axes);
   return iq;
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX subroutine of type
 /// `iD*;iD&;iD&;iD&;iD&;iD&;iD&;iD&;oD&;oD&;oD&;oD&;oD&;oD&`.
 ///
@@ -956,7 +956,7 @@ lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[],
       ptrs[9].d++, ptrs[10].d++, ptrs[11].d++, ptrs[12].d++, ptrs[13].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD&;rD&`.
 //
 // The LUX function arguments are:
@@ -999,7 +999,7 @@ lux_i_dT3dpdp_iaiqrq_0z122_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type `iD3*;iD;iD;rD&`.
 ///
 /// The LUX function arguments are:
@@ -1046,7 +1046,7 @@ lux_i_dT5dp3_i3aiirq_120003_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /// Bind a C++ function to a LUX function of type
 /// `iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&`.
 ///
@@ -1092,7 +1092,7 @@ lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `i>L*;oD+2,+3&;oD[-]&`.
 
 // The LUX function arguments are:
@@ -1166,7 +1166,7 @@ lux_i_dddp23T2_iaop2p3qocq_0z12_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;rD&`.
 
 // The LUX function arguments are:
@@ -1205,7 +1205,7 @@ lux_i_dddpdp_iarq_0z11_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iL;rD+3,+2&`.
 
 // The LUX function arguments are:
@@ -1248,7 +1248,7 @@ lux_i_ddidp23_iairp3p2q_0z12_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `i>L*;rD+3&`.
 
 // The LUX function arguments are:
@@ -1354,7 +1354,7 @@ lux_i_ddipT3dp_iarp3q_0z1111_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD2,3*;oD-2-3&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&`.
 
@@ -1404,7 +1404,7 @@ lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iL;iL;rD&`
 
 // The LUX function arguments are:
@@ -1450,7 +1450,7 @@ lux_i_dpiT3dp_iaiirq_00T3_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iL;rD&`.
 
 // The LUX function arguments are:
@@ -1493,7 +1493,7 @@ lux_i_dpiidp_iairq_00T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3*;iL;rD&`.
 
 // The LUX function arguments are:
@@ -1537,7 +1537,7 @@ lux_i_idT3dp3_i3airq_10002_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iL;iD3*;rD[-]&`.
 
 // The LUX function arguments are:
@@ -1581,7 +1581,7 @@ lux_i_idp3dpT3_ii3arcq_0T222_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iL*;rD+2&`.
 
 // The LUX function arguments are:
@@ -1620,7 +1620,7 @@ lux_i_idpdp_iarp2q_011_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C pointer-count-stride function to a LUX subroutine of type
 // `iD*` or `iD*;iL*`.
 
@@ -1652,7 +1652,7 @@ lux_i_sd_iaia_000_s_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t c
 {
   return lux_ivarl_copy_eachaxis_(narg, ps, f, 0);
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C pointer-count-stride function to a LUX function of type
 // `iD*;rD&` or `iD*;iL*;rD&`.
 
@@ -1689,7 +1689,7 @@ lux_i_sd_iaiarq_000_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t
 {
   return lux_ivarl_copy_eachaxis_(narg, ps, f, 1);
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iL?;iD;iD?;rD&`.
 
 // The LUX function arguments are:
@@ -1725,7 +1725,7 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
 
   StandardArguments_RAII sa;
   switch (narg) {
-  case 2:                       /* source, param1; (param2 = 0) */
+  case 2:                       // source, param1; (param2 = 0)
     if ((iq = sa.set(narg, ps, "iD*;iD;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     ipar1 = 1;
@@ -1734,7 +1734,7 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     setAxes(&infos[0], 0, NULL, SL_EACHROW);
     setAxes(&infos[iret], 0, NULL, SL_EACHROW);
     break;
-  case 3:                       /* source, param1, param2 */
+  case 3:                       // source, param1, param2
     if ((iq = sa.set(narg, ps, "iD*;iD;iD;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     ipar1 = 1;
@@ -1743,7 +1743,7 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     setAxes(&infos[0], 0, NULL, SL_EACHROW);
     setAxes(&infos[iret], 0, NULL, SL_EACHROW);
     break;
-  case 4:                       /* source, axis, param1, param2 */
+  case 4:                       // source, axis, param1, param2
     if ((iq = sa.set(narg, ps, "iD*;iL;iD;iD;rD&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     ipar1 = 2;
@@ -1764,7 +1764,7 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
            < infos[iret].rndim);
   return iq;
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD&;iD&;rD+3,+3&`.
 
 // The LUX function arguments are:
@@ -1812,7 +1812,7 @@ lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(int32_t narg, int32_t ps[],
            advanceLoop(&infos[3], &ptrs[0]) < infos[0].rndim);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD&;iD&;rD+3&`.
 
 // The LUX function arguments are:
@@ -1858,7 +1858,7 @@ lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD&;iD&;iD&;rD+3,+3&`.
 
 // The LUX function arguments are:
@@ -1909,7 +1909,7 @@ lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD&;iD&;rD+3,+3&`.
 
 // The LUX function arguments are:
@@ -1957,7 +1957,7 @@ lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `iD*;iD&;oD&;oD&;oD&`.
 
 // The LUX subroutine arguments are:
@@ -2003,7 +2003,7 @@ lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(int32_t narg, int32_t ps[],
       ptrs[4].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;iD&;iD&;oD&;oD&;oD&;oD&`.
 
@@ -2046,7 +2046,7 @@ lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(int32_t narg, int32_t ps[],
       ptrs[4].d++, ptrs[5].d++, ptrs[6].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;iD&;iD&;oD&;oD+3,+3&;oD[-]&;oD[-]&;oD[-]&;oD[-]&`.
 
@@ -2111,7 +2111,7 @@ lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;iD&;iD&;iD&;oD&;oD&`.
 
@@ -2152,7 +2152,7 @@ lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(int32_t narg, int32_t ps[],
       ptrs[4].d++, ptrs[5].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;iD&;iD&;oD&;oD&`.
 
@@ -2192,7 +2192,7 @@ lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(int32_t narg, int32_t ps[],
     f(*ptrs[0].d++, *ptrs[1].d++, *ptrs[2].d++, 0.0, ptrs[3].d++, ptrs[4].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type
 // `iD*;iD&;iD&;iD&;iD&;iD&;rD+2,+3&`.
 
@@ -2238,7 +2238,7 @@ lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD&;iD&;iD&;rD+3,+3&`.
 
 // The LUX function arguments are:
@@ -2289,7 +2289,7 @@ lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;iD&;iD&;iD&;iD&;iD&;oD&;oD&;oD&;oD&;oD&;oD&`.
 
@@ -2336,7 +2336,7 @@ lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(int32_t narg, int32_t ps[],
       ptrs[8].d++, ptrs[9].d++, ptrs[10].d++, ptrs[11].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type
 // `iD*;iD&;iD&;iD&;iD&;rD+3,+3&`.
 
@@ -2389,7 +2389,7 @@ lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD+3,+3&;rD[-]&`.
 
 // The LUX function arguments are:
@@ -2438,7 +2438,7 @@ lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `i>L*;oD3,3;oD+3,+3&;oD[-]&`.
 
@@ -2517,7 +2517,7 @@ lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;rD+3,+3&`.
 
 // The LUX function arguments are:
@@ -2558,7 +2558,7 @@ lux_v_dddp33_iarp3p3q_0z1_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD&;rD+3&`.
 
 // The LUX function arguments are:
@@ -2601,7 +2601,7 @@ lux_v_dddp3_iaiqrp3q_0T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3*;iD;iD;rD&`.
 
 // The LUX function arguments are:
@@ -2648,7 +2648,7 @@ lux_v_dddp3dpT3_i3aiirq_120333_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&`.
 
@@ -2695,7 +2695,7 @@ lux_v_dddpT16_iaoqT16_0z1T16_s_(int32_t narg, int32_t ps[],
       ptrs[15].d++, ptrs[16].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `iD*;oD&;oD&;oD&`.
 
 // The LUX subroutine arguments are:
@@ -2731,7 +2731,7 @@ lux_v_dddpT3_iaoqT3_0z1T3_s_(int32_t narg, int32_t ps[],
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;oD&;oD&;oD&;oD+3,+3&;oD[-1]&;oD[-]&;oD[-]&;oD[-]&`.
 
@@ -2793,7 +2793,7 @@ lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD*;oD&;oD&;oD&;oD&`.
 
@@ -2830,7 +2830,7 @@ lux_v_dddpT4_iaoqT4_0z1T4_s_(int32_t narg, int32_t ps[],
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++, ptrs[3].d++, ptrs[4].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `iD*;oD&;oD&`.
 
 // The LUX subroutine arguments are:
@@ -2865,7 +2865,7 @@ lux_v_dddpdp_iaoqoq_0z12_s_(int32_t narg, int32_t ps[],
     f(*ptrs[0].d++, 0.0, ptrs[1].d++, ptrs[2].d++);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `iD*;oD3,3&`.
 
 // The LUX subroutine arguments are:
@@ -2904,7 +2904,7 @@ lux_v_ddp33_iao33q_01_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `iD*;oD&;oD&`.
 
 // The LUX subroutine arguments are:
@@ -2940,7 +2940,7 @@ lux_v_ddpdp_iaoqoq_012_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD2,3*;iD&;rD=,-&`.
 
 // The LUX function arguments are:
@@ -2990,7 +2990,7 @@ lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD2,3*;iD&;rD&`.
 
 // The LUX function arguments are:
@@ -3039,7 +3039,7 @@ lux_v_dp23T3_i23aiqrq_0T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD2,3*;oD-,-&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&`.
 
@@ -3086,7 +3086,7 @@ lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD2,3*;oD-,-&;oD[-]&`.
 
@@ -3128,7 +3128,7 @@ lux_v_dp23dpdp_i23aommqocq_0T2_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3,3*;rD&`.
 
 // The LUX function arguments are:
@@ -3170,7 +3170,7 @@ lux_v_dp33T2_i33arq_01_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3,3*;iD&;rD&`.
 
 // The LUX function arguments are:
@@ -3221,7 +3221,7 @@ lux_v_dp33T3_i33aiqrq_0T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `rD3,3`.
 
 // The LUX function has no arguments.
@@ -3250,7 +3250,7 @@ lux_v_dp33_r33_0_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3]))
   f((double (*)[3]) ptrs[0].d);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3,3*;iD-,-&;iD&;rD&`.
 
 // The LUX function arguments are:
@@ -3307,7 +3307,7 @@ lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3,3*;iD-3+2&;rD&`.
 
 // The LUX function arguments are:
@@ -3355,7 +3355,7 @@ lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3,3*;iD-&;rD[-]&`.
 
 // The LUX function arguments are:
@@ -3404,7 +3404,7 @@ lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3,3*;rD-&`.
 
 // The LUX function arguments are:
@@ -3448,7 +3448,7 @@ lux_v_dp33dp3_i33armq_01_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type
 // `iD3,3*;oD-,-&;oD[-]&`.
 
@@ -3490,7 +3490,7 @@ lux_v_dp33dpdp_i33aommqocq_0T2_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3*;iD&;rD&`.
 
 // The LUX function arguments are:
@@ -3537,7 +3537,7 @@ lux_v_dp3T3_i3aiqrq_0T2_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3*;rD+3&`.
 
 // The LUX function arguments are:
@@ -3578,7 +3578,7 @@ lux_v_dp3dp33_i3arp3q_01_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3*;rD&`.
 
 // The LUX function arguments are:
@@ -3619,7 +3619,7 @@ lux_v_dp3dpT3_i3arq_0111_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `oD3,3;oD3`.
 
 // The LUX subroutine arguments are:
@@ -3653,7 +3653,7 @@ lux_v_dp3dp_o33o3_01_s_(int32_t narg, int32_t ps[],
   f((double (*)[3]) ptrs[0].d, (double *) ptrs[1].d);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX subroutine of type `iD3*;oD-&;oD&`.
 
 // The LUX subroutine arguments are:
@@ -3698,7 +3698,7 @@ lux_v_dp3dpdp3_i3aomqoq_0T2_s_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD3*;rD-3+2&`.
 
 // The LUX function arguments are:
@@ -3741,7 +3741,7 @@ lux_v_dp3dpdp_i3arm3p2q_011_f_(int32_t narg, int32_t ps[],
   }
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `rD3`.
 
 // The LUX function has no arguments.
@@ -3770,7 +3770,7 @@ lux_v_dpT3_r3_000_f_(int32_t narg, int32_t ps[],
   f(&tgts[0].d[0], &tgts[0].d[1], &tgts[0].d[2]);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 // Bind a C++ function to a LUX function of type `iD*;iD?;rD&`.
 
 // The LUX function arguments are:
@@ -3810,7 +3810,7 @@ lux_v_sddsd_iairq_012_f_(int32_t narg, int32_t ps[],
     infos[2].dims[0], 1);
   return sa.result();
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /** Register a LUX function so it can be used in LUX programs.
 
  \param [in] f points to the C++ function that corresponds to the LUX
@@ -3953,7 +3953,7 @@ void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name,
   ir.keys = spec;
   obstack_grow(registered_functions, &ir, sizeof(ir));
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 /** Register a LUX subroutine so it can be used in LUX programs.
 
  \param [in] f points to the C++ function that corresponds to the LUX

@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* LUX routines dealing with (X window) menus */
+// LUX routines dealing with (X window) menus
 /* file menu.c  LS  Started 17apr93.
    contains routines for creating and manipulating menus in windows */
 #ifdef HAVE_CONFIG_H
@@ -55,12 +55,12 @@ extern double	last_time;
 int32_t	theMenu, theItem;
 
 struct Menu {
-  int32_t          n_items;		/* number of menu panes (including title) */
-  char         **text;		/* pointer to item strings */
-  Window       *window;		/* pointer to item windows */
+  int32_t          n_items;		// number of menu panes (including title)
+  char         **text;		// pointer to item strings
+  Window       *window;		// pointer to item windows
 };
 typedef        struct Menu     Menu;
-/* title is # 0 */
+// title is # 0
 
 Menu	menu[MAXMENU];
 XFontStruct	*menu_font_info;
@@ -74,9 +74,9 @@ float	menu_x, menu_y;
 int32_t	text_menus = 0;
 
 void	delete_menu(int32_t);
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t menu_setup(void)
-/* setup for menus.  executed once before first menu is created */
+// setup for menus.  executed once before first menu is created
 {
  int32_t	i;
 
@@ -86,8 +86,8 @@ int32_t menu_setup(void)
    return luxerror("Cannot find font %s\n", 0, menu_font_name);
  fontheight = menu_font_info->max_bounds.ascent
             + menu_font_info->max_bounds.descent;
-				/* scale !XMENU with size of largest */
-				/* char in font */
+				// scale !XMENU with size of largest
+				// char in font
  fontwidth = menu_font_info->max_bounds.width;
  menugc = XCreateGC(display, RootWindow(display, screen_num), 0, NULL);
  XSetForeground(display, menugc, BlackPixel(display, screen_num));
@@ -100,12 +100,12 @@ int32_t menu_setup(void)
  menu_setup_done = 1;
  return LUX_OK;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t placeEvent(XEvent *event)
-/* returns 1 if the event occurred in one of our menus;  0 otherwise. */
-/* if 1, then stores the menu number in theMenu and the item number in */
-/* theItem.  KeyPress and PointerMotion events always have theItem = -1. */
-/* if 0, then both theMenu and theItem are -1. */
+// returns 1 if the event occurred in one of our menus;  0 otherwise.
+// if 1, then stores the menu number in theMenu and the item number in
+// theItem.  KeyPress and PointerMotion events always have theItem = -1.
+// if 0, then both theMenu and theItem are -1.
 {
  int32_t	i, j;
 
@@ -125,9 +125,9 @@ int32_t placeEvent(XEvent *event)
  }
  return 0;
 } 
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 void paint_pane(int32_t menu_num, int32_t menu_item, int32_t mode)
-/* paints a menu item */
+// paints a menu item
 {
  int32_t	x = 2, y;
  GC	gc;
@@ -144,9 +144,9 @@ void paint_pane(int32_t menu_num, int32_t menu_item, int32_t mode)
      gc = menugc;
      break;
  }
-    /* clearing repaints the background */
+    // clearing repaints the background
  XClearWindow(display, window);
-   /* find out index of window for label text */
+   // find out index of window for label text
  y = menu_font_info->max_bounds.ascent;
     /* the string length is necessary because strings for
         XDrawString may not be NULL terminated */
@@ -154,10 +154,10 @@ void paint_pane(int32_t menu_num, int32_t menu_item, int32_t mode)
 	     strlen(menu[menu_num].text[menu_item]));
  return;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t lux_menu_hide(int32_t narg, int32_t ps[])
-/* remove menu from window, but keep in memory */
-/* if argument is -1, then hide all */
+// remove menu from window, but keep in memory
+// if argument is -1, then hide all
 {
  int32_t	num, i1, i2;
 
@@ -173,12 +173,12 @@ int32_t lux_menu_hide(int32_t narg, int32_t ps[])
      i2 = num + 1;
    }
    for (num = i1; num < i2; num++)
-     if (menu[num].n_items) XUnmapWindow(display, menu_win[num]); /* unmap */
+     if (menu[num].n_items) XUnmapWindow(display, menu_win[num]); // unmap
    XFlush(display);
  }
  return LUX_OK;
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 int32_t lux_menu_kill(int32_t narg, int32_t ps[])
 /* remove menu from window and from memory
    argument -1 -> remove all menus */
@@ -195,7 +195,7 @@ int32_t lux_menu_kill(int32_t narg, int32_t ps[])
    i1 = num;
    i2 = num + 1;
  }
-	/* note: a nonexistant menu is guaranteed to have menu_win[] == 0 */
+	// note: a nonexistant menu is guaranteed to have menu_win[] == 0
  for (num = i1; num < i2; num++)
    if (menu_win[num])
      delete_menu(num);
@@ -203,10 +203,10 @@ int32_t lux_menu_kill(int32_t narg, int32_t ps[])
    XFlush(display);
  return LUX_OK;
 } 
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 Bool menuButtonPress(Display *display, XEvent *event, XPointer arg)
-/* returns True if the event is a ButtonPress, EnterNotify, or LeaveNotify */
-/* in one of our menus, False otherwise */
+// returns True if the event is a ButtonPress, EnterNotify, or LeaveNotify
+// in one of our menus, False otherwise
 {
   int32_t	num;
 
@@ -222,10 +222,10 @@ Bool menuButtonPress(Display *display, XEvent *event, XPointer arg)
       return False;
   }
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 Bool menuKeyPress(Display *display, XEvent *event, XPointer arg)
-/* returns True if the event is a KeyPress */
-/* in one of our menus, False otherwise */
+// returns True if the event is a KeyPress
+// in one of our menus, False otherwise
 {
   int32_t	num;
 
@@ -238,16 +238,16 @@ Bool menuKeyPress(Display *display, XEvent *event, XPointer arg)
       return False;
   }
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 Bool menuEvent(Display *display, XEvent *event, XPointer arg)
-/* returns True if the event was in one of our menus, False otherwise */
+// returns True if the event was in one of our menus, False otherwise
 {
   return placeEvent(event)? True: False;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t lux_check_menu(int32_t narg, int32_t ps[])
-/* checks event buffer for any pending menu selections */
-/* function: returns 1 if pending, 0 if not pending, error if illegal */
+// checks event buffer for any pending menu selections
+// function: returns 1 if pending, 0 if not pending, error if illegal
 {
  int32_t	num;
  XEvent	event;
@@ -278,9 +278,9 @@ int32_t lux_check_menu(int32_t narg, int32_t ps[])
  } else
    return LUX_ZERO;
 } 
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 char getMenuChar(int32_t menu_num)
-/* reads the next character from menu #menu_num */
+// reads the next character from menu #menu_num
 {
   XEvent	event;
   char	buffer;
@@ -296,7 +296,7 @@ char getMenuChar(int32_t menu_num)
     return buffer;
   }
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 char *readPane(int32_t menu_num, int32_t item_num, char const* query)
 {
   extern int32_t	scrat[];
@@ -304,8 +304,8 @@ char *readPane(int32_t menu_num, int32_t item_num, char const* query)
   int32_t	y, c = 'x', revert_to;
   Window	focusWindow;
 
-  /* make item text pointer point at "current" instead of "old", */
-  /* so that paint_pane finds the text that is being entered */
+  // make item text pointer point at "current" instead of "old",
+  // so that paint_pane finds the text that is being entered
   current = (char *) scrat;
   old = menu[menu_num].text[item_num];
   menu[menu_num].text[item_num] = current;
@@ -359,14 +359,14 @@ char *readPane(int32_t menu_num, int32_t item_num, char const* query)
   XSetWindowBackground(display, menu[menu_num].window[item_num - 1],
 		       WhitePixel(display,screen_num)); 
   XClearWindow(display, menu[menu_num].window[item_num - 1]);
-  menu[menu_num].text[item_num] = old; /* restore old text */
+  menu[menu_num].text[item_num] = old; // restore old text
   XDrawString(display, menu[menu_num].window[item_num - 1], menugc, 2, y + 2,
 	      old, strlen(old));
   XSetInputFocus(display, focusWindow, revert_to, CurrentTime);
   XFlush(display);
   return answer;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t lux_menu_read(int32_t narg, int32_t ps[])
      /* read string through menu item; 
 	Syntax:  menuread,menu#,item#,query,answer */
@@ -391,9 +391,9 @@ int32_t lux_menu_read(int32_t narg, int32_t ps[])
   string_value(result) = answer;
   return lux_replace(*ps, result);
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 int32_t lux_wait_for_menu(int32_t narg, int32_t ps[])
-/* grabs pointer and waits for menu input */
+// grabs pointer and waits for menu input
 {
  int32_t	mode;
  XEvent	event;
@@ -434,9 +434,9 @@ int32_t lux_wait_for_menu(int32_t narg, int32_t ps[])
    return LUX_OK;
  }
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 int32_t lux_menu_pop(int32_t narg, int32_t ps[])
-/* as lux_menu, but fix x and y according to mouse position */
+// as lux_menu, but fix x and y according to mouse position
 {
  int32_t	x, y, i, xd, yd;
  uint32_t	kb;
@@ -446,13 +446,13 @@ int32_t lux_menu_pop(int32_t narg, int32_t ps[])
    return luxerror("lux_menu_pop not yet upgraded for text menus!", 0);
  if (menu_setup() < 0)
    return LUX_ERROR;
-	/* get current mouse position in root window */
+	// get current mouse position in root window
  XQueryPointer(display, RootWindow(display, screen_num), &qroot, &qchild,
 	       &x, &y, &xd, &yd, &kb);
  i = define_menu(x, y, narg, ps);
  return i;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t createMenu(int32_t num, int32_t x, int32_t y, int32_t nItem, char **item)
 {
   int32_t	i, direction, ascent, descent, menu_width = 0,
@@ -504,7 +504,7 @@ int32_t createMenu(int32_t num, int32_t x, int32_t y, int32_t nItem, char **item
 					   actual width */
     XFlush(display);
     XGetWindowAttributes(display, menu_win[num], &w_attributes);
-    menu_width = w_attributes.width;	/* items as wide as window */
+    menu_width = w_attributes.width;	// items as wide as window
     attributes.event_mask = ButtonPressMask | EnterWindowMask
       | LeaveWindowMask;
     for (i = 1; i < nItem; i++) {
@@ -521,7 +521,7 @@ int32_t createMenu(int32_t num, int32_t x, int32_t y, int32_t nItem, char **item
   }
   return LUX_OK;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t lux_menu(int32_t narg, int32_t ps[])
 /* try at menus.  Syntax:
    MENU,num,x,y,title,item1 [,item2...]             (re)create menu
@@ -532,23 +532,23 @@ int32_t lux_menu(int32_t narg, int32_t ps[])
 {
  int32_t	num, i, n_items, iq, x = 0, y = 0;
 
- num = int_arg(ps[0]);		/* menu number */
+ num = int_arg(ps[0]);		// menu number
  if (num < 0 || num >= MAXMENU)
    return luxerror("Menu number %1d out of range", 0, num);
- if (narg == 1 && !menu_win[num]) /* MENU,num  case */
+ if (narg == 1 && !menu_win[num]) // MENU,num  case
    return luxerror("Requested menu %1d does not exist", 0, num);
  if (narg > 1) {
    iq = ps[1];
-   if (symbolIsNumerical(symbol_type(iq))) { /* no string: MENU,num,x,y,... */
+   if (symbolIsNumerical(symbol_type(iq))) { // no string: MENU,num,x,y,...
      if (narg == 2) 
        return luxerror("Need x and y coordinates", 0);
      x = int_arg(iq);
      y = int_arg(ps[2]);
-     i = 2;			/* skip num,x,y */
-     ps[2] = ps[0];		/* pass menu number to define_menu */
+     i = 2;			// skip num,x,y
+     ps[2] = ps[0];		// pass menu number to define_menu
    } else
-     i = 0;			/* MENU,num,title,item1,...   skip num */
-   n_items = narg - i - 1;	/* # text arguments */
+     i = 0;			// MENU,num,title,item1,...   skip num
+   n_items = narg - i - 1;	// # text arguments
    if (!menu_setup_done && menu_setup() != 1)
      return LUX_ERROR;
    if (n_items == 0 || i == 0) {
@@ -564,7 +564,7 @@ int32_t lux_menu(int32_t narg, int32_t ps[])
  }
  return LUX_OK;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t redefine_menu(int32_t narg, int32_t ps[])
 /* store new menu items in existing Menu struct. 
    ps[]:  menu_number, menu_item, ... */
@@ -577,7 +577,7 @@ int32_t redefine_menu(int32_t narg, int32_t ps[])
  if (narg == 2
      && symbol_class(ps[1]) == LUX_ARRAY
      && symbol_type(ps[1]) == LUX_STRING_ARRAY) {
-   string_array = 1;		/* string array, one allowed */
+   string_array = 1;		// string array, one allowed
    ptr = (char **) array_data(ps[1]);
    narg = array_size(ps[1]);
  } else
@@ -586,7 +586,7 @@ int32_t redefine_menu(int32_t narg, int32_t ps[])
  if (narg < n_new)
    n_new = narg;
  for (i = 0; i < n_new; i++) {
-   Free(menu[num].text[i]);	/* delete individual entries */
+   Free(menu[num].text[i]);	// delete individual entries
    if (string_array) {
      if (*ptr)
        text = *ptr++; 
@@ -609,7 +609,7 @@ int32_t redefine_menu(int32_t narg, int32_t ps[])
  }
  return LUX_OK;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t lux_menu_item(int32_t narg, int32_t ps[])
 /* change a single menu item
    Syntax: MenuItem,menu,item,text
@@ -634,11 +634,11 @@ int32_t lux_menu_item(int32_t narg, int32_t ps[])
  menu[num].text[item] = strsave(text);
  if (item > 0)
    paint_pane(num, item, WHITE);
- /* else change icon title:  still to be done! */
+ // else change icon title:  still to be done!
  XFlush(display);
  return LUX_OK;
 }
- /*------------------------------------------------------------------------*/ 
+ //------------------------------------------------------------------------
 int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
 /* store menu items in Menu struct.  menu number must be valid!
    also finds appropriate menu sizes, creates windows (but doesn't map
@@ -653,16 +653,16 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
   if (narg == 2
       && symbol_class(ps[1]) == LUX_ARRAY
       && array_type(ps[1]) == LUX_STRING_ARRAY) {
-    string_array = 1;			/* string array, one allowed */
+    string_array = 1;			// string array, one allowed
     narg = array_size(ps[1]);
     ptr.l = (int32_t*) array_data(ps[1]);
   } else
     narg--;
-  if (narg < 2) 		/* just a title */
+  if (narg < 2) 		// just a title
     return luxerror("Need at least one item in menu", 0);
   if (!(item = (char **) Malloc(narg*sizeof(char *))))
     return cerror(ALLOC_ERR, 0);
-  for (i = 0; i < narg; i++) {		/* all menu items and title */
+  for (i = 0; i < narg; i++) {		// all menu items and title
     if (string_array) {
       if (*ptr.sp)
 	text = *ptr.sp++; 
@@ -685,7 +685,7 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
     for (i = 1; i < menu[num].n_items; i++)
       printf("%2d - %s\n", i, menu[num].text[i]);
   } else {
-    XMapWindow(display, menu_win[num]); /* display window */
+    XMapWindow(display, menu_win[num]); // display window
     XRaiseWindow(display, menu_win[num]);
     for (i = 1; i < menu[num].n_items; i++)
       paint_pane(num, i, WHITE);
@@ -693,29 +693,29 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
   }
   return LUX_OK;
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 void delete_menu(int32_t num)
-/* delete a menu.  assumes that menu number <num> is legal. */
+// delete a menu.  assumes that menu number <num> is legal.
 {
  int32_t	i;
  XEvent	e;
 
  if (!menu_win[num])
-   return;			/* nothing to do */
+   return;			// nothing to do
  for (i = 0; i < menu[num].n_items; i++) {
    if (text_menus && i)
      while (XCheckWindowEvent(display, menu[num].window[i], ~NoEventMask,
 			      &e));
-   Free(menu[num].text[i]);		/* delete individual entries */
+   Free(menu[num].text[i]);		// delete individual entries
  }
- Free(menu[num].text);			/* delete entry pointer list */
+ Free(menu[num].text);			// delete entry pointer list
  if (!text_menus) {
-   Free(menu[num].window);		/* delete window pointer list */
+   Free(menu[num].window);		// delete window pointer list
    XDestroyWindow(display, menu_win[num]);
  }
- menu_win[num] = 0;			/* guaranteed for nonexistant menus */
+ menu_win[num] = 0;			// guaranteed for nonexistant menus
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 #define X_KEYPRESS	1
 #define X_BUTTONPRESS	4
 #define X_BUTTONRELEASE	8
@@ -749,16 +749,16 @@ extern float	xhair, yhair;
 extern Window	win[];
 
 int32_t lux_register_event(int32_t narg, int32_t ps[])
-     /* registers event types that XLOOP must act on */
-     /* syntax:  xregister,event_mask,window,menu,item */
-     /* a negative event_mask unregisters;  a zero mask clears. */
+     // registers event types that XLOOP must act on
+     // syntax:  xregister,event_mask,window,menu,item
+     // a negative event_mask unregisters;  a zero mask clears.
 {
   int32_t	type, addEvent, i, j, temp, iq, *windows, *menus, nWindow, nMenu,
   	sources;
   char	started;
 
-  if (!narg && !internalMode) {	/* no arguments; show current */
-    /* first see which events are selected for all windows */
+  if (!narg && !internalMode) {	// no arguments; show current
+    // first see which events are selected for all windows
     addEvent = ~0;
     temp = 0;
     for (i = 0; i < MAXWINDOWS; i++) {
@@ -768,7 +768,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
     }
     if (!temp)
       printw("No events registered for any window.\n");
-    else {			/* report individual events */
+    else {			// report individual events
       for (i = 0; i < MAXWINDOWS; i++) {
 	temp = XRegisteredWindow[i] & ~addEvent;
 	started = 0;
@@ -785,7 +785,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
 	  printw("\n");
 	}
       }
-				/* report all common events */
+				// report all common events
       if (addEvent) {
 	puts("Events registered for all defined windows:");
 	started = 0;
@@ -800,7 +800,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
 	putchar('\n');
       }
     }
-    /* now do the menus */
+    // now do the menus
     addEvent = ~0;
     temp = 0;
     for (i = 0; i < MAXMENU; i++) {
@@ -810,7 +810,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
     }
     if (!temp)
       printw("No events registered for any menu.\n");
-    else {			/* report individual events */
+    else {			// report individual events
       for (i = 0; i < MAXMENU; i++) {
 	temp = XRegisteredMenu[i] & ~addEvent;
 	started = 0;
@@ -826,7 +826,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
 	  printw("\n");
 	}
       }
-				/* report all common events */
+				// report all common events
       if (addEvent) {
 	puts("Events registered for all defined menus:");  started = 0;
 	for (i = 0; i < N_XMask; i++)
@@ -841,20 +841,20 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
     }
     return LUX_OK;
   }
-				/* install new */
+				// install new
   if (narg)
     type = int_arg(*ps);
   else
-    type = 0;			/* event codes */
+    type = 0;			// event codes
   if (type < 0)
     type = -type | X_DESELECT;
   if (internalMode)
     type |= internalMode;
-  if (narg >= 2 && ps[1]) {	/* window #s */
+  if (narg >= 2 && ps[1]) {	// window #s
     iq = lux_long(1, &ps[1]);
     switch (symbol_class(iq)) {
       case LUX_SCAL_PTR:
-	iq = dereferenceScalPointer(iq); /* fall-thru */
+	iq = dereferenceScalPointer(iq); // fall-thru
       case LUX_SCALAR:
 	windows = &sym[iq].spec.scalar.l;
 	nWindow = 1;
@@ -868,7 +868,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
     }
   } else
     nWindow = 0;
-  if (narg >= 3 && ps[2]) {	/* menu #s */
+  if (narg >= 3 && ps[2]) {	// menu #s
     iq = lux_long(1, &ps[1]);
     switch (symbol_class(iq)) {
       case LUX_SCALAR:
@@ -900,7 +900,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
   sources = (type & X_SOURCES);
   if (sources)
     type &= ~X_SOURCES;
-				/* now do the registration */
+				// now do the registration
   if (!nWindow && ((!sources && narg < 2) || sources & X_ALLWINDOWS)) {
     for (i = 0; i < MAXWINDOWS; i++)
       if (temp)
@@ -933,7 +933,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
       printfw("Warning: menu number %d out of range\n", *menus);
     menus++;
   }
-				/* determine if anything is registered */
+				// determine if anything is registered
   anythingRegistered = 0;
   for (i = 0; i < MAXWINDOWS; i++)
     if (XRegisteredWindow[i]) {
@@ -948,22 +948,22 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
       }
   return LUX_OK;
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 #define XLOOP_WINDOW	-1
 #define XLOOP_MENU	-2
 #define XLOOP_NONE	-3
 int32_t lux_xloop(int32_t narg, int32_t ps[])
-     /* LUX interface to X window manager. */
-     /* waits for a registered event, returns event type in !EVENT_TYPE */
-     /* important global variables:  button -> mouse button #; */
-     /* lux_event -> event type;  xcoord, ycoord -> pointer position in */
-     /* window;  menu_item -> menu item;  root_x, root_y -> pointer */
-     /* position in root window;  last_wid -> window;  last_menu -> menu; */
-     /* menu_x, menu_y -> pointer position in menu item; */
-     /* last_time -> time of last event;  event_source -> source of event */
-     /* returns appropriate values only if a registered event was caught. */
-     /* treats EnterNotify and LeaveNotify events on menu items regardless */
-     /* of whether such events were selected. */
+     // LUX interface to X window manager.
+     // waits for a registered event, returns event type in !EVENT_TYPE
+     // important global variables:  button -> mouse button #;
+     // lux_event -> event type;  xcoord, ycoord -> pointer position in
+     // window;  menu_item -> menu item;  root_x, root_y -> pointer
+     // position in root window;  last_wid -> window;  last_menu -> menu;
+     // menu_x, menu_y -> pointer position in menu item;
+     // last_time -> time of last event;  event_source -> source of event
+     // returns appropriate values only if a registered event was caught.
+     // treats EnterNotify and LeaveNotify events on menu items regardless
+     // of whether such events were selected.
 {
   XEvent	event;
   int32_t	type, arg, i, j, mask;
@@ -973,10 +973,10 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
   extern int32_t	lux_keycode, lux_button, lux_keysym, lux_keystate;
 
   if (narg)
-    arg = int_arg(*ps);		/* if 1 then flush event queue first */
+    arg = int_arg(*ps);		// if 1 then flush event queue first
   else
     arg = 0;
-  if (!anythingRegistered) {	/* nothing was registered: return */
+  if (!anythingRegistered) {	// nothing was registered: return
     eventSource = 0;
     lux_event = 0;
     return LUX_OK;
@@ -985,21 +985,21 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   status = 0;
   lux_keycode = lux_button = lux_keysym = lux_keystate = 0;
-  /* clean out the event queue if required */
+  // clean out the event queue if required
   if (arg)
     while (XCheckMaskEvent(display, ~0, &event));
-  /* now treat all events until one of the requested kinds occurs */
+  // now treat all events until one of the requested kinds occurs
   while (!status) {
     XNextEvent(display, &event);
     w = event.xany.window;
     j = XLOOP_NONE;
     status = 0;
     mask = 0;
-    /* figure out which LUX window or menu the event occurred in, if any */
-    /* results: status = 1 if in an LUX window or menu, then i = number */
-    /* of the window or menu, j = XLOOP_WINDOW if a window, XLOOP_MENU */
-    /* if a menu envelope, the item number if a menu item.  status = 0 */
-    /* if not in an LUX window or menu. */
+    // figure out which LUX window or menu the event occurred in, if any
+    // results: status = 1 if in an LUX window or menu, then i = number
+    // of the window or menu, j = XLOOP_WINDOW if a window, XLOOP_MENU
+    // if a menu envelope, the item number if a menu item.  status = 0
+    // if not in an LUX window or menu.
     if (w) {
       for (i = 0; i < MAXWINDOWS; i++)
 	if (win[i] && w == win[i]) {
@@ -1030,8 +1030,8 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
     }
     if (status && (((j == XLOOP_WINDOW && !XRegisteredWindow[i])
 		    || (j >= 0 && !XRegisteredMenu[i])))) status = 0;
-    /* now know if the right kind of source was caught; still need */
-    /* to treat all kinds */
+    // now know if the right kind of source was caught; still need
+    // to treat all kinds
     switch (event.type) {
       case ButtonPress:
 	if (mask & X_BUTTONPRESS)
@@ -1045,7 +1045,7 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
 	  last_time = (double) event.xbutton.time/1000.0;
 	  lux_keystate = event.xbutton.state;
 	  switch (j) {
-	    case XLOOP_WINDOW:	/* button press in an LUX window */
+	    case XLOOP_WINDOW:	// button press in an LUX window
 	      eventSource = i | X_WINDOW;
 	      xhair = event.xbutton.x;
 	      yhair = event.xbutton.y;
@@ -1054,9 +1054,9 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
 	      ycoord = (int32_t) yhair;
 	      coordTrf(&xhair, &yhair, LUX_DEV, LUX_DVI);
 	      break;
-	    case XLOOP_MENU:	/* button press in LUX menu envelope */
+	    case XLOOP_MENU:	// button press in LUX menu envelope
 	      return luxerror("?? button press in enveloping menu window?", 0);
-	    default:		/* button press in LUX menu item */
+	    default:		// button press in LUX menu item
 	      menu_x = (float) event.xbutton.x / (float) fontwidth;
 	      menu_y = (float) event.xbutton.y / (float) fontheight;
 	      eventSource = i | X_MENU;
@@ -1065,7 +1065,7 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
 	  }
 	}
 	if (j == X_WINDOW)
-	  set_defw(i);		/* set LUX window focus */
+	  set_defw(i);		// set LUX window focus
 	break;
       case KeyPress:
 	if (mask & X_KEYPRESS)
@@ -1082,21 +1082,21 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
 	  root_y = event.xkey.y_root;
 	  last_time = (double) event.xkey.time/1000.0;
 	  switch (j) {
-	    case XLOOP_WINDOW:	/* key press in an LUX window */
+	    case XLOOP_WINDOW:	// key press in an LUX window
 	      eventSource = i | X_WINDOW;
 	      break;
-	    case XLOOP_MENU:	/* key press in LUX menu envelope */
+	    case XLOOP_MENU:	// key press in LUX menu envelope
 	      eventSource = i | X_MENU;
 	      last_menu = i;
 	      break;
-	    default:		/* key press in LUX menu item */
+	    default:		// key press in LUX menu item
 	      return luxerror("?? key press in menu item?", 0);
 	  }
 	}
 	break;
       case MotionNotify:
-	/* remove all pointer motion events - we really only want the */
-	/* last one */
+	// remove all pointer motion events - we really only want the
+	// last one
 	while (XCheckMaskEvent(display, PointerMotionMask, &event));
 	if (mask & X_POINTERMOTION)
 	  type = X_POINTERMOTION;
@@ -1129,15 +1129,15 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
 	else
 	  status = 0;
 	switch (j) {
-	  case XLOOP_WINDOW:	/* entering an LUX window */
+	  case XLOOP_WINDOW:	// entering an LUX window
 	    if (status) {
 	      last_time = (double) event.xcrossing.time/1000.0;
 	      eventSource = i | X_WINDOW;
 	    }
 	    break;
-	  case XLOOP_MENU:	/* entering a menu envelope */
+	  case XLOOP_MENU:	// entering a menu envelope
 	    return luxerror("?? pointer enters menu envelope?", 0);
-	  default:		/* entering a menu item */
+	  default:		// entering a menu item
 	    if (status) {
 	      last_menu = i;
 	      menu_item = j;
@@ -1155,15 +1155,15 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
 	else
 	  status = 0;
 	switch (j) {
-	  case XLOOP_WINDOW:	/* leaving an LUX window */
+	  case XLOOP_WINDOW:	// leaving an LUX window
 	    if (status) {
 	      eventSource = i | X_WINDOW;
 	      last_time = (double) event.xcrossing.time/1000.0;
 	    }
 	    break;
-	  case XLOOP_MENU:	/* entering a menu envelope */
+	  case XLOOP_MENU:	// entering a menu envelope
 	    return luxerror("?? pointer leaves menu envelope?", 0);
-	  default:		/* leaving a menu item */
+	  default:		// leaving a menu item
 	    if (status) {
 	      last_menu = i;
 	      menu_item = j;
@@ -1183,7 +1183,7 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
 	}
 	status = 0;
 	break;
-      default:			/* other event types are ignored */
+      default:			// other event types are ignored
 	status = 0;
 	break;
       }
@@ -1191,9 +1191,9 @@ int32_t lux_xloop(int32_t narg, int32_t ps[])
   lux_event = type;
   return LUX_OK;
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 char const* eventName(int32_t type)
-/* returns name of LUX X event */
+// returns name of LUX X event
 {
   static char	eventHashTable[] = {
     3, 6, 5, 7, 0, 1, 7, 2, 4
@@ -1210,7 +1210,7 @@ char const* eventName(int32_t type)
     return "unknown";
   return XEventName[hash];
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------
 int32_t lux_event_name(int32_t narg, int32_t ps[])
 {
   int32_t	type, result;
@@ -1220,4 +1220,4 @@ int32_t lux_event_name(int32_t narg, int32_t ps[])
   string_value(result) = strsave(eventName(type));
   return result;
 }
- /*------------------------------------------------------------------------*/
+ //------------------------------------------------------------------------

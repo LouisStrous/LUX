@@ -18,8 +18,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File post.c */
-/* LUX routines dealing with PostScript output. */
+// File post.c
+// LUX routines dealing with PostScript output.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -30,19 +30,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
 #if DEBUG
-#define _Xdebug			/* to get synchronous X error messages */
+#define _Xdebug			// to get synchronous X error messages
 #endif
 
 int32_t	ipen = 7, ipost = 0;
 extern int32_t	landscape;
-static int32_t	nline = 0,	/* number of lines since last Stroke */
-  icnt = 0;			/* number of chars on current output line */
+static int32_t	nline = 0,	// number of lines since last Stroke
+  icnt = 0;			// number of chars on current output line
 static float	xq, yq;
 extern float	current_gray;
 extern int32_t	current_pen;
 FILE	*postScriptFp;
 void	xyup(void), xydown(void);
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 /*
   x setgray		selects DeviceGray color space
   width height bits/sample matrix datasrc image
@@ -55,20 +55,20 @@ int32_t postreset(int32_t landscape)
  char	*fname = NULL;
  extern int32_t	psfile, updateBoundingBox;
 
- if (ipost == 0) {	/* check if already started up */
+ if (ipost == 0) {	// check if already started up
    if (symbol_type(psfile) == LUX_TEMP_STRING)
      fname = string_value(psfile);
    if (fname)
      fname = expand_name(fname, NULL);
-   /* open for update; bit elaborate because different operating systems */
-   /* have different ideas about what "update" means.  LS 18jan95 */
+   // open for update; bit elaborate because different operating systems
+   // have different ideas about what "update" means.  LS 18jan95
    postScriptFp = Fopen(fname, "w+");
    if (!postScriptFp) {
      printf("Can't open postscript file %s\n", fname? fname: "junk.eps");
      return LUX_ERROR;
    }
    ipost = 1;
-   /* some preambles */
+   // some preambles
    fputs("%!PS-Adobe-1.0\n", postScriptFp);
    fputs("%%Creator: LUX generated plot image\n", postScriptFp);
    fputs("%%BoundingBox:  0000  0000  0600  0720\n", postScriptFp);
@@ -81,17 +81,17 @@ int32_t postreset(int32_t landscape)
    else
      fputs("90 rotate .05 -.825 translate\n", postScriptFp);
    fprintf(postScriptFp, "%f setlinewidth\n", current_pen*0.00033333);
-   /* The next line implicitly selects the DeviceGray color space */
+   // The next line implicitly selects the DeviceGray color space
    fprintf(postScriptFp, "%f setgray \n", 1 - current_gray); 
    icnt = nline = 0;
    updateBoundingBox = 1;
  }
  return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postpen(int32_t pen, float gray)
 {
-  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+  if (postreset(landscape) == LUX_ERROR) // start up if not already
     return LUX_ERROR;
   if (nline) {
     fputs("\n", postScriptFp);
@@ -104,10 +104,10 @@ int32_t postpen(int32_t pen, float gray)
   xyup();
   return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postcolorpen(float red, float green, float blue)
 {
-  postreset(landscape);		/* start up if not already */
+  postreset(landscape);		// start up if not already
   if (nline) {
     fputs("\n", postScriptFp);
     xyup();
@@ -116,13 +116,13 @@ int32_t postcolorpen(float red, float green, float blue)
     nline = 0;
   }
   fprintf(postScriptFp, " %f %f %f setrgbcolor \n", red, green, blue);
-  /* xyup(); */
+  // xyup();
   return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postvec(float xin, float yin, int32_t mode)
 {
-  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+  if (postreset(landscape) == LUX_ERROR) // start up if not already
     return LUX_ERROR;
   xq = MAX(0, xin);
   xq = MIN(xq, 0.9998);
@@ -133,7 +133,7 @@ int32_t postvec(float xin, float yin, int32_t mode)
   else
     xyup();
   nline++;
-  if (nline > 500) {	/* time for a stroke */
+  if (nline > 500) {	// time for a stroke
     nline = icnt = 0;
     fputs("\n", postScriptFp);
     fputs("S\n", postScriptFp);
@@ -145,7 +145,7 @@ int32_t postvec(float xin, float yin, int32_t mode)
   }
   return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 void xyup(void)
 {
   extern int32_t	alternateDash;
@@ -157,19 +157,19 @@ void xyup(void)
     fprintf(postScriptFp," %5.4f %5.4f M", xq, yq);
   icnt += 14;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 void xydown(void)
 {
   fprintf(postScriptFp," %5.4f %5.4f L", xq, yq);
   icnt += 14;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postcopy()
 {
-  if (!ipost) {			/* if the output file is not yet opened, */
-	/* then we don't need to generate an empty page with "showpage". */
-	/* LS 24oct95 */
-    if (postreset(landscape) == LUX_ERROR)/* start up if not already */
+  if (!ipost) {			// if the output file is not yet opened,
+	// then we don't need to generate an empty page with "showpage".
+	// LS 24oct95
+    if (postreset(landscape) == LUX_ERROR)// start up if not already
       return LUX_ERROR;
   } else {
     fputs("\n", postScriptFp);
@@ -184,10 +184,10 @@ int32_t postcopy()
   }
   return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postrawout(char *s)
 {
-  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+  if (postreset(landscape) == LUX_ERROR) // start up if not already
     return LUX_ERROR;
   if (nline) {
     fputs(" stroke\n", postScriptFp);
@@ -196,7 +196,7 @@ int32_t postrawout(char *s)
   fputs(s, postScriptFp);
   return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, float ybot,
 	     float ytop, int32_t iorder)
 {
@@ -211,10 +211,10 @@ int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, f
     return LUX_ERROR;
   }
 
-  /* ought to change !iorder stuff so that for !iorder = 0 the image on */
-  /* paper is oriented the same was as on screen  LS 19jan95 */
+  // ought to change !iorder stuff so that for !iorder = 0 the image on
+  // paper is oriented the same was as on screen  LS 19jan95
 
-  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+  if (postreset(landscape) == LUX_ERROR) // start up if not already
     return LUX_ERROR;
   if (nline) {
     fputs(" stroke\n", postScriptFp);
@@ -280,7 +280,7 @@ int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, f
   if (i % 40 != 0)
     fprintf(postScriptFp, "\n");
   fputs(" grestore\n", postScriptFp);
-  /* always update bounding box */
+  // always update bounding box
   if (xbot < postXBot)
     postXBot = xbot;
   if (xtop > postXTop)
@@ -291,7 +291,7 @@ int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, f
     postYTop = ytop;
   return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, float ybot,
 	      float ytop, int32_t iorder)
 /* writes an RGB image to a postscript file.  The image has dimensions
@@ -311,10 +311,10 @@ int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, 
     return LUX_ERROR;
   }
 
-  /* ought to change !iorder stuff so that for !iorder = 0 the image on */
-  /* paper is oriented the same was as on screen  LS 19jan95 */
+  // ought to change !iorder stuff so that for !iorder = 0 the image on
+  // paper is oriented the same was as on screen  LS 19jan95
 
-  if (postreset(landscape) == LUX_ERROR) /* start up if not already */
+  if (postreset(landscape) == LUX_ERROR) // start up if not already
     return LUX_ERROR;
   if (nline) {
     fputs(" stroke\n", postScriptFp);
@@ -384,7 +384,7 @@ int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, 
   if (i % 40 >= 3)
     fprintf(postScriptFp, "\n");
   fputs(" grestore\n", postScriptFp);
-  /* always update bounding box */
+  // always update bounding box
   if (xbot < postXBot)
     postXBot = xbot;
   if (xtop > postXTop)
@@ -395,7 +395,7 @@ int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, 
     postYTop = ytop;
   return LUX_OK;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------
 int32_t postrelease(int32_t narg, int32_t ps[])
 {
   char  ok = 0;
@@ -417,15 +417,15 @@ int32_t postrelease(int32_t narg, int32_t ps[])
     if (nline) 
       fputs(" stroke\n", postScriptFp);
     fputs(" showpage\n", postScriptFp);
-    /* now insert bounding box  LS 18jan95 */
-    if (fseek(postScriptFp, 66, SEEK_SET)) {	/* length of preamble */
+    // now insert bounding box  LS 18jan95
+    if (fseek(postScriptFp, 66, SEEK_SET)) {	// length of preamble
       printf("Could not reset file pointer to insert bounding box into %s\n",
 	     string_value(psfile));
       puts("Using default.");
     } else {
       if (!narg) {
 	if (postXTop < postXBot
-	    || postYTop < postYBot) { /* no bounding box */
+	    || postYTop < postYBot) { // no bounding box
 	  bb1 = bb2 = 0;
 	  bb3 = 600;
 	  bb4 = 720;
@@ -457,4 +457,4 @@ int32_t postrelease(int32_t narg, int32_t ps[])
   ipost = 0;
   return 1;
 }
-/*------------------------------------------------------------------------*/
+//------------------------------------------------------------------------

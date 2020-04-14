@@ -24,14 +24,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_BYTESTACK_H_
 #define HAVE_BYTESTACK_H_
 
-/* HEADERS */
+// HEADERS
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include <unistd.h>		/* for ssize_t */
-/* END HEADERS */
+#include <unistd.h>		// for ssize_t
+// END HEADERS
 
-/** Defines a Byte stack, as a pointer to an opaque structure. */
+//* Defines a Byte stack, as a pointer to an opaque structure.
 typedef struct Bytestack_struct *Bytestack;
 
 /** Defines an unsigned integral type for an index into a Byte

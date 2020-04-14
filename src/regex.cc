@@ -74,7 +74,7 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
     flags = REG_EXTENDED;
     if ((internalMode & 1) == 0)
       flags |= REG_ICASE;
-    regfree(&preg);		/* clean out previous one */
+    regfree(&preg);		// clean out previous one
     result = regcomp(&preg, regex, REG_EXTENDED);
     if (result) {
       int32_t size;
@@ -86,13 +86,13 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
     nmatch = countMatches(regex);
     pmatch = realloc(pmatch, nmatch*sizeof(regmatch_t));
     if (nmatch && !pmatch) {
-      nmatch = 1; /* flag: non-zero means a preg was defined */
+      nmatch = 1; // flag: non-zero means a preg was defined
       return cerror(ALLOC_ERR, -1);
     }
   } else if (!nmatch)
     return luxerror("No regular expression was specified earlier", -1);
   result = regexec(&preg, text, nmatch, pmatch, 0);
-  if (result) 			/* no match */
+  if (result) 			// no match
     result = LUX_ZERO;
   else 
     if (nmatch > 1) {
@@ -117,7 +117,7 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
 	  p++;
 	}
       }
-    } else {			/* nmatch == 1 */
+    } else {			// nmatch == 1
       char *p;
       int32_t len;
 	

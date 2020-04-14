@@ -56,7 +56,7 @@ static int32_t obstack_printf_sexagesimal_int_left(struct obstack *o,
   sign = (value < 0)? -1: 1;
   value = fabs(value);
   ivalue = (int32_t) value;
-  if (info->pad == L'0') {      /* sign comes first */
+  if (info->pad == L'0') {      // sign comes first
     if (sign < 0)
       obstack_1grow(o, '-');
     else if (info->showsign)
@@ -65,7 +65,7 @@ static int32_t obstack_printf_sexagesimal_int_left(struct obstack *o,
       obstack_1grow(o, ' ');
     if (firstwidth > 0)
       obstack_printf(o, "%0*d", firstwidth, 0);
-  } else {                      /* sign comes after padding */
+  } else {                      // sign comes after padding
     obstack_printf(o, "%*s", firstwidth, "");
     if (sign < 0)
       obstack_1grow(o, '-');
@@ -75,7 +75,7 @@ static int32_t obstack_printf_sexagesimal_int_left(struct obstack *o,
       obstack_1grow(o, ' ');
   }
   obstack_printf(o, "%d", ivalue);
-  while (precision-- > 0) {	/* do the rest of them */
+  while (precision-- > 0) {	// do the rest of them
     value = 60*(value - ivalue);
     ivalue = (int32_t) value;
     obstack_printf(o, ":%02d", ivalue);
@@ -93,15 +93,15 @@ int32_t printf_sexagesimal(FILE *stream, const struct printf_info *info,
   double value = *((const double *)(args[0]));
   struct obstack o;
 
-  if (info->alt)                /* %#T */
-    value /= 15;                /* transform from degrees to hours */
+  if (info->alt)                // %#T
+    value /= 15;                // transform from degrees to hours
 
   /* we must take the specified width and justification into account.
      we do this by first printing the number without any regards to
      padding, and then checking if we need to move it any. */
   obstack_init(&o);
   width = obstack_printf_sexagesimal_int_left(&o, info, value, &lastvalue, 0);
-  if (width < info->width) {    /* room left over */
+  if (width < info->width) {    // room left over
     if (info->left) {
       if (info->prec == 0) {
         int32_t fmttype;
@@ -123,13 +123,13 @@ int32_t printf_sexagesimal(FILE *stream, const struct printf_info *info,
         obstack_printf(&o, "%0#*.*f", info->width - width + 2,
                        info->width - width - 1, lastvalue);
       }
-    } else {                    /* !info->left */
+    } else {                    // !info->left
       obstack_blank(&o, -width);
       obstack_printf_sexagesimal_int_left(&o, info, value, NULL, info->width - width);
     }
   }
   width = obstack_object_size(&o);
-  obstack_1grow(&o, '\0');      /* ensure terminating \0 */
+  obstack_1grow(&o, '\0');      // ensure terminating \0
   char *p = (char*) obstack_finish(&o);
   fputs(p, stream);
   obstack_free(&o, 0);
@@ -166,7 +166,7 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
   if (prec < 0)
     prec = 3;
   CJDtoCommon(info->alt? JDtoCJD(value): value, &year, &month, &day);
-  if (info->pad == L'0') {      /* sign comes first */
+  if (info->pad == L'0') {      // sign comes first
     if (year < 0)
       obstack_1grow(o, '-');
     else if (info->showsign)
@@ -175,7 +175,7 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
       obstack_1grow(o, ' ');
     if (firstwidth > 0)
       obstack_printf(o, "%0*d", firstwidth, 0);
-  } else {                      /* sign comes after padding */
+  } else {                      // sign comes after padding
     obstack_printf(o, "%*s", firstwidth, "");
     if (year < 0)
       obstack_1grow(o, '-');
@@ -193,7 +193,7 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
       JD2 = CJDtoJD(JD2);
     }
     lastvalue = (value - JD1)/(JD2 - JD1) + year;
-  } else if (prec >= 2) {       /* month */
+  } else if (prec >= 2) {       // month
     obstack_printf(o, "-%02d", month);
     if (prec == 2) {
       double JD1 = CommontoCJD(year, month, 1);
@@ -203,12 +203,12 @@ static int32_t obstack_printf_date_int_left(struct obstack *o,
         JD2 = CJDtoJD(JD2);
       }
       lastvalue = (value - JD1)/(JD2 - JD1) + month;
-    } else if (prec >= 3) {     /* day */
+    } else if (prec >= 3) {     // day
       ivalue = (int32_t) day;
       obstack_printf(o, "-%02d", ivalue);
       if (prec == 3)
         lastvalue = day;
-      else if (prec >= 4) {     /* hour &c */
+      else if (prec >= 4) {     // hour &c
         lastvalue = 24*(day - ivalue);
         prec -= 3;
         obstack_1grow(o, 'T');
@@ -252,9 +252,9 @@ int32_t printf_date(FILE *stream, const struct printf_info *info,
     fmttype += 4;
   obstack_init(&o);
   width = obstack_printf_date_int_left(&o, info, value, &value2, 0);
-  if (width && width < info->width) { /* still room left over */
+  if (width && width < info->width) { // still room left over
     if (info->left) {
-      if (info->prec == 1) {    /* year only */
+      if (info->prec == 1) {    // year only
         obstack_blank(&o, -width);
         obstack_printf(&o, ffmts[fmttype], info->width,
                        info->width - width - 1, value2);
@@ -269,7 +269,7 @@ int32_t printf_date(FILE *stream, const struct printf_info *info,
     }
   }
   width = obstack_object_size(&o);
-  obstack_1grow(&o, '\0');      /* ensure terminating \0 */
+  obstack_1grow(&o, '\0');      // ensure terminating \0
   char *p = (char*) obstack_finish(&o);
   fputs(p, stream);
   obstack_free(&o, 0);

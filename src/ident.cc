@@ -17,7 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* ident.c: a number of routines for identifying pieces of LUX code */
+// ident.c: a number of routines for identifying pieces of LUX code
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -30,14 +30,14 @@ extern char	*curScrat, *binOpSign[];
 char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
 FILE	*outputStream;
 
-/*-------------------------------------------------------------------*/
+//-------------------------------------------------------------------
 char const* symbolProperName(int32_t symbol)
-/* returns the proper name of the symbol, if any, or NULL */
+// returns the proper name of the symbol, if any, or NULL
 {
   hashTableEntry	**hashTable, *hp;
   int32_t	hashValue;
 
-  if (symbol < 0 || symbol >= NAMED_END) /* out of range */
+  if (symbol < 0 || symbol >= NAMED_END) // out of range
     return NULL;
   switch (symbol_class(symbol)) {
     case LUX_SUBROUTINE: case LUX_DEFERRED_SUBR:
@@ -49,23 +49,23 @@ char const* symbolProperName(int32_t symbol)
     case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
       hashTable = blockHashTable;
       break;
-    default:			/* must be a regular variable */
+    default:			// must be a regular variable
       hashTable = varHashTable;
       break;
   }
 
   hashValue = sym[symbol].xx - 1;
-  if (hashValue < 0 || hashValue > HASHSIZE) /* illegal hash value */
+  if (hashValue < 0 || hashValue > HASHSIZE) // illegal hash value
     return NULL;
-  hp = hashTable[hashValue];	/* start of appropriate name list */
-  while (hp) {			/* not at end of list */
-    if (hp->symNum == symbol)	/* found symbol */
+  hp = hashTable[hashValue];	// start of appropriate name list
+  while (hp) {			// not at end of list
+    if (hp->symNum == symbol)	// found symbol
       return hp->name;
-    hp = hp->next;		/* go to next */
+    hp = hp->next;		// go to next
   }
-  return NULL;			/* did not find it */
+  return NULL;			// did not find it
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t fmt_entry(formatInfo *fmi)
 /* finds the next format entry in format string <fmi->current> and returns
    information in other members of <fmi>.  These members are:
@@ -107,30 +107,30 @@ int32_t fmt_entry(formatInfo *fmi)
   fmtType type;
   char	*p, *p2;
 
-  if (!fmi->current || !*fmi->current) { /* no format */
+  if (!fmi->current || !*fmi->current) { // no format
     fmi->start = fmi->next = NULL;
     fmi->type = FMT_ERROR;
     puts("Illegal format string");
     return FMT_ERROR;
   }
 
-  if (fmi->current == fmi->format)  /* at beginning of whole format string */
-    /* initialize grouping info */
+  if (fmi->current == fmi->format)  // at beginning of whole format string
+    // initialize grouping info
     fmi->active_group = -1;
 
   p = fmi->start = fmi->current;
   /* find the next % format entry or plain text, treating any format
      group beginnings along the way. */
   do {
-    if (*p == '%' && p[1] != '%') { /* format specification or %( %) */
-      if (p[1] == '(') {		/* group beginning */
+    if (*p == '%' && p[1] != '%') { // format specification or %( %)
+      if (p[1] == '(') {		// group beginning
 	p += 2;
 	if (++(fmi->active_group) == MAXFMT) {
 	  puts("Format groups nested too deeply");
-	  return FMT_ERROR;	/* too may active groups */
+	  return FMT_ERROR;	// too may active groups
 	}
 	fmi->group_start[fmi->active_group] = p;
-	fmi->group_count[fmi->active_group] = -1; /* repeat count yet unknown */
+	fmi->group_count[fmi->active_group] = -1; // repeat count yet unknown
 	fmi->start = p;
 	continue;
       }
@@ -139,13 +139,13 @@ int32_t fmt_entry(formatInfo *fmi)
 
   /* now we're pointing either at a regular format specification,
      or at a format group end or at the beginning of some plain text */
-  type = FMT_PLAIN;		/* default */
+  type = FMT_PLAIN;		// default
   fmi->flags = 0;
-  if (*p == '%' && p[1] != '%' && p[1] != ')') { /* a format specification */
+  if (*p == '%' && p[1] != '%' && p[1] != ')') { // a format specification
     uint8_t done = 0;
-    p++;			/* skip the initial % */
+    p++;			// skip the initial %
     
-    /* service any modifier */
+    // service any modifier
     do {
       switch (*p++) {
 	case '*':
@@ -173,24 +173,24 @@ int32_t fmt_entry(formatInfo *fmi)
 	  fmi->flags |= FMT_MIX2;
 	  break;
 	default:
-	  p--;			/* we went one too far */
+	  p--;			// we went one too far
 	  done = 1;
 	  break;
       }
     } while (!done);
 
     if (isdigit((uint8_t) *p))
-      fmi->width = strtol(p, &p, 10); /* find & skip the number */
+      fmi->width = strtol(p, &p, 10); // find & skip the number
     else
-      fmi->width = -1;		/* no explicit width */
+      fmi->width = -1;		// no explicit width
 
-    /* look for the precision */
-    if (*p == '.') 		/* the precision */
-      fmi->precision = strtol(p + 1, &p, 10); /* find and skip */
+    // look for the precision
+    if (*p == '.') 		// the precision
+      fmi->precision = strtol(p + 1, &p, 10); // find and skip
     else
-      fmi->precision = -1;	/* no explicit precision */
+      fmi->precision = -1;	// no explicit precision
 
-    /* more modifiers? */
+    // more modifiers?
     do {
       switch (*p++) {
       case 'h':
@@ -203,12 +203,12 @@ int32_t fmt_entry(formatInfo *fmi)
         fmi->flags |= FMT_BIG;
         continue;
       default:
-        p--;			/* we went one too far */
+        p--;			// we went one too far
         break;
       }
     } while (0);
 
-    /* now look for the specification and deduce the type */
+    // now look for the specification and deduce the type
     switch (*p) {
     case 'd': case 'i': case 'o': case 'x': case 'X':
       type = FMT_INTEGER;
@@ -234,53 +234,53 @@ int32_t fmt_entry(formatInfo *fmi)
     default:
       printf("Illegal format entry, %s\n", fmi->current);
       fmi->type = FMT_ERROR;
-      return FMT_ERROR;	/* illegal type */
+      return FMT_ERROR;	// illegal type
     }
-    fmi->spec_char = p++;		/* record this position */
+    fmi->spec_char = p++;		// record this position
     if (p[-1] == '[') {
-      /* we make p point at the closing ] */
-      /* in '[]...]' and '[^]....]', the first ] is a regular character */
-      /* and doesn't indicate the end of the scan set */
+      // we make p point at the closing ]
+      // in '[]...]' and '[^]....]', the first ] is a regular character
+      // and doesn't indicate the end of the scan set
       if (p[1] == ']')
 	p += 2;
       else if (p[1] == '^' && p[2] == ']')
 	p += 3;
       while (*p && *p != ']')
 	p++;
-      p++;			/* point one beyond the closing ] */
+      p++;			// point one beyond the closing ]
     }
 
-    fmi->repeat = p;		/* record this position */
+    fmi->repeat = p;		// record this position
 
-    /* look for a repeat count */
-    fmi->count = -1;		/* default */
-    if (isdigit((uint8_t) *p)) {	/* maybe a repeat count */
+    // look for a repeat count
+    fmi->count = -1;		// default
+    if (isdigit((uint8_t) *p)) {	// maybe a repeat count
       p2 = p + 1;
       while (isdigit((uint8_t) *p2))
 	p2++;
-      if (*p2 == '#') {		/* yes, a repeat count */
+      if (*p2 == '#') {		// yes, a repeat count
 	fmi->count = strtol(p, &p, 10);
-	p++;			/* skip the # */
+	p++;			// skip the #
       }
     }
-  } /* end of if (*p == '%' && p[1] != '%' && p[1] != ')') */
+  } // end of if (*p == '%' && p[1] != '%' && p[1] != ')')
 
   fmi->plain = p;
-  /* now we are looking at plain text or a group end */
-  if (*p != '%' || p[1] != ')')	{ /* we have plain text */
+  // now we are looking at plain text or a group end
+  if (*p != '%' || p[1] != ')')	{ // we have plain text
     if (type == FMT_PLAIN ||
-	(fmi->flags & (FMT_MIX | FMT_MIX2))) { /* plain text is allowed */
+	(fmi->flags & (FMT_MIX | FMT_MIX2))) { // plain text is allowed
       do {
 	p2 = strchr(p, '%');
-	if (p2 && p2[1] == '%')	/* a %% escape sequence */
-	  p2 += 2;		/* skip */
+	if (p2 && p2[1] == '%')	// a %% escape sequence
+	  p2 += 2;		// skip
       } while (p2 && *p2 && *p2 != '%');
       p = (p2 && *p2)? p2: p + strlen(p);
     }
   }
   fmi->end = p;
  
-  if (*p == '%' && p[1] == ')') { /* a group end */
+  if (*p == '%' && p[1] == ')') { // a group end
     if (fmi->active_group < 0) { /* group ending but no corresponding
 				    group beginning */
       puts("Unbalanced format group end");
@@ -290,20 +290,20 @@ int32_t fmt_entry(formatInfo *fmi)
     fmi->end = p;
     p += 2;
     if (fmi->group_count[fmi->active_group] == -1) {
-      /* we don't have a repeat count for this grouping yet */
-      fmi->group_count[fmi->active_group] = 1;/* default */
-      if (isdigit((uint8_t) *p)) { /* may be a repeat count */
+      // we don't have a repeat count for this grouping yet
+      fmi->group_count[fmi->active_group] = 1;// default
+      if (isdigit((uint8_t) *p)) { // may be a repeat count
 	p2 = p;
 	k = strtol(p2, &p2, 10);
-	if (*p2 == '#')  	/* yes, it's a repeat count */
+	if (*p2 == '#')  	// yes, it's a repeat count
 	  fmi->group_count[fmi->active_group] = k;
       }
-    } /* else we already had a repeat count */
-    fmi->group_count[fmi->active_group]--; /* one less repetition to go */
-    if (fmi->group_count[fmi->active_group]) /* more repeats to do? */
-      fmi->next = fmi->group_start[fmi->active_group]; /* then go back */
+    } // else we already had a repeat count
+    fmi->group_count[fmi->active_group]--; // one less repetition to go
+    if (fmi->group_count[fmi->active_group]) // more repeats to do?
+      fmi->next = fmi->group_start[fmi->active_group]; // then go back
     else {
-      fmi->active_group--;	/* done with this one */
+      fmi->active_group--;	// done with this one
       p2 = strchr(p, '#');
       fmi->next = p2? p2 + 1: p;
     }
@@ -317,7 +317,7 @@ int32_t fmt_entry(formatInfo *fmi)
      && strspn(fmi->plain, " ") == fmi->next - fmi->plain);
   return type;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 formatInfo	theFormat;
 char *fmttok(char *format)
 /* returns the next token from the installed format.  If <format> is equal
@@ -325,13 +325,13 @@ char *fmttok(char *format)
    If <format> is unequal to NULL, then the string that it points at is
    installed as the new format from which tokens will be returned, and
    the first token from that new format is returned in the same call. */
-/* if there is nothing left, then theFormat.type is set to FMT_EMPTY */
-/* and NULL is returned.  If an error occurs, then theFormat.type is */
-/* set to FMT_ERROR and NULL is returned.  LS 12nov99 */
+// if there is nothing left, then theFormat.type is set to FMT_EMPTY
+// and NULL is returned.  If an error occurs, then theFormat.type is
+// set to FMT_ERROR and NULL is returned.  LS 12nov99
 {
   formatInfo	*fmi = &theFormat;
 
-  if (format) {			/* we install the new format */
+  if (format) {			// we install the new format
     fmi->format = (char*) realloc(fmi->format, strlen(format) + 1);
     if (!fmi->format) {
       puts("fmttok:");
@@ -341,7 +341,7 @@ char *fmttok(char *format)
     strcpy(fmi->format, format);
     fmi->current = fmi->format;
   } else if (fmi->next) {
-    *fmi->end = fmi->save1;	/* restore */
+    *fmi->end = fmi->save1;	// restore
     if (fmi->type != FMT_PLAIN
 	&& fmi->plain > fmi->spec_char + 1)
       *fmi->repeat = fmi->save2;
@@ -357,27 +357,27 @@ char *fmttok(char *format)
     return NULL;
   }
 
-  if (fmt_entry(fmi) == FMT_ERROR) /* something illegal */
+  if (fmt_entry(fmi) == FMT_ERROR) // something illegal
     return NULL;
 
   if (fmi->type != FMT_PLAIN
       && fmi->plain > fmi->spec_char + 1) {
-    /* the plain text does not follow the format specification directly */
+    // the plain text does not follow the format specification directly
     fmi->save2 = *fmi->repeat;
-    *fmi->repeat = '\0';	/* \0 over the start of the repeat count */
+    *fmi->repeat = '\0';	// \0 over the start of the repeat count
   }
-  /* we must terminate the current format */
+  // we must terminate the current format
   fmi->save1 = *fmi->end;
   *fmi->end = '\0';
   return fmi->start;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t Sprintf_general(char *str, char *format, va_list ap)
 /* prints the first argument into a string at <str> under guidance of
    the format specification in <format>.
    Only one argument is serviced, and only the first % entry is
    recognized: everything else is printed as plain text.  LS 16nov98 */
-/* Sprintf does not attempt to write into <format>. */
+// Sprintf does not attempt to write into <format>.
 {
   static formatInfo	ownfmi, *fmi;
   int32_t	width, n;
@@ -394,13 +394,13 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
 
   width = fmi->width;
 
-  if (fmi->type == FMT_ERROR)	/* some error */
+  if (fmi->type == FMT_ERROR)	// some error
     return LUX_ERROR;
   
-  /* first we initialize */
+  // first we initialize
   switch (*fmi->spec_char) {
     case 'z':
-      /* construct a format for sprintf() in tmp[]*/
+      // construct a format for sprintf() in tmp[]
       p = tmp;
       strcpy(p++, "%");
       if (fmi->precision >= 0) {
@@ -419,11 +419,11 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
     default:
       if (fmi->flags & (FMT_MIX | FMT_MIX2)) {
 	p = strpbrk(fmi->start, "_=");
-	/* if we're printing a multi-element array, then when we get here */
-	/* for the second and later elements, fmi->start is already fixed, */
-	/* so there's no longer a _ or = in it, but fmi->flags is still */
-	/* set to lead us in here.  Then, we can just skip the rest. */
-	/* LS 22jan2001 */
+	// if we're printing a multi-element array, then when we get here
+	// for the second and later elements, fmi->start is already fixed,
+	// so there's no longer a _ or = in it, but fmi->flags is still
+	// set to lead us in here.  Then, we can just skip the rest.
+	// LS 22jan2001
 	if (p) {
 	  memcpy(tmp, fmi->start, p - fmi->start);
 	  memcpy(tmp + (p - fmi->start), p + 1, fmi->end - p);
@@ -435,15 +435,15 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
   }
   
   switch (*fmi->spec_char) {
-  default:			/* let vsprintf handle it */
+  default:			// let vsprintf handle it
     n = vsprintf(str, fmi->start, ap);
     str = strchr(str, 0);
     break;
-  case 'z':			/* complex number */
+  case 'z':			// complex number
     /* for complex numbers, the real and imaginary parts must be specified
        as separate (double) arguments */
-    d = va_arg(ap, double);	/* the real part */
-    d2 = va_arg(ap, double); /* the imaginary part */
+    d = va_arg(ap, double);	// the real part
+    d2 = va_arg(ap, double); // the imaginary part
     sprintf(str, tmp, d, d2, &n);
     if (n < width) {
       memmove(str + (width - n), str, n + 1);
@@ -455,14 +455,14 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
     break;
   }
   va_end(ap);
-  /* print any trailing plain text */
-  if ((fmi->plain - fmi->spec_char) > 1 && *fmi->plain) {/* have some more text */
+  // print any trailing plain text
+  if ((fmi->plain - fmi->spec_char) > 1 && *fmi->plain) {// have some more text
     strcpy(str, fmi->plain);
     n += strlen(fmi->plain);
   }
   return n;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t Sprintf_tok(char *str, ...)
 /* prints the first argument into a string at <str> under guidance of
    the format specification currently installed through fmttok().
@@ -477,13 +477,13 @@ int32_t Sprintf_tok(char *str, ...)
   va_end(ap);
   return n;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t Sprintf(char *str, char *format, ...)
 /* prints the first argument into a string at <str> under guidance of
    the format specification in <format>.
    Only one argument is serviced, and only the first % entry is
    recognized: everything else is printed as plain text.  LS 16nov98 */
-/* Sprintf does not attempt to write into <format>. */
+// Sprintf does not attempt to write into <format>.
 {
   va_list	ap;
   int32_t	n;
@@ -493,7 +493,7 @@ int32_t Sprintf(char *str, char *format, ...)
   va_end(ap);
   return n;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 char *symbolIdent(int32_t symbol, int32_t mode)
 /* assembles a string identifying symbol <iq>, depending on <mode>, at
    curScrat, and returns curScrat.
@@ -535,12 +535,12 @@ char *symbolIdent(int32_t symbol, int32_t mode)
 
   save = curScrat;
 
-  if (symbol == LUX_ERROR) {	/* the error symbol: should not occur here */
+  if (symbol == LUX_ERROR) {	// the error symbol: should not occur here
     strcpy(curScrat, "(error)");
     return curScrat;
   }
 
-  if (symbol < 0) {	/* some break condition */
+  if (symbol < 0) {	// some break condition
     switch (symbol) {
       case LOOP_BREAK:
 	strcpy(curScrat, "break ");
@@ -557,19 +557,19 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
   }
 
-  if ((mode & I_FILELEVEL) /* want file level */
-      && fileLevel) {		/* have file level */
+  if ((mode & I_FILELEVEL) // want file level
+      && fileLevel) {		// have file level
     sprintf(curScrat, "%1d, ", fileLevel);
-    curScrat += strlen(curScrat); /* update */
+    curScrat += strlen(curScrat); // update
   }
 
-  if ((mode & I_LINE) /* want line number */
-      && symbol_line(symbol)) {	/* have line number */
+  if ((mode & I_LINE) // want line number
+      && symbol_line(symbol)) {	// have line number
     sprintf(curScrat, "%3d| ", symbol_line(symbol));
-    curScrat += strlen(curScrat); /* update */
+    curScrat += strlen(curScrat); // update
   }
 
-  if ((mode & I_PARENT)) { /* want parent's name, too */
+  if ((mode & I_PARENT)) { // want parent's name, too
     if (symbol_context(symbol)) {
       char const* cp = symbolProperName(symbol_context(symbol));
       if (cp) {
@@ -596,12 +596,12 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   if (symbol == errorSym)
     errorPtr = curScrat;
 
-  if (i == 0) {		/* want a name, if available */
-    char const* cp = symbolProperName(symbol); /* get symbol's name at curScrat */
-    if (cp) { 			/* have a name */
+  if (i == 0) {		// want a name, if available
+    char const* cp = symbolProperName(symbol); // get symbol's name at curScrat
+    if (cp) { 			// have a name
       strcpy(curScrat, cp);
-      if (symbol_class(symbol) == LUX_UNDEFINED) /* undefined symbol */
-	strcat(curScrat, "?"); /* add ? to indicate no value */
+      if (symbol_class(symbol) == LUX_UNDEFINED) // undefined symbol
+	strcat(curScrat, "?"); // add ? to indicate no value
       curScrat = save;
       return curScrat;
     }
@@ -616,7 +616,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     j = i;
     i = transfer_target(i);
   }
-  if (i == 0)			/* pointer to nothing */
+  if (i == 0)			// pointer to nothing
     symbol = j;
   else
     symbol = i;
@@ -655,14 +655,14 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       sprintf(curScrat, "%g", fltval);
       if (scalar_type(symbol) == LUX_FLOAT) {
         p = strchr(curScrat, '.');
-        if (!p) {		/* none yet: add one */
+        if (!p) {		// none yet: add one
           p = curScrat + strlen(curScrat);
           strcpy(p, ".");
         }
-      } else {		/* DOUBLE */
+      } else {		// DOUBLE
         p = strchr(curScrat, 'e');
         if (p)
-          *p = 'd';		/* replace "e" with "d" to indicate DOUBLE*/
+          *p = 'd';		// replace "e" with "d" to indicate DOUBLE
         else {
           p = curScrat + strlen(curScrat);
           strcpy(p, "d");
@@ -670,7 +670,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
     }
     break;
-  case LUX_CSCALAR:		/* complex number */
+  case LUX_CSCALAR:		// complex number
     ptr.cf = complex_scalar_data(symbol).cf;
     if (complex_scalar_type(symbol) == LUX_CFLOAT) {
       if (ptr.cf->real == 0.0)
@@ -699,21 +699,21 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           *p = 'd';
       }
     } else {
-      /* add one at the end */
+      // add one at the end
       if (complex_scalar_type(symbol) == LUX_CFLOAT)
         strcat(curScrat, "e");
       else
         strcat(curScrat, "d");
     }
-    strcat(curScrat, "i)");	/* indicate complex number */
+    strcat(curScrat, "i)");	// indicate complex number
     break;
   case LUX_STRING:
     if ((mode & I_TRUNCATE)
-        && string_size(symbol) > 20) { /* truncate */
+        && string_size(symbol) > 20) { // truncate
       sprintf(curScrat, "'%.17s...'", string_value(symbol));
-    } else			/* full value */
+    } else			// full value
       sprintf(curScrat, "'%s'", string_value(symbol));
-    if ((mode & I_LENGTH)) {	/* need length indication */
+    if ((mode & I_LENGTH)) {	// need length indication
       curScrat += strlen(curScrat);
       sprintf(curScrat, " (%1d#)", string_size(symbol));
     }
@@ -721,10 +721,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_RANGE: case LUX_PRE_RANGE:
     strcpy(curScrat++, "(");
     i = range_start(symbol);
-    if (i == -1)		/* (*) */
+    if (i == -1)		// (*)
       strcpy(curScrat++, "*");
     else {
-      if (i < 0) {		/* (* - expr ...) */
+      if (i < 0) {		// (* - expr ...)
         i = -i;
         strcpy(curScrat, "*-");
         curScrat += 2;
@@ -732,13 +732,13 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       symbolIdent(i, mode);
       curScrat += strlen(curScrat);
       i = range_end(symbol);
-      if (i != LUX_ZERO) {	/* really have a range end */
+      if (i != LUX_ZERO) {	// really have a range end
         strcpy(curScrat++, ":");
-        if (i < 0) {		/* * ... */
-          if (i == -1) {	/* just * */
+        if (i < 0) {		// * ...
+          if (i == -1) {	// just *
             strcpy(curScrat++, "*");
             i = 0;
-          } else {		/* * - expr */
+          } else {		// * - expr
             strcpy(curScrat, "*-");
             curScrat += 2;
             i = -i;
@@ -766,11 +766,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     n = array_size(symbol);
     if ((mode & I_TRUNCATE)
         && n > 3) {
-      j = 3;			/* number to print */
-      i = 1;			/* did truncate */
+      j = 3;			// number to print
+      i = 1;			// did truncate
     } else {
-      j = n;			/* print all */
-      i = 0;			/* no truncation */
+      j = n;			// print all
+      i = 0;			// no truncation
     }
     ptr.b = (uint8_t*) array_data(symbol);
     switch (array_type(symbol)) {
@@ -826,7 +826,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       if ((mode & I_TRUNCATE)) {
         while (j--) {
           if (*ptr.sp) {
-            if (strlen(*ptr.sp) > 20)  /* need to truncate */
+            if (strlen(*ptr.sp) > 20)  // need to truncate
               sprintf(curScrat, "'%.17s...'", *ptr.sp);
             else
               sprintf(curScrat, "'%s'", *ptr.sp);
@@ -837,7 +837,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           if (j || i)
             strcpy(curScrat++, ",");
         }
-      } else {		/* no truncation */
+      } else {		// no truncation
         while (j--) {
           if (*ptr.sp)
             sprintf(curScrat, "'%s'", *ptr.sp);
@@ -853,12 +853,12 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     default:
       cerror(ILL_TYPE, symbol);
     }
-    if (i) {		/* we truncated */
+    if (i) {		// we truncated
       strcpy(curScrat, "...");
       curScrat += 3;
     }
     strcpy(curScrat, "]");
-    if ((mode & I_LENGTH)) { /* need length indication */
+    if ((mode & I_LENGTH)) { // need length indication
       curScrat += strlen(curScrat);
       sprintf(curScrat, " (");
       curScrat += 2;
@@ -874,7 +874,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     break;
   case LUX_POINTER: case LUX_TRANSFER:
-    /* if we get here then this is a pointer to nothing */
+    // if we get here then this is a pointer to nothing
     {
       char const* p = symbolProperName(symbol);
       strcpy(curScrat, p? p: "(unnamed)");
@@ -922,7 +922,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_FUNC_PTR:
     strcpy(curScrat++, "&");
     n = func_ptr_routine_num(symbol);
-    if (n < 0) {		/* internal function/routine */
+    if (n < 0) {		// internal function/routine
       n = -n;
       switch (func_ptr_type(symbol)) {
       case LUX_SUBROUTINE:
@@ -932,8 +932,8 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         strcpy(curScrat, function[n].name);
         break;
       }
-    } else			/* user-defined function/routine */
-      symbolIdent(n, mode);	/* is put at curScratch */
+    } else			// user-defined function/routine
+      symbolIdent(n, mode);	// is put at curScratch
     break;
   case LUX_SCAL_PTR:
     switch (scal_ptr_type(symbol)) {
@@ -962,28 +962,28 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     default:
       cerror(ILL_TYPE, symbol);
     }
-    if (isIntegerType(scal_ptr_type(symbol))) /* integer type */
+    if (isIntegerType(scal_ptr_type(symbol))) // integer type
       sprintf(curScrat, "%jd", intval);
-    else if (isRealType(scal_ptr_type(symbol))) /* float type */
+    else if (isRealType(scal_ptr_type(symbol))) // float type
       sprintf(curScrat, "%g", number.f);
     break;
   case LUX_SUBSC_PTR:
-    if (subsc_ptr_start(symbol) == -1) /* (*) */
+    if (subsc_ptr_start(symbol) == -1) // (*)
       strcpy(curScrat++, "*");
     else {
-      if (subsc_ptr_start(symbol) < 0) /* (*-...) */
+      if (subsc_ptr_start(symbol) < 0) // (*-...)
         sprintf(curScrat, "*%+1d", subsc_ptr_start(symbol));
       else
         sprintf(curScrat, "%1d", subsc_ptr_start(symbol));
       curScrat += strlen(curScrat);
       strcpy(curScrat++, ":");
-      if (subsc_ptr_end(symbol) < 0) { /* (...:*...) */
+      if (subsc_ptr_end(symbol) < 0) { // (...:*...)
         strcpy(curScrat++, "*");
-        if (subsc_ptr_end(symbol) != -1) { /* not (...:*-...) */
+        if (subsc_ptr_end(symbol) != -1) { // not (...:*-...)
           sprintf(curScrat, "%+1d", subsc_ptr_end(symbol));
           curScrat += strlen(curScrat);
         }
-      } else {		/* (...:...) */
+      } else {		// (...:...)
         sprintf(curScrat, "%1d", subsc_ptr_end(symbol));
         curScrat += strlen(curScrat);
       }
@@ -1047,11 +1047,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     ptr.w = clist_symbols(symbol);
     if ((mode & I_TRUNCATE)) {
       if (n > 3) {
-        j = 3;		/* number of elements to display */
-        i = 1;		/* flag truncation */
+        j = 3;		// number of elements to display
+        i = 1;		// flag truncation
       } else {
         j = n;
-        i = 0;		/* no trunctation was necessary */
+        i = 0;		// no trunctation was necessary
       }
     } else {
       j = n;
@@ -1059,7 +1059,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     m = mode & I_SINGLEMODE;
     if (symbol_class(symbol) == LUX_CPLIST)
-      /* for CPLIST, show names if possible */
+      // for CPLIST, show names if possible
       m &= ~I_VALUE;
     while (j--) {
       symbolIdent(*ptr.w++, m);
@@ -1067,7 +1067,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       if (j || i)
         strcpy(curScrat++, ",");
     }
-    if (i) {			/* we did truncate */
+    if (i) {			// we did truncate
       strcpy(curScrat, "...");
       curScrat += strlen(curScrat);
     }
@@ -1122,7 +1122,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_LIST_PTR:
     symbolIdent(list_ptr_target(symbol), mode & I_SINGLEMODE);
     curScrat += strlen(curScrat);
-    if (list_ptr_target(symbol) < 0) /* numerical tag */
+    if (list_ptr_target(symbol) < 0) // numerical tag
       sprintf(curScrat, ".%1d", list_ptr_tag_number(symbol));
     else
       sprintf(curScrat, ".%s", list_ptr_tag_string(symbol));
@@ -1236,7 +1236,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     n = routine_num_parameters(symbol);
     if (symbol_class(symbol) == LUX_FUNCTION)
       strcpy(curScrat++, "(");
-    if (n) {			/* have parameters */
+    if (n) {			// have parameters
       ptr.sp = routine_parameter_names(symbol);
       if (symbol_class(symbol) == LUX_SUBROUTINE)
         strcpy(curScrat++, ",");
@@ -1264,7 +1264,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       j = n;
       i = 0;
     }
-    if (j) {			/* have statements */
+    if (j) {			// have statements
       while (j--) {
         symbolIdent(*ptr.w++, mode & ~I_PARENT);
         curScrat += strlen(curScrat);
@@ -1277,7 +1277,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           strcpy(curScrat++, " ");
       }
     }
-    if (i) {			/* we truncated */
+    if (i) {			// we truncated
       strcpy(curScrat, "...");
       curScrat += strlen(curScrat);
       if ((mode & I_LENGTH)) {
@@ -1323,7 +1323,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_INT_FUNC:
     n = 0;
     switch (int_func_number(symbol)) {
-    case 0:			/* unary_negative */
+    case 0:			// unary_negative
       strcpy(curScrat++, "-");
       if (symbolIsUnitaryExpression(symbol)) {
         symbolIdent(*int_func_arguments(symbol), mode & I_SINGLEMODE);
@@ -1333,7 +1333,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         n = 1;
       }
       break;
-    case 1:			/* subscript */
+    case 1:			// subscript
       n = int_func_num_arguments(symbol);
       arg = int_func_arguments(symbol);
       symbolIdent(arg[n - 1], mode & I_SINGLEMODE);
@@ -1349,15 +1349,15 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       strcpy(curScrat, ")");
       n = 0;
       break;
-    case 2:			/* cputime */
+    case 2:			// cputime
       strcpy(curScrat, "!CPUTIME");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 3:			/* power */
+    case 3:			// power
       n = 1;
       break;
-    case 4:			/* concat */
+    case 4:			// concat
       strcpy(curScrat++, "[");
       n = int_func_num_arguments(symbol);
       if ((mode & I_TRUNCATE)
@@ -1380,37 +1380,37 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       strcpy(curScrat, "]");
       n = 0;
       break;
-    case 5:			/* ctime */
+    case 5:			// ctime
       strcpy(curScrat, "!ctime");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 6:			/* time */
+    case 6:			// time
       strcpy(curScrat, "!time");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 7:			/* date */
+    case 7:			// date
       strcpy(curScrat, "!date");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 8:			/* readkey */
+    case 8:			// readkey
       strcpy(curScrat, "!readkey");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 9:			/* readkeyne */
+    case 9:			// readkeyne
       strcpy(curScrat, "!readkeyne");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 10:		/* systime */
+    case 10:		// systime
       strcpy(curScrat, "!systime");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 11:		/* jd */
+    case 11:		// jd
       strcpy(curScrat, "!jd");
       curScrat += strlen(curScrat);
       n = 0;
@@ -1451,7 +1451,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     break;
   case LUX_EXTRACT: case LUX_PRE_EXTRACT:
     if (symbol_class(symbol) == LUX_EXTRACT) {
-      if (extract_target(symbol) > 0) { /* target is regular symbol */
+      if (extract_target(symbol) > 0) { // target is regular symbol
         switch (symbol_class(extract_target(symbol))) {
         case LUX_FUNCTION:
           strcpy(curScrat, symbolProperName(extract_target(symbol)));
@@ -1465,7 +1465,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       curScrat += strlen(curScrat);
       sec = extract_ptr(symbol);
       n = extract_num_sec(symbol);
-    } else {			/* an LUX_PRE_EXTRACT symbol */
+    } else {			// an LUX_PRE_EXTRACT symbol
       strcpy(curScrat, pre_extract_name(symbol));
       sec = pre_extract_ptr(symbol);
       n = pre_extract_num_sec(symbol);
@@ -1652,7 +1652,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       strcpy(curScrat, "run,");
       curScrat += strlen(curScrat);
       n = usr_code_routine_num(symbol);
-      if (symbol_class(n) == LUX_STRING)  /* unevaluated name */
+      if (symbol_class(n) == LUX_STRING)  // unevaluated name
         strcpy(curScrat, string_value(n));
       else {
         char const* p = symbolProperName(usr_code_routine_num(symbol));
@@ -1673,7 +1673,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case EVB_INT_SUB:
       switch (int_sub_routine_num(symbol)) {
-      case LUX_INSERT_SUB: /* INSERT */
+      case LUX_INSERT_SUB: // INSERT
         n = int_sub_num_arguments(symbol) - 2;
         ptr.w = int_sub_arguments(symbol);
         symbolIdent(ptr.w[n + 1], mode & I_SINGLEMODE);
@@ -1703,7 +1703,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
       break;
     case EVB_USR_SUB:
-      if (usr_sub_is_deferred(symbol))  /* call to an LUX_DEFERRED_SUBR */
+      if (usr_sub_is_deferred(symbol))  // call to an LUX_DEFERRED_SUBR
         strcpy(curScrat, string_value(usr_sub_routine_num(symbol)));
       else {
         char const* p = symbolProperName(usr_sub_routine_num(symbol));
@@ -1745,7 +1745,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       } else
         strcpy(curScrat++, " ");
       n = case_num_statements(symbol);
-      n = (n - 1)/2;	/* number of statements */
+      n = (n - 1)/2;	// number of statements
       if ((mode & I_TRUNCATE) && n > 1) {
         j = 1;
         i = 1;
@@ -1755,7 +1755,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
       ptr.w = case_statements(symbol);
       while (j--) {
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	/* condition */
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	// condition
         curScrat += strlen(curScrat);
         strcpy(curScrat, " : ");
         curScrat += 3;
@@ -1766,18 +1766,18 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
         curScrat += strlen(curScrat);
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	/* action */
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	// action
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           indent -= 2;
-          if (!j && !*ptr.w) /* last one and no ELSE */
+          if (!j && !*ptr.w) // last one and no ELSE
             indent -= 2;
           sprintf(curScrat, "\n%*s", indent, "");
           curScrat += strlen(curScrat);
         } else
           strcpy(curScrat++, " ");
       }
-      if (i) {		/* we truncated */
+      if (i) {		// we truncated
         strcpy(curScrat, "...");
         curScrat += 3;
         if ((mode & I_LENGTH)) {
@@ -1786,7 +1786,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         }
         ptr.w += n - 1;
       }
-      if (*ptr.w) {		/* have an ELSE clause */
+      if (*ptr.w) {		// have an ELSE clause
         strcpy(curScrat, "else ");
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
@@ -1837,7 +1837,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
       }
-      if (i) {		/* we were truncating */
+      if (i) {		// we were truncating
         strcpy(curScrat, "...");
         curScrat += strlen(curScrat);
         if ((mode & I_LENGTH)) {
@@ -1889,7 +1889,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
       }
-      if (i) {		/* we truncated */
+      if (i) {		// we truncated
         strcpy(curScrat, "...");
         curScrat += strlen(curScrat);
         if ((mode & I_LENGTH)) {
@@ -1918,8 +1918,8 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     strcpy(curScrat++, "(");
     se = struct_elements(struct_ptr_target(symbol));
     while (n--) {
-      if (!spe->desc) {	/* top element */
-        i = spe->n_subsc;	/* number of subscripts */
+      if (!spe->desc) {	// top element
+        i = spe->n_subsc;	// number of subscripts
         spm = spe->member;
         while (i--) {
           switch (spm->type) {
@@ -1964,10 +1964,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     break;
   }
 
-  curScrat = save;		/* restore proper value */
+  curScrat = save;		// restore proper value
   return curScrat;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t identStruct(structElem *se)
 {
   int32_t	n, nelem, ndim, *dims, ndim2, *dims2;
@@ -2014,7 +2014,7 @@ int32_t identStruct(structElem *se)
 	      *curScrat++ = ',';
 	  }
 	  *curScrat++ = ')';
-	} else {		/* scalar: show as 1-element array */
+	} else {		// scalar: show as 1-element array
 	  sprintf(curScrat, "1)");
 	  curScrat += strlen(curScrat);
 	}
@@ -2036,7 +2036,7 @@ int32_t identStruct(structElem *se)
   curScrat += strlen(curScrat);
   return 1;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 void dumpTree(int32_t symbol)
 {
   int32_t	kind, i, n, *l;
@@ -2527,14 +2527,14 @@ void dumpTree(int32_t symbol)
     }
   return;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void dumpLine(int32_t symbol)
 {
   while (symbol_context(symbol) > 0)
     symbol = symbol_context(symbol);
   dumpTree(symbol);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_list(int32_t narg, int32_t ps[])
 /* shows the definition of a user-defined subroutine, function,
    or block routine */
@@ -2569,4 +2569,4 @@ int32_t lux_list(int32_t narg, int32_t ps[])
   resetPager();
   return LUX_ONE;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------

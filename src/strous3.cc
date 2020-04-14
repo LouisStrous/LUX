@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File strous3.c */
-/* Various LUX routines by L. Strous */
+// File strous3.c
+// Various LUX routines by L. Strous
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -28,7 +28,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <float.h>
 #include <math.h>
-#include <errno.h>              /* for errno */
+#include <errno.h>              // for errno
 #include "action.hh"
 #include "Bytestack.hh"
 #include "SSFC.hh"
@@ -36,13 +36,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <functional>
 #include "MonotoneInterpolation.hh"
 
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t lux_bisect(int32_t narg, int32_t ps[])
-/* y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width]) */
-/* calculates bisector positions */
-/* <axis> may only have a single dimension. */
-/* The first dimension of <y> traces profiles to be checked for */
-/* bisectors. */
+// y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width])
+// calculates bisector positions
+// <axis> may only have a single dimension.
+// The first dimension of <y> traces profiles to be checked for
+// bisectors.
 /* <values> contains the levels at which bisector positions are to be
    returned.
    <pos> contains the position (index to each profile) at which
@@ -53,7 +53,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
    a scalar.
    If <width> is specified, then the profile widths corresponding to the
    bisector positions are returned in it. */
-/* LS 7may98 */
+// LS 7may98
 {
   int32_t	result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
@@ -80,8 +80,8 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   if (standardLoop(ySym, (narg > 3 && ps[3])? ps[3]: 0,
 		   SL_COMPRESS | SL_ONEAXIS | SL_NEGONED | SL_SRCUPGRADE
 		   | SL_EACHROW | SL_AXISCOORD, LUX_FLOAT,
-		   &srcinfo, &src, NULL, NULL, NULL) < 0) /* <data>, <axis> */
-    return LUX_ERROR;		/* some error */
+		   &srcinfo, &src, NULL, NULL, NULL) < 0) // <data>, <axis>
+    return LUX_ERROR;		// some error
 
   if (xSym) {
     if (!symbolIsNumericalArray(xSym))
@@ -93,26 +93,26 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   } else
     x.f = NULL;
 
-  if (!symbolIsNumerical(vSym)) /* <levels> */
+  if (!symbolIsNumerical(vSym)) // <levels>
     return LUX_ERROR;
-  iq = lux_converts[srcinfo.type](1, &vSym); /* ensure proper type */
+  iq = lux_converts[srcinfo.type](1, &vSym); // ensure proper type
   numerical(iq, NULL, NULL, &nLev, &level);
 
-  if (narg > 4 && ps[4]) { 	/* have <pos> */
+  if (narg > 4 && ps[4]) { 	// have <pos>
     pos = int_arg(ps[4]);
     if (pos < 0 || pos >= srcinfo.rdims[0])
       return luxerror("Index out of range", ps[4]);
-  } else				/* no <pos> */
+  } else				// no <pos>
     pos = -1;
 
-  /* create output symbol */
+  // create output symbol
   if (nLev > 1) {
     outDims[0] = nLev;
     memcpy(outDims + 1, srcinfo.dims, srcinfo.raxes[0]*sizeof(int32_t));
     memcpy(outDims + srcinfo.raxes[0] + 1, srcinfo.dims + srcinfo.raxes[0] + 1,
 	   (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
     result = array_scratch(srcinfo.type, srcinfo.ndim, outDims);
-    if (narg > 5 && ps[5])	/* have <width> */
+    if (narg > 5 && ps[5])	// have <width>
       if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
 	  == LUX_ERROR)
 	return LUX_ERROR;
@@ -122,13 +122,13 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
       memcpy(outDims + srcinfo.raxes[0], srcinfo.dims + srcinfo.raxes[0] + 1,
 	     (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
       result = array_scratch(srcinfo.type, srcinfo.ndim - 1, outDims);
-      if (narg > 5 && ps[5])	/* have <width> */
+      if (narg > 5 && ps[5])	// have <width>
 	if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
 	    == LUX_ERROR)
 	  return LUX_ERROR;
-    } else {			/* only one return value */
+    } else {			// only one return value
       result = scalar_scratch(srcinfo.type);
-      if (narg > 5 && ps[5]) {	/* have <width> */
+      if (narg > 5 && ps[5]) {	// have <width>
 	undefine(ps[5]);
 	symbol_class(ps[5]) = LUX_SCALAR;
 	scalar_type(ps[5]) = srcinfo.type;
@@ -156,21 +156,21 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 
   step = srcinfo.step[0];
   
-  /* now do the work */
+  // now do the work
   switch (srcinfo.type) {
     case LUX_FLOAT:
       do {
 	rightedge.f = src.f + step*(srcinfo.rdims[0] - 1);
 	if (pos >= 0) {
-	  ptr.f = src.f + pos*step; /* start position */
-	  /* now seek the local minimum */
+	  ptr.f = src.f + pos*step; // start position
+	  // now seek the local minimum
 	  if (ptr.f > src.f && ptr.f[-step] < *ptr.f)
 	    while (ptr.f > src.f && ptr.f[-step] < *ptr.f)
 	      ptr.f -= step;
 	  else
 	    while (ptr.f < rightedge.f && ptr.f[step] < *ptr.f)
 	      ptr.f += step;
-	} else {		/* find absolute minimum */
+	} else {		// find absolute minimum
 	  ptr.f = left.f = src.f;
 	  do {
 	    left.f += step;
@@ -179,7 +179,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	  } while (left.f < rightedge.f);
 	}
 
-	/* install table for cubic spline interpolation */
+	// install table for cubic spline interpolation
 	cubic_spline_tables(x.f, srcinfo.type, 1,
 			    src.f, srcinfo.type, step,
 			    srcinfo.rdims[0], 0, 0,
@@ -201,14 +201,14 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	}
 	find_cspline_extremes(x1l, x2r, &minpos, &min, NULL, NULL, &cspl);
 
-	/* the levels are assumed to be sorted in ascending order */
+	// the levels are assumed to be sorted in ascending order
 	for (lev = 0; lev < nLev; lev++) {
 	  if (min > level.f[lev]) {
 	    *trgt.f++ = -1.0;
 	    if (width.f != NULL)
 	      *width.f++ = 0.0;
 	  } else {
-	    if (*ptr.f > level.f[lev]) { /* the current level is above */
+	    if (*ptr.f > level.f[lev]) { // the current level is above
 	      /* the minimum of the spline fit, but below the local minimum of
 	       the tabular points */
 	      xl = find_cspline_value(level.f[lev], x1l, minpos, &cspl);
@@ -240,7 +240,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	      } else
 		xl = -DBL_MAX;
 
-	      if (ir < srcinfo.rdims[0]) { /* not yet at edge */
+	      if (ir < srcinfo.rdims[0]) { // not yet at edge
 		do {
 		  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
 					&max, &cspl);
@@ -259,23 +259,23 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 		if (ir < srcinfo.rdims[0])
 		  xr = find_cspline_value(level.f[lev], x1r, maxpos, &cspl);
 		else
-		  xr = -DBL_MAX;	/* flag: at edge */
+		  xr = -DBL_MAX;	// flag: at edge
 	      } else
 		xr = -DBL_MAX;
 
-	      if (xl > -DBL_MAX && xr > -DBL_MAX) { /* not at edge */
+	      if (xl > -DBL_MAX && xr > -DBL_MAX) { // not at edge
 		*trgt.f = (xl + xr)/2;
 		if (width.f)
 		  *width.f++ = xr - xl;
 	      } else {
 		if (width.f)
 		  *width.f++ = 0;
-		*trgt.f = -1;	/* not found */
+		*trgt.f = -1;	// not found
 	      }
 	    }
 	    trgt.f++;
-	  } /* end of if (*ptr.f > level.f[lev]) else */
-	} /* end of for (lev = 0; ...) */
+	  } // end of if (*ptr.f > level.f[lev]) else
+	} // end of for (lev = 0; ...)
 	src.f += step*srcinfo.rdims[0];
       } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
@@ -283,15 +283,15 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
       do {
 	rightedge.d = src.d + step*(srcinfo.rdims[0] - 1);
 	if (pos >= 0) {
-	  ptr.d = src.d + pos*step; /* start position */
-	  /* now seek the local minimum */
+	  ptr.d = src.d + pos*step; // start position
+	  // now seek the local minimum
 	  if (ptr.d > src.d && ptr.d[-step] < *ptr.d)
 	    while (ptr.d > src.d && ptr.d[-step] < *ptr.d)
 	      ptr.d -= step;
 	  else
 	    while (ptr.d < rightedge.d && ptr.d[step] < *ptr.d)
 	      ptr.d += step;
-	} else {		/* find absolute minimum */
+	} else {		// find absolute minimum
 	  ptr.d = left.d = src.d;
 	  do {
 	    left.d += step;
@@ -300,7 +300,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	  } while (left.d < rightedge.d);
 	}
 
-	/* install table for cubic spline interpolation */
+	// install table for cubic spline interpolation
 	cubic_spline_tables(x.d, srcinfo.type, 1,
 			    src.d, srcinfo.type, step,
 			    srcinfo.rdims[0], 0, 0,
@@ -322,14 +322,14 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	}
 	find_cspline_extremes(x1l, x2r, &minpos, &min, NULL, NULL, &cspl);
 
-	/* the levels are assumed to be sorted in ascending order */
+	// the levels are assumed to be sorted in ascending order
 	for (lev = 0; lev < nLev; lev++) {
 	  if (min > level.d[lev]) {
 	    *trgt.d++ = -1.0;
 	    if (width.d != NULL)
 	      *width.d++ = 0.0;
 	  } else {
-	    if (*ptr.d > level.d[lev]) { /* the current level is above */
+	    if (*ptr.d > level.d[lev]) { // the current level is above
 	      /* the minimum of the spline fit, but below the local minimum of
 	       the tabular points */
 	      xl = find_cspline_value(level.d[lev], x1l, minpos, &cspl);
@@ -361,7 +361,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 	      } else
 		xl = -DBL_MAX;
 
-	      if (ir < srcinfo.rdims[0]) { /* not yet at edge */
+	      if (ir < srcinfo.rdims[0]) { // not yet at edge
 		do {
 		  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
 					&max, &cspl);
@@ -380,23 +380,23 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 		if (ir < srcinfo.rdims[0])
 		  xr = find_cspline_value(level.d[lev], x1r, maxpos, &cspl);
 		else
-		  xr = -DBL_MAX;	/* flag: at edge */
+		  xr = -DBL_MAX;	// flag: at edge
 	      } else
 		xr = -DBL_MAX;
 
-	      if (xl > -DBL_MAX && xr > -DBL_MAX) { /* not at edge */
+	      if (xl > -DBL_MAX && xr > -DBL_MAX) { // not at edge
 		*trgt.d = (xl + xr)/2;
 		if (width.d)
 		  *width.d++ = xr - xl;
 	      } else {
 		if (width.d)
 		  *width.d++ = 0;
-		*trgt.d = -1;	/* not found */
+		*trgt.d = -1;	// not found
 	      }
 	    }
 	    trgt.d++;
-	  } /* end of if (*ptr.d > level.d[lev]) else */
-	} /* end of for (lev = 0; ...) */
+	  } // end of if (*ptr.d > level.d[lev]) else
+	} // end of for (lev = 0; ...)
 	src.d += step*srcinfo.rdims[0];
       } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
       break;
@@ -406,7 +406,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   cleanup_cubic_spline_tables(&cspl);
   return result;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 static int32_t cmp0(const void *a, const void *b)
 {
   struct c { double v; int32_t l; } aa, bb;
@@ -427,9 +427,9 @@ static int32_t cmp0(const void *a, const void *b)
   }
   return 0;
 }
-/*---------------------------------------------------------------------*/
+//---------------------------------------------------------------------
 int32_t lux_cspline_find(int32_t narg, int32_t ps[])
-/* z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index]) */
+// z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index])
 /* locates positions where a certain value gets attained, using cubic
    splines
    <y> = data values
@@ -442,7 +442,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
    found locations.  The locations are sorted by the level and secondarily
    by the coordinates.  The locations for level <level(i)> begin at
    index <index(i)> and run up to but not including index <index(i+1)>. */
-/* LS 2009-08-09 */
+// LS 2009-08-09
 {
   int32_t       result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   Pointer       src, level;
@@ -452,8 +452,8 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   struct c { double v; int32_t l; int32_t c; } *c;
   int32_t csize;
 
-  ySym = ps[0];                 /* <y> */
-  vSym = ps[1];                 /* <values> */
+  ySym = ps[0];                 // <y>
+  vSym = ps[1];                 // <values>
 
   if (!symbolIsNumericalArray(ySym))
     return cerror(NEED_NUM_ARR, ySym);
@@ -463,16 +463,16 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   if (standardLoop(ySym, (narg > 2 && ps[2])? ps[2]: LUX_ZERO,
                    SL_NEGONED | SL_ONEAXIS | SL_SRCUPGRADE
                    | SL_AXISCOORD, LUX_FLOAT,
-                   &srcinfo, &src, NULL, NULL, NULL) < 0) /* <data>, <axis> */
-    return LUX_ERROR;           /* some error */
+                   &srcinfo, &src, NULL, NULL, NULL) < 0) // <data>, <axis>
+    return LUX_ERROR;           // some error
 
-  if (!symbolIsNumerical(vSym)) /* <levels> */
+  if (!symbolIsNumerical(vSym)) // <levels>
     return LUX_ERROR;
-  iq = lux_converts[srcinfo.type](1, &vSym); /* ensure proper type */
+  iq = lux_converts[srcinfo.type](1, &vSym); // ensure proper type
 
   numerical(iq, NULL, NULL, &nLev, &level);
 
-  if (narg > 3 && ps[3]) {      /* <index> */
+  if (narg > 3 && ps[3]) {      // <index>
     if (to_scratch_array(ps[3], LUX_INT32, 1, &nLev) == LUX_ERROR)
       return LUX_ERROR;
     index = (int32_t *) array_data(ps[3]);
@@ -480,8 +480,8 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   } else
     index = NULL;
 
-  /* we don't know beforehand how many output values there will be */
-  b = Bytestack_create();       /* so store them on a Byte stack */
+  // we don't know beforehand how many output values there will be
+  b = Bytestack_create();       // so store them on a Byte stack
 
   step = srcinfo.rsinglestep[0];
 
@@ -495,20 +495,20 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   }
   c = (struct c*) malloc(csize);
 
-  /* now do the work */
+  // now do the work
   switch (srcinfo.type) {
     case LUX_FLOAT:
       do {
-        /* install table for cubic spline interpolation */
+        // install table for cubic spline interpolation
         cubic_spline_tables(NULL, srcinfo.type, 1,
                             src.f, srcinfo.type, step,
                             srcinfo.rdims[0], 0, 0,
                             &cspl);
-        /* the levels are assumed to be sorted in ascending order */
+        // the levels are assumed to be sorted in ascending order
         do {
           if (!srcinfo.coords[0]) {
             for (lev = 0; lev < nLev && *src.f > level.f[lev]; lev++) ;
-            /* now level.f[lev - 1] <= *src.f < level.f[lev] */
+            // now level.f[lev - 1] <= *src.f < level.f[lev]
           } else {
             double z;
 
@@ -519,9 +519,9 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
                                      srcinfo.coords[0] - 1,
                                      srcinfo.coords[0],
                                      &cspl);
-              c->v = z;                 /* store the found location */
-              c->l = --lev;     /* and the level index */
-              /* and after that the coordinates */
+              c->v = z;                 // store the found location
+              c->l = --lev;     // and the level index
+              // and after that the coordinates
               for (j = 0; j < srcinfo.ndim; j++)
                 (&c->c)[srcinfo.raxes[j]] = srcinfo.coords[j];
               Bytestack_push_data(b, c, (uint8_t *) c + csize);
@@ -544,16 +544,16 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
       break;
   case LUX_DOUBLE:
       do {
-        /* install table for cubic spline interpolation */
+        // install table for cubic spline interpolation
         cubic_spline_tables(NULL, srcinfo.type, 1,
                             src.d, srcinfo.type, step,
                             srcinfo.rdims[0], 0, 0,
                             &cspl);
-        /* the levels are assumed to be sorted in ascending order */
+        // the levels are assumed to be sorted in ascending order
         do {
           if (!srcinfo.coords[0]) {
             for (lev = 0; lev < nLev && *src.d > level.d[lev]; lev++) ;
-            /* now level.d[lev - 1] <= *src.d < level.d[lev] */
+            // now level.d[lev - 1] <= *src.d < level.d[lev]
           } else {
             double z;
 
@@ -599,7 +599,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
     int32_t n;
     struct c *d;
     
-    n = Bytestack_bytes(b, 0)/csize; /* number of found data points */
+    n = Bytestack_bytes(b, 0)/csize; // number of found data points
     if (n > 0) {
       Bytestack_index bi;
       union {
@@ -607,10 +607,10 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
         uint8_t *b; 
       } q;
 
-      d = (struct c *) Bytestack_peek(b, 0); /* beginning of data */
+      d = (struct c *) Bytestack_peek(b, 0); // beginning of data
       qsort(d, n, csize, cmp0);
 
-      /* create output symbol */
+      // create output symbol
       bi = Bytestack_top(NULL);
       if (srcinfo.ndim > 1)
         Bytestack_push_var(NULL, srcinfo.ndim);
@@ -690,7 +690,7 @@ int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
   return sa.result();
 }
 REGISTER(monotone_interpolation, f, monotoneinterpolate, 3, 3, "1none:2circle:4square:8wide:16full");
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 #ifdef WORDS_BIGENDIAN
 #define SYNCH_OK	0xaaaa5555
 #define SYNCH_REVERSE	0x5555aaaa
@@ -699,18 +699,18 @@ REGISTER(monotone_interpolation, f, monotoneinterpolate, 3, 3, "1none:2circle:4s
 #define SYNCH_REVERSE	0xaaaa5555
 #endif
 int32_t lux_fitskey(int32_t narg, int32_t ps[])
-/* FITSKEY(file, key) returns the value associated with the string <key> */
+// FITSKEY(file, key) returns the value associated with the string <key>
 /* in FITS file <file>.  If <file> is a string, then it is taken as the
    name of the FITS file.  If <file> is a scalar, then its (integer) value
    is taken as the lun on which the FITS file is assumed to be opened.
    If a lun is specified, then the file pointer is left in the same position
    it was found in.
    Returns 0 if (1) the file cannot be opened */
-/* for reading, (2) the file is not a FITS file (does not have "SIMPLE " */
-/* as its first keyword), (3) the key is not a string, or (4) the key has */
-/* more than 8 characters.  If the keyword is not found, then a 0 is */
-/* returned.  The key is transformed to all uppercase before it is sought */
-/* in the file.  LS 4jun98 */
+// for reading, (2) the file is not a FITS file (does not have "SIMPLE "
+// as its first keyword), (3) the key is not a string, or (4) the key has
+// more than 8 characters.  If the keyword is not found, then a 0 is
+// returned.  The key is transformed to all uppercase before it is sought
+// in the file.  LS 4jun98
 {
   char	*file, *key, *key2, *scr, mustclose, ok;
   int32_t	n, n2, i, evalString(char *, int32_t), ptr, iq, i0;
@@ -722,11 +722,11 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
 
   switch (symbol_class(ps[0])) {
     case LUX_STRING:
-      file = expand_name(string_value(ps[0]), NULL); /* full file name */
+      file = expand_name(string_value(ps[0]), NULL); // full file name
       fp = fopen(file, "r");
       if (!fp)
 	return LUX_ZERO;
-      mustclose = 1;		/* must close the file again when done */
+      mustclose = 1;		// must close the file again when done
       break;
     case LUX_SCALAR:
       i = int_arg(ps[0]);
@@ -735,14 +735,14 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
       fp = lux_file[i];
       if (!fp)
 	return LUX_ZERO;
-      ptr = ftell(fp);		/* current file pointer position */
+      ptr = ftell(fp);		// current file pointer position
       fseek(fp, 0, SEEK_SET);
-      mustclose = 0;		/* leave file open when done */
+      mustclose = 0;		// leave file open when done
       break;
     default:
       return LUX_ZERO;
   }
-  if (symbol_class(ps[1]) != LUX_STRING) { /* <key> must be a string */
+  if (symbol_class(ps[1]) != LUX_STRING) { // <key> must be a string
     if (mustclose)
       fclose(fp);
     else
@@ -759,37 +759,37 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   }
 
   key = string_value(ps[1]);
-  n2 = (n < 8)? n + 1: 8;	/* because we add a space if it fits */
+  n2 = (n < 8)? n + 1: 8;	// because we add a space if it fits
   key2 = (char*) malloc(n2 + 1);
   strcpy(key2, key);
-  if (n2 != n) {		/* add a space at the end to prevent */
-				/* partial matches */
+  if (n2 != n) {		// add a space at the end to prevent
+				// partial matches
     key2[n] = ' ';
     key2[n + 1] = '\0';
   }
-  for (key = key2; *key; key++)	/* make all uppercase */
+  for (key = key2; *key; key++)	// make all uppercase
     *key = toupper(*key);
 
   scr = curScrat;
   scr = fgets(scr, 9, fp);
 
   ok = 1;
-  i0 = 0;			/* default offset is 0 */
+  i0 = 0;			// default offset is 0
   if (!scr)
     ok = 0;
-  else if (strncmp(scr, "SIMPLE  ", 8)) { /* no expected FITS key */
-    /* we'll accept an FZ file if its has a FITS header */
+  else if (strncmp(scr, "SIMPLE  ", 8)) { // no expected FITS key
+    // we'll accept an FZ file if its has a FITS header
     p.s = scr;
-    if (*p.l == SYNCH_OK) {	/* have an FZ file.  OK header? */
-      fseek(fp, 256, SEEK_SET); /* to start of header */
+    if (*p.l == SYNCH_OK) {	// have an FZ file.  OK header?
+      fseek(fp, 256, SEEK_SET); // to start of header
       scr = fgets(scr, 9, fp);
-      if (!scr || strncmp(scr, "SIMPLE  ", 8)) /* not OK */
+      if (!scr || strncmp(scr, "SIMPLE  ", 8)) // not OK
 	ok = 0;
-      else			/* we have an FZ FITS header: adjust offset */
+      else			// we have an FZ FITS header: adjust offset
 	i0 = 256;
     }
   }
-  if (!ok) {			/* something was wrong */
+  if (!ok) {			// something was wrong
     if (mustclose)
       fclose(fp);
     else
@@ -825,33 +825,33 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   else
     fseek(fp, ptr, SEEK_SET);
   free(key2);
-  if (!strncmp(scr, "END ", 4))	/* found end of header but not the keyword */
+  if (!strncmp(scr, "END ", 4))	// found end of header but not the keyword
     return LUX_ZERO;
 
   /* The FITS rules say that a comment is introduced by a forward slash.
      String constants are enclosed in single quotes ('' inside a string refers
      to a literal single quote), so we must look for the first forward slash
      outside of a string.  LS 14jan99 */
-  /* if /COMMENT is specified, then we must return the comment value; */
-  /* otherwise the data value.  Return comments always as strings. */
-  /* LS 26may99 */
-  scr += 9;			/* beginning of data value */
+  // if /COMMENT is specified, then we must return the comment value;
+  // otherwise the data value.  Return comments always as strings.
+  // LS 26may99
+  scr += 9;			// beginning of data value
   n = 0;
   while (isspace((int32_t) *scr))
     scr++;
   key = scr;
   while (*key) {
     switch (*key) {
-      case '\'':		/* literal text string */
-	n = !n;			/* toggle string status */
+      case '\'':		// literal text string
+	n = !n;			// toggle string status
 	break;
-      case '/':			/* maybe FITS comment */
-	if (!n) { 		/* not in a literal text string */
-	  if (internalMode & 1) { /* /COMMENT */
-	    scr = key + 1;	/* start reading here */
+      case '/':			// maybe FITS comment
+	if (!n) { 		// not in a literal text string
+	  if (internalMode & 1) { // /COMMENT
+	    scr = key + 1;	// start reading here
 	    while (isspace((int32_t) *scr))
-	      scr++;		/* skip initial whitespace */
-	    key = scr + strlen(scr) - 1; /* skip final whitespace */
+	      scr++;		// skip initial whitespace
+	    key = scr + strlen(scr) - 1; // skip final whitespace
 	    while (key > scr && isspace((int32_t) *key))
 	      key--;
 	    key[1] = '\0';
@@ -860,38 +860,38 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
 	    return iq;
 	  } else {
 	    while (key > scr
-		   && isspace((int32_t) key[-1])) /* skip trailing spaces */
+		   && isspace((int32_t) key[-1])) // skip trailing spaces
 	      key--;
-	    *key-- = '\0';	/* terminate data value */
+	    *key-- = '\0';	// terminate data value
 	  }
 	}
 	break;
     }
     key++;
   }
-  /* the data may be numerical, or a quote-enclosed string, or the values */
-  /* T for true or F for false.  We return non-quoted non-numerical text */
-  /* as a string */
+  // the data may be numerical, or a quote-enclosed string, or the values
+  // T for true or F for false.  We return non-quoted non-numerical text
+  // as a string
   key = scr;
   switch (*key) {
-    case '\'':			/* a string */
+    case '\'':			// a string
       scr = ++key;
-      while (*key && *key != '\'') /* find the closing quote */
+      while (*key && *key != '\'') // find the closing quote
 	key++;
-      *key = '\0';		/* terminate */
+      *key = '\0';		// terminate
       break;
-    case '-': case '+':		/* may be a number */
+    case '-': case '+':		// may be a number
       scr = key++;
-      while (isspace((int32_t) *key)) /* skip whitespace */
+      while (isspace((int32_t) *key)) // skip whitespace
 	key++;
-      if (!isdigit((int32_t) *key)) { /* treat it as a string */
-	key += strlen(key);	/* go to the end of the string */
+      if (!isdigit((int32_t) *key)) { // treat it as a string
+	key += strlen(key);	// go to the end of the string
 	while (key > scr
-	       && isspace((int32_t) key[-1])) /* skip trailing whitespace */
+	       && isspace((int32_t) key[-1])) // skip trailing whitespace
 	  key--;
 	break;
       }
-      /* else we treat it as a number; fall through to the next case */
+      // else we treat it as a number; fall through to the next case
     case '0': case '1': case '2': case '3': case '4': case '5':
     case '6': case '7': case '8': case '9':
       read_a_number(&scr, &value, &type);
@@ -926,10 +926,10 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   }
   
   iq = string_scratch(strlen(scr));
-  strcpy(string_value(iq), scr); /* copy string */
+  strcpy(string_value(iq), scr); // copy string
   return iq;
 }
-/*--------------------------------------------------------------------------*/
+//--------------------------------------------------------------------------
 #define LEFT	0
 #define DOWN	1
 #define RIGHT	2
@@ -946,7 +946,7 @@ int32_t sign(float x)
   else
     return 0;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t sgnclass(float x)
 {
   if (x > 0)
@@ -956,7 +956,7 @@ int32_t sgnclass(float x)
   else
     return 1;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t traverseElement(float xin, float yin, float vx, float vy,
 		    float *xout, float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
@@ -965,11 +965,11 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
    or CENTER if <vx> = <vy> = 0) and what the coordinates are.  The
    new coordinates are returned in <*xout> and <*yout> and the pixel
    boundary code is the return value of the routine.  LS 17oct98 */
-/* We must make sure that the edges are treated properly, too. */
-/* We do that by moving the edges outward a tiny bit so that our */
-/* data point <xin>,<yin> is never actually one an edge. */
+// We must make sure that the edges are treated properly, too.
+// We do that by moving the edges outward a tiny bit so that our
+// data point <xin>,<yin> is never actually one an edge.
 {
-  if (vx > 0) {			/* to the right */
+  if (vx > 0) {			// to the right
     /* first we check for UP.  The vector that separates UP from RIGHT
        has coordinates (1 - xin, 1 - yin); rotated counterclockwise
        over 90 degrees this becomes (yin - 1, 1 - xin): if the inner
@@ -977,12 +977,12 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
        positive, then we are going UP.  The vector that separates
        RIGHT from DOWN is (1-xin,-yin), which leads to (yin, 1-xin). */
     if (vx*(yin - 1 - FLT_EPSILON) + vy*(1 + FLT_EPSILON - xin) > 0) {
-      /* going UP */
+      // going UP
       *xout = vy? xin + (1 - yin)/vy*vx: 1;
       *yout = 1;
       return UP;
     } else if (vx*(yin + FLT_EPSILON) + vy*(1 + FLT_EPSILON - xin) > 0) {
-      /* we're going RIGHT */
+      // we're going RIGHT
       *xout = 1;
       *yout = vx? yin + (1 - xin)/vx*vy: 0;
       return RIGHT;
@@ -993,47 +993,47 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
     }
   }
 
-  if (vx < 0) {		/* to the left */
-    /* first we check for DOWN.  The vector that separates DOWN from LEFT */
-    /* has coordinates (-xin,-yin); rotated counterclockwise over 90 */
-    /* degrees this becomes (yin,-xin): if the inner product of the velocity */
-    /* vector (vx,vy) with this vector is positive, then we are going DOWN. */
-    /* The vector that separates LEFT from UP is (-xin,1-yin), which leads */
-    /* to (yin-1,-xin). */
-    if (vx*(yin + FLT_EPSILON) - vy*(xin + FLT_EPSILON) > 0) {	/* DOWN */
+  if (vx < 0) {		// to the left
+    // first we check for DOWN.  The vector that separates DOWN from LEFT
+    // has coordinates (-xin,-yin); rotated counterclockwise over 90
+    // degrees this becomes (yin,-xin): if the inner product of the velocity
+    // vector (vx,vy) with this vector is positive, then we are going DOWN.
+    // The vector that separates LEFT from UP is (-xin,1-yin), which leads
+    // to (yin-1,-xin).
+    if (vx*(yin + FLT_EPSILON) - vy*(xin + FLT_EPSILON) > 0) {	// DOWN
       *xout = vy? xin - yin/vy*vx: 0;
       *yout = 0;
       return DOWN;
     } else if (vx*(yin + FLT_EPSILON - 1) - vy*(xin + FLT_EPSILON) > 0) {
-      /* LEFT */
+      // LEFT
       *xout = 0;
       *yout = vx? yin - xin/vx*vy: 1;
       return LEFT;
-    } else {			/* UP */
+    } else {			// UP
       *xout = vy? xin + (1 - yin)/vy*vx: 0;
       *yout = 1;
       return UP;
     }
   }
 
-  if (vy > 0) {		/* straight up */
+  if (vy > 0) {		// straight up
     *xout = xin;
     *yout = 1;
     return UP;
   }
 
-  if (vy < 0) {		/* straight down */
+  if (vy < 0) {		// straight down
     *xout = xin;
     *yout = 0;
     return DOWN;
   }
-  /* no movement at all */
+  // no movement at all
   *xout = xin;
   *yout = yin;
   return CENTER;
 }
-/*--------------------------------------------------------------------*/
-#define FACTOR	(0.886226925)	/* 0.5*sqrt(pi) */
+//--------------------------------------------------------------------
+#define FACTOR	(0.886226925)	// 0.5*sqrt(pi)
 int32_t lux_dir_smooth(int32_t narg, int32_t ps[])
 /* Y = DSMOOTH(<data>,<vx>,<vy> [, /TWOSIDED, /ONESIDED, /BOXCAR, /GAUSSIAN,
                /NORMALIZE])
@@ -1058,15 +1058,15 @@ LS 9nov98 */
   Pointer	src, trgt, src0;
   LoopInfo	srcinfo, trgtinfo;
 
-  iq0 = ps[0];			/* data */
-  if (symbol_class(iq0) != LUX_ARRAY /* not an array */
-      || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
+  iq0 = ps[0];			// data
+  if (symbol_class(iq0) != LUX_ARRAY // not an array
+      || array_num_dims(iq0) != 2) // or doesn't have 2 dimensions
     return cerror(NEED_2D_ARR, iq0);
   iq0 = lux_float(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
-  iq = ps[1];			/* vx */
+  iq = ps[1];			// vx
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1075,7 +1075,7 @@ LS 9nov98 */
   iq = lux_float(1, &iq);
   vx0 = (float*) array_data(iq);
 
-  iq = ps[2];			/* vy */
+  iq = ps[2];			// vy
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1089,12 +1089,12 @@ LS 9nov98 */
     return LUX_ERROR;
   src0.f = src.f;
 
-  twosided = ((internalMode & 1) == 0); /* /TWOSIDED */
-  total = (internalMode & 4);	/* /TOTAL */
-  gaussian = (internalMode & 2); /* /GAUSSIAN */
-  straight = (internalMode & 16); /* /STRAIGHT */
+  twosided = ((internalMode & 1) == 0); // /TWOSIDED
+  total = (internalMode & 4);	// /TOTAL
+  gaussian = (internalMode & 2); // /GAUSSIAN
+  straight = (internalMode & 16); // /STRAIGHT
 
-  if (!gaussian)		/* boxcar */
+  if (!gaussian)		// boxcar
     do {
       count = twosided + 1;
       /* we work up to the desired smoothing width by measuring the path
@@ -1109,45 +1109,45 @@ LS 9nov98 */
 	 of the past steps and quitting if the weighted average gets too
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
-      dslimit = 1.0;		/* current weighted average of step sizes */
+      dslimit = 1.0;		// current weighted average of step sizes
       value = 0.0;
       *trgt.f = 0.0;
       while (count--) {
-	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
-	index = src.f - src0.f;	/* index relative to data start */
+	rindex = 0;		// index relative to current start location
+	ix = srcinfo.coords[0];	// x pixel coordinate
+	iy = srcinfo.coords[1];	// y pixel coordinate
+	index = src.f - src0.f;	// index relative to data start
 
-	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
-	y1 = 0.5;		/* y coordinate in pixel (between 0 and 1) */
-	vx = vx0[index];	/* x velocity */
-	vy = vy0[index];	/* y velocity */
+	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
+	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
+	vx = vx0[index];	// x velocity
+	vy = vy0[index];	// y velocity
 	if (count) {
 	  vx = -vx;
 	  vy = -vy;
 	}
 
-	s0 = 0.5*hypot(vx, vy); /* length indicates smoothing width */
+	s0 = 0.5*hypot(vx, vy); // length indicates smoothing width
 	s1 = s0;
 	s = 0.0;
 	
 	while (s < s1) {
 	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  /* calculate distance inside the current pixel */
+	  // calculate distance inside the current pixel
 	  x1 -= x2;
 	  y1 -= y2;
 	  ds = hypot(x1, y1);
 	  if (s + ds > s1)
 	    ds = s0 - s;
 	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	/* we fear a semi-infinite loop here */
+	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
 	    value += src.f[rindex]*(s1 - s);
-	    s = s1;		/* we break it off */
+	    s = s1;		// we break it off
 	    continue;
 	  }
 	  switch (c) {
 	    case UP:
-	      if (iy == ny - 1) { /* already at top */
+	      if (iy == ny - 1) { // already at top
 		value += src.f[rindex]*ds;
 		s += ds;
 		s1 = s;
@@ -1159,7 +1159,7 @@ LS 9nov98 */
 	      iy++;
 	      break;
 	    case RIGHT:
-	      if (ix == nx - 1) { /* already at right edge */
+	      if (ix == nx - 1) { // already at right edge
 		value += src.f[rindex]*ds;
 		s += ds;
 		s1 = s;
@@ -1171,7 +1171,7 @@ LS 9nov98 */
 	      ix++;
 	      break;
 	    case DOWN:
-	      if (iy == 0) {	/* already at bottom */
+	      if (iy == 0) {	// already at bottom
 		value += src.f[rindex]*ds;
 		s += ds;
 		s1 = s;
@@ -1183,7 +1183,7 @@ LS 9nov98 */
 	      iy--;
 	      break;
 	    case LEFT:
-	      if (ix == 0) { 	/* already at left edge */
+	      if (ix == 0) { 	// already at left edge
 		value += src.f[rindex]*ds;
 		s += ds;
 		s1 = s;
@@ -1198,7 +1198,7 @@ LS 9nov98 */
 	      value += src.f[rindex]*(s1 - s);
 	      s1 = s;
 	      continue;
-	  } /* end of switch (c) */
+	  } // end of switch (c)
 	  value += src.f[rindex]*ds;
 	  index += di;
 	  rindex += di;
@@ -1210,9 +1210,9 @@ LS 9nov98 */
 	      vx = -vx;
 	      vy = -vy;
 	    }
-	  } /* end of if (straight) */
-	} /* end of while (s < s0) */
-      } /* end of while (count--) */
+	  } // end of if (straight)
+	} // end of while (s < s0)
+      } // end of while (count--)
       if (!total) {
 	value /= s1;
 	if (twosided)
@@ -1221,7 +1221,7 @@ LS 9nov98 */
       *trgt.f = value;
     } while (advanceLoop(&trgtinfo, &trgt),
 	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
-  else				/* gaussian smoothing */
+  else				// gaussian smoothing
     do {
       count = twosided + 1;
       /* we work up to the desired smoothing width by measuring the path
@@ -1236,31 +1236,31 @@ LS 9nov98 */
 	 of the past steps and quitting if the weighted average gets too
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
-      dslimit = 1.0;		/* current weighted average of step sizes */
+      dslimit = 1.0;		// current weighted average of step sizes
       value = 0.0;
       ws = 0.0;
       while (count--) {
-	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
-	index = src.f - src0.f;	/* index relative to data start */
+	rindex = 0;		// index relative to current start location
+	ix = srcinfo.coords[0];	// x pixel coordinate
+	iy = srcinfo.coords[1];	// y pixel coordinate
+	index = src.f - src0.f;	// index relative to data start
 
-	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
-	y1 = 0.5;		/* y coordinate in pixel (between 0 and 1) */
-	vx = vx0[index];	/* x velocity */
-	vy = vy0[index];	/* y velocity */
+	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
+	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
+	vx = vx0[index];	// x velocity
+	vy = vy0[index];	// y velocity
 	if (count) {
 	  vx = -vx;
 	  vy = -vy;
 	}
 
-	s0 = 0.6005612*hypot(vx, vy); /* smoothing width */
+	s0 = 0.6005612*hypot(vx, vy); // smoothing width
 	s = 0.0;
 	s1 = 4*s0;
 	
 	while (s < s1) {
 	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  /* calculate distance inside the current pixel */
+	  // calculate distance inside the current pixel
 	  x1 -= x2;
 	  y1 -= y2;
 	  ds = hypot(x1, y1);
@@ -1279,14 +1279,14 @@ LS 9nov98 */
 	  weight = s? (s + 0.5)/s0: 0.0;
 	  weight = exp(-weight*weight);
 	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	/* we fear a semi-infinite loop here */
+	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
 	    ds = 0.5;
 	    if (s + ds > s1)
 	      ds = s1 - s;
 	  }
 	  switch (c) {
 	    case UP:
-	      if (iy == ny - 1) { /* already at top */
+	      if (iy == ny - 1) { // already at top
 		value += src.f[rindex]*weight*ds;
 		ws += weight*ds;
 		s += ds;
@@ -1299,7 +1299,7 @@ LS 9nov98 */
 	      iy++;
 	      break;
 	    case RIGHT:
-	      if (ix == nx - 1) { /* already at right edge */
+	      if (ix == nx - 1) { // already at right edge
 		value += src.f[rindex]*weight*ds;
 		ws += weight*ds;
 		s += ds;
@@ -1312,7 +1312,7 @@ LS 9nov98 */
 	      ix++;
 	      break;
 	    case DOWN:
-	      if (iy == 0) {	/* already at bottom */
+	      if (iy == 0) {	// already at bottom
 		value += src.f[rindex]*weight*ds;
 		ws += weight*ds;
 		s += ds;
@@ -1325,7 +1325,7 @@ LS 9nov98 */
 	      iy--;
 	      break;
 	    case LEFT:
-	      if (ix == 0) {	/* already at left edge */
+	      if (ix == 0) {	// already at left edge
 		value += src.f[rindex]*weight*ds;
 		ws += weight*ds;
 		s += ds;
@@ -1340,7 +1340,7 @@ LS 9nov98 */
 	    case CENTER:
 	      di = 0;
 	      break;
-	  } /* end of switch (c) */
+	  } // end of switch (c)
 	  value += src.f[rindex]*weight*ds;
 	  rindex += di;
 	  index += di;
@@ -1352,10 +1352,10 @@ LS 9nov98 */
 	    if (count) {
 	      vx = -vx;
 	      vy = -vy;
-	    } /* end of if (count) */
-	  } /* end of if (straight) */
-	} /* end of while (d < DONE) */
-      } /* end of while (count--) */
+	    } // end of if (count)
+	  } // end of if (straight)
+	} // end of while (d < DONE)
+      } // end of while (count--)
       if (!total)
 	value /= ws;
       *trgt.f = value;
@@ -1363,7 +1363,7 @@ LS 9nov98 */
 	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   return iq;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 /* Y = LSMOOTH(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
@@ -1377,15 +1377,15 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
   Pointer	src, trgt, src0;
   LoopInfo	srcinfo, trgtinfo;
 
-  iq0 = ps[0];			/* data */
-  if (symbol_class(iq0) != LUX_ARRAY /* not an array */
-      || array_num_dims(iq0) != 2) /* or doesn't have 2 dimensions */
+  iq0 = ps[0];			// data
+  if (symbol_class(iq0) != LUX_ARRAY // not an array
+      || array_num_dims(iq0) != 2) // or doesn't have 2 dimensions
     return cerror(NEED_2D_ARR, iq0);
   iq0 = lux_float(1, &iq0);
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
-  iq = ps[1];			/* vx */
+  iq = ps[1];			// vx
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1394,7 +1394,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
   iq = lux_float(1, &iq);
   vx0 = (float*) array_data(iq);
 
-  iq = ps[2];			/* vy */
+  iq = ps[2];			// vy
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1408,14 +1408,14 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   src0.f = src.f;
 
-  twosided = ((internalMode & 1) == 0); /* /TWOSIDED */
-  normalize = (internalMode & 4)? 1: 0;	/* /NORMALIZE */
-  gaussian = (internalMode & 2)? 1: 0; /* /GAUSSIAN */
+  twosided = ((internalMode & 1) == 0); // /TWOSIDED
+  normalize = (internalMode & 4)? 1: 0;	// /NORMALIZE
+  gaussian = (internalMode & 2)? 1: 0; // /GAUSSIAN
   straight = (internalMode & 8);
 
-  zerobytes(trgt.f, array_size(iq)*sizeof(float)); /* set to zero */
+  zerobytes(trgt.f, array_size(iq)*sizeof(float)); // set to zero
 
-  if (!gaussian) {		/* boxcar */
+  if (!gaussian) {		// boxcar
     if (!normalize)
       norm = 1.0;
     do {
@@ -1432,23 +1432,23 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	 of the past steps and quitting if the weighted average gets too
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
-      dslimit = 1.0;		/* current weighted average of step sizes */
+      dslimit = 1.0;		// current weighted average of step sizes
       while (count--) {
-	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
-	index = src.f - src0.f;	/* index relative to data start */
+	rindex = 0;		// index relative to current start location
+	ix = srcinfo.coords[0];	// x pixel coordinate
+	iy = srcinfo.coords[1];	// y pixel coordinate
+	index = src.f - src0.f;	// index relative to data start
 
-	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
-	y1 = 0.5;		/* y coordinate in pixel (between 0 and 1) */
-	vx = vx0[index];	/* x velocity */
-	vy = vy0[index];	/* y velocity */
+	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
+	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
+	vx = vx0[index];	// x velocity
+	vy = vy0[index];	// y velocity
 	if (count) {
 	  vx = -vx;
 	  vy = -vy;
 	}
 
-	s0 = 0.5*hypot(vx, vy); /* smoothing width */
+	s0 = 0.5*hypot(vx, vy); // smoothing width
 	s1 = s0;
 	s = 0.0;
 	if (normalize)
@@ -1456,21 +1456,21 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	
 	while (s < s1) {
 	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  /* calculate distance inside the current pixel */
+	  // calculate distance inside the current pixel
 	  x1 -= x2;
 	  y1 -= y2;
 	  ds = hypot(x1, y1);
 	  if (s + ds > s1)
 	    ds = s0 - s;
 	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	/* we fear a semi-infinite loop here */
+	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
 	    trgt.f[rindex] += *src.f*(s1 - s)*norm;
-	    s = s1;		/* we break it off */
+	    s = s1;		// we break it off
 	    continue;
 	  }
 	  switch (c) {
 	    case UP:
-	      if (iy == ny - 1) { /* already at top */
+	      if (iy == ny - 1) { // already at top
 		trgt.f[rindex] += *src.f*ds*norm;
 		s += ds;
 		s1 = s;
@@ -1482,7 +1482,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      iy++;
 	      break;
 	    case RIGHT:
-	      if (ix == nx - 1) { /* already at right edge */
+	      if (ix == nx - 1) { // already at right edge
 		trgt.f[rindex] += *src.f*ds*norm;
 		s += ds;
 		s1 = s;
@@ -1494,7 +1494,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      ix++;
 	      break;
 	    case DOWN:
-	      if (iy == 0) {	/* already at bottom */
+	      if (iy == 0) {	// already at bottom
 		trgt.f[rindex] += *src.f*ds*norm;
 		s += ds;
 		s1 = s;
@@ -1506,7 +1506,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      iy--;
 	      break;
 	    case LEFT:
-	      if (ix == 0) { 	/* already at left edge */
+	      if (ix == 0) { 	// already at left edge
 		trgt.f[rindex] += *src.f*ds*norm;
 		s += ds;
 		s1 = s;
@@ -1521,7 +1521,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      trgt.f[rindex] += *src.f*(s1 - s)*norm;
 	      s1 = s;
 	      continue;
-	  } /* end of switch (c) */
+	  } // end of switch (c)
 	  trgt.f[rindex] += *src.f*ds*norm;
 	  index += di;
 	  rindex += di;
@@ -1534,11 +1534,11 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      vy = -vy;
 	    }
 	  }
-	} /* end of while (s < s0) */
-      } /* end of while (count--) */
+	} // end of while (s < s0)
+      } // end of while (count--)
     } while (advanceLoop(&trgtinfo, &trgt),
 	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
-  } else {			/* gaussian smoothing */
+  } else {			// gaussian smoothing
     norm = 0.5*M_2_SQRTPI;
     do {
       count = twosided + 1;
@@ -1554,24 +1554,24 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	 of the past steps and quitting if the weighted average gets too
 	 small.  We use an exponential decay scale of 2 steps and
 	 a limit value of 0.2. */
-      dslimit = 1.0;		/* current weighted average of step sizes */
+      dslimit = 1.0;		// current weighted average of step sizes
       ws = 0.0;
       while (count--) {
-	rindex = 0;		/* index relative to current start location */
-	ix = srcinfo.coords[0];	/* x pixel coordinate */
-	iy = srcinfo.coords[1];	/* y pixel coordinate */
-	index = src.f - src0.f;	/* index relative to data start */
+	rindex = 0;		// index relative to current start location
+	ix = srcinfo.coords[0];	// x pixel coordinate
+	iy = srcinfo.coords[1];	// y pixel coordinate
+	index = src.f - src0.f;	// index relative to data start
 
-	x1 = 0.5;		/* x coordinate in pixel (between 0 and 1) */
-	y1 = 0.5;		/* y coordinate in pixel (between 0 and 1) */
-	vx = vx0[index];	/* x velocity */
-	vy = vy0[index];	/* y velocity */
+	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
+	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
+	vx = vx0[index];	// x velocity
+	vy = vy0[index];	// y velocity
 	if (count) {
 	  vx = -vx;
 	  vy = -vy;
 	}
 
-	s0 = 0.6005612*hypot(vx, vy);	/* smoothing width */
+	s0 = 0.6005612*hypot(vx, vy);	// smoothing width
 	s = 0.0;
 	s1 = 4*s0;
 
@@ -1580,7 +1580,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	
 	while (s < s1) {
 	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  /* calculate distance inside the current pixel */
+	  // calculate distance inside the current pixel
 	  x1 -= x2;
 	  y1 -= y2;
 	  ds = hypot(x1, y1);
@@ -1599,14 +1599,14 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	  weight = s? (s + 0.5)/s0: 0.0;
 	  weight = exp(-weight*weight);
 	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	/* we fear a semi-infinite loop here */
+	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
 	    ds = 0.5;
 	    if (s + ds > s1)
 	      ds = s1 - s;
 	  }
 	  switch (c) {
 	    case UP:
-	      if (iy == ny - 1) { /* already at top */
+	      if (iy == ny - 1) { // already at top
 		trgt.f[rindex] += *src.f*ds*weight*norm;
 		ws += weight*ds;
 		s += ds;
@@ -1619,7 +1619,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      iy++;
 	      break;
 	    case RIGHT:
-	      if (ix == nx - 1) { /* already at right edge */
+	      if (ix == nx - 1) { // already at right edge
 		trgt.f[rindex] += *src.f*ds*weight*norm;
 		ws += weight*ds;
 		s += ds;
@@ -1632,7 +1632,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      ix++;
 	      break;
 	    case DOWN:
-	      if (iy == 0) {	/* already at bottom */
+	      if (iy == 0) {	// already at bottom
 		trgt.f[rindex] += *src.f*ds*weight*norm;
 		ws += weight*ds;
 		s += ds;
@@ -1645,7 +1645,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      iy--;
 	      break;
 	    case LEFT:
-	      if (ix == 0) {	/* already at left edge */
+	      if (ix == 0) {	// already at left edge
 		trgt.f[rindex] += *src.f*ds*weight*norm;
 		ws += weight*ds;
 		s += ds;
@@ -1660,7 +1660,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	    case CENTER:
 	      di = 0;
 	      break;
-	  } /* end of switch (c) */
+	  } // end of switch (c)
 	  trgt.f[rindex] += *src.f*weight*ds*norm;
 	  rindex += di;
 	  index += di;
@@ -1674,14 +1674,14 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
 	      vy = -vy;
 	    }
 	  }
-	} /* end of while (d < DONE) */
-      } /* end of while (count--) */
+	} // end of while (d < DONE)
+      } // end of while (count--)
     } while (advanceLoop(&trgtinfo, &trgt),
 	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
   }
   return iq;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_trajectory(int32_t narg, int32_t ps[])
 /* TRAJECTORY,<gx>,<gy>,<vx>,<vy>[,<n>][,<ox>,<oy>])
   Takes the positions indicated by <gx>,<gy> and advances them for <n>
@@ -1714,20 +1714,20 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
   Pointer	gx, gy, vx0, vy0, ox, oy;
   int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
-  /* we treat all arguments. */
-  if (!symbolIsRealArray(ps[0]))/* <gx> must be a real array */
+  // we treat all arguments.
+  if (!symbolIsRealArray(ps[0]))// <gx> must be a real array
     return cerror(ILL_CLASS, ps[0]);
-  ngrid = array_size(ps[0]);	/* number of grid points */
-  if (!symbolIsRealArray(ps[1]) || /* <gy> must be a real array */
-      array_size(ps[1]) != ngrid) /* with the same size as <gx> */
+  ngrid = array_size(ps[0]);	// number of grid points
+  if (!symbolIsRealArray(ps[1]) || // <gy> must be a real array
+      array_size(ps[1]) != ngrid) // with the same size as <gx>
     return cerror(INCMP_ARG, ps[1]);
 
-  /* we keep track of the greatest data type */
+  // we keep track of the greatest data type
   type = array_type(ps[0]);
   if (array_type(ps[1]) > type)
     type = array_type(ps[1]);
 
-  if (!symbolIsRealArray(ps[2])) /* <vx> must be a real array */
+  if (!symbolIsRealArray(ps[2])) // <vx> must be a real array
     return cerror(NEED_ARR, ps[2]);
   if (array_type(ps[2]) > type)
     type = array_type(ps[2]);
@@ -1760,7 +1760,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
       type = array_type(ps[3]);
   }
 
-  /* check for <n> */
+  // check for <n>
   if (narg == 7) {
     if (!symbolIsScalar(ps[4]))
       return luxerror("Need a scalar here", ps[4]);
@@ -1776,9 +1776,9 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
   } else
     n = 1;
 
-  /* check for <ox> and <oy>; prepare output variables */
-  if (narg >= 5) {		/* have <ox> and <oy> */
-    /* we prepare the output symbols */
+  // check for <ox> and <oy>; prepare output variables
+  if (narg >= 5) {		// have <ox> and <oy>
+    // we prepare the output symbols
     i = 0;
     if (n > 1)
       dims[i++] = n;
@@ -1788,15 +1788,15 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     ox.v = array_data(ps[narg - 2]);
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
-  } else {			/* use <gx> and <gy> for <ox> and <oy> */
+  } else {			// use <gx> and <gy> for <ox> and <oy>
     int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
     lux_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
     oy.v = array_data(ps[1]);
   }
 
-  /* now we do any promotion to the highest type and get pointers to */
-  /* the data */
+  // now we do any promotion to the highest type and get pointers to
+  // the data
   iq = lux_converts[type](1, ps);
   if (iq == LUX_ERROR)
     return LUX_ERROR;
@@ -1806,7 +1806,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   gy.v = array_data(iq);
   if (narg == 3 || narg == 5
-      || (narg == 6 && symbolIsScalar(ps[3]))) { /* <v> */
+      || (narg == 6 && symbolIsScalar(ps[3]))) { // <v>
     iq = lux_converts[type](1, ps + 2);
     if (iq == LUX_ERROR)
       return LUX_ERROR;
@@ -1825,7 +1825,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     dv = 1;
   }
 
-  while (ngrid--) {			/* all grid points */
+  while (ngrid--) {			// all grid points
     /* we work up to the desired distance by measuring the path
        lengths in each pixel and adding them up.  This scheme backfires
        when the velocities
@@ -1839,50 +1839,50 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
        small.  We use an exponential decay scale of 2 steps and
        a limit value of 0.2. */
     for (i = 0; i < n; i++) {
-      dslimit = 1.0;		/* current weighted average of step sizes */
+      dslimit = 1.0;		// current weighted average of step sizes
       if (i) {
 	x1 = x2;
 	y1 = y2;
       } else {
 	switch (type) {
 	  case LUX_INT8:
-	    ix = (int32_t) *gx.b;	/* x pixel coordinate */
-	    iy = (int32_t) *gy.b;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.b;	// x pixel coordinate
+	    iy = (int32_t) *gy.b;	// y pixel coordinate
 	    x1 = (double) *gx.b++ - ix;
 	    y1 = (double) *gy.b++ - iy;
 	    break;
 	  case LUX_INT16:
-	    ix = (int32_t) *gx.w;	/* x pixel coordinate */
-	    iy = (int32_t) *gy.w;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.w;	// x pixel coordinate
+	    iy = (int32_t) *gy.w;	// y pixel coordinate
 	    x1 = (double) *gx.w++ - ix;
 	    y1 = (double) *gy.w++ - iy;
 	    break;
 	  case LUX_INT32:
-	    ix = (int32_t) *gx.l;	/* x pixel coordinate */
-	    iy = (int32_t) *gy.l;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.l;	// x pixel coordinate
+	    iy = (int32_t) *gy.l;	// y pixel coordinate
 	    x1 = (double) *gx.l++ - ix;
 	    y1 = (double) *gy.l++ - iy;
 	    break;
 	  case LUX_INT64:
-	    ix = (int32_t) *gx.q;	/* x pixel coordinate */
-	    iy = (int32_t) *gy.q;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.q;	// x pixel coordinate
+	    iy = (int32_t) *gy.q;	// y pixel coordinate
 	    x1 = (double) *gx.q++ - ix;
 	    y1 = (double) *gy.q++ - iy;
 	    break;
 	  case LUX_FLOAT:
-	    ix = (int32_t) *gx.f;	/* x pixel coordinate */
-	    iy = (int32_t) *gy.f;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.f;	// x pixel coordinate
+	    iy = (int32_t) *gy.f;	// y pixel coordinate
 	    x1 = (double) *gx.f++ - ix;
 	    y1 = (double) *gy.f++ - iy;
 	    break;
 	  case LUX_DOUBLE:
-	    ix = (int32_t) *gx.d;	/* x pixel coordinate */
-	    iy = (int32_t) *gy.d;	/* y pixel coordinate */
+	    ix = (int32_t) *gx.d;	// x pixel coordinate
+	    iy = (int32_t) *gy.d;	// y pixel coordinate
 	    x1 = (double) *gx.d++ - ix;
 	    y1 = (double) *gy.d++ - iy;
 	    break;
 	}
-	if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { /* out of range */
+	if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { // out of range
 	  zerobytes(ox.b, lux_type_size[type]);
 	  zerobytes(oy.b, lux_type_size[type]);
 	  ox.b += lux_type_size[type];
@@ -1891,58 +1891,58 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	}
       }
       
-      index = ix + iy*nx;	/* index relative to data start */
+      index = ix + iy*nx;	// index relative to data start
     
       switch (type) {
 	case LUX_INT8:
-	  vx = (double) vx0.b[index*dv]; /* x velocity */
-	  vy = (double) vy0.b[index*dv]; /* y velocity */
+	  vx = (double) vx0.b[index*dv]; // x velocity
+	  vy = (double) vy0.b[index*dv]; // y velocity
 	  break;
 	case LUX_INT16:
-	  vx = (double) vx0.w[index*dv]; /* x velocity */
-	  vy = (double) vy0.w[index*dv]; /* y velocity */
+	  vx = (double) vx0.w[index*dv]; // x velocity
+	  vy = (double) vy0.w[index*dv]; // y velocity
 	  break;
 	case LUX_INT32:
-	  vx = (double) vx0.l[index*dv]; /* x velocity */
-	  vy = (double) vy0.l[index*dv]; /* y velocity */
+	  vx = (double) vx0.l[index*dv]; // x velocity
+	  vy = (double) vy0.l[index*dv]; // y velocity
 	  break;
 	case LUX_INT64:
-	  vx = (double) vx0.q[index*dv]; /* x velocity */
-	  vy = (double) vy0.q[index*dv]; /* y velocity */
+	  vx = (double) vx0.q[index*dv]; // x velocity
+	  vy = (double) vy0.q[index*dv]; // y velocity
 	  break;
 	case LUX_FLOAT:
-	  vx = (double) vx0.f[index*dv]; /* x velocity */
-	  vy = (double) vy0.f[index*dv]; /* y velocity */
+	  vx = (double) vx0.f[index*dv]; // x velocity
+	  vy = (double) vy0.f[index*dv]; // y velocity
 	  break;
 	case LUX_DOUBLE:
-	  vx = (double) vx0.d[index*dv]; /* x velocity */
-	  vy = (double) vy0.d[index*dv]; /* y velocity */
+	  vx = (double) vx0.d[index*dv]; // x velocity
+	  vy = (double) vy0.d[index*dv]; // y velocity
 	  break;
       }
     
-      s0 = 0.5*hypot(vx, vy);	/* length indicates desired distance */
+      s0 = 0.5*hypot(vx, vy);	// length indicates desired distance
       s1 = s0;
       s = 0.0;
     
-      while (s < s1) {		/* go the distance */
+      while (s < s1) {		// go the distance
 	c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	/* calculate distance inside the current pixel */
+	// calculate distance inside the current pixel
 	x1 -= x2;
 	y1 -= y2;
-	ds = hypot(x1, y1);	/* distance in the current pixel */
-	if (s + ds > s1) {	/* we went a bit too far */
+	ds = hypot(x1, y1);	// distance in the current pixel
+	if (s + ds > s1) {	// we went a bit too far
 	  x2 -= x1*(s0 - s - ds)/ds;
 	  y2 -= y1*(s0 - s - ds)/ds;
 	  c = CENTER;
 	}
 	dslimit = 0.5*(dslimit + ds);
-	if (dslimit < 0.2) {	/* we fear a semi-infinite loop here */
-	  s = s1;		/* we break it off */
+	if (dslimit < 0.2) {	// we fear a semi-infinite loop here
+	  s = s1;		// we break it off
 	  continue;
 	}
 	switch (c) {
 	  case UP:
-	    if (iy == ny - 1) { /* we're already at the top */
+	    if (iy == ny - 1) { // we're already at the top
 	      s += ds;
 	      s1 = s;
 	      continue;
@@ -1953,7 +1953,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	    iy++;
 	    break;
 	  case RIGHT:
-	    if (ix == nx - 1) { /* already at right edge */
+	    if (ix == nx - 1) { // already at right edge
 	      s += ds;
 	      s1 = s;
 	      continue;
@@ -1964,7 +1964,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	    ix++;
 	    break;
 	  case DOWN:
-	    if (iy == 0) {	/* already at bottom */
+	    if (iy == 0) {	// already at bottom
 	      s += ds;
 	      s1 = s;
 	      continue;
@@ -1975,7 +1975,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	    iy--;
 	    break;
 	  case LEFT:
-	    if (ix == 0) { 	/* already at left edge */
+	    if (ix == 0) { 	// already at left edge
 	      s += ds;
 	      s1 = s;
 	      continue;
@@ -1988,7 +1988,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	  case CENTER:
 	    s1 = s;
 	    continue;
-	} /* end of switch (c) */
+	} // end of switch (c)
 	index += di;
 	s += ds;
 	switch (type) {
@@ -2017,10 +2017,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	    vy = (double) vy0.d[index*dv];
 	    break;
 	}
-      } /* end of while (s < s0) */
+      } // end of while (s < s0)
 
-      /* if we get here then we are at the desired spot, or we have overshot */
-      /* it a bit.  We adjust. */
+      // if we get here then we are at the desired spot, or we have overshot
+      // it a bit.  We adjust.
 
       switch (type) {
 	case LUX_INT8:
@@ -2048,23 +2048,23 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 	  *oy.d++ = iy + y2;
 	  break;
       }
-    } /* end of for (i = 0; i < n; i++) */
-  } /* end of while (ngrid--) */
+    } // end of for (i = 0; i < n; i++)
+  } // end of while (ngrid--)
   return LUX_OK;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 void legendre(double x, int32_t lmax, double *values)
-/* calculates the values of the associate Legendre polynomials */
-/* P_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
-/* from 0 through <l> */
-/* we store the results in predefined <values>, in the following order: */
-/* l 0 1 1 2 2 2 3 3 3 3 */
-/* m 0 0 1 0 1 2 0 1 2 3 */
-/* based on the following (recursion) relations: */
-/* (l - m) P_l^m = x (2 l - 1) P_{l-1}^m - (l + m - 1) P_{l-2}^m */
-/* P_m^m = (-1)^m (2 m - 1)!! (1 - x^2)^{m/2} */
-/* (with n!! the product of all *odd* values between 1 and n) */
-/* P_{m+1}^m = x (2 m + 1) P_m^m */
+// calculates the values of the associate Legendre polynomials
+// P_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m>
+// from 0 through <l>
+// we store the results in predefined <values>, in the following order:
+// l 0 1 1 2 2 2 3 3 3 3
+// m 0 0 1 0 1 2 0 1 2 3
+// based on the following (recursion) relations:
+// (l - m) P_l^m = x (2 l - 1) P_{l-1}^m - (l + m - 1) P_{l-2}^m
+// P_m^m = (-1)^m (2 m - 1)!! (1 - x^2)^{m/2}
+// (with n!! the product of all *odd* values between 1 and n)
+// P_{m+1}^m = x (2 m + 1) P_m^m
 {
   int32_t	l, m, j1, j2, j3, j4;
   double	z, *p, v1, v2;
@@ -2073,30 +2073,30 @@ void legendre(double x, int32_t lmax, double *values)
 
   p = values;
   z = sqrt(1 - x*x);
-  /* first we calculate P_l^l for all <l> */
-  v1 = *p = 1.0;		/* P_0^0 */
+  // first we calculate P_l^l for all <l>
+  v1 = *p = 1.0;		// P_0^0
   p += 2;
-  /*    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4 */
-  /*    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4 */
-  /* done + +                           */
+  //    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4
+  //    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4
+  // done + +
 
-  /* now p points at P_1_1 */
+  // now p points at P_1_1
   j1 = 1;
   for (l = 1; l <= lmax; l++) {
     v1 = *p = -v1*j1*z;
     j1 += 2;
     p += l + 2;
   }
-  /*    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4 */
-  /*    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4 */
-  /* done + + +     +       +         + */
+  //    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4
+  //    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4
+  // done + + +     +       +         +
 
-  /* then we do the other combinations */
-  /* the index of P_l^m is equal to l(l + 1)/2 + m */
+  // then we do the other combinations
+  // the index of P_l^m is equal to l(l + 1)/2 + m
   for (m = 0; m < lmax; m++) {
-    v2 = values[(m + 1)*(m + 2)/2 - 1]; /* P_m^m */
-    v1 = values[(m + 2)*(m + 3)/2 - 2] = x*(2*m + 1)*v2; /* P_{m+1}^m */
-    p = values + (m + 3)*(m + 4)/2 - 3;	/* points at P_{m+2}^m */
+    v2 = values[(m + 1)*(m + 2)/2 - 1]; // P_m^m
+    v1 = values[(m + 2)*(m + 3)/2 - 2] = x*(2*m + 1)*v2; // P_{m+1}^m
+    p = values + (m + 3)*(m + 4)/2 - 3;	// points at P_{m+2}^m
     j1 = 2*m + 3;
     j2 = j1 - 2;
     j3 = 2;
@@ -2113,32 +2113,32 @@ void legendre(double x, int32_t lmax, double *values)
     }
   }
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 void spherical_harmonics(double x, int32_t lmax, double *values)
-/* calculates the values of the normalized associate Legendre polynomials */
-/* y_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m> */
-/* from 0 through <l>.  The normalization is such that */
-/* the normalized spherical harmonics are equal to */
-/* Y_l^m(theta,phi) = y_l^m(cos(theta)) exp(i m phi). */
-/* we store the results in predefined <values>, in the following order: */
-/* l 0 1 1 2 2 2 3 3 3 3 */
-/* m 0 0 1 0 1 2 0 1 2 3 */
-/* NOTE: doesn't seem quite OK yet */
+// calculates the values of the normalized associate Legendre polynomials
+// y_l^m(x) at ordinate <x> for all <l> from 0 through <lmax> and all <m>
+// from 0 through <l>.  The normalization is such that
+// the normalized spherical harmonics are equal to
+// Y_l^m(theta,phi) = y_l^m(cos(theta)) exp(i m phi).
+// we store the results in predefined <values>, in the following order:
+// l 0 1 1 2 2 2 3 3 3 3
+// m 0 0 1 0 1 2 0 1 2 3
+// NOTE: doesn't seem quite OK yet
 {
   int32_t	l, m, j4;
   double	z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
 
   p = values;
   z = sqrt(1 - x*x);
-  /* first we calculate y_l^l for all <l> */
-  v1 = *p = 0.25*M_2_SQRTPI;	/* P_0^0 */
+  // first we calculate y_l^l for all <l>
+  v1 = *p = 0.25*M_2_SQRTPI;	// P_0^0
   p += 2;
-  /*    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4 */
-  /*    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4 */
-  /* done + +                           */
+  //    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4
+  //    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4
+  // done + +
 
-  /* now p points at y_1_1 */
-  /* y_{m+1}^{m+1} = -y_m^m z sqrt((2*m + 3)/(2*m + 1)) */
+  // now p points at y_1_1
+  // y_{m+1}^{m+1} = -y_m^m z sqrt((2*m + 3)/(2*m + 1))
   w1 = 3;
   w2 = 2;
   for (l = 1; l <= lmax; l++) {
@@ -2147,19 +2147,19 @@ void spherical_harmonics(double x, int32_t lmax, double *values)
     w2 += 2;
     p += l + 2;
   }
-  /*    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4 */
-  /*    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4 */
-  /* done + + +     +       +         + */
+  //    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4
+  //    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4
+  // done + + +     +       +         +
 
-  /* then we do the other combinations */
-  /* the index of y_l^m is equal to l(l + 1)/2 + m */
-  /* y_{m+1}^m = y_m^m x sqrt(2m + 3) */
-  /* y_l^m = x y_{l-1}^m sqrt((4l^2 - 1)/(l^2 - m^2)) */
-  /*         - y_{l-2}^m sqrt((2l + 1)/(2l - 3)*((l - 1)^2 - m^2)/(l^2 - m^2))*/
+  // then we do the other combinations
+  // the index of y_l^m is equal to l(l + 1)/2 + m
+  // y_{m+1}^m = y_m^m x sqrt(2m + 3)
+  // y_l^m = x y_{l-1}^m sqrt((4l^2 - 1)/(l^2 - m^2))
+  //         - y_{l-2}^m sqrt((2l + 1)/(2l - 3)*((l - 1)^2 - m^2)/(l^2 - m^2))
   for (m = 0; m < lmax; m++) {
-    v2 = values[(m + 1)*(m + 2)/2 - 1]; /* P_m^m */
-    v1 = values[(m + 2)*(m + 3)/2 - 2] = x*sqrt(2*m + 3)*v2; /* P_{m+1}^m */
-    p = values + (m + 3)*(m + 4)/2 - 3;	/* points at P_{m+2}^m */
+    v2 = values[(m + 1)*(m + 2)/2 - 1]; // P_m^m
+    v1 = values[(m + 2)*(m + 3)/2 - 2] = x*sqrt(2*m + 3)*v2; // P_{m+1}^m
+    p = values + (m + 3)*(m + 4)/2 - 3;	// points at P_{m+2}^m
     j4 = m + 2;
     w2 = m*m;
     w3 = 2*(m + 2) + 1;
@@ -2179,9 +2179,9 @@ void spherical_harmonics(double x, int32_t lmax, double *values)
     }
   }
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_legendre(int32_t narg, int32_t ps[])
-/* LEGENDRE(x, lmax) */
+// LEGENDRE(x, lmax)
 {
   double	x, *values;
   int32_t	lmax, out, n;
@@ -2201,7 +2201,7 @@ int32_t lux_legendre(int32_t narg, int32_t ps[])
     legendre(x, lmax, values);
   return out;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
 /* ENHANCEIMAGE(<x> [, <part>, <tgt>, /SYMMETRIC]) enhances an image
   <x>.  The first dimension of <x> is assumed to select between color
@@ -2246,17 +2246,17 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
   for (i = 0; i < nelem; i += dims[0]) {
     int32_t j, x = 0;
 
-    for (j = 0; j < dims[0]; j++) /* over all color channels */
+    for (j = 0; j < dims[0]; j++) // over all color channels
       x += *src.b++;
     hist[x]++;
   }
   src.b = (uint8_t*) array_data(ps[0]);
-  for (i = 1; i < nhist; i++)	/* calculate running sum */
+  for (i = 1; i < nhist; i++)	// calculate running sum
     hist[i] += hist[i - 1];
   a = 2 - 4*target;
   b = 1 - a;
   m[0] = 1.0;
-  for (i = 1; i < nhist; i++) {	/* calculate adjustment factors */
+  for (i = 1; i < nhist; i++) {	// calculate adjustment factors
     float q;
 
     q = (float) hist[i]*dims[0]/nelem;
@@ -2266,7 +2266,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
     if (part != 1)
       m[i] = part*m[i] + 1 - part;
   }
-  for (i = 0; i < nelem; i += dims[0]) { /* calculate adjusted image */
+  for (i = 0; i < nelem; i += dims[0]) { // calculate adjusted image
     int32_t j, x = 0;
 
     for (j = 0; j < dims[0]; j++)
@@ -2284,7 +2284,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
   free(hist);
   return result;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t lux_hamming(int32_t narg, int32_t ps[]) {
   int32_t nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
   Pointer src, src2, tgt;
@@ -2404,7 +2404,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
   }
   return result;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 double vhypot(int32_t n, double arg1, double arg2, ...)
 {
   double arg = hypot(arg1, arg2);
@@ -2418,7 +2418,7 @@ double vhypot(int32_t n, double arg1, double arg2, ...)
   va_end(ap);
   return arg;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 double hypota(int32_t n, double *x)
 {
   if (n < 1)
@@ -2428,7 +2428,7 @@ double hypota(int32_t n, double *x)
     arg = hypot(arg, *x++);
   return arg;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t compare_doubles(const void *a, const void *b)
 {
   const double *da = (const double *) a;
@@ -2468,19 +2468,19 @@ int32_t runord_d(double *data, int32_t n, int32_t width, int32_t ord, double *re
   return 0;
 }
 BIND(runord_d, i_dpiT3dp_iaiirq_00T3, f, runord, 3, 3, NULL);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t runmax_d(double *data, int32_t n, int32_t width, double *result)
 {
   return runord_d(data, n, width, width - 1, result);
 }
 BIND(runmax_d, i_dpiidp_iairq_00T2, f, RUNMAX, 2, 2, NULL);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t runmin_d(double *data, int32_t n, int32_t width, double *result)
 {
   return runord_d(data, n, width, 0, result);
 }
 BIND(runmin_d, i_dpiidp_iairq_00T2, f, RUNMIN, 2, 2, NULL);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 /*
   Returns <x> such that <x> = <cur> (mod <period) and
   <average> - <period>/2 <= <x> - <prev> < <average> + <period>/2
@@ -2491,7 +2491,7 @@ double unmod(double cur, double prev, double period, double average)
     return cur;
   return cur + period*ceil((prev - cur + average)/period - 0.5);
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
                   double period, double average,
                   double *tgtptr, size_t tgtcount, size_t tgtstride)
@@ -2513,7 +2513,7 @@ int32_t unmod_slice_d(double *srcptr, size_t srccount, size_t srcstride,
   return 0;
 }
 BIND(unmod_slice_d, i_sdddsd_iaiiirq_000T333, f, unmod, 2, 4, ":axis:period:average");
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 double hypot_stride(double *data, size_t count, size_t stride)
 {
   double result = 0.0;
@@ -2524,12 +2524,12 @@ double hypot_stride(double *data, size_t count, size_t stride)
   return result;
 }
 BIND(hypot_stride, d_sd_iaiarxq_000_2, f, hypot, 1, 2, ":axis");
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t approximately_equal(double a, double b, double eps)
 {
   return fabs(a - b) <= (fabs(a) < fabs(b)? fabs(b): fabs(a))*DBL_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t approximately_equal_z(doubleComplex a, doubleComplex b, double eps)
 {
   double md = hypot(a.real - b.real, a.imaginary - b.imaginary);
@@ -2537,12 +2537,12 @@ int32_t approximately_equal_z(doubleComplex a, doubleComplex b, double eps)
   double mb = hypot(b.real, b.imaginary);
   return md <= (ma < mb? mb: ma)*DBL_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t essentially_equal(double a, double b, double eps)
 {
   return fabs(a - b) <= (fabs(a) > fabs(b)? fabs(b): fabs(a))*DBL_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t essentially_equal_z(doubleComplex a, doubleComplex b, double eps)
 {
   double md = hypot(a.real - b.real, a.imaginary - b.imaginary);
@@ -2550,12 +2550,12 @@ int32_t essentially_equal_z(doubleComplex a, doubleComplex b, double eps)
   double mb = hypot(b.real, b.imaginary);
   return md <= (ma > mb? mb: ma)*DBL_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t approximately_equal_f(float a, float b, float eps)
 {
   return fabs(a - b) <= (fabs(a) < fabs(b)? fabs(b): fabs(a))*FLT_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t approximately_equal_z_f(floatComplex a, floatComplex b, float eps)
 {
   float md = hypot(a.real - b.real, a.imaginary - b.imaginary);
@@ -2563,12 +2563,12 @@ int32_t approximately_equal_z_f(floatComplex a, floatComplex b, float eps)
   float mb = hypot(b.real, b.imaginary);
   return md <= (ma < mb? mb: ma)*FLT_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t essentially_equal_f(float a, float b, float eps)
 {
   return fabs(a - b) <= (fabs(a) > fabs(b)? fabs(b): fabs(a))*FLT_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 int32_t essentially_equal_z_f(floatComplex a, floatComplex b, float eps)
 {
   float md = hypot(a.real - b.real, a.imaginary - b.imaginary);
@@ -2576,7 +2576,7 @@ int32_t essentially_equal_z_f(floatComplex a, floatComplex b, float eps)
   float mb = hypot(b.real, b.imaginary);
   return md <= (ma > mb? mb: ma)*FLT_EPSILON*eps;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 /// SSFCTOPOLAR(<x> [, <level>]) interprets each element of <x> as an
 /// SSFC (Sierpiński Surface-Filling Coordinate) and returns the
 /// corresponding latitude, longitude, and precision for it, all
@@ -2673,7 +2673,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
   return iq;
 }
 REGISTER(ssfc_to_polar, f, ssfctopolar, 1, 2, 0);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 //// POLARTOSSFC(<coords>, [<level>]) converts polar coordinates into
 /// SSFC (Sierpiński Surface-Filling Coordinate).  <coords> is
 /// expected to have at least 2 elements in its first dimension, which

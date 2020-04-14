@@ -21,9 +21,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define CALENDAR_H
 
 #include "action.hh"
-/* HEADERS */
-#include <math.h> /* for floor */
-/* END HEADERS */
+// HEADERS
+#include <math.h> // for floor
+// END HEADERS
 
 /** \file
   Calendrical calculations. 
@@ -95,7 +95,7 @@ double CJD_now(void);
 */
 int32_t CJDN_now(void);
 
-/* GREGORIAN CALENDAR */
+// GREGORIAN CALENDAR
 
 /**    
     Translates a Chronological Julian Day Number to a Gregorian
@@ -289,7 +289,7 @@ double GregorianStoCJD(char const *date);
  */
 void   GregorianStoCJDA(char * const *date, double *CJD);
 
-/* JULIAN CALENDAR */
+// JULIAN CALENDAR
 
 /**    
     Translates a Chronological Julian Day Number to a Julian
@@ -483,7 +483,7 @@ double JulianStoCJD(char const *date);
  */
 void   JulianStoCJDA(char * const *date, double *CJD);
 
-/* COMMON CALENDAR */
+// COMMON CALENDAR
 
 /**    
     Translates a Chronological Julian Day Number to a Common
@@ -677,7 +677,7 @@ double CommonStoCJD(char const *date);
  */
 void   CommonStoCJDA(char * const *date, double *CJD);
 
-/* HEBREW CALENDAR */
+// HEBREW CALENDAR
 
 /**    
     Translates a Chronological Julian Day Number to a Hebrew
@@ -871,7 +871,7 @@ double HebrewStoCJD(char const *date);
  */
 void   HebrewStoCJDA(char * const *date, double *CJD);
 
-/* ISLAMIC CALENDAR */
+// ISLAMIC CALENDAR
 
 /**    
     Translates a Chronological Julian Day Number to a Islamic
@@ -1065,7 +1065,7 @@ double IslamicStoCJD(char const *date);
  */
 void   IslamicStoCJDA(char * const *date, double *CJD);
 
-/* EGYPTIAN CALENDAR */
+// EGYPTIAN CALENDAR
 
 /**    
     Translates a Chronological Julian Day Number to a Egyptian
@@ -1259,7 +1259,7 @@ double EgyptianStoCJD(char const *date);
  */
 void   EgyptianStoCJDA(char * const *date, double *CJD);
 
-/* JULIAN DAY */
+// JULIAN DAY
 
 /** Translates Julian Day to Chronological Julian Day.
 
@@ -1321,7 +1321,7 @@ void CJDNtoCJDNA(int32_t const *in, int32_t *out);
  */
 void CJDtoCJDA(double const *in, double *out);
 
-/* LUNAR CALENDAR */
+// LUNAR CALENDAR
 
 /** Translates a Chronological Julian Day to a (fractional) count of
     lunar months.
@@ -1360,7 +1360,7 @@ double LunartoCJD(double lunar);
  */ 
 void LunartoCJDA(double const *lunar, double *CJD);
 
-/* MAYAN TZOLKIN/HAAB CALENDAR */
+// MAYAN TZOLKIN/HAAB CALENDAR
 
 /** Translates a Chronological Julian Day Number into a Mayan
     tzolkin/haab calendar date (from Tikal).
@@ -1736,7 +1736,7 @@ double MayanStoCJD(char const *date);
  */
 void MayanStoCJDA(char * const *date, double *CJD);
 
-/* MAYAN LONG COUNT CALENDAR */
+// MAYAN LONG COUNT CALENDAR
 
 /** Translates a Chronological Julian Day Number to a Maya Long Count.
 

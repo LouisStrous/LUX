@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File editor.c */
-/* Command line editor. */
+// File editor.c
+// Command line editor.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -28,7 +28,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include "action.hh"
 #include <limits.h>
-#include <unistd.h>		/* for usleep() */
+#include <unistd.h>		// for usleep()
 #include "editor.hh"
 
 #include <stdio.h>
@@ -40,14 +40,14 @@ FILE	*inputStream;
 char	*inputString;
 int32_t	curLineNumber = 0, compileLevel = 0;
 static int32_t	promptLength, show = 1;
-int32_t	echo = 0;  /* flag: 1 -> echo lines even if not gotten from stdin */
+int32_t	echo = 0;  // flag: 1 -> echo lines even if not gotten from stdin
 int32_t	getStreamChar(void), getStringChar(void);
 int32_t     (*getChar)(void) = getStreamChar, termCol, termRow, uTermCol, page;
 int32_t	noPrompt = 0;
 static int32_t	col = 0, row = 0, textWidth;
 static char	*thePrompt;
 extern int32_t	scrat[];
-/*----------------------------------------------------*/
+//----------------------------------------------------
 void getTerminalSize(void)
 {
   int rows, cols;
@@ -56,22 +56,22 @@ void getTerminalSize(void)
   uTermCol = termCol = cols;
   page = termRow = rows;
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------
 int getStreamChar(void)
 {
   return rl_getc(inputStream);
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------
 int getSingleStdinChar(void)
 {
-  rl_prep_terminal(0);          /* prepare for input one char at a time */
+  rl_prep_terminal(0);          // prepare for input one char at a time
   int c = rl_getc(stdin);
-  rl_deprep_terminal();         /* restore old situation */
+  rl_deprep_terminal();         // restore old situation
   return c;
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------
 int getStringChar(void)
-/* gets the next input char from inputString, no control sequences */
+// gets the next input char from inputString, no control sequences
 {
   int32_t	c;
 
@@ -81,20 +81,20 @@ int getStringChar(void)
     inputString--; }
   return c;
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------
 int32_t readHistory(void)
-/* reads history from a history file (~/.lux-history) */
+// reads history from a history file (~/.lux-history)
 {
   int result = read_history(expand_name("~/.lux-history", NULL));
-  if (result                    /* a problem */
-      && result != ENOENT)      /* except "no such file" */
+  if (result                    // a problem
+      && result != ENOENT)      // except "no such file"
     luxerror("A problem reading command line history from ~/.lux-history: %s",
              0, strerror(result));
   return result;
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------
 int32_t saveHistory(void)
-/* saves history in a history file (~/.lux-history) */
+// saves history in a history file (~/.lux-history)
 {
   int result = write_history(expand_name("~/.lux-history", NULL));
   if (result)
@@ -102,7 +102,7 @@ int32_t saveHistory(void)
              0, strerror(result));
   return result;
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------
 int32_t getNewLine(char *buffer, size_t bufsize, char const* prompt, char historyFlag)
 /* reads new line from keyboard or file into buffer; returns length
    (terminating null isn't included in count).
@@ -123,14 +123,14 @@ int32_t getNewLine(char *buffer, size_t bufsize, char const* prompt, char histor
     if (historyFlag && line && *line)
       add_history(line);
     n = strlen(line);
-  } else {                      /* read from a file */
+  } else {                      // read from a file
     size_t nbuf = 0;
     n = getline(&line, &nbuf, inputStream);
     if (n > 0)
       --n; /* don't count terminating null, so the outcome is the same
               as for strlen() */
   }
-  if (n < 0)                    /* end of file */
+  if (n < 0)                    // end of file
     return n;
   strncpy(buffer, line, bufsize);
   if (n >= bufsize) {
@@ -139,4 +139,4 @@ int32_t getNewLine(char *buffer, size_t bufsize, char const* prompt, char histor
   }
   return n;
 }
-/*----------------------------------------------------*/
+//----------------------------------------------------

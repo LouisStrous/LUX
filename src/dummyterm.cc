@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* This is file dummyterm.cc, part of the LUX software package. */
-/* LS 28apr99 */
+// This is file dummyterm.cc, part of the LUX software package.
+// LS 28apr99
 
 #include "action.hh"
 

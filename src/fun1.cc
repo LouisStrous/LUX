@@ -18,9 +18,9 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File fun1.c */
-/* Various LUX functions. */
-/*a collection of internal lux subroutines and functions */
+// File fun1.c
+// Various LUX functions.
+//a collection of internal lux subroutines and functions
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -102,10 +102,10 @@ doubleComplex (*func_c[])(double, double) = {
   NULL, NULL, NULL
 };
 
-/* NOTE:  pow (and lux_pow) are now implemented as a LUX_BIN_OP instead of */
-/* an LUX_EVB, so they are superfluous here.  keep them around just in case */
-/* LS 29aug94 */
-/*------------------------------------------------------------------------- */
+// NOTE:  pow (and lux_pow) are now implemented as a LUX_BIN_OP instead of
+// an LUX_EVB, so they are superfluous here.  keep them around just in case
+// LS 29aug94
+//-------------------------------------------------------------------------
 int32_t defined(int32_t symbol, int32_t argument)
 /* <argument> = 0: Returns 0 if <symbol> is or links to (through LUX_TRANSFERs)
     a class of LUX_UNDEFINED or LUX_UNUSED, 1 otherwise.
@@ -132,23 +132,23 @@ int32_t defined(int32_t symbol, int32_t argument)
   return (!target || symbol_class(target) == LUX_UNUSED
 	  || symbol_class(target) == LUX_UNDEFINED)? 0: 1;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_defined(int32_t narg, int32_t ps[])
-/* DEFINED(x) returns 0 if <x> is itself, or is linked through LUX_TRANSFERs */
-/* with, a class of LUX_UNUSED or LUX_UNDEFINED.  DEFINED(x,/TARGET) returns 0 */
-/* if it is itself, or is linked through LUX_POINTERs with, a class of */
-/* LUX_UNUSED.  Dangling LUX_POINTERs, and dangling or unspecified parameters */
-/* to user-defined subroutines and functions have DEFINED() = */
-/* DEFINED(,/TARGET) = 0.  LUX_POINTERs or parameters that link to */
-/* LUX_UNDEFINED have DEFINED() = 0, DEFINED(,/TARGET) = 1.  Other */
-/* LUX_POINTERs or parameters have DEFINED() = DEFINED(,/TARGET) = 1. */
-/* Other variables have DEFINED() = DEFINED(,/TARGET).  LS 27may96*/
+// DEFINED(x) returns 0 if <x> is itself, or is linked through LUX_TRANSFERs
+// with, a class of LUX_UNUSED or LUX_UNDEFINED.  DEFINED(x,/TARGET) returns 0
+// if it is itself, or is linked through LUX_POINTERs with, a class of
+// LUX_UNUSED.  Dangling LUX_POINTERs, and dangling or unspecified parameters
+// to user-defined subroutines and functions have DEFINED() =
+// DEFINED(,/TARGET) = 0.  LUX_POINTERs or parameters that link to
+// LUX_UNDEFINED have DEFINED() = 0, DEFINED(,/TARGET) = 1.  Other
+// LUX_POINTERs or parameters have DEFINED() = DEFINED(,/TARGET) = 1.
+// Other variables have DEFINED() = DEFINED(,/TARGET).  LS 27may96
 {
   return defined(*ps, internalMode)? LUX_ONE: LUX_ZERO;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_delete(int32_t narg, int32_t ps[])
-/* deletes symbols (deallocates memory & makes undefined) */
+// deletes symbols (deallocates memory & makes undefined)
 {
   int32_t   i, iq;
 
@@ -168,9 +168,9 @@ int32_t lux_delete(int32_t narg, int32_t ps[])
   }
   return LUX_OK;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_quit(int32_t narg, int32_t ps[])
-/*exit routine, calls are exit,status or quit,status */
+//exit routine, calls are exit,status or quit,status
 {
  int32_t	iq, saveHistory(void);
 
@@ -179,11 +179,11 @@ int32_t lux_quit(int32_t narg, int32_t ps[])
  else
    iq = 0;
  Quit(iq);
- return LUX_OK;			/* or some compilers complain */
+ return LUX_OK;			// or some compilers complain
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_cputime(int32_t n, int32_t ps[])
-     /*returns an cpu time in seconds */
+     //returns an cpu time in seconds
 {
   int32_t	i;
   double value;
@@ -194,7 +194,7 @@ int32_t lux_cputime(int32_t n, int32_t ps[])
   int bad = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tp);
   if (!bad) {
     value = tp.tv_sec + tp.tv_nsec/1e9;
-  } else {             /* no hi-res clock, use old method after all */
+  } else {             // no hi-res clock, use old method after all
     value = ((double) clock())/CLOCKS_PER_SEC;
   }
 #else
@@ -203,9 +203,9 @@ int32_t lux_cputime(int32_t n, int32_t ps[])
   scalar_value(i).d = value;
   return i;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_systime(int32_t narg, int32_t ps[])
-     /* returns the system time in LUX_DOUBLE seconds */
+     // returns the system time in LUX_DOUBLE seconds
 {
   int32_t     i;
   struct timeval tp;
@@ -215,11 +215,11 @@ int32_t lux_systime(int32_t narg, int32_t ps[])
   i = scalar_scratch(LUX_DOUBLE);
   scalar_value(i).d = (double) tp.tv_sec + 0.000001* (double) tp.tv_usec;
   return i;
-  return LUX_ZERO;		/* return 0 if not available */
+  return LUX_ZERO;		// return 0 if not available
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_ctime(int32_t narg, int32_t ps[])
-     /* returns current time and date in a string */
+     // returns current time and date in a string
 {
   int32_t	i;
   time_t	t;
@@ -229,10 +229,10 @@ int32_t lux_ctime(int32_t narg, int32_t ps[])
   strncpy(string_value(i), ctime(&t), 24);
   return i;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_time(int32_t narg, int32_t ps[])
-     /* returns current time in a string */
-     /* added \0 to result string  LS 22may94 */
+     // returns current time in a string
+     // added \0 to result string  LS 22may94
 {
   int32_t	i;
   time_t	t;
@@ -245,9 +245,9 @@ int32_t lux_time(int32_t narg, int32_t ps[])
   *(string_value(i) + 9) = '\0';
   return i;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_date(int32_t narg, int32_t ps[])
-     /* returns current date in a string */
+     // returns current date in a string
 {
   int32_t	i;
   time_t	t;
@@ -263,30 +263,30 @@ int32_t lux_date(int32_t narg, int32_t ps[])
   p2[12] = '\0';
   return i;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_jd(int32_t narg, int32_t ps[])
-/* returns current Julian Day (relative to UTC) in double precision */
+// returns current Julian Day (relative to UTC) in double precision
 {
   time_t	t;
   double	jd;
   int32_t	result;
 
   t = time(NULL);
-  /* NOTE: I assume here that t indicates the number of seconds since */
-  /* 00:00:00 UTC on January 1, 1970, as it is supposed to do under */
-  /* SunOS 5.4.  ANSI C's time routines are awkward.  It provides a */
-  /* routine for specifying a particular *local* time in the internal */
-  /* time_t representation, but none for specifying a particular UTC */
-  /* time in that format.  If they did, then I could use difftime(). */
-  /* Use of the struct tm representation is awkward, since I am not */
-  /* interested in the (integer) second, minute, hour, day, and year. */
-  /* LS 7oct97 */
+  // NOTE: I assume here that t indicates the number of seconds since
+  // 00:00:00 UTC on January 1, 1970, as it is supposed to do under
+  // SunOS 5.4.  ANSI C's time routines are awkward.  It provides a
+  // routine for specifying a particular *local* time in the internal
+  // time_t representation, but none for specifying a particular UTC
+  // time in that format.  If they did, then I could use difftime().
+  // Use of the struct tm representation is awkward, since I am not
+  // interested in the (integer) second, minute, hour, day, and year.
+  // LS 7oct97
   jd = (double) t/86400.0 + 2440587.5;
   result = scalar_scratch(LUX_DOUBLE);
   scalar_value(result).d = jd;
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_cjd(int32_t narg, int32_t ps[])
 /* returns current Chronological Julian Day, relative to the current
    time zone */
@@ -297,16 +297,16 @@ int32_t lux_cjd(int32_t narg, int32_t ps[])
   scalar_value(result).d = CJD_now();
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_show(int32_t narg, int32_t ps[])
-/*show some info about symbols by number or subname */
+//show some info about symbols by number or subname
 {
   int32_t	iq, i;
   char	*s, *s2;
   int32_t	lux_dump(int32_t, int32_t []);
 
   if (narg == 0)
-    return lux_dump(-1, ps);	/* everybody */
+    return lux_dump(-1, ps);	// everybody
   /* if a number passed, show symbol with that number; if a string, find
      all symbols containing string in name */
   iq = ps[0];
@@ -317,12 +317,12 @@ int32_t lux_show(int32_t narg, int32_t ps[])
 	printf("no such symbol #\n");
 	return LUX_ERROR;
       }
-      return lux_dump(1, &iq);	/* dump this symbol by number */
+      return lux_dump(1, &iq);	// dump this symbol by number
     case LUX_STRING:
-						/* more interesting */
+						// more interesting
       s = string_value(iq);
       for (i = 0; i < NSYM; i++) {
-	/* get the name */
+	// get the name
 	char const *cp = varName(i);
 	if (strstr(cp, s) != NULL) {
 	  if (lux_dump(1, &i) != LUX_OK)
@@ -339,7 +339,7 @@ int32_t lux_show(int32_t narg, int32_t ps[])
       return LUX_ERROR;
   }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 void symdumpswitch(int32_t nsym, int32_t mode)
 {
   const char	*typeName(int32_t);
@@ -402,7 +402,7 @@ void symdumpswitch(int32_t nsym, int32_t mode)
   case LUX_CLIST:
     printwf("#elem = %1d, ", clist_num_symbols(nsym));
     break;
-    case LUX_ASSOC:			/* assoc */
+    case LUX_ASSOC:			// assoc
       s = typeName((int32_t) assoc_type(nsym));
       printwf("lun = %d, offset = %d, ", assoc_lun(nsym),
 	      assoc_has_offset(nsym)? assoc_offset(nsym): 0);
@@ -428,7 +428,7 @@ void symdumpswitch(int32_t nsym, int32_t mode)
       else
 	printwf("(deferred), file %s\n", deferred_routine_filename(nsym));
       return;
-  }						/*end of class switch */
+  }						//end of class switch
 
   /* both printwf and symbolIdent use curScrat: use a trick to make it come
      out right.  LS 19oct98 */
@@ -439,7 +439,7 @@ void symdumpswitch(int32_t nsym, int32_t mode)
   curScrat = save;
   return;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_dump_one(int32_t iq, int32_t full)
 {
   int32_t	j;
@@ -456,8 +456,8 @@ int32_t lux_dump_one(int32_t iq, int32_t full)
   printwf("%3d ", iq);
 
   s = symbolProperName(iq);
-  if (s) {			/* has its own name */
-    if (symbol_context(iq) > 0) { /* has a "parent" */
+  if (s) {			// has its own name
+    if (symbol_context(iq) > 0) { // has a "parent"
       sprintf(curScrat, "%s", symbolProperName(symbol_context(iq)));
       curScrat += strlen(curScrat);
       strcpy(curScrat++, ".");
@@ -477,10 +477,10 @@ int32_t lux_dump_one(int32_t iq, int32_t full)
   symdumpswitch(iq, j);
   return 0;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_dump(int32_t narg, int32_t ps[])
-/* show some info about symbols in list */
-/* internalMode:  1 fixed, 2 system, 4 zero, 8 local, 16 context */
+// show some info about symbols in list
+// internalMode:  1 fixed, 2 system, 4 zero, 8 local, 16 context
 /* 1 -> all fixed numbers (#s < nFixed)
    2 -> all system variables (nFixed <= #s <= tempSym)
    4 -> all main-level variables outside block routines
@@ -497,7 +497,7 @@ int32_t lux_dump(int32_t narg, int32_t ps[])
     mode = 1;
     narg = N_NAMED;
   }
-  else if (imode & 16) {		/* /CONTEXT */
+  else if (imode & 16) {		// /CONTEXT
     mode = 1;
     narg = N_NAMED;
     context = int_arg(*ps);
@@ -507,32 +507,32 @@ int32_t lux_dump(int32_t narg, int32_t ps[])
     iq = mode? i: ps[i];
     if (mode) {
       if (iq < nFixed) {
-	if ((imode & 1) == 0)	/* /FIXED */
+	if ((imode & 1) == 0)	// /FIXED
 	  continue;
       } else if (iq <= tempSym) {
-	if ((imode & 2) == 0)	/* /SYSTEM */
+	if ((imode & 2) == 0)	// /SYSTEM
 	  continue;
       } else if (symbol_context(iq) <= 0) {
-	if ((imode & 4) == 0)	/* /ZERO */
+	if ((imode & 4) == 0)	// /ZERO
 	  continue;
       } else if (symbol_context(iq) != context) {
-	if ((imode & 8) == 0)	/* /LOCAL */
+	if ((imode & 8) == 0)	// /LOCAL
 	  continue;
       }
     }
-    if ((imode & 32) && iq > EXE_START) /* /FOLLOW -> evaluate */
+    if ((imode & 32) && iq > EXE_START) // /FOLLOW -> evaluate
       iq = evals(iq);
 
     iq = lux_dump_one(iq, (internalMode & 64)? 1: 0);
     if (iq < 0)
       return iq;
-  }						/*end of loop over args */
+  }						//end of loop over args
   resetPager();
   return 1;
-}							/*end of lux_dump */
-/*------------------------------------------------------------------------- */
+}							//end of lux_dump
+//-------------------------------------------------------------------------
 int32_t lux_zero(int32_t narg, int32_t ps[])
-/* subroutine version,  LUX_ZERO, x, [y ...] zero symbols in list */
+// subroutine version,  LUX_ZERO, x, [y ...] zero symbols in list
 {
   int32_t	i, iq, mq, n;
   extern int32_t	nFixed;
@@ -543,16 +543,16 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
 
   for (i = 0; i < narg; i++) {
     iq = ps[i];
-    /* check if it is legal to change this symbol */
+    // check if it is legal to change this symbol
     if (iq <= nFixed)
       return cerror(CST_LHS, iq);
     switch (symbol_class(iq)) {
-      default:			/* don't do anything */
+      default:			// don't do anything
 	break;
       case LUX_FILEMAP:
 	mq = file_map_size(iq);
-	mq *= lux_type_size[file_map_size(iq)]; /* # bytes to zero */
-	p = file_map_file_name(iq); /* file name */
+	mq *= lux_type_size[file_map_size(iq)]; // # bytes to zero
+	p = file_map_file_name(iq); // file name
 	if ((fp = fopen(p, "r+")) == NULL
 	    && (fp = fopen(p, "w+")) == NULL) {
 	  printf("File %s; ", p);
@@ -574,7 +574,7 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
 	}
 	fclose(fp);
 	break;
-      case LUX_SCALAR: case LUX_CSCALAR: /* scalar case */
+      case LUX_SCALAR: case LUX_CSCALAR: // scalar case
 	switch (scalar_type(iq)) {
 	  case LUX_INT8:
 	    scalar_value(iq).b = 0;
@@ -603,8 +603,8 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
 	    complex_scalar_data(iq).cd->imaginary = 0.0;
 	    break;
 	}
-	break;			/*end of scalar case */
-      case LUX_SCAL_PTR:		/*scalar ptr case */
+	break;			//end of scalar case
+      case LUX_SCAL_PTR:		//scalar ptr case
 	switch (scal_ptr_type(iq)) {
 	  case LUX_INT8:
 	    *scal_ptr_pointer(iq).b = 0;
@@ -633,9 +633,9 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
 	    scal_ptr_pointer(iq).cd->imaginary = 0.0;
 	    break;
 	}
-	break;		/*end of scalar ptr case */
-      case LUX_ARRAY: case LUX_CARRAY: /*array case */
-	if (isStringType(array_type(iq))) { /* string array, remove members */
+	break;		//end of scalar ptr case
+      case LUX_ARRAY: case LUX_CARRAY: //array case
+	if (isStringType(array_type(iq))) { // string array, remove members
 	  mq = array_size(iq);
 	  q.sp = (char**) array_data(iq);
 	  while (mq--) {
@@ -644,32 +644,32 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
 	    q.sp++;
 	  }
 	}
-	/*try to zero quickly */
+	//try to zero quickly
 	mq = array_size(iq)*lux_type_size[array_type(iq)];
-	/*mq should now be the # of bytes in the array, get start */
+	//mq should now be the # of bytes in the array, get start
 	p = (char*) array_data(iq);
 	zerobytes(p, mq);
 	break;
-      case LUX_STRING:		/* string case */
-	/*strings are blanked rather than zeroed */
+      case LUX_STRING:		// string case
+	//strings are blanked rather than zeroed
 	/*this may not make as much sense in Unix as it seemed to in VMS, may
 	  want to change */
 	mq = string_size(iq);
-				/*note no ahead structure for strings */
-	/* mq should now be the # of bytes +1 in the string, get start */
+				//note no ahead structure for strings
+	// mq should now be the # of bytes +1 in the string, get start
 	p = string_value(iq);
 	while (mq--)
 	  *p++ = ' ';
-	*p = '\0';		/*but null terminate it */
+	*p = '\0';		//but null terminate it
 	break;
     }
   }
   return 1;
-}							/*end of lux_type */
-/*------------------------------------------------------------------------- */
+}							//end of lux_type
+//-------------------------------------------------------------------------
 int32_t lux_onef(int32_t narg, int32_t ps[])
-/* ONE(x) returns copy of numerical <x> with all elements equal to 1 */
-/* LS 7apr98 */
+// ONE(x) returns copy of numerical <x> with all elements equal to 1
+// LS 7apr98
 {
   Pointer	p;
   int32_t	n, iq;
@@ -734,10 +734,10 @@ int32_t lux_onef(int32_t narg, int32_t ps[])
   }
   return iq;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_one(int32_t narg, int32_t ps[])
-/* replaces all values in numerical array ps[0] by ones. */
-/* LS 7apr98 */
+// replaces all values in numerical array ps[0] by ones.
+// LS 7apr98
 {
   Pointer	p;
   int32_t	n, iq;
@@ -758,13 +758,13 @@ int32_t lux_one(int32_t narg, int32_t ps[])
 	n = 1;
 	break;
       case LUX_ARRAY: case LUX_CARRAY:
-	if (isNumericalType(iq)) { /* numerical type */
+	if (isNumericalType(iq)) { // numerical type
 	  p.b = (uint8_t*) array_data(iq);
 	  n = array_size(iq);
 	  break;
 	}
       default:
-	n = 0;			/* flag: ignore this argument */
+	n = 0;			// flag: ignore this argument
 	break;
     }
     if (n)
@@ -809,7 +809,7 @@ int32_t lux_one(int32_t narg, int32_t ps[])
   }
   return LUX_OK;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_zerof(int32_t narg, int32_t ps[])
 /* function version,  x = LUX_ZERO(y)
    create array x of same type and size as y and set all elements to zero
@@ -872,7 +872,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
   }
   return iq;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 // <y> = setnan(<x>, <mask>)
 //
 // returns a copy of <x> with all elements for which the <mask> is
@@ -946,7 +946,7 @@ int32_t lux_setnan(int32_t narg, int32_t ps[])
   return iq;
 }
 REGISTER(setnan, f, setnan, 2, 2, NULL);
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 /* fills array elements with their element index or with the value of
  one of their coordinates */
@@ -1017,20 +1017,20 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
   }
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_indgen(int32_t narg, int32_t ps[])
 {
   return indgen(narg, ps, 1);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_indgen_s(int32_t narg, int32_t ps[])
 {
   return indgen(narg, ps, 0);
 }
 REGISTER(indgen_s, s, indgen, 1, 2, "*");
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_neg_func(int32_t narg, int32_t ps[])
-     /*take the negative of something */
+     //take the negative of something
 {
   int32_t	n, result;
   Pointer	src, trgt;
@@ -1040,7 +1040,7 @@ int32_t lux_neg_func(int32_t narg, int32_t ps[])
      the same data type as <*ps> and return a pointer to it in <trgt>
      and its symbol number in <result>. */
   if (getNumerical(*ps, LUX_INT8, &n, &src, 0, &result, &trgt) < 0)
-    return LUX_ERROR;		/* some error */
+    return LUX_ERROR;		// some error
   switch (symbol_type(*ps)) {
     case LUX_INT8:
       memcpy(trgt.b, src.b, n);
@@ -1080,11 +1080,11 @@ int32_t lux_neg_func(int32_t narg, int32_t ps[])
       break;
   }
   return result;
-} /* end of lux_neg_func */
-/*------------------------------------------------------------------------- */
+} // end of lux_neg_func
+//-------------------------------------------------------------------------
 int32_t lux_isnan(int32_t narg, int32_t ps[])
-     /* returns 1 if the argument is not a number (NaN).  Only works */
-     /* if IEEE function isnan is available.  LS 28jun97 */
+     // returns 1 if the argument is not a number (NaN).  Only works
+     // if IEEE function isnan is available.  LS 28jun97
 {
   int32_t	n, result, iq, *trgt;
   Pointer	src;
@@ -1095,8 +1095,8 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
-      if (scalar_type(iq) < LUX_FLOAT) /* integer type */
-	return lux_zerof(narg, ps); /* always OK */
+      if (scalar_type(iq) < LUX_FLOAT) // integer type
+	return lux_zerof(narg, ps); // always OK
       n = 1;
       src.f = &scalar_value(iq).f;
       result = scalar_scratch(LUX_INT32);
@@ -1110,9 +1110,9 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
       break;
     case LUX_ARRAY:
       if (array_type(iq) < LUX_FLOAT)
-	return lux_zerof(narg, ps); /* always OK */
+	return lux_zerof(narg, ps); // always OK
       if (isStringType(array_type(iq)))
-	return cerror(ILL_TYPE, *ps); /* no string arrays allowed here */
+	return cerror(ILL_TYPE, *ps); // no string arrays allowed here
       n = array_size(iq);
       src.f = (float *) array_data(iq);
       result = array_clone(iq, LUX_INT32);
@@ -1152,12 +1152,12 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
   }
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
-/* ZERONANS,value=<value>, <arg1>, <arg2>, ... */
-/* ZERONANS(value=<value>, <arg1>) */
-/* replaces NaNs in numerical <arg1> &c with <value> (if defined), or */
-/* with 0.  LS 27apr99 */
+// ZERONANS,value=<value>, <arg1>, <arg2>, ...
+// ZERONANS(value=<value>, <arg1>)
+// replaces NaNs in numerical <arg1> &c with <value> (if defined), or
+// with 0.  LS 27apr99
 {
   int32_t	size, result, valueSym;
   Scalar	value;
@@ -1178,7 +1178,7 @@ int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
 	continue;
       }
     }
-    if (symbol_type(*ps) < LUX_FLOAT) { /* nothing to do: no NaN integers */
+    if (symbol_type(*ps) < LUX_FLOAT) { // nothing to do: no NaN integers
       if (func)
 	return *ps;
       else {
@@ -1235,23 +1235,23 @@ int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
   }
   return func? result: LUX_OK;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_zapnan(int32_t narg, int32_t ps[])
-/* ZAPNAN,value=<value>, <x1>, <x2>, ... replaces NaNs in the <x>s with the */
-/* scalar <value>, which defaults to zero.  LS 8jun98 27apr99 */
+// ZAPNAN,value=<value>, <x1>, <x2>, ... replaces NaNs in the <x>s with the
+// scalar <value>, which defaults to zero.  LS 8jun98 27apr99
 {
   return zapnan(narg, ps, 0);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_zapnan_f(int32_t narg, int32_t ps[])
-/* ZAPNAN(value=<value>, <x>) returns a copy of <x> with all NaNs replaced */
-/* by the scalar <value> which defaults to zero.  LS 8jun98 27apr99 */
+// ZAPNAN(value=<value>, <x>) returns a copy of <x> with all NaNs replaced
+// by the scalar <value> which defaults to zero.  LS 8jun98 27apr99
 {
   return zapnan(narg, ps, 1);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_abs(int32_t narg, int32_t ps[])
-/*take the absolute value of something */
+//take the absolute value of something
 {
   int32_t	n, result, iq;
   Pointer	src, trgt;
@@ -1301,7 +1301,7 @@ int32_t lux_abs(int32_t narg, int32_t ps[])
 
   switch (symbol_type(*ps)) {
     case LUX_INT8:
-      memcpy(trgt.b, src.b, n);	/* BYTEs are always nonnegative */
+      memcpy(trgt.b, src.b, n);	// BYTEs are always nonnegative
       break;
     case LUX_INT16:
       while (n--) {
@@ -1349,8 +1349,8 @@ int32_t lux_abs(int32_t narg, int32_t ps[])
       break;
   }
   return result;
-}						/*end of lux_abs */
-/*------------------------------------------------------------------------- */
+}						//end of lux_abs
+//-------------------------------------------------------------------------
 int32_t lux_complexsquare(int32_t narg, int32_t ps[])
 /* returns the complex square of argument <x>, i.e., the product of
    <x> and its complex conjugate; if <x> is not complex, then assumes
@@ -1478,10 +1478,10 @@ int32_t lux_complexsquare(int32_t narg, int32_t ps[])
   }
   return result;  
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_conjugate(int32_t narg, int32_t ps[])
-/* returns the complex conjugate of numerical symbols */
-/* LS 31jul98 */
+// returns the complex conjugate of numerical symbols
+// LS 31jul98
 {
   int32_t	result, n;
   Pointer	src, trgt;
@@ -1490,7 +1490,7 @@ int32_t lux_conjugate(int32_t narg, int32_t ps[])
     return cerror(ILL_CLASS, *ps);
   
   if (isRealType(symbol_type(*ps)))
-    return *ps;			/* conjugate equals original */
+    return *ps;			// conjugate equals original
 
   switch (symbol_class(*ps)) {
     case LUX_CSCALAR:
@@ -1531,9 +1531,9 @@ int32_t lux_conjugate(int32_t narg, int32_t ps[])
   }
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
-/* accumulates source values by class */
+// accumulates source values by class
 {
   int32_t	type, offset, *indx, i, size, result, nElem, indices2,
     haveWeights, p, psign, pp, nbase, j;
@@ -1548,17 +1548,17 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   extern Scalar	lastmin, lastmax;
   int32_t	minmax(int32_t *, int32_t, int32_t);
 
-  if (narg > 3 && ps[3]) {	/* have <weights> */
-    if (!symbolIsNumericalArray(ps[3]) /* not a numerical array */
-	|| array_size(ps[3]) != array_size(ps[0])) /* or has the wrong size */
+  if (narg > 3 && ps[3]) {	// have <weights>
+    if (!symbolIsNumericalArray(ps[3]) // not a numerical array
+	|| array_size(ps[3]) != array_size(ps[0])) // or has the wrong size
       return cerror(INCMP_ARG, ps[3]);
     haveWeights = 1;
   } else
     haveWeights = 0;
 
-  src.v = array_data(ps[0]);	/* source data */
-  nElem = array_size(ps[0]);	/* number of source elements */
-  type = array_type(ps[0]);	/* source data type */
+  src.v = array_data(ps[0]);	// source data
+  nElem = array_size(ps[0]);	// number of source elements
+  type = array_type(ps[0]);	// source data type
   if (isComplexType(type))
     outType = ((internalMode & 1)
 	       || type == LUX_CDOUBLE)? LUX_CDOUBLE: LUX_CFLOAT;
@@ -1566,12 +1566,12 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
     outType = ((internalMode & 1)
 	       || type == LUX_DOUBLE)? LUX_DOUBLE: LUX_FLOAT;
 
-  if (narg > 2 && ps[2]) {	/* have <power> */
+  if (narg > 2 && ps[2]) {	// have <power>
     if (!symbolIsScalar(ps[2]))
       return cerror(NEED_SCAL, ps[2]);
     p = int_arg(ps[2]);
     if (p < 0) {
-      psign = -1;			/* sign of power */
+      psign = -1;			// sign of power
       p = -p;
     } else
       psign = +1;
@@ -1580,18 +1580,18 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
     psign = +1;
   }
 
-  /* make <weights> have the same type as <x> (except not complex) */
+  // make <weights> have the same type as <x> (except not complex)
   if (haveWeights) {
     haveWeights = lux_converts[realType(outType)](1, &ps[3]);
-    if (haveWeights == LUX_ERROR) /* some error */
+    if (haveWeights == LUX_ERROR) // some error
       return LUX_ERROR;
     weights.v = array_data(haveWeights);
   }
 
-  /* need min and max of indices so we can create result array of */
-  /* proper size */
-  indices2 = lux_long(1, &ps[1]); /* force LUX_INT32 */
-  indx = (int32_t*) array_data(indices2);	/* assumed of same size as <source>! */
+  // need min and max of indices so we can create result array of
+  // proper size
+  indices2 = lux_long(1, &ps[1]); // force LUX_INT32
+  indx = (int32_t*) array_data(indices2);	// assumed of same size as <source>!
   minmax(indx, nElem, LUX_INT32);
   size = lastmax.l + 1;
   offset = 0;
@@ -1603,9 +1603,9 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   trgt.b += offset*lux_type_size[outType];
   sum.b += offset*lux_type_size[outType];
   i = nElem;
-  if (p == 1) {			/* regular summation */
-    if (haveWeights) {		/* have <weights> */
-      if (mean) {		/* want average */
+  if (p == 1) {			// regular summation
+    if (haveWeights) {		// have <weights>
+      if (mean) {		// want average
 	ALLOCATE(hist.d, size, double);
 	zerobytes(hist.d, size*sizeof(double));
 	hist.d += offset;
@@ -1613,42 +1613,42 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	  case LUX_FLOAT:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) {		/* get the sum */
+		while (i--) {		// get the sum
 		  hist.f[*indx] += *weights.f;
 		  trgt.f[*indx] += (float) *src.b++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT16:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.f[*indx] += *weights.f;
 		  trgt.f[*indx] += (float) *src.w++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT32:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.f[*indx] += *weights.f;
 		  trgt.f[*indx] += (float) *src.l++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT64:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.f[*indx] += *weights.f;
 		  trgt.f[*indx] += (float) *src.q++ * *weights.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.f[*indx] += *weights.f;
 		  trgt.f[*indx] += (float) *src.f++ * *weights.f++;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.f[i])
 		trgt.f[i] /= hist.f[i];
@@ -1656,49 +1656,49 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	  case LUX_DOUBLE:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) {		/* get the sum */
+		while (i--) {		// get the sum
 		  hist.d[*indx] += *weights.d;
 		  trgt.d[*indx] += (double) *src.b++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT16:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.d[*indx] += *weights.d;
 		  trgt.d[*indx] += (double) *src.w++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT32:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.d[*indx] += *weights.d;
 		  trgt.d[*indx] += (double) *src.l++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT64:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.d[*indx] += *weights.d;
 		  trgt.d[*indx] += (double) *src.q++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.d[*indx] += *weights.d;
 		  trgt.d[*indx] += (double) *src.f++ * *weights.d++;
 		  indx++;
 		}
 		break;
 	      case LUX_DOUBLE:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.d[*indx] += *weights.d;
 		  trgt.d[*indx] += *src.d++ * *weights.d++;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.d[i])
 		trgt.d[i] /= hist.d[i];
@@ -1735,7 +1735,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		    (float) src.cd++->imaginary * *weights.d++;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.d[i]) {
 		trgt.cd[i].real /= hist.d[i];
@@ -1743,61 +1743,61 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	      } else
 		trgt.cd[i].real = trgt.cf->imaginary = 0.0;
 	    break;
-	} /* end of switch (outType) */
+	} // end of switch (outType)
 	free(hist.d - offset);
-      } else {			/* want totals */
+      } else {			// want totals
 	switch (outType) {
 	  case LUX_FLOAT:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) 		/* get the sum */
+		while (i--) 		// get the sum
 		  trgt.f[*indx++] += (float) *src.b++ * *weights.f++;
 		break;
 	      case LUX_INT16:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += (float) *src.w++ * *weights.f++;
 		break;
 	      case LUX_INT32:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += (float) *src.l++ * *weights.f++;
 		break;
 	      case LUX_INT64:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += (float) *src.q++ * *weights.f++;
 		break;
 	      case LUX_FLOAT:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += (float) *src.f++ * *weights.f++;
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_DOUBLE:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) 	/* get the sum */
+		while (i--) 	// get the sum
 		  trgt.d[*indx++] += (double) *src.b++ * *weights.d++;
 		break;
 	      case LUX_INT16:
-		while (i--) 		/* first, get the sum */
+		while (i--) 		// first, get the sum
 		  trgt.d[*indx++] += (double) *src.w++ * *weights.d++;
 		break;
 	      case LUX_INT32:
-		while (i--) 		/* first, get the sum */
+		while (i--) 		// first, get the sum
 		  trgt.d[*indx++] += (double) *src.l++ * *weights.d++;
 		break;
 	      case LUX_INT64:
-		while (i--) 		/* first, get the sum */
+		while (i--) 		// first, get the sum
 		  trgt.d[*indx++] += (double) *src.q++ * *weights.d++;
 		break;
 	      case LUX_FLOAT:
-		while (i--) 		/* first get the sum */
+		while (i--) 		// first get the sum
 		  trgt.d[*indx++] += (double) *src.f++ * *weights.d++;
 		break;
 	      case LUX_DOUBLE:
-		while (i--) 		/* first get the sum */
+		while (i--) 		// first get the sum
 		  trgt.d[*indx++] += *src.d++ * *weights.d++;
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_CFLOAT:
 	    while (i--) {
@@ -1823,10 +1823,10 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	    }
 	    break;
-	} /* end of switch (outType) */
-      }	/* end of if (mean) else */
-    } else {			/* no <weights>: each element counts once */
-      if (mean) {		/* want average */
+	} // end of switch (outType)
+      }	// end of if (mean) else
+    } else {			// no <weights>: each element counts once
+      if (mean) {		// want average
 	ALLOCATE(hist.l, size, int32_t);
 	zerobytes(hist.l, size*sizeof(int32_t));
 	hist.l += offset;
@@ -1834,42 +1834,42 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	  case LUX_FLOAT:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) {		/* get the sum */
+		while (i--) {		// get the sum
 		  hist.l[*indx]++;
 		  trgt.f[*indx] += (float) *src.b++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT16:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.f[*indx] += (float) *src.w++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT32:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.f[*indx] += (float) *src.l++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT64:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.f[*indx] += (float) *src.q++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.f[*indx] += (float) *src.f++;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.l[i])
 		trgt.f[i] /= hist.l[i];
@@ -1877,49 +1877,49 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	  case LUX_DOUBLE:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) {		/* get the sum */
+		while (i--) {		// get the sum
 		  hist.l[*indx]++;
 		  trgt.d[*indx] += *src.b++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT16:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.d[*indx] += *src.w++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT32:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.d[*indx] += *src.l++;
 		  indx++;
 		}
 		break;
 	      case LUX_INT64:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.d[*indx] += *src.q++;
 		  indx++;
 		}
 		break;
 	      case LUX_FLOAT:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.d[*indx] += *src.f++;
 		  indx++;
 		}
 		break;
 	      case LUX_DOUBLE:
-		while (i--) {		/* first, get the sum */
+		while (i--) {		// first, get the sum
 		  hist.l[*indx]++;
 		  trgt.d[*indx] += *src.d++;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.l[i])
 		trgt.d[i] /= hist.l[i];
@@ -1953,7 +1953,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  trgt.cd[*indx++].imaginary += (float) src.cd++->imaginary;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.l[i]) {
 		trgt.cd[i].real /= hist.l[i];
@@ -1961,61 +1961,61 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	      } else
 		trgt.cd[i].real = trgt.cf->imaginary = 0.0;
 	    break;
-	} /* end of switch (outType) */
+	} // end of switch (outType)
 	free(hist.l - offset);
-      } else {			/* want totals */
+      } else {			// want totals
 	switch (outType) {
 	  case LUX_FLOAT:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) 		/* get the sum */
+		while (i--) 		// get the sum
 		  trgt.f[*indx++] += (float) *src.b++;
 		break;
 	      case LUX_INT16:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += (float) *src.w++;
 		break;
 	      case LUX_INT32:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += (float) *src.l++;
 		break;
 	      case LUX_INT64:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += *src.q++;
 		break;
 	      case LUX_FLOAT:
-		while (i--)		/* first, get the sum */
+		while (i--)		// first, get the sum
 		  trgt.f[*indx++] += (float) *src.f++;
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_DOUBLE:
 	    switch (type) {
 	      case LUX_INT8:
-		while (i--) 	/* get the sum */
+		while (i--) 	// get the sum
 		  trgt.d[*indx++] += *src.b++;
 		break;
 	      case LUX_INT16:
-		while (i--) 		/* first, get the sum */
+		while (i--) 		// first, get the sum
 		  trgt.d[*indx++] += *src.w++;
 		break;
 	      case LUX_INT32:
-		while (i--) 		/* first, get the sum */
+		while (i--) 		// first, get the sum
 		  trgt.d[*indx++] += *src.l++;
 		break;
 	      case LUX_INT64:
-		while (i--) 		/* first, get the sum */
+		while (i--) 		// first, get the sum
 		  trgt.d[*indx++] += *src.q++;
 		break;
 	      case LUX_FLOAT:
-		while (i--) 		/* first get the sum */
+		while (i--) 		// first get the sum
 		  trgt.d[*indx++] += *src.f++;
 		break;
 	      case LUX_DOUBLE:
-		while (i--) 		/* first get the sum */
+		while (i--) 		// first get the sum
 		  trgt.d[*indx++] += *src.d++;
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_CFLOAT:
 	    while (i--) {
@@ -2039,22 +2039,22 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	    }
 	    break;
-	} /* end of switch (outType) */
-      }	/* end of if (mean) else */
-    } /* end of if (haveWeights) else */
-  } else {			/* power summation */
-    /* we set up for the calculation of the powers.  We use a scheme that */
-    /* minimizes the number of multiplications that need to be performed. */
-    present = (uint8_t *) curScrat;/* some scratch space */
+	} // end of switch (outType)
+      }	// end of if (mean) else
+    } // end of if (haveWeights) else
+  } else {			// power summation
+    // we set up for the calculation of the powers.  We use a scheme that
+    // minimizes the number of multiplications that need to be performed.
+    present = (uint8_t *) curScrat;// some scratch space
     pp = p;
     while (pp) {
       *present++ = (pp & 1);
       pp >>= 1;
     }
-    nbase = present - (uint8_t *) curScrat; /* number of bits in the exponent */
+    nbase = present - (uint8_t *) curScrat; // number of bits in the exponent
     present = (uint8_t *) curScrat;
-    if (haveWeights) {		/* weighted power summation */
-      if (mean) {		/* want averages */
+    if (haveWeights) {		// weighted power summation
+      if (mean) {		// want averages
 	ALLOCATE(hist.d, size, double);
 	zerobytes(hist.d, size*sizeof(double));
 	hist.d += offset;
@@ -2063,16 +2063,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.f = *src.b++; /* data value */
+		  temp.f = *src.b++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2083,16 +2083,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.f = *src.w++; /* data value */
+		  temp.f = *src.w++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2103,16 +2103,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.f = *src.l++; /* data value */
+		  temp.f = *src.l++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2123,16 +2123,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.f = *src.q++; /* data value */
+		  temp.f = *src.q++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2143,16 +2143,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.f = *src.f++; /* data value */
+		  temp.f = *src.f++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2161,8 +2161,8 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.f[i])
 		trgt.f[i] /= hist.f[i];
@@ -2171,16 +2171,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.d = *src.b++; /* data value */
+		  temp.d = *src.b++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2191,16 +2191,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.d = *src.w++; /* data value */
+		  temp.d = *src.w++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2211,16 +2211,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.d = *src.l++; /* data value */
+		  temp.d = *src.l++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2231,16 +2231,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.d = *src.q++; /* data value */
+		  temp.d = *src.q++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2251,16 +2251,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.d = *src.f++; /* data value */
+		  temp.d = *src.f++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2271,16 +2271,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_DOUBLE:
 		while (i--) {
-		  temp.d = *src.d++; /* data value */
+		  temp.d = *src.d++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2289,35 +2289,35 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.d[i])
 		trgt.d[i] /= hist.d[i];
 	    break;
 	  case LUX_CFLOAT:
 	    while (i--) {
-	      tempcf.real = src.cf->real; /* data value */
+	      tempcf.real = src.cf->real; // data value
 	      tempcf.imaginary = src.cf++->imaginary;
 	      valuecf.real = 1.0;
 	      valuecf.imaginary = 0.0;
 	      for (j = 0; j < nbase; j++) {
-		if (present[j]) { /* valuecf *= tempcf */
+		if (present[j]) { // valuecf *= tempcf
 		  temp2f = valuecf.real*tempcf.real
 		    - valuecf.imaginary*tempcf.imaginary;
 		  valuecf.imaginary = valuecf.real*tempcf.imaginary
 		    + valuecf.imaginary*tempcf.real;
 		  valuecf.real = temp2f;
 		}
-		/* replace tempcf with tempcf*tempcf */
+		// replace tempcf with tempcf*tempcf
 		temp2f = tempcf.real*tempcf.real
 		  - tempcf.imaginary*tempcf.imaginary;
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      /* we now have the data value to the given unsigned power */
-	      /* add in the exponent sign and the weighte */
-	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
+	      // we now have the data value to the given unsigned power
+	      // add in the exponent sign and the weighte
+	      if (psign == -1) { // replace valuecf by *weights.f/valuecf
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2334,7 +2334,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	      hist.f[*indx] += *weights.f++;
 	      indx++;
 	    }
-	    /* and divide by number */
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.f[i]) {
 		trgt.cf[i].real /= hist.f[i];
@@ -2345,27 +2345,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_CFLOAT:
 		while (i--) {
-		  tempcd.real = src.cf->real; /* data value */
+		  tempcd.real = src.cf->real; // data value
 		  tempcd.imaginary = src.cf++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2385,27 +2385,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_CDOUBLE:
 		while (i--) {
-		  tempcd.real = src.cd->real; /* data value */
+		  tempcd.real = src.cd->real; // data value
 		  tempcd.imaginary = src.cd++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2423,32 +2423,32 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.d[i]) {
 		trgt.cd[i].real /= hist.d[i];
 		trgt.cd[i].imaginary /= hist.d[i];
 	      }
 	    break;
-	} /* end of switch (outType) */
+	} // end of switch (outType)
 	free(hist.d - offset);
-      } else {			/* want totals */
+      } else {			// want totals
 	switch (outType) {
 	  case LUX_FLOAT:
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.f = *src.b++; /* data value */
+		  temp.f = *src.b++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2459,16 +2459,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.f = *src.w++; /* data value */
+		  temp.f = *src.w++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2479,16 +2479,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.f = *src.l++; /* data value */
+		  temp.f = *src.l++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2499,16 +2499,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.f = *src.q++; /* data value */
+		  temp.f = *src.q++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2519,16 +2519,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.f = *src.f++; /* data value */
+		  temp.f = *src.f++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? *weights.f/value.f: 0.0;
 		  else
 		    value.f *= *weights.f;
@@ -2537,22 +2537,22 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_DOUBLE:
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.d = *src.b++; /* data value */
+		  temp.d = *src.b++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2563,16 +2563,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.d = *src.w++; /* data value */
+		  temp.d = *src.w++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2583,16 +2583,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.d = *src.l++; /* data value */
+		  temp.d = *src.l++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2603,16 +2603,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.d = *src.q++; /* data value */
+		  temp.d = *src.q++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2623,16 +2623,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.d = *src.f++; /* data value */
+		  temp.d = *src.f++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2643,16 +2643,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_DOUBLE:
 		while (i--) {
-		  temp.d = *src.d++; /* data value */
+		  temp.d = *src.d++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? *weights.d/value.d: 0.0;
 		  else
 		    value.d *= *weights.d;
@@ -2661,31 +2661,31 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_CFLOAT:
 	    while (i--) {
-	      tempcf.real = src.cf->real; /* data value */
+	      tempcf.real = src.cf->real; // data value
 	      tempcf.imaginary = src.cf++->imaginary;
 	      valuecf.real = 1.0;
 	      valuecf.imaginary = 0.0;
 	      for (j = 0; j < nbase; j++) {
-		if (present[j]) { /* valuecf *= tempcf */
+		if (present[j]) { // valuecf *= tempcf
 		  temp2f = valuecf.real*tempcf.real
 		    - valuecf.imaginary*tempcf.imaginary;
 		  valuecf.imaginary = valuecf.real*tempcf.imaginary
 		    + valuecf.imaginary*tempcf.real;
 		  valuecf.real = temp2f;
 		}
-		/* replace tempcf with tempcf*tempcf */
+		// replace tempcf with tempcf*tempcf
 		temp2f = tempcf.real*tempcf.real
 		  - tempcf.imaginary*tempcf.imaginary;
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      /* we now have the data value to the given unsigned power */
-	      /* add in the exponent sign and the weighte */
-	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
+	      // we now have the data value to the given unsigned power
+	      // add in the exponent sign and the weighte
+	      if (psign == -1) { // replace valuecf by *weights.f/valuecf
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -2707,27 +2707,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_CFLOAT:
 		while (i--) {
-		  tempcd.real = src.cf->real; /* data value */
+		  tempcd.real = src.cf->real; // data value
 		  tempcd.imaginary = src.cf++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2747,27 +2747,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_CDOUBLE:
 		while (i--) {
-		  tempcd.real = src.cd->real; /* data value */
+		  tempcd.real = src.cd->real; // data value
 		  tempcd.imaginary = src.cd++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -2785,12 +2785,12 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
-	} /* end of switch (outType) */
-      }	/* end of if (mean) else */
-    } else {			/* unweighted power summation */
-      if (mean) {		/* want averages */
+	} // end of switch (outType)
+      }	// end of if (mean) else
+    } else {			// unweighted power summation
+      if (mean) {		// want averages
 	ALLOCATE(hist.l, size, int32_t);
 	zerobytes(hist.l, size*sizeof(int32_t));
 	hist.l += offset;
@@ -2799,16 +2799,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.f = *src.b++; /* data value */
+		  temp.f = *src.b++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  hist.l[*indx]++;
@@ -2817,16 +2817,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.f = *src.w++; /* data value */
+		  temp.f = *src.w++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  hist.l[*indx]++;
@@ -2835,16 +2835,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.f = *src.l++; /* data value */
+		  temp.f = *src.l++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  hist.l[*indx]++;
@@ -2853,16 +2853,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.f = *src.q++; /* data value */
+		  temp.f = *src.q++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  hist.l[*indx]++;
@@ -2871,24 +2871,24 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.f = *src.f++; /* data value */
+		  temp.f = *src.f++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  hist.l[*indx]++;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.f[i])
 		trgt.f[i] /= hist.l[i];
@@ -2897,16 +2897,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.d = *src.b++; /* data value */
+		  temp.d = *src.b++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  hist.l[*indx]++;
@@ -2915,16 +2915,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.d = *src.w++; /* data value */
+		  temp.d = *src.w++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  hist.l[*indx]++;
@@ -2933,16 +2933,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.d = *src.l++; /* data value */
+		  temp.d = *src.l++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  hist.l[*indx]++;
@@ -2951,16 +2951,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.d = *src.q++; /* data value */
+		  temp.d = *src.q++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  hist.l[*indx]++;
@@ -2969,16 +2969,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.d = *src.f++; /* data value */
+		  temp.d = *src.f++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  hist.l[*indx]++;
@@ -2987,51 +2987,51 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_DOUBLE:
 		while (i--) {
-		  temp.d = *src.d++; /* data value */
+		  temp.d = *src.d++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  hist.l[*indx]++;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.l[i])
 		trgt.d[i] /= hist.l[i];
 	    break;
 	  case LUX_CFLOAT:
 	    while (i--) {
-	      tempcf.real = src.cf->real; /* data value */
+	      tempcf.real = src.cf->real; // data value
 	      tempcf.imaginary = src.cf++->imaginary;
 	      valuecf.real = 1.0;
 	      valuecf.imaginary = 0.0;
 	      for (j = 0; j < nbase; j++) {
-		if (present[j]) { /* valuecf *= tempcf */
+		if (present[j]) { // valuecf *= tempcf
 		  temp2f = valuecf.real*tempcf.real
 		    - valuecf.imaginary*tempcf.imaginary;
 		  valuecf.imaginary = valuecf.real*tempcf.imaginary
 		    + valuecf.imaginary*tempcf.real;
 		  valuecf.real = temp2f;
 		}
-		/* replace tempcf with tempcf*tempcf */
+		// replace tempcf with tempcf*tempcf
 		temp2f = tempcf.real*tempcf.real
 		  - tempcf.imaginary*tempcf.imaginary;
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      /* we now have the data value to the given unsigned power */
-	      /* add in the exponent sign and the weighte */
-	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
+	      // we now have the data value to the given unsigned power
+	      // add in the exponent sign and the weighte
+	      if (psign == -1) { // replace valuecf by *weights.f/valuecf
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -3045,7 +3045,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	      hist.l[*indx]++;
 	      indx++;
 	    }
-	    /* and divide by number */
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.f[i]) {
 		trgt.cf[i].real /= hist.l[i];
@@ -3056,27 +3056,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_CFLOAT:
 		while (i--) {
-		  tempcd.real = src.cf->real; /* data value */
+		  tempcd.real = src.cf->real; // data value
 		  tempcd.imaginary = src.cf++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3093,27 +3093,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_CDOUBLE:
 		while (i--) {
-		  tempcd.real = src.cd->real; /* data value */
+		  tempcd.real = src.cd->real; // data value
 		  tempcd.imaginary = src.cd++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3128,32 +3128,32 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
-	    /* and divide by number */
+	    } // end of switch (type)
+	    // and divide by number
 	    for (i = -offset; i < size - offset; i++)
 	      if (hist.l[i]) {
 		trgt.cd[i].real /= hist.l[i];
 		trgt.cd[i].imaginary /= hist.l[i];
 	      }
 	    break;
-	} /* end of switch (outType) */
+	} // end of switch (outType)
 	free(hist.l - offset);
-      } else {			/* want unweighted power totals */
+      } else {			// want unweighted power totals
 	switch (outType) {
 	  case LUX_FLOAT:
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.f = *src.b++; /* data value */
+		  temp.f = *src.b++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  indx++;
@@ -3161,16 +3161,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.f = *src.w++; /* data value */
+		  temp.f = *src.w++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  indx++;
@@ -3178,16 +3178,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.f = *src.l++; /* data value */
+		  temp.f = *src.l++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  indx++;
@@ -3195,16 +3195,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.f = *src.q++; /* data value */
+		  temp.f = *src.q++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  indx++;
@@ -3212,37 +3212,37 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.f = *src.f++; /* data value */
+		  temp.f = *src.f++; // data value
 		  value.f = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  trgt.f[*indx] += value.f;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_DOUBLE:
 	    switch (type) {
 	      case LUX_INT8:
 		while (i--) {
-		  temp.d = *src.b++; /* data value */
+		  temp.d = *src.b++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  indx++;
@@ -3250,16 +3250,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT16:
 		while (i--) {
-		  temp.d = *src.w++; /* data value */
+		  temp.d = *src.w++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  indx++;
@@ -3267,16 +3267,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT32:
 		while (i--) {
-		  temp.d = *src.l++; /* data value */
+		  temp.d = *src.l++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  indx++;
@@ -3284,16 +3284,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_INT64:
 		while (i--) {
-		  temp.d = *src.q++; /* data value */
+		  temp.d = *src.q++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  indx++;
@@ -3301,16 +3301,16 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_FLOAT:
 		while (i--) {
-		  temp.d = *src.f++; /* data value */
+		  temp.d = *src.f++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  indx++;
@@ -3318,46 +3318,46 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_DOUBLE:
 		while (i--) {
-		  temp.d = *src.d++; /* data value */
+		  temp.d = *src.d++; // data value
 		  value.d = 1.0;
 		  for (j = 0; j < nbase; j++) {
 		    if (present[j])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1)/* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1)// negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  trgt.d[*indx] += value.d;
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
 	  case LUX_CFLOAT:
 	    while (i--) {
-	      tempcf.real = src.cf->real; /* data value */
+	      tempcf.real = src.cf->real; // data value
 	      tempcf.imaginary = src.cf++->imaginary;
 	      valuecf.real = 1.0;
 	      valuecf.imaginary = 0.0;
 	      for (j = 0; j < nbase; j++) {
-		if (present[j]) { /* valuecf *= tempcf */
+		if (present[j]) { // valuecf *= tempcf
 		  temp2f = valuecf.real*tempcf.real
 		    - valuecf.imaginary*tempcf.imaginary;
 		  valuecf.imaginary = valuecf.real*tempcf.imaginary
 		    + valuecf.imaginary*tempcf.real;
 		  valuecf.real = temp2f;
 		}
-		/* replace tempcf with tempcf*tempcf */
+		// replace tempcf with tempcf*tempcf
 		temp2f = tempcf.real*tempcf.real
 		  - tempcf.imaginary*tempcf.imaginary;
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      /* we now have the data value to the given unsigned power */
-	      /* add in the exponent sign and the weighte */
-	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
+	      // we now have the data value to the given unsigned power
+	      // add in the exponent sign and the weighte
+	      if (psign == -1) { // replace valuecf by *weights.f/valuecf
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -3375,27 +3375,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 	    switch (type) {
 	      case LUX_CFLOAT:
 		while (i--) {
-		  tempcd.real = src.cf->real; /* data value */
+		  tempcd.real = src.cf->real; // data value
 		  tempcd.imaginary = src.cf++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3411,27 +3411,27 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		break;
 	      case LUX_CDOUBLE:
 		while (i--) {
-		  tempcd.real = src.cd->real; /* data value */
+		  tempcd.real = src.cd->real; // data value
 		  tempcd.imaginary = src.cd++->imaginary;
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (j = 0; j < nbase; j++) {
-		    if (present[j]) { /* valuecf *= tempcf */
+		    if (present[j]) { // valuecf *= tempcf
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weighte */
-		  if (psign == -1) {/* replace valuecd by *weights.f/valuecd */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weighte
+		  if (psign == -1) {// replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -3445,33 +3445,33 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
 		  indx++;
 		}
 		break;
-	    } /* end of switch (type) */
+	    } // end of switch (type)
 	    break;
-	} /* end of switch (outType) */
-      }	/* end of if (mean) else */
-    } /* end of if (haveWeights) */
-  } /* end of if (p == 1) else */
+	} // end of switch (outType)
+      }	// end of if (mean) else
+    } // end of if (haveWeights)
+  } // end of if (p == 1) else
 
   return result;
 }
-/*-----------------------------------------------------------------------*/
+//-----------------------------------------------------------------------
 int32_t total(int32_t narg, int32_t ps[], int32_t mean)
-/* TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /FLOAT, /DOUBLE]) */
+// TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /FLOAT, /DOUBLE])
 
-/* TOTAL(array) sums all elements of <array> and returns a LUX_SCALAR. */
-/* TOTAL(array, axis) sums all elements along dimension <axis> (if this */
-/*   is a LUX_SCALAR) and returns an array with one less dimensions than */
+// TOTAL(array) sums all elements of <array> and returns a LUX_SCALAR.
+// TOTAL(array, axis) sums all elements along dimension <axis> (if this
+//   is a LUX_SCALAR) and returns an array with one less dimensions than
 /*   <array> (or a scalar).  If <axis> is an array with a number of
      elements different from that of <array>, then it is taken to be a
      list of dimensions along which must be summed.  */
-/* TOTAL(array, index) collects each element of <array> at index <index> */
+// TOTAL(array, index) collects each element of <array> at index <index>
 /*   in the result, if <index> is an LUX_ARRAY with the same number of
      elements as <array>.  */
-/* The result is at least LUX_INT32.   LS 14jan96 */
-/* TOTAL(array [, axis], POWER=p) returns the total of the <p>th */
-/*   (integer) power of <array>.  LS 22jul98 */
-/* Fixed erroneous cast to (float) in (double) summations.  LS 11jul2000 */
-/* Allow LUX_INT32 output.  LS 27oct2010 */
+// The result is at least LUX_INT32.   LS 14jan96
+// TOTAL(array [, axis], POWER=p) returns the total of the <p>th
+//   (integer) power of <array>.  LS 22jul98
+// Fixed erroneous cast to (float) in (double) summations.  LS 11jul2000
+// Allow LUX_INT32 output.  LS 27oct2010
 {
   int32_t	result, done, p, psign, pp, nbase, i, haveWeights, n;
   Symboltype type, outtype;
@@ -3490,10 +3490,10 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 #endif
   if (narg > 1 && ps[1] && symbolIsNumericalArray(ps[1])
       && symbolIsNumericalArray(ps[0])
-      && array_size(ps[1]) == array_size(ps[0])) /* collect by class */
+      && array_size(ps[1]) == array_size(ps[0])) // collect by class
     return index_total(narg, ps, mean);
 
-  if (narg > 2 && ps[2]) {	/* have <power> */
+  if (narg > 2 && ps[2]) {	// have <power>
 #if DEBUG_VOCAL
     debugout("checking <power>");
 #endif
@@ -3501,7 +3501,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
       return cerror(NEED_SCAL, ps[2]);
     p = int_arg(ps[2]);
     if (p < 0) {
-      psign = -1;			/* sign of power */
+      psign = -1;			// sign of power
       p = -p;
     } else
       psign = +1;
@@ -3521,14 +3521,14 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
       if (outtype < LUX_INT32)
         outtype = LUX_INT32;
       break;
-    case 1:                       /* /DOUBLE */
-    case 5:                       /* /DOUBLE, /FLOAT */
+    case 1:                       // /DOUBLE
+    case 5:                       // /DOUBLE, /FLOAT
       if (isComplexType(type))
         outtype = LUX_CDOUBLE;
       else if (outtype < LUX_DOUBLE)
         outtype = LUX_DOUBLE;
       break;
-    case 4:                       /* /FLOAT */
+    case 4:                       // /FLOAT
       if (outtype < LUX_FLOAT)
         outtype = LUX_FLOAT;
       break;
@@ -3537,14 +3537,14 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
   debugout1("output type: %s", typeName(outtype));
 #endif
 
-  if (narg > 3 && ps[3]) {	/* have <weights> */
+  if (narg > 3 && ps[3]) {	// have <weights>
 #if DEBUG_VOCAL
     debugout("checking <weights>");
 #endif
-    if (!symbolIsNumericalArray(ps[3]) /* not a numerical array */
-	|| array_size(ps[3]) != array_size(ps[0])) /* or wrong size */
+    if (!symbolIsNumericalArray(ps[3]) // not a numerical array
+	|| array_size(ps[3]) != array_size(ps[0])) // or wrong size
       return cerror(INCMP_ARG, ps[3]);
-    for (i = 0; i < array_num_dims(ps[3]) - 1; i++) /* check dimensions */
+    for (i = 0; i < array_num_dims(ps[3]) - 1; i++) // check dimensions
       if (array_dims(ps[3])[i] != array_dims(ps[0])[i])
 	return cerror(INCMP_DIMS, ps[3]);
     haveWeights = 1;
@@ -3554,15 +3554,15 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 #if DEBUG_VOCAL
   debugout("standardLoop for <x>");
 #endif
-  /* set up for walking through <x> */
+  // set up for walking through <x>
   if (standardLoop(ps[0], narg > 1? ps[1]: 0,
-		   SL_COMPRESSALL /* selected dims removed from result */
-		   | SL_UPGRADE	/* result at least of source type */
-		   | SL_EACHCOORD /* want all coordinates */
-		   | SL_UNIQUEAXES /* no duplicate axes allowed */
-		   | SL_AXESBLOCK /* rearrange selected axes to front */
-		   | SL_NEGONED	/* axis negative -> treat as 1D */
-		   | ((internalMode & 2)? SL_ONEDIMS: 0), /* omit -> 1 */
+		   SL_COMPRESSALL // selected dims removed from result
+		   | SL_UPGRADE	// result at least of source type
+		   | SL_EACHCOORD // want all coordinates
+		   | SL_UNIQUEAXES // no duplicate axes allowed
+		   | SL_AXESBLOCK // rearrange selected axes to front
+		   | SL_NEGONED	// axis negative -> treat as 1D
+		   | ((internalMode & 2)? SL_ONEDIMS: 0), // omit -> 1
 		   outtype,
 		   &srcinfo, &src, &result, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
@@ -3570,13 +3570,13 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
   debugout("back from standardLoop for <x>");
 #endif
 
-  /* set up for walking through <weights> as well (if present) */
+  // set up for walking through <weights> as well (if present)
   if (haveWeights) {
 #if DEBUG_VOCAL
     debugout("standardLoop for <weights>");
 #endif
-    /* we make sure that <weights> has the same data type as <x> -- except */
-    /* that <weights> is never complex */
+    // we make sure that <weights> has the same data type as <x> -- except
+    // that <weights> is never complex
     haveWeights = lux_converts[realType(array_type(ps[0]))](1, &ps[3]);
     if (standardLoop(haveWeights, ps[1],
 		     (ps[1]? 0: SL_ALLAXES) | SL_EACHCOORD | SL_AXESBLOCK,
@@ -3588,8 +3588,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 #if DEBUG_VOCAL
     debugout("calculating # elements per result");
 #endif
-    /* calculate how many elements go into each result */
-    if (srcinfo.naxes) {	/* user specified one or more axes */
+    // calculate how many elements go into each result
+    if (srcinfo.naxes) {	// user specified one or more axes
       n = 1;
       for (i = 0; i < srcinfo.naxes; i++)
 	n *= srcinfo.dims[srcinfo.axes[i]];
@@ -3602,11 +3602,11 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 #endif
   }
 
-  if (!srcinfo.naxes) {		/* no axes specified */
+  if (!srcinfo.naxes) {		// no axes specified
 #if DEBUG_VOCAL
     debugout("adjusting srcinfo.naxes");
 #endif
-    srcinfo.naxes++;		/* or no proper summing */
+    srcinfo.naxes++;		// or no proper summing
     if (haveWeights) {
 #if DEBUG_VOCAL
       debugout("adjusting winfo.naxes");
@@ -3617,8 +3617,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 
   bool omitNaNs = (internalMode & 8) != 0;
 
-  if (p == 1) {			/* regular summation */
-    if (haveWeights) {		/* have <weights> */
+  if (p == 1) {			// regular summation
+    if (haveWeights) {		// have <weights>
 #if DEBUG_VOCAL
       debugout("Weighted regular summation");
 #endif
@@ -3664,7 +3664,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_INT64:
 	  switch (type) {
@@ -3720,7 +3720,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0): sum.q;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_FLOAT:
 	  switch (type) {
@@ -3805,9 +3805,9 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-            /* no cases LUX_DOUBLE, LUX_CFLOAT, or LUX_CDOUBLE: if <x> */
-	    /* is any of those types, then so is the output */
-	  } /* end of switch (type) */
+            // no cases LUX_DOUBLE, LUX_CFLOAT, or LUX_CDOUBLE: if <x>
+	    // is any of those types, then so is the output
+	  } // end of switch (type)
 	  break;
 	case LUX_DOUBLE:
 	  switch (type) {
@@ -3921,12 +3921,12 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-            /* no cases LUX_CFLOAT, or LUX_CDOUBLE: if <x> */
-	    /* is any of those types, then so is the output */
-	  } /* end of switch (type) */
+            // no cases LUX_CFLOAT, or LUX_CDOUBLE: if <x>
+	    // is any of those types, then so is the output
+	  } // end of switch (type)
 	  break;
 	case LUX_CFLOAT:
-	  /* if we get here then <x> must itself be CFLOAT */
+	  // if we get here then <x> must itself be CFLOAT
 	  do {
 	    sumcf.real = sumcf.imaginary = 0.0;
 	    w.f = 0.0;
@@ -3951,7 +3951,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	  } while (done < srcinfo.rndim);
 	  break;
 	case LUX_CDOUBLE:
-	  /* if we get here then <x> must be CFLOAT or CDOUBLE */
+	  // if we get here then <x> must be CFLOAT or CDOUBLE
 	  switch (type) {
 	    case LUX_CFLOAT:
 	      do {
@@ -4001,10 +4001,10 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		trgt.cd++;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
-      }	/* end of switch (outtype) */
-    } else {			/* no <weights>: plain summation */
+      }	// end of switch (outtype)
+    } else {			// no <weights>: plain summation
 #if DEBUG_VOCAL
       debugout("Regular unweighted summing");
 #endif
@@ -4038,7 +4038,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_INT64:
 	  switch (type) {
@@ -4078,7 +4078,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		*trgt.q++ = mean? sum.q/n: sum.q;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_FLOAT:
 	  switch (type) {
@@ -4141,8 +4141,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-           /* no cases DOUBLE, CFLOAT, or CDOUBLE */
-	  } /* end of switch (type) */
+           // no cases DOUBLE, CFLOAT, or CDOUBLE
+	  } // end of switch (type)
 	  break;
 	case LUX_DOUBLE:
 	  switch (type) {
@@ -4228,8 +4228,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-           /* no cases CFLOAT, CDOUBLE */
-	  } /* end of switch (type) */
+           // no cases CFLOAT, CDOUBLE
+	  } // end of switch (type)
 	  break;
 	case LUX_CFLOAT:
 	  do {
@@ -4281,25 +4281,25 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		}
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
-      }	/* end of switch (outtype) */
-    } /* end of if (haveWeights) else */
-  } else {			/* power summation */
+      }	// end of switch (outtype)
+    } // end of if (haveWeights) else
+  } else {			// power summation
 #if DEBUG_VOCAL
     debugout("power summation");
 #endif
-    /* we set up for the calculation of the powers.  We use a scheme that */
-    /* minimizes the number of multiplications that need to be performed. */
-    present = (uint8_t *) curScrat;/* some scratch space */
+    // we set up for the calculation of the powers.  We use a scheme that
+    // minimizes the number of multiplications that need to be performed.
+    present = (uint8_t *) curScrat;// some scratch space
     pp = p;
     while (pp) {
       *present++ = (pp & 1);
       pp >>= 1;
     }
-    nbase = present - (uint8_t *) curScrat; /* number of bits in the exponent */
+    nbase = present - (uint8_t *) curScrat; // number of bits in the exponent
     present = (uint8_t *) curScrat;
-    if (haveWeights) {		/* weighted power summation */
+    if (haveWeights) {		// weighted power summation
 #if DEBUG_VOCAL
       debugout("weighted power summation");
 #endif
@@ -4310,16 +4310,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.l = w.l = 0.0;
 		do {
-		  temp.l = *src.b; /* data value */
+		  temp.l = *src.b; // data value
 		  value.l = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.l *= temp.l;
 		    temp.l *= temp.l;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.l = value.l? *weights.b/value.l: 0.0;
 		  else
 		    value.l *= *weights.b;
@@ -4335,16 +4335,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.l = w.l = 0.0;
 		do {
-		  temp.l = *src.w; /* data value */
+		  temp.l = *src.w; // data value
 		  value.l = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.l *= temp.l;
 		    temp.l *= temp.l;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.l = value.l? *weights.w/value.l: 0.0;
 		  else
 		    value.l *= *weights.w;
@@ -4360,16 +4360,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.l = w.l = 0.0;
 		do {
-		  temp.l = *src.l; /* data value */
+		  temp.l = *src.l; // data value
 		  value.l = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.l *= temp.l;
 		    temp.l *= temp.l;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.l = value.l? *weights.l/value.l: 0.0;
 		  else
 		    value.l *= *weights.l;
@@ -4381,7 +4381,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		*trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_INT64:
 	  switch (type) {
@@ -4389,16 +4389,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = w.q = 0.0;
 		do {
-		  temp.q = *src.b; /* data value */
+		  temp.q = *src.b; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? *weights.b/value.q: 0.0;
 		  else
 		    value.q *= *weights.b;
@@ -4414,16 +4414,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = w.q = 0.0;
 		do {
-		  temp.q = *src.w; /* data value */
+		  temp.q = *src.w; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? *weights.w/value.q: 0.0;
 		  else
 		    value.q *= *weights.w;
@@ -4439,16 +4439,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = w.q = 0.0;
 		do {
-		  temp.q = *src.l; /* data value */
+		  temp.q = *src.l; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? *weights.l/value.q: 0.0;
 		  else
 		    value.q *= *weights.l;
@@ -4464,16 +4464,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = w.q = 0.0;
 		do {
-		  temp.q = *src.q; /* data value */
+		  temp.q = *src.q; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? *weights.q/value.q: 0.0;
 		  else
 		    value.q *= *weights.q;
@@ -4485,7 +4485,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		*trgt.q++ = mean? (w.q? sum.q/w.q: 0.0): sum.q;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_FLOAT:
 	  switch (type) {
@@ -4493,16 +4493,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = w.f = 0.0;
 		do {
-		  temp.f = *src.b; /* data value */
+		  temp.f = *src.b; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? *weights.b/value.f: 0.0;
 		  else
 		    value.f *= *weights.b;
@@ -4518,16 +4518,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = w.f = 0.0;
 		do {
-		  temp.f = *src.w; /* data value */
+		  temp.f = *src.w; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? *weights.w/value.f: 0.0;
 		  else
 		    value.f *= *weights.w;
@@ -4543,16 +4543,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = w.f = 0.0;
 		do {
-		  temp.f = *src.l; /* data value */
+		  temp.f = *src.l; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? *weights.l/value.f: 0.0;
 		  else
 		    value.f *= *weights.l;
@@ -4568,16 +4568,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = w.f = 0.0;
 		do {
-		  temp.f = *src.q; /* data value */
+		  temp.f = *src.q; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? *weights.q/value.f: 0.0;
 		  else
 		    value.f *= *weights.q;
@@ -4595,7 +4595,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sum.f = w.f = 0.0;
                   do {
                     if (!isnan(*src.f) && !isnan(*weights.f)) {
-                      temp.f = *src.f; /* data value */
+                      temp.f = *src.f; // data value
                       value.f = 1.0;
                       for (i = 0; i < nbase; i++) {
                         if (present[i])
@@ -4605,7 +4605,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       // we now have the data value to the given
                       // unsigned power. add in the exponent sign and
                       // the weight
-                      if (psign == -1) /* negative exponent: must divide */
+                      if (psign == -1) // negative exponent: must divide
                         value.f = value.f? *weights.f/value.f: 0.0;
                       else
                         value.f *= *weights.f;
@@ -4621,16 +4621,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.f = w.f = 0.0;
                   do {
-                    temp.f = *src.f; /* data value */
+                    temp.f = *src.f; // data value
                     value.f = 1.0;
                     for (i = 0; i < nbase; i++) {
                       if (present[i])
                         value.f *= temp.f;
                       temp.f *= temp.f;
                     }
-                    /* we now have the data value to the given unsigned power */
-                    /* add in the exponent sign and the weight */
-                    if (psign == -1) /* negative exponent: must divide */
+                    // we now have the data value to the given unsigned power
+                    // add in the exponent sign and the weight
+                    if (psign == -1) // negative exponent: must divide
                       value.f = value.f? *weights.f/value.f: 0.0;
                     else
                       value.f *= *weights.f;
@@ -4643,7 +4643,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_DOUBLE:
 	  switch (type) {
@@ -4651,16 +4651,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = w.d = 0.0;
 		do {
-		  temp.d = *src.b; /* data value */
+		  temp.d = *src.b; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? *weights.b/value.d: 0.0;
 		  else
 		    value.d *= *weights.b;
@@ -4676,16 +4676,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = w.d = 0.0;
 		do {
-		  temp.d = *src.w; /* data value */
+		  temp.d = *src.w; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? *weights.w/value.d: 0.0;
 		  else
 		    value.d *= *weights.w;
@@ -4701,16 +4701,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = w.d = 0.0;
 		do {
-		  temp.d = *src.l; /* data value */
+		  temp.d = *src.l; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? *weights.l/value.d: 0.0;
 		  else
 		    value.d *= *weights.l;
@@ -4726,16 +4726,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = w.d = 0.0;
 		do {
-		  temp.d = *src.q; /* data value */
+		  temp.d = *src.q; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? *weights.q/value.d: 0.0;
 		  else
 		    value.d *= *weights.q;
@@ -4753,7 +4753,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sum.d = w.d = 0.0;
                   do {
                     if (!isnan(*src.f) && !isnan(*weights.f)) {
-                      temp.d = *src.f; /* data value */
+                      temp.d = *src.f; // data value
                       value.d = 1.0;
                       for (i = 0; i < nbase; i++) {
                         if (present[i])
@@ -4763,7 +4763,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       // we now have the data value to the given
                       // unsigned power.  add in the exponent sign and
                       // the weight
-                      if (psign == -1) /* negative exponent: must divide */
+                      if (psign == -1) // negative exponent: must divide
                         value.d = value.d? *weights.f/value.d: 0.0;
                       else
                         value.d *= *weights.f;
@@ -4779,7 +4779,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d = w.d = 0.0;
                   do {
-                    temp.d = *src.f; /* data value */
+                    temp.d = *src.f; // data value
                     value.d = 1.0;
                     for (i = 0; i < nbase; i++) {
                       if (present[i])
@@ -4789,7 +4789,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     // we now have the data value to the given
                     // unsigned power.  add in the exponent sign and
                     // the weight
-                    if (psign == -1) /* negative exponent: must divide */
+                    if (psign == -1) // negative exponent: must divide
                       value.d = value.d? *weights.f/value.d: 0.0;
                     else
                       value.d *= *weights.f;
@@ -4808,16 +4808,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sum.d = w.d = 0.0;
                   do {
                     if (!isnan(*src.d) && !isnan(*weights.d)) {
-                      temp.d = *src.d; /* data value */
+                      temp.d = *src.d; // data value
                       value.d = 1.0;
                       for (i = 0; i < nbase; i++) {
                         if (present[i])
                           value.d *= temp.d;
                         temp.d *= temp.d;
                       }
-                      /* we now have the data value to the given unsigned power */
-                      /* add in the exponent sign and the weight */
-                      if (psign == -1) /* negative exponent: must divide */
+                      // we now have the data value to the given unsigned power
+                      // add in the exponent sign and the weight
+                      if (psign == -1) // negative exponent: must divide
                         value.d = value.d? *weights.d/value.d: 0.0;
                       else
                         value.d *= *weights.d;
@@ -4833,16 +4833,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d = w.d = 0.0;
                   do {
-                    temp.d = *src.d; /* data value */
+                    temp.d = *src.d; // data value
                     value.d = 1.0;
                     for (i = 0; i < nbase; i++) {
                       if (present[i])
                         value.d *= temp.d;
                       temp.d *= temp.d;
                     }
-                    /* we now have the data value to the given unsigned power */
-                    /* add in the exponent sign and the weight */
-                    if (psign == -1) /* negative exponent: must divide */
+                    // we now have the data value to the given unsigned power
+                    // add in the exponent sign and the weight
+                    if (psign == -1) // negative exponent: must divide
                       value.d = value.d? *weights.d/value.d: 0.0;
                     else
                       value.d *= *weights.d;
@@ -4855,7 +4855,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_CFLOAT:
 	  do {
@@ -4866,20 +4866,20 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      valuecf.real = 1.0;
 	      valuecf.imaginary = 0.0;
 	      for (i = 0; i < nbase; i++) {
-		if (present[i]) { /* valuecf *= tempcf */
+		if (present[i]) { // valuecf *= tempcf
 		  temp2f = valuecf.real*tempcf.real
 		    - valuecf.imaginary*tempcf.imaginary;
 		  valuecf.imaginary = valuecf.real*tempcf.imaginary
 		    + valuecf.imaginary*tempcf.real;
 		  valuecf.real = temp2f;
 		}
-		/* replace tempcf with tempcf*tempcf */
+		// replace tempcf with tempcf*tempcf
 		temp2f = tempcf.real*tempcf.real
 		  - tempcf.imaginary*tempcf.imaginary;
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { // replace valuecf by *weights.f/valuecf
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -4921,20 +4921,20 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (i = 0; i < nbase; i++) {
-		    if (present[i]) { /* valuecd *= tempcd */
+		    if (present[i]) { // valuecd *= tempcd
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { // replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -4974,20 +4974,20 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (i = 0; i < nbase; i++) {
-		    if (present[i]) { /* valuecd *= tempcd */
+		    if (present[i]) { // valuecd *= tempcd
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { // replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -5018,10 +5018,10 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		trgt.cd++;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
-      }	/* end of switch (outtype) */
-    } else {			/* unweighted power summation */
+      }	// end of switch (outtype)
+    } else {			// unweighted power summation
 #if DEBUG_VOCAL
       debugout("unweighted power summation");
 #endif
@@ -5032,16 +5032,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.l = 0.0;
 		do {
-		  temp.l = *src.b; /* data value */
+		  temp.l = *src.b; // data value
 		  value.l = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.l *= temp.l;
 		    temp.l *= temp.l;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5052,16 +5052,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.l = 0.0;
 		do {
-		  temp.l = *src.w; /* data value */
+		  temp.l = *src.w; // data value
 		  value.l = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.l *= temp.l;
 		    temp.l *= temp.l;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5072,23 +5072,23 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.l = 0.0;
 		do {
-		  temp.l = *src.l; /* data value */
+		  temp.l = *src.l; // data value
 		  value.l = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.l *= temp.l;
 		    temp.l *= temp.l;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.l = value.l? 1.0/value.l: 0.0;
 		  sum.l += value.l;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.l++ = mean? sum.l/n: sum.l;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_INT64:
 	  switch (type) {
@@ -5096,16 +5096,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = 0.0;
 		do {
-		  temp.q = *src.b; /* data value */
+		  temp.q = *src.b; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5116,16 +5116,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = 0.0;
 		do {
-		  temp.q = *src.w; /* data value */
+		  temp.q = *src.w; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5136,16 +5136,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = 0.0;
 		do {
-		  temp.q = *src.l; /* data value */
+		  temp.q = *src.l; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5156,23 +5156,23 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.q = 0.0;
 		do {
-		  temp.q = *src.q; /* data value */
+		  temp.q = *src.q; // data value
 		  value.q = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.q *= temp.q;
 		    temp.q *= temp.q;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.q = value.q? 1.0/value.q: 0.0;
 		  sum.q += value.q;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
 		*trgt.q++ = mean? sum.q/n: sum.q;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_FLOAT:
 	  switch (type) {
@@ -5180,16 +5180,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = 0.0;
 		do {
-		  temp.f = *src.b; /* data value */
+		  temp.f = *src.b; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5200,16 +5200,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = 0.0;
 		do {
-		  temp.f = *src.w; /* data value */
+		  temp.f = *src.w; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5220,16 +5220,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = 0.0;
 		do {
-		  temp.f = *src.l; /* data value */
+		  temp.f = *src.l; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5240,16 +5240,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.f = 0.0;
 		do {
-		  temp.f = *src.q; /* data value */
+		  temp.f = *src.q; // data value
 		  value.f = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.f *= temp.f;
 		    temp.f *= temp.f;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.f = value.f? 1.0/value.f: 0.0;
 		  sum.f += value.f;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5263,7 +5263,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   size_t w = 0;
                   do {
                     if (!isnan(*src.f)) {
-                      temp.f = *src.f; /* data value */
+                      temp.f = *src.f; // data value
                       value.f = 1.0;
                       for (i = 0; i < nbase; i++) {
                         if (present[i])
@@ -5273,7 +5273,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       // we now have the data value to the given
                       // unsigned power.  add in the exponent sign and
                       // the weight
-                      if (psign == -1) /* negative exponent: must divide */
+                      if (psign == -1) // negative exponent: must divide
                         value.f = value.f? 1.0/value.f: 0.0;
                       sum.f += value.f;
                       ++w;
@@ -5285,16 +5285,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.f = 0.0;
                   do {
-                    temp.f = *src.f; /* data value */
+                    temp.f = *src.f; // data value
                     value.f = 1.0;
                     for (i = 0; i < nbase; i++) {
                       if (present[i])
                         value.f *= temp.f;
                       temp.f *= temp.f;
                     }
-                    /* we now have the data value to the given unsigned power */
-                    /* add in the exponent sign and the weight */
-                    if (psign == -1) /* negative exponent: must divide */
+                    // we now have the data value to the given unsigned power
+                    // add in the exponent sign and the weight
+                    if (psign == -1) // negative exponent: must divide
                       value.f = value.f? 1.0/value.f: 0.0;
                     sum.f += value.f;
                   } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5302,7 +5302,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_DOUBLE:
 	  switch (type) {
@@ -5310,16 +5310,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = 0.0;
 		do {
-		  temp.d = *src.b; /* data value */
+		  temp.d = *src.b; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5330,16 +5330,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = 0.0;
 		do {
-		  temp.d = *src.w; /* data value */
+		  temp.d = *src.w; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5350,16 +5350,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = 0.0;
 		do {
-		  temp.d = *src.l; /* data value */
+		  temp.d = *src.l; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5370,16 +5370,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      do {
 		sum.d = 0.0;
 		do {
-		  temp.d = *src.q; /* data value */
+		  temp.d = *src.q; // data value
 		  value.d = 1.0;
 		  for (i = 0; i < nbase; i++) {
 		    if (present[i])
 		      value.d *= temp.d;
 		    temp.d *= temp.d;
 		  }
-		  /* we now have the data value to the given unsigned power */
-		  /* add in the exponent sign and the weight */
-		  if (psign == -1) /* negative exponent: must divide */
+		  // we now have the data value to the given unsigned power
+		  // add in the exponent sign and the weight
+		  if (psign == -1) // negative exponent: must divide
 		    value.d = value.d? 1.0/value.d: 0.0;
 		  sum.d += value.d;
 		} while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5393,16 +5393,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   size_t w = 0;
                   do {
                     if (!isnan(*src.f)) {
-                      temp.d = *src.f; /* data value */
+                      temp.d = *src.f; // data value
                       value.d = 1.0;
                       for (i = 0; i < nbase; i++) {
                         if (present[i])
                           value.d *= temp.d;
                         temp.d *= temp.d;
                       }
-                      /* we now have the data value to the given unsigned power */
-                      /* add in the exponent sign and the weight */
-                      if (psign == -1) /* negative exponent: must divide */
+                      // we now have the data value to the given unsigned power
+                      // add in the exponent sign and the weight
+                      if (psign == -1) // negative exponent: must divide
                         value.d = value.d? 1.0/value.d: 0.0;
                       sum.d += value.d;
                       ++w;
@@ -5414,16 +5414,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d = 0.0;
                   do {
-                    temp.d = *src.f; /* data value */
+                    temp.d = *src.f; // data value
                     value.d = 1.0;
                     for (i = 0; i < nbase; i++) {
                       if (present[i])
                         value.d *= temp.d;
                       temp.d *= temp.d;
                     }
-                    /* we now have the data value to the given unsigned power */
-                    /* add in the exponent sign and the weight */
-                    if (psign == -1) /* negative exponent: must divide */
+                    // we now have the data value to the given unsigned power
+                    // add in the exponent sign and the weight
+                    if (psign == -1) // negative exponent: must divide
                       value.d = value.d? 1.0/value.d: 0.0;
                     sum.d += value.d;
                   } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5438,16 +5438,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   size_t w = 0;
                   do {
                     if (!isnan(*src.d)) {
-                      temp.d = *src.d; /* data value */
+                      temp.d = *src.d; // data value
                       value.d = 1.0;
                       for (i = 0; i < nbase; i++) {
                         if (present[i])
                           value.d *= temp.d;
                         temp.d *= temp.d;
                       }
-                      /* we now have the data value to the given unsigned power */
-                      /* add in the exponent sign and the weight */
-                      if (psign == -1) /* negative exponent: must divide */
+                      // we now have the data value to the given unsigned power
+                      // add in the exponent sign and the weight
+                      if (psign == -1) // negative exponent: must divide
                         value.d = value.d? 1.0/value.d: 0.0;
                       sum.d += value.d;
                       ++w;
@@ -5459,16 +5459,16 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d = 0.0;
                   do {
-                    temp.d = *src.d; /* data value */
+                    temp.d = *src.d; // data value
                     value.d = 1.0;
                     for (i = 0; i < nbase; i++) {
                       if (present[i])
                         value.d *= temp.d;
                       temp.d *= temp.d;
                     }
-                    /* we now have the data value to the given unsigned power */
-                    /* add in the exponent sign and the weight */
-                    if (psign == -1) /* negative exponent: must divide */
+                    // we now have the data value to the given unsigned power
+                    // add in the exponent sign and the weight
+                    if (psign == -1) // negative exponent: must divide
                       value.d = value.d? 1.0/value.d: 0.0;
                     sum.d += value.d;
                   } while ((done = advanceLoop(&srcinfo, &src)) < srcinfo.naxes);
@@ -5476,7 +5476,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 } while (done < srcinfo.rndim);
               }
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
 	case LUX_CFLOAT:
 	  do {
@@ -5487,20 +5487,20 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 	      valuecf.real = 1.0;
 	      valuecf.imaginary = 0.0;
 	      for (i = 0; i < nbase; i++) {
-		if (present[i]) { /* valuecf *= tempcf */
+		if (present[i]) { // valuecf *= tempcf
 		  temp2f = valuecf.real*tempcf.real
 		    - valuecf.imaginary*tempcf.imaginary;
 		  valuecf.imaginary = valuecf.real*tempcf.imaginary
 		    + valuecf.imaginary*tempcf.real;
 		  valuecf.real = temp2f;
 		}
-		/* replace tempcf with tempcf*tempcf */
+		// replace tempcf with tempcf*tempcf
 		temp2f = tempcf.real*tempcf.real
 		  - tempcf.imaginary*tempcf.imaginary;
 		tempcf.imaginary = 2*tempcf.real*tempcf.imaginary;
 		tempcf.real = temp2f;
 	      }
-	      if (psign == -1) { /* replace valuecf by *weights.f/valuecf */
+	      if (psign == -1) { // replace valuecf by *weights.f/valuecf
 		temp2f = valuecf.real*valuecf.real
 		  + valuecf.imaginary*valuecf.imaginary;
 		if (temp2f) {
@@ -5533,20 +5533,20 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (i = 0; i < nbase; i++) {
-		    if (present[i]) { /* valuecd *= tempcd */
+		    if (present[i]) { // valuecd *= tempcd
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { // replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -5577,20 +5577,20 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		  valuecd.real = 1.0;
 		  valuecd.imaginary = 0.0;
 		  for (i = 0; i < nbase; i++) {
-		    if (present[i]) { /* valuecd *= tempcd */
+		    if (present[i]) { // valuecd *= tempcd
 		      temp2d = valuecd.real*tempcd.real
 			- valuecd.imaginary*tempcd.imaginary;
 		      valuecd.imaginary = valuecd.real*tempcd.imaginary
 			+ valuecd.imaginary*tempcd.real;
 		      valuecd.real = temp2d;
 		    }
-		    /* replace tempcd with tempcd*tempcd */
+		    // replace tempcd with tempcd*tempcd
 		    temp2d = tempcd.real*tempcd.real
 		      - tempcd.imaginary*tempcd.imaginary;
 		    tempcd.imaginary = 2*tempcd.real*tempcd.imaginary;
 		    tempcd.real = temp2d;
 		  }
-		  if (psign == -1) { /* replace valuecd by *weights.f/valuecd */
+		  if (psign == -1) { // replace valuecd by *weights.f/valuecd
 		    temp2d = valuecd.real*valuecd.real
 		      + valuecd.imaginary*valuecd.imaginary;
 		    if (temp2d) {
@@ -5612,11 +5612,11 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 		trgt.cd++;
 	      } while (done < srcinfo.rndim);
 	      break;
-	  } /* end of switch (type) */
+	  } // end of switch (type)
 	  break;
-      }	/* end of switch (outtype) */
-    } /* end of if (haveWeights) else */
-  } /* end of if (p == 1) else */
+      }	// end of switch (outtype)
+    } // end of if (haveWeights) else
+  } // end of if (p == 1) else
 
 #if DEBUG_VOCAL
   debugout("zapping <haveWeights>");
@@ -5628,19 +5628,19 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
   return result;
 }
 #undef DEBUG_VOCAL
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_total(int32_t narg, int32_t ps[])
  {
    return total(narg, ps, 0);
  }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_mean(int32_t narg, int32_t ps[])
  {
    return total(narg, ps, 1);
  }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_sin(double real, double imaginary)
-/* complex sine */
+// complex sine
 {
   doubleComplex	result;
 
@@ -5648,9 +5648,9 @@ doubleComplex c_sin(double real, double imaginary)
   result.imaginary = cos(real)*sinh(imaginary);
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_cos(double real, double imaginary)
-/* complex cosine */
+// complex cosine
 {
   doubleComplex	result;
 
@@ -5658,9 +5658,9 @@ doubleComplex c_cos(double real, double imaginary)
   result.imaginary = -sin(real)*sinh(imaginary);
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_tan(double real, double imaginary)
-/* complex tangent */
+// complex tangent
 {
   doubleComplex result;
   double	factor;
@@ -5670,9 +5670,9 @@ doubleComplex c_tan(double real, double imaginary)
   result.imaginary = sinh(2*imaginary)*factor;
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_arcsin(double real, double imaginary)
-/* complex arc sine */
+// complex arc sine
 {
   double	a, b, c, d;
   doubleComplex	result;
@@ -5688,9 +5688,9 @@ doubleComplex c_arcsin(double real, double imaginary)
   result.imaginary = log(a + sqrt(a*a - 1));
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_arccos(double real, double imaginary)
-/* complex arc cosine */
+// complex arc cosine
 {
   double	a, b, c, d;
   doubleComplex	result;
@@ -5706,9 +5706,9 @@ doubleComplex c_arccos(double real, double imaginary)
   result.imaginary = -log(a + sqrt(a*a - 1));
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_arctan(double real, double imaginary)
-/* complex arc tangent */
+// complex arc tangent
 {
   double	a, b;
   doubleComplex	result;
@@ -5722,9 +5722,9 @@ doubleComplex c_arctan(double real, double imaginary)
   result.imaginary = 0.25*log(a/b);
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_sinh(double real, double imaginary)
-/* complex hyperbolic sine */
+// complex hyperbolic sine
 {
   doubleComplex	result;
 
@@ -5732,9 +5732,9 @@ doubleComplex c_sinh(double real, double imaginary)
   result.imaginary = cosh(real)*sin(imaginary);
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_cosh(double real, double imaginary)
-/* complex hyperbolic cosine */
+// complex hyperbolic cosine
 {
   doubleComplex	result;
 
@@ -5742,9 +5742,9 @@ doubleComplex c_cosh(double real, double imaginary)
   result.imaginary = sinh(real)*sin(imaginary);
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_tanh(double real, double imaginary)
-/* complex hyperbolic tangent */
+// complex hyperbolic tangent
 {
   double	factor;
   doubleComplex	result;
@@ -5754,9 +5754,9 @@ doubleComplex c_tanh(double real, double imaginary)
   result.imaginary = sin(2*imaginary)*factor;
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_log(double real, double imaginary)
-/* complex logarithm */
+// complex logarithm
 {
   doubleComplex	result;
 
@@ -5764,9 +5764,9 @@ doubleComplex c_log(double real, double imaginary)
   result.imaginary = atan2(imaginary, real);
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 doubleComplex c_exp(double real, double imaginary)
-/* complex exponential */
+// complex exponential
 {
   double	r;
   doubleComplex	result;
@@ -5776,261 +5776,261 @@ doubleComplex c_exp(double real, double imaginary)
   result.imaginary = r*sin(imaginary);
   return result;
 }
-/*------------------------------------------------------------------------- */
-/*------------------------------------------------------------------------- */
-/*------------------------------------------------------------------------- */
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 /*math functions with 1 argument, all just call math_funcs with approiate
 code, all have names of form lux_xxx... */
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_sin(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SIN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_cos(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_COS);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_tan(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_TAN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_asin(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ASIN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_acos(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ACOS);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_atan(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ATAN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_sinh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SINH);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_cosh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_COSH);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_tanh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_TANH);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_asinh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ASINH);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_acosh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ACOSH);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_atanh(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ATANH);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_sqrt(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SQRT);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_cbrt(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_CBRT);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_exp(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_EXP);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_expm1(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_EXPM1);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_log(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_log10(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG10);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_log1p(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG1P);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_erf(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ERF);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_erfc(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ERFC);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_atan2(int32_t narg, int32_t ps[])
-/*the right way to do atan's, the atan2 function, 2 arguments */
+//the right way to do atan's, the atan2 function, 2 arguments
 {
   return math_funcs_2f(ps[0], ps[1], F_ATAN2);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_j0(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_J0);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_j1(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_J1);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_jn(int32_t narg, int32_t ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_JN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_y0(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_Y0);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_y1(int32_t narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_Y1);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_yn(int32_t narg, int32_t ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_YN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_pow(int32_t narg, int32_t ps[])
 {
   return math_funcs_2f(ps[0], ps[1], F_POW);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_voigt(int32_t narg, int32_t ps[])
-/* the voigt function.  LS */
+// the voigt function.  LS
 {
   return math_funcs_2f(ps[0], ps[1], F_VOIGT);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_gamma(int32_t narg, int32_t ps[])
-/* returns the gamma function - or the natural logarithm of it (if keyword */
-/* /LOG is present)  LS 11jan96 */
+// returns the gamma function - or the natural logarithm of it (if keyword
+// /LOG is present)  LS 11jan96
 {
   return math_funcs(ps[0], (internalMode & 1)? F_LOGGAMMA: F_GAMMA);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_beta(int32_t narg, int32_t ps[])
-/* the beta function: beta(x,y) = gamma(x)*gamma(y)/gamma(x+y). */
-/* Switch /COMPLEMENT returns one minus the beta function. */
-/* LS 11jan96 22jul96 */
+// the beta function: beta(x,y) = gamma(x)*gamma(y)/gamma(x+y).
+// Switch /COMPLEMENT returns one minus the beta function.
+// LS 11jan96 22jul96
 {
   return math_funcs_2f(ps[0], ps[1], (internalMode & 1)? F_LOGBETA: F_BETA);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_incomplete_gamma(int32_t narg, int32_t ps[])
-/* the incomplete gamma function P(a,x).  LS 11jan96 */
+// the incomplete gamma function P(a,x).  LS 11jan96
 {
   return math_funcs_2f(ps[0], ps[1], F_IGAMMA);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_chi_square(int32_t narg, int32_t ps[])
-/* the chi-square function chi2(chi2, nu).  LS 11jan96 19oct96 */
+// the chi-square function chi2(chi2, nu).  LS 11jan96 19oct96
 {
   return math_funcs_2f(ps[0], ps[1], F_CHI2);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_noncentral_chi_square(int32_t narg, int32_t ps[])
-/* the noncentral chi-squre function ncchi2(chi2, nu, nc) */
+// the noncentral chi-squre function ncchi2(chi2, nu, nc)
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_NCCHI2);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_bessel_i0(int32_t narg, int32_t ps[])
-/* the modified bessel function I0 */
+// the modified bessel function I0
 {
   return math_funcs(ps[0], F_I0);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_bessel_i1(int32_t narg, int32_t ps[])
-/* the modified bessel function I1 */
+// the modified bessel function I1
 {
   return math_funcs(ps[0], F_I1);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_bessel_k0(int32_t narg, int32_t ps[])
-/* the modified bessel function K0 */
+// the modified bessel function K0
 {
   return math_funcs(ps[0], F_K0);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_bessel_k1(int32_t narg, int32_t ps[])
-/* the modified bessel function K1 */
+// the modified bessel function K1
 {
   return math_funcs(ps[0], F_K1);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_bessel_kn(int32_t narg, int32_t ps[])
-/* the modified bessel function Kn */
+// the modified bessel function Kn
 {
   return math_funcs_i_f(ps[0], ps[1], F_KN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_sgn(int32_t narg, int32_t ps[])
-/* the signum function: returns +1 if the argument is positive, -1 if */
-/* negative, and 0 if zero.  LS 19may98 */
+// the signum function: returns +1 if the argument is positive, -1 if
+// negative, and 0 if zero.  LS 19may98
 {
   return math_funcs(ps[0], F_SGN);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_incomplete_beta(int32_t narg, int32_t ps[])
-/* the incomplete beta function I_x(a,b).  LS 15jan96 */
+// the incomplete beta function I_x(a,b).  LS 15jan96
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_IBETA);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_student(int32_t narg, int32_t ps[])
-/* Student's t-distribution.  LS 15jan96 */
+// Student's t-distribution.  LS 15jan96
 {
   return math_funcs_2f(ps[0], ps[1], F_STUDENT);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t lux_f_ratio(int32_t narg, int32_t ps[])
-/* F variance ratio.  LS 15jan96 */
+// F variance ratio.  LS 15jan96
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_FRATIO);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t math_funcs(int32_t nsym, int32_t code)
-     /*general program for floating point functions */
+     //general program for floating point functions
 {
   int32_t	n, result, type, out_type;
   Pointer	trgt, src;
   doubleComplex	value;
 
-  errno = 0;			/* or "old" errors might get reported */
+  errno = 0;			// or "old" errors might get reported
   type = symbol_type(nsym);
   if (isComplexType(type) && !*func_c[code])
     return cerror(ILL_TYPE, nsym, typeName(type));
@@ -6039,7 +6039,7 @@ int32_t math_funcs(int32_t nsym, int32_t code)
      clone in <result> with its data type equal to the greater of
      <nsym>'s and LUX_FLOAT and return its pointer in <trgt>. */
   if (getNumerical(nsym, LUX_FLOAT, &n, &src, GN_UPGRADE, &result, &trgt) < 0)
-    return LUX_ERROR;		/* result */
+    return LUX_ERROR;		// result
   out_type = symbol_type(result);
   /*addresses and count set up, now do the calculations in a loop determined
     by input and output types, only certain combinations possible */
@@ -6097,7 +6097,7 @@ int32_t math_funcs(int32_t nsym, int32_t code)
       }
       break;
     case LUX_CFLOAT:
-      /* input type must be CFLOAT, too */
+      // input type must be CFLOAT, too
       while (n--) {
 	value = (*func_c[code])(src.cf->real, src.cf->imaginary);
 	trgt.cf->real = value.real;
@@ -6106,7 +6106,7 @@ int32_t math_funcs(int32_t nsym, int32_t code)
       }
       break;
     case LUX_CDOUBLE:
-      /* input type is CDOUBLE, too */
+      // input type is CDOUBLE, too
       while (n--) {
 	value = (*func_c[code])(src.cd->real, src.cd->imaginary);
 	trgt.cd->real = value.real;
@@ -6116,12 +6116,12 @@ int32_t math_funcs(int32_t nsym, int32_t code)
       break;
   }
   return result;
-}						/*end of math_funcs */
-/*------------------------------------------------------------------------- */
+}						//end of math_funcs
+//-------------------------------------------------------------------------
 int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
-/*general program for floating point functions with 2 floating arguments */
-/*messier than the 1 argument case but not as bad as binary ops routines */
-/*assumes that the function requires double arguments (most C functions) */
+//general program for floating point functions with 2 floating arguments
+//messier than the 1 argument case but not as bad as binary ops routines
+//assumes that the function requires double arguments (most C functions)
 {
   int32_t	n1, n2, nelem, i, result_sym, type1, type2;
   Symboltype out_type;
@@ -6170,7 +6170,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
   if (n1 > 1
       || n2 > 1
       || symbol_class(nsym1) == LUX_ARRAY
-      || symbol_class(nsym2) == LUX_ARRAY) { /* need an array for output */
+      || symbol_class(nsym2) == LUX_ARRAY) { // need an array for output
     result_sym = 0;
     if (isFreeTemp(nsym1)
 	&& symbol_class(nsym1) == LUX_ARRAY
@@ -6198,12 +6198,12 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
 	result_sym = array_clone(nsym1, out_type);
     }
     trgt.l = (int32_t*) array_data(result_sym);
-  } else {			/* a scalar will do */
+  } else {			// a scalar will do
     result_sym = scalar_scratch(out_type);
     trgt.l = &scalar_value(result_sym).l;
   }
 
-  if (n1 == n2) {		/* advance both argument pointers */
+  if (n1 == n2) {		// advance both argument pointers
     switch (type1) {
       case LUX_INT8:
 	switch (type2) {
@@ -6374,7 +6374,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
 	}
 	break;
     }
-  } else if (n1 > n2) {		/* nsym1 pointer is advanced, but not nsym2 */
+  } else if (n1 > n2) {		// nsym1 pointer is advanced, but not nsym2
     switch (type2) {
       case LUX_INT8:
 	value = *src2.b;
@@ -6449,7 +6449,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
 	    *trgt.d++ = (*func_dd[code])(*src1.d++, value);
 	  break;
       }
-  } else {			/* nsym2 pointer is advanced, but not nsym1 */
+  } else {			// nsym2 pointer is advanced, but not nsym1
     switch (type1) {
       case LUX_INT8:
 	value = *src1.b;
@@ -6527,10 +6527,10 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
   }
   return result_sym;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
-/*general program for floating point functions with int32_t and float arguments */
-/*assumes that the function requires double arguments (most C functions) */
+//general program for floating point functions with int32_t and float arguments
+//assumes that the function requires double arguments (most C functions)
 {
   int32_t	n1, n2, nelem, i, result_sym, type1, type2, valuei;
   Symboltype out_type;
@@ -6555,7 +6555,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
   type1 = symbol_type(nsym1);
   type2 = symbol_type(nsym2);
 
-  /* the output symbol is DOUBLE if <nsym2> is DOUBLE, and FLOAT otherwise */
+  // the output symbol is DOUBLE if <nsym2> is DOUBLE, and FLOAT otherwise
   if (type2 == LUX_DOUBLE)
     out_type = LUX_DOUBLE;
   else
@@ -6578,7 +6578,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
   if (n1 > 1
       || n2 > 1
       || symbol_class(nsym1) == LUX_ARRAY
-      || symbol_class(nsym2) == LUX_ARRAY) { /* need an array for output */
+      || symbol_class(nsym2) == LUX_ARRAY) { // need an array for output
     result_sym = 0;
     if (isFreeTemp(nsym1)
 	&& symbol_class(nsym1) == LUX_ARRAY
@@ -6602,12 +6602,12 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
     if (!result_sym)
       result_sym = array_clone(i, out_type);
     trgt.l = (int32_t*) array_data(result_sym);
-  } else {			/* a scalar will do */
+  } else {			// a scalar will do
     result_sym = scalar_scratch(out_type);
     trgt.l = &scalar_value(result_sym).l;
   }
 
-  if (n1 == n2) {		/* advance both argument pointers */
+  if (n1 == n2) {		// advance both argument pointers
     switch (type1) {
       case LUX_INT8:
 	switch (type2) {
@@ -6778,7 +6778,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
 	}
 	break;
     }
-  } else if (n1 > n2) {		/* nsym1 pointer is advanced, but not nsym2 */
+  } else if (n1 > n2) {		// nsym1 pointer is advanced, but not nsym2
     switch (type2) {
       case LUX_INT8:
 	valuei = *src2.b;
@@ -6853,7 +6853,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
 	    *trgt.d++ = (*func_id[code])(*src1.d++, valuei);
 	  break;
       }
-  } else {			/* nsym2 pointer is advanced, but not nsym1 */
+  } else {			// nsym2 pointer is advanced, but not nsym1
     switch (type1) {
       case LUX_INT8:
 	valued = *src1.b;
@@ -6930,16 +6930,16 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
       }
   }
   return result_sym;
-}						/*end of math_funcs_i_f */
-/*------------------------------------------------------------------------- */
+}						//end of math_funcs_i_f
+//-------------------------------------------------------------------------
 int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
-/* mathematical function with three arguments.  This code goes for */
-/* conciseness, not for speed.  It is assumed that the calculation */
-/* of the actual mathematical function takes more time than */
-/* looping through the input does.  At the moment, each of the three */
-/* arguments may be a LUX_SCALAR or an LUX_ARRAY.  Any arrays must all have */
-/* the same number of elements.  The dimensional structures are not */
-/* checked.  LS 15jan96 */
+// mathematical function with three arguments.  This code goes for
+// conciseness, not for speed.  It is assumed that the calculation
+// of the actual mathematical function takes more time than
+// looping through the input does.  At the moment, each of the three
+// arguments may be a LUX_SCALAR or an LUX_ARRAY.  Any arrays must all have
+// the same number of elements.  The dimensional structures are not
+// checked.  LS 15jan96
 {
   int32_t	n1, n2, n3, iq, n, step1, step2, step3;
   Symboltype type1, type2, type3, type;
@@ -6947,24 +6947,24 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
   double	val1, val2, val3, val;
 
   errno = 0;
-  /* get sizes and pointers */
+  // get sizes and pointers
   if (getNumerical(sym1, LUX_INT8, &n1, &src1, 0, NULL, NULL) < 0
       || getNumerical(sym2, LUX_INT8, &n2, &src2, 0, NULL, NULL) < 0
       || getNumerical(sym3, LUX_INT8, &n3, &src3, 0, NULL, NULL) < 0) 
     return LUX_ERROR;
-				/* crude check on sizes */
+				// crude check on sizes
   if ((n1 != n2 && n1 > 1 && n2 > 1)
       || (n1 != n3 && n1 > 1 && n3 > 1)
       || (n2 != n3 && n2 > 1 && n3 > 1))
     return cerror(INCMP_DIMS, sym2);
 
-  type1 = symbol_type(sym1);	/* get data types */
+  type1 = symbol_type(sym1);	// get data types
   type2 = symbol_type(sym2);
   type3 = symbol_type(sym3);
-  type = (type1 == LUX_DOUBLE	/* get output type (at least LUX_FLOAT) */
+  type = (type1 == LUX_DOUBLE	// get output type (at least LUX_FLOAT)
 	  || type2 == LUX_DOUBLE
 	  || type3 == LUX_DOUBLE)? LUX_DOUBLE: LUX_FLOAT;
-  if (n1 > 1) {			/* get output symbol */
+  if (n1 > 1) {			// get output symbol
     iq = array_clone(sym1, type);
     n = n1;
   } else if (n2 > 1) {
@@ -6979,15 +6979,15 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
     iq = scalar_scratch(type);
     n = 1;
   }
-  if (symbol_class(iq) == LUX_SCALAR) /* get pointer to output data */
+  if (symbol_class(iq) == LUX_SCALAR) // get pointer to output data
     trgt.b =  &scalar_value(iq).b;
   else
     trgt.b = (uint8_t *) array_data(iq);
-  step1 = (n1 == 1)? 0: lux_type_size[type1]; /* get step sizes */
+  step1 = (n1 == 1)? 0: lux_type_size[type1]; // get step sizes
   step2 = (n2 == 1)? 0: lux_type_size[type2];
   step3 = (n3 == 1)? 0: lux_type_size[type3];
-  /* if any of the arguments has only one element, then evaluate that */
-  /* element once. */
+  // if any of the arguments has only one element, then evaluate that
+  // element once.
   if (!step1)
     switch (type1) {
       case LUX_INT8:
@@ -7051,8 +7051,8 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
 	val3 = (double) *src3.d;
 	break;
     }
-  while (n--) {			/* loop over all elements */
-    if (step1) {		/* new element */
+  while (n--) {			// loop over all elements
+    if (step1) {		// new element
       switch (type1) {
 	case LUX_INT8:
 	  val1 = (double) *src1.b;
@@ -7120,15 +7120,15 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
       }
       src3.b += step3;
     }
-    val = (*func_ddd[code])(val1, val2, val3); /* get function value */
-    if (type == LUX_FLOAT)		/* store result */
+    val = (*func_ddd[code])(val1, val2, val3); // get function value
+    if (type == LUX_FLOAT)		// store result
       *trgt.f++ = (float) val;
     else
       *trgt.d++ = val;
   }
   return iq;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double voigt(double a, double v)
 {
     double	anhs, avsd, sumb, avss;
@@ -7163,11 +7163,11 @@ double voigt(double a, double v)
       if (sumb < 1e-6) break; }
     return a/(2*M_PI*avss) + a/M_PI*sum + p2;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double loggamma(double x)
-/* returns the natural logarithm of the absolute value of the gamma */
-/* function at ordinate <x>. */
-/* Uses the approximation of Lanczos.   LS 11jan96 22jul96 */
+// returns the natural logarithm of the absolute value of the gamma
+// function at ordinate <x>.
+// Uses the approximation of Lanczos.   LS 11jan96 22jul96
 {
   static double	a[6] =
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
@@ -7191,9 +7191,9 @@ double loggamma(double x)
     y = 1.14472988584940017 - y - log(fabs(sin(x*M_PI)));
   return y;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double gamma(double x)
-/* returns the value of the gamma function at ordinate <x>.  LS 22jul96 */
+// returns the value of the gamma function at ordinate <x>.  LS 22jul96
 {
   static double	a[6] =
   { 76.18009172947146, -86.50532032941677, 24.01409824083091,
@@ -7220,12 +7220,12 @@ double gamma(double x)
     y = -y;
   return y;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double incomplete_gamma(double a, double x)
-/* returns the incomplete gamma function P(a,x) */
-/* series expansion for x < a + 1, and continued fraction for x > a + 1 */
-/* if internalMode & 1, then 1 - P(a,x) is returned. */
-/* LS 11jan96 22jul96 */
+// returns the incomplete gamma function P(a,x)
+// series expansion for x < a + 1, and continued fraction for x > a + 1
+// if internalMode & 1, then 1 - P(a,x) is returned.
+// LS 11jan96 22jul96
 {
   double	z, g, z0, c, d, tiny, aa, bb, del;
   int32_t	i;
@@ -7235,7 +7235,7 @@ double incomplete_gamma(double a, double x)
   if (!x)
     return (internalMode & 1)? 1.0: 0.0;
   c = a;
-  if (x < a + 1)		/* series */
+  if (x < a + 1)		// series
   { z = z0 = g = 1./a;
     do
     { z0 = z;
@@ -7244,16 +7244,16 @@ double incomplete_gamma(double a, double x)
     while (z0 != z);
     z = -x + a*log(x) + log(z) - loggamma(a);
     switch (internalMode & 3) {
-    case 0:			/* regular */
+    case 0:			// regular
       return exp(z);
-    case 1:			/* /COMPLEMENT */
+    case 1:			// /COMPLEMENT
       return -expm1(z);
-    case 2:			/* /LOG */
+    case 2:			// /LOG
       return z;
-    case 3:			/* /LOG,/COMPLEMENT */
+    case 3:			// /LOG,/COMPLEMENT
       return log(-expm1(z));
     }
-  } else {				/* continued fraction */
+  } else {				// continued fraction
     tiny = DBL_EPSILON*DBL_EPSILON;
     c = 1.0/tiny;
     z = d = 1.0/(x + 1 - a);
@@ -7271,53 +7271,53 @@ double incomplete_gamma(double a, double x)
       if (fabs(del - 1) < 3E-7)
 	break;
       bb += 2; }
-    z = -x + a*log(x) + log(z) - loggamma(a); /* log(1 - igamma) */
+    z = -x + a*log(x) + log(z) - loggamma(a); // log(1 - igamma)
     switch (internalMode & 3) {
-    case 0:			/* regular */
+    case 0:			// regular
       return -expm1(z);
-    case 1:			/* /COMPLEMENT */
+    case 1:			// /COMPLEMENT
       return exp(z);
-    case 2:			/* /LOG */
+    case 2:			// /LOG
       return log(-expm1(z));
-    case 3:			/* /LOG,/COMPLEMENT */
+    case 3:			// /LOG,/COMPLEMENT
       return z;
     }
   }
-  return 1.0;			/* or some compilers complain */
+  return 1.0;			// or some compilers complain
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double beta(double x, double y)
-/* returns the beta function. */
-/* LS 15jan96 22jul96 */
+// returns the beta function.
+// LS 15jan96 22jul96
 {
   return exp(loggamma(x) + loggamma(y) - loggamma(x + y));
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double logbeta(double x, double y)
-/* returns the logarithm of the beta function. */
-/* LS 15jan96 22jul96 */
+// returns the logarithm of the beta function.
+// LS 15jan96 22jul96
 {
   return loggamma(x) + loggamma(y) - loggamma(x + y);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double chi_square(double chi2, double nu)
-/* returns the chi-square function or, if internalMode & 1, its */
-/* complement.  LS 15jan95 22jul96 */
+// returns the chi-square function or, if internalMode & 1, its
+// complement.  LS 15jan95 22jul96
 {
   return incomplete_gamma(nu/2, chi2/2);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double incomplete_beta(double x, double a, double b)
-/* returns the incomplete beta function or (if internalMode & 1) its */
-/* complement or (if internalMode & 2) its natural logarithm. */
-/* LS 15jan96 5nov96 */
+// returns the incomplete beta function or (if internalMode & 1) its
+// complement or (if internalMode & 2) its natural logarithm.
+// LS 15jan96 5nov96
 {
   double	x0, tiny, c, f, d, e1, e2, e3, e4, e5, aa, del, k, g;
   char	flip;
   int32_t	j;
 
   if (a <= 0 || b <= 0)
-    return -1.0;			/* error condition */
+    return -1.0;			// error condition
   if (x == 0)
     return (internalMode & 1)? 1.0: 0.0;
   if (x == 1)
@@ -7356,20 +7356,20 @@ double incomplete_beta(double x, double a, double b)
     if (fabs(del - 1) < 3e-7)
       break;
     j++; }
-  /* we use logbeta() even if /LOG is not selected to guard against */
-  /* dividing by zero (if beta(a,b) < machine precision).  LS 30jan98 */
+  // we use logbeta() even if /LOG is not selected to guard against
+  // dividing by zero (if beta(a,b) < machine precision).  LS 30jan98
   g = a*log(x) + b*log1p(-x) - log(a) - logbeta(a,b);
-  if (internalMode & 2)		/* return natural logarithm */
+  if (internalMode & 2)		// return natural logarithm
   { f = log(f) + g;
     return (flip ^ (internalMode & 1))? log1p(-exp(f)): f; }
   else
   { f *= exp(g);
     return (flip ^ (internalMode & 1))? 1 - f: f; }
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double student(double t, double nu)
-/* returns Student's t distribution or, if internalMode & 1, its complement */
-/* or, if internalMode & 2, its natural logarithm.  LS 22jul96 5nov96 */
+// returns Student's t distribution or, if internalMode & 1, its complement
+// or, if internalMode & 2, its natural logarithm.  LS 22jul96 5nov96
 {
   double result;
 
@@ -7378,24 +7378,24 @@ double student(double t, double nu)
   internalMode ^= 1;
   return result;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double F(double F, double nu1, double nu2)
-/* returns the F-ratio function or, if internalMode & 1, its complement */
-/* LS 22jul96 */
+// returns the F-ratio function or, if internalMode & 1, its complement
+// LS 22jul96
 {
   return incomplete_beta(nu2/(nu2 + nu1*F), nu2/2, nu1/2);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double non_central_chi_square(double chi2, double nu, double lambda)
-/* returns the value of the non-central chi-square distribution for */
-/* chi-square <chi2>, <nu> degrees of freedom, and non-centrality */
-/* parameter <lambda>.  algorithm of my own devising.  LS 19oct96  */
+// returns the value of the non-central chi-square distribution for
+// chi-square <chi2>, <nu> degrees of freedom, and non-centrality
+// parameter <lambda>.  algorithm of my own devising.  LS 19oct96
 {
   double	a, b, c, d, y, c2, l2, i1, i2;
 
-  if (chi2 < 0.0 || lambda < 0.0 || nu < 0) /* all parameters must be */
-					    /* non-negative */
-    return sqrt(-1);		/* generate error */
+  if (chi2 < 0.0 || lambda < 0.0 || nu < 0) // all parameters must be
+					    // non-negative
+    return sqrt(-1);		// generate error
   l2 = lambda/2.0;
   c2 = chi2/2.0;
   i1 = 1;
@@ -7413,11 +7413,11 @@ double non_central_chi_square(double chi2, double nu, double lambda)
   while (d*3e7 > y);
   return y*exp(-l2);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double bessel_i0(double x)
-/* returns value of the modified Bessel function of order zero I0. */
-/* LS 2dec96.  uses Abramowitz & Stegun approximations. */
-/* if internalMode & 1 then returns I0(x)*exp(-x).  LS 3dec95 */
+// returns value of the modified Bessel function of order zero I0.
+// LS 2dec96.  uses Abramowitz & Stegun approximations.
+// if internalMode & 1 then returns I0(x)*exp(-x).  LS 3dec95
 {
   double	t;
   
@@ -7435,10 +7435,10 @@ double bessel_i0(double x)
        + 0.39894228)/sqrt(x);
   return (internalMode & 1)? t: t*exp(x);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double bessel_i1(double x)
-/* returns value of the modified Bessel function of order one I1. */
-/* LS 3dec96.  uses Abramowitz & Stegun approximations. */
+// returns value of the modified Bessel function of order one I1.
+// LS 3dec96.  uses Abramowitz & Stegun approximations.
 {
   double	t;
   double	sign;
@@ -7457,15 +7457,15 @@ double bessel_i1(double x)
 	       + 0.02282967)*t - 0.01031555)*t + 0.00163801)*t
 	    - 0.00362018)*t - 0.03988024)*t + 0.39894228)/sqrt(x)*exp(x)*sign;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double bessel_k0(double x)
-/* returns value of the modified Bessel function of order zero K0. */
-/* LS 3dec96.  uses Abramowitz & Stegun approximations. */
+// returns value of the modified Bessel function of order zero K0.
+// LS 3dec96.  uses Abramowitz & Stegun approximations.
 {
   double	t;
 
   if (x <= 0)
-    return sqrt(-1);		/* generate error */
+    return sqrt(-1);		// generate error
   if (x <= 2)
   { t = x/2;
     t *= t;
@@ -7477,15 +7477,15 @@ double bessel_k0(double x)
 	     - 0.01062446)*t + 0.02189568)*t - 0.07832358)*t
 	  + 1.25331414)*exp(-x)/sqrt(x);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double bessel_k1(double x)
-/* returns value of the modified Bessel function of order one K1. */
-/* LS 3dec96.  uses Abramowitz & Stegun approximations. */
+// returns value of the modified Bessel function of order one K1.
+// LS 3dec96.  uses Abramowitz & Stegun approximations.
 {
   double	t;
   
   if (x <= 0)
-    return sqrt(-1);		/* generate domain error */
+    return sqrt(-1);		// generate domain error
   if (x <= 2)
   { t = x/2;
     t *= t;
@@ -7497,16 +7497,16 @@ double bessel_k1(double x)
 	     + 0.01504268)*t - 0.03655620)*t + 0.23498619)*t
 	  + 1.25331414)*exp(-x)/sqrt(x);
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double bessel_kn(int32_t n, double x)
-/* returns value of the modified Bessel function of order n Kn. */
-/* LS 3dec96.  uses Abramowitz & Stegun approximations. */
+// returns value of the modified Bessel function of order n Kn.
+// LS 3dec96.  uses Abramowitz & Stegun approximations.
 {
   double	z, b0, b1, b2;
   int32_t	i;
 
   if (n < 2 || x <= 0)
-    return sqrt(-1);		/* generate error */
+    return sqrt(-1);		// generate error
   b1 = bessel_k0(x);
   b2 = bessel_k1(x);
   n--;
@@ -7517,10 +7517,10 @@ double bessel_kn(int32_t n, double x)
     b2 = b0 + i*b1*z; }
   return b2;
 }
-/*------------------------------------------------------------------------- */
+//-------------------------------------------------------------------------
 double sgn(double x)
-/* returns the sign of x: +1 if x > 0, -1 if x < 0, and 0 if x == 0. */
-/* LS 19may98 */
+// returns the sign of x: +1 if x > 0, -1 if x < 0, and 0 if x == 0.
+// LS 19may98
 {
   if (x > 0)
     return 1.0;

@@ -18,13 +18,13 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <errno.h> /* for errno(3) ENOMEM(2) ENOENT(1) */
-#include <malloc.h> /* for free(3) realloc(2) malloc(2) */
-#include <stddef.h> /* for NULL(9) */
-#include <stdint.h> /* for uint16_t(9) uint32_t(7) int8_t(2) */
-#include <stdio.h> /* for fread(5) printf(5) fclose(2) fopen(1) FILE(1) */
-#include <stdlib.h> /* for bsearch(1) */
-#include <string.h> /* for strdup(1) */
+#include <errno.h> // for errno(3) ENOMEM(2) ENOENT(1)
+#include <malloc.h> // for free(3) realloc(2) malloc(2)
+#include <stddef.h> // for NULL(9)
+#include <stdint.h> // for uint16_t(9) uint32_t(7) int8_t(2)
+#include <stdio.h> // for fread(5) printf(5) fclose(2) fopen(1) FILE(1)
+#include <stdlib.h> // for bsearch(1)
+#include <string.h> // for strdup(1)
 #include "hershey.hh"
 
 static uint32_t hershey_numbers_count;
@@ -184,7 +184,7 @@ int32_t hershey_coords(hershey_handle *handle, int32_t *x, int32_t *y) {
   if (*handle < 0 || *handle >= hershey_data_size)
     return HERSHEY_ERR;
 
-  if (hershey_data[*handle] == -50) { /* move */
+  if (hershey_data[*handle] == -50) { // move
     result = HERSHEY_MOVE;
     (*handle)++;
   }

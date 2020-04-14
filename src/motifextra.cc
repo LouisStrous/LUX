@@ -17,14 +17,14 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* routines that Strous needs to run Shine's Motif stuff */
+// routines that Strous needs to run Shine's Motif stuff
 #include "action.hh"
 #include <string.h>
 #include <stdlib.h>
 
 int32_t	motif_input_flag = 0;
 
-/*-------------------------------------------*/
+//-------------------------------------------
 int32_t lux_zeroifnotdefined(int32_t narg, int32_t ps[])
 /* assigns zero to the argument if the argument is undefined.
  (should replace by DEFAULT,arg,0 instead) */
@@ -39,9 +39,9 @@ int32_t lux_zeroifnotdefined(int32_t narg, int32_t ps[])
   }
   return 1;
 }
-/*-------------------------------------------*/
+//-------------------------------------------
 int32_t lux_compile_file(int32_t narg, int32_t ps[])
-/* COMPILE_FILE compiles the contents of a file at the top level */
+// COMPILE_FILE compiles the contents of a file at the top level
 {
   FILE	*fp;
   int32_t	result, nextCompileLevel(FILE *, char const*);
@@ -57,4 +57,4 @@ int32_t lux_compile_file(int32_t narg, int32_t ps[])
   fclose(fp);
   return result;
 }
-/*-------------------------------------------*/
+//-------------------------------------------

@@ -17,8 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* File orientation.c */
-/* LUX routines for determining 2D and 3D orientation. */
+// File orientation.c
+// LUX routines for determining 2D and 3D orientation.
 #include <math.h>
 #include <string.h>
 #ifdef HAVE_CONFIG_H
@@ -29,32 +29,32 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <gsl/gsl_poly.h>
 
 int32_t	lux_replace(int32_t, int32_t);
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 #define SQRT3	1.7320508075688772935
 int32_t lux_orientation(int32_t narg, int32_t ps[])
-/* determine local orientation in a two- or three-dimensional data array */
-/* Syntax: ORIENTATION,data,widths[,orientation,values,wavenumber, */
-/*                                  grid,order] */
-/* <data>   = 2D or 3D data array (input) */
-/* <widths> = Gaussian smoothing witdths for all dimensions (input) */
-/* <orientation> = orientation angle (2D) or x and y components of the */
-/*            orientation (with the z component set to unity) (3D) (output) */
-/* <values> = the eigenvalues of the "inertia" tensor (output) */
-/* <wavenumber> = wavenumber indicating characteristic scale (output) */
-/* <grid>   = dimensions of output cube.  If unspecified, then the */
-/*            output cube has the same dimensions as the input cube. */
-/* <order>  = approximation order of the discrete derivative (1 - 4) */
-/* <aspect> = aspect ratio of the pixels (2D) or the dimensions of a */
-/*            pixel (3D) */
-/* LS 24mar95 */
-/* Method:  local Fourier transforms yield local direction in least */
-/*          squares fashion.  Calculations can be performed totally */
-/*          in the spatial domain by calculating symmetric "inertia */
-/*          tensor" J and finding the eigenvector corresponding to */
-/*          the largest eigenvalue.  B. Jaehne "Digital Image */
-/*          Processing; Concepts, Algorithms, and Scientific */
-/*          Applications", 2nd edition, Springer Verlag, 1993 */
-/* see at end of file for more info on the method */
+// determine local orientation in a two- or three-dimensional data array
+// Syntax: ORIENTATION,data,widths[,orientation,values,wavenumber,
+//                                  grid,order]
+// <data>   = 2D or 3D data array (input)
+// <widths> = Gaussian smoothing witdths for all dimensions (input)
+// <orientation> = orientation angle (2D) or x and y components of the
+//            orientation (with the z component set to unity) (3D) (output)
+// <values> = the eigenvalues of the "inertia" tensor (output)
+// <wavenumber> = wavenumber indicating characteristic scale (output)
+// <grid>   = dimensions of output cube.  If unspecified, then the
+//            output cube has the same dimensions as the input cube.
+// <order>  = approximation order of the discrete derivative (1 - 4)
+// <aspect> = aspect ratio of the pixels (2D) or the dimensions of a
+//            pixel (3D)
+// LS 24mar95
+// Method:  local Fourier transforms yield local direction in least
+//          squares fashion.  Calculations can be performed totally
+//          in the spatial domain by calculating symmetric "inertia
+//          tensor" J and finding the eigenvector corresponding to
+//          the largest eigenvalue.  B. Jaehne "Digital Image
+//          Processing; Concepts, Algorithms, and Scientific
+//          Applications", 2nd edition, Springer Verlag, 1993
+// see at end of file for more info on the method
 {
   double	j11, j22, j33, j12, j13, j23, gg;
   float	*out, *comp, *widths, *data, *wave;
@@ -67,22 +67,22 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
   int32_t	order, wavenum, ndim, xdims[3];
   char	vocal, getVal, getVec, getJ, getWave, parallel;
 
-  /* First, treat input data */
-  if (narg > 2 && ps[2])	/* ORIENTATION */
+  // First, treat input data
+  if (narg > 2 && ps[2])	// ORIENTATION
     getVec = 1;
   else
     getVec = 0;
-  if (narg > 3 && ps[3])	/* VALUES */
+  if (narg > 3 && ps[3])	// VALUES
     getVal = 1;
   else
     getVal = 0;
-  if (narg > 4 && ps[4])	/* WAVENUMBER */
+  if (narg > 4 && ps[4])	// WAVENUMBER
     getWave = 1;
   else
     getWave = 0;
   if (!getVec && !getVal && !getWave)
     return luxerror("No output symbols specified - nothing to calculate", 0);
-  if (symbol_class(*ps) != LUX_ARRAY) /* DATA */
+  if (symbol_class(*ps) != LUX_ARRAY) // DATA
     return cerror(NEED_ARR, *ps);
   ndim = array_num_dims(*ps);
   if (ndim != 2 && ndim != 3)
@@ -90,7 +90,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
   dims = array_dims(*ps);
   iq = lux_float(1, ps);
   data = (float *) array_data(iq);
-  if (symbol_class(ps[1]) != LUX_ARRAY) /* WIDTHS */
+  if (symbol_class(ps[1]) != LUX_ARRAY) // WIDTHS
     return cerror(NEED_ARR, ps[1]);
   d = array_size(ps[1]);
   if (d != ndim)
@@ -100,7 +100,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
   for (i = 0; i < ndim; i++)
     if (widths[i] < 0)
       return luxerror("Need nonnegative smoothing widths", ps[1]);
-  if (narg > 5 && ps[5]) {	/* GRID */
+  if (narg > 5 && ps[5]) {	// GRID
     iq = lux_long(1, &ps[5]);
     if (array_size(iq) != ndim)
       return luxerror("Need %1d output cube dimensions", ps[5], ndim);
@@ -122,7 +122,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
     }
   } else
     memcpy(grid2, dims, ndim*sizeof(float));
-  if (narg > 6 && ps[6]) {	/* ASPECT */
+  if (narg > 6 && ps[6]) {	// ASPECT
     if (symbol_class(ps[6]) != LUX_ARRAY)
       return cerror(NEED_ARR, ps[6]);
     if (array_size(ps[6]) != ndim)
@@ -130,7 +130,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
     aspect = (float *) array_data(lux_float(1, ps + 6));
   } else
     aspect = NULL;
-  if (narg > 7 && ps[7]) {	/* ORDER: discrete derivative accuracy */
+  if (narg > 7 && ps[7]) {	// ORDER: discrete derivative accuracy
     order = int_arg(ps[7]);
     if (order < 1 || order > 4)
       return luxerror("Approximation order must be between 1 and 4", ps[7]);
@@ -142,8 +142,8 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 
   parallel = !(internalMode & 4);
 
-  /* Create Gaussian smoothing kernels */
-				/* X kernel */
+  // Create Gaussian smoothing kernels
+				// X kernel
   w = widths[0]*0.6005612;
   n1 = 4*((int32_t) w) + 1;
   if (n1 > dims[0]) {
@@ -162,11 +162,11 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
     sum += *ptr++;
   }
   ptr = smooth1;
-  for (i = 0; i < n1; i++) {	/* normalize kernel so sum is one */
+  for (i = 0; i < n1; i++) {	// normalize kernel so sum is one
     *ptr = *ptr/sum;
     ptr++;
   }
-				/* Y kernel */
+				// Y kernel
   w = widths[1]*0.6005612;
   n2 = 4*((int32_t) w) + 1;
   if (n2 > dims[1]) {
@@ -189,7 +189,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
     *ptr = *ptr/sum;
     ptr++;
   }
-				/* T kernel */
+				// T kernel
   if (ndim == 3) {
     w = widths[2]*0.6005612;
     n3 = 4*((int32_t) w) + 1;
@@ -217,7 +217,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
   }
   n1 /= 2;
   n2 /= 2;
-				/* Create the output symbols */
+				// Create the output symbols
   memcpy(odims + 1, grid2, ndim*sizeof(int32_t));
   if (getVal) {
     odims[0] = ndim;
@@ -260,7 +260,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
   }
   vocal = (internalMode & 1);
   getJ = (internalMode & 2)? 1: 0;
-  /* Now start the real work */
+  // Now start the real work
   memcpy(xdims, dims, ndim*sizeof(int32_t));
   if (ndim == 2) {
     xdims[2] = 1;
@@ -272,20 +272,20 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
   ptr2 = out;
   ptr3 = comp;
   for (t3 = xdims[2] - grid2[2]; t3 < 2*xdims[2]*grid2[2];
-       t3 += 2*xdims[2]) {		/* all time frames */
+       t3 += 2*xdims[2]) {		// all time frames
     if (ndim == 3) {
       t = t3/grid2[2]/2;
-      w3 = n3 + order - t;	/* first time frame in integration volume */
-      if (w3 < 0)		/* extends before first time frame */
-	w3 = 0;			/* adjust */
-      m3 = xdims[2] + n3 - t - order; /* last time frame in volume */
-      if (m3 > 2*n3 + 1)	/* extends after last time frame */
-	m3 = 2*n3 + 1;		/* adjust */
-      m3 -= w3;			/* number of time frames in volume */
-    } else			/* 2D case */
+      w3 = n3 + order - t;	// first time frame in integration volume
+      if (w3 < 0)		// extends before first time frame
+	w3 = 0;			// adjust
+      m3 = xdims[2] + n3 - t - order; // last time frame in volume
+      if (m3 > 2*n3 + 1)	// extends after last time frame
+	m3 = 2*n3 + 1;		// adjust
+      m3 -= w3;			// number of time frames in volume
+    } else			// 2D case
       t = w3 = n3 = 0;
     for (j3 = xdims[1] - grid2[1]; j3 < 2*xdims[1]*grid2[1];
-	 j3 += 2*xdims[1]) {	/* all rows */
+	 j3 += 2*xdims[1]) {	// all rows
       j = j3/grid2[1]/2;
       if (vocal) {
 	if (ndim == 3)
@@ -296,36 +296,36 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 		 j, xdims[1] - 1);	  
 	fflush(stdout);
       }
-      w2 = n2 + order - j;	/* first row of integration volume */
-      if (w2 < 0)		/* extends beyond left edge */
-	w2 = 0;			/* adjust */
-      m2 = xdims[1] + n2 - j - order; /* last row of volume */
-      if (m2 > 2*n2 + 1)	/* extends beyond right edge */
-	m2 = 2*n2 + 1;		/* adjust */
-      m2 -= w2;			/* number of rows */
+      w2 = n2 + order - j;	// first row of integration volume
+      if (w2 < 0)		// extends beyond left edge
+	w2 = 0;			// adjust
+      m2 = xdims[1] + n2 - j - order; // last row of volume
+      if (m2 > 2*n2 + 1)	// extends beyond right edge
+	m2 = 2*n2 + 1;		// adjust
+      m2 -= w2;			// number of rows
       ptr0 = data + (w2 - n2 + j)*step[1] + (w3 - n3 + t)*step[2];
       for (i3 = xdims[0] - grid2[0]; i3 < 2*xdims[0]*grid2[0];
-	   i3 += 2*xdims[0]) {	/* all columns */
+	   i3 += 2*xdims[0]) {	// all columns
 	i = i3/grid2[0]/2;
-	w1 = n1 + order - i;	/* first column of integration volume */
-	if (w1 < 0)		/* extends beyond edge of data cube */
-	  w1 = 0;		/* adjust */
-	m1 = xdims[0] + n1 - i - order; /* last column of volume */
-	if (m1 > 2*n1 + 1)	/* extends beyond edge of data */
-	  m1 = 2*n1 + 1;	/* adjust */
-	m1 -= w1;		/* number of columns */
+	w1 = n1 + order - i;	// first column of integration volume
+	if (w1 < 0)		// extends beyond edge of data cube
+	  w1 = 0;		// adjust
+	m1 = xdims[0] + n1 - i - order; // last column of volume
+	if (m1 > 2*n1 + 1)	// extends beyond edge of data
+	  m1 = 2*n1 + 1;	// adjust
+	m1 -= w1;		// number of columns
 
-	if (ndim == 3) {	/* 3D case */
-	  j11 = j22 = j33 = j12 = j13 = j23 = gg = 0; /* tensor element init */
+	if (ndim == 3) {	// 3D case
+	  j11 = j22 = j33 = j12 = j13 = j23 = gg = 0; // tensor element init
 	  ptr = ptr0 + w1 - n1 + i;
-	  for (t2 = w3; t2 < w3 + m3; t2++) { /* integration volume times */
-	    for (j2 = w2; j2 < w2 + m2; j2++) { /* all rows */
-	      for (i2 = w1; i2 < w1 + m1; i2++) { /* all columns */
-		switch (order) { /* discrete derivative order */
+	  for (t2 = w3; t2 < w3 + m3; t2++) { // integration volume times
+	    for (j2 = w2; j2 < w2 + m2; j2++) { // all rows
+	      for (i2 = w1; i2 < w1 + m1; i2++) { // all columns
+		switch (order) { // discrete derivative order
 		  case 1:
-		    d1 = ptr[1] - ptr[-1]; /* X derivative */
-		    d2 = ptr[step[1]] - ptr[-step[1]]; /* Y derivative */
-		    d3 = ptr[step[2]] - ptr[-step[2]]; /* T derivative */
+		    d1 = ptr[1] - ptr[-1]; // X derivative
+		    d2 = ptr[step[1]] - ptr[-step[1]]; // Y derivative
+		    d3 = ptr[step[2]] - ptr[-step[2]]; // T derivative
 		    break;
 		  case 2:
 		    d1 = (-ptr[2] + 8*ptr[1] - 8*ptr[-1] + ptr[-2])/12;
@@ -357,14 +357,14 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 			  - 672*ptr[-step[2]] + 168*ptr[-2*step[2]]
 			  - 32*ptr[-3*step[2]] + 3*ptr[-4*step[2]])/840;
 		    break;
-		} /* end of switch (order) */
+		} // end of switch (order)
 		if (aspect) {
 		  d1 *= aspect[0];
 		  d2 *= aspect[1];
 		  d3 *= aspect[2];
 		}
-		s = smooth1[i2]*smooth2[j2]*smooth3[t2]; /* element weight */
-		j11 += d1*d1*s;	/* update tensor elements */
+		s = smooth1[i2]*smooth2[j2]*smooth3[t2]; // element weight
+		j11 += d1*d1*s;	// update tensor elements
 		j22 += d2*d2*s;
 		j33 += d3*d3*s;
 		j12 += d1*d2*s;
@@ -373,31 +373,31 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 		if (getWave)
 		  gg += *ptr * *ptr * s;
 		ptr++;
-	      }	/* end of for (i2 = w1; ... ) */
+	      }	// end of for (i2 = w1; ... )
 	      ptr += step[1] - m1;
-	    } /* end of for (j2 = w2; ... ) */
+	    } // end of for (j2 = w2; ... )
 	    ptr += step[2] - step[1]*m2;
-	  } /* end of for (t2 = w3; ... ) */
+	  } // end of for (t2 = w3; ... )
 	  if (getVec || getVal || getJ || getWave) {
-				/* adjust tensor elements on main diagonal */
+				// adjust tensor elements on main diagonal
 	    q = j22 + j33;
 	    r = j11 + j33;
 	    s = j11 + j22;
-	    if (getJ) {		/* user wants tensor elements */
-	      if (getVal) {	/* space for the main diagonal */
+	    if (getJ) {		// user wants tensor elements
+	      if (getVal) {	// space for the main diagonal
 		*ptr2++ = j11;
 		*ptr2++ = j22;
 		*ptr2++ = j33;
 	      }
-	      if (getVec) {	/* space for the off-diagonal ones */
+	      if (getVec) {	// space for the off-diagonal ones
 		*ptr3++ = j12;
 		*ptr3++ = j13;
 		*ptr3++ = j23;
 	      }
 	      if (getWave)
 		*wave++ = gg;
-	    } else {		/* user wants orientation and/or eigenvalues */
-	      /* calculate coefficients of characteristic polynomial */
+	    } else {		// user wants orientation and/or eigenvalues
+	      // calculate coefficients of characteristic polynomial
 	      j11 = q;
 	      j22 = r;
 	      j33 = s;
@@ -405,26 +405,26 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 		+ 2*j12*j13*j23;
 	      c1 = j11*j22 + j11*j33 + j22*j33 - j12*j12 - j13*j13 - j23*j23;
 	      c2 = -j11 - j22 - j33;
-				/* find roots of polynomial: eigenvalues */
+				// find roots of polynomial: eigenvalues
 	      q = c2*c2/9 - c1/3;
 	      r = (c1*c2 - 3*c0)/6 - c2*c2*c2/27;
 	      s = q*q*q - r*r;
 	      if (s < 0)
-		s = 0;		/* the symmetrical matrix has only real */
-				/* eigenvalues; if s < 0, then this must */
-				/* be due to roundoff errors */
+		s = 0;		// the symmetrical matrix has only real
+				// eigenvalues; if s < 0, then this must
+				// be due to roundoff errors
 	      ang = atan2(sqrt(s),r)/3;
 	      q = sqrt(q);
 	      r = c2/3;
 	      s = sin(ang);
-	      c = sqrt(1 - s*s); /* cosine, always > 0 */
+	      c = sqrt(1 - s*s); // cosine, always > 0
 	      c0 = 2*q*c - r;
 	      r = -q*c - r;
 	      q = q*s*SQRT3;
 	      c1 = r + q;
 	      c2 = r - q;
-				/* now c0, c1, c2 are the eigenvalues */
-				/* put them in decending order */
+				// now c0, c1, c2 are the eigenvalues
+				// put them in decending order
 	      if (c1 > c0) {
 		q = c1;
 		c1 = c0;
@@ -442,16 +442,16 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 	      }
 	      if (getWave) {
 		if (gg) {
-		  q = 0.5*(j11 + j22 + j33) - c2; /* really c2 and not c0? */
+		  q = 0.5*(j11 + j22 + j33) - c2; // really c2 and not c0?
 		  if (q < 0)
-		    q = 0;	/* must be a roundoff error */
+		    q = 0;	// must be a roundoff error
 		  gg = sqrt(q/gg);
 		} else
 		  gg = 0.0;
 		*wave++ = gg;
 	      }
-	      if (getVec) {	/* user wants orientation */
-		/* OK, now find eigenvector for largest eigenvalue */
+	      if (getVec) {	// user wants orientation
+		// OK, now find eigenvector for largest eigenvalue
 		j11 -= c0;
 		j22 -= c0;
 		j33 -= c0;
@@ -471,29 +471,29 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 		    s = j23*j12 + j22*j13;
 		  }
 		}
-		*ptr3++ = q;	/* return components of eigenvector */
+		*ptr3++ = q;	// return components of eigenvector
 		*ptr3++ = r;
 		*ptr3++ = s;
-	      }	/* end of if (getVec) */
-              if (getVal) {	/* user wants eigenvalues */
-		q = (c1 + c2 - c0)/2; /* adjust eigenvalues */
+	      }	// end of if (getVec)
+              if (getVal) {	// user wants eigenvalues
+		q = (c1 + c2 - c0)/2; // adjust eigenvalues
                 r = (c0 + c2 - c1)/2;
                 s = (c0 + c1 - c2)/2;
-                *ptr2++ = q;    /* return eigenvalues */
+                *ptr2++ = q;    // return eigenvalues
                 *ptr2++ = r;
                 *ptr2++ = s;
 	      }
-	    } /* end of if (getJ) else */
-	  } /* end of if (getVec || getVal || getJ) else */
-	} else { /* 2D case */
-	  j11 = j22 = j12 = gg = 0; /* tensor element start values */
-	  ptr = ptr0 + w1 - n1 + i; /* first integration element */
-	  for (j2 = w2; j2 < w2 + m2; j2++) { /* all rows for integration */
-	    for (i2 = w1; i2 < w1 + m1; i2++) { /* columns for integration */
-	      switch (order) {	/* discrete derivative order */
+	    } // end of if (getJ) else
+	  } // end of if (getVec || getVal || getJ) else
+	} else { // 2D case
+	  j11 = j22 = j12 = gg = 0; // tensor element start values
+	  ptr = ptr0 + w1 - n1 + i; // first integration element
+	  for (j2 = w2; j2 < w2 + m2; j2++) { // all rows for integration
+	    for (i2 = w1; i2 < w1 + m1; i2++) { // columns for integration
+	      switch (order) {	// discrete derivative order
 		case 1:
-		  d1 = ptr[1] - ptr[-1]; /* derivative in X */
-		  d2 = ptr[step[1]] - ptr[-step[1]]; /* derivative in Y */
+		  d1 = ptr[1] - ptr[-1]; // derivative in X
+		  d2 = ptr[step[1]] - ptr[-step[1]]; // derivative in Y
 		  break;
 		case 2:
 		  d1 = (-ptr[2] + 8*ptr[1] - 8*ptr[-1] + ptr[-2])/12;
@@ -516,13 +516,13 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 			- 672*ptr[-step[1]] + 168*ptr[-2*step[1]]
 			- 32*ptr[-3*step[1]] + 3*ptr[-4*step[1]])/840;
 		  break;
-	      } /* end of switch (order) */
+	      } // end of switch (order)
 	      if (aspect) {
 		d1 *= aspect[0];
 		d2 *= aspect[1];
 	      }
-	      s = smooth1[i2]*smooth2[j2]; /* weight factor of this element */
-	      j11 += d2*d2*s;	/* update tensor elements */
+	      s = smooth1[i2]*smooth2[j2]; // weight factor of this element
+	      j11 += d2*d2*s;	// update tensor elements
 	      j22 += d1*d1*s;
 	      j12 += d1*d2*s;
 	      if (getWave)
@@ -530,7 +530,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 	      ptr++;
 	    }
 	    ptr += step[1] - m1;
-	  } /* end of for (i2 = w1; ... ) */
+	  } // end of for (i2 = w1; ... )
 	  if (getVec || getVal || getJ || getWave) {
 	    if (getJ) {
 	      if (getVal) {
@@ -541,53 +541,53 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 		*ptr3++ = j12;
 	      if (getWave)
 		*wave++ = gg;
-	    } else { /* user wants orientation and/or eigenvalues */
-	    /* we must determine the eigenvalues of the matrix */
-	    /*   j11 j12 */
-	    /*   j12 j22 */
-	      /* calculate coefficients of characteristic polynomial */
+	    } else { // user wants orientation and/or eigenvalues
+	    // we must determine the eigenvalues of the matrix
+	    //   j11 j12
+	    //   j12 j22
+	      // calculate coefficients of characteristic polynomial
 	      c0 = j11*j22 - j12*j12;
 	      c1 = -j11 - j22;
-				/* find roots of polynomial: eigenvalues */
+				// find roots of polynomial: eigenvalues
 	      q = c1*c1 - 4*c0;
 	      if (q < 0)
-		q = 0;		/* the symmetrical matrix has only real */
-				/* roots, so q < 0 must be due to */
-				/* roundoff errors */
+		q = 0;		// the symmetrical matrix has only real
+				// roots, so q < 0 must be due to
+				// roundoff errors
 	      q = sqrt(q);
 	      if (c1 < 0)
 		q = -q;
-	      q = -(c1 + q)/2;	/* first solution */
-	      r = q? c0/q: 0.0;	/* second solution */
-	      /* put them in descending order */
+	      q = -(c1 + q)/2;	// first solution
+	      r = q? c0/q: 0.0;	// second solution
+	      // put them in descending order
 	      if (r > q) {
 		s = r;
 		r = q;
 		q = s;
 	      }
-	      if (getVal) {	/* the user wants the eigenvalues */
+	      if (getVal) {	// the user wants the eigenvalues
 		*ptr2++ = q;
 		*ptr2++ = r;
 	      }
-	      /* OK, now find angle */
-	      if (getVec)	/* the user wants the orientation */
+	      // OK, now find angle
+	      if (getVec)	// the user wants the orientation
 		*ptr3++ = 0.5*atan2(-2*j12, j11 - j22);
-	      if (getWave) {	/* user wants wavenumber */
+	      if (getWave) {	// user wants wavenumber
 		if (gg) {
 		  q = j11 + j22 - (parallel? q: r);
 		  if (q < 0)
-		    q = 0;	/* must be a roundoff error */
+		    q = 0;	// must be a roundoff error
 		  gg = sqrt(q/gg);
 		} else
 		  gg = 0.0;
 		*wave++ = gg;
 	      }
-	    } /* end of if (getJ) else */
-	  } /* end of if (getVec || getVal || getJ) */
-	} /* end of if (ndim == 3) else */
-      }	/* end of for (i3 = xdims[0] - grid2[0]; ... ) */
-    } /* end of for (j3 = xdims[1] - grid2[1]; ... ) */
-  } /* end of for (t3 = xdims[2] - grid2[2]; ... ) */
+	    } // end of if (getJ) else
+	  } // end of if (getVec || getVal || getJ)
+	} // end of if (ndim == 3) else
+      }	// end of for (i3 = xdims[0] - grid2[0]; ... )
+    } // end of for (j3 = xdims[1] - grid2[1]; ... )
+  } // end of for (t3 = xdims[2] - grid2[2]; ... )
   if (vocal)
     printf("\n");
   if (getVec)
@@ -618,7 +618,7 @@ int32_t lux_root3(int32_t narg, int32_t ps[])
   memcpy(p, x, n*sizeof(double));
   return iq;
 }
-/*--------------------------------------------------------------------*/
+//--------------------------------------------------------------------
 /* The method:
 
 I. The Direction

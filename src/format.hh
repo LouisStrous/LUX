@@ -17,13 +17,13 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* header file for LUX string formatting */
+// header file for LUX string formatting
 
-/* format_check store choices */
+// format_check store choices
 #define STORE	1
 #define NOSTORE	0
 
-/* format_check return value macros */
+// format_check return value macros
 #define	isIntegerFormat(A)	((A >= 0 && A < 6)? 1: 0)
 #define isFloatFormat(A)	((A > 5 && A < 14)? 1: 0)
 #define isStringFormat(A)	((A == 14)? 1: 0)

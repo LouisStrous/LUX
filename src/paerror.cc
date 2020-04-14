@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "lux_structures.hh"
 
-int32_t execute_error(int32_t n) /* handle errors */
+int32_t execute_error(int32_t n) // handle errors
  {
  printf("execution error: ");
  switch (n) {
@@ -164,7 +164,7 @@ int32_t execute_error(int32_t n) /* handle errors */
  default: printf("(X)undefined error code\n"); break;
  }
  return -1;
- }						/*end of execute_error */
+ }						//end of execute_error
 
 int32_t file_open_error()
 {

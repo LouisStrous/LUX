@@ -17,14 +17,14 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-/*----------------------------------------------------*/
+//----------------------------------------------------
 void getTermCaps(void)
-/* sets terminal capabilities.  I've had trouble with both termcap and */
-/* terminfo (specifically with returned key sequences - e.g. for the */
-/* right arrow key - which did not correspond to what it said in the */
-/* termcap or terminfo databases, and finally decided to do it my own */
-/* way.  Now, I read an "anatermcap" file depending on the TERM */
-/* environment variable.  LS 12jul96 */
+// sets terminal capabilities.  I've had trouble with both termcap and
+// terminfo (specifically with returned key sequences - e.g. for the
+// right arrow key - which did not correspond to what it said in the
+// termcap or terminfo databases, and finally decided to do it my own
+// way.  Now, I read an "anatermcap" file depending on the TERM
+// environment variable.  LS 12jul96
 {
   char	*term, *cscrat = (char *) scrat;
   extern char	expname[];
@@ -45,7 +45,7 @@ void getTermCaps(void)
     else
     { i = 0;
       while (fgets(cscrat, 80, fp))
-      { if (*cscrat == '#')	/* a comment line */
+      { if (*cscrat == '#')	// a comment line
 	  continue;
 	sprintf(cscrat + 80, cscrat);
 	n = strlen(cscrat + 80);

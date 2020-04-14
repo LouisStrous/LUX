@@ -73,7 +73,7 @@ int32_t yyerror(const char *), yylex(YYSTYPE *);
 int32_t installString(char const* string);
 %}
 
-%pure-parser                    /* reentrant parser, so we can compile a
+%define api.pure                    /* reentrant parser, so we can compile a
                                  new routine we encounter while we're already
                                  compiling something else */
 
@@ -130,9 +130,6 @@ next_line {                     /* a statement or a newline */
                                    is not a newline or an error, then store
                                    it at the start of a new list */
     startList($1);
-  /*  if (debugLine) */         /* if we're in debugging mode (dbg> prompt)
-                                   then we return after the first statement */
-  /* YYACCEPT; */                       /* return */
 }
 
 | lines next_line {             /* next member in a set of statements and

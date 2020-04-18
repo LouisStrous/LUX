@@ -35,8 +35,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------
 void shell_s(int32_t n, char *arr[])
 {
-  int32_t	nn,m,j,i,lognb2;
-  char	*t;
+  int32_t        nn,m,j,i,lognb2;
+  char        *t;
 
   lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
@@ -46,8 +46,8 @@ void shell_s(int32_t n, char *arr[])
       i = j - m;
       t = arr[j];
       while (i >= 0 && strcmp(arr[i], t) > 0) {
-	arr[i + m] = arr[i];
-	i -= m;
+        arr[i + m] = arr[i];
+        i -= m;
       }
       arr[i + m] = t;
     }
@@ -56,8 +56,8 @@ void shell_s(int32_t n, char *arr[])
 //-------------------------------------------------------------------------
 void shell_f(int32_t n, float arr[])
 {
-  int32_t	nn,m,j,i,lognb2;
-  float	t;
+  int32_t        nn,m,j,i,lognb2;
+  float        t;
 
   lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
@@ -67,8 +67,8 @@ void shell_f(int32_t n, float arr[])
       i = j - m;
       t = arr[j];
       while (i >= 0 && arr[i] > t) {
-	arr[i + m] = arr[i];
-	i -= m;
+        arr[i + m] = arr[i];
+        i -= m;
       }
       arr[i + m] = t;
     }
@@ -77,8 +77,8 @@ void shell_f(int32_t n, float arr[])
 //-------------------------------------------------------------------------
 void shell_b(int32_t n, uint8_t arr[])
 {
-  int32_t	nn,m,j,i,lognb2;
-  uint8_t	t;
+  int32_t        nn,m,j,i,lognb2;
+  uint8_t        t;
 
   lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
@@ -88,8 +88,8 @@ void shell_b(int32_t n, uint8_t arr[])
       i = j - m;
       t = arr[j];
       while (i >= 0 && arr[i] > t) {
-	arr[i + m] = arr[i];
-	i -= m;
+        arr[i + m] = arr[i];
+        i -= m;
       }
       arr[i + m] = t;
     }
@@ -98,8 +98,8 @@ void shell_b(int32_t n, uint8_t arr[])
 //-------------------------------------------------------------------------
 void shell_l(int32_t n, int32_t arr[])
 {
- int32_t	nn,m,j,i,lognb2;
- int32_t	t;
+ int32_t        nn,m,j,i,lognb2;
+ int32_t        t;
 
  lognb2 = (log((double) n)*ALN2I + TINY);
  m = n;
@@ -119,8 +119,8 @@ void shell_l(int32_t n, int32_t arr[])
 //-------------------------------------------------------------------------
 void shell_int64(int64_t n, int64_t arr[])
 {
- int64_t	nn,m,j,i,lognb2;
- int64_t	t;
+ int64_t        nn,m,j,i,lognb2;
+ int64_t        t;
 
  lognb2 = (log((double) n)*ALN2I + TINY);
  m = n;
@@ -140,8 +140,8 @@ void shell_int64(int64_t n, int64_t arr[])
 //-------------------------------------------------------------------------
 void shell_w(int32_t n, int16_t arr[])
 {
-  int32_t	nn,m,j,i,lognb2;
-  int16_t	t;
+  int32_t        nn,m,j,i,lognb2;
+  int16_t        t;
 
   lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
@@ -151,8 +151,8 @@ void shell_w(int32_t n, int16_t arr[])
       i = j - m;
       t = arr[j];
       while (i >= 0 && arr[i] > t) {
-	arr[i + m] = arr[i];
-	i -= m;
+        arr[i + m] = arr[i];
+        i -= m;
       }
       arr[i + m] = t;
     }
@@ -161,8 +161,8 @@ void shell_w(int32_t n, int16_t arr[])
 //-------------------------------------------------------------------------
 void shell_d(int32_t n, double arr[])
 {
-  int32_t	nn,m,j,i,lognb2;
-  double	t;
+  int32_t        nn,m,j,i,lognb2;
+  double        t;
 
   lognb2 = (log((double) n)*ALN2I + TINY);
   m = n;
@@ -172,8 +172,8 @@ void shell_d(int32_t n, double arr[])
       i = j - m;
       t = arr[j];
       while (i >= 0 && arr[i] > t) {
-	arr[i + m] = arr[i];
-	i -= m;
+        arr[i + m] = arr[i];
+        i -= m;
       }
       arr[i + m] = t;
     }
@@ -182,8 +182,8 @@ void shell_d(int32_t n, double arr[])
 //-------------------------------------------------------------------------
 void sort_s(int32_t n, char *ra[])
 {
-  int32_t	l,j,ir,i;
-  char	*rra;
+  int32_t        l,j,ir,i;
+  char        *rra;
 
   l = (n/2);
   ir = n-1;
@@ -194,20 +194,20 @@ void sort_s(int32_t n, char *ra[])
       rra = ra[ir];
       ra[ir] = ra[0];
       if (--ir == 0) {
-	ra[0] = rra;
-	return;
+        ra[0] = rra;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && strcmp(ra[j], ra[j+1]) < 0)
-	j++;
+        j++;
       if (strcmp(rra, ra[j]) < 0) {
-	ra[i] = ra[j];
-	j += (i = j) + 1;
+        ra[i] = ra[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     ra[i] = rra;
   }
@@ -215,8 +215,8 @@ void sort_s(int32_t n, char *ra[])
 //-------------------------------------------------------------------------
 void sort_f(int32_t n, float ra[])
 {
-  int32_t	l,j,ir,i;
-  float	rra;
+  int32_t        l,j,ir,i;
+  float        rra;
 
   l = (n/2);
   ir = n-1;
@@ -227,20 +227,20 @@ void sort_f(int32_t n, float ra[])
       rra = ra[ir];
       ra[ir] = ra[0];
       if (--ir == 0) {
-	ra[0] = rra;
-	return;
+        ra[0] = rra;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[j] < ra[j+1])
-	j++;
+        j++;
       if (rra < ra[j]) {
-	ra[i] = ra[j];
-	j += (i=j) + 1;
+        ra[i] = ra[j];
+        j += (i=j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     ra[i] = rra;
   }
@@ -248,8 +248,8 @@ void sort_f(int32_t n, float ra[])
 //-------------------------------------------------------------------------
 void sort_b(int32_t n, uint8_t ra[])
 {
-  int32_t	l,j,ir,i;
-  uint8_t	rra;
+  int32_t        l,j,ir,i;
+  uint8_t        rra;
 
   l = (n/2);
   ir = n-1;
@@ -260,20 +260,20 @@ void sort_b(int32_t n, uint8_t ra[])
       rra = ra[ir];
       ra[ir] = ra[0];
       if (--ir == 0) {
-	ra[0] = rra;
-	return;
+        ra[0] = rra;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[j] < ra[j+1])
-	j++;
+        j++;
       if (rra < ra[j]) {
-	ra[i] = ra[j];
-	j += (i=j) + 1;
+        ra[i] = ra[j];
+        j += (i=j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     ra[i] = rra;
   }
@@ -281,8 +281,8 @@ void sort_b(int32_t n, uint8_t ra[])
 //-------------------------------------------------------------------------
 void sort_w(int32_t n, int16_t ra[])
 {
-  int32_t	l,j,ir,i;
-  int16_t	rra;
+  int32_t        l,j,ir,i;
+  int16_t        rra;
 
   l = (n/2);
   ir = n-1;
@@ -293,20 +293,20 @@ void sort_w(int32_t n, int16_t ra[])
       rra = ra[ir];
       ra[ir] = ra[0];
       if (--ir == 0) {
-	ra[0] = rra;
-	return;
+        ra[0] = rra;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[j] < ra[j+1])
-	j++;
+        j++;
       if (rra < ra[j]) {
-	ra[i] = ra[j];
-	j += (i=j) + 1;
+        ra[i] = ra[j];
+        j += (i=j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     ra[i] = rra;
   }
@@ -314,8 +314,8 @@ void sort_w(int32_t n, int16_t ra[])
 //-------------------------------------------------------------------------
 void sort_l(int32_t n, int32_t ra[])
 {
-  int32_t	l,j,ir,i;
-  long	rra;
+  int32_t        l,j,ir,i;
+  long        rra;
 
   l = (n/2);
   ir = n-1;
@@ -326,20 +326,20 @@ void sort_l(int32_t n, int32_t ra[])
       rra = ra[ir];
       ra[ir] = ra[0];
       if (--ir == 0) {
-	ra[0] = rra;
-	return;
+        ra[0] = rra;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[j] < ra[j+1])
-	j++;
+        j++;
       if (rra < ra[j]) {
-	ra[i] = ra[j];
-	j += (i=j) + 1;
+        ra[i] = ra[j];
+        j += (i=j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     ra[i] = rra;
   }
@@ -347,8 +347,8 @@ void sort_l(int32_t n, int32_t ra[])
 //-------------------------------------------------------------------------
 void sort_int64(int64_t n, int64_t ra[])
 {
-  int64_t	l,j,ir,i;
-  long	rra;
+  int64_t        l,j,ir,i;
+  long        rra;
 
   l = (n/2);
   ir = n-1;
@@ -359,20 +359,20 @@ void sort_int64(int64_t n, int64_t ra[])
       rra = ra[ir];
       ra[ir] = ra[0];
       if (--ir == 0) {
-	ra[0] = rra;
-	return;
+        ra[0] = rra;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[j] < ra[j+1])
-	j++;
+        j++;
       if (rra < ra[j]) {
-	ra[i] = ra[j];
-	j += (i=j) + 1;
+        ra[i] = ra[j];
+        j += (i=j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     ra[i] = rra;
   }
@@ -380,7 +380,7 @@ void sort_int64(int64_t n, int64_t ra[])
 //------------------------------------------------------------------------
 void sort_d(int32_t n, double ra[])
 {
-  int32_t	l,j,ir,i;
+  int32_t        l,j,ir,i;
   double rra;
 
   l = (n/2);
@@ -392,18 +392,18 @@ void sort_d(int32_t n, double ra[])
       rra = ra[ir];
       ra[ir] = ra[0];
       if (--ir == 0) {
-	ra[0] = rra;
-	return;
+        ra[0] = rra;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[j] < ra[j+1])
-	j++;
+        j++;
       if (rra < ra[j]) {
-	ra[i] = ra[j];
-	j += (i=j) + 1;
+        ra[i] = ra[j];
+        j += (i=j) + 1;
    } else
      j = ir + 1;
     }
@@ -413,8 +413,8 @@ void sort_d(int32_t n, double ra[])
 //-------------------------------------------------------------------------
 void indexx_s(int32_t n, char *ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
-  char	*q;
+  int32_t        l,j,ir,i,indxt;
+  char        *q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -427,20 +427,20 @@ void indexx_s(int32_t n, char *ra[], int32_t indx[])
       q = ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && strcmp(ra[indx[j]], ra[indx[j+1]]) < 0)
-	j++;
+        j++;
       if (strcmp(q, ra[indx[j]]) < 0) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -448,8 +448,8 @@ void indexx_s(int32_t n, char *ra[], int32_t indx[])
 //-------------------------------------------------------------------------
 void indexx_d(int32_t n, double ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
-  double	q;
+  int32_t        l,j,ir,i,indxt;
+  double        q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -462,20 +462,20 @@ void indexx_d(int32_t n, double ra[], int32_t indx[])
       q = ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] < ra[indx[j+1]])
-	j++;
+        j++;
       if (q < ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -483,8 +483,8 @@ void indexx_d(int32_t n, double ra[], int32_t indx[])
 //-------------------------------------------------------------------------
 void indexx_b(int32_t n, uint8_t ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
-  uint8_t	q;
+  int32_t        l,j,ir,i,indxt;
+  uint8_t        q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -497,20 +497,20 @@ void indexx_b(int32_t n, uint8_t ra[], int32_t indx[])
       q = ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] < ra[indx[j+1]])
-	j++;
+        j++;
       if (q < ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -518,8 +518,8 @@ void indexx_b(int32_t n, uint8_t ra[], int32_t indx[])
 //-------------------------------------------------------------------------
 void indexx_w(int32_t n, int16_t ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
-  int16_t	q;
+  int32_t        l,j,ir,i,indxt;
+  int16_t        q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -532,20 +532,20 @@ void indexx_w(int32_t n, int16_t ra[], int32_t indx[])
       q=ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] < ra[indx[j+1]])
-	j++;
+        j++;
       if (q < ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -553,8 +553,8 @@ void indexx_w(int32_t n, int16_t ra[], int32_t indx[])
 //-------------------------------------------------------------------------
 void indexx_l(int32_t n, int32_t ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
-  int32_t	q;
+  int32_t        l,j,ir,i,indxt;
+  int32_t        q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -567,20 +567,20 @@ void indexx_l(int32_t n, int32_t ra[], int32_t indx[])
       q=ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] < ra[indx[j+1]])
-	j++;
+        j++;
       if (q < ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -588,8 +588,8 @@ void indexx_l(int32_t n, int32_t ra[], int32_t indx[])
 //-------------------------------------------------------------------------
 void indexx_int64(int64_t n, int64_t ra[], int64_t indx[])
 {
-  int64_t	l,j,ir,i,indxt;
-  int64_t	q;
+  int64_t        l,j,ir,i,indxt;
+  int64_t        q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -602,20 +602,20 @@ void indexx_int64(int64_t n, int64_t ra[], int64_t indx[])
       q=ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] < ra[indx[j+1]])
-	j++;
+        j++;
       if (q < ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -623,8 +623,8 @@ void indexx_int64(int64_t n, int64_t ra[], int64_t indx[])
 //-------------------------------------------------------------------------
 void indexx_f(int32_t n, float ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
-  float	q;
+  int32_t        l,j,ir,i,indxt;
+  float        q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -637,20 +637,20 @@ void indexx_f(int32_t n, float ra[], int32_t indx[])
       q = ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] < ra[indx[j+1]])
-	j++;
+        j++;
       if (q < ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -658,8 +658,8 @@ void indexx_f(int32_t n, float ra[], int32_t indx[])
 //-------------------------------------------------------------------------
 void indexxr_f(int32_t n, float ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
-  float	q;
+  int32_t        l,j,ir,i,indxt;
+  float        q;
 
   for (i = 0; i < n; i++)
     indx[i] = i;
@@ -672,20 +672,20 @@ void indexxr_f(int32_t n, float ra[], int32_t indx[])
       q = ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] > ra[indx[j+1]])
-	j++;
+        j++;
       if (q > ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -693,7 +693,7 @@ void indexxr_f(int32_t n, float ra[], int32_t indx[])
 //-------------------------------------------------------------------------
 void indexxr_d(int32_t n, double ra[], int32_t indx[])
 {
-  int32_t	l,j,ir,i,indxt;
+  int32_t        l,j,ir,i,indxt;
   double q;
 
   for (i = 0; i < n; i++)
@@ -707,20 +707,20 @@ void indexxr_d(int32_t n, double ra[], int32_t indx[])
       q = ra[(indxt = indx[ir])];
       indx[ir] = indx[0];
       if (--ir == 0) {
-	indx[0] = indxt;
-	return;
+        indx[0] = indxt;
+        return;
       }
     }
     i = l;
     j = l + l + 1;
     while (j <= ir) {
       if (j < ir && ra[indx[j]] > ra[indx[j+1]])
-	j++;
+        j++;
       if (q > ra[indx[j]]) {
-	indx[i] = indx[j];
-	j += (i = j) + 1;
+        indx[i] = indx[j];
+        j += (i = j) + 1;
       } else
-	j = ir + 1;
+        j = ir + 1;
     }
     indx[i] = indxt;
   }
@@ -735,7 +735,7 @@ void invertPermutation(int32_t *data, int32_t n)
 // I.e., if beforehand data[i] = j, then afterwards data[j] = i.
 // LS 25aug2000
 {
-  int32_t	nloop, i, j, k;
+  int32_t        nloop, i, j, k;
 
   i = 0;
   nloop = 0;
@@ -746,7 +746,7 @@ void invertPermutation(int32_t *data, int32_t n)
     while (1) {
       k = data[j];
       if (k < 0)
-	break;
+        break;
       data[j] = -i - 1;
       nloop++;
       i = j;

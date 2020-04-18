@@ -62,11 +62,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
  void readextension(FILE *), readimage(FILE *, int32_t, char *),
    loadcolortable(FILE *, int32_t, int32_t), readraster(int32_t, FILE *, unsigned char *);
- static	int32_t	quit = 0, status = 1, gcmflag;
- static int32_t	nxs, nys;
+ static        int32_t        quit = 0, status = 1, gcmflag;
+ static int32_t        nxs, nys;
 
-int32_t	lux_gifread(int32_t, int32_t []);
-void	process(int32_t, unsigned char **);
+int32_t        lux_gifread(int32_t, int32_t []);
+void        process(int32_t, unsigned char **);
 
  //-------------------------------------------------------------------------
 int32_t lux_gifread_f(int32_t narg, int32_t ps[])
@@ -80,14 +80,14 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
  /* call is gifread,array,file,map where map is the color map, if
  map not in argument list, you don't get it! */
  {
- FILE	*fin;
+ FILE        *fin;
  int32_t    iq, n, cr, pixel;
  int32_t    sep, cmsym, dim[8];
  char   *p, *name, *data;
  struct ahead   *h;
  struct GIFScreen gh;
 
- 		// first arg is the variable to load, second is name of file
+                 // first arg is the variable to load, second is name of file
  if (!symbolIsStringScalar(ps[1]))
    return cerror(NEED_STR, ps[1]);
  name = expand_name(string_value(ps[1]), NULL);
@@ -101,30 +101,30 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
  normally followed by a global color map, the first 2 of these total 15 bytes*/
 
  if (fread(&gh,1,13,fin) != 13) { perror("gifread in header");
- 		fclose(fin); return -1; }
+                 fclose(fin); return -1; }
  if (strncmp((gh.id),"GIF",3) != 0) {
- 	printf("not a GIF file\n"); return -1; }
+         printf("not a GIF file\n"); return -1; }
  if (strncmp(((gh.id))+3,"87a",3) != 0) {
- 	if (strncmp(((gh.id))+3,"89a",3) != 0) {
- 	printf("invalid GIF version #\n"); return -1; } else {
-	printf("version 89a, warning, not all options supported\n"); }
-	}
+         if (strncmp(((gh.id))+3,"89a",3) != 0) {
+         printf("invalid GIF version #\n"); return -1; } else {
+        printf("version 89a, warning, not all options supported\n"); }
+        }
  // yank out the screen size
  nxs = ( (gh.width_msb << 8) | gh.width_lsb );
  nys = ( (gh.height_msb << 8) | gh.height_lsb );
  // printf("screen size %d %d\n", nxs, nys);
 
  // define the output array as a Byte of the screen size
- iq = ps[0];	dim[0] = nxs;	dim[1] = nys;
+ iq = ps[0];        dim[0] = nxs;        dim[1] = nys;
  if ( redef_array(iq, LUX_INT8, 2, dim) != 1) { fclose(fin); return -1; }
  h = (struct ahead *) sym[iq].spec.array.ptr;
  data = ((char *)h + sizeof(struct ahead));
 
  // global color map stuff
- gcmflag = gh.mask >> 7;	// top bit in mask
+ gcmflag = gh.mask >> 7;        // top bit in mask
  if (gcmflag) {
- cr = (gh.mask >> 4) & 0x7;	cr += 1;	cr = 1 << cr;
- pixel = gh.mask & 0x7;	pixel += 1;	pixel = 1 << pixel;
+ cr = (gh.mask >> 4) & 0x7;        cr += 1;        cr = 1 << cr;
+ pixel = gh.mask & 0x7;        pixel += 1;        pixel = 1 << pixel;
  // set the data array to the background color
  p = data; n = nxs*nys; while (n--) *p++ = gh.background;
  /* still in global color table exist conditional, read the color table
@@ -132,7 +132,7 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
  loadcolortable(fin, pixel, cmsym);
  }
 
- quit = 0;	status = 1;
+ quit = 0;        status = 1;
  //  read the next separator and try to process
 
  do {
@@ -140,33 +140,33 @@ int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
   //  printf("separator %#x\n", sep);
   switch (sep) {
    case EOF: perror("gifread, separator");
- 	quit = 1;
-   	status = -1;
-   	break;
+         quit = 1;
+           status = -1;
+           break;
    case 0x3b:
-	// must be the end
-     //	printf("end of image\n");
-	quit = 1;
-	break;
+        // must be the end
+     //        printf("end of image\n");
+        quit = 1;
+        break;
    case 0x21:
-	// an extension of some sort
-	readextension(fin);	// currently nothing is done
-	break;
+        // an extension of some sort
+        readextension(fin);        // currently nothing is done
+        break;
    case 0x2c:
-	// normal, read image descriptor and image
-	readimage(fin, cmsym, data);
- 	quit = 1;
- 	break;
+        // normal, read image descriptor and image
+        readimage(fin, cmsym, data);
+         quit = 1;
+         break;
    default:
- 	quit = 1;
-	printf("illegal GIF block type\n");
-   	status = -1;
-	break;
+         quit = 1;
+        printf("illegal GIF block type\n");
+           status = -1;
+        break;
  }
  } while (!quit);
 
  fclose(fin);
- return status;		// normally a 1
+ return status;                // normally a 1
  }
  //-------------------------------------------------------------------------
 void readextension(FILE *fin)
@@ -182,12 +182,12 @@ void readextension(FILE *fin)
 void readimage(FILE *fin, int32_t cmsym, char *data)
  {
  struct GIFImage gimage;
- int32_t	nx, ny, ix, iy, local, localbits, nc, fflag;
- int32_t	n, m, stride;
- char	*image, *p, *p2;
+ int32_t        nx, ny, ix, iy, local, localbits, nc, fflag;
+ int32_t        n, m, stride;
+ char        *image, *p, *p2;
  if (fread(&gimage.left_lsb,1,9,fin) != 9) {
  perror("gifread in image descriptor");
- quit = 1;	status = -1;	return; }
+ quit = 1;        status = -1;        return; }
  // get offsets, etc
  ix = ( (gimage.left_msb << 8) | gimage.left_lsb );
  iy = ( (gimage.top_msb << 8) | gimage.top_lsb );
@@ -210,10 +210,10 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
  allocated screen array */
 
  if (ix && iy) fflag = 0; else { if (nx != nxs || ny != nys) fflag = 0;
- 	else fflag =1; }
+         else fflag =1; }
  if (fflag) image = data; else { image = (char*) malloc(nx * ny);
-	if (!image) { printf("malloc error in GIFREAD\n"); quit=1; status=-1;
-   	return; }
+        if (!image) { printf("malloc error in GIFREAD\n"); quit=1; status=-1;
+           return; }
  }
  // now read in
  readraster(nx * ny, fin, (unsigned char *) image);
@@ -222,8 +222,8 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
  // if not the screen size, load into screen image and free temp
  // printf("fflag = %d\n", fflag);
  if (!fflag) {
- p2 = image;	p = data + ix + iy*nxs;
- m = ny;	stride = nxs - nx;
+ p2 = image;        p = data + ix + iy*nxs;
+ m = ny;        stride = nxs - nx;
  while (m--) { n = nx;  while (n--) {*p++ = *p2++; }  p += stride; }
  free(image);
  }
@@ -231,21 +231,21 @@ void readimage(FILE *fin, int32_t cmsym, char *data)
  //-------------------------------------------------------------------------
 void loadcolortable(FILE *fin, int32_t nc, int32_t cmsym)
  {
- int32_t	dim[8], ncolmap;
+ int32_t        dim[8], ncolmap;
  struct ahead   *h;
- char	*colormap;
+ char        *colormap;
  /* we either load the color table into lux symbol cmsym or we just
  skip over the area in the file */
  ncolmap = 3*nc;
  if (cmsym) {
- dim[0] = 3;	dim[1] = nc;
+ dim[0] = 3;        dim[1] = nc;
  if ( redef_array(cmsym, LUX_INT8, 2, dim) != 1) { status = -1;  quit = 1; return; }
  h = (struct ahead *) sym[cmsym].spec.array.ptr;
  colormap = ((char *)h + sizeof(struct ahead));
  if (fread(colormap, 1, ncolmap,fin) != ncolmap)
- 	{ perror("gifread, colormap"); status = -1;  quit = 1; return; }
+         { perror("gifread, colormap"); status = -1;  quit = 1; return; }
  } else if (fseek(fin, ncolmap, SEEK_CUR) == -1)
- 	{ perror("gifread, colormap"); status = -1;  quit = 1; return; }
+         { perror("gifread, colormap"); status = -1;  quit = 1; return; }
  return;
  }
  //-------------------------------------------------------------------------
@@ -253,7 +253,7 @@ void fatal(char const* s)
  // well, not really, in LUX we like to stick around
  {
         fprintf(stderr,"giftops: %s\n",s);
-        quit = 1;	status = -1;
+        quit = 1;        status = -1;
  }
 
 
@@ -312,14 +312,14 @@ void process(int32_t code, unsigned char **fill)
  //-------------------------------------------------------------------------
 void readraster(int32_t nsize, FILE *fin, unsigned char *raster)
  {
-	unsigned char *fill;
+        unsigned char *fill;
         unsigned char buf[255];
         register int32_t bits=0;
         register unsigned count,datum=0;
         register unsigned char *ch;
         register int32_t code;
 
-	fill = raster;
+        fill = raster;
         datasize = getc(fin);
         clear = 1 << datasize;
         eoi = clear+1;
@@ -344,7 +344,7 @@ void readraster(int32_t nsize, FILE *fin, unsigned char *raster)
                     if (code == eoi) goto exitloop;  /* This kludge put in
                                                         because some GIF files
                                                         aren't standard */
-		    process(code,&fill);
+                    process(code,&fill);
                 }
             }
         }

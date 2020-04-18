@@ -23,7 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #endif
 #include "action.hh"
-#include <string.h>		// for memcpy
+#include <string.h>             // for memcpy
 
 typedef struct {
   int32_t num_levels;
@@ -46,7 +46,7 @@ int32_t lux_laplace2d(int32_t narg, int32_t ps[])
   if (array_num_dims(img) != 2)
     return cerror(NEED_2D_ARR, img);
   if (array_type(img) < LUX_FLOAT)
-    img = lux_float(1, &img);	// get temp FLOAT version
+    img = lux_float(1, &img);   // get temp FLOAT version
   nx = array_dims(img)[0];
   ny = array_dims(img)[1];
   src.f = (float*) array_data(img);
@@ -76,8 +76,8 @@ int32_t lux_laplace2d(int32_t narg, int32_t ps[])
       src.f++;
       // middle part
       for (i = 1; i < nx - 1; i++) {
-	*tgt.f++ = src.f[-1] + src.f[1] + src.f[-nx] + src.f[nx] - 4*src.f[0];
-	src.f++;
+        *tgt.f++ = src.f[-1] + src.f[1] + src.f[-nx] + src.f[nx] - 4*src.f[0];
+        src.f++;
       }
       // right edge
       *tgt.f++ = src.f[-1] + src.f[-nx] + src.f[nx] - 4*src.f[0];
@@ -118,8 +118,8 @@ int32_t lux_laplace2d(int32_t narg, int32_t ps[])
       src.d++;
       // middle part
       for (i = 1; i < nx - 1; i++) {
-	*tgt.d++ = src.d[-1] + src.d[1] + src.d[-nx] + src.d[nx] - 4*src.d[0];
-	src.d++;
+        *tgt.d++ = src.d[-1] + src.d[1] + src.d[-nx] + src.d[nx] - 4*src.d[0];
+        src.d++;
       }
       // right edge
       *tgt.d++ = src.d[-1] + src.d[-nx] + src.d[nx] - 4*src.d[0];
@@ -175,11 +175,11 @@ int32_t gauss_seidel_2d2o(Pointer b, Pointer x, Scalar sx, Scalar sy,
       b.f++;
       // middle
       for (i = 1; i < nx - 1; i++) {
-	*x.f = (sx.f*(x.f[-1] + x.f[1])
-		+ sy.f*(x.f[-nx] + x.f[nx])
-		- *b.f)*s.f;
-	x.f++;
-	b.f++;
+        *x.f = (sx.f*(x.f[-1] + x.f[1])
+                + sy.f*(x.f[-nx] + x.f[nx])
+                - *b.f)*s.f;
+        x.f++;
+        b.f++;
       }
       // right edge
       *x.f = (sx.f*x.f[-1] + sy.f*(x.f[-nx] + x.f[nx]) - *b.f)*s.f;
@@ -225,11 +225,11 @@ int32_t gauss_seidel_2d2o(Pointer b, Pointer x, Scalar sx, Scalar sy,
       b.d++;
       // middle
       for (i = 1; i < nx - 1; i++) {
-	*x.d = (sx.d*(x.d[-1] + x.d[1])
-		+ sy.d*(x.d[-nx] + x.d[nx])
-		- *b.d)*s.d;
-	x.d++;
-	b.d++;
+        *x.d = (sx.d*(x.d[-1] + x.d[1])
+                + sy.d*(x.d[-nx] + x.d[nx])
+                - *b.d)*s.d;
+        x.d++;
+        b.d++;
       }
       // right edge
       *x.d = (sx.d*x.d[-1] + sy.d*(x.d[-nx] + x.d[nx]) - *b.d)*s.d;
@@ -259,7 +259,7 @@ void restrict2(Pointer b, Pointer x, int32_t type, int32_t nx, int32_t ny,
                Scalar sx, Scalar sy, int32_t do_residual, Pointer tgt)
 {
   int32_t i, j, nx2, ny2;
-  Pointer r0, r;		// nx+2 by 3 elements
+  Pointer r0, r;                // nx+2 by 3 elements
 
   nx2 = nx/2;
   ny2 = ny/2;
@@ -267,7 +267,7 @@ void restrict2(Pointer b, Pointer x, int32_t type, int32_t nx, int32_t ny,
   case LUX_FLOAT:
     r0.f = (float*) malloc(nx*3*sizeof(*r0.f));
 
-    r.f = r0.f + 2*nx;		// bottom row of r.f
+    r.f = r0.f + 2*nx;          // bottom row of r.f
 
     // fill in row
     if (do_residual) {
@@ -276,9 +276,9 @@ void restrict2(Pointer b, Pointer x, int32_t type, int32_t nx, int32_t ny,
       x.f++;
       // top middle
       for (i = 1; i < nx - 1; i++) {
-	*r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0]) + sy.f*(x.f[nx] - 2*x.f[0])
-	  - *b.f++;
-	x.f++;
+        *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0]) + sy.f*(x.f[nx] - 2*x.f[0])
+          - *b.f++;
+        x.f++;
       }
       // top right
       *r.f++ = sx.f*(x.f[-1] - 2*x.f[0]) + sy.f*(x.f[nx] - 2*x.f[0]) - *b.f++;
@@ -291,79 +291,79 @@ void restrict2(Pointer b, Pointer x, int32_t type, int32_t nx, int32_t ny,
 
     // do vertically middle part
     for (j = 0; j < ny2 - 1; j++) {
-      r.f = r0.f + nx;		// to beginning of middle row
+      r.f = r0.f + nx;          // to beginning of middle row
       memcpy(r.f - nx, r.f + nx, nx*sizeof(*r.f));
       // left column
       if (do_residual) {
-	r.f[0] = sx.f*(x.f[1] - 2*x.f[0])
-	  + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - b.f[0];
-	r.f[nx] = sx.f*(x.f[nx + 1] - 2*x.f[nx])
-	  + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
-	b.f++;
+        r.f[0] = sx.f*(x.f[1] - 2*x.f[0])
+          + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - b.f[0];
+        r.f[nx] = sx.f*(x.f[nx + 1] - 2*x.f[nx])
+          + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
+        b.f++;
       } else {
-	r.f[0] = x.f[0];
-	r.f[nx] = x.f[nx];
+        r.f[0] = x.f[0];
+        r.f[nx] = x.f[nx];
       }
       r.f++;
       x.f++;
       // middle columns
       for (i = 0; i < nx2 - 1; i++) {
-	if (do_residual) {
-	  r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
-	    + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
-	  *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
-	    + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
-	  x.f++;
-	  r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
-	    + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
-	  *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
-	    + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
-	  x.f++;
-	} else {
-	  r.f[nx] = x.f[nx];
-	  *r.f++ = *x.f++;
-	  r.f[nx] = x.f[nx];
-	  *r.f++ = *x.f++;
-	}
-	//  calculate restricted version
-	*tgt.f++ = r.f[-nx - 3]/16 + r.f[-nx - 2]/8 + r.f[-nx - 1]/16
-	  + r.f[-3]/8 + r.f[-2]/4 + r.f[-1]/8
-	  + r.f[nx - 3]/16 + r.f[nx - 2]/8 + r.f[nx - 1]/16;
+        if (do_residual) {
+          r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
+            + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
+          *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
+            + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+          x.f++;
+          r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
+            + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
+          *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
+            + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+          x.f++;
+        } else {
+          r.f[nx] = x.f[nx];
+          *r.f++ = *x.f++;
+          r.f[nx] = x.f[nx];
+          *r.f++ = *x.f++;
+        }
+        //  calculate restricted version
+        *tgt.f++ = r.f[-nx - 3]/16 + r.f[-nx - 2]/8 + r.f[-nx - 1]/16
+          + r.f[-3]/8 + r.f[-2]/4 + r.f[-1]/8
+          + r.f[nx - 3]/16 + r.f[nx - 2]/8 + r.f[nx - 1]/16;
       }
       // right column
       if (do_residual) {
-	r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
-	  + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
-	*r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
-	  + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
-	x.f++;
-	r.f[nx] = sx.f*(x.f[nx - 1] - 2*x.f[nx])
-	  + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
-	*r.f++ = sx.f*(x.f[-1] - 2*x.f[0])
-	  + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
-	x.f++;
+        r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
+          + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
+        *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
+          + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+        x.f++;
+        r.f[nx] = sx.f*(x.f[nx - 1] - 2*x.f[nx])
+          + sy.f*(x.f[2*nx] + x.f[0] - 2*x.f[nx]) - b.f[nx];
+        *r.f++ = sx.f*(x.f[-1] - 2*x.f[0])
+          + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+        x.f++;
       } else {
-	r.f[nx] = x.f[nx];
-	*r.f++ = *x.f++;
-	r.f[nx] = x.f[nx];
-	*r.f++ = *x.f++;
+        r.f[nx] = x.f[nx];
+        *r.f++ = *x.f++;
+        r.f[nx] = x.f[nx];
+        *r.f++ = *x.f++;
       }
       //  calculate restricted version
       *tgt.f++ = r.f[-nx - 3]/16 + r.f[-nx - 2]/8 + r.f[-nx - 1]/16
-	+ r.f[-3]/8 + r.f[-2]/4 + r.f[-1]/8
-	+ r.f[nx - 3]/16 + r.f[nx - 2]/8 + r.f[nx - 1]/16;
+        + r.f[-3]/8 + r.f[-2]/4 + r.f[-1]/8
+        + r.f[nx - 3]/16 + r.f[nx - 2]/8 + r.f[nx - 1]/16;
       x.f += nx;
     }
 
     // bottom row
-    r.f = r0.f + nx;		// to beginning of middle row
+    r.f = r0.f + nx;            // to beginning of middle row
     memcpy(r.f - nx, r.f + nx, nx*sizeof(*r.f));
     // left column
     if (do_residual) {
       r.f[0] = sx.f*(x.f[1] - 2*x.f[0])
-	+ sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - b.f[0];
+        + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - b.f[0];
       r.f[nx] = sx.f*(x.f[nx + 1] - 2*x.f[nx])
-	+ sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
+        + sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
       b.f++;
     } else {
       r.f[0] = x.f[0];
@@ -374,38 +374,38 @@ void restrict2(Pointer b, Pointer x, int32_t type, int32_t nx, int32_t ny,
     // middle columns
     for (i = 0; i < nx2 - 1; i++) {
       if (do_residual) {
-	r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
-	  + sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
-	*r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
-	  + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
-	x.f++;
-	r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
-	  + sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
-	*r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
-	  + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
-	x.f++;
+        r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
+          + sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
+        *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
+          + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+        x.f++;
+        r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
+          + sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
+        *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
+          + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+        x.f++;
       } else {
-	r.f[nx] = x.f[nx];
-	*r.f++ = *x.f++;
-	r.f[nx] = x.f[nx];
-	*r.f++ = *x.f++;
+        r.f[nx] = x.f[nx];
+        *r.f++ = *x.f++;
+        r.f[nx] = x.f[nx];
+        *r.f++ = *x.f++;
       }
       //  calculate restricted version
       *tgt.f++ = r.f[-nx - 3]/16 + r.f[-nx - 2]/8 + r.f[-nx - 1]/16
-	+ r.f[-3]/8 + r.f[-2]/4 + r.f[-1]/8
-	+ r.f[nx - 3]/16 + r.f[nx - 2]/8 + r.f[nx - 1]/16;
+        + r.f[-3]/8 + r.f[-2]/4 + r.f[-1]/8
+        + r.f[nx - 3]/16 + r.f[nx - 2]/8 + r.f[nx - 1]/16;
     }
     // right column
     if (do_residual) {
       r.f[nx] = sx.f*(x.f[nx + 1] + x.f[nx - 1] - 2*x.f[nx])
-	+ sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
+        + sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
       *r.f++ = sx.f*(x.f[1] + x.f[-1] - 2*x.f[0])
-	+ sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+        + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
       x.f++;
       r.f[nx] = sx.f*(x.f[nx - 1] - 2*x.f[nx])
-	+ sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
+        + sy.f*(x.f[0] - 2*x.f[nx]) - b.f[nx];
       *r.f++ = sx.f*(x.f[-1] - 2*x.f[0])
-	+ sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
+        + sy.f*(x.f[nx] + x.f[-nx] - 2*x.f[0]) - *b.f++;
       x.f++;
     } else {
       r.f[nx] = x.f[nx];
@@ -450,7 +450,7 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
   if (array_num_dims(img) != 2)
     return cerror(NEED_2D_ARR, img);
   if (array_type(img) < LUX_FLOAT)
-    img = lux_float(1, &img);	// get temp FLOAT version
+    img = lux_float(1, &img);   // get temp FLOAT version
   type = array_type(img);
   nx = array_dims(img)[0];
   ny = array_dims(img)[1];
@@ -497,9 +497,9 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
       pyramid->ny[i] = ny2;
       tgt.f += nx2*ny2;
       if (nx2 > 1)
-	nx2 /= 2;
+        nx2 /= 2;
       if (ny2 > 1)
-	ny2 /= 2;
+        ny2 /= 2;
     }
     break;
   case LUX_DOUBLE:
@@ -511,9 +511,9 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
       pyramid->ny[i] = ny2;
       tgt.d += nx2*ny2;
       if (nx2 > 1)
-	nx2 /= 2;
+        nx2 /= 2;
       if (ny2 > 1)
-	ny2 /= 2;
+        ny2 /= 2;
     }
     break;
   }
@@ -562,7 +562,7 @@ a grid of size ~ 2^k
 Multigrid v-cycle:
 
 function MGV(i, b[i], x[i])
-if i == 0 then			// 1 unknown
+if i == 0 then                  // 1 unknown
  solve P[0] exactly for x[0]
  return x[0]
 else

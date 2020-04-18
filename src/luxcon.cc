@@ -28,12 +28,12 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 int32_t anacon(float *xarr, int32_t nx, int32_t ny, float *xlev, int32_t numlev,
-	    int32_t itvord, float xl, float yl, float xsc, float ysc,
-	    float cut)
+            int32_t itvord, float xl, float yl, float xsc, float ysc,
+            float cut)
 {
   // System generated locals
   int32_t i_1, i_2, i_3;
-  int32_t	tkdash(float *, float *, int32_t *, int32_t *);
+  int32_t        tkdash(float *, float *, int32_t *, int32_t *);
 
   // Local variables
   float cell[5];
@@ -107,7 +107,7 @@ details*/
       xmin = cell[0];
       imax = 1;
       for (j = 2; j <= 4; ++j) {
-	// find max,min of cell
+        // find max,min of cell
         if (cell[j - 1] > xmax)
         { xmax = cell[j - 1];  imax = j; }
         else if (cell[j - 1] < xmin)
@@ -118,88 +118,88 @@ details*/
 
       i_3 = numlev;
       for (k = 1; k <= i_3; ++k) {
-	if (xlev[k] <= xmax && xlev[k] >= xmin) {
+        if (xlev[k] <= xmax && xlev[k] >= xmin) {
 //  level goes through cell
-	  ndsh = 1;
-	  if (xlev[k] < cut) {
-	    ndsh = 2;
-	  }
-	  ns = 0;
+          ndsh = 1;
+          if (xlev[k] < cut) {
+            ndsh = 2;
+          }
+          ns = 0;
 // number of sides
-	  for (l = 1; l <= 4; ++l) {
-	    if ((xlev[k] >= cell[l - 1] && xlev[k] < cell[l])
-		|| (xlev[k] < cell[l - 1] && xlev[k] >= cell[l])) {
+          for (l = 1; l <= 4; ++l) {
+            if ((xlev[k] >= cell[l - 1] && xlev[k] < cell[l])
+                || (xlev[k] < cell[l - 1] && xlev[k] >= cell[l])) {
 
 
 /*  calculate endpoints of line segment on the
 side of the cell */
 
-	      ++ns;
-	      if (l == 1) {
+              ++ns;
+              if (l == 1) {
 // top
-		xa[ns - 1] = (float) (icol - 1) +
-		  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
-		ya[ns - 1] = (float) (irow - 1);
-	      } else if (l == 2) {
+                xa[ns - 1] = (float) (icol - 1) +
+                  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
+                ya[ns - 1] = (float) (irow - 1);
+              } else if (l == 2) {
 // right side
-		xa[ns - 1] = (float) icol;
-		ya[ns - 1] = (float) (irow - 1) +
-		  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
-	      } else if (l == 3) {
+                xa[ns - 1] = (float) icol;
+                ya[ns - 1] = (float) (irow - 1) +
+                  (xlev[k] - cell[l - 1]) / (cell[l] - cell[l - 1]);
+              } else if (l == 3) {
 // bottom side
-		xa[ns - 1] = (float) (icol - 1) +
-		  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
-		ya[ns - 1] = (float) irow;
-	      } else {
+                xa[ns - 1] = (float) (icol - 1) +
+                  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
+                ya[ns - 1] = (float) irow;
+              } else {
 // left side
-		xa[ns - 1] = (float) (icol - 1);
-		ya[ns - 1] = (float) (irow - 1) +
-		  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
-	      }
-	    }
-	  }
-	
-	  if (ns > 2) {
-	    ntim = 2;
-	    xmean = cellavg(cell, 4);
+                xa[ns - 1] = (float) (icol - 1);
+                ya[ns - 1] = (float) (irow - 1) +
+                  (xlev[k] - cell[l]) / (cell[l - 1] - cell[l]);
+              }
+            }
+          }
+        
+          if (ns > 2) {
+            ntim = 2;
+            xmean = cellavg(cell, 4);
 /*  if the present level is greater than the mean,
 then the contour */
 /*  is drawn between the max point and the center. (
 imax gives max */
 //  point)
 //  first calculate all screen coordinates
-	    in = imax;
-	    for (ii = 1; ii <= 4; ++ii) {
-	      aa[ii - 1] = xz + xa[in - 1] * xsc;
-	      bb[ii - 1] = yz + ya[in - 1] * ysc;
-	      --in;
-	      if (in < 1) {
-		in = 4;
-	      }
-	    }
-	    if (xlev[k] <= xmean) {
+            in = imax;
+            for (ii = 1; ii <= 4; ++ii) {
+              aa[ii - 1] = xz + xa[in - 1] * xsc;
+              bb[ii - 1] = yz + ya[in - 1] * ysc;
+              --in;
+              if (in < 1) {
+                in = 4;
+              }
+            }
+            if (xlev[k] <= xmean) {
 /* switch 2 and 4 so that point 1 connects to
 point 2 and point 3 to 4. */
-	      tmp = aa[3];
-	      aa[3] = aa[1];
-	      aa[1] = tmp;
-	      tmp = bb[3];
-	      bb[3] = bb[1];
-	      bb[1] = tmp;
-	    }
-	  } else if (ns == 2) {
-	    ntim = 1;
-	    for (ii = 1; ii <= 2; ++ii) {
-	      aa[ii - 1] = xz + xa[ii - 1] * xsc;
-	      bb[ii - 1] = yz + ya[ii - 1] * ysc;
-	    }
-	  }
+              tmp = aa[3];
+              aa[3] = aa[1];
+              aa[1] = tmp;
+              tmp = bb[3];
+              bb[3] = bb[1];
+              bb[1] = tmp;
+            }
+          } else if (ns == 2) {
+            ntim = 1;
+            for (ii = 1; ii <= 2; ++ii) {
+              aa[ii - 1] = xz + xa[ii - 1] * xsc;
+              bb[ii - 1] = yz + ya[ii - 1] * ysc;
+            }
+          }
 // now draw the contours
 // ns.gt.2
-	  if (ns >= 2) {
-	    tkdash(aa, bb, &ndsh, &ntim);
-	  }
-	}
+          if (ns >= 2) {
+            tkdash(aa, bb, &ndsh, &ntim);
+          }
+        }
 // xlev(k).gt....
       }
 // k=1,numlev
@@ -233,19 +233,19 @@ float cellavg(float *cell, int32_t nav)
 
 
 int32_t inccon(int32_t itv, int32_t nx, int32_t ny, int32_t *ibase, int32_t *ibindx, int32_t *incr,
-	    int32_t *ninc, int32_t *n2, int32_t *n3, int32_t *n4)
+            int32_t *ninc, int32_t *n2, int32_t *n3, int32_t *n4)
 {
 // get limits and increments for processing the raw array
 // inputs:
 // itv is the order to process :
-// 	    0  left to right, bottom to top
-// 	    1  bottom to top, left to right
-// 	    2  left to right, top to bottom
-// 	    3  top to bottom, left to right
-// 	    4  right to left, top to bottom
-// 	    5  top to bottom, right to left
-// 	    6  right to left, bottom to top
-// 	    7  bottom to top, right to left
+//             0  left to right, bottom to top
+//             1  bottom to top, left to right
+//             2  left to right, top to bottom
+//             3  top to bottom, left to right
+//             4  right to left, top to bottom
+//             5  top to bottom, right to left
+//             6  right to left, bottom to top
+//             7  bottom to top, right to left
 // nx,ny  size of raw array (columns,rows)
 
 // outputs:
@@ -262,11 +262,11 @@ int32_t inccon(int32_t itv, int32_t nx, int32_t ny, int32_t *ibase, int32_t *ibi
 
 // from the bottom of the screen to the top.
 
-/* --	7/7/86        orders 1 and 5 seem to be reversed, patch to
+/* --        7/7/86        orders 1 and 5 seem to be reversed, patch to
 fix */
-/* 	the comments and logic in parts of this seem wrong, should be cleaned
+/*         the comments and logic in parts of this seem wrong, should be cleaned
 */
-// 	up someday, beware !
+//         up someday, beware !
   if (itv % 2 == 0) {
 // process horizontal before vertical
     *ibindx = 1;

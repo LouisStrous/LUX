@@ -24,37 +24,37 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <stdlib.h>
 #include <limits.h>
-#include <string.h>		// for memcpy
+#include <string.h>                // for memcpy
 #include <math.h>
 #include "action.hh"
 extern "C" {
 #include "visualclass.h"
 }
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>		// for XVisualInfo
+#include <X11/Xutil.h>                // for XVisualInfo
 
-Display		*display;
-int32_t		screen_num, connect_flag = 0, private_colormap = 0,
+Display                *display;
+int32_t                screen_num, connect_flag = 0, private_colormap = 0,
   threeColors = 0, foreground_pixel, colormin, colormax, nColors,
   select_visual = 0, bits_per_rgb, bits_per_pixel, colorIndexType,
   visualClass;
-uint32_t	display_cells, depth, display_width, display_height,
+uint32_t        display_cells, depth, display_width, display_height,
   nColorCells, colorIndex;
-unsigned long	*pixels, black_pixel, white_pixel, red_mask, green_mask,
+unsigned long        *pixels, black_pixel, white_pixel, red_mask, green_mask,
   blue_mask, red_mask_bits, green_mask_bits, blue_mask_bits,
   red_mask_lower, green_mask_lower, blue_mask_lower;
-Colormap	colorMap;
-Visual		*visual;
-XColor		*colors;
-GC	gcnot;
-Atom	wm_delete;
+Colormap        colorMap;
+Visual                *visual;
+XColor                *colors;
+GC        gcnot;
+Atom        wm_delete;
 
-int32_t	xerr(Display *, XErrorEvent *), selectVisual(void);
-XColor	*anaFindBestRGB(XColor *color, int32_t mode);
-Status	anaAllocNamedColor(char const*, XColor **);
+int32_t        xerr(Display *, XErrorEvent *), selectVisual(void);
+XColor        *anaFindBestRGB(XColor *color, int32_t mode);
+Status        anaAllocNamedColor(char const*, XColor **);
 
-#define FBRGB_RAMP		1 // color ramp
-#define FBRGB_INCIDENTAL	2 // incidental colors
+#define FBRGB_RAMP                1 // color ramp
+#define FBRGB_INCIDENTAL        2 // incidental colors
 
 /*
   Global variables:
@@ -135,7 +135,7 @@ Status	anaAllocNamedColor(char const*, XColor **);
    StaticColor, PseudoColor, TrueColor, DirectColor */
 
 char const* visualNames[] = { "StaticGray", "GrayScale", "StaticColor",
-			   "PseudoColor", "TrueColor", "DirectColor" };
+                           "PseudoColor", "TrueColor", "DirectColor" };
 
 
 int32_t setup_x_visual(int32_t desiredVisualClass)
@@ -146,15 +146,15 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
 // routine returns LUX_OK immediately.  Sets some of the globals.
 // LS 12mar99
 {
-  extern int32_t	scalemin, scalemax;
-  Window	win;
-  int32_t	i, j;
-  XColor	*tempColor, rgb;
-  unsigned long	n;
-  extern char	*display_name;
-  XVisualInfo	matchedVisual;
+  extern int32_t        scalemin, scalemax;
+  Window        win;
+  int32_t        i, j;
+  XColor        *tempColor, rgb;
+  unsigned long        n;
+  extern char        *display_name;
+  XVisualInfo        matchedVisual;
 
-  if (connect_flag)		// already did this earlier
+  if (connect_flag)                // already did this earlier
     return LUX_OK;
 
   // 1. open the display
@@ -165,7 +165,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
   // 2. set error handler
   XSetErrorHandler(xerr);
 
-  connect_flag = 1;		// flag connection to X server
+  connect_flag = 1;                // flag connection to X server
 
   // 3. get defaults
   screen_num     = DefaultScreen(display);
@@ -182,9 +182,9 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     selectVisual();
   else if (desiredVisualClass >= 0) {
     if (!XMatchVisualInfo(display, screen_num, depth, desiredVisualClass,
-			  &matchedVisual))
+                          &matchedVisual))
       return luxerror("No %s visual at depth %d is available on this screen.",
-		   0, visualNames[desiredVisualClass], depth);
+                   0, visualNames[desiredVisualClass], depth);
     visual = matchedVisual.visual;
     depth = matchedVisual.depth;
     display_cells = matchedVisual.colormap_size;
@@ -202,7 +202,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     i = 0;
     do {
       if (red_mask_lower == -1 && (n & 1))
-	red_mask_lower = i;
+        red_mask_lower = i;
       red_mask_bits += (n & 1);
       n = n >> 1;
       i++;
@@ -213,7 +213,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     i = 0;
     do {
       if (green_mask_lower == -1 && (n & 1))
-	green_mask_lower = i;
+        green_mask_lower = i;
       green_mask_bits += (n & 1);
       n = n >> 1;
       i++;
@@ -224,7 +224,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     i = 0;
     do {
       if (blue_mask_lower == -1 && (n & 1))
-	blue_mask_lower = i;
+        blue_mask_lower = i;
       blue_mask_bits += (n & 1);
       n = n >> 1;
       i++;
@@ -261,11 +261,11 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
   switch (visualclass(visual)) {
     case PseudoColor: case StaticGray: case GrayScale: case StaticColor:
       if (display_cells <= 0x100)
-	bits_per_pixel = 8;
+        bits_per_pixel = 8;
       else if (display_cells <= 0x10000)
-	bits_per_pixel = 16;
+        bits_per_pixel = 16;
       else
-	bits_per_pixel = 32;
+        bits_per_pixel = 32;
       break;
     case DirectColor: case TrueColor:
       red_mask = visual->red_mask;
@@ -274,72 +274,72 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
       bits_per_pixel = 0;
       n = red_mask | green_mask | blue_mask;
       while (n & 1) {
-	bits_per_pixel++;
-	n = n >> 1;
-      }	// end of while (n & 1)
+        bits_per_pixel++;
+        n = n >> 1;
+      }        // end of while (n & 1)
       if (bits_per_pixel <= 8)
-	bits_per_pixel = 8;
+        bits_per_pixel = 8;
       else if (bits_per_pixel <= 16)
-	bits_per_pixel = 16;
+        bits_per_pixel = 16;
       else
-	bits_per_pixel = 32;
+        bits_per_pixel = 32;
       break;
   } // end of switch (visualclass(visual))
 
   if (visualIsRW(visualclass(visual))) {
     if (!private_colormap) {
       for (nColorCells = display_cells; nColorCells > 95; nColorCells--)
-	if (XAllocColorCells(display, colorMap, False, NULL, 0, pixels,
-			     nColorCells))
-	  break;
+        if (XAllocColorCells(display, colorMap, False, NULL, 0, pixels,
+                             nColorCells))
+          break;
       if (nColorCells < 96)
-	private_colormap = 1;
+        private_colormap = 1;
     } // end of if (!private_colormap)
     if (private_colormap) {
       puts("Using private colormap.");
       colorMap = XCreateColormap(display, RootWindow(display, screen_num),
-				 visual, AllocNone);
+                                 visual, AllocNone);
       /* On some systems, there seem to be fewer DirectColor color cells
-	 available than visual->map_entries.  We better check how many
-	 we can really get */
+         available than visual->map_entries.  We better check how many
+         we can really get */
       for ( ; display_cells; display_cells--)
-	if (XAllocColorCells(display, colorMap, False, NULL, 0, pixels,
-			     display_cells)) {
-	  printf("Got %d color cells.\n", display_cells);
-	  break;
-	}
+        if (XAllocColorCells(display, colorMap, False, NULL, 0, pixels,
+                             display_cells)) {
+          printf("Got %d color cells.\n", display_cells);
+          break;
+        }
       if (!display_cells) {
-	printf("Could not allocate any color cells for the %s visual.\nUse a different one.\n", visualNames[visualclass(visual)]);
-	XFreeColormap(display, colorMap);
-	XCloseDisplay(display);
-	free(pixels);
-	return LUX_ERROR;
+        printf("Could not allocate any color cells for the %s visual.\nUse a different one.\n", visualNames[visualclass(visual)]);
+        XFreeColormap(display, colorMap);
+        XCloseDisplay(display);
+        free(pixels);
+        return LUX_ERROR;
       }
       // we may not want to get them all
       XFreeColors(display, colorMap, pixels, display_cells, 0);
 
       /* for DirectColor and TrueColor we can construct incidental colors
-	 reasonably well on the fly from the existing map, so we don't
-	 leave any cells for those, particularly because the number of cells
-	 can be very small, e.g. only 8 on a modest PC. */
+         reasonably well on the fly from the existing map, so we don't
+         leave any cells for those, particularly because the number of cells
+         can be very small, e.g. only 8 on a modest PC. */
       // for the other visual classes, we leave some for incidental colors
       if (visualPrimariesAreSeparate(visualclass(visual)))
-	j = 0;
+        j = 0;
       else {
-	j = display_cells/3;
-	if (j < 2)
-	  j = 2;
-	else if (j > 32)
-	  j = 32;
+        j = display_cells/3;
+        if (j < 2)
+          j = 2;
+        else if (j > 32)
+          j = 32;
       }
       nColorCells = display_cells - j;
       if (!XAllocColorCells(display, colorMap, False, NULL, 0, pixels,
-			    nColorCells)) {
-	XCloseDisplay(display);
-	connect_flag = 0;
-	return
-	  luxerror("Could not allocate %d cells in private colormap for %s visual.", 0, nColorCells, visualNames[visualclass(visual)]);
-      }	// end of if (!XAllocColorCells(...))
+                            nColorCells)) {
+        XCloseDisplay(display);
+        connect_flag = 0;
+        return
+          luxerror("Could not allocate %d cells in private colormap for %s visual.", 0, nColorCells, visualNames[visualclass(visual)]);
+      }        // end of if (!XAllocColorCells(...))
     } // end of if (private_colormap)
     else {
       // we grabbed all available color cells and found that there
@@ -358,11 +358,11 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
       XCloseDisplay(display);
       connect_flag = 0;
       return
-	luxerror("Could not allocate memory for XColor entries in setup_x()",
-	      0);
+        luxerror("Could not allocate memory for XColor entries in setup_x()",
+              0);
     } // end of (!colors)
 
-    nColors = nColorCells;	// currently all of them are for the ramp
+    nColors = nColorCells;        // currently all of them are for the ramp
     colormin = 0;
     colormax = nColors - 1;
 
@@ -370,7 +370,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     for (i = 0; i < nColors; i++) {
       colors[i].pixel = pixels[i];
       colors[i].red = colors[i].green = colors[i].blue =
-	(i*0xffff)/(nColors - 1);
+        (i*0xffff)/(nColors - 1);
       colors[i].flags = DoRed | DoGreen | DoBlue;
     } // end of for (i)
     // indicate that we are not using the remaining cells for LUX (yet)
@@ -401,7 +401,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     else
       white_pixel = colors[1].pixel; // just pick one
 
-    free(pixels);		// don't need it anymore
+    free(pixels);                // don't need it anymore
     if (private_colormap)
       XInstallColormap(display, colorMap);
 
@@ -419,10 +419,10 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
     for (i = 0; i < display_cells; i++)
       pixels[i] = colors[(i*(nColors - 1))/(display_cells - 1)].pixel;
   } // end of if (visualIsRW(visualclass(visual)))
-  else {			// read-only visuals
+  else {                        // read-only visuals
     if (private_colormap)
       colorMap = XCreateColormap(display, RootWindow(display, screen_num),
-				 visual, AllocNone);
+                                 visual, AllocNone);
     nColorCells = display_cells;
 
     // 5. get black and white
@@ -453,8 +453,8 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
       XCloseDisplay(display);
       connect_flag = 0;
       return
-	luxerror("Could not allocate memory for XColor entries in setup_x()",
-	      0);
+        luxerror("Could not allocate memory for XColor entries in setup_x()",
+              0);
     } // end of if (!colors)
     for (i = 0; i < nColorCells; ++i) {
       XColor thisone = colors[i];
@@ -473,8 +473,8 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
   // applies to those visuals, too
 
  {
-   unsigned long	valuemask;
-   XSetWindowAttributes	att;
+   unsigned long        valuemask;
+   XSetWindowAttributes        att;
 
    att.background_pixel = black_pixel;
    att.border_pixel = black_pixel;
@@ -482,8 +482,8 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
    valuemask = CWBackPixel | CWColormap | CWBorderPixel;
 
    win = XCreateWindow(display, RootWindow(display, screen_num), 0, 0,
-		       100, 100, 1, depth, InputOutput, visual,
-		       valuemask, &att);
+                       100, 100, 1, depth, InputOutput, visual,
+                       valuemask, &att);
    gcnot = XCreateGC(display, win,0, NULL);
    XDestroyWindow(display, win); // no longer needed
  }
@@ -517,10 +517,10 @@ void disconnect_x(void)
 int32_t selectVisual(void)
 // allow the user to select a visual
 {
-  XVisualInfo	*vInfo, vTemplate;
-  int32_t	nVisual, i, mask, j;
-  int32_t	getNewLine(char *, size_t, char const *, char);
-  uint32_t	r, x;
+  XVisualInfo        *vInfo, vTemplate;
+  int32_t        nVisual, i, mask, j;
+  int32_t        getNewLine(char *, size_t, char const *, char);
+  uint32_t        r, x;
   char const* name;
 
   mask = VisualScreenMask;
@@ -536,38 +536,38 @@ int32_t selectVisual(void)
   printf("There are %1d visuals available on this screen\n", nVisual);
 
   printf("%2s %11s %3s %4s %1s %1s %1s\n", "#", "class", "bit",
-	 "lev", "r", "g", "b");
+         "lev", "r", "g", "b");
   j = -1;
   for (i = 0; i < nVisual; i++) {
     name = visualNames[xvisualinfoclass(vInfo[i])];
 
     printf("%2d %11s %3d %4d", i + 1, name, vInfo[i].depth,
-	   vInfo[i].colormap_size);
+           vInfo[i].colormap_size);
     if (visualPrimariesAreSeparate(xvisualinfoclass(vInfo[i]))) {
       r = 0;
       x = vInfo[i].red_mask;
       do {
-	r += (x & 1);
-	x = x >> 1;
+        r += (x & 1);
+        x = x >> 1;
       } while (x);
       printf(" %1d", r);
       r = 0;
       x = vInfo[i].green_mask;
       do {
-	r += (x & 1);
-	x = x >> 1;
+        r += (x & 1);
+        x = x >> 1;
       } while (x);
       printf(" %1d", r);
       r = 0;
       x = vInfo[i].blue_mask;
       do {
-	r += (x & 1);
-	x = x >> 1;
+        r += (x & 1);
+        x = x >> 1;
       } while (x);
       printf(" %1d\n", r);
     } else
       putchar('\n');
-    if (vInfo[i].visual == visual)	// found current visual
+    if (vInfo[i].visual == visual)        // found current visual
       j = i;
   }
   printf("current visual: %d\n", j + 1);
@@ -578,9 +578,9 @@ int32_t selectVisual(void)
     visualClass = atol(curScrat);
     if (visualClass < 1 || visualClass > nVisual)
       printf("Selection %1d is invalid.  Select between 1 and %1d (inclusive).\n",
-	     visualClass, nVisual);
+             visualClass, nVisual);
   } while (visualClass < 1 || visualClass > nVisual);
-  visualClass--;		// visual class
+  visualClass--;                // visual class
   visual = vInfo[visualClass].visual;
   depth = vInfo[visualClass].depth;
   display_cells = vInfo[visualClass].colormap_size;
@@ -597,7 +597,7 @@ int32_t nextFreeColorsIndex(void)
 // returns an index to a free colors[] element.
 // NOTE: this routine assumes there is such an element!
 {
-  static int32_t	index = 0;
+  static int32_t        index = 0;
 
   while (colors[index].flags) {
     index++;
@@ -611,7 +611,7 @@ void installPixel(int32_t pixel)
 // installs the indicated pixel value as one incidental color in the
 // colors[] database if it does not already exist there.
 {
-  int32_t	i;
+  int32_t        i;
 
   for (i = nColors; i < nColorCells; i++)
     if (colors[i].pixel == pixel)
@@ -644,23 +644,23 @@ Status anaAllocNamedColor(char const* colorName, XColor **return_color)
    Returns 0 if some fatal error occurs.
    LS 12mar99 - 17mar99 4oct99 */
 {
-  unsigned long	pixel;
-  XColor	color, color2, *bestcolor;
-  static XColor	rcolor;
-  int32_t	index;
+  unsigned long        pixel;
+  XColor        color, color2, *bestcolor;
+  static XColor        rcolor;
+  int32_t        index;
 
   if (visualclass(visual) == GrayScale || visualclass(visual) == PseudoColor) {
     // figure out which RGB values to store
     if (!XLookupColor(display, colorMap, colorName, &color2, &color)) {
       printf("Could not resolve color \"%s\"\nSubstituting another",
-	     colorName);
+             colorName);
       *return_color = &colors[nColorCells - 1]; // take the last one
       foreground_pixel = (*return_color)->pixel;
       return 1;
     } // end of if (!XLookupColor(...))
     // have rgb values
     bestcolor = anaFindBestRGB(&color, FBRGB_INCIDENTAL);
-    if (bestcolor->pad) {	// an exact match
+    if (bestcolor->pad) {        // an exact match
       *return_color = bestcolor;
       foreground_pixel = bestcolor->pixel;
       return 1;
@@ -668,21 +668,21 @@ Status anaAllocNamedColor(char const* colorName, XColor **return_color)
     // need to allocate a new cell
     if (nColorCells < display_cells) { // may have more cells
       if (XAllocColorCells(display, colorMap, False, NULL, 0, &pixel, 1)) {
-	// found a R/W cell; now find an available XColor cell
-	index = nextFreeColorsIndex();
-	// store the RGB and pixel values
-	colors[index].red = color.red;
-	colors[index].green = color.green;
-	colors[index].blue = color.blue;
-	colors[index].flags = DoRed | DoGreen | DoBlue;
-	colors[index].pixel = pixel;
-	nColorCells++;
-	*return_color = &colors[index];
-	XStoreColor(display, colorMap, colors + index);
-	XQueryColor(display, colorMap, colors + index);
-	foreground_pixel = pixel;
-	return 1;
-      }	// end of if (XAllocColorCells(...))
+        // found a R/W cell; now find an available XColor cell
+        index = nextFreeColorsIndex();
+        // store the RGB and pixel values
+        colors[index].red = color.red;
+        colors[index].green = color.green;
+        colors[index].blue = color.blue;
+        colors[index].flags = DoRed | DoGreen | DoBlue;
+        colors[index].pixel = pixel;
+        nColorCells++;
+        *return_color = &colors[index];
+        XStoreColor(display, colorMap, colors + index);
+        XQueryColor(display, colorMap, colors + index);
+        foreground_pixel = pixel;
+        return 1;
+      }        // end of if (XAllocColorCells(...))
     } // end of if (nColorCells < display_cells)
     // if we get here then there are no more R/W cells available
     printf("Cannot allocate color \"%s\"\n", colorName);
@@ -694,17 +694,17 @@ Status anaAllocNamedColor(char const* colorName, XColor **return_color)
   else if (visualIsRO(visualclass(visual))) {
     if (!XAllocNamedColor(display, colorMap, colorName, &rcolor, &color)) {
       printf("Could not resolve color \"%s\"\nSubstituting another",
-	     colorName);
+             colorName);
       XAllocColor(display, colorMap, &rcolor);
     }
     foreground_pixel = rcolor.pixel;
     *return_color = &rcolor;
   } /* end of if (visualclass(visual) == GrayScale
      || visualclass(visual) == PseudoColor) else if (visualIsRO(visualclass(visual)) */
-  else {			// DirectColor: find closest match
+  else {                        // DirectColor: find closest match
     if (!XLookupColor(display, colorMap, colorName, &color2, &color)) {
       printf("Could not resolve color \"%s\"\nSubstituting another",
-	     colorName);
+             colorName);
       *return_color = &colors[nColorCells - 1]; // take the last one
       foreground_pixel = (*return_color)->pixel;
       return 1;
@@ -725,9 +725,9 @@ XColor *anaFindBestRGB(XColor *color, int32_t mode)
 // FBRGB_INCIDENTAL -> check LUX's incidental colors
 // LS 12mar99
 {
-  uint32_t	i, best, i1, i2;
-  float	mindist, dist, temp;	// use float because uint32_t is not
-				// big enough in all cases
+  uint32_t        i, best, i1, i2;
+  float        mindist, dist, temp;        // use float because uint32_t is not
+                                // big enough in all cases
 
   if (visualPrimariesAreSeparate(visualclass(visual))) {
     XAllocColor(display, colorMap, color);
@@ -755,25 +755,25 @@ XColor *anaFindBestRGB(XColor *color, int32_t mode)
       temp = colors[i].red - color->red;
       dist = temp*temp;
       if (dist > mindist)
-	continue;
+        continue;
       temp = colors[i].green - color->green;
       dist += temp*temp;
       if (dist > mindist)
-	continue;
+        continue;
       temp = colors[i].blue - color->blue;
       dist += temp*temp;
       if (dist < mindist) {
-	mindist = dist;
-	best = i;
-      }	// end of if (dist < mindist)
+        mindist = dist;
+        best = i;
+      }        // end of if (dist < mindist)
     } // end of for (i1)
-    colors[best].pad = (mindist == 0)? 1: 0;	// flag 1 if exact match
+    colors[best].pad = (mindist == 0)? 1: 0;        // flag 1 if exact match
     return &colors[best];
   } // end of if (visualPrimariesAreSeparate(visualclass(visual))) else
 }
 //-------------------------------------------------------------------------
 void storeColorTable(float *red, float *green, float *blue, int32_t nelem,
-		     int32_t stretch)
+                     int32_t stretch)
 // stores a new color table in LUX's color map.
 // <red>: points at an array of red color intensities between 0 and 1
 // <green>: points at an array of green color intensities between 0 and 1
@@ -785,8 +785,8 @@ void storeColorTable(float *red, float *green, float *blue, int32_t nelem,
 // If any color value is not within the range 0 - 1, then wraparound occurs
 // LS 12mar99
 {
-  uint32_t	i, j, k1, k2, n;
-  XColor	rgb;
+  uint32_t        i, j, k1, k2, n;
+  XColor        rgb;
 
   if (stretch) {
     k1 = nColors - 1;
@@ -799,16 +799,16 @@ void storeColorTable(float *red, float *green, float *blue, int32_t nelem,
   if (visualIsRW(visualclass(visual))) {
     if (visualIsGray(visualclass(visual)))
       for (i = 0; i < n; i++) {
-	j = (i*k2)/k1;
-	colors[i].red = colors[i].green = colors[i].blue =
-	  ((int32_t) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
+        j = (i*k2)/k1;
+        colors[i].red = colors[i].green = colors[i].blue =
+          ((int32_t) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
       }
     else
       for (i = 0; i < n; i++) {
-	j = (i*k2)/k1;
-	colors[i].red = ((int32_t) floor(red[j]*0xffff)) & 0xffff;
-	colors[i].blue = ((int32_t) floor(blue[j]*0xffff)) & 0xffff;
-	colors[i].green = ((int32_t) floor(green[j]*0xffff)) & 0xffff;
+        j = (i*k2)/k1;
+        colors[i].red = ((int32_t) floor(red[j]*0xffff)) & 0xffff;
+        colors[i].blue = ((int32_t) floor(blue[j]*0xffff)) & 0xffff;
+        colors[i].green = ((int32_t) floor(green[j]*0xffff)) & 0xffff;
       }
     XStoreColors(display, colorMap, colors, n);
     XFlush(display);
@@ -816,25 +816,25 @@ void storeColorTable(float *red, float *green, float *blue, int32_t nelem,
     rgb.flags = DoRed | DoGreen | DoBlue;
     if (visualIsGray(visualclass(visual)))
       for (i = 0; i < display_cells; i++) {
-	j = (i*k2)/k1;
-	rgb.red = rgb.green = rgb.blue =
-	  ((int32_t) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
-	XAllocColor(display, colorMap, &rgb);
-	pixels[i] = rgb.pixel;
+        j = (i*k2)/k1;
+        rgb.red = rgb.green = rgb.blue =
+          ((int32_t) floor((red[j] + green[j] + blue[j])/3.0*0xffff)) & 0xffff;
+        XAllocColor(display, colorMap, &rgb);
+        pixels[i] = rgb.pixel;
       }
     else
       for (i = 0; i < display_cells; i++) {
-	j = (i*k2)/k1;
-	rgb.red = ((int32_t) floor(red[j]*0xffff)) & 0xffff;
-	rgb.blue = ((int32_t) floor(blue[j]*0xffff)) & 0xffff;
-	rgb.green = ((int32_t) floor(green[j]*0xffff)) & 0xffff;
-	XAllocColor(display, colorMap, &rgb);
-	pixels[i] = rgb.pixel;
+        j = (i*k2)/k1;
+        rgb.red = ((int32_t) floor(red[j]*0xffff)) & 0xffff;
+        rgb.blue = ((int32_t) floor(blue[j]*0xffff)) & 0xffff;
+        rgb.green = ((int32_t) floor(green[j]*0xffff)) & 0xffff;
+        XAllocColor(display, colorMap, &rgb);
+        pixels[i] = rgb.pixel;
       }
   }
 }
 //-------------------------------------------------------------------------
-int32_t	ck_window(int32_t);
+int32_t        ck_window(int32_t);
 int32_t getXcolor(char *colorname, XColor *color, int32_t alloc)
 // looks for the named color in the current colormap.  Returns the found
 // color in <color>, which must be predefined.  If <alloc> is non-zero, then
@@ -843,13 +843,13 @@ int32_t getXcolor(char *colorname, XColor *color, int32_t alloc)
 // returns LUX_OK on success; LUX_ERROR on failure.
 // LS 12mar99
 {
-  XColor	color2, *pcolor;
-  extern int32_t	last_wid;
-  extern GC	gc[], gcmap[];
-  int32_t	lux_xcreat(int32_t, uint32_t, uint32_t, int32_t, int32_t, int32_t, char *,
-		   char *);
-  extern Window	win[];
-  extern Pixmap	maps[];
+  XColor        color2, *pcolor;
+  extern int32_t        last_wid;
+  extern GC        gc[], gcmap[];
+  int32_t        lux_xcreat(int32_t, uint32_t, uint32_t, int32_t, int32_t, int32_t, char *,
+                   char *);
+  extern Window        win[];
+  extern Pixmap        maps[];
 
   if (alloc) {
     if (anaAllocNamedColor(colorname, &pcolor) == LUX_ERROR)
@@ -859,13 +859,13 @@ int32_t getXcolor(char *colorname, XColor *color, int32_t alloc)
       return LUX_ERROR;
     if (last_wid < 0) {
       if (!maps[-last_wid]
-	  && lux_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == LUX_ERROR)
-	return LUX_ERROR;
+          && lux_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == LUX_ERROR)
+        return LUX_ERROR;
       XSetForeground(display, gcmap[-last_wid], color->pixel);
     } else {
       if (!win[last_wid]
-	  && lux_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == LUX_ERROR)
-	return LUX_ERROR;
+          && lux_xcreat(last_wid, 512, 512, 0, 0, 0, NULL, NULL) == LUX_ERROR)
+        return LUX_ERROR;
       XSetForeground(display, gc[last_wid], color->pixel);
     }
     return LUX_OK;
@@ -889,50 +889,50 @@ int32_t threecolors(float *list, int32_t n)
    a table with a grey section, a red section, and a blue section.
    LS 12nov98 */
 {
-  float	factor, tlist[9], off[3], fac[3];
-  int32_t	i, j;
+  float        factor, tlist[9], off[3], fac[3];
+  int32_t        i, j;
 
   switch (n) {
-    case 0:			// uninstall
+    case 0:                        // uninstall
       break;
     case 1:
       if (!*list) {
-	n = 0;
+        n = 0;
       } else {
-	factor = *list;
-	if (factor < -1)
-	  factor = -1;
-	else if (factor > 1)
-	  factor = 1;
-	tlist[0] = tlist[1] = tlist[2] = 1.0; // grey
-	tlist[3] = tlist[8] = -factor;
-	tlist[4] = tlist[7] = 0.0;
-	tlist[5] = tlist[6] = 0.0;
-	n = 9;
+        factor = *list;
+        if (factor < -1)
+          factor = -1;
+        else if (factor > 1)
+          factor = 1;
+        tlist[0] = tlist[1] = tlist[2] = 1.0; // grey
+        tlist[3] = tlist[8] = -factor;
+        tlist[4] = tlist[7] = 0.0;
+        tlist[5] = tlist[6] = 0.0;
+        n = 9;
       }
       break;
     case 9:
       for (i = 0; i < 9; i++)
-	if (list[i] < -1)
-	  tlist[i] = -1;
-	else if (list[i] > 1)
-	  tlist[i] = 1;
-	else
-	  tlist[i] = list[i];
+        if (list[i] < -1)
+          tlist[i] = -1;
+        else if (list[i] > 1)
+          tlist[i] = 1;
+        else
+          tlist[i] = list[i];
       break;
     default:
       return luxerror("Wrong # arguments to threecolors()", 0);
   }
 
-  if (!n) {			// uninstall
-    if (!threeColors)		// nothing to do
+  if (!n) {                        // uninstall
+    if (!threeColors)                // nothing to do
       return LUX_OK;
     factor = 65535.0/nColors;
     for (i = 0; i < nColors; i++)
       colors[i].red = colors[i].blue = colors[i].green = i*factor;
     for (i = 0; i < 256; i++)
       pixels[i] = colors[(i*nColors)/256].pixel;
-    threeColors = 0;		// standard grey colormap
+    threeColors = 0;                // standard grey colormap
   } else {
     /* we install three color domains.  In colors[], each is nColors/3
        color cells.  In pixels[], each is 256/3 = 85 elements wide.
@@ -944,11 +944,11 @@ int32_t threecolors(float *list, int32_t n)
     // first domain
     for (j = 0; j < 3; j++)
       if (tlist[j] >= 0) {
-	off[j] = 0.0;
-	fac[j] = tlist[j]*factor;
+        off[j] = 0.0;
+        fac[j] = tlist[j]*factor;
       } else {
-	off[j] = (1 + tlist[j])*65535.0;
-	fac[j] = -tlist[j]*factor;
+        off[j] = (1 + tlist[j])*65535.0;
+        fac[j] = -tlist[j]*factor;
       }
     for (i = 0; i < nColors/3; i++) {
       colors[i].red = i*fac[0] + off[0];
@@ -958,11 +958,11 @@ int32_t threecolors(float *list, int32_t n)
     // second domain
     for (j = 0; j < 3; j++)
       if (tlist[j + 3] >= 0) {
-	fac[j] = tlist[j + 3]*factor;
-	off[j] = 0.0 - i*fac[j];
+        fac[j] = tlist[j + 3]*factor;
+        off[j] = 0.0 - i*fac[j];
       } else {
-	fac[j] = -tlist[j + 3]*factor;
-	off[j] = (1 + tlist[j + 3])*65535.0 - i*fac[j];
+        fac[j] = -tlist[j + 3]*factor;
+        off[j] = (1 + tlist[j + 3])*65535.0 - i*fac[j];
       }
     for ( ; i < 2*(nColors/3); i++) {
       colors[i].red = i*fac[0] + off[0];
@@ -972,11 +972,11 @@ int32_t threecolors(float *list, int32_t n)
     // third domain
     for (j = 0; j < 3; j++)
       if (tlist[j + 6] >= 0) {
-	fac[j] = tlist[j + 6]*factor;
-	off[j] = 0.0 - i*fac[j];
+        fac[j] = tlist[j + 6]*factor;
+        off[j] = 0.0 - i*fac[j];
       } else {
-	fac[j] = -tlist[j + 6]*factor;
-	off[j] = (1 + tlist[j + 6])*65535.0 - i*fac[j];
+        fac[j] = -tlist[j + 6]*factor;
+        off[j] = (1 + tlist[j + 6])*65535.0 - i*fac[j];
       }
     for ( ; i < 3*(nColors/3); i++) {
       colors[i].red = i*fac[0] + off[0];
@@ -1006,11 +1006,11 @@ int32_t lux_colorComponents(int32_t narg, int32_t ps[])
 // and blue components in <r>, <g>, and <b>, which range between 0 and 255.
 // <pixels> must have type
 {
-  uint8_t	*data;
+  uint8_t        *data;
   int32_t *q1, *q2, *q3;
-  uint8_t	*red, *green, *blue;
-  int32_t	nelem, i, step, pix;
-  XColor	*color;
+  uint8_t        *red, *green, *blue;
+  int32_t        nelem, i, step, pix;
+  XColor        *color;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
@@ -1043,7 +1043,7 @@ int32_t lux_colorComponents(int32_t narg, int32_t ps[])
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < display_cells; i++)
       if (colors[i].flags & (DoRed | DoGreen | DoBlue))
-	q1[colors[i].pixel] = i;
+        q1[colors[i].pixel] = i;
     while (nelem--) {
       memcpy(&pix, data, step);
       color = &colors[q1[pix]];
@@ -1122,7 +1122,7 @@ int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
 
     // we can use the indices from tolookup if we convert them to LUX_INT8
     if (lux_byte_inplace(1, ps + 2) == LUX_ERROR
-	|| redef_array(iq, LUX_INT8, 2, dims) == LUX_ERROR)
+        || redef_array(iq, LUX_INT8, 2, dims) == LUX_ERROR)
       goto error_1;
     q = (uint8_t*) array_data(iq);
     p = (uint8_t*) array_data(ps[1]);
@@ -1131,28 +1131,28 @@ int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
     case PseudoColor: case GrayScale: case StaticColor: case StaticGray:
       q1 = (int32_t*) malloc(display_cells*sizeof(int32_t));
       if (!q1) {
-	cerror(ALLOC_ERR, 0);
-	goto error_1;
+        cerror(ALLOC_ERR, 0);
+        goto error_1;
       }
       for (i = 0; i < display_cells; i++)
-	if (colors[i].flags & (DoRed | DoGreen | DoBlue))
-	  q1[colors[i].pixel] = i;
+        if (colors[i].flags & (DoRed | DoGreen | DoBlue))
+          q1[colors[i].pixel] = i;
       for (i = 0; i < ncolors; i++) {
-	int32_t pix;
-	XColor *color;
+        int32_t pix;
+        XColor *color;
 
-	memcpy(&pix, p, step);
-	color = &colors[q1[pix]];
-	*q++ = color->red >> 8;
-	*q++ = color->green >> 8;
-	*q++ = color->blue >> 8;
-	p += step;
+        memcpy(&pix, p, step);
+        color = &colors[q1[pix]];
+        *q++ = color->red >> 8;
+        *q++ = color->green >> 8;
+        *q++ = color->blue >> 8;
+        p += step;
       }
       free(q1);
       for ( ; i < 256; i++) {
-	*q++ = 0;
-	*q++ = 0;
-	*q++ = 0;
+        *q++ = 0;
+        *q++ = 0;
+        *q++ = 0;
       }
       break;
     case DirectColor:
@@ -1160,51 +1160,51 @@ int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
       q2 = (int32_t*) malloc(display_cells*sizeof(int32_t));
       q3 = (int32_t*) malloc(display_cells*sizeof(int32_t));
       if (!q1 || !q2 || !q3) {
-	free(q1);
-	free(q2);
-	cerror(ALLOC_ERR, 0);
-	goto error_1;
+        free(q1);
+        free(q2);
+        cerror(ALLOC_ERR, 0);
+        goto error_1;
       }
       for (i = 0; i < nColors; i++) {
-	q1[(colors[i].pixel & red_mask) >> red_mask_lower] = i;
-	q2[(colors[i].pixel & green_mask) >> green_mask_lower] = i;
-	q3[(colors[i].pixel & blue_mask) >> blue_mask_lower] = i;
+        q1[(colors[i].pixel & red_mask) >> red_mask_lower] = i;
+        q2[(colors[i].pixel & green_mask) >> green_mask_lower] = i;
+        q3[(colors[i].pixel & blue_mask) >> blue_mask_lower] = i;
       }
       for (i = 0; i < ncolors; i++) {
-	memcpy(&pix, p, step);
-	*q++ = colors[q1[(pix & red_mask) >> red_mask_lower]].red >> 8;
-	*q++ = colors[q2[(pix & green_mask) >> green_mask_lower]].green >> 8;
-	*q++ = colors[q3[(pix & blue_mask) >> blue_mask_lower]].blue >> 8;
-	p += step;
+        memcpy(&pix, p, step);
+        *q++ = colors[q1[(pix & red_mask) >> red_mask_lower]].red >> 8;
+        *q++ = colors[q2[(pix & green_mask) >> green_mask_lower]].green >> 8;
+        *q++ = colors[q3[(pix & blue_mask) >> blue_mask_lower]].blue >> 8;
+        p += step;
       }
       free(q1);
       free(q2);
       free(q3);
       for ( ; i < 256; i++) {
-	*q++ = 0;
-	*q++ = 0;
-	*q++ = 0;
+        *q++ = 0;
+        *q++ = 0;
+        *q++ = 0;
       }
       break;
     case TrueColor:
       for (i = 0; i < ncolors; i++) {
-	memcpy(&pix, p, step);
-	*q++ = ((pix & red_mask) >> red_mask_lower) << (8 - red_mask_bits);
-	*q++ = ((pix & green_mask) >> green_mask_lower) << (8 - green_mask_bits);
-	*q++ = ((pix & blue_mask) >> blue_mask_lower) << (8 - blue_mask_bits);
-	p += step;
+        memcpy(&pix, p, step);
+        *q++ = ((pix & red_mask) >> red_mask_lower) << (8 - red_mask_bits);
+        *q++ = ((pix & green_mask) >> green_mask_lower) << (8 - green_mask_bits);
+        *q++ = ((pix & blue_mask) >> blue_mask_lower) << (8 - blue_mask_bits);
+        p += step;
       }
       for ( ; i < 256; i++) {
-	*q++ = 0;
-	*q++ = 0;
-	*q++ = 0;
+        *q++ = 0;
+        *q++ = 0;
+        *q++ = 0;
       }
       break;
     }
   } else {
     return luxerror("More than 256 different colors!", 0);
   }
-  zapTemp(ps[1]);	// no longer needed
+  zapTemp(ps[1]);        // no longer needed
   ps[1] = iq;
   return LUX_OK;
 
@@ -1241,7 +1241,7 @@ int32_t lux_colorstogrey(int32_t narg, int32_t ps[])
       return cerror(ALLOC_ERR, 0);
     for (i = 0; i < display_cells; i++)
       if (colors[i].flags & (DoRed | DoGreen | DoBlue))
-	q1[colors[i].pixel] = i;
+        q1[colors[i].pixel] = i;
     while (nelem--) {
       memcpy(&pix, data, step);
       color = &colors[q1[pix]];

@@ -26,13 +26,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "action.hh"
 
-extern float	xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
+extern float        xfac, yfac, wxt, wxb, wyt, wyb, xmin, xmax, ymin, ymax;
 #if HAVE_LIBX11
-extern float	tvix, tviy, tvixb, tviyb, tvscale;
+extern float        tvix, tviy, tvixb, tviyb, tvscale;
 #endif
-extern int32_t	iorder, iyhigh, ipltyp;
+extern int32_t        iorder, iyhigh, ipltyp;
 
-int32_t	lux_replace(int32_t, int32_t);
+int32_t        lux_replace(int32_t, int32_t);
 
 // A bunch of coordinate transformation routines
 /* choices: LUX_DVI, LUX_DEV (xport), LUX_IMG, LUX_PLT (plot),
@@ -57,7 +57,7 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
 // if <x> or <y> are equal to NULL, then the corresponding coordinate
 // is not treated.
 {
-  extern int32_t	setup;
+  extern int32_t        setup;
 
   if (from == to)
     return 1;
@@ -67,73 +67,73 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
       break;
     case LUX_DEP:
       if (!((x && *x < 1.0 && *x != 0.0) || (y && *y < 1.0 && *y != 0.0)))
-	break;
+        break;
       // else fall-thru
     case LUX_DVI:
       if (x)
-	*x *= xfac;
+        *x *= xfac;
       if (y)
-	*y *= yfac;
+        *y *= yfac;
       break;
 #if HAVE_LIBX11
     case LUX_RIM:
       if (x)
-	*x = tvix + *x * (tvixb - tvix);
+        *x = tvix + *x * (tvixb - tvix);
       if (y) {
-	if (setup & 8)
-	  *y = tviyb - *y * (tviyb - tviy);
-	else
-	  *y = tviy + *y * (tviyb - tviy);
+        if (setup & 8)
+          *y = tviyb - *y * (tviyb - tviy);
+        else
+          *y = tviy + *y * (tviyb - tviy);
       }
       break;
     case LUX_X11:
       if (y)
-	*y = yfac - 1 - *y;
+        *y = yfac - 1 - *y;
       break;
     case LUX_IMG:
       if (x)
-	*x = tvix + *x*tvscale;
+        *x = tvix + *x*tvscale;
       if (y) {
-	if (setup & 8)
-	  *y = tviyb - *y * tvscale;
-	else
-	  *y = tviy + *y * tvscale;
+        if (setup & 8)
+          *y = tviyb - *y * tvscale;
+        else
+          *y = tviy + *y * tvscale;
       }
       break;
 #endif
     case LUX_PLT:
       if (x) {
-	if (ipltyp/2 % 2) {
-	  if (xmin && xmin != xmax)
-	    *x = log(*x/xmin)/log(xmax/xmin);
-	  else
-	    *x = 0.0;
-	} else {
-	  if (xmin != xmax)
-	    *x = (*x - xmin)/(xmax - xmin);
-	  else
-	    *x = 0.0;
-	}
+        if (ipltyp/2 % 2) {
+          if (xmin && xmin != xmax)
+            *x = log(*x/xmin)/log(xmax/xmin);
+          else
+            *x = 0.0;
+        } else {
+          if (xmin != xmax)
+            *x = (*x - xmin)/(xmax - xmin);
+          else
+            *x = 0.0;
+        }
       }
       if (y) {
-	if (ipltyp % 2) {
-	  if (ymin && ymin != ymax)
-	    *y = log(*y/ymin)/log(ymax/ymin);
-	  else
-	    *y = 0;
-	} else {
-	  if (ymin != ymax)
-	    *y = (*y - ymin)/(ymax - ymin);
-	  else
-	    *y = 0.0;
-	}
+        if (ipltyp % 2) {
+          if (ymin && ymin != ymax)
+            *y = log(*y/ymin)/log(ymax/ymin);
+          else
+            *y = 0;
+        } else {
+          if (ymin != ymax)
+            *y = (*y - ymin)/(ymax - ymin);
+          else
+            *y = 0.0;
+        }
       }
       // fall-thru
     case LUX_RPL:
       if (x)
-	*x = (*x * (wxt - wxb) + wxb)*xfac;
+        *x = (*x * (wxt - wxb) + wxb)*xfac;
       if (y)
-	*y = (*y * (wyt - wyb) + wyb)*yfac;
+        *y = (*y * (wyt - wyb) + wyb)*yfac;
       break;
     default:
       return cerror(ILL_COORD_SYS, from);
@@ -144,69 +144,69 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
       return 1;
     case LUX_DVI: case 0:
       if (x)
-	*x = xfac? *x/xfac: 0.0;
+        *x = xfac? *x/xfac: 0.0;
       if (y)
-	*y = yfac? *y/yfac: 0.0;
+        *y = yfac? *y/yfac: 0.0;
       break;
 #if HAVE_LIBX11
     case LUX_RIM:
       if (x)
-	*x = (tvixb != tvix)? (*x - tvix)/(tvixb - tvix): 0.0;
+        *x = (tvixb != tvix)? (*x - tvix)/(tvixb - tvix): 0.0;
       if (y) {
-	if (setup & 8)
-	  *y = (tviyb != tviy)? (tviyb - *y)/(tviyb - tviy): 0.0;
-	else
-	  *y = (tviyb != tviy)? (*y - tviy)/(tviyb - tviy): 0.0;
+        if (setup & 8)
+          *y = (tviyb != tviy)? (tviyb - *y)/(tviyb - tviy): 0.0;
+        else
+          *y = (tviyb != tviy)? (*y - tviy)/(tviyb - tviy): 0.0;
       }
       break;
     case LUX_IMG:
       if (tvscale) {
-	if (x)
-	  *x = (*x - tvix)/tvscale;
-	if (y) {
-	  if (setup & 8)
-	    *y = (tviyb - *y)/tvscale;
-	  else
-	    *y = (*y - tviy)/tvscale;
-	}
+        if (x)
+          *x = (*x - tvix)/tvscale;
+        if (y) {
+          if (setup & 8)
+            *y = (tviyb - *y)/tvscale;
+          else
+            *y = (*y - tviy)/tvscale;
+        }
       } else {
-	if (x)
-	  *x = 0.0;
-	if (y)
-	  *y = 0.0;
+        if (x)
+          *x = 0.0;
+        if (y)
+          *y = 0.0;
       }
       break;
     case LUX_X11:
       if (y)
-	*y = yfac - 1 - *y;
+        *y = yfac - 1 - *y;
       break;
 #endif
     case LUX_PLT:  case LUX_RPL:
       if (x) {
-	if (xfac && wxt != wxb)
-	  *x = (*x/xfac - wxb)/(wxt - wxb);
-	else
-	  *x = 0.0;
+        if (xfac && wxt != wxb)
+          *x = (*x/xfac - wxb)/(wxt - wxb);
+        else
+          *x = 0.0;
       }
       if (y) {
-	if (yfac && wyt != wyb)
-	  *y = (*y/yfac - wyb)/(wyt - wyb);
-	else
-	  *y = 0.0;
+        if (yfac && wyt != wyb)
+          *y = (*y/yfac - wyb)/(wyt - wyb);
+        else
+          *y = 0.0;
       }
       if (to == LUX_RPL)
-	break;
+        break;
       if (x) {
-	if (ipltyp/2 % 2)
-	  *x = (xmin != xmax)? xmin*exp(log(xmax/xmin)* *x): 0.0;
-	else
-	  *x = *x * (xmax - xmin) + xmin;
+        if (ipltyp/2 % 2)
+          *x = (xmin != xmax)? xmin*exp(log(xmax/xmin)* *x): 0.0;
+        else
+          *x = *x * (xmax - xmin) + xmin;
       }
       if (y) {
-	if (ipltyp % 2)
-	  *y = (ymin != ymax)? ymin*exp(log(ymax/ymin)* *y): 0.0;
-	else
-	  *y = *y * (ymax - ymin) + ymin;
+        if (ipltyp % 2)
+          *y = (ymin != ymax)? ymin*exp(log(ymax/ymin)* *y): 0.0;
+        else
+          *y = *y * (ymax - ymin) + ymin;
       }
       break;
     default:
@@ -222,12 +222,12 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
 // /DVI, /DEV, /IMG, /PLT, /RIM, /RPL, /DEP, /X11
 // /TODVI, /TODEV, /TOIMG, /TOPLT, /TORIM, /TORPL, /TOX11
 {
-  int32_t	iq, n, n2, from, to;
-  float	*xold, *yold, *xnew, *ynew, x, y;
+  int32_t        iq, n, n2, from, to;
+  float        *xold, *yold, *xnew, *ynew, x, y;
 
   from = (internalMode & 7);
   to = (internalMode/8 & 7);
-  iq = lux_float(1, ps);	// float xold
+  iq = lux_float(1, ps);        // float xold
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
@@ -242,7 +242,7 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
     default:
       return cerror(ILL_CLASS, iq);
   }
-  iq = lux_float(1, &ps[1]);	// float yold
+  iq = lux_float(1, &ps[1]);        // float yold
   switch (symbol_class(iq)) {
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
@@ -259,7 +259,7 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
   }
   if (n != n2)
     return cerror(INCMP_DIMS, iq);
-  if (narg >= 3) {		// xnew
+  if (narg >= 3) {                // xnew
     lux_replace(ps[2], iq);
     iq = ps[2];
     if (symbol_class(iq) == LUX_SCALAR)
@@ -268,7 +268,7 @@ int32_t lux_coordtrf(int32_t narg, int32_t ps[])
       xnew = (float *) array_data(iq);
   } else
     xnew = xold;
-  if (narg >= 4) {		// ynew
+  if (narg >= 4) {                // ynew
     lux_replace(ps[3], iq);
     iq = ps[3];
     if (symbol_class(iq) == LUX_SCALAR)

@@ -24,9 +24,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include "action.hh"
 
-char	*c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
-	*k_delete, *k_insert, *k_up, *k_down, *k_right, *k_left, *c_save,
-	*c_restore, *special[7], isSpecial[256];
+char        *c_left, *c_right, *c_up, *c_down, *cl_eos, *k_backspace,
+        *k_delete, *k_insert, *k_up, *k_down, *k_right, *k_left, *c_save,
+        *c_restore, *special[7], isSpecial[256];
 
 // dummyterm assumes vt100-like defaults for the special key codes.
 // The delete and backspace keys on PCs are often different from those
@@ -39,8 +39,8 @@ void dummyTerm(void)
   char const *termName[] = {
     "linux"
   };
-  int32_t	nTerms = 1, i;
-  char	*name, isPCterm = 0;
+  int32_t        nTerms = 1, i;
+  char        *name, isPCterm = 0;
 
   name = getenv("TERM");
   for (i = 0; i < nTerms; i++)
@@ -82,7 +82,7 @@ void dummyTerm(void)
 }
 //--------------------------------------------------------------------
 // This routine reads the specifications from a user-generated file.
-#define	nNames  (sizeof(names)/sizeof(char *))
+#define        nNames  (sizeof(names)/sizeof(char *))
 void manualTerm(int32_t number)
 {
   char const* names[] = {
@@ -96,12 +96,12 @@ void manualTerm(int32_t number)
     &cl_eos
   };
 
-  extern char	*curScrat;
-  char	*p, *name;
-  FILE	*fp;
-  int32_t	n, i;
+  extern char        *curScrat;
+  char        *p, *name;
+  FILE        *fp;
+  int32_t        n, i;
 
-  dummyTerm();			// default;
+  dummyTerm();                        // default;
   p = getenv("LUXDIR");
   if (p) {
     strcpy(curScrat, p);
@@ -116,19 +116,19 @@ void manualTerm(int32_t number)
   }
   fp = fopen(curScrat, "r");
   if (!fp)
-    return;			// not found; using dummyterm instead
+    return;                        // not found; using dummyterm instead
   n = scratSize();
   do {
     if (fgets(curScrat, n, fp)) { // get line from file
       p = strtok(curScrat, "="); // find code name
       for (i = 0; i < nNames; i++)
-	if (!strcmp(names[i], p)) // found code name in list
-	  break;
+        if (!strcmp(names[i], p)) // found code name in list
+          break;
       p = strtok(NULL, "\n");
-      if (i < nNames) {		// found code name in list
-	translateEscapes(p);
-	*codes[i] = (char*) realloc(*codes[i], strlen(p) + 1);
-	memcpy(*codes[i], p, strlen(p) + 1);
+      if (i < nNames) {                // found code name in list
+        translateEscapes(p);
+        *codes[i] = (char*) realloc(*codes[i], strlen(p) + 1);
+        memcpy(*codes[i], p, strlen(p) + 1);
       }
     }
   } while (!feof(fp));
@@ -149,7 +149,7 @@ void manualTerm(int32_t number)
 int32_t lux_manualterm(int32_t narg, int32_t ps[])
 // select a manual terminal specification
 {
-  int32_t	i;
+  int32_t        i;
 
   i = int_arg(ps[0]);
   if (i < 0)

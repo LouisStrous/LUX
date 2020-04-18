@@ -772,7 +772,7 @@ void CommonStoCJDA(char * const *date, double *CJD)
 
 //--------------------------------------------------------------------------
 //* The Chronological Julian Day Number of the epoch of the Hebrew calendar
-#define HEBREW_EPOCH	(347998)
+#define HEBREW_EPOCH        (347998)
 
 static char const * const Hebrew_monthnames[] = {
   "Tishri", "Heshvan", "Kislev", "Tevet", "Shevat", "Adar", "Nisan",
@@ -815,31 +815,31 @@ void CJDNtoHebrew(int32_t CJDN, int32_t *year, int32_t *month, int *day)
   int32_t x1 = iaquot(19*y1 + 17, 235); // provisional calculation year number
   // -5879541 ≤ x₁ ≤ 5878588
   int32_t x3 = y1 - iaquot(235*x1 + 1, 19); /* provisional calculation
-					   month number */
+                                           month number */
   /* calculate the running day number of the beginning of calculation
      month x3 of calculation year x1 */
   int32_t c4 = Hebrew_cycm2rd(x1, x3);
   // -5879539 ≤ x₁ ≤ 5878588
 
-  int32_t z4 = y4 - c4;		// provisional calculation day
-  if (z4 < 0 || z4 > 28) {	// the month number may be wrong
-    if (z4 < 0) {	 // the provisional month was one too great
+  int32_t z4 = y4 - c4;                // provisional calculation day
+  if (z4 < 0 || z4 > 28) {        // the month number may be wrong
+    if (z4 < 0) {         // the provisional month was one too great
       --y1;
       x1 = iaquot(19*y1 + 17, 235);
       x3 = y1 - iaquot(235*x1 + 1, 19);
       c4 = Hebrew_cycm2rd(x1, x3);
       z4 = y4 - c4;
-    } else {			// the provisional month may be one too small
+    } else {                        // the provisional month may be one too small
       int32_t y1b = y1 + 1;
       int32_t x1b = iaquot(19*y1b + 17, 235);
       int32_t x3b = y1b - iaquot(235*x1b + 1, 19);
       int32_t c4b = Hebrew_cycm2rd(x1b, x3b);
       int32_t z4b = y4 - c4b;
-      if (z4b == 0) {		// provisional month y1 was indeed one too small
-	x1 = x1b;
-	x3 = x3b;
-	z4 = z4b;
-      }	// else y1 was already correct after all
+      if (z4b == 0) {                // provisional month y1 was indeed one too small
+        x1 = x1b;
+        x3 = x3b;
+        z4 = z4b;
+      }        // else y1 was already correct after all
     }
   } // else y1 was already correct
   /* translate from calculation year/month/day to calendar
@@ -944,32 +944,32 @@ int32_t Hebrew_cycm2rd(int32_t x1, int32_t x3)
      account only the first two delays */
   int32_t nu2m = tishri2(x1 - 1);
   // -5879539 ≤ x₁ ≤ 5879541
-  int32_t nu2 = tishri2(x1);	// likewise for year x₁
+  int32_t nu2 = tishri2(x1);        // likewise for year x₁
   /* -5879539 ≤ x₁ ≤ 5879541
      -2147482937 ≤ υ₂ ≤ 2147482937 */
-  int32_t nu2p = tishri2(x1 + 1);	// likewise for year x₁ + 1
+  int32_t nu2p = tishri2(x1 + 1);        // likewise for year x₁ + 1
   // -5879539 ≤ x₁ ≤ 5879540
-  int32_t nu2p2 = tishri2(x1 + 2);	// likewise for year x₁ + 2
+  int32_t nu2p2 = tishri2(x1 + 2);        // likewise for year x₁ + 2
   // -5879539 ≤ x₁ ≤ 5879539
 
   /* calculate the length of year x₁ - 1, taking into account only the
      first two delays */
   int32_t L2m = nu2 - nu2m;
-  int32_t L2 = nu2p - nu2;		// likewise for year x₁
-  int32_t L2p = nu2p2 - nu2p;	// likewise for year x₁ + 1
+  int32_t L2 = nu2p - nu2;                // likewise for year x₁
+  int32_t L2p = nu2p2 - nu2p;        // likewise for year x₁ + 1
 
   // calculate the effect of the third delay on the length of year x₁
   int32_t v3 = (L2 == 356)? 2: 0;
-  int32_t v3p = (L2p == 356)? 2: 0;	// likewise for year x₁ + 1
+  int32_t v3p = (L2p == 356)? 2: 0;        // likewise for year x₁ + 1
 
   // calculate the effect of the fourth delay on the length of year x₁
   int32_t v4 = (L2m == 382);
-  int32_t v4p = (L2 == 382);	// likewise for year x₁ + 1
+  int32_t v4p = (L2 == 382);        // likewise for year x₁ + 1
 
   // calculate the running day number of New Year of calculation year x₁
   int32_t c2 = nu2 + v3 + v4;
-  int32_t c2p = nu2p + v3p + v4p;	// likewise for year x₁ + 1
-  int32_t L = c2p - c2;		// the length of calculation year x₁
+  int32_t c2p = nu2p + v3p + v4p;        // likewise for year x₁ + 1
+  int32_t L = c2p - c2;                // the length of calculation year x₁
 
   /* calculate the running day number within the calendar year of the
      first day of calculation month x₃, assuming a regular year, and
@@ -980,9 +980,9 @@ int32_t Hebrew_cycm2rd(int32_t x1, int32_t x3)
   /* the lengths of calendar months 8 and 9 depend on the length of
      the year */
   if (x3 > 7)
-    c3 += ((L + 7)/2)%15;	// adjustment for length of calendar month 8
+    c3 += ((L + 7)/2)%15;        // adjustment for length of calendar month 8
   if (x3 > 8)
-    c3 -= ((385 - L)/2)%15;	// adjustment for length of calendar month 9
+    c3 -= ((385 - L)/2)%15;        // adjustment for length of calendar month 9
   // 0 ≤ c₃ ≤ 356
 
   return c2 + c3;
@@ -1003,10 +1003,10 @@ int32_t HebrewtoCJDN(int year, int month, int day)
 
      Translate (calendar) year, month, day into calculation year,
      calculation month, calculation day. */
-  int32_t c0 = (13 - month)/7;	// assumption: 1 ≤ month ≤ 13
-  int32_t x1 = year - 1 + c0;	// calculation year
-  int32_t x3 = month - 1;		// calculation month
-  int32_t z4 = day - 1;		// calculation day
+  int32_t c0 = (13 - month)/7;        // assumption: 1 ≤ month ≤ 13
+  int32_t x1 = year - 1 + c0;        // calculation year
+  int32_t x3 = month - 1;                // calculation month
+  int32_t z4 = day - 1;                // calculation day
   /* Calculate the running day number of the first day of calculation
      year x₁, calculation month x₃, relative to calendar day 1 of
      calendar month 1 preceding New Year (calendar day 1 of calendar
@@ -1325,7 +1325,7 @@ void CJDtoCJDA(double const *in, double *out)
 //--------------------------------------------------------------------------
 double CJDtoLunar(double CJD)
 {
-  double	k, CJD2;
+  double        k, CJD2;
 
   k = floor((CJDtoJD(CJD) - 2451550.09765)/29.530588853) + 83017;
   CJD2 = LunartoCJD(k);
@@ -1340,7 +1340,7 @@ void CJDtoLunarA(double const *CJD, double *lunar)
 //--------------------------------------------------------------------------
 double LunartoCJD(double lunar)
 {
-  double	T, k;
+  double        T, k;
 
   k = lunar - 83017;
   T = k/1236.85;

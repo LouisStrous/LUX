@@ -29,10 +29,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
  typedef double TIME;
- static	int32_t	m[]  =  {31,28,31,30,31,30,31,31,30,31,30,31};
- static	float	rq = 57.2957795;
- static	float	pi = 3.141592654, b, r, d, p;
- static	int32_t	choice;
+ static        int32_t        m[]  =  {31,28,31,30,31,30,31,31,30,31,30,31};
+ static        float        rq = 57.2957795;
+ static        float        pi = 3.141592654, b, r, d, p;
+ static        int32_t        choice;
  //--------------------------------------------------------------------------
  /* this section has a copy of part of Bogart's time routines, we want to be
  able to get UTC time strings from TAI in seconds and the reverse */
@@ -50,7 +50,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     int32_t ut_flag;
     char zone[8];
  } dattim;
- double	time_tai,  last_tai = 0.0;
+ double        time_tai,  last_tai = 0.0;
 #define JD_EPOCH        (2443144.5)
 #define EPOCH_2000_01_01        ( 725760000.0)
 #define EPOCH_1601_01_01        (-11865398400.0)
@@ -83,7 +83,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
   -94694387.0,                                                //  1974.01.01
   -63158386.0,                                                //  1975.01.01
   -31622385.0,                                                //  1976.01.01
-	 16.0,                                                //  1977.01.01
+         16.0,                                                //  1977.01.01
    31536017.0,                                                //  1978.01.01
    63072018.0,                                                //  1979.01.01
    94608019.0,                                                //  1980.01.01
@@ -226,7 +226,7 @@ TIME epoch_time_from_date ()
  /* modified from one used by Rick Bogart to work with day of year rather
  than month, day of month */
   TIME t;
-  int32_t	yr1601;
+  int32_t        yr1601;
 
   t = dattim.second + 60.0 * (dattim.minute + 60.0 * (dattim.hour));
   t += SEC_DAY * (dattim.dofy - 1);
@@ -342,9 +342,9 @@ int32_t lux_tai_from_date(int32_t narg, int32_t ps[]) // returns TAI
 int32_t lux_date_from_tai(int32_t narg, int32_t ps[]) // returns date string
  // call is s =  date_from_tai(tai)
  {
- char	utc[64];		// just to hold times
+ char        utc[64];                // just to hold times
  int32_t result_sym, prec = 0;
- TIME	t;
+ TIME        t;
  if (double_arg_stat(ps[0], &t) != 1) return -1;
  if (narg > 1) {
  if (int_arg_stat(ps[1], &prec) != 1) return -1;
@@ -358,9 +358,9 @@ int32_t lux_date_from_tai(int32_t narg, int32_t ps[]) // returns date string
 int32_t lux_tri_name_from_tai(int32_t narg, int32_t ps[]) // returns date string
  // call is s =  tri_name_tai(tai)
  {
- char	*p;
+ char        *p;
  int32_t result_sym;
- TIME	t;
+ TIME        t;
  if (double_arg_stat(ps[0], &t) != 1) return -1;
 #define TRILENGTH 16
  t += utc_adjustment (t, "UTC");
@@ -390,36 +390,36 @@ int32_t lux_sun_r(int32_t narg, int32_t ps[]) // sun_r function
  // returns solar radius, r = sun_r(day_of_year, year)
  {
  choice = 1;
- return	ephem_setup(narg,ps);
+ return        ephem_setup(narg,ps);
  }
  //--------------------------------------------------------------------------
 int32_t lux_sun_d(int32_t narg, int32_t ps[]) // sun_d function
  // returns solar d angle, d = sun_d(day_of_year, year)
  {
  choice = 2;
- return	ephem_setup(narg,ps);
+ return        ephem_setup(narg,ps);
  }
  //--------------------------------------------------------------------------
 int32_t lux_sun_p(int32_t narg, int32_t ps[]) // sun_p function
  // returns solar P angle, p = sun_p(day_of_year, year)
  {
  choice = 3;
- return	ephem_setup(narg,ps);
+ return        ephem_setup(narg,ps);
  }
  //--------------------------------------------------------------------------
-int32_t	execute_error(int32_t), sephem(int32_t, float);
+int32_t        execute_error(int32_t), sephem(int32_t, float);
 int32_t ephem_setup(int32_t narg, int32_t ps[])
  {
- int32_t	nsym, result_sym, j, nd, n, iy;
- float	day;
- struct	ahead	*h;
- register union	types_ptr q1,q3;
+ int32_t        nsym, result_sym, j, nd, n, iy;
+ float        day;
+ struct        ahead        *h;
+ register union        types_ptr q1,q3;
 
  // first arg is the day, can be scalar or array
  nsym= ps[0];
  nsym = lux_float(1, &nsym);
  //switch on the class
- switch (symbol_class(nsym))	{
+ switch (symbol_class(nsym))        {
  case LUX_SCAL_PTR:             //scalar ptr
  result_sym = scalar_scratch(LUX_FLOAT); n=1; q1.l = scal_ptr_pointer(nsym).l;
  q3.l = &sym[result_sym].spec.scalar.l; break;
@@ -430,12 +430,12 @@ int32_t ephem_setup(int32_t narg, int32_t ps[])
  h = (struct ahead *) sym[nsym].spec.array.ptr;
  q1.l = (int32_t *) ((char *)h + sizeof(struct ahead));
  nd = h->ndim;
- n = 1; for (j=0;j<nd;j++) n *= h->dims[j];	// # of elements for nsym
+ n = 1; for (j=0;j<nd;j++) n *= h->dims[j];        // # of elements for nsym
  result_sym = array_clone(nsym,LUX_FLOAT);
  h = (struct ahead *) sym[result_sym].spec.array.ptr;
  q3.f = (float *) ((char *)h + sizeof(struct ahead));
  break;
- default:	return execute_error(32);
+ default:        return execute_error(32);
  }
  // second arg is the year which must be a scalar
  iy = int_arg( ps[1]);
@@ -448,7 +448,7 @@ int32_t ephem_setup(int32_t narg, int32_t ps[])
  // 4/7/99 - patched to accept year 2000 to 2099
  if (iy < 0 || iy > 199 )  return execute_error(117);
  while (n>0) {
- n--;	day = *q1.f++;	sephem( iy, day);
+ n--;        day = *q1.f++;        sephem( iy, day);
  switch (choice) {
  case 0: *q3.f++ = b; break;
  case 1: *q3.f++ = r; break;
@@ -456,13 +456,13 @@ int32_t ephem_setup(int32_t narg, int32_t ps[])
  case 3: *q3.f++ = p; break;
  }
  }
- return	result_sym;
+ return        result_sym;
  }
  //--------------------------------------------------------------------------
 int32_t admo(int32_t idoy, int32_t iyr, int32_t *idm, int32_t *imy)
  {
  // convert day of year to month and day of month
- int32_t	ndt, i;
+ int32_t        ndt, i;
  if (iyr%4 == 0) m[1]  =  29; else m[1]  =  28;
  ndt = 0;
  for (i=0;i<12;i++) {ndt = ndt + m[i];if (ndt >= idoy) break;}
@@ -480,72 +480,72 @@ int32_t julian(int32_t iy, int32_t im, int32_t id)
  c         jd  -  julian day
  */
  {
- double	b, did, a;
- int32_t	ii, iyy, ij;
+ double        b, did, a;
+ int32_t        ii, iyy, ij;
  iyy  =  1900. + iy;
- if (im <= 2) { iyy = iyy - 1;	im = im+12; }
- a = ((float) iyy)/100.;	b = 2.-a+a/4.;	did = id;
- ii = 365.25 * (float) iyy;	ij = 30.6001* (float) (im+1);
- return	(int32_t) (ii + ij + b + 1720994.5 + did);
+ if (im <= 2) { iyy = iyy - 1;        im = im+12; }
+ a = ((float) iyy)/100.;        b = 2.-a+a/4.;        did = id;
+ ii = 365.25 * (float) iyy;        ij = 30.6001* (float) (im+1);
+ return        (int32_t) (ii + ij + b + 1720994.5 + did);
  }
  //--------------------------------------------------------------------------
 int32_t sephem(int32_t ny, float day)
  {
- /*	returns solar b angle (in radians) and solar radius (in arcsec)
-	 input is year and day of year (including fraction of day)*/
+ /*        returns solar b angle (in radians) and solar radius (in arcsec)
+         input is year and day of year (including fraction of day)*/
  /*
    time variable for newcomb's folmulae:
    fraction of julian centuries elapsed since 1900.05 (noon 1st of january)
    =  j.d.2415020.0)
  */
- double	sday, jd, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
- double	year, eincl, t;
- int32_t	id, im, idoy, iy;
+ double        sday, jd, h, hh, ehel, eks, sml, anm, cc, el, sl, san, av, om, ba;
+ double        year, eincl, t;
+ int32_t        id, im, idoy, iy;
  /* the day is done as a fp value such that the first day is 0 - 0.9999999,
  this means that to use the julian date function, we have to add 1,
  we finally get the f.p. day since 1900.05 */
- idoy = (int32_t) (day+1.0);	iy = ny;	sday = (day- (int32_t) day);
+ idoy = (int32_t) (day+1.0);        iy = ny;        sday = (day- (int32_t) day);
  admo(idoy, iy, &id, &im);
  // printf("iy,im,id = %d %d %d\n",iy,im,id);
  jd = (double) julian(iy,im,id)+0.5;
- h = (jd + sday - 2415020.0)/36525.0;	hh = h * h;
+ h = (jd + sday - 2415020.0)/36525.0;        hh = h * h;
  //printf("sday, jd, h0, h, hh = %f, %10.1f %g %g %g\n",sday, jd, h0, h, hh);
-	 /* newcomb's formulae. (page 98 explanatory suppl. to the ephemeris)
-	    mean obliquity of the ecliptic*/
+         /* newcomb's formulae. (page 98 explanatory suppl. to the ephemeris)
+            mean obliquity of the ecliptic*/
  ehel = 0.4093198 - 2.2703e-4 * h - 2.86e-8 * hh;
-					 // eccentricity of earth's orbit
+                                         // eccentricity of earth's orbit
  eks = 0.01675104 - 0.0000418*h;
-						 // mean longitude of sun
+                                                 // mean longitude of sun
  sml = 279.6967 + 36000.769*h;
  sml = sml - 360.* floor( sml/360.);
  sml = sml * pi/180.0;
  //printf("sml = %f\n",sml);
-						 // mean anomaly
- anm = 358.4758+35999.0498*h - 0.00015*hh;	anm = anm*pi/180.0;
-					 // true longitude of sun (sl)
+                                                 // mean anomaly
+ anm = 358.4758+35999.0498*h - 0.00015*hh;        anm = anm*pi/180.0;
+                                         // true longitude of sun (sl)
  cc = (1.91946-0.00479*h) * sin(anm) + 0.020 * sin(2*anm);
- cc = cc * pi/180.0;	sl = sml + cc;
-							 // true anomaly
+ cc = cc * pi/180.0;        sl = sml + cc;
+                                                         // true anomaly
  //printf("anm, cc = %f %f\n", anm, cc);
- san = anm + cc;	el = sl;
-					 // no correction for aberration
-					 // distance to sun
+ san = anm + cc;        el = sl;
+                                         // no correction for aberration
+                                         // distance to sun
  //printf("san, eks = %f %f\n",san,eks);
  av = (1-eks*eks)/(1+eks*cos(san));
-							 // radius of sun
+                                                         // radius of sun
  r = atan(0.0046555/av)*(180./pi)*3600.;
-							 // in arcseconds
+                                                         // in arcseconds
  // need years since 1850 to calculate long. of ascending node
  year = 1900.+ny+(day/365.);
  // longitude of ascending node (page 171 smart)
  om = (73.66666+0.01395833*(year-1850.0)) * (pi/180.);
  // inclination of solar equator on the ecliptic (7.25 degrees ('constant'))
  eincl = 0.12653637;
-			 // heliographic latitude of centre of disc
+                         // heliographic latitude of centre of disc
  ba = sin(el-om) * sin(eincl); b = asin(ba) * rq;
  ba = sin(el-om+0.5*pi) * sin(eincl); d = asin(ba) * rq;
- 			// position angle of northern rotation pole of sun
+                         // position angle of northern rotation pole of sun
  t = atan(-1.0*cos(el)*tan(ehel))+atan(-1.0*cos(el-om)*tan(eincl));
- p = t * rq;					// p angle in degrees
+ p = t * rq;                                        // p angle in degrees
  return 1;
  }

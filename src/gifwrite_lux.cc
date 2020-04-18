@@ -26,7 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <errno.h>
 #include <math.h>
-#include <strings.h>		// for bzero
+#include <strings.h>                // for bzero
 #include "lux_structures.hh"
  extern struct sym_desc sym[];
  struct GIFScreen {
@@ -61,7 +61,7 @@ int32_t lux_gifwrite(int32_t narg, int32_t ps[]) // gifwrite subroutine
  /* call is gifwrite,array,file,[map] where map is the color map
  and must be (3,256) I*1 in rgb triplets */
  {
- FILE	*fout;
+ FILE        *fout;
  int32_t    iq, nd, type, i;
  int32_t    nx, ny, ncolmap;
  uint8_t   codesize=8;
@@ -395,7 +395,7 @@ static void output(int32_t code)
   }
  }
  //******************************
-static void cl_block(void)	// table clear for block compress
+static void cl_block(void)        // table clear for block compress
  {
   // Clear out the hash table
 

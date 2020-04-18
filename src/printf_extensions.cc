@@ -75,7 +75,7 @@ static int32_t obstack_printf_sexagesimal_int_left(struct obstack *o,
       obstack_1grow(o, ' ');
   }
   obstack_printf(o, "%d", ivalue);
-  while (precision-- > 0) {	// do the rest of them
+  while (precision-- > 0) {        // do the rest of them
     value = 60*(value - ivalue);
     ivalue = (int32_t) value;
     obstack_printf(o, ":%02d", ivalue);

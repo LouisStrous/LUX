@@ -48,14 +48,14 @@ int32_t execute_error(int32_t n) // handle errors
  case 21: printf("(X) symbol passed to string_clone not a string\n"); break;
  case 22: printf("INDGEN accepts only arrays or scalars\n"); break;
  case 23: printf("(X) malloc failure creating argument list (how did you do this?)\n");
-		 break;
+                 break;
  case 24: printf("incompatible arrays in expression\n"); break;
  case 25: printf("(X) error in fixed_string count\n"); break;
  case 26: printf("illegal action with a string (kinky?)\n"); break;
  case 27: printf("(X) mysterious class in binary operation or function\n"); break;
  case 28: printf("(X) illegal variable type in dump\n"); break;
  case 29: printf("floating point values illegal in logical expression\n");
-			 break;
+                         break;
  case 30: printf("illegal variable type (string?) in math function\n"); break;
  case 31: printf("subscripted variable is not an array or string\n"); break;
  case 32: printf("illegal variable type\n"); break;
@@ -146,10 +146,10 @@ int32_t execute_error(int32_t n) // handle errors
  case 111: printf("I*2 input array required\n"); break;
  case 112: printf("error in associated variable index\n"); break;
  case 113: printf("failure in assoc var input (record too big?)\n");
-	  break;
+          break;
  case 114: printf("assoc. var (output) does not match array\n"); break;
  case 115: printf("failure in assoc var output\n");
-	  break;
+          break;
  case 116: printf("attempt to redefine a protected symbol\n"); break;
  case 117: printf("bad year in ephemeris call, must be 19xx or xx\n"); break;
  case 118: printf("I*1 input array required\n"); break;
@@ -164,7 +164,7 @@ int32_t execute_error(int32_t n) // handle errors
  default: printf("(X)undefined error code\n"); break;
  }
  return -1;
- }						//end of execute_error
+ }                                                //end of execute_error
 
 int32_t file_open_error()
 {

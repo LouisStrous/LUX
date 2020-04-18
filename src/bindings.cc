@@ -230,7 +230,7 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
     break;
   }
 
-  if (internalMode & 1) {	// /allaxes
+  if (internalMode & 1) {        // /allaxes
     naxes = infos[0].ndim;
     axes = (int32_t*) malloc(naxes*sizeof(int32_t));
     allaxes = 1;

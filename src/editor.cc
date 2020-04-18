@@ -28,25 +28,25 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include "action.hh"
 #include <limits.h>
-#include <unistd.h>		// for usleep()
+#include <unistd.h>                // for usleep()
 #include "editor.hh"
 
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
-char	line[BUFSIZE], tLine[BUFSIZE], recording = 0;
-FILE	*inputStream;
-char	*inputString;
-int32_t	curLineNumber = 0, compileLevel = 0;
-static int32_t	promptLength, show = 1;
-int32_t	echo = 0;  // flag: 1 -> echo lines even if not gotten from stdin
-int32_t	getStreamChar(void), getStringChar(void);
+char        line[BUFSIZE], tLine[BUFSIZE], recording = 0;
+FILE        *inputStream;
+char        *inputString;
+int32_t        curLineNumber = 0, compileLevel = 0;
+static int32_t        promptLength, show = 1;
+int32_t        echo = 0;  // flag: 1 -> echo lines even if not gotten from stdin
+int32_t        getStreamChar(void), getStringChar(void);
 int32_t     (*getChar)(void) = getStreamChar, termCol, termRow, uTermCol, page;
-int32_t	noPrompt = 0;
-static int32_t	col = 0, row = 0, textWidth;
-static char	*thePrompt;
-extern int32_t	scrat[];
+int32_t        noPrompt = 0;
+static int32_t        col = 0, row = 0, textWidth;
+static char        *thePrompt;
+extern int32_t        scrat[];
 //----------------------------------------------------
 void getTerminalSize(void)
 {
@@ -73,7 +73,7 @@ int getSingleStdinChar(void)
 int getStringChar(void)
 // gets the next input char from inputString, no control sequences
 {
-  int32_t	c;
+  int32_t        c;
 
   c = *inputString++;
   if (!c)

@@ -30,8 +30,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t lux_memstat(int32_t narg, int32_t ps[])
 // returns some info on memory usage
 {
- char		*p;
- extern char	*firstbreak;
+ char                *p;
+ extern char        *firstbreak;
 
  p = (char*) sbrk(0);
  printf("Break at %p, allocated %u bytes\n",
@@ -42,9 +42,9 @@ int32_t lux_memstat(int32_t narg, int32_t ps[])
 int32_t lux_memory(int32_t narg, int32_t ps[])
      // returns size of allocated memory
 {
-  int32_t	result;
-  char	*p;
-  extern char	*firstbreak;
+  int32_t        result;
+  char        *p;
+  extern char        *firstbreak;
 
   p = (char*) sbrk(0);
   result = scalar_scratch(LUX_INT32);

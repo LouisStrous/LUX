@@ -58,9 +58,9 @@ static int32_t hershey_load(char *filename)
     goto err_2;
   }
   hershey_numbers = realloc(hershey_numbers,
-			    hershey_numbers_count*sizeof(uint16_t));
+                            hershey_numbers_count*sizeof(uint16_t));
   hershey_indices = realloc(hershey_indices,
-			    hershey_numbers_count*sizeof(uint32_t));
+                            hershey_numbers_count*sizeof(uint32_t));
   if (!hershey_numbers || !hershey_indices) {
     errno = ENOMEM;
     goto err_3;
@@ -144,7 +144,7 @@ hershey_handle hershey_exists(int32_t hershey_char) {
     return HERSHEY_ERR;
   number = hershey_char;
   found = bsearch(&number, hershey_numbers, hershey_numbers_count,
-		  sizeof(uint16_t), uint16cmp);
+                  sizeof(uint16_t), uint16cmp);
   if (found) {
     int32_t i;
 

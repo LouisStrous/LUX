@@ -256,7 +256,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
   if (lowbound && hibound) {
     for (i = 0; i < nPar; i++)
       if (hibound[i] <= lowbound[i])
-	return luxerror("High bound %g of parameter %d is not greater than low bound %g", ps[5], hibound[i], i + 1, lowbound[i]);
+        return luxerror("High bound %g of parameter %d is not greater than low bound %g", ps[5], hibound[i], i + 1, lowbound[i]);
   }
 
   if (narg >= 7 && (iq = ps[6])) { // WEIGHTS
@@ -440,11 +440,11 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
         mu = 1;
       if (onebyone) {
         par[i] = parBest1[i] + mu*meanShift[i] + err[i]*ran[i];
-	enforce_bounds(par, lowbound, hibound, nPar);
+        enforce_bounds(par, lowbound, hibound, nPar);
       } else {
         for (j = 0; j < nPar; j++) // update parameters
           par[j] = parBest1[j] + mu*meanShift[j] + err[j]*ran[j];
-	enforce_bounds(par, lowbound, hibound, nPar);
+        enforce_bounds(par, lowbound, hibound, nPar);
       }
       if (fitSym) {
         j = eval(fitTemp);
@@ -459,9 +459,9 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
       if (qual < qBest1) {      // this one is better
         qBest1 = qual;
         memcpy(parBest1, par, size);
-      } else {			// restore parameter
-	if (onebyone)
-	  par[i] = parBest1[i];
+      } else {                  // restore parameter
+        if (onebyone)
+          par[i] = parBest1[i];
       }
     } // end for (i = 0; i < nn; i++)
 
@@ -471,20 +471,20 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
     if (qBest1 < qBest2) {      // this cycle yielded a better one
       same = 0;
       for (j = 0; j < nPar; j++) {
-	temp = parBest1[j] - parBest2[j];
-	if (temp) {		// some improvement due to this parameter
-	  meanShift[j] = meanShift[j]*fac + temp*(1 - fac);
-	  err[j] = (err[j]*fac + 2*fabs(temp)*(1 - fac))/dir;
-	} else {
-	  meanShift[j] = 0;
-	}
+        temp = parBest1[j] - parBest2[j];
+        if (temp) {             // some improvement due to this parameter
+          meanShift[j] = meanShift[j]*fac + temp*(1 - fac);
+          err[j] = (err[j]*fac + 2*fabs(temp)*(1 - fac))/dir;
+        } else {
+          meanShift[j] = 0;
+        }
       }
       qBest2 = qBest1;
       memcpy(parBest2, parBest1, size);
     } else {
       for (j = 0; j < nPar; j++) {
-	meanShift[j] = 0;
-	err[j] *= dir;
+        meanShift[j] = 0;
+        err[j] *= dir;
       }
     }
     iter++;
@@ -496,8 +496,8 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
       for (j = 0; j < nPar; j++)
         if (step[j]) {
           printf("%#10.4g", parBest2[j]);
-	  if (vocal_err)
-	    printf("(%#8.2g)", err[j]);
+          if (vocal_err)
+            printf("(%#8.2g)", err[j]);
           n++;
           if (n >= 14/(vocal_err? 2: 1)) // we show at most twenty
             break;
@@ -516,7 +516,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
        instead. */
   } while (qBest2 >= qThresh
            && (mu >= dThresh*fabs(qBest2) || !mu)
-	   && qBest2 < qLag*0.99
+           && qBest2 < qLag*0.99
            && n < nPar
            && (!iThresh || iter < iThresh)
            && same <= nSame
@@ -586,7 +586,7 @@ int32_t lux_generalfit(int32_t narg, int32_t ps[])
           if (bad)
             break;
 
-          par[i] = parBest2[i];	// restore
+          par[i] = parBest2[i];         // restore
           err[i] = h;
         } else
           err[i] = 0;
@@ -741,46 +741,46 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   {
     int32_t nx, *dims, ndim, nStep;
 
-    d_x_sym = lux_double(1, &ps[0]);	// X
+    d_x_sym = lux_double(1, &ps[0]);    // X
     if (isFreeTemp(d_x_sym))
       symbol_context(d_x_sym) = 1;     // avoid premature deletion
-    d_y_sym = lux_double(1, &ps[1]);	// Y
+    d_y_sym = lux_double(1, &ps[1]);    // Y
     if (isFreeTemp(d_y_sym))
       symbol_context(d_y_sym) = 1;
     d_par_sym = lux_double(1, &ps[2]); // PAR
     if (isFreeTemp(d_par_sym))
-      symbol_context(d_par_sym) = 1;	// avoid premature deletion
+      symbol_context(d_par_sym) = 1;    // avoid premature deletion
     d_step_sym = lux_double(1, &ps[3]); // STEP
     if (isFreeTemp(d_step_sym))
       symbol_context(d_step_sym) = 1;
     if (numerical(d_x_sym, &dims, &ndim, &nx, NULL) < 0 // X
-	|| numerical(d_y_sym, NULL, NULL, &nPoints, NULL) < 0 // Y
-	|| numerical(d_par_sym, NULL, NULL, &nPar, NULL) < 0
-	|| numerical(d_step_sym, NULL, NULL, &nStep, NULL) < 0)
+        || numerical(d_y_sym, NULL, NULL, &nPoints, NULL) < 0 // Y
+        || numerical(d_par_sym, NULL, NULL, &nPar, NULL) < 0
+        || numerical(d_step_sym, NULL, NULL, &nStep, NULL) < 0)
       return LUX_ERROR;
     if (nStep == nPar - 1)
-      --nPar;			// assume last element of START is quality
+      --nPar;                   // assume last element of START is quality
     if (nStep != nPar) {
       result = luxerror("Number of elements (%d) in step argument is unequal to number of elements (%d) in parameters argument", ps[3], nStep, nPar);
     }
   }
   if (!result) {
-    if (!symbolIsString(ps[4])) {	// FUNCNAME
+    if (!symbolIsString(ps[4])) {       // FUNCNAME
       result = cerror(NEED_STR, ps[4]);
     }
   }
   if (!result) {
-    if (narg > 5 && ps[5]) {	// ERR
+    if (narg > 5 && ps[5]) {    // ERR
       redef_array(ps[5], LUX_DOUBLE, 1, &nPar);
       errors = (double *) array_data(ps[5]);
     }
-    if (narg > 6 && ps[6])	// ITHRESH
+    if (narg > 6 && ps[6])      // ITHRESH
       ithresh = int_arg(ps[6]);
     if (ithresh <= 0)
       ithresh = 10000;
-    if (narg > 7 && ps[7])	// STHRESH
+    if (narg > 7 && ps[7])      // STHRESH
       sthresh = double_arg(ps[7]);
-    if (narg > 8 && ps[8])	// NITHRESH
+    if (narg > 8 && ps[8])      // NITHRESH
       nithresh = int_arg(ps[8]);
     else
       nithresh = sqrt(nPar)*10;
@@ -807,9 +807,9 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   }
 
   if (!result) {
-    lux_func_if_set_param(afif, 0, d_par_sym);		 // par
-    lux_func_if_set_param(afif, 1, d_x_sym);		 // x
-    lux_func_if_set_param(afif, 2, d_y_sym);		 // y
+    lux_func_if_set_param(afif, 0, d_par_sym);           // par
+    lux_func_if_set_param(afif, 1, d_x_sym);             // x
+    lux_func_if_set_param(afif, 2, d_y_sym);             // y
 
     minimizer = gsl_multimin_fminimizer_alloc(gsl_multimin_fminimizer_nmsimplex2,
                                               nPar);

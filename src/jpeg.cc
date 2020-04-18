@@ -21,17 +21,17 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // LUX support of the Independent JPEG Group's JPEG
 // compression/decompression software, version 6b.
 
-#include <stdio.h>		// for FILE, fopen(), fclose(), printf()
-#include <setjmp.h>		// for setjmp(), longjmp()
-#include <ctype.h>		// for isprint()
-#include <jpeglib.h>		// for IJG JPEG v6b stuff
-#include <string.h>		// for memcpy()
-#include "action.hh"		// for LUX-specific stuff
+#include <stdio.h>                // for FILE, fopen(), fclose(), printf()
+#include <setjmp.h>                // for setjmp(), longjmp()
+#include <ctype.h>                // for isprint()
+#include <jpeglib.h>                // for IJG JPEG v6b stuff
+#include <string.h>                // for memcpy()
+#include "action.hh"                // for LUX-specific stuff
 
 // a structure for our own error handler
 struct my_error_mgr {
-  struct jpeg_error_mgr	pub;
-  jmp_buf	setjmp_buffer;
+  struct jpeg_error_mgr        pub;
+  jmp_buf        setjmp_buffer;
 };
 typedef struct my_error_mgr *my_error_ptr;
 
@@ -40,7 +40,7 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 // our own error handler; following the example in example.c in the IJG
 // JPEG v6b source
 {
-  my_error_ptr	myerr = (my_error_ptr) cinfo->err;
+  my_error_ptr        myerr = (my_error_ptr) cinfo->err;
 
   // display the message
   (*cinfo->err->output_message)(cinfo);
@@ -52,13 +52,13 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 int32_t read_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
 // JREAD,<x>,<file>[,<header>,SHRINK=<shrink>][,/GREYSCALE]
 {
-  char	*filename, *p;
-  struct jpeg_decompress_struct	cinfo;
-  struct my_error_mgr		jerr;
-  FILE	*infile;
-  int32_t	dims[3], i, stride, n;
-  JSAMPROW	row_pointer[1];	// pointer to a single row
-  JSAMPLE	*image;
+  char        *filename, *p;
+  struct jpeg_decompress_struct        cinfo;
+  struct my_error_mgr                jerr;
+  FILE        *infile;
+  int32_t        dims[3], i, stride, n;
+  JSAMPROW        row_pointer[1];        // pointer to a single row
+  JSAMPLE        *image;
 
   if (!symbolIsStringScalar(ps[1]))
     return isFunc? LUX_ERROR: cerror(NEED_STR, ps[1]);
@@ -86,9 +86,9 @@ int32_t read_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
   jpeg_save_markers(&cinfo, JPEG_COM, 0xffff);// we look for a comment
   jpeg_read_header(&cinfo, TRUE);
 
-  if (internalMode & 1)		// user wants greyscale output
+  if (internalMode & 1)                // user wants greyscale output
     cinfo.out_color_space = JCS_GRAYSCALE;
-  if (narg > 3 && ps[3]) {	// have <shrink>
+  if (narg > 3 && ps[3]) {        // have <shrink>
     // the user wants to shrink the image.  shrink factors 1, 2, 4, and 8
     // are allowed; if the user supplies a different value, then the next
     // smaller allowed value is used.  The sign of the shrink factor is
@@ -137,22 +137,22 @@ int32_t read_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
     p = (char *) cinfo.marker_list->data;
     while (n--) {
       if (!isprint(*p))
-	*p = '*';
+        *p = '*';
       p++;
     }
-    if (narg > 2 && ps[2]) {	// user wants comment in variable
+    if (narg > 2 && ps[2]) {        // user wants comment in variable
       if (symbolIsNamed(ps[2])) {
-	n = cinfo.marker_list->data_length;
-	redef_string(ps[2], n);
-	memcpy(string_value(ps[2]), cinfo.marker_list->data, n);
-	string_value(ps[2])[n] = '\0'; // terminate properly
+        n = cinfo.marker_list->data_length;
+        redef_string(ps[2], n);
+        memcpy(string_value(ps[2]), cinfo.marker_list->data, n);
+        string_value(ps[2])[n] = '\0'; // terminate properly
       } else if (!isFunc)
-	cerror(NEED_NAMED, ps[2]);
-    } else {			// just print it
+        cerror(NEED_NAMED, ps[2]);
+    } else {                        // just print it
       p = (char *) cinfo.marker_list->data;
       n = cinfo.marker_list->data_length;
       while (n--)
-	putchar(*p++);
+        putchar(*p++);
       putchar('\n');
     }
   } else if (narg > 2 && ps[2]) {
@@ -186,13 +186,13 @@ int32_t lux_read_jpeg6b_f(int32_t narg, int32_t ps[])
 int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
 // JWRITE,<x>,<file>[,<header>,<quality>]
 {
-  int32_t	nx, ny, nd, quality, stride;
-  struct jpeg_compress_struct	cinfo;
-  struct my_error_mgr		jerr;
-  FILE	*outfile;
-  char	*header;
-  JSAMPROW	row_pointer[1];
-  JSAMPLE	*image;
+  int32_t        nx, ny, nd, quality, stride;
+  struct jpeg_compress_struct        cinfo;
+  struct my_error_mgr                jerr;
+  FILE        *outfile;
+  char        *header;
+  JSAMPROW        row_pointer[1];
+  JSAMPLE        *image;
 
   // get image info
   if (!symbolIsNumericalArray(ps[0]))
@@ -207,7 +207,7 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
   nx = array_dims(ps[0])[0 + (nd == 3)];
   ny = array_dims(ps[0])[1 + (nd == 3)];
 
-  if (narg > 2 && ps[2]) {	// have a <header>
+  if (narg > 2 && ps[2]) {        // have a <header>
     if (!symbolIsStringScalar(ps[2]))
       return isFunc? LUX_ERROR: cerror(NEED_STR, ps[2]);
     header = string_value(ps[2]);
@@ -231,7 +231,7 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
     return LUX_ERROR;
   }
 
-  jpeg_create_compress(&cinfo);	// compression structure
+  jpeg_create_compress(&cinfo);        // compression structure
 
   // 2. specify data target
   jpeg_stdio_dest(&cinfo, outfile);
@@ -239,10 +239,10 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
   // 3. specify image characteristics
   cinfo.image_width = nx;
   cinfo.image_height = ny;
-  if (nd == 3) {		// RGB image
+  if (nd == 3) {                // RGB image
     cinfo.input_components = 3;
     cinfo.in_color_space = JCS_RGB;
-  } else {			// greyscale image
+  } else {                        // greyscale image
     cinfo.input_components = 1;
     cinfo.in_color_space = JCS_GRAYSCALE;
   }
@@ -250,7 +250,7 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
   // 4. select compression parameters
   jpeg_set_defaults(&cinfo);
 
-  if (narg > 3 && ps[3]) {	// have <quality>
+  if (narg > 3 && ps[3]) {        // have <quality>
     quality = int_arg(ps[3]);
     if (quality < 0)
       quality = 0;

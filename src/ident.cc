@@ -26,16 +26,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 #include "luxdefs.hh"
 
-extern char	*curScrat, *binOpSign[];
-char	*fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
-FILE	*outputStream;
+extern char        *curScrat, *binOpSign[];
+char        *fmt_integer, *fmt_float, *fmt_string, *fmt_complex, *fmt_time;
+FILE        *outputStream;
 
 //-------------------------------------------------------------------
 char const* symbolProperName(int32_t symbol)
 // returns the proper name of the symbol, if any, or NULL
 {
-  hashTableEntry	**hashTable, *hp;
-  int32_t	hashValue;
+  hashTableEntry        **hashTable, *hp;
+  int32_t        hashValue;
 
   if (symbol < 0 || symbol >= NAMED_END) // out of range
     return NULL;
@@ -49,7 +49,7 @@ char const* symbolProperName(int32_t symbol)
     case LUX_BLOCKROUTINE: case LUX_DEFERRED_BLOCK:
       hashTable = blockHashTable;
       break;
-    default:			// must be a regular variable
+    default:                        // must be a regular variable
       hashTable = varHashTable;
       break;
   }
@@ -57,13 +57,13 @@ char const* symbolProperName(int32_t symbol)
   hashValue = sym[symbol].xx - 1;
   if (hashValue < 0 || hashValue > HASHSIZE) // illegal hash value
     return NULL;
-  hp = hashTable[hashValue];	// start of appropriate name list
-  while (hp) {			// not at end of list
-    if (hp->symNum == symbol)	// found symbol
+  hp = hashTable[hashValue];        // start of appropriate name list
+  while (hp) {                        // not at end of list
+    if (hp->symNum == symbol)        // found symbol
       return hp->name;
-    hp = hp->next;		// go to next
+    hp = hp->next;                // go to next
   }
-  return NULL;			// did not find it
+  return NULL;                        // did not find it
 }
 //---------------------------------------------------------------------
 int32_t fmt_entry(formatInfo *fmi)
@@ -78,7 +78,7 @@ int32_t fmt_entry(formatInfo *fmi)
            of the following: FMT_LEFT_JUSTIFY (-), FMT_ALWAYS_SIGN
            (+), FMT_ZERO_PAD (0), FMT_ALTERNATIVE (#),
            FMT_POSITIVE_BLANK ( ), FMT_SUPPRESS (*), FMT_SMALL (h),
-	   FMT_BIG (l), FMT_BIGINT (j), FMT_MIX (_), FMT_MIX2 (=),
+           FMT_BIG (l), FMT_BIGINT (j), FMT_MIX (_), FMT_MIX2 (=),
            FMT_SEPARATE (:).
    fmi->start: points at the % that introduces the format.
    fmi->spec_char: a pointer to the format specifier character.
@@ -92,20 +92,20 @@ int32_t fmt_entry(formatInfo *fmi)
    fmi->only_whitespace: non-zero if the format consists of whitespace only.
    LS 16nov98 23jan99
    Return values: one of
-   FMT_ERROR	illegal format
-   FMT_PLAIN	plain text only; no % format entry
-   FMT_INTEGER	integer
-   FMT_FLOAT	floating point
-   FMT_TIME	sexagesimal
+   FMT_ERROR        illegal format
+   FMT_PLAIN        plain text only; no % format entry
+   FMT_INTEGER        integer
+   FMT_FLOAT        floating point
+   FMT_TIME        sexagesimal
    FMT_DATE     date
-   FMT_STRING	string
-   FMT_COMPLEX	complex number
+   FMT_STRING        string
+   FMT_COMPLEX        complex number
 
   */
 {
-  int32_t	k;
+  int32_t        k;
   fmtType type;
-  char	*p, *p2;
+  char        *p, *p2;
 
   if (!fmi->current || !*fmi->current) { // no format
     fmi->start = fmi->next = NULL;
@@ -123,72 +123,72 @@ int32_t fmt_entry(formatInfo *fmi)
      group beginnings along the way. */
   do {
     if (*p == '%' && p[1] != '%') { // format specification or %( %)
-      if (p[1] == '(') {		// group beginning
-	p += 2;
-	if (++(fmi->active_group) == MAXFMT) {
-	  puts("Format groups nested too deeply");
-	  return FMT_ERROR;	// too may active groups
-	}
-	fmi->group_start[fmi->active_group] = p;
-	fmi->group_count[fmi->active_group] = -1; // repeat count yet unknown
-	fmi->start = p;
-	continue;
+      if (p[1] == '(') {                // group beginning
+        p += 2;
+        if (++(fmi->active_group) == MAXFMT) {
+          puts("Format groups nested too deeply");
+          return FMT_ERROR;        // too may active groups
+        }
+        fmi->group_start[fmi->active_group] = p;
+        fmi->group_count[fmi->active_group] = -1; // repeat count yet unknown
+        fmi->start = p;
+        continue;
       }
     }
   } while (0);
 
   /* now we're pointing either at a regular format specification,
      or at a format group end or at the beginning of some plain text */
-  type = FMT_PLAIN;		// default
+  type = FMT_PLAIN;                // default
   fmi->flags = 0;
   if (*p == '%' && p[1] != '%' && p[1] != ')') { // a format specification
     uint8_t done = 0;
-    p++;			// skip the initial %
+    p++;                        // skip the initial %
 
     // service any modifier
     do {
       switch (*p++) {
-	case '*':
-	  fmi->flags |= FMT_SUPPRESS;
-	  break;
-	case '-':
-	  fmi->flags |= FMT_LEFT_JUSTIFY;
-	  break;
-	case '+':
-	  fmi->flags |= FMT_ALWAYS_SIGN;
-	  break;
-	case '0':
-	  fmi->flags |= FMT_ZERO_PAD;
-	  break;
-	case '#':
-	  fmi->flags |= FMT_ALTERNATIVE;
-	  break;
-	case ' ':
-	  fmi->flags |= FMT_POSITIVE_BLANK;
-	  break;
-	case '_':
-	  fmi->flags |= FMT_MIX;
-	  break;
-	case '=':
-	  fmi->flags |= FMT_MIX2;
-	  break;
-	default:
-	  p--;			// we went one too far
-	  done = 1;
-	  break;
+        case '*':
+          fmi->flags |= FMT_SUPPRESS;
+          break;
+        case '-':
+          fmi->flags |= FMT_LEFT_JUSTIFY;
+          break;
+        case '+':
+          fmi->flags |= FMT_ALWAYS_SIGN;
+          break;
+        case '0':
+          fmi->flags |= FMT_ZERO_PAD;
+          break;
+        case '#':
+          fmi->flags |= FMT_ALTERNATIVE;
+          break;
+        case ' ':
+          fmi->flags |= FMT_POSITIVE_BLANK;
+          break;
+        case '_':
+          fmi->flags |= FMT_MIX;
+          break;
+        case '=':
+          fmi->flags |= FMT_MIX2;
+          break;
+        default:
+          p--;                        // we went one too far
+          done = 1;
+          break;
       }
     } while (!done);
 
     if (isdigit((uint8_t) *p))
       fmi->width = strtol(p, &p, 10); // find & skip the number
     else
-      fmi->width = -1;		// no explicit width
+      fmi->width = -1;                // no explicit width
 
     // look for the precision
-    if (*p == '.') 		// the precision
+    if (*p == '.')                 // the precision
       fmi->precision = strtol(p + 1, &p, 10); // find and skip
     else
-      fmi->precision = -1;	// no explicit precision
+      fmi->precision = -1;        // no explicit precision
 
     // more modifiers?
     do {
@@ -203,7 +203,7 @@ int32_t fmt_entry(formatInfo *fmi)
         fmi->flags |= FMT_BIG;
         continue;
       default:
-        p--;			// we went one too far
+        p--;                        // we went one too far
         break;
       }
     } while (0);
@@ -234,46 +234,46 @@ int32_t fmt_entry(formatInfo *fmi)
     default:
       printf("Illegal format entry, %s\n", fmi->current);
       fmi->type = FMT_ERROR;
-      return FMT_ERROR;	// illegal type
+      return FMT_ERROR;        // illegal type
     }
-    fmi->spec_char = p++;		// record this position
+    fmi->spec_char = p++;                // record this position
     if (p[-1] == '[') {
       // we make p point at the closing ]
       // in '[]...]' and '[^]....]', the first ] is a regular character
       // and doesn't indicate the end of the scan set
       if (p[1] == ']')
-	p += 2;
+        p += 2;
       else if (p[1] == '^' && p[2] == ']')
-	p += 3;
+        p += 3;
       while (*p && *p != ']')
-	p++;
-      p++;			// point one beyond the closing ]
+        p++;
+      p++;                        // point one beyond the closing ]
     }
 
-    fmi->repeat = p;		// record this position
+    fmi->repeat = p;                // record this position
 
     // look for a repeat count
-    fmi->count = -1;		// default
-    if (isdigit((uint8_t) *p)) {	// maybe a repeat count
+    fmi->count = -1;                // default
+    if (isdigit((uint8_t) *p)) {        // maybe a repeat count
       p2 = p + 1;
       while (isdigit((uint8_t) *p2))
-	p2++;
-      if (*p2 == '#') {		// yes, a repeat count
-	fmi->count = strtol(p, &p, 10);
-	p++;			// skip the #
+        p2++;
+      if (*p2 == '#') {                // yes, a repeat count
+        fmi->count = strtol(p, &p, 10);
+        p++;                        // skip the #
       }
     }
   } // end of if (*p == '%' && p[1] != '%' && p[1] != ')')
 
   fmi->plain = p;
   // now we are looking at plain text or a group end
-  if (*p != '%' || p[1] != ')')	{ // we have plain text
+  if (*p != '%' || p[1] != ')')        { // we have plain text
     if (type == FMT_PLAIN ||
-	(fmi->flags & (FMT_MIX | FMT_MIX2))) { // plain text is allowed
+        (fmi->flags & (FMT_MIX | FMT_MIX2))) { // plain text is allowed
       do {
-	p2 = strchr(p, '%');
-	if (p2 && p2[1] == '%')	// a %% escape sequence
-	  p2 += 2;		// skip
+        p2 = strchr(p, '%');
+        if (p2 && p2[1] == '%')        // a %% escape sequence
+          p2 += 2;                // skip
       } while (p2 && *p2 && *p2 != '%');
       p = (p2 && *p2)? p2: p + strlen(p);
     }
@@ -282,7 +282,7 @@ int32_t fmt_entry(formatInfo *fmi)
 
   if (*p == '%' && p[1] == ')') { // a group end
     if (fmi->active_group < 0) { /* group ending but no corresponding
-				    group beginning */
+                                    group beginning */
       puts("Unbalanced format group end");
       fmi->type = FMT_ERROR;
       return FMT_ERROR;
@@ -293,17 +293,17 @@ int32_t fmt_entry(formatInfo *fmi)
       // we don't have a repeat count for this grouping yet
       fmi->group_count[fmi->active_group] = 1;// default
       if (isdigit((uint8_t) *p)) { // may be a repeat count
-	p2 = p;
-	k = strtol(p2, &p2, 10);
-	if (*p2 == '#')  	// yes, it's a repeat count
-	  fmi->group_count[fmi->active_group] = k;
+        p2 = p;
+        k = strtol(p2, &p2, 10);
+        if (*p2 == '#')          // yes, it's a repeat count
+          fmi->group_count[fmi->active_group] = k;
       }
     } // else we already had a repeat count
     fmi->group_count[fmi->active_group]--; // one less repetition to go
     if (fmi->group_count[fmi->active_group]) // more repeats to do?
       fmi->next = fmi->group_start[fmi->active_group]; // then go back
     else {
-      fmi->active_group--;	// done with this one
+      fmi->active_group--;        // done with this one
       p2 = strchr(p, '#');
       fmi->next = p2? p2 + 1: p;
     }
@@ -318,7 +318,7 @@ int32_t fmt_entry(formatInfo *fmi)
   return type;
 }
 //---------------------------------------------------------------------
-formatInfo	theFormat;
+formatInfo        theFormat;
 char *fmttok(char *format)
 /* returns the next token from the installed format.  If <format> is equal
    to NULL, then the next token from the last installed format is returned.
@@ -329,9 +329,9 @@ char *fmttok(char *format)
 // and NULL is returned.  If an error occurs, then theFormat.type is
 // set to FMT_ERROR and NULL is returned.  LS 12nov99
 {
-  formatInfo	*fmi = &theFormat;
+  formatInfo        *fmi = &theFormat;
 
-  if (format) {			// we install the new format
+  if (format) {                        // we install the new format
     fmi->format = (char*) realloc(fmi->format, strlen(format) + 1);
     if (!fmi->format) {
       puts("fmttok:");
@@ -341,9 +341,9 @@ char *fmttok(char *format)
     strcpy(fmi->format, format);
     fmi->current = fmi->format;
   } else if (fmi->next) {
-    *fmi->end = fmi->save1;	// restore
+    *fmi->end = fmi->save1;        // restore
     if (fmi->type != FMT_PLAIN
-	&& fmi->plain > fmi->spec_char + 1)
+        && fmi->plain > fmi->spec_char + 1)
       *fmi->repeat = fmi->save2;
     fmi->current = fmi->next;
     if (!fmi->current || !*fmi->current) {
@@ -364,7 +364,7 @@ char *fmttok(char *format)
       && fmi->plain > fmi->spec_char + 1) {
     // the plain text does not follow the format specification directly
     fmi->save2 = *fmi->repeat;
-    *fmi->repeat = '\0';	// \0 over the start of the repeat count
+    *fmi->repeat = '\0';        // \0 over the start of the repeat count
   }
   // we must terminate the current format
   fmi->save1 = *fmi->end;
@@ -379,11 +379,11 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
    recognized: everything else is printed as plain text.  LS 16nov98 */
 // Sprintf does not attempt to write into <format>.
 {
-  static formatInfo	ownfmi, *fmi;
-  int32_t	width, n;
-  double	d, d2;
-  char	*p;
-  static char	tmp[20];
+  static formatInfo        ownfmi, *fmi;
+  int32_t        width, n;
+  double        d, d2;
+  char        *p;
+  static char        tmp[20];
 
   if (format) {
     ownfmi.format = ownfmi.current = format;
@@ -394,7 +394,7 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
 
   width = fmi->width;
 
-  if (fmi->type == FMT_ERROR)	// some error
+  if (fmi->type == FMT_ERROR)        // some error
     return LUX_ERROR;
 
   // first we initialize
@@ -404,13 +404,13 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
       p = tmp;
       strcpy(p++, "%");
       if (fmi->precision >= 0) {
-	sprintf(p, ".%1d", fmi->precision);
-	p += strlen(p);
+        sprintf(p, ".%1d", fmi->precision);
+        p += strlen(p);
       }
       if (fmi->flags & FMT_ALTERNATIVE)
-	strcpy(p++, "f");
+        strcpy(p++, "f");
       else
-	strcpy(p++, "g");
+        strcpy(p++, "g");
       strcpy(p + 1, tmp);
       *p++ = '%';
       *p++ = '+';
@@ -418,38 +418,38 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
       break;
     default:
       if (fmi->flags & (FMT_MIX | FMT_MIX2)) {
-	p = strpbrk(fmi->start, "_=");
-	// if we're printing a multi-element array, then when we get here
-	// for the second and later elements, fmi->start is already fixed,
-	// so there's no longer a _ or = in it, but fmi->flags is still
-	// set to lead us in here.  Then, we can just skip the rest.
-	// LS 22jan2001
-	if (p) {
-	  memcpy(tmp, fmi->start, p - fmi->start);
-	  memcpy(tmp + (p - fmi->start), p + 1, fmi->end - p);
-	  tmp[fmi->end - p] = '\0';
-	  fmi->start = tmp;
-	}
+        p = strpbrk(fmi->start, "_=");
+        // if we're printing a multi-element array, then when we get here
+        // for the second and later elements, fmi->start is already fixed,
+        // so there's no longer a _ or = in it, but fmi->flags is still
+        // set to lead us in here.  Then, we can just skip the rest.
+        // LS 22jan2001
+        if (p) {
+          memcpy(tmp, fmi->start, p - fmi->start);
+          memcpy(tmp + (p - fmi->start), p + 1, fmi->end - p);
+          tmp[fmi->end - p] = '\0';
+          fmi->start = tmp;
+        }
       }
       break;
   }
 
   switch (*fmi->spec_char) {
-  default:			// let vsprintf handle it
+  default:                        // let vsprintf handle it
     n = vsprintf(str, fmi->start, ap);
     str = strchr(str, 0);
     break;
-  case 'z':			// complex number
+  case 'z':                        // complex number
     /* for complex numbers, the real and imaginary parts must be specified
        as separate (double) arguments */
-    d = va_arg(ap, double);	// the real part
+    d = va_arg(ap, double);        // the real part
     d2 = va_arg(ap, double); // the imaginary part
     sprintf(str, tmp, d, d2, &n);
     if (n < width) {
       memmove(str + (width - n), str, n + 1);
       width -= n;
       while (width--)
-	*str++ = ' ';
+        *str++ = ' ';
     }
     str += strlen(str);
     break;
@@ -469,8 +469,8 @@ int32_t Sprintf_tok(char *str, ...)
    Only one argument is serviced, and only the first % entry is
    recognized: everything else is printed as plain text.  LS 16nove98 */
 {
-  va_list	ap;
-  int32_t	n;
+  va_list        ap;
+  int32_t        n;
 
   va_start(ap, str);
   n = Sprintf_general(str, NULL, ap);
@@ -485,8 +485,8 @@ int32_t Sprintf(char *str, char *format, ...)
    recognized: everything else is printed as plain text.  LS 16nov98 */
 // Sprintf does not attempt to write into <format>.
 {
-  va_list	ap;
-  int32_t	n;
+  va_list        ap;
+  int32_t        n;
 
   va_start(ap, format);
   n = Sprintf_general(str, format, ap);
@@ -498,19 +498,19 @@ char *symbolIdent(int32_t symbol, int32_t mode)
 /* assembles a string identifying symbol <iq>, depending on <mode>, at
    curScrat, and returns curScrat.
    modes:
-     I_VALUE		show symbol values rather than symbol names; except
-			for routines and functions (see I_ROUTINE)
-     I_PARENT		show symbol as member of parent structure
+     I_VALUE                show symbol values rather than symbol names; except
+                        for routines and functions (see I_ROUTINE)
+     I_PARENT                show symbol as member of parent structure
                         (e.g., ROUTINE.SYMBOLNAME)
-     I_TRUNCATE		truncate strings at 20 characters; arrays,
-			structures, and lists at 3 elements; statement
-			groups at 1 member statement
-     I_LINE		show the line number associated with the symbol
-     I_FILELEVEL	show the compilation depth associated with symbol;
-			includes I_LINE
-     I_ROUTINE		show the statements of a routine or function; not
-			just the name
-     I_LENGTH		show the number of elements in truncated symbols
+     I_TRUNCATE                truncate strings at 20 characters; arrays,
+                        structures, and lists at 3 elements; statement
+                        groups at 1 member statement
+     I_LINE                show the line number associated with the symbol
+     I_FILELEVEL        show the compilation depth associated with symbol;
+                        includes I_LINE
+     I_ROUTINE                show the statements of a routine or function; not
+                        just the name
+     I_LENGTH                show the number of elements in truncated symbols
   LS 23jul98
 */
 {
@@ -518,53 +518,53 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   char* p;
   char const* scalarIndicator = "bw\0q\0d";
   char const* name;
-  Scalar	number;
-  int32_t	i, j, n, m;
-  Pointer	ptr;
-  listElem	*sptr;
-  enumElem	*eptr;
-  extractSec	*sec;
-  structElem	*se;
-  structPtr	*spe;
-  structPtrMember	*spm;
-  int16_t	*arg;
-  extern int32_t	fileLevel, errorSym;
-  extern char	*errorPtr;
-  static int32_t	indent = 0;
-  int32_t	identStruct(structElem *);
+  Scalar        number;
+  int32_t        i, j, n, m;
+  Pointer        ptr;
+  listElem        *sptr;
+  enumElem        *eptr;
+  extractSec        *sec;
+  structElem        *se;
+  structPtr        *spe;
+  structPtrMember        *spm;
+  int16_t        *arg;
+  extern int32_t        fileLevel, errorSym;
+  extern char        *errorPtr;
+  static int32_t        indent = 0;
+  int32_t        identStruct(structElem *);
 
   save = curScrat;
 
-  if (symbol == LUX_ERROR) {	// the error symbol: should not occur here
+  if (symbol == LUX_ERROR) {        // the error symbol: should not occur here
     strcpy(curScrat, "(error)");
     return curScrat;
   }
 
-  if (symbol < 0) {	// some break condition
+  if (symbol < 0) {        // some break condition
     switch (symbol) {
       case LOOP_BREAK:
-	strcpy(curScrat, "break ");
-	return curScrat;
+        strcpy(curScrat, "break ");
+        return curScrat;
       case LOOP_CONTINUE:
-	strcpy(curScrat, "continue ");
-	return curScrat;
+        strcpy(curScrat, "continue ");
+        return curScrat;
       case LOOP_RETALL:
-	strcpy(curScrat, "retall ");
-	return curScrat;
+        strcpy(curScrat, "retall ");
+        return curScrat;
       default:
-	sprintf(curScrat, "[symbol %1d] ", symbol);
-	return curScrat;
+        sprintf(curScrat, "[symbol %1d] ", symbol);
+        return curScrat;
     }
   }
 
   if ((mode & I_FILELEVEL) // want file level
-      && fileLevel) {		// have file level
+      && fileLevel) {                // have file level
     sprintf(curScrat, "%1d, ", fileLevel);
     curScrat += strlen(curScrat); // update
   }
 
   if ((mode & I_LINE) // want line number
-      && symbol_line(symbol)) {	// have line number
+      && symbol_line(symbol)) {        // have line number
     sprintf(curScrat, "%3d| ", symbol_line(symbol));
     curScrat += strlen(curScrat); // update
   }
@@ -573,9 +573,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     if (symbol_context(symbol)) {
       char const* cp = symbolProperName(symbol_context(symbol));
       if (cp) {
-	strcpy(curScrat, cp);
-	curScrat += strlen(curScrat);
-	strcpy(curScrat++, ".");
+        strcpy(curScrat, cp);
+        curScrat += strlen(curScrat);
+        strcpy(curScrat++, ".");
       }
     }
   }
@@ -596,12 +596,12 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   if (symbol == errorSym)
     errorPtr = curScrat;
 
-  if (i == 0) {		// want a name, if available
+  if (i == 0) {                // want a name, if available
     char const* cp = symbolProperName(symbol); // get symbol's name at curScrat
-    if (cp) { 			// have a name
+    if (cp) {                         // have a name
       strcpy(curScrat, cp);
       if (symbol_class(symbol) == LUX_UNDEFINED) // undefined symbol
-	strcat(curScrat, "?"); // add ? to indicate no value
+        strcat(curScrat, "?"); // add ? to indicate no value
       curScrat = save;
       return curScrat;
     }
@@ -616,7 +616,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     j = i;
     i = transfer_target(i);
   }
-  if (i == 0)			// pointer to nothing
+  if (i == 0)                        // pointer to nothing
     symbol = j;
   else
     symbol = i;
@@ -655,14 +655,14 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       sprintf(curScrat, "%g", fltval);
       if (scalar_type(symbol) == LUX_FLOAT) {
         p = strchr(curScrat, '.');
-        if (!p) {		// none yet: add one
+        if (!p) {                // none yet: add one
           p = curScrat + strlen(curScrat);
           strcpy(p, ".");
         }
-      } else {		// DOUBLE
+      } else {                // DOUBLE
         p = strchr(curScrat, 'e');
         if (p)
-          *p = 'd';		// replace "e" with "d" to indicate DOUBLE
+          *p = 'd';                // replace "e" with "d" to indicate DOUBLE
         else {
           p = curScrat + strlen(curScrat);
           strcpy(p, "d");
@@ -670,7 +670,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
     }
     break;
-  case LUX_CSCALAR:		// complex number
+  case LUX_CSCALAR:                // complex number
     ptr.cf = complex_scalar_data(symbol).cf;
     if (complex_scalar_type(symbol) == LUX_CFLOAT) {
       if (ptr.cf->real == 0.0)
@@ -705,15 +705,15 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       else
         strcat(curScrat, "d");
     }
-    strcat(curScrat, "i)");	// indicate complex number
+    strcat(curScrat, "i)");        // indicate complex number
     break;
   case LUX_STRING:
     if ((mode & I_TRUNCATE)
         && string_size(symbol) > 20) { // truncate
       sprintf(curScrat, "'%.17s...'", string_value(symbol));
-    } else			// full value
+    } else                        // full value
       sprintf(curScrat, "'%s'", string_value(symbol));
-    if ((mode & I_LENGTH)) {	// need length indication
+    if ((mode & I_LENGTH)) {        // need length indication
       curScrat += strlen(curScrat);
       sprintf(curScrat, " (%1d#)", string_size(symbol));
     }
@@ -721,10 +721,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_RANGE: case LUX_PRE_RANGE:
     strcpy(curScrat++, "(");
     i = range_start(symbol);
-    if (i == -1)		// (*)
+    if (i == -1)                // (*)
       strcpy(curScrat++, "*");
     else {
-      if (i < 0) {		// (* - expr ...)
+      if (i < 0) {                // (* - expr ...)
         i = -i;
         strcpy(curScrat, "*-");
         curScrat += 2;
@@ -732,13 +732,13 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       symbolIdent(i, mode);
       curScrat += strlen(curScrat);
       i = range_end(symbol);
-      if (i != LUX_ZERO) {	// really have a range end
+      if (i != LUX_ZERO) {        // really have a range end
         strcpy(curScrat++, ":");
-        if (i < 0) {		// * ...
-          if (i == -1) {	// just *
+        if (i < 0) {                // * ...
+          if (i == -1) {        // just *
             strcpy(curScrat++, "*");
             i = 0;
-          } else {		// * - expr
+          } else {                // * - expr
             strcpy(curScrat, "*-");
             curScrat += 2;
             i = -i;
@@ -766,11 +766,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     n = array_size(symbol);
     if ((mode & I_TRUNCATE)
         && n > 3) {
-      j = 3;			// number to print
-      i = 1;			// did truncate
+      j = 3;                        // number to print
+      i = 1;                        // did truncate
     } else {
-      j = n;			// print all
-      i = 0;			// no truncation
+      j = n;                        // print all
+      i = 0;                        // no truncation
     }
     ptr.b = (uint8_t*) array_data(symbol);
     switch (array_type(symbol)) {
@@ -837,7 +837,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           if (j || i)
             strcpy(curScrat++, ",");
         }
-      } else {		// no truncation
+      } else {                // no truncation
         while (j--) {
           if (*ptr.sp)
             sprintf(curScrat, "'%s'", *ptr.sp);
@@ -853,7 +853,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     default:
       cerror(ILL_TYPE, symbol);
     }
-    if (i) {		// we truncated
+    if (i) {                // we truncated
       strcpy(curScrat, "...");
       curScrat += 3;
     }
@@ -922,7 +922,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_FUNC_PTR:
     strcpy(curScrat++, "&");
     n = func_ptr_routine_num(symbol);
-    if (n < 0) {		// internal function/routine
+    if (n < 0) {                // internal function/routine
       n = -n;
       switch (func_ptr_type(symbol)) {
       case LUX_SUBROUTINE:
@@ -932,8 +932,8 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         strcpy(curScrat, function[n].name);
         break;
       }
-    } else			// user-defined function/routine
-      symbolIdent(n, mode);	// is put at curScratch
+    } else                        // user-defined function/routine
+      symbolIdent(n, mode);        // is put at curScratch
     break;
   case LUX_SCAL_PTR:
     switch (scal_ptr_type(symbol)) {
@@ -983,7 +983,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           sprintf(curScrat, "%+1d", subsc_ptr_end(symbol));
           curScrat += strlen(curScrat);
         }
-      } else {		// (...:...)
+      } else {                // (...:...)
         sprintf(curScrat, "%1d", subsc_ptr_end(symbol));
         curScrat += strlen(curScrat);
       }
@@ -1047,11 +1047,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     ptr.w = clist_symbols(symbol);
     if ((mode & I_TRUNCATE)) {
       if (n > 3) {
-        j = 3;		// number of elements to display
-        i = 1;		// flag truncation
+        j = 3;                // number of elements to display
+        i = 1;                // flag truncation
       } else {
         j = n;
-        i = 0;		// no trunctation was necessary
+        i = 0;                // no trunctation was necessary
       }
     } else {
       j = n;
@@ -1067,7 +1067,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       if (j || i)
         strcpy(curScrat++, ",");
     }
-    if (i) {			// we did truncate
+    if (i) {                        // we did truncate
       strcpy(curScrat, "...");
       curScrat += strlen(curScrat);
     }
@@ -1236,7 +1236,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     n = routine_num_parameters(symbol);
     if (symbol_class(symbol) == LUX_FUNCTION)
       strcpy(curScrat++, "(");
-    if (n) {			// have parameters
+    if (n) {                        // have parameters
       ptr.sp = routine_parameter_names(symbol);
       if (symbol_class(symbol) == LUX_SUBROUTINE)
         strcpy(curScrat++, ",");
@@ -1264,7 +1264,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       j = n;
       i = 0;
     }
-    if (j) {			// have statements
+    if (j) {                        // have statements
       while (j--) {
         symbolIdent(*ptr.w++, mode & ~I_PARENT);
         curScrat += strlen(curScrat);
@@ -1277,7 +1277,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           strcpy(curScrat++, " ");
       }
     }
-    if (i) {			// we truncated
+    if (i) {                        // we truncated
       strcpy(curScrat, "...");
       curScrat += strlen(curScrat);
       if ((mode & I_LENGTH)) {
@@ -1296,7 +1296,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     if (mode & I_NL) {
       sprintf(curScrat, "\n%*s", indent, "");
       curScrat += strlen(curScrat);
-    }	else
+    }        else
       strcpy(curScrat++, " ");
     break;
   case LUX_BIN_OP: case LUX_IF_OP:
@@ -1323,7 +1323,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_INT_FUNC:
     n = 0;
     switch (int_func_number(symbol)) {
-    case 0:			// unary_negative
+    case 0:                        // unary_negative
       strcpy(curScrat++, "-");
       if (symbolIsUnitaryExpression(symbol)) {
         symbolIdent(*int_func_arguments(symbol), mode & I_SINGLEMODE);
@@ -1333,7 +1333,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         n = 1;
       }
       break;
-    case 1:			// subscript
+    case 1:                        // subscript
       n = int_func_num_arguments(symbol);
       arg = int_func_arguments(symbol);
       symbolIdent(arg[n - 1], mode & I_SINGLEMODE);
@@ -1349,15 +1349,15 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       strcpy(curScrat, ")");
       n = 0;
       break;
-    case 2:			// cputime
+    case 2:                        // cputime
       strcpy(curScrat, "!CPUTIME");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 3:			// power
+    case 3:                        // power
       n = 1;
       break;
-    case 4:			// concat
+    case 4:                        // concat
       strcpy(curScrat++, "[");
       n = int_func_num_arguments(symbol);
       if ((mode & I_TRUNCATE)
@@ -1380,37 +1380,37 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       strcpy(curScrat, "]");
       n = 0;
       break;
-    case 5:			// ctime
+    case 5:                        // ctime
       strcpy(curScrat, "!ctime");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 6:			// time
+    case 6:                        // time
       strcpy(curScrat, "!time");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 7:			// date
+    case 7:                        // date
       strcpy(curScrat, "!date");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 8:			// readkey
+    case 8:                        // readkey
       strcpy(curScrat, "!readkey");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 9:			// readkeyne
+    case 9:                        // readkeyne
       strcpy(curScrat, "!readkeyne");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 10:		// systime
+    case 10:                // systime
       strcpy(curScrat, "!systime");
       curScrat += strlen(curScrat);
       n = 0;
       break;
-    case 11:		// jd
+    case 11:                // jd
       strcpy(curScrat, "!jd");
       curScrat += strlen(curScrat);
       n = 0;
@@ -1465,7 +1465,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       curScrat += strlen(curScrat);
       sec = extract_ptr(symbol);
       n = extract_num_sec(symbol);
-    } else {			// an LUX_PRE_EXTRACT symbol
+    } else {                        // an LUX_PRE_EXTRACT symbol
       strcpy(curScrat, pre_extract_name(symbol));
       sec = pre_extract_ptr(symbol);
       n = pre_extract_num_sec(symbol);
@@ -1745,7 +1745,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       } else
         strcpy(curScrat++, " ");
       n = case_num_statements(symbol);
-      n = (n - 1)/2;	// number of statements
+      n = (n - 1)/2;        // number of statements
       if ((mode & I_TRUNCATE) && n > 1) {
         j = 1;
         i = 1;
@@ -1755,7 +1755,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
       ptr.w = case_statements(symbol);
       while (j--) {
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	// condition
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);        // condition
         curScrat += strlen(curScrat);
         strcpy(curScrat, " : ");
         curScrat += 3;
@@ -1766,7 +1766,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
         curScrat += strlen(curScrat);
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);	// action
+        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);        // action
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           indent -= 2;
@@ -1777,7 +1777,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
       }
-      if (i) {		// we truncated
+      if (i) {                // we truncated
         strcpy(curScrat, "...");
         curScrat += 3;
         if ((mode & I_LENGTH)) {
@@ -1786,7 +1786,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         }
         ptr.w += n - 1;
       }
-      if (*ptr.w) {		// have an ELSE clause
+      if (*ptr.w) {                // have an ELSE clause
         strcpy(curScrat, "else ");
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
@@ -1837,7 +1837,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
       }
-      if (i) {		// we were truncating
+      if (i) {                // we were truncating
         strcpy(curScrat, "...");
         curScrat += strlen(curScrat);
         if ((mode & I_LENGTH)) {
@@ -1889,7 +1889,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
       }
-      if (i) {		// we truncated
+      if (i) {                // we truncated
         strcpy(curScrat, "...");
         curScrat += strlen(curScrat);
         if ((mode & I_LENGTH)) {
@@ -1918,8 +1918,8 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     strcpy(curScrat++, "(");
     se = struct_elements(struct_ptr_target(symbol));
     while (n--) {
-      if (!spe->desc) {	// top element
-        i = spe->n_subsc;	// number of subscripts
+      if (!spe->desc) {        // top element
+        i = spe->n_subsc;        // number of subscripts
         spm = spe->member;
         while (i--) {
           switch (spm->type) {
@@ -1964,13 +1964,13 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     break;
   }
 
-  curScrat = save;		// restore proper value
+  curScrat = save;                // restore proper value
   return curScrat;
 }
 //---------------------------------------------------------------------
 int32_t identStruct(structElem *se)
 {
-  int32_t	n, nelem, ndim, *dims, ndim2, *dims2;
+  int32_t        n, nelem, ndim, *dims, ndim2, *dims2;
   char const * arrName[] = {
     "bytarr", "intarr", "lonarr", "quadarr", "fltarr", "dblarr", "strarr",
     "strarr", "strarr", "cfltarr", "cdblarr"
@@ -1987,38 +1987,38 @@ int32_t identStruct(structElem *se)
     se++;
     switch (se->u.regular.type) {
       default:
-	if (se->u.regular.tag) {
-	  sprintf(curScrat, "%s:", se->u.regular.tag);
-	  curScrat += strlen(curScrat);
-	}
-	ndim2 = se->u.regular.spec.singular.ndim;
-	sprintf(curScrat, "%s(", arrName[se->u.regular.type]);
-	curScrat += strlen(curScrat);
-	if (ndim2) {
-	  dims2 = se->u.regular.spec.singular.dims;
-	  if (se->u.regular.type == LUX_TEMP_STRING) {
-	    sprintf(curScrat, "size=%1d,1", *dims2++);
-	    curScrat += strlen(curScrat);
-	    ndim2 = 0;
-	  } else if (se->u.regular.type == LUX_STRING_ARRAY) {
-	    sprintf(curScrat, "size=%1d", *dims2++);
-	    curScrat += strlen(curScrat);
-	    if (ndim2 > 1)
-	      *curScrat++ = ',';
-	    ndim2--;
-	  }
-	  while (ndim2--) {
-	    sprintf(curScrat, "%1d", *dims2++);
-	    curScrat += strlen(curScrat);
-	    if (ndim2)
-	      *curScrat++ = ',';
-	  }
-	  *curScrat++ = ')';
-	} else {		// scalar: show as 1-element array
-	  sprintf(curScrat, "1)");
-	  curScrat += strlen(curScrat);
-	}
-	break;
+        if (se->u.regular.tag) {
+          sprintf(curScrat, "%s:", se->u.regular.tag);
+          curScrat += strlen(curScrat);
+        }
+        ndim2 = se->u.regular.spec.singular.ndim;
+        sprintf(curScrat, "%s(", arrName[se->u.regular.type]);
+        curScrat += strlen(curScrat);
+        if (ndim2) {
+          dims2 = se->u.regular.spec.singular.dims;
+          if (se->u.regular.type == LUX_TEMP_STRING) {
+            sprintf(curScrat, "size=%1d,1", *dims2++);
+            curScrat += strlen(curScrat);
+            ndim2 = 0;
+          } else if (se->u.regular.type == LUX_STRING_ARRAY) {
+            sprintf(curScrat, "size=%1d", *dims2++);
+            curScrat += strlen(curScrat);
+            if (ndim2 > 1)
+              *curScrat++ = ',';
+            ndim2--;
+          }
+          while (ndim2--) {
+            sprintf(curScrat, "%1d", *dims2++);
+            curScrat += strlen(curScrat);
+            if (ndim2)
+              *curScrat++ = ',';
+          }
+          *curScrat++ = ')';
+        } else {                // scalar: show as 1-element array
+          sprintf(curScrat, "1)");
+          curScrat += strlen(curScrat);
+        }
+        break;
     }
     if (n)
       *curScrat++ = ',';
@@ -2039,14 +2039,14 @@ int32_t identStruct(structElem *se)
 //---------------------------------------------------------------------
 void dumpTree(int32_t symbol)
 {
-  int32_t	kind, i, n, *l;
-  int16_t	*ptr;
-  static int32_t	indent = 0;
+  int32_t        kind, i, n, *l;
+  int16_t        *ptr;
+  static int32_t        indent = 0;
   extern char *binOpName[];
   char** sp;
   char const noName[] = "-";
   char const* name;
-  extractSec	*eptr;
+  extractSec        *eptr;
 
   if (!indent)
     puts(symbolIdent(symbol, 0));
@@ -2056,7 +2056,7 @@ void dumpTree(int32_t symbol)
   if (name == NULL)
     name = noName;
   printf("<%1d> %s (%1d) %s: ", symbol, name, symbol_context(symbol),
-	 className(symbol_class(symbol)));
+         className(symbol_class(symbol)));
   switch (symbol_class(symbol)) {
   default:
       printf(" type %1d\n", symbol_type(symbol));
@@ -2073,36 +2073,36 @@ void dumpTree(int32_t symbol)
       return;
     case LUX_PRE_EXTRACT: case LUX_EXTRACT:
       if (symbol_class(symbol) == LUX_PRE_EXTRACT) {
-	printf("target: %s\n", pre_extract_name(symbol));
-	eptr = pre_extract_ptr(symbol);
-	n = pre_extract_num_sec(symbol);
+        printf("target: %s\n", pre_extract_name(symbol));
+        eptr = pre_extract_ptr(symbol);
+        n = pre_extract_num_sec(symbol);
       } else {
-	printf("target:\n");
-	dumpTree(extract_target(symbol));
-	eptr = extract_ptr(symbol);
-	n = extract_num_sec(symbol);
+        printf("target:\n");
+        dumpTree(extract_target(symbol));
+        eptr = extract_ptr(symbol);
+        n = extract_num_sec(symbol);
       }
       printf("extractions: %1d\n", n);
       if (!n)
-	break;
+        break;
       indent++;
       while (n--) {
-	i = eptr->number;
-	switch (eptr->type) {
-	  case LUX_RANGE:
-	    printf("range:\n");
-	    ptr = eptr->ptr.w;
-	    while (i--)
-	      dumpTree(*ptr++);
-	    break;
-	  case LUX_LIST:
-	    printf("tags:\n");
-	    sp = eptr->ptr.sp;
-	    while (i--)
-	      printf(".%s ", *sp++);
-	    break;
-	}
-	eptr++;
+        i = eptr->number;
+        switch (eptr->type) {
+          case LUX_RANGE:
+            printf("range:\n");
+            ptr = eptr->ptr.w;
+            while (i--)
+              dumpTree(*ptr++);
+            break;
+          case LUX_LIST:
+            printf("tags:\n");
+            sp = eptr->ptr.sp;
+            while (i--)
+              printf(".%s ", *sp++);
+            break;
+        }
+        eptr++;
       }
       indent--;
       break;
@@ -2110,64 +2110,64 @@ void dumpTree(int32_t symbol)
       printf(" parameters: ");
       n = routine_num_parameters(symbol);
       if (!n)
-	printf(" none");
+        printf(" none");
       else {
-	ptr = routine_parameters(symbol);
-	for (i = 0; i < n; i++)
-	  printf(" %1d", *ptr++);
+        ptr = routine_parameters(symbol);
+        for (i = 0; i < n; i++)
+          printf(" %1d", *ptr++);
       }
       n = routine_num_statements(symbol);
       printf("; statements:");
       if (!n)
-	printf(" none");
+        printf(" none");
       else {
-	ptr = routine_statements(symbol);
-	for (i = 0; i < n; i++)
-	  printf(" %1d", *ptr++);
+        ptr = routine_statements(symbol);
+        for (i = 0; i < n; i++)
+          printf(" %1d", *ptr++);
       }
       putchar('\n');
       n = routine_num_parameters(symbol);
       indent++;
       if (n) {
-	ptr = routine_parameters(symbol);
-	for (i = 0; i < n; i++)
-	  dumpTree(*ptr++);
+        ptr = routine_parameters(symbol);
+        for (i = 0; i < n; i++)
+          dumpTree(*ptr++);
       }
       n = routine_num_statements(symbol);
       if (n) {
-	ptr = routine_statements(symbol);
-	for (i = 0; i < n; i++)
-	  dumpTree(*ptr++);
+        ptr = routine_statements(symbol);
+        for (i = 0; i < n; i++)
+          dumpTree(*ptr++);
       }
       indent--;
       return;
     case LUX_RANGE:
       printf("start: %1d, end: %1d, sum: %1d, redirect: %1d\n",
-	     range_start(symbol), range_end(symbol), range_sum(symbol),
-	     range_redirect(symbol));
+             range_start(symbol), range_end(symbol), range_sum(symbol),
+             range_redirect(symbol));
       indent++;
       n = range_start(symbol);
       if (n < 0)
-	n = -n;
+        n = -n;
       dumpTree(n);
       n = range_end(symbol);
       if (n < 0)
-	n = -n;
+        n = -n;
       dumpTree(n);
       n = range_redirect(symbol);
       if (n >= 0)
-	dumpTree(n);
+        dumpTree(n);
       indent--;
       return;
     case LUX_LIST:
       printf("key - value: ");
       n = list_num_symbols(symbol);
       for (i = 0; i < n; i++)
-	printf(" %s: %1d;", list_key(symbol, i), list_symbol(symbol, i));
+        printf(" %s: %1d;", list_key(symbol, i), list_symbol(symbol, i));
       putchar('\n');
       indent++;
       for (i = 0; i < n; i++)
-	dumpTree(list_symbol(symbol, i));
+        dumpTree(list_symbol(symbol, i));
       indent--;
       return;
     case LUX_CLIST:
@@ -2175,17 +2175,17 @@ void dumpTree(int32_t symbol)
       n = clist_num_symbols(symbol);
       ptr = clist_symbols(symbol);
       for (i = 0; i < n; i++)
-	printf(" %1d", *ptr++);
+        printf(" %1d", *ptr++);
       putchar('\n');
       ptr -= n;
       indent++;
       for (i = 0; i < n; i++)
-	dumpTree(*ptr++);
+        dumpTree(*ptr++);
       indent--;
       return;
     case LUX_KEYWORD:
       printf("name: %1d, value: %1d\n", keyword_name_symbol(symbol),
-	   keyword_value(symbol));
+           keyword_value(symbol));
       indent++;
       dumpTree(keyword_name_symbol(symbol));
       dumpTree(keyword_value(symbol));
@@ -2193,12 +2193,12 @@ void dumpTree(int32_t symbol)
       return;
     case LUX_FILEMAP:
       printf("type: %s, file: %s, dimensions:",
-	     typeName(file_map_type(symbol)),
-	     file_map_file_name(symbol));
+             typeName(file_map_type(symbol)),
+             file_map_file_name(symbol));
       n = file_map_num_dims(symbol);
       l = file_map_dims(symbol);
       for (i = 0; i < n; i++)
-	printf(" %1d", *l++);
+        printf(" %1d", *l++);
       putchar('\n');
       return;
     case LUX_ASSOC:
@@ -2206,12 +2206,12 @@ void dumpTree(int32_t symbol)
       n = assoc_num_dims(symbol);
       l = assoc_dims(symbol);
       for (i = 0; i < n; i++)
-	printf(" %1d", *l++);
+        printf(" %1d", *l++);
       putchar('\n');
       return;
     case LUX_ENUM:
       printf("type: %s, key - value: %s\n", typeName(enum_type(symbol)),
-	     symbolIdent(symbol, I_VALUE));
+             symbolIdent(symbol, I_VALUE));
       return;
     case LUX_UNDEFINED:
       putchar('\n');
@@ -2225,27 +2225,27 @@ void dumpTree(int32_t symbol)
     case LUX_FUNC_PTR:
       n = func_ptr_routine_num(symbol);
       if (n < 0) {
-	if ((Symbolclass) func_ptr_type(symbol) == LUX_FUNCTION)
-	  printf("internal function: %s\n", function[-n].name);
-	else
-	  printf("internal subroutine: %s\n", subroutine[-n].name);
+        if ((Symbolclass) func_ptr_type(symbol) == LUX_FUNCTION)
+          printf("internal function: %s\n", function[-n].name);
+        else
+          printf("internal subroutine: %s\n", subroutine[-n].name);
       } else {
-	printf("routine: %1d\n", n);
-	indent++;
-	dumpTree(n);
-	indent--;
+        printf("routine: %1d\n", n);
+        indent++;
+        dumpTree(n);
+        indent--;
       }
       return;
     case LUX_PRE_LIST:
       printf("key - element: ");
       n = pre_list_num_symbols(symbol);
       for (i = 0; i < n; i++)
-	printf(" %s: %1d;", pre_list_key(symbol, i),
-	       pre_list_symbol(symbol, i));
+        printf(" %s: %1d;", pre_list_key(symbol, i),
+               pre_list_symbol(symbol, i));
       putchar('\n');
       indent++;
       for (i = 0; i < n; i++)
-	dumpTree(pre_list_symbol(symbol, i));
+        dumpTree(pre_list_symbol(symbol, i));
       indent--;
       return;
     case LUX_PRE_CLIST:
@@ -2253,85 +2253,85 @@ void dumpTree(int32_t symbol)
       n = pre_clist_num_symbols(symbol);
       ptr = pre_clist_symbols(symbol);
       for (i = 0; i < n; i++)
-	printf(" %1d", *ptr++);
+        printf(" %1d", *ptr++);
       putchar('\n');
       ptr--;
       indent++;
       for (i = 0; i < n; i++)
-	dumpTree(*ptr++);
+        dumpTree(*ptr++);
       indent--;
       return;
     case LUX_PRE_RANGE:
       printf("start: %1d, end: %1d, sum: %1d, redirect: %1d\n",
-	     pre_range_start(symbol), pre_range_end(symbol),
-	     pre_range_sum(symbol), pre_range_redirect(symbol));
+             pre_range_start(symbol), pre_range_end(symbol),
+             pre_range_sum(symbol), pre_range_redirect(symbol));
       indent++;
       n = pre_range_start(symbol);
       if (n < 0)
-	n = -n;
+        n = -n;
       dumpTree(n);
       n = pre_range_end(symbol);
       if (n < 0) n = -n;
       dumpTree(n);
       n = pre_range_redirect(symbol);
       if (n >= 0)
-	dumpTree(n);
+        dumpTree(n);
       indent--;
       return;
     case LUX_LIST_PTR:
       n = list_ptr_target(symbol);
       printf("target: %1d, tag: ", n < 0? -n: n);
       if (n < 0) {
-	printf("%1d\n", list_ptr_tag_number(symbol));
-	n = -n;
+        printf("%1d\n", list_ptr_tag_number(symbol));
+        n = -n;
       }
       else
-	printf("%s\n", list_ptr_tag_string(symbol));
+        printf("%s\n", list_ptr_tag_string(symbol));
       indent++;
       dumpTree(n);
       indent--;
       return;
     case LUX_INT_FUNC:
       printf("function: %s, arguments:",
-	     function[int_func_number(symbol)].name);
+             function[int_func_number(symbol)].name);
       n = int_func_num_arguments(symbol);
       if (!n) {
-	puts(" none");
-	return;
+        puts(" none");
+        return;
       }
       ptr = int_func_arguments(symbol);
       for (i = 0; i < n; i++)
-	printf(" %1d", *ptr++);
+        printf(" %1d", *ptr++);
       putchar('\n');
       ptr -= n;
       indent++;
       for (i = 0; i < n; i++)
-	dumpTree(*ptr++);
+        dumpTree(*ptr++);
       indent--;
       return;
     case LUX_USR_FUNC:
       printf("function: %1d (%s), arguments:", usr_func_number(symbol),
-	     symbolProperName(usr_func_number(symbol)));
+             symbolProperName(usr_func_number(symbol)));
       n = usr_func_num_arguments(symbol);
       if (!n) {
-	puts(" none");
-	return;
+        puts(" none");
+        return;
       } else {
-	ptr = usr_func_arguments(symbol);
-	for (i = 0; i < n; i++)
-	  printf(" %1d", *ptr++);
-	putchar('\n');
-	ptr -= n;
+        ptr = usr_func_arguments(symbol);
+        for (i = 0; i < n; i++)
+          printf(" %1d", *ptr++);
+        putchar('\n');
+        ptr -= n;
       }
       indent++;
       for (i = 0; i < n; i++)
-	dumpTree(*ptr++);
+        dumpTree(*ptr++);
       indent--;
       return;
     case LUX_IF_OP: case LUX_BIN_OP:
       printf("%s, lhs: %1d, rhs: %1d\n",
-	     binOpName[bin_op_type(symbol)], bin_op_lhs(symbol),
-	     bin_op_rhs(symbol));
+             binOpName[bin_op_type(symbol)], bin_op_lhs(symbol),
+             bin_op_rhs(symbol));
       indent++;
       dumpTree(bin_op_lhs(symbol));
       dumpTree(bin_op_rhs(symbol));
@@ -2340,190 +2340,190 @@ void dumpTree(int32_t symbol)
     case LUX_EVB:
       kind = evb_type(symbol);
       switch (kind) {
-	case EVB_REPLACE:
-	  printf("assignment: lhs: %1d, rhs: %1d\n", replace_lhs(symbol),
-		 replace_rhs(symbol));
-	  indent++;
-	  dumpTree(replace_lhs(symbol));
-	  dumpTree(replace_rhs(symbol));
-	  indent--;
-	  return;
-	case EVB_INT_SUB:
-	  printf("internal routine: %s, arguments:",
-		 subroutine[int_sub_routine_num(symbol)].name);
-	  n = int_sub_num_arguments(symbol);
-	  if (!n) {
-	    puts(" none");
-	    return;
-	  }
-	  ptr = int_sub_arguments(symbol);
-	  for (i = 0; i < n; i++)
-	    printf(" %1d", *ptr++);
-	  putchar('\n');
-	  ptr -= n;
-	  indent++;
-	  for (i = 0; i < n; i++)
-	    dumpTree(*ptr++);
-	  indent--;
-	  return;
-	case EVB_USR_SUB:
-	  printf("subr call: %1d (%s), arguments:",
-		 usr_sub_routine_num(symbol),
-		 symbolProperName(usr_sub_routine_num(symbol)));
-	  n = usr_sub_num_arguments(symbol);
-	  if (!n) {
-	    puts(" none");
-	    return;
-	  }
-	  ptr = usr_sub_arguments(symbol);
-	  for (i = 0; i < n; i++)
-	    printf(" %1d", *ptr++);
-	  putchar('\n');
-	  ptr -= n;
-	  indent++;
-	  for (i = 0; i < n; i++)
-	    dumpTree(*ptr++);
-	  indent--;
-	  return;
-	case EVB_USR_CODE:
-	  printf("block call: %1d (%s)\n", usr_code_routine_num(symbol),
-		 symbolProperName(usr_code_routine_num(symbol)));
-	  return;
-	case EVB_INSERT:
-	  printf("insertion: source: %1d, target: %1d, target coordinates:",
-		 insert_source(symbol), insert_target(symbol));
-	  n = insert_num_target_indices(symbol);
-	  ptr = insert_target_indices(symbol);
-	  if (!n)
-	    puts(" none");
-	  indent++;
-	  dumpTree(insert_source(symbol));
-	  dumpTree(insert_target(symbol));
-	  if (!n) {
-	    indent--;
-	    return;
-	  }
-	  for (i = 0; i < n; i++)
-	    printf(" %1d", *ptr++);
-	  putchar('\n');
-	  ptr -= n;
-	  for (i = 0; i < n; i++)
-	    dumpTree(*ptr++);
-	  indent--;
-	  return;
-	case EVB_CASE:
-	  printf("case: condition - statements:");
-	  n = case_num_statements(symbol)/2;
-	  if (!n) {
-	    puts(" none");
-	    return;
-	  }
-	  ptr = case_statements(symbol);
-	  for (i = 0; i < n; i++) {
-	    printf(" %1d", *ptr++);
-	    printf(" %1d;", *ptr++);
-	  }
-	  putchar('\n');
-	  ptr -= n*2;
-	  indent++;
-	  for (i = 0; i < 2*n; i++)
-	    dumpTree(*ptr++);
-	  indent--;
-	  return;
-	case EVB_NCASE:
-	  printf("ncase: condition: %1d, statements:",
-		 ncase_switch_value(symbol));
-	  n = ncase_num_statements(symbol);
-	  if (!n) {
-	    puts(" none");
-	    return;
-	  }
-	  ptr = ncase_statements(symbol);
-	  for (i = 0; i < n + 1; i++)
-	    printf(" %1d", *ptr++);
-	  putchar('\n');
-	  ptr -= n;
-	  indent++;
-	  for (i = 0; i < n + 1; i++)
-	    dumpTree(*ptr++);
-	  indent--;
-	  return;
-	case EVB_FILE:
-	  printf("file inclusion: name: %s, type: %s\n", file_name(symbol),
-		 file_include_type(symbol) == FILE_INCLUDE?
-		 "include (@)": "report (@@)");
-	  break;
-	case EVB_BLOCK:
-	  printf("block statement: statements:");
-	  n = block_num_statements(symbol);
-	  if (!n) {
-	    puts(" none");
-	    return;
-	  }
-	  ptr = block_statements(symbol);
-	  for (i = 0; i < n; i++)
-	    printf(" %1d", *ptr++);
-	  putchar('\n');
-	  ptr -= n;
-	  indent++;
-	  for (i = 0; i < n; i++)
-	    dumpTree(*ptr++);
-	  indent--;
-	  return;
-	case EVB_FOR:
-	  printf("for statement: start: %1d, end: %1d, step: %1d, body: %1d\n",
-		 for_start(symbol), for_end(symbol), for_step(symbol),
-		 for_body(symbol));
-	  indent++;
-	  dumpTree(for_start(symbol));
-	  dumpTree(for_end(symbol));
-	  dumpTree(for_step(symbol));
-	  dumpTree(for_body(symbol));
-	  indent--;
-	  return;
-	case EVB_IF:
-	  printf("if statement: condition: %1d, true: %1d, false: %1d\n",
-		 if_condition(symbol), if_true_body(symbol),
-		 if_false_body(symbol));
-	  indent++;
-	  dumpTree(if_condition(symbol));
-	  dumpTree(if_true_body(symbol));
-	  dumpTree(if_false_body(symbol));
-	  indent--;
-	  return;
-	case EVB_REPEAT:
-	  printf("repeat statement: body: %1d, condition: %1d\n",
-		 repeat_body(symbol), repeat_condition(symbol));
-	  indent++;
-	  dumpTree(repeat_body(symbol));
-	  dumpTree(repeat_condition(symbol));
-	  indent--;
-	  return;
-	case EVB_DO_WHILE:
-	  printf("do-while statement: body: %1d, condition: %1d\n",
-		 do_while_body(symbol), do_while_condition(symbol));
-	  indent++;
-	  dumpTree(do_while_body(symbol));
-	  dumpTree(do_while_condition(symbol));
-	  indent--;
-	  return;
-	case EVB_WHILE_DO:
-	  printf("while-do statement: condition: %1d, body: %1d\n",
-		 while_do_condition(symbol), while_do_body(symbol));
-	  indent++;
-	  dumpTree(while_do_condition(symbol));
-	  dumpTree(while_do_body(symbol));
-	  indent--;
-	  return;
-	case EVB_RETURN:
-	  printf("return: value: %1d\n", return_value(symbol));
-	  indent++;
-	  dumpTree(return_value(symbol));
-	  indent--;
-	  return;
-	default:
-	  return;
-	}
+        case EVB_REPLACE:
+          printf("assignment: lhs: %1d, rhs: %1d\n", replace_lhs(symbol),
+                 replace_rhs(symbol));
+          indent++;
+          dumpTree(replace_lhs(symbol));
+          dumpTree(replace_rhs(symbol));
+          indent--;
+          return;
+        case EVB_INT_SUB:
+          printf("internal routine: %s, arguments:",
+                 subroutine[int_sub_routine_num(symbol)].name);
+          n = int_sub_num_arguments(symbol);
+          if (!n) {
+            puts(" none");
+            return;
+          }
+          ptr = int_sub_arguments(symbol);
+          for (i = 0; i < n; i++)
+            printf(" %1d", *ptr++);
+          putchar('\n');
+          ptr -= n;
+          indent++;
+          for (i = 0; i < n; i++)
+            dumpTree(*ptr++);
+          indent--;
+          return;
+        case EVB_USR_SUB:
+          printf("subr call: %1d (%s), arguments:",
+                 usr_sub_routine_num(symbol),
+                 symbolProperName(usr_sub_routine_num(symbol)));
+          n = usr_sub_num_arguments(symbol);
+          if (!n) {
+            puts(" none");
+            return;
+          }
+          ptr = usr_sub_arguments(symbol);
+          for (i = 0; i < n; i++)
+            printf(" %1d", *ptr++);
+          putchar('\n');
+          ptr -= n;
+          indent++;
+          for (i = 0; i < n; i++)
+            dumpTree(*ptr++);
+          indent--;
+          return;
+        case EVB_USR_CODE:
+          printf("block call: %1d (%s)\n", usr_code_routine_num(symbol),
+                 symbolProperName(usr_code_routine_num(symbol)));
+          return;
+        case EVB_INSERT:
+          printf("insertion: source: %1d, target: %1d, target coordinates:",
+                 insert_source(symbol), insert_target(symbol));
+          n = insert_num_target_indices(symbol);
+          ptr = insert_target_indices(symbol);
+          if (!n)
+            puts(" none");
+          indent++;
+          dumpTree(insert_source(symbol));
+          dumpTree(insert_target(symbol));
+          if (!n) {
+            indent--;
+            return;
+          }
+          for (i = 0; i < n; i++)
+            printf(" %1d", *ptr++);
+          putchar('\n');
+          ptr -= n;
+          for (i = 0; i < n; i++)
+            dumpTree(*ptr++);
+          indent--;
+          return;
+        case EVB_CASE:
+          printf("case: condition - statements:");
+          n = case_num_statements(symbol)/2;
+          if (!n) {
+            puts(" none");
+            return;
+          }
+          ptr = case_statements(symbol);
+          for (i = 0; i < n; i++) {
+            printf(" %1d", *ptr++);
+            printf(" %1d;", *ptr++);
+          }
+          putchar('\n');
+          ptr -= n*2;
+          indent++;
+          for (i = 0; i < 2*n; i++)
+            dumpTree(*ptr++);
+          indent--;
+          return;
+        case EVB_NCASE:
+          printf("ncase: condition: %1d, statements:",
+                 ncase_switch_value(symbol));
+          n = ncase_num_statements(symbol);
+          if (!n) {
+            puts(" none");
+            return;
+          }
+          ptr = ncase_statements(symbol);
+          for (i = 0; i < n + 1; i++)
+            printf(" %1d", *ptr++);
+          putchar('\n');
+          ptr -= n;
+          indent++;
+          for (i = 0; i < n + 1; i++)
+            dumpTree(*ptr++);
+          indent--;
+          return;
+        case EVB_FILE:
+          printf("file inclusion: name: %s, type: %s\n", file_name(symbol),
+                 file_include_type(symbol) == FILE_INCLUDE?
+                 "include (@)": "report (@@)");
+          break;
+        case EVB_BLOCK:
+          printf("block statement: statements:");
+          n = block_num_statements(symbol);
+          if (!n) {
+            puts(" none");
+            return;
+          }
+          ptr = block_statements(symbol);
+          for (i = 0; i < n; i++)
+            printf(" %1d", *ptr++);
+          putchar('\n');
+          ptr -= n;
+          indent++;
+          for (i = 0; i < n; i++)
+            dumpTree(*ptr++);
+          indent--;
+          return;
+        case EVB_FOR:
+          printf("for statement: start: %1d, end: %1d, step: %1d, body: %1d\n",
+                 for_start(symbol), for_end(symbol), for_step(symbol),
+                 for_body(symbol));
+          indent++;
+          dumpTree(for_start(symbol));
+          dumpTree(for_end(symbol));
+          dumpTree(for_step(symbol));
+          dumpTree(for_body(symbol));
+          indent--;
+          return;
+        case EVB_IF:
+          printf("if statement: condition: %1d, true: %1d, false: %1d\n",
+                 if_condition(symbol), if_true_body(symbol),
+                 if_false_body(symbol));
+          indent++;
+          dumpTree(if_condition(symbol));
+          dumpTree(if_true_body(symbol));
+          dumpTree(if_false_body(symbol));
+          indent--;
+          return;
+        case EVB_REPEAT:
+          printf("repeat statement: body: %1d, condition: %1d\n",
+                 repeat_body(symbol), repeat_condition(symbol));
+          indent++;
+          dumpTree(repeat_body(symbol));
+          dumpTree(repeat_condition(symbol));
+          indent--;
+          return;
+        case EVB_DO_WHILE:
+          printf("do-while statement: body: %1d, condition: %1d\n",
+                 do_while_body(symbol), do_while_condition(symbol));
+          indent++;
+          dumpTree(do_while_body(symbol));
+          dumpTree(do_while_condition(symbol));
+          indent--;
+          return;
+        case EVB_WHILE_DO:
+          printf("while-do statement: condition: %1d, body: %1d\n",
+                 while_do_condition(symbol), while_do_body(symbol));
+          indent++;
+          dumpTree(while_do_condition(symbol));
+          dumpTree(while_do_body(symbol));
+          indent--;
+          return;
+        case EVB_RETURN:
+          printf("return: value: %1d\n", return_value(symbol));
+          indent++;
+          dumpTree(return_value(symbol));
+          indent--;
+          return;
+        default:
+          return;
+        }
     }
   return;
 }
@@ -2541,8 +2541,8 @@ int32_t lux_list(int32_t narg, int32_t ps[])
 /* LIST,symbol  or  LIST,'name'  lists the definition of the given symbol
  or of the routine with the given name.  */
 {
-  int32_t	symbol;
-  char	*name;
+  int32_t        symbol;
+  char        *name;
 
   switch (symbol_class(ps[0])) {
     case LUX_SCALAR:
@@ -2552,14 +2552,14 @@ int32_t lux_list(int32_t narg, int32_t ps[])
       name = string_value(ps[0]);
       symbol = lookForName(name, varHashTable, 0);
       if (symbol < 0)
-	symbol = lookForName(name, subrHashTable, 0);
+        symbol = lookForName(name, subrHashTable, 0);
       if (symbol < 0)
-	symbol = lookForName(name, funcHashTable, 0);
+        symbol = lookForName(name, funcHashTable, 0);
       if (symbol < 0)
-	symbol = lookForName(name, blockHashTable, 0);
+        symbol = lookForName(name, blockHashTable, 0);
       free(name);
       if (symbol < 0)
-	return luxerror("Could not find the symbol", ps[0]);
+        return luxerror("Could not find the symbol", ps[0]);
       break;
     default:
       return cerror(ILL_CLASS, ps[0]);

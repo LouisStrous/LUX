@@ -34,35 +34,35 @@ int32_t filemap(Symboltype type, int32_t narg, int32_t ps[])
 /* Create a file map symbol (file array) and stores array structure,
    file name and offset */
 {
- int32_t	iq, ndim, dims[8], mq, get_dims(int32_t *, int32_t *, int32_t *);
- char	*p;
+ int32_t        iq, ndim, dims[8], mq, get_dims(int32_t *, int32_t *, int32_t *);
+ char        *p;
 
- iq = ps[1];				// file name
+ iq = ps[1];                                // file name
  if (symbol_class(iq) != LUX_STRING)
    return cerror(NEED_STR, iq);
  p = expand_name(string_value(iq), "");
- iq = ps[2];				// dimensions
+ iq = ps[2];                                // dimensions
  ndim = narg - 2;
  if (ndim > MAX_DIMS)
-   return cerror(N_DIMS_OVR, iq);	// too many dims
+   return cerror(N_DIMS_OVR, iq);        // too many dims
  if (get_dims(&ndim, &ps[2], dims) != 1)
-   return -1;			// some error in dims
+   return -1;                        // some error in dims
  getFreeTempVariable(iq);
  symbol_class(iq) = LUX_FILEMAP;
  file_map_type(iq) = type;
- symbol_context(iq) = -1;	// ?
+ symbol_context(iq) = -1;        // ?
  symbol_line(iq) = curLineNumber;
-					// memory requirement
+                                        // memory requirement
  mq = sizeof(array) + sizeof(int32_t)*(*ps != 0) + strlen(p) + 1;
  symbol_memory(iq) = mq;
  file_map_header(iq) = (array*) malloc(mq);
  if (!file_map_header(iq))
    return luxerror("Memory allocation error\n", 0);
  if (internalMode & 1)
-   set_file_map_readonly(iq);	// /READONLY
+   set_file_map_readonly(iq);        // /READONLY
  else
    set_file_map_readwrite(iq);  // read-write
- if (internalMode & 2)		// /SWAP
+ if (internalMode & 2)                // /SWAP
    set_file_map_swap(iq);
  file_map_num_dims(iq) = ndim;
  memcpy(file_map_dims(iq), dims, ndim*sizeof(int32_t)); // copy dimensions
@@ -111,8 +111,8 @@ int32_t lux_i_file_output(FILE *fp, Pointer q, int32_t assoctype,
 /* use a file array as a guide to writing into a file, and an
  index array as a guide to the positions where to write */
 {
-  int32_t	*qi, error = 0, size, dindx, i;
-  array	*h;
+  int32_t        *qi, error = 0, size, dindx, i;
+  array        *h;
 
   if (sym[offsym].type != LUX_INT32)
     offsym = lux_long(1, &offsym);
@@ -159,18 +159,18 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
 {
  int32_t    ddat, *dat, dfile, *file, daxes, *axes, doff, *off, offset;
  int32_t    i, dattype, assoctype, ystep[MAX_DIMS], rstep[MAX_DIMS],
-	tally[MAX_DIMS], done;
+        tally[MAX_DIMS], done;
  int32_t    efile, n, *step, baseOffset;
  Pointer       q;
  FILE   *fp;
- char	*fname;
+ char        *fname;
 
  if (file_map_readonly(iq))
    return luxerror("File array is read-only", iq);
  step = rstep;
  assoctype = file_map_type(iq);
  dattype = symbol_type(jq);
- if (assoctype != dattype) 	// make proper type
+ if (assoctype != dattype)         // make proper type
    jq = lux_converts[assoctype](1, &jq);
  switch (symbol_class(jq)) {
    case LUX_SCAL_PTR: case LUX_SCALAR:
@@ -211,7 +211,7 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
    GET_SIZE(n, file, dfile);
    dfile = n;
    return lux_i_file_output(fp, q, assoctype, offsym, ddat, dfile,
-			     baseOffset);
+                             baseOffset);
  }
  if (!offsym) {
    offset = 0;
@@ -230,12 +230,12 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
      doff = 0;
    }
  }
- if (axsym == -1) {		// assoc(off) = .. quick insert
+ if (axsym == -1) {                // assoc(off) = .. quick insert
    GET_SIZE(done, dat, ddat);
    ddat = 1;                                    // fake 1D insert
    daxes = 0;
    dat = &done;
- } else if (axsym) {		// redirection axes
+ } else if (axsym) {                // redirection axes
    daxes = array_size(axsym);
    if (daxes != ddat) {
      puts("Wrong number of axes");
@@ -265,7 +265,7 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
    for (i = 0; i < ddat; i++)
      if (off[(daxes)? axes[i]: i] + dat[i] > file[(daxes)? axes[i]: i]) {
        printf("%d + %d > %d\n", off[(daxes)? axes[i]: i], dat[i],
-	      file[(daxes)? axes[i]: i]);
+              file[(daxes)? axes[i]: i]);
        puts("Specified coordinates reach outside array");
        return cerror(INCMP_DIMS, iq);
      }
@@ -308,40 +308,40 @@ int32_t lux_fzarr(int32_t narg, int32_t ps[])
 // FZARR(name) returns a file array symbol appropriate for an
 // uncompressed FZ file.
 {
-  char	*name, *p;
-  int32_t	wwflag, iq, mq;
-  FILE	*fp;
-  fzHead	*fh;
-  int32_t	ck_synch_hd(FILE *, fzHead *, int32_t *);
+  char        *name, *p;
+  int32_t        wwflag, iq, mq;
+  FILE        *fp;
+  fzHead        *fh;
+  int32_t        ck_synch_hd(FILE *, fzHead *, int32_t *);
 
   if (symbol_class(*ps) != LUX_STRING)
     return cerror(NEED_STR, *ps);
   name = string_value(*ps);
   fp = Fopen(expand_name(name, NULL), "r");
-  if (!fp)			// could not open file for reading
+  if (!fp)                        // could not open file for reading
     return cerror(ERR_OPEN, 0);
   fh = (fzHead *) scrat;
   if (ck_synch_hd(fp, fh, &wwflag) < 0)
     return LUX_ERROR;
   fclose(fp);
-  if (fh->subf % 128 == 1)	// compressed data
+  if (fh->subf % 128 == 1)        // compressed data
     return luxerror("FZARR cannot deal with compressed data", 0);
 
   getFreeTempVariable(iq);
   symbol_class(iq) = LUX_FILEMAP;
   file_map_type(iq) = (Symboltype) fh->datyp;
-  symbol_context(iq) = -1;	// ?
+  symbol_context(iq) = -1;        // ?
   symbol_line(iq) = curLineNumber;
-					// memory requirement
+                                        // memory requirement
   mq = sizeof(array) + sizeof(int32_t) + strlen(name) + 1;
   symbol_memory(iq) = mq;
   file_map_header(iq) = (array*) malloc(mq);
   if (!file_map_header(iq))
     return luxerror("Memory allocation error\n", 0);
   if (internalMode & 1)
-    set_file_map_readonly(iq);	// /READONLY
+    set_file_map_readonly(iq);        // /READONLY
   file_map_num_dims(iq) = fh->ndim;
-  set_file_map_has_offset(iq);	// offset will be specified
+  set_file_map_has_offset(iq);        // offset will be specified
 
    // copy dimensions
   memcpy(file_map_dims(iq), fh->dim, fh->ndim*sizeof(int32_t));

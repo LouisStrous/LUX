@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "action.hh"
 
-void	manualTerm(int32_t);
+void        manualTerm(int32_t);
 
 void getTermCaps(void)
 {

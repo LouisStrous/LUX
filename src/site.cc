@@ -29,13 +29,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "luxdefs.hh"
 #include "dmalloc.hh"
-#include "editor.hh"		// for BUFSIZE
+#include "editor.hh"                // for BUFSIZE
 
-extern int32_t	internalMode;
+extern int32_t        internalMode;
 extern void printw(char const* string), printwf(char const* fmt, ...);
-extern char	*c_left, *k_left, *c_right, *k_right,
-	*c_up, *k_up, *c_down, *k_down, *k_delete,
-	*k_backspace, *k_insert, *cl_eos, *c_save, *c_restore;
+extern char        *c_left, *k_left, *c_right, *k_right,
+        *c_up, *k_up, *c_down, *k_down, *k_delete,
+        *k_backspace, *k_insert, *cl_eos, *c_save, *c_restore;
 
 void printnice(char *p)
 {
@@ -57,8 +57,8 @@ int32_t site(int32_t narg, int32_t ps[])
    Be sure to delete  site.o  before every compilation, because otherwise the
    compilation time etc. aren't updated!   LS 10/5/92 */
 {
-  char	fmt[] = " %22s %6d %6d\n", hasInclude = 0, *p, *p2;
-  void	setPager(int32_t), resetPager(void);
+  char        fmt[] = " %22s %6d %6d\n", hasInclude = 0, *p, *p2;
+  void        setPager(int32_t), resetPager(void);
 
   setPager(0);
   if (!internalMode || internalMode == 255) {
@@ -74,7 +74,7 @@ int32_t site(int32_t narg, int32_t ps[])
 #endif
   }
 
-  if (internalMode & 16)	// /WARRANTY
+  if (internalMode & 16)        // /WARRANTY
     printw("****WARRANTY\n"
            "This program is distributed in the hope that it will be useful, "
            "but WITHOUT ANY WARRANTY; without even the implied warranty of "
@@ -82,27 +82,27 @@ int32_t site(int32_t narg, int32_t ps[])
            "GNU General Public License for more details.\n\n"
            "You should have received a copy of the GNU General Public License\n "
            "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n");
-  if (internalMode & 32)	// /COPY
+  if (internalMode & 32)        // /COPY
     printw("****COPYING\n"
            "This program is free software: you can redistribute it and/or modify "
            "it under the terms of the GNU General Public License as published by "
            "the Free Software Foundation, either version 3 of the License, or "
            "(at your option) any later version.\n");
-  if (internalMode & 64)	// /BUGS
+  if (internalMode & 64)        // /BUGS
     printw("****BUGS\n"
-	   "If you think you have found a bug in LUX, then please report "
-	   "it to lux@quae.nl.\n");
+           "If you think you have found a bug in LUX, then please report "
+           "it to lux@quae.nl.\n");
 #ifdef __STDC__
-  if (internalMode & 2) {	// /TIME
+  if (internalMode & 2) {        // /TIME
     printw("****COMPILATION TIME\n");
     printw("This version was compiled on " __DATE__ ", " __TIME__ "\n");
   }
 #endif
-  if (internalMode & 4) {	// /PLATFORM
+  if (internalMode & 4) {        // /PLATFORM
     printw("****PLATFORM\n");
     printw("Platform: " PLATFORM "\n");
   }
-  if (internalMode & 8)		// /PACKAGES
+  if (internalMode & 8)                // /PACKAGES
   {
     printw("****PACKAGES\n");
 #if HAVE_LIBX11
@@ -118,7 +118,7 @@ int32_t site(int32_t narg, int32_t ps[])
     if (hasInclude) printw("\n");
   }
 
-  if (internalMode & 1)	{	// give tables info
+  if (internalMode & 1)        {        // give tables info
     printw("****SYMBOL TABLES\n");
     printwf("Symbol Table:\n %22s %6s %6s\n", "Type", "Start", "Number");
     printwf(fmt, "named variables", NAMED_START, N_NAMED);
@@ -141,7 +141,7 @@ int32_t site(int32_t narg, int32_t ps[])
     printwf("X menus: %d\n", MAXMENU);
 #endif
   }
-  if (internalMode & 128) {	// /KEYS
+  if (internalMode & 128) {        // /KEYS
     puts("****TERMINAL KEYS\n");
     printf(" Right Arrow: ");
     printnice(k_right);

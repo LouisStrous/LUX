@@ -77,18 +77,18 @@ static void gatherVSOP(double T, struct planetIndex *index, double *terms,
    theory of Bretagnon & Francou (1988).  The heliocentric coordinate
    is returned in <*value>. */
 {
-  double	*ptr;
-  int32_t	nTerm, i;
+  double        *ptr;
+  int32_t        nTerm, i;
 
-  *value = 0.0;			// initialize
-  for (i = 5; i >= 0; i--) {	// powers of T
-    *value *= T;		// move previous stuff to next power of T
-    nTerm = index[i].nTerms;	// number of terms to add
+  *value = 0.0;                        // initialize
+  for (i = 5; i >= 0; i--) {        // powers of T
+    *value *= T;                // move previous stuff to next power of T
+    nTerm = index[i].nTerms;        // number of terms to add
     if (nTerm) {
       ptr = terms + 3*(index[i].index); // points at first term
       while (nTerm--) {
-	*value += ptr[0]*cos(ptr[1] + ptr[2]*T); // add term
-	ptr += 3;		// go to next term for this coordinate
+        *value += ptr[0]*cos(ptr[1] + ptr[2]*T); // add term
+        ptr += 3;                // go to next term for this coordinate
       }
     }
   }
@@ -98,15 +98,15 @@ void XYZfromVSOP(double T, int32_t object, double *pos, double tolerance,
                  struct VSOPdata *data)
 {
   switch (object) {
-    case 0:			// Sun
+    case 0:                        // Sun
       pos[0] = pos[1] = pos[2] = 0.0;
       break;
-    default:			// other planets
-				// heliocentric ecliptic X (AU)
+    default:                        // other planets
+                                // heliocentric ecliptic X (AU)
       gatherVSOP(T, &data->indices[6*3*(object - 1)], data->terms, &pos[0]);
-				// heliocentric ecliptic Y (AU)
+                                // heliocentric ecliptic Y (AU)
       gatherVSOP(T, &data->indices[6*3*(object - 1) + 6], data->terms, &pos[1]);
-				// heliocentric ecliptic Z (AU)
+                                // heliocentric ecliptic Z (AU)
       gatherVSOP(T, &data->indices[6*3*(object - 1) + 12], data->terms, &pos[2]);
       break;
   }

@@ -37,10 +37,10 @@ static int32_t countMatches(char *text) {
       int32_t i = 1;
 
       while (i <= n && text[n - i] == '\\')
-	i++;
+        i++;
       if ((i % 2) == 0) {
-	p++;
-	continue;
+        p++;
+        continue;
       }
     }
     n++;
@@ -74,7 +74,7 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
     flags = REG_EXTENDED;
     if ((internalMode & 1) == 0)
       flags |= REG_ICASE;
-    regfree(&preg);		// clean out previous one
+    regfree(&preg);                // clean out previous one
     result = regcomp(&preg, regex, REG_EXTENDED);
     if (result) {
       int32_t size;
@@ -92,7 +92,7 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
   } else if (!nmatch)
     return luxerror("No regular expression was specified earlier", -1);
   result = regexec(&preg, text, nmatch, pmatch, 0);
-  if (result) 			// no match
+  if (result)                         // no match
     result = LUX_ZERO;
   else
     if (nmatch > 1) {
@@ -101,30 +101,30 @@ int32_t lux_regex(int32_t narg, int32_t ps[]) {
       result = array_scratch(LUX_STRING_ARRAY, 1, &nmatch);
       p = (char **) array_data(result);
       for (i = 0; i < nmatch; i++) {
-	if (pmatch[i].rm_so >= 0) {
-	  int32_t len;
-	
-	  len = pmatch[i].rm_eo - pmatch[i].rm_so;
-	  *p = malloc(len + 1);
-	  if (!*p) {
-	    zap(result);
-	    if (!nmatch)
-	      nmatch = 1;
-	    return cerror(ALLOC_ERR, -1);
-	  }
-	  memcpy(*p, text + pmatch[i].rm_so, len);
-	  (*p)[len] = '\0';
-	  p++;
-	}
+        if (pmatch[i].rm_so >= 0) {
+          int32_t len;
+        
+          len = pmatch[i].rm_eo - pmatch[i].rm_so;
+          *p = malloc(len + 1);
+          if (!*p) {
+            zap(result);
+            if (!nmatch)
+              nmatch = 1;
+            return cerror(ALLOC_ERR, -1);
+          }
+          memcpy(*p, text + pmatch[i].rm_so, len);
+          (*p)[len] = '\0';
+          p++;
+        }
       }
-    } else {			// nmatch == 1
+    } else {                        // nmatch == 1
       char *p;
       int32_t len;
-	
+        
       len = pmatch[0].rm_eo - pmatch[0].rm_so;
       result = string_scratch(len);
       if (result == LUX_ERROR)
-	return LUX_ERROR;
+        return LUX_ERROR;
       p = string_value(result);
       memcpy(p, text + pmatch[0].rm_so, len);
       p[len] = '\0';

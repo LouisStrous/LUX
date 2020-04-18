@@ -22,27 +22,27 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #define HASHSIZE                64 // hash table modulus value
 #define NSCRAT                  8192 // scratch space size (bytes)
 #define NLIST                   2000 // size of listStack[]
-#define MAXFILES		10 // number of logical units
-#define MAXFMT			10 // number of active levels in formats
+#define MAXFILES                10 // number of logical units
+#define MAXFMT                        10 // number of active levels in formats
 #if HAVE_LIBX11
-#define MAXWINDOWS		20 // number of X ports
-#define MAXPIXMAPS		20 // number of X pixmaps
-#define MAXCOLORS		200 // max number of default color cells
-#define MINCOLORS		64 // minimum number of default color cells
-#define MAXMENU			20 // max number of X menus
+#define MAXWINDOWS                20 // number of X ports
+#define MAXPIXMAPS                20 // number of X pixmaps
+#define MAXCOLORS                200 // max number of default color cells
+#define MINCOLORS                64 // minimum number of default color cells
+#define MAXMENU                        20 // max number of X menus
 #ifdef MOTIF
-#define MAXWIDGETS		4000
+#define MAXWIDGETS                4000
 #endif
 #endif
-#define MAX_DIMS		8 // max number of array dimensions
-#define STACKSIZE		100 // user stack size (#STACK)
-#define MAXDEBUG		20 // max number of debugging breakpoints
-#define MAXTAPE			4 // max number of tape drives
+#define MAX_DIMS                8 // max number of array dimensions
+#define STACKSIZE                100 // user stack size (#STACK)
+#define MAXDEBUG                20 // max number of debugging breakpoints
+#define MAXTAPE                        4 // max number of tape drives
 
-#define NBREAKPOINTS		20
-#define NWATCHVARS		20
+#define NBREAKPOINTS                20
+#define NWATCHVARS                20
 
-#define MSSIZE			5000
+#define MSSIZE                        5000
 
 // symbol stack sizes
 #define N_NAMED                 6000 // number of named variables

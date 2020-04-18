@@ -24,21 +24,21 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <termcap.h>
 
-char	*c_left, *c_right, *c_up, *c_down, *cl_eos,
-	*c_save, *c_restore, *k_backspace, *k_delete, *k_insert,
-	*k_left, *k_right, *k_up, *k_down, *special[7], bs = '\010';
-static char	termcaps[1024];
-extern int32_t	scrat[];
+char        *c_left, *c_right, *c_up, *c_down, *cl_eos,
+        *c_save, *c_restore, *k_backspace, *k_delete, *k_insert,
+        *k_left, *k_right, *k_up, *k_down, *special[7], bs = '\010';
+static char        termcaps[1024];
+extern int32_t        scrat[];
 //----------------------------------------------------
 void getTermCaps(void)
 // reads terminal capabilities of terminal type TERM (environment variable)
 // from file /etc/termcap. Uses vt100 defaults for capabilities that
 // could not be found.
 {
-  /*  int32_t	tgetent(char *buffer, char *name);
-      char	*tgetstr(char *cap, char **buf); */
-  char	*term, *ptr, *cscrat = (char *) scrat;
-  int32_t	n, keycode(char *);
+  /*  int32_t        tgetent(char *buffer, char *name);
+      char        *tgetstr(char *cap, char **buf); */
+  char        *term, *ptr, *cscrat = (char *) scrat;
+  int32_t        n, keycode(char *);
 
   term = getenv("TERM");
   if (!term)
@@ -53,7 +53,7 @@ void getTermCaps(void)
       printf("getTermCaps - No termcap entry for '%s' terminal.", term);
     n = 2; }
   ptr = termcaps;
-  if (n == 1)			// termcaps found
+  if (n == 1)                        // termcaps found
   { c_left = tgetstr("le", &ptr);
     k_left = tgetstr("kl", &ptr);
     c_down = tgetstr("do", &ptr);
@@ -84,9 +84,9 @@ void getTermCaps(void)
       puts("No 'restore cursor' (rc) capability - trying vt100 default");
     if (!k_backspace)
     { if (tgetflag("bs"))
-	k_backspace = &bs;
+        k_backspace = &bs;
       else
-	puts("No 'backspace key' (kb,bs) capability - trying vt100 default"); }
+        puts("No 'backspace key' (kb,bs) capability - trying vt100 default"); }
     if (!k_delete)
       puts("No 'delete key' (kD) capability - trying default");
     if (!k_insert)

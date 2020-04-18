@@ -29,17 +29,17 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <stdio.h>
 
-extern char	recording;
-extern FILE	*recordFile;
+extern char        recording;
+extern FILE        *recordFile;
 
 //----------------------------------------------------------------------
 int32_t Printf(const char *format, ...)
 {
-  va_list	ap;
-  int32_t	result;
+  va_list        ap;
+  int32_t        result;
 
   va_start(ap, format);
-  if (recording & 2)		// record output
+  if (recording & 2)                // record output
     vfprintf(recordFile, format, ap);
   result = vprintf(format, ap);
   va_end(ap);
@@ -48,12 +48,12 @@ int32_t Printf(const char *format, ...)
 //----------------------------------------------------------------------
 int32_t Fprintf(FILE *stream, const char *format, ...)
 {
-  va_list	ap;
-  int32_t	result;
+  va_list        ap;
+  int32_t        result;
 
   va_start(ap, format);
   if ((stream == stdout || stream == stderr) && (recording & 2))
-						// record output
+                                                // record output
     vfprintf(recordFile, format, ap);
   result = vfprintf(stream, format, ap);
   va_end(ap);
@@ -62,7 +62,7 @@ int32_t Fprintf(FILE *stream, const char *format, ...)
 //----------------------------------------------------------------------
 int32_t Vprintf(const char *format, va_list arg)
 {
-  int32_t	result;
+  int32_t        result;
 
   if (recording & 2) // record output
     vfprintf(recordFile, format, arg);
@@ -72,10 +72,10 @@ int32_t Vprintf(const char *format, va_list arg)
 //----------------------------------------------------------------------
 int32_t Vfprintf(FILE *stream, const char *format, va_list arg)
 {
-  int32_t	result;
+  int32_t        result;
 
   if ((stream == stdout || stream == stderr) && (recording & 2))
-						// record output
+                                                // record output
     vfprintf(recordFile, format, arg);
   result = vfprintf(stream, format, arg);
   return result;
@@ -83,7 +83,7 @@ int32_t Vfprintf(FILE *stream, const char *format, va_list arg)
 //----------------------------------------------------------------------
 int32_t Puts(const char *s)
 {
-  if (recording & 2)		// record output
+  if (recording & 2)                // record output
   { fputs(s, recordFile);
     fputc('\n', recordFile); }
   return puts(s);

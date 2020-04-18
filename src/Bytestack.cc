@@ -106,7 +106,7 @@ Bytestack_delete(Bytestack b)
     free(b);
   }
   if (b == stack)
-    stack = NULL;		// undefined again
+    stack = NULL;               // undefined again
 }
 
 /** Adds a minimum number of bytes of room to the Byte stack.
@@ -152,14 +152,14 @@ enlarge(Bytestack b, size_t n)
  */
 Bytestack_index
 Bytestack_push_text(Bytestack b,
-		       const char *text)
+                    const char *text)
 {
   return Bytestack_push_data(b, text, NULL);
 }
 
 char *
 Bytestack_strcpy(Bytestack b,
-		 const char *text)
+                 const char *text)
 {
   Bytestack_pop_all(b);
   return Bytestack_strcat(b, text);
@@ -167,7 +167,7 @@ Bytestack_strcpy(Bytestack b,
 
 char *
 Bytestack_strcat(Bytestack b,
-		 const char *text)
+                 const char *text)
 {
   return Bytestack_peek(b, Bytestack_push_text(b, text));
 }
@@ -192,8 +192,8 @@ Bytestack_strcat(Bytestack b,
  */
 Bytestack_index
 Bytestack_push_data(Bytestack b,
-		       const void *begin,
-		       const void *end)
+                    const void *begin,
+                    const void *end)
 {
   size_t n;
   ssize_t p;
@@ -214,7 +214,7 @@ Bytestack_push_data(Bytestack b,
   }
   n = (size_t) ((char*) end - (char*) begin);
   p = -1;
-  if ((b->cur + n < b->size	// enough room
+  if ((b->cur + n < b->size       // enough room
        || enlarge(b, n + 1) == 0) // or enlarged sufficiently
       && end >= begin) {
     memcpy(b->begin + b->cur, bbegin, n);
@@ -340,7 +340,7 @@ Bytestack_temp_text(Bytestack stack, const char *text)
  */
 void *
 Bytestack_temp_data(Bytestack stack, const void *begin,
-		       const void *end)
+                    const void *end)
 {
   return Bytestack_pop(stack, Bytestack_push_data(stack, begin, end));
 }
@@ -584,9 +584,9 @@ Bytestack_quotify(Bytestack b, Bytestack_index bi1, Bytestack_index bi2)
       switch (*p) {
       case '\\':
       case '\"':
-	*--p = '\\';
-	c--;
-	break;
+        *--p = '\\';
+        c--;
+        break;
       }
       p--;
     }
@@ -610,9 +610,9 @@ Bytestack_unescapify(Bytestack b, Bytestack_index bi)
   if (*p) {
     while (*p && bi < b->cur) {
       if (*p == '\\') {
-	c++;
-	p++;
-	bi++;
+        c++;
+        p++;
+        bi++;
       }
       *q++ = *p++;
       bi++;
@@ -620,9 +620,9 @@ Bytestack_unescapify(Bytestack b, Bytestack_index bi)
     ccur = c;
     while (*p) {
       if (*p == '\\') {
-	c++;
-	p++;
-	bi++;
+        c++;
+        p++;
+        bi++;
       }
       *q++ = *p++;
       bi++;
@@ -651,8 +651,8 @@ Bytestack_unescapify(Bytestack b, Bytestack_index bi)
     of the Byte stack and the current position within the Byte
     stack. */
 typedef struct {
-  Bytestack stack;		//*< The Byte stack
-  Bytestack_index index;	//*< The Byte stack index
+  Bytestack stack;              //*< The Byte stack
+  Bytestack_index index;        //*< The Byte stack index
 } *Bytestack_cookie;
 
 /** Reads from a Byte stack stream.
@@ -700,7 +700,7 @@ Bytestack_stream_read(void *cookie, char *buffer, size_t size)
  */
 static ssize_t
 Bytestack_stream_write(void *cookie, const char *buffer,
-			  size_t size)
+                          size_t size)
 {
   Bytestack_cookie lc = (Bytestack_cookie) cookie;
   Bytestack stack = lc->stack;

@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdlib.h>
 
-int32_t	motif_input_flag = 0;
+int32_t        motif_input_flag = 0;
 
 //-------------------------------------------
 int32_t lux_zeroifnotdefined(int32_t narg, int32_t ps[])
@@ -43,8 +43,8 @@ int32_t lux_zeroifnotdefined(int32_t narg, int32_t ps[])
 int32_t lux_compile_file(int32_t narg, int32_t ps[])
 // COMPILE_FILE compiles the contents of a file at the top level
 {
-  FILE	*fp;
-  int32_t	result, nextCompileLevel(FILE *, char const*);
+  FILE        *fp;
+  int32_t        result, nextCompileLevel(FILE *, char const*);
 
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);

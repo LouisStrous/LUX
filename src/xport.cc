@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>		// key symbol definitions LS 23nov92
+#include <X11/keysym.h>                // key symbol definitions LS 23nov92
 #include <X11/Xos.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
@@ -47,12 +47,12 @@ extern "C" {
 #define BITMAPDEPTH     1
 #define TOO_SMALL       0
 #define BIG_ENOUGH      1
-#define WHITE_BACKGR	2
+#define WHITE_BACKGR        2
 
-int32_t	coordTrf(float *, float *, int32_t, int32_t),
+int32_t        coordTrf(float *, float *, int32_t, int32_t),
   checkCoordSys(int32_t mode, int32_t defaultmode);
 
-int32_t	setup_x(void), anaAllocNamedColor(char const*, XColor **);
+int32_t        setup_x(void), anaAllocNamedColor(char const*, XColor **);
 
 extern  int32_t     scalemin, scalemax, setup, connect_flag, visualClass;
 extern  float   xfac, yfac, xlimit, ylimit;
@@ -62,40 +62,40 @@ int32_t     last_wid = 0;
 
 double  last_time;
 int32_t     xcoord, ycoord, lux_button, lux_keycode, lux_keypress, root_x, root_y,
-	preventEventFlush = 0, lux_keystate, lux_keysym;
-uint32_t	kb;
-float	xhair, yhair, tvscale = 1.0;
+        preventEventFlush = 0, lux_keystate, lux_keysym;
+uint32_t        kb;
+float        xhair, yhair, tvscale = 1.0;
 Window  win[MAXWINDOWS];
 // the size of each of the windows and pixmaps for our use
 
 int32_t     wd[MAXWINDOWS], ht[MAXWINDOWS], wdmap[MAXPIXMAPS], htmap[MAXPIXMAPS];
 int32_t     xerrors;
-extern Atom	wm_delete;
+extern Atom        wm_delete;
 GC      gc[MAXWINDOWS], gcmap[MAXPIXMAPS];
-int32_t	drawingareas[MAXWINDOWS]; // used in motif.c
+int32_t        drawingareas[MAXWINDOWS]; // used in motif.c
 XFontStruct     *font_info[MAXWINDOWS];
 XImage  *xi;
 Pixmap  icon_pixmap, maps[MAXPIXMAPS], back_pixmap;
 extern Colormap        colorMap;
-int32_t	xold, yold;
+int32_t        xold, yold;
 float     tvix, tviy, tvixb, tviyb;
-extern GC	gcnot;
+extern GC        gcnot;
 
 // from color.c
-extern unsigned long	black_pixel, white_pixel, *pixels;
-extern Visual	*visual;
-extern uint32_t	depth;
-extern int32_t	private_colormap, screen_num;
-extern uint32_t	display_width, display_height, display_cells, nColors;
-extern Display	*display;
+extern unsigned long        black_pixel, white_pixel, *pixels;
+extern Visual        *visual;
+extern uint32_t        depth;
+extern int32_t        private_colormap, screen_num;
+extern uint32_t        display_width, display_height, display_cells, nColors;
+extern Display        *display;
 
 extern char   *visualNames[];
 
-int32_t	freeCellIndex, nFreeCells;
+int32_t        freeCellIndex, nFreeCells;
 
 #ifdef MOTIF
 #include <X11/Intrinsic.h>
-extern Widget	lux_widget_id[MAXWIDGETS];
+extern Widget        lux_widget_id[MAXWIDGETS];
 #endif
 
 // revised color handling (LS 18jan94):
@@ -115,7 +115,7 @@ int32_t xerr(Display *display, XErrorEvent *err)
   XGetErrorText(display, err->error_code, msg, 80);
   printwf("X window error: %s\n", msg);
   printwf("Request code: %1d (%1d)\n", err->request_code,
-	  err->minor_code);
+          err->minor_code);
   xerrors += 1;
   return LUX_ERROR;
 }
@@ -123,7 +123,7 @@ int32_t xerr(Display *display, XErrorEvent *err)
 void eventType(int32_t type)
 // reports the name corresponding to the event type
 {
-  static unsigned long	count = 0;
+  static unsigned long        count = 0;
 
   count++;
   printf("%d: ", count);
@@ -241,7 +241,7 @@ void xsynchronize(int32_t status)
      // if you want to find out which LUX command generates an X window
      // error, then set this synchronization.
 {
-  if (setup_x() == LUX_ERROR)	// make sure we're connected
+  if (setup_x() == LUX_ERROR)        // make sure we're connected
     return;
   XSynchronize(display, status? True: False);
   printf("X synchronization %sset.\n", status? "": "re");
@@ -249,9 +249,9 @@ void xsynchronize(int32_t status)
  //--------------------------------------------------------------------------
 int32_t lux_show_visuals(int32_t narg, int32_t ps[])
 {
-  XVisualInfo	*vInfo, vTemplate;
-  extern char	*visualNames[];
-  int32_t	nVisual, i, mask, j;
+  XVisualInfo        *vInfo, vTemplate;
+  extern char        *visualNames[];
+  int32_t        nVisual, i, mask, j;
 
   if (!connect_flag && setup_x() < 0)
     return LUX_ERROR;
@@ -269,13 +269,13 @@ int32_t lux_show_visuals(int32_t narg, int32_t ps[])
   printf("%1d visuals available on this screen\n", nVisual);
 
   printf("%6s %11s %2s %3s %6s %6s %6s %3s\n", "number", "class", "d",
-	 "csz", "red", "green", "blue", "bpc");
+         "csz", "red", "green", "blue", "bpc");
   for (i = 0; i < nVisual; i++) {
     printf("%6d %11s %2d %3d %06x %06x %06x %3d\n", i + 1,
-	   visualNames[xvisualinfoclass(vInfo[i])], vInfo[i].depth,
-	   vInfo[i].colormap_size, vInfo[i].red_mask,
-	   vInfo[i].green_mask, vInfo[i].blue_mask,
-	   vInfo[i].bits_per_rgb);
+           visualNames[xvisualinfoclass(vInfo[i])], vInfo[i].depth,
+           vInfo[i].colormap_size, vInfo[i].red_mask,
+           vInfo[i].green_mask, vInfo[i].blue_mask,
+           vInfo[i].bits_per_rgb);
     if (vInfo[i].visual == visual)
       j = i;
   }
@@ -283,8 +283,8 @@ int32_t lux_show_visuals(int32_t narg, int32_t ps[])
 
 #ifdef DEBUG
   printf("current width, height, cells, depth = %d %d %d %d\n",
-	display_width, display_height, display_cells,
-	depth);
+        display_width, display_height, display_cells,
+        depth);
 #endif
 
   XFree(vInfo);
@@ -295,9 +295,9 @@ int32_t lux_xclose(int32_t narg, int32_t ps[])
 // close connection to window manager: close and destroy all windows,
 // pixmaps, color maps, etc.  LS 30jul96
 {
-  int32_t	i;
-  extern int32_t	menu_setup_done;
-  void	disconnect_x();
+  int32_t        i;
+  extern int32_t        menu_setup_done;
+  void        disconnect_x();
 
   if (connect_flag) {
     for (i = 0; i < MAXPIXMAPS; i++)
@@ -317,23 +317,23 @@ int32_t ck_area(int32_t wid, int32_t *xpos, int32_t *ypos, int32_t *width, int32
    window, and 1 is returned.  If the area is wholly outside the window,
    or the window does not exist, then 0 is returned.  LS 16apr93 */
 {
- int32_t	dwd, dht;
+ int32_t        dwd, dht;
 
  if (wid >= 0) {
    if (!win[wid])
-     return 0;			// window does not exist
+     return 0;                        // window does not exist
    dwd = wd[wid];
    dht = ht[wid];
  } else {
    if (!maps[-wid])
-     return 0;			// pixmap does not exist
+     return 0;                        // pixmap does not exist
    dwd = wdmap[-wid];
    dht = htmap[-wid];
  }
  if (*xpos + *width < 0 || *ypos + *height < 0
      || *xpos >= dwd || *ypos >= dht
      || *width <= 0 || *height <= 0)
-   return 0;			// wholly outside
+   return 0;                        // wholly outside
  if (*xpos + *width >= dwd)
    *width = dwd - *xpos;
  if (*ypos + *height >= dht)
@@ -353,14 +353,14 @@ int32_t lux_xtvlct(int32_t narg, int32_t ps[])
 // load color table, scaling to available range
 // expect 3 arrays for RGB
 {
-  int32_t	i, n, nmin = INT32_MAX, iq;
-  float	*p[3];
-  void	storeColorTable(float *, float *, float *, int32_t, int32_t);
+  int32_t        i, n, nmin = INT32_MAX, iq;
+  float        *p[3];
+  void        storeColorTable(float *, float *, float *, int32_t, int32_t);
 
   for (i = 0; i < 3; i++) {
     if (!symbolIsNumericalArray(ps[i]))
       return cerror(NEED_NUM_ARR, ps[i]);
-    iq = lux_float(1, ps + i);	// convert to FLOAT if necessary
+    iq = lux_float(1, ps + i);        // convert to FLOAT if necessary
     n = array_size(iq);
     if (n < nmin)
       nmin = n;
@@ -376,33 +376,33 @@ int32_t lux_xopen(int32_t narg, int32_t ps[])
 // sets or changes the display name for x setup and/or sets or changes the
 // color map default.  LS 30jul96
 {
-  extern int32_t	select_visual;
+  extern int32_t        select_visual;
 
-  if (narg && ps[0]) {			// set display name
+  if (narg && ps[0]) {                        // set display name
     if (symbol_class(ps[0]) != LUX_STRING)
       return cerror(NEED_STR, *ps);
-    if (display_name)		// may already be connected: disconnect old
+    if (display_name)                // may already be connected: disconnect old
       lux_xclose(0, NULL);
     if (string_size(ps[0]) == 0) // empty string -> default ($DISPLAY)
       display_name = NULL;
-    else			// explicit name
+    else                        // explicit name
       display_name = strsave(string_value(ps[0]));
   }
   switch (internalMode & 3) {
-    case 1:			// /PRIVATE_COLORS
-      if (private_colormap != 1)	
-	lux_xclose(0, NULL);	// get rid of old
+    case 1:                        // /PRIVATE_COLORS
+      if (private_colormap != 1)        
+        lux_xclose(0, NULL);        // get rid of old
       private_colormap = 1;
       break;
-    case 2: case 0:		// /DEFAULT_COLORMAP
+    case 2: case 0:                // /DEFAULT_COLORMAP
       if (private_colormap != 0)
-	lux_xclose(0, NULL);	// get rid of old
+        lux_xclose(0, NULL);        // get rid of old
       private_colormap = 0;
       break;
     default:
       return luxerror("Illegal keyword combination", 0);
   }
-  if (internalMode & 4) {	// /SELECTVISUAL
+  if (internalMode & 4) {        // /SELECTVISUAL
     if (connect_flag)
       lux_xclose(0, NULL);
     select_visual = 1;
@@ -429,7 +429,7 @@ int32_t lux_xexist(int32_t narg, int32_t ps[])// return 1 if window exists
   return LUX_ZERO;
 }
 //--------------------------------------------------------------------------
-int32_t lux_xport(int32_t narg, int32_t ps[])	// open a window or pixmap
+int32_t lux_xport(int32_t narg, int32_t ps[])        // open a window or pixmap
  // arguments are port #, width , height (default is 512x512)
  // position x, y, window title (<128 chars), icon title (<16 chars)
  /* might be nice to have some commands to change things like the background
@@ -438,11 +438,11 @@ int32_t lux_xport(int32_t narg, int32_t ps[])	// open a window or pixmap
 // check validity of window number  LS 14jul2000
 {
   int32_t     wid, mapid, xpos = 0, ypos = 0, pflag, n;
-  uint32_t	width, height;
-  char	*wtitle = NULL, *ititle = NULL;
-  int32_t	ck_window(int32_t), set_defw(int32_t), lux_xdelete(int32_t, int32_t []),
+  uint32_t        width, height;
+  char        *wtitle = NULL, *ititle = NULL;
+  int32_t        ck_window(int32_t), set_defw(int32_t), lux_xdelete(int32_t, int32_t []),
     lux_xcreat(int32_t, uint32_t, uint32_t, int32_t, int32_t, int32_t, char *,
-	       char *);
+               char *);
 
   if (narg > 0)
     wid = int_arg(ps[0]);
@@ -470,34 +470,34 @@ int32_t lux_xport(int32_t narg, int32_t ps[])	// open a window or pixmap
   if (ck_window(wid) != 1)
     return LUX_ERROR;
   if (wid < 0) {
-			 		 // pixmap case
+                                          // pixmap case
     // check if pixmap already created, if so and no size, just set last_wid
     mapid = - wid;
     if (maps[mapid] != 0) {
       if (narg < 2) {
-	set_defw(wid);
-	return 1;
+        set_defw(wid);
+        return 1;
       } else
-	lux_xdelete(1, ps);
+        lux_xdelete(1, ps);
     }
   } else {                                // window case
     // check if window already created, if so and no size, just set last_wid
     if (win[wid] != 0) {
       switch (narg) {
-	default:
-	  if (height != ht[wid])
-	    break;
-	case 2:
-	  if (width != wd[wid])
-	    break;
-	case 1: case 0:
-	  set_defw(wid);
-	  return 1;
+        default:
+          if (height != ht[wid])
+            break;
+        case 2:
+          if (width != wd[wid])
+            break;
+        case 1: case 0:
+          set_defw(wid);
+          return 1;
       }
       lux_xdelete(1,ps);
     }
   }
-		 // if we get here, we now create the window or pixmap
+                 // if we get here, we now create the window or pixmap
   n = lux_xcreat(wid, height, width, xpos, ypos, pflag, wtitle, ititle);
   if (n > 0)
     set_defw(wid);
@@ -509,7 +509,7 @@ int32_t ck_window(int32_t wid)
 {
   if (wid >= MAXWINDOWS || wid <= -MAXPIXMAPS)
     return luxerror("Illegal window or pixmap %1d; allowed range %1d -- %1d",
-		 0, wid, -MAXPIXMAPS+1, MAXWINDOWS-1);
+                 0, wid, -MAXPIXMAPS+1, MAXWINDOWS-1);
   else
     return LUX_OK;
 }
@@ -525,7 +525,7 @@ int32_t ck_events(void)         // checks events for focus and size changes
    XEvent  report;
    int32_t     nev, i, j, iq;
    Window wq;
-   int32_t	set_defw(int32_t);
+   int32_t        set_defw(int32_t);
 
    if (setup_x() < 0)
      return LUX_ERROR;
@@ -548,9 +548,9 @@ int32_t ck_events(void)         // checks events for focus and size changes
        break;
      case ClientMessage:
        if ((Atom) report.xclient.data.l[0] == wm_delete)
-	 wq = report.xclient.window;
+         wq = report.xclient.window;
        else
-	 wq = 0;
+         wq = 0;
        break;
        /*
      case Expose:
@@ -568,25 +568,25 @@ int32_t ck_events(void)         // checks events for focus and size changes
      if (wq != 0) {
        iq = -1;
        for (j=0;j<MAXWINDOWS;j++) {
-	 if (win[j] == wq) {
-	   iq = j;
-	   break;
-	 }
+         if (win[j] == wq) {
+           iq = j;
+           break;
+         }
        }
-       if (iq == -1)		// probably clicked in LUX menu    LS 1jun93
-	 XPutBackEvent(display, &report);	// save for later
-       else {				// clicked in LUX window
-	 if (report.type == ConfigureNotify) {
-	   wd[iq] = report.xconfigure.width;
-	   ht[iq] = report.xconfigure.height;
-	 } else if (report.type == ClientMessage) {
-	   XDestroyWindow(display, report.xclient.window);
-	   win[iq] = 0;
-	   XFlush(display);
-	 } else {
-	   last_wid = iq;
-	   set_defw(iq);
-	 }
+       if (iq == -1)                // probably clicked in LUX menu    LS 1jun93
+         XPutBackEvent(display, &report);        // save for later
+       else {                                // clicked in LUX window
+         if (report.type == ConfigureNotify) {
+           wd[iq] = report.xconfigure.width;
+           ht[iq] = report.xconfigure.height;
+         } else if (report.type == ClientMessage) {
+           XDestroyWindow(display, report.xclient.window);
+           win[iq] = 0;
+           XFlush(display);
+         } else {
+           last_wid = iq;
+           set_defw(iq);
+         }
        }
      }
    }
@@ -599,13 +599,13 @@ int32_t set_defw(int32_t wid)
   int32_t     mapid;
 
   last_wid = wid;
-  if (wid < 0 ) {		// pixmap case
+  if (wid < 0 ) {                // pixmap case
     mapid = - wid;
-    xfac = wdmap[mapid];	// width
-    yfac = htmap[mapid];	// height
-  } else {			// window case
-    xfac = wd[wid];		// width
-    yfac = ht[wid];		// height
+    xfac = wdmap[mapid];        // width
+    yfac = htmap[mapid];        // height
+  } else {                        // window case
+    xfac = wd[wid];                // width
+    yfac = ht[wid];                // height
   }
   ixlow = 0;
   iylow = 0;
@@ -615,7 +615,7 @@ int32_t set_defw(int32_t wid)
 }
 //--------------------------------------------------------------------------
 int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
-	       int32_t ypos, int32_t pflag, char *wtitle, char *ititle)
+               int32_t ypos, int32_t pflag, char *wtitle, char *ititle)
  /* might be nice to have some commands to change things like the background
  color and pattern and cursor */
 {
@@ -655,11 +655,11 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
        strcpy(window_name, "lux ");
        strcat(window_name, snum);
      }
-     if (wtitle) {		// user specified window name
-       if (*wtitle == '-')	// skip initial -
-	 wtitle++;
+     if (wtitle) {                // user specified window name
+       if (*wtitle == '-')        // skip initial -
+         wtitle++;
        else
-	 strcat(window_name, ": ");
+         strcat(window_name, ": ");
        strncat(window_name, wtitle, 127 - strlen(window_name)); // add title
      }
      *icon_name = '\0';
@@ -669,11 +669,11 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
        strcpy(icon_name, "lux ");
        strcat(icon_name, snum);
      }
-     if (ititle) {		// user specified window name
-       if (*ititle == '-')	// skip initial -
-	 ititle++;
+     if (ititle) {                // user specified window name
+       if (*ititle == '-')        // skip initial -
+         ititle++;
        else
-	 strcat(icon_name, ": ");
+         strcat(icon_name, ": ");
        strncat(icon_name, ititle, 15 - strlen(icon_name)); // add title
      }
 
@@ -687,23 +687,23 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
      attributes.backing_store = Always;
      attributes.colormap = colorMap;
      /* note that contents still disappear when window is iconized, may need
-	to use our own pixmap to store and not count on server */
+        to use our own pixmap to store and not count on server */
      attributes.bit_gravity = StaticGravity;
 
      /*
      win[wid] = XCreateWindow(display, RootWindow(display, screen_num), xpos,
-			      ypos, width, height, border_width, depth,
-			      InputOutput, visual, valuemask, &attributes);
+                              ypos, width, height, border_width, depth,
+                              InputOutput, visual, valuemask, &attributes);
      */
 
      win[wid] = XCreateWindow(display, RootWindow(display, screen_num), xpos,
-			      ypos, width, height, border_width, depth,
-			      InputOutput, visual, valuemask, &attributes);
+                              ypos, width, height, border_width, depth,
+                              InputOutput, visual, valuemask, &attributes);
      if (!win[wid])
        return luxerror("Could not create requested window", 0);
      icon_pixmap =
        XCreateBitmapFromData(display, win[wid], (const char*) icon_bitmap_bits,
-			     icon_bitmap_width, icon_bitmap_height);
+                             icon_bitmap_width, icon_bitmap_height);
 
      wm_hints.initial_state = NormalState;
      wm_hints.input = True;
@@ -719,13 +719,13 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
      XStringListToTextProperty(&window_name, 1, &window);
 
      XSetWMProperties(display, win[wid], &window, &icon, NULL, 0, &size_hints,
-		      &wm_hints, NULL);
+                      &wm_hints, NULL);
 
-     XSetWMProtocols(display, win[wid], &wm_delete, 1);	
+     XSetWMProtocols(display, win[wid], &wm_delete, 1);        
 
      XSelectInput(display, win[wid], KeyPressMask | ButtonPressMask
-		  | ButtonReleaseMask | PointerMotionMask | ExposureMask |
-		  FocusChangeMask | EnterWindowMask | LeaveWindowMask);
+                  | ButtonReleaseMask | PointerMotionMask | ExposureMask |
+                  FocusChangeMask | EnterWindowMask | LeaveWindowMask);
 
 #ifdef MOTIF
    } else {
@@ -738,21 +738,21 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
        return luxerror("cannot get window attributes for motif drawing area", 0);
      ht[wid] = wat.width;
      wd[wid] = wat.height;
-     valuemask = CWBackPixel;	// was |= but valuemask was not yet defined
+     valuemask = CWBackPixel;        // was |= but valuemask was not yet defined
      attributes.background_pixel = white_pixel;
      valuemask |= CWBackingStore;
      /* attributes.backing_store = WhenMapped; / note that Always screws up things
-					      not sure why yet */
+                                              not sure why yet */
      attributes.backing_store = Always;
      XChangeWindowAttributes(display, win[wid], valuemask, &attributes);
      XSelectInput(display, win[wid], ExposureMask | KeyPressMask
-		  | ButtonPressMask | ExposureMask | FocusChangeMask);
+                  | ButtonPressMask | ExposureMask | FocusChangeMask);
    }
 #endif
    // this part is again the same for window and widget
  {
-   XGCValues	xgcv;
-   unsigned long	valuemask;
+   XGCValues        xgcv;
+   unsigned long        valuemask;
 
    xgcv.foreground = (setup & WHITE_BACKGR)? black_pixel: white_pixel;
    xgcv.background = (setup & WHITE_BACKGR)? white_pixel: black_pixel;
@@ -771,22 +771,22 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
    mapid = -wid;
    if (maps[mapid] == 0)
      maps[mapid] = XCreatePixmap(display, RootWindow(display,screen_num),
-				 width, height, 8);
+                                 width, height, 8);
    wdmap[mapid] = width;
    htmap[mapid] = height;
    gcmap[mapid] = XCreateGC(display, maps[mapid], 0, NULL);
    XSetForeground(display, gcmap[mapid],
-		  setup & WHITE_BACKGR? black_pixel: white_pixel);
+                  setup & WHITE_BACKGR? black_pixel: white_pixel);
    XSetBackground(display, gcmap[mapid],
-		  setup & WHITE_BACKGR? white_pixel: black_pixel);
+                  setup & WHITE_BACKGR? white_pixel: black_pixel);
  }
  set_defw(wid);
  return 1;
 }
 //--------------------------------------------------------------------------
-int32_t lux_xsetinputs(int32_t narg, int32_t ps[])		// set the input mask
+int32_t lux_xsetinputs(int32_t narg, int32_t ps[])                // set the input mask
 {
-  int32_t	wid;
+  int32_t        wid;
 
   if (ck_events() != 1)
     return LUX_ERROR;
@@ -802,7 +802,7 @@ int32_t lux_xcursor(int32_t narg, int32_t ps[]) // set the cursor
 {
   int32_t    wid, iq;
   Cursor cursor;
-  XColor	*cfore, *cback;
+  XColor        *cfore, *cback;
   char const* cfore_default = {"red"};
   char const* cback_default = {"black"};
   char const* pc;
@@ -846,9 +846,9 @@ int32_t lux_xsetbackground(int32_t narg, int32_t ps[])// set the background colo
 // allow three-element array for <color> to specify RGB values. LS 14jul2000
 {
   int32_t    wid, iq;
-  char	*pc;
-  float	*value;
-  XColor	*color;
+  char        *pc;
+  float        *value;
+  XColor        *color;
 
   ck_events();
   if (narg == 1)
@@ -865,27 +865,27 @@ int32_t lux_xsetbackground(int32_t narg, int32_t ps[])// set the background colo
     case LUX_STRING:
       pc = string_value(*ps);
       if (anaAllocNamedColor(pc, &color) == 0)
-	goto setbg_1;
+        goto setbg_1;
       break;
     case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
-	iq = lux_float(1, ps);	// ensure FLOAT
-	value = (float*) array_data(iq);
-	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
-	if (anaAllocNamedColor(pc, &color) == 0)
-	  goto setbg_1;
-	if (iq != *ps)
-	  zap(iq);		// not needed anymore
+        iq = lux_float(1, ps);        // ensure FLOAT
+        value = (float*) array_data(iq);
+        sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
+        if (anaAllocNamedColor(pc, &color) == 0)
+          goto setbg_1;
+        if (iq != *ps)
+          zap(iq);                // not needed anymore
       } else return luxerror("Need string or 3-element real array for color specification", 0);
       break;
     default:
       return cerror(ILL_CLASS, *ps);
   }
 
-  if (wid < 0) {		// pixmap case
+  if (wid < 0) {                // pixmap case
     XSetBackground(display, gcmap[-wid], color->pixel);
     XSetWindowBackground(display, maps[-wid], color->pixel);
-  } else {			// window case
+  } else {                        // window case
     XSetBackground(display, gc[wid], color->pixel);
     XSetWindowBackground(display,win[wid], color->pixel);
   }
@@ -904,9 +904,9 @@ int32_t lux_xsetforeground(int32_t narg, int32_t ps[])// set the foreground colo
 // allow three-element array for <color> to specify RGB values. LS 14jul2000
 {
   int32_t    wid, iq;
-  char	*pc;
-  float	*value;
-  XColor	*color;
+  char        *pc;
+  float        *value;
+  XColor        *color;
 
   ck_events();
   if (narg == 1)
@@ -923,26 +923,26 @@ int32_t lux_xsetforeground(int32_t narg, int32_t ps[])// set the foreground colo
     case LUX_STRING:
       pc = string_value(*ps);
       if (anaAllocNamedColor(pc, &color) == 0)
-	goto setfg_1;
+        goto setfg_1;
       break;
     case LUX_ARRAY:
       if (symbolIsRealArray(*ps) && array_size(*ps) == 3) {
-	iq = lux_float(1, ps);	// ensure FLOAT
-	value = (float*) array_data(iq);
-	sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
-	if (anaAllocNamedColor(pc, &color) == 0)
-	  goto setfg_1;
-	if (iq != *ps)
-	  zap(iq);		// not needed anymore
+        iq = lux_float(1, ps);        // ensure FLOAT
+        value = (float*) array_data(iq);
+        sprintf(pc = curScrat, "rgbi:%g/%g/%g", value[0], value[1], value[2]);
+        if (anaAllocNamedColor(pc, &color) == 0)
+          goto setfg_1;
+        if (iq != *ps)
+          zap(iq);                // not needed anymore
       } else return luxerror("Need string or 3-element real array for color specification", 0);
       break;
     default:
       return cerror(ILL_CLASS, *ps);
   }
 
-  if (wid < 0) {		// pixmap case
+  if (wid < 0) {                // pixmap case
     XSetForeground(display, gcmap[-wid], color->pixel);
-  } else {			// window case
+  } else {                        // window case
     XSetForeground(display, gc[wid], color->pixel);
   }
   XFlush(display);
@@ -960,14 +960,14 @@ int32_t lux_xdelete(int32_t narg, int32_t ps[]) // delete a window or a pixmap
   wid = int_arg( ps[0] );
   if (ck_window(wid) != 1)
     return -1;
-  if (wid < 0 )  {		// pixmap case
+  if (wid < 0 )  {                // pixmap case
     XFreePixmap(display, maps[-wid]);
     maps[-wid] = 0;
-  } else {			// window case
+  } else {                        // window case
     XDestroyWindow(display, win[wid]);
     win[wid] = 0;
   }
-  XFlush(display);		// or it won't vanish for a long time
+  XFlush(display);                // or it won't vanish for a long time
   return 1;
  }
  //--------------------------------------------------------------------------
@@ -976,18 +976,18 @@ int32_t lux_xerase(int32_t narg, int32_t ps[])
      // pixmap support added.  LS 8oct97
 {
  int32_t    wid, xx, yx, wx, hx, old, cs;
- float	x, y, w, h;
- XGCValues	values;
+ float        x, y, w, h;
+ XGCValues        values;
 
  ck_events();
 
- x = y = h = w = 0.0;		// defaults
+ x = y = h = w = 0.0;                // defaults
  wid = last_wid;
  switch (narg) {
-   case 0:			// OK
+   case 0:                        // OK
      break;
    case 1:
-     wid = int_arg(ps[0]);	// window number
+     wid = int_arg(ps[0]);        // window number
      break;
    case 4:
      x = float_arg(ps[0]);
@@ -996,7 +996,7 @@ int32_t lux_xerase(int32_t narg, int32_t ps[])
      h = float_arg(ps[3]);
      break;
    case 5:
-     wid = int_arg(ps[0]);	// window number
+     wid = int_arg(ps[0]);        // window number
      x = float_arg(ps[1]);
      y = float_arg(ps[2]);
      w = float_arg(ps[3]);
@@ -1007,27 +1007,27 @@ int32_t lux_xerase(int32_t narg, int32_t ps[])
  if (ck_window(wid) != 1)
    return LUX_ERROR;
 
- if (wid < 0) {			// pixmap
+ if (wid < 0) {                        // pixmap
    if (!maps[-wid]) {
      last_wid = wid;
      if (lux_xport(0, NULL) < 0)
        return LUX_ERROR;
    }
- } else {			// window
+ } else {                        // window
    if (!win[wid]) {
      last_wid = wid;
      if (lux_xport(0, NULL) < 0)
-       return LUX_ERROR;	// window didn't exists
+       return LUX_ERROR;        // window didn't exists
    }
  }
 
- if (!w || !h) {		// not yet specified -- or illegal
+ if (!w || !h) {                // not yet specified -- or illegal
    // we erase the whole image
    xx = 0;
    yx = 0;
    if (wid < 0) {
-     wx = wdmap[-wid];		// take window dimension
-     hx = htmap[-wid];		// take window dimension
+     wx = wdmap[-wid];                // take window dimension
+     hx = htmap[-wid];                // take window dimension
    } else {
      wx = wd[wid];
      hx = ht[wid];
@@ -1047,7 +1047,7 @@ int32_t lux_xerase(int32_t narg, int32_t ps[])
  }
 
  if (!ck_area(wid, &xx, &yx, &wx, &hx)) // area wholly outside window
-   return 1;			// do nothing
+   return 1;                        // do nothing
 
  if (wid >= 0)
    XClearArea(display, win[wid], xx, yx, wx, hx, False);
@@ -1057,11 +1057,11 @@ int32_t lux_xerase(int32_t narg, int32_t ps[])
    values.function = GXclear;
    XChangeGC(display, gcmap[-wid], GCFunction, &values);
    XCopyArea(display, maps[-wid], maps[-wid], gcmap[-wid], xx, yx, wx, hx,
-	     xx, yx);
+             xx, yx);
    values.function = old;
    XChangeGC(display, gcmap[-wid], GCFunction, &values);
  }
- XFlush(display);		// or it won't happen for a long time
+ XFlush(display);                // or it won't happen for a long time
  return 1;
 }
  //------------------------------------------------------------------------
@@ -1072,17 +1072,17 @@ int32_t lux_xsetaction(int32_t narg, int32_t ps[])
 /* syntax:  xsetaction [,code,window]
     code defaults to 1, window to last_win */
 {
-  int32_t	wid = last_wid, code = 1;
-  static int32_t	function_code[] = {
-	GXcopy, GXxor, GXequiv, GXclear, GXset, GXnoop, GXinvert, GXand,
-	GXandReverse, GXandInverted, GXor, GXorReverse, GXorInverted,
-	GXnand, GXnor, GXcopyInverted };
+  int32_t        wid = last_wid, code = 1;
+  static int32_t        function_code[] = {
+        GXcopy, GXxor, GXequiv, GXclear, GXset, GXnoop, GXinvert, GXand,
+        GXandReverse, GXandInverted, GXor, GXorReverse, GXorInverted,
+        GXnand, GXnor, GXcopyInverted };
 
-  if (narg) code = int_arg(ps[0]);			// action code
+  if (narg) code = int_arg(ps[0]);                        // action code
   if (code < 0 || code > 15)
   { puts("Invalid action.  Valid range: 0 thru 15.");
     return -1; }
-  if (narg > 1) wid = int_arg(ps[1]);			// window number
+  if (narg > 1) wid = int_arg(ps[1]);                        // window number
   if (ck_window(wid) != 1) return -1;
   code = function_code[code];
   // does window exist? If not create a default size
@@ -1097,8 +1097,8 @@ int32_t lux_xsetaction(int32_t narg, int32_t ps[])
 int32_t reverseYImage(int32_t iq)
 // returns a copy of 2D image <iq> reversed in the y direction
 {
-  int32_t	ps[2];
-  int32_t	lux_reverse(int32_t, int32_t *);
+  int32_t        ps[2];
+  int32_t        lux_reverse(int32_t, int32_t *);
 
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2)
@@ -1110,25 +1110,25 @@ int32_t reverseYImage(int32_t iq)
 //------------------------------------------------------------------------
 int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
 {
-  Pointer	data;
-  int32_t	type, nx, ny, wid;
-  float	x, y;
-  int32_t	tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
-	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
+  Pointer        data;
+  int32_t        type, nx, ny, wid;
+  float        x, y;
+  int32_t        tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
+          float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
+          int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2);
 
   if (internalMode & TV_24) {
     mode |= TV_24;
     if (!symbolIsNumericalArray(ps[0]) // <image>
-	|| isComplexType(array_type(ps[0]))
-	|| array_num_dims(ps[0]) != 3
-	|| array_dims(ps[0])[2] != 3)
+        || isComplexType(array_type(ps[0]))
+        || array_num_dims(ps[0]) != 3
+        || array_dims(ps[0])[2] != 3)
       return luxerror("Need 3D array with 3rd dimension = 3", ps[0]);
   } else {
     mode &= ~TV_24;
     if (!symbolIsNumericalArray(ps[0]) // <image>
-	|| isComplexType(array_type(ps[0]))
-	|| array_num_dims(ps[0]) != 2)
+        || isComplexType(array_type(ps[0]))
+        || array_num_dims(ps[0]) != 2)
       return cerror(NEED_2D_ARR, ps[0]);
   }
 
@@ -1137,28 +1137,28 @@ int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
   type = array_type(ps[0]);
   data.v = array_data(ps[0]);
 
-  if (narg > 1 && ps[1]) {	// <x>
+  if (narg > 1 && ps[1]) {        // <x>
     if (!symbolIsScalar(ps[1]))
       return cerror(NEED_SCAL, ps[1]);
     x = float_arg(ps[1]);
   } else
     x = 0;
 
-  if (narg > 2 && ps[2]) {	// <y>
+  if (narg > 2 && ps[2]) {        // <y>
     if (!symbolIsScalar(ps[2]))
       return cerror(NEED_SCAL, ps[2]);
     y = float_arg(ps[2]);
   } else
     y = 0;
 
-  if (narg > 3 && ps[3]) {	// <window>
+  if (narg > 3 && ps[3]) {        // <window>
     if (!symbolIsScalar(ps[3]))
       return cerror(NEED_SCAL, ps[3]);
     wid = int_arg(ps[3]);
   } else
     wid = last_wid;
 
-  if (narg > 4 && ps[4]) {	// <scale>
+  if (narg > 4 && ps[4]) {        // <scale>
     if (!symbolIsScalar(ps[4]))
       return cerror(NEED_SCAL, ps[4]);
     tvscale = float_arg(ps[4]);
@@ -1168,7 +1168,7 @@ int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
     tvscale = 0.0;
 
   return tvraw(data, type, nx, ny, 0, nx - 1, 0, ny - 1, x, y, wid, &tvscale,
-	       mode, 0.0, 0.0, NULL, NULL);
+               mode, 0.0, 0.0, NULL, NULL);
 }
 //------------------------------------------------------------------------
 int32_t lux_xtvraw(int32_t narg, int32_t ps[])
@@ -1187,8 +1187,8 @@ int32_t lux_xtvraw(int32_t narg, int32_t ps[])
 }
 //------------------------------------------------------------------------
 int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, float x2,
-	  float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
-	  int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2)
+          float y1, float y2, float sxf, float syf, int32_t wid, float *mag,
+          int32_t mode, double clo, double chi, uint8_t *bitmap1, uint8_t *bitmap2)
 // display data in a window.
 // data: pointer to the start of the data
 // type: data type
@@ -1202,19 +1202,19 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
          if 1 -> (sx,sy) indicate position of center
          if &2 -> 24-bit color specification; the data is assumed to
           have dimensions (nx,ny,3) with (*,*,0) the red, (*,*,1)
-	  the green, and (*,*,2) the blue value for each pixel. */
+          the green, and (*,*,2) the blue value for each pixel. */
 // it is assumed here that the arguments are consistent!
 {
-  Pointer	image, image0;
-  int32_t	hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
+  Pointer        image, image0;
+  int32_t        hq, wq, nxx, nyy, ix, iy, xsrc, ysrc, indx, i, toscreen, maxdim,
     iq, sx, sy, bpp, s;
-  Scalar	min, max, value, factor, offset;
-  float	fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
-  extern float	postXBot, postXTop, postYBot, postYTop,
+  Scalar        min, max, value, factor, offset;
+  float        fx, fy, fx2, fy2, magx, magy, nxxf, nyyf;
+  extern float        postXBot, postXTop, postYBot, postYTop,
     zoom_mag, zoom_xc, zoom_yc, zoom_clo, zoom_chi, wxb, wxt, wyb, wyt;
-  extern int32_t	lunplt, bits_per_pixel;
-  extern unsigned long	red_mask, green_mask, blue_mask;
-  int32_t	lux_threecolors(int32_t, int32_t []), checkCoordSys(int32_t, int32_t),
+  extern int32_t        lunplt, bits_per_pixel;
+  extern unsigned long        red_mask, green_mask, blue_mask;
+  int32_t        lux_threecolors(int32_t, int32_t []), checkCoordSys(int32_t, int32_t),
     coordTrf(float *, float *, int32_t, int32_t),
     postgray(char *, int32_t, int32_t, float, float, float, float, int32_t),
     postcolor(char *, int32_t, int32_t, float, float, float, float, int32_t);
@@ -1232,48 +1232,48 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
       break;
     default:
       return luxerror("Cannot specify /SCREEN and /POSTSCRIPT at the same time",
-		   0);
+                   0);
   }
 
   if (connect_flag) {
-    if (wid >= 0 && win[wid]) {	// existent window
+    if (wid >= 0 && win[wid]) {        // existent window
       hq = ht[wid];
       wq = wd[wid];
-    } else if (wid < 0 && maps[-wid]) {	// existent pixmap
+    } else if (wid < 0 && maps[-wid]) {        // existent pixmap
       hq = htmap[-wid];
       wq = wdmap[-wid];
-    } else {			// defaults
+    } else {                        // defaults
       hq = yfac = ny;
       wq = xfac = nx;
     }
-  } else {			// defaults
+  } else {                        // defaults
     hq = yfac = ny;
     wq = xfac = nx;
   }
 
   bpp = bits_per_pixel? bits_per_pixel: 8; // bits_per_pixel is zero if we
-					   // haven't connected to the X
-					   // server (e.g., tv,x,/post)
+                                           // haven't connected to the X
+                                           // server (e.g., tv,x,/post)
 
   if (!*mag)
     *mag = 1;
 
-  if (internalMode & TV_ZOOM) {	// use ZOOM parameters instead
-    sxf = wq*0.5;		// zoom target coordinates: image center
+  if (internalMode & TV_ZOOM) {        // use ZOOM parameters instead
+    sxf = wq*0.5;                // zoom target coordinates: image center
     syf = hq*0.5;
     sx = (int32_t) sxf;
     sy = (int32_t) syf;
-    *mag = zoom_mag;		// zoom scale
-    internalMode |= TV_CENTER;	// zoom coordinates indicate image center
+    *mag = zoom_mag;                // zoom scale
+    internalMode |= TV_CENTER;        // zoom coordinates indicate image center
     internalMode = (internalMode & ~63) | LUX_DEV;
-				// zoom coordinates are in DEV
-    clo = zoom_clo;		// zoom contrast
+                                // zoom coordinates are in DEV
+    clo = zoom_clo;                // zoom contrast
     chi = zoom_chi;
     x1 = zoom_xc - 0.5*wq/(*mag); // zoom image part
     x2 = zoom_xc + 0.5*wq/(*mag);
     y1 = zoom_yc - 0.5*hq/(*mag);
     y2 = zoom_yc + 0.5*hq/(*mag);
-    if (x2 < 0)			// restrict desired part to existent image
+    if (x2 < 0)                        // restrict desired part to existent image
       x2 = 1;
     else if (x2 >= nx)
       x2 = nx - 1;
@@ -1302,7 +1302,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
       magx = magy = 1.0;
     }
   } else if ((mode & TV_SCALE) || (setup & 32)) {
-				// set magnification to standard value
+                                // set magnification to standard value
     *mag = MIN((float) hq/ny, (float) wq/nx);
     if (*mag >= 1)
       *mag = (int32_t) *mag;
@@ -1334,36 +1334,36 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     sy = (int32_t) syf;
   } else {
     i = (internalMode & 7);
-    if (toscreen		// displaying on screen
-	&& (setup & 4)		// X11 coordinates
-	&& i == LUX_DEV)	// have DEV coordinates
-      i = LUX_X11;		// interpret as X11
+    if (toscreen                // displaying on screen
+        && (setup & 4)                // X11 coordinates
+        && i == LUX_DEV)        // have DEV coordinates
+      i = LUX_X11;                // interpret as X11
     coordTrf(&sxf, &syf, i, LUX_DEV); // transform to DEV
     sx = (int32_t) sxf;
     sy = (int32_t) syf;
     /* calculate coordinates of image's upper right-hand corner in X11
        coordinates */
-    switch (internalMode & TV_CENTER) {	// /CENTER
-      case 0:			// (sx,sy) indicate lower left-hand corner
-	if (setup & 4)
-	  sy = hq - 1 - sy;
-	else
-	  sy = hq - nyy - sy;
-	break;
-      case TV_CENTER:		// (sx,sy) indicate image center position
-	sx = sx - nxx*0.5;
-	if (setup & 4)
-	  sy = sy - nyy*0.5;
-	else
-	  sy = hq - sy - nyy*0.5;
-	break;
+    switch (internalMode & TV_CENTER) {        // /CENTER
+      case 0:                        // (sx,sy) indicate lower left-hand corner
+        if (setup & 4)
+          sy = hq - 1 - sy;
+        else
+          sy = hq - nyy - sy;
+        break;
+      case TV_CENTER:                // (sx,sy) indicate image center position
+        sx = sx - nxx*0.5;
+        if (setup & 4)
+          sy = sy - nyy*0.5;
+        else
+          sy = hq - sy - nyy*0.5;
+        break;
     }
   }
 
   if (toscreen) {
     // does window or pixmap exist?  If not, create to fit image
     if ((wid >= 0 && win[wid] == 0)
-	|| (wid < 0 && maps[-wid] == 0)) {
+        || (wid < 0 && maps[-wid] == 0)) {
       lux_xcreat(wid, hq, wq, 0, 0, 0, NULL, NULL);
     }
     if (!ck_area(wid, &sx, &sy, &nxx, &nyy)) {
@@ -1385,317 +1385,317 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 
   if (!(mode & (TV_MAP | TV_RAW))) {
     // must scale the image contrast
-    if (clo == chi) {		// no contrast -> use full contrast in
-				// current image
+    if (clo == chi) {                // no contrast -> use full contrast in
+                                // current image
       // determine min/max
-      if (mode & TV_24) {		// three bytes per pixel
-	switch (type) {
-	  case LUX_INT8:
-	    min.b = UINT8_MAX;
-	    max.b = 0;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.b = data.b[ix + iy*nx];
-		if (value.b < min.b)
-		  min.b = value.b;
-		if (value.b > max.b)
-		  max.b = value.b;
-		value.b = data.b[ix + iy*nx + s];
-		if (value.b < min.b)
-		  min.b = value.b;
-		if (value.b > max.b)
-		  max.b = value.b;
-		value.b = data.b[ix + iy*nx + 2*s];
-		if (value.b < min.b)
-		  min.b = value.b;
-		if (value.b > max.b)
-		  max.b = value.b;
-	      }
-	    if (max.b == min.b)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.b - min.b);
-	    else
-	      factor.f = 255/((float) max.b - min.b);
-	    offset.f = (float) min.b;
-	    break;
-	  case LUX_INT16:
-	    min.w = INT16_MAX;
-	    max.w = -INT16_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.w = data.w[ix + iy*nx];
-		if (value.w < min.w)
-		  min.w = value.w;
-		if (value.w > max.w)
-		  max.w = value.w;
-		value.w = data.w[ix + iy*nx + s];
-		if (value.w < min.w)
-		  min.w = value.w;
-		if (value.w > max.w)
-		  max.w = value.w;
-		value.w = data.w[ix + iy*nx + 2*s];
-		if (value.w < min.w)
-		  min.w = value.w;
-		if (value.w > max.w)
-		  max.w = value.w;
-	      }
-	    if (max.w == min.w)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.w - min.w);
-	    else
-	      factor.f = 255/((float) max.w - min.w);
-	    offset.f = (float) min.w;
-	    break;
-	  case LUX_INT32:
-	    min.l = INT32_MAX;
-	    max.l = -INT32_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.l = data.l[ix + iy*nx];
-		if (value.l < min.l)
-		  min.l = value.l;
-		if (value.l > max.l)
-		  max.l = value.l;
-		value.l = data.l[ix + iy*nx + s];
-		if (value.l < min.l)
-		  min.l = value.l;
-		if (value.l > max.l)
-		  max.l = value.l;
-		value.l = data.l[ix + iy*nx + 2*s];
-		if (value.l < min.l)
-		  min.l = value.l;
-		if (value.l > max.l)
-		  max.l = value.l;
-	      }
-	    if (max.l == min.l)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.l - min.l);
-	    else
-	      factor.f = 255/((float) max.l - min.l);
-	    offset.f = (float) min.l;
-	    break;
-	  case LUX_INT64:
-	    min.q = INT64_MAX;
-	    max.q = -INT64_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.q = data.q[ix + iy*nx];
-		if (value.q < min.q)
-		  min.q = value.q;
-		if (value.q > max.q)
-		  max.q = value.q;
-		value.q = data.q[ix + iy*nx + s];
-		if (value.q < min.q)
-		  min.q = value.q;
-		if (value.q > max.q)
-		  max.q = value.q;
-		value.q = data.q[ix + iy*nx + 2*s];
-		if (value.q < min.q)
-		  min.q = value.q;
-		if (value.q > max.q)
-		  max.q = value.q;
-	      }
-	    if (max.q == min.q)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.q - min.q);
-	    else
-	      factor.f = 255/((float) max.q - min.q);
-	    offset.f = (float) min.q;
-	    break;
-	  case LUX_FLOAT:
-	    min.f = FLT_MAX;
-	    max.f = -FLT_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.f = data.f[ix + iy*nx];
-		if (value.f < min.f)
-		  min.f = value.f;
-		if (value.f > max.f)
-		  max.f = value.f;
-		value.f = data.f[ix + iy*nx + s];
-		if (value.f < min.f)
-		  min.f = value.f;
-		if (value.f > max.f)
-		  max.f = value.f;
-		value.f = data.f[ix + iy*nx + 2*s];
-		if (value.f < min.f)
-		  min.f = value.f;
-		if (value.f > max.f)
-		  max.f = value.f;
-	      }
-	    if (max.f == min.f)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.f - min.f);
-	    else
-	      factor.f = 255/((float) max.f - min.f);
-	    offset.f = (float) min.f;
-	    break;
-	  case LUX_DOUBLE:
-	    min.d = DBL_MAX;
-	    max.d = -DBL_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.d = data.d[ix + iy*nx];
-		if (value.d < min.d)
-		  min.d = value.d;
-		if (value.d > max.d)
-		  max.d = value.d;
-		value.d = data.d[ix + iy*nx + s];
-		if (value.d < min.d)
-		  min.d = value.d;
-		if (value.d > max.d)
-		  max.d = value.d;
-		value.d = data.d[ix + iy*nx + 2*s];
-		if (value.d < min.d)
-		  min.d = value.d;
-		if (value.d > max.d)
-		  max.d = value.d;
-	      }
-	    if (max.d == min.d)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.d - min.d);
-	    else
-	      factor.f = 255/((float) max.d - min.d);
-	    offset.f = (float) min.d;
-	    break;
-	}
-      } else {			// one uint8_t per pixel
-	switch (type) {
-	  case LUX_INT8:
-	    min.b = UINT8_MAX;
-	    max.b = 0;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.b = data.b[ix + iy*nx];
-		if (value.b < min.b)
-		  min.b = value.b;
-		if (value.b > max.b)
-		  max.b = value.b;
-	      }
-	    if (max.b == min.b)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.b - min.b);
-	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.b - min.b);
-	    offset.f = (float) min.b;
-	    break;
-	  case LUX_INT16:
-	    min.w = INT16_MAX;
-	    max.w = -INT16_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.w = data.w[ix + iy*nx];
-		if (value.w < min.w)
-		  min.w = value.w;
-		if (value.w > max.w)
-		  max.w = value.w;
-	      }
-	    if (max.w == min.w)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.w - min.w);
-	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.w - min.w);
-	    offset.f = (float) min.w;
-	    break;
-	  case LUX_INT32:
-	    min.l = INT32_MAX;
-	    max.l = -INT32_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.l = data.l[ix + iy*nx];
-		if (value.l < min.l)
-		  min.l = value.l;
-		if (value.l > max.l)
-		  max.l = value.l;
-	      }
-	    if (max.l == min.l)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.l - min.l);
-	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.l - min.l);
-	    offset.f = (float) min.l;
-	    break;
-	  case LUX_INT64:
-	    min.q = INT64_MAX;
-	    max.q = -INT64_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.q = data.q[ix + iy*nx];
-		if (value.q < min.q)
-		  min.q = value.q;
-		if (value.q > max.q)
-		  max.q = value.q;
-	      }
-	    if (max.q == min.q)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/((float) max.q - min.q);
-	    else
-	      factor.f = ((float) scalemax - scalemin)/((float) max.q - min.q);
-	    offset.f = (float) min.q;
-	    break;
-	  case LUX_FLOAT:
-	    min.f = FLT_MAX;
-	    max.f = -FLT_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.f = data.f[ix + iy*nx];
-		if (value.f < min.f)
-		  min.f = value.f;
-		if (value.f > max.f)
-		  max.f = value.f;
-	      }
-	    if (max.f == min.f)
-	      factor.f = 1;
-	    else if (threeColors)
-	      factor.f = (256/3)/(max.f - min.f);
-	    else
-	      factor.f = (scalemax - scalemin)/(max.f - min.f);
-	    offset.f = min.f;
-	    break;
-	  case LUX_DOUBLE:
-	    min.d = DBL_MAX;
-	    max.d = -DBL_MAX;
-	    for (iy = y1; iy <= y2; iy++)
-	      for (ix = x1; ix <= x2; ix++) {
-		value.d = data.d[ix + iy*nx];
-		if (value.d < min.d)
-		  min.d = value.d;
-		if (value.d > max.d)
-		  max.d = value.d;
-	      }
-	    if (max.d == min.d)
-	      factor.d = 1;
-	    else if (threeColors)
-	      factor.d = (256/3)/(max.d - min.d);
-	    else
-	      factor.d = (scalemax - scalemin)/(max.d - min.d);
-	    offset.d = min.d;
-	    break;
-	}
+      if (mode & TV_24) {                // three bytes per pixel
+        switch (type) {
+          case LUX_INT8:
+            min.b = UINT8_MAX;
+            max.b = 0;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.b = data.b[ix + iy*nx];
+                if (value.b < min.b)
+                  min.b = value.b;
+                if (value.b > max.b)
+                  max.b = value.b;
+                value.b = data.b[ix + iy*nx + s];
+                if (value.b < min.b)
+                  min.b = value.b;
+                if (value.b > max.b)
+                  max.b = value.b;
+                value.b = data.b[ix + iy*nx + 2*s];
+                if (value.b < min.b)
+                  min.b = value.b;
+                if (value.b > max.b)
+                  max.b = value.b;
+              }
+            if (max.b == min.b)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.b - min.b);
+            else
+              factor.f = 255/((float) max.b - min.b);
+            offset.f = (float) min.b;
+            break;
+          case LUX_INT16:
+            min.w = INT16_MAX;
+            max.w = -INT16_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.w = data.w[ix + iy*nx];
+                if (value.w < min.w)
+                  min.w = value.w;
+                if (value.w > max.w)
+                  max.w = value.w;
+                value.w = data.w[ix + iy*nx + s];
+                if (value.w < min.w)
+                  min.w = value.w;
+                if (value.w > max.w)
+                  max.w = value.w;
+                value.w = data.w[ix + iy*nx + 2*s];
+                if (value.w < min.w)
+                  min.w = value.w;
+                if (value.w > max.w)
+                  max.w = value.w;
+              }
+            if (max.w == min.w)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.w - min.w);
+            else
+              factor.f = 255/((float) max.w - min.w);
+            offset.f = (float) min.w;
+            break;
+          case LUX_INT32:
+            min.l = INT32_MAX;
+            max.l = -INT32_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.l = data.l[ix + iy*nx];
+                if (value.l < min.l)
+                  min.l = value.l;
+                if (value.l > max.l)
+                  max.l = value.l;
+                value.l = data.l[ix + iy*nx + s];
+                if (value.l < min.l)
+                  min.l = value.l;
+                if (value.l > max.l)
+                  max.l = value.l;
+                value.l = data.l[ix + iy*nx + 2*s];
+                if (value.l < min.l)
+                  min.l = value.l;
+                if (value.l > max.l)
+                  max.l = value.l;
+              }
+            if (max.l == min.l)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.l - min.l);
+            else
+              factor.f = 255/((float) max.l - min.l);
+            offset.f = (float) min.l;
+            break;
+          case LUX_INT64:
+            min.q = INT64_MAX;
+            max.q = -INT64_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.q = data.q[ix + iy*nx];
+                if (value.q < min.q)
+                  min.q = value.q;
+                if (value.q > max.q)
+                  max.q = value.q;
+                value.q = data.q[ix + iy*nx + s];
+                if (value.q < min.q)
+                  min.q = value.q;
+                if (value.q > max.q)
+                  max.q = value.q;
+                value.q = data.q[ix + iy*nx + 2*s];
+                if (value.q < min.q)
+                  min.q = value.q;
+                if (value.q > max.q)
+                  max.q = value.q;
+              }
+            if (max.q == min.q)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.q - min.q);
+            else
+              factor.f = 255/((float) max.q - min.q);
+            offset.f = (float) min.q;
+            break;
+          case LUX_FLOAT:
+            min.f = FLT_MAX;
+            max.f = -FLT_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.f = data.f[ix + iy*nx];
+                if (value.f < min.f)
+                  min.f = value.f;
+                if (value.f > max.f)
+                  max.f = value.f;
+                value.f = data.f[ix + iy*nx + s];
+                if (value.f < min.f)
+                  min.f = value.f;
+                if (value.f > max.f)
+                  max.f = value.f;
+                value.f = data.f[ix + iy*nx + 2*s];
+                if (value.f < min.f)
+                  min.f = value.f;
+                if (value.f > max.f)
+                  max.f = value.f;
+              }
+            if (max.f == min.f)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.f - min.f);
+            else
+              factor.f = 255/((float) max.f - min.f);
+            offset.f = (float) min.f;
+            break;
+          case LUX_DOUBLE:
+            min.d = DBL_MAX;
+            max.d = -DBL_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.d = data.d[ix + iy*nx];
+                if (value.d < min.d)
+                  min.d = value.d;
+                if (value.d > max.d)
+                  max.d = value.d;
+                value.d = data.d[ix + iy*nx + s];
+                if (value.d < min.d)
+                  min.d = value.d;
+                if (value.d > max.d)
+                  max.d = value.d;
+                value.d = data.d[ix + iy*nx + 2*s];
+                if (value.d < min.d)
+                  min.d = value.d;
+                if (value.d > max.d)
+                  max.d = value.d;
+              }
+            if (max.d == min.d)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.d - min.d);
+            else
+              factor.f = 255/((float) max.d - min.d);
+            offset.f = (float) min.d;
+            break;
+        }
+      } else {                        // one uint8_t per pixel
+        switch (type) {
+          case LUX_INT8:
+            min.b = UINT8_MAX;
+            max.b = 0;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.b = data.b[ix + iy*nx];
+                if (value.b < min.b)
+                  min.b = value.b;
+                if (value.b > max.b)
+                  max.b = value.b;
+              }
+            if (max.b == min.b)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.b - min.b);
+            else
+              factor.f = ((float) scalemax - scalemin)/((float) max.b - min.b);
+            offset.f = (float) min.b;
+            break;
+          case LUX_INT16:
+            min.w = INT16_MAX;
+            max.w = -INT16_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.w = data.w[ix + iy*nx];
+                if (value.w < min.w)
+                  min.w = value.w;
+                if (value.w > max.w)
+                  max.w = value.w;
+              }
+            if (max.w == min.w)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.w - min.w);
+            else
+              factor.f = ((float) scalemax - scalemin)/((float) max.w - min.w);
+            offset.f = (float) min.w;
+            break;
+          case LUX_INT32:
+            min.l = INT32_MAX;
+            max.l = -INT32_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.l = data.l[ix + iy*nx];
+                if (value.l < min.l)
+                  min.l = value.l;
+                if (value.l > max.l)
+                  max.l = value.l;
+              }
+            if (max.l == min.l)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.l - min.l);
+            else
+              factor.f = ((float) scalemax - scalemin)/((float) max.l - min.l);
+            offset.f = (float) min.l;
+            break;
+          case LUX_INT64:
+            min.q = INT64_MAX;
+            max.q = -INT64_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.q = data.q[ix + iy*nx];
+                if (value.q < min.q)
+                  min.q = value.q;
+                if (value.q > max.q)
+                  max.q = value.q;
+              }
+            if (max.q == min.q)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/((float) max.q - min.q);
+            else
+              factor.f = ((float) scalemax - scalemin)/((float) max.q - min.q);
+            offset.f = (float) min.q;
+            break;
+          case LUX_FLOAT:
+            min.f = FLT_MAX;
+            max.f = -FLT_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.f = data.f[ix + iy*nx];
+                if (value.f < min.f)
+                  min.f = value.f;
+                if (value.f > max.f)
+                  max.f = value.f;
+              }
+            if (max.f == min.f)
+              factor.f = 1;
+            else if (threeColors)
+              factor.f = (256/3)/(max.f - min.f);
+            else
+              factor.f = (scalemax - scalemin)/(max.f - min.f);
+            offset.f = min.f;
+            break;
+          case LUX_DOUBLE:
+            min.d = DBL_MAX;
+            max.d = -DBL_MAX;
+            for (iy = y1; iy <= y2; iy++)
+              for (ix = x1; ix <= x2; ix++) {
+                value.d = data.d[ix + iy*nx];
+                if (value.d < min.d)
+                  min.d = value.d;
+                if (value.d > max.d)
+                  max.d = value.d;
+              }
+            if (max.d == min.d)
+              factor.d = 1;
+            else if (threeColors)
+              factor.d = (256/3)/(max.d - min.d);
+            else
+              factor.d = (scalemax - scalemin)/(max.d - min.d);
+            offset.d = min.d;
+            break;
+        }
       }
-    } else { 			// have explicit contrast range
+    } else {                         // have explicit contrast range
       if (type == LUX_DOUBLE) {
-	if (threeColors)
-	  factor.d = (256/3)/(chi - clo);
-	else
-	  factor.d = (scalemax - scalemin)/(chi - clo);
-	offset.d = clo;
+        if (threeColors)
+          factor.d = (256/3)/(chi - clo);
+        else
+          factor.d = (scalemax - scalemin)/(chi - clo);
+        offset.d = clo;
       } else {
-	if (threeColors)
-	  factor.f = (256/3)/(chi - clo);
-	else
-	  factor.f = (scalemax - scalemin)/(chi - clo);
-	offset.f = (float) clo;
+        if (threeColors)
+          factor.f = (256/3)/(chi - clo);
+        else
+          factor.f = (scalemax - scalemin)/(chi - clo);
+        offset.f = (float) clo;
       }
     }
   }
@@ -1722,9 +1722,9 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
      the final dimensions and position of the image, so we can modify
      the remaining parameters so that not more data that necessary is
      written to the file */
-  if (!toscreen) {		// to postscript file
-    magx = magy = 1;		// unit magnification
-    nxx = nx;			// original dimensions
+  if (!toscreen) {                // to postscript file
+    magx = magy = 1;                // unit magnification
+    nxx = nx;                        // original dimensions
     nyy = ny;
   }
   image.b = image0.b = (uint8_t*) malloc(nxx*nyy*(bpp/8)*((mode & TV_24)? 3: 1));
@@ -1733,1572 +1733,1572 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 
   // now generate the image data
   if (!(mode & (TV_RAW | TV_MAP))) {
-    if (setup & 4) {		// "reversed" images
-      if (mode & TV_24) {	// 24-bit colors
-	switch (type) {
-	  case LUX_INT8:
-	    for (iy = 0; iy < nyy; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.b[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.b[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_INT16:
-	    for (iy = 0; iy < nyy; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.w[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.w[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_INT32:
-	    for (iy = 0; iy < nyy; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.l[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.l[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_INT64:
-	    for (iy = 0; iy < nyy; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.q[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.q[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_FLOAT:
-	    for (iy = 0; iy < nyy; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.f[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.f[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_DOUBLE:
-	    for (iy = 0; iy < nyy; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.d[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.d[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < scalemin)
-		  indx = scalemin;
-		else if (indx > scalemax)
-		  indx = scalemax;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	} // end of switch (type)
-      }	// end of if (mode & TV_24)
-      else if (threeColors) {	// have three-color colortable
-	switch (type) {
-	  case LUX_INT8:
-	    for (iy = 0; iy < nyy; iy++)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_INT16:
-	    for (iy = 0; iy < nyy; iy++)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_INT32:
-	    for (iy = 0; iy < nyy; iy++)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_INT64:
-	    for (iy = 0; iy < nyy; iy++)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix...)
-	    break;
-	  case LUX_FLOAT:
-	    for (iy = 0; iy < nyy; iy++)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	  case LUX_DOUBLE:
-	    for (iy = 0; iy < nyy; iy++)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	} // end of switch (type)
+    if (setup & 4) {                // "reversed" images
+      if (mode & TV_24) {        // 24-bit colors
+        switch (type) {
+          case LUX_INT8:
+            for (iy = 0; iy < nyy; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.b[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.b[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_INT16:
+            for (iy = 0; iy < nyy; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.w[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.w[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_INT32:
+            for (iy = 0; iy < nyy; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.l[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.l[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_INT64:
+            for (iy = 0; iy < nyy; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.q[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.q[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_FLOAT:
+            for (iy = 0; iy < nyy; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.f[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.f[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_DOUBLE:
+            for (iy = 0; iy < nyy; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.d[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.d[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < scalemin)
+                  indx = scalemin;
+                else if (indx > scalemax)
+                  indx = scalemax;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+        } // end of switch (type)
+      }        // end of if (mode & TV_24)
+      else if (threeColors) {        // have three-color colortable
+        switch (type) {
+          case LUX_INT8:
+            for (iy = 0; iy < nyy; iy++)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_INT16:
+            for (iy = 0; iy < nyy; iy++)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_INT32:
+            for (iy = 0; iy < nyy; iy++)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_INT64:
+            for (iy = 0; iy < nyy; iy++)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix...)
+            break;
+          case LUX_FLOAT:
+            for (iy = 0; iy < nyy; iy++)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+          case LUX_DOUBLE:
+            for (iy = 0; iy < nyy; iy++)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+        } // end of switch (type)
       } // end of if (mode & TV_24) else if (threeColors)
-      else switch (type) {	// ordinary color table
-	case LUX_INT8:
-	  for (iy = 0; iy < nyy; iy++)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_INT16:
-	  for (iy = 0; iy < nyy; iy++)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_INT32:
-	  for (iy = 0; iy < nyy; iy++)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_INT64:
-	  for (iy = 0; iy < nyy; iy++)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_FLOAT:
-	  for (iy = 0; iy < nyy; iy++)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_DOUBLE:
-	  for (iy = 0; iy < nyy; iy++)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.d[xsrc + ysrc*nx] - offset.d)*factor.d
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-      }	// end if (mode & TV_24) else if (threeColors) else switch (type)
+      else switch (type) {        // ordinary color table
+        case LUX_INT8:
+          for (iy = 0; iy < nyy; iy++)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_INT16:
+          for (iy = 0; iy < nyy; iy++)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_INT32:
+          for (iy = 0; iy < nyy; iy++)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_INT64:
+          for (iy = 0; iy < nyy; iy++)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_FLOAT:
+          for (iy = 0; iy < nyy; iy++)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_DOUBLE:
+          for (iy = 0; iy < nyy; iy++)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.d[xsrc + ysrc*nx] - offset.d)*factor.d
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+      }        // end if (mode & TV_24) else if (threeColors) else switch (type)
     } // end of if (setup & 4)
-    else {			// standard image
-      if (mode & TV_24) {	// 24-bit colors
-	switch (type) {
-	  case LUX_INT8:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.b[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.b[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	  case LUX_INT16:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.w[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.w[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	  case LUX_INT32:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.l[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.l[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	  case LUX_INT64:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.q[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.q[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	  case LUX_FLOAT:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.f[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.f[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	  case LUX_DOUBLE:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b = (pixels[indx] & red_mask);
-		    break;
-		  case 16:
-		    *image.w = (pixels[indx] & red_mask);
-		    break;
-		  case 32:
-		    *image.l = (pixels[indx] & red_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.d[xsrc + ysrc*nx + s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b |= (pixels[indx] & green_mask);
-		    break;
-		  case 16:
-		    *image.w |= (pixels[indx] & green_mask);
-		    break;
-		  case 32:
-		    *image.l |= (pixels[indx] & green_mask);
-		    break;
-		} // end of switch (bpp)
-		indx = (data.d[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx > 255)
-		  indx = 255;
-		switch (bpp) {
-		  case 8:
-		    *image.b++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 16:
-		    *image.w++ |= (pixels[indx] & blue_mask);
-		    break;
-		  case 32:
-		    *image.l++ |= (pixels[indx] & blue_mask);
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	} // end of switch (type)
-      }	// end of if (mode & TV_24)
-      else if (threeColors) {	// have three-color colortable
-	switch (type) {
-	  case LUX_INT8:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of for (ix)
-	    break;
-	  case LUX_INT16:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of if (ix)
-	    break;
-	  case LUX_INT32:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of if (ix)
-	    break;
-	  case LUX_INT64:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of if (ix)
-	    break;
-	  case LUX_FLOAT:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of if (ix)
-	    break;
-	  case LUX_DOUBLE:
-	    for (iy = nyy - 1; iy >= 0; iy--)
-	      for (ix = 0; ix < nxx; ix++) {
-		xsrc = x1 + ix/magx;
-		ysrc = y1 + iy/magy;
-		indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
-		if (indx < 0)
-		  indx = 0;
-		else if (indx >= 256/3)
-		  indx = 256/3 - 1;
-		if (bitmap1 && bitmap1[xsrc + ysrc*nx])
-		  indx += 256/3;
-		else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
-		  indx += 2*(256/3);
-		switch (bpp) {
-		  case 8:
-		    *image.b++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 16:
-		    *image.w++ = toscreen? pixels[indx]: indx;
-		    break;
-		  case 32:
-		    *image.l++ = toscreen? pixels[indx]: indx;
-		    break;
-		} // end of switch (bpp)
-	      }	// end of if (ix)
-	    break;
-	} // end of switch (type)
-      }	// end of if (mode & TV_24) else if (threeColors)
-      else switch (type) {	// ordinary color table
-	case LUX_INT8:
-	  for (iy = nyy - 1; iy >= 0; iy--)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_INT16:
-	  for (iy = nyy - 1; iy >= 0; iy--)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_INT32:
-	  for (iy = nyy - 1; iy >= 0; iy--)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_INT64:
-	  for (iy = nyy - 1; iy >= 0; iy--)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_FLOAT:
-	  for (iy = nyy - 1; iy >= 0; iy--)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-	case LUX_DOUBLE:
-	  for (iy = nyy - 1; iy >= 0; iy--)
-	    for (ix = 0; ix < nxx; ix++) {
-	      xsrc = x1 + ix/magx;
-	      ysrc = y1 + iy/magy;
-	      indx = (data.d[xsrc + ysrc*nx] - offset.d)*factor.d
-		+ scalemin;
-	      if (indx < scalemin)
-		indx = scalemin;
-	      else if (indx > scalemax)
-		indx = scalemax;
-	      switch (bpp) {
-		case 8:
-		  *image.b++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 16:
-		  *image.w++ = toscreen? pixels[indx]: indx;
-		  break;
-		case 32:
-		  *image.l++ = toscreen? pixels[indx]: indx;
-		  break;
-	      }	// end of switch (bpp)
-	    } // end of for (ix)
-	  break;
-      }	// end of if (mode & TV_24) else if (threeColors) else switch (type)
+    else {                        // standard image
+      if (mode & TV_24) {        // 24-bit colors
+        switch (type) {
+          case LUX_INT8:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.b[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.b[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+          case LUX_INT16:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.w[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.w[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+          case LUX_INT32:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.l[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.l[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+          case LUX_INT64:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.q[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.q[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+          case LUX_FLOAT:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.f[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.f[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+          case LUX_DOUBLE:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b = (pixels[indx] & red_mask);
+                    break;
+                  case 16:
+                    *image.w = (pixels[indx] & red_mask);
+                    break;
+                  case 32:
+                    *image.l = (pixels[indx] & red_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.d[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b |= (pixels[indx] & green_mask);
+                    break;
+                  case 16:
+                    *image.w |= (pixels[indx] & green_mask);
+                    break;
+                  case 32:
+                    *image.l |= (pixels[indx] & green_mask);
+                    break;
+                } // end of switch (bpp)
+                indx = (data.d[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx > 255)
+                  indx = 255;
+                switch (bpp) {
+                  case 8:
+                    *image.b++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 16:
+                    *image.w++ |= (pixels[indx] & blue_mask);
+                    break;
+                  case 32:
+                    *image.l++ |= (pixels[indx] & blue_mask);
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+        } // end of switch (type)
+      }        // end of if (mode & TV_24)
+      else if (threeColors) {        // have three-color colortable
+        switch (type) {
+          case LUX_INT8:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of for (ix)
+            break;
+          case LUX_INT16:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of if (ix)
+            break;
+          case LUX_INT32:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of if (ix)
+            break;
+          case LUX_INT64:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of if (ix)
+            break;
+          case LUX_FLOAT:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of if (ix)
+            break;
+          case LUX_DOUBLE:
+            for (iy = nyy - 1; iy >= 0; iy--)
+              for (ix = 0; ix < nxx; ix++) {
+                xsrc = x1 + ix/magx;
+                ysrc = y1 + iy/magy;
+                indx = (data.d[xsrc + ysrc*nx] - offset.f)*factor.f;
+                if (indx < 0)
+                  indx = 0;
+                else if (indx >= 256/3)
+                  indx = 256/3 - 1;
+                if (bitmap1 && bitmap1[xsrc + ysrc*nx])
+                  indx += 256/3;
+                else if (bitmap2 && bitmap2[xsrc + ysrc*nx])
+                  indx += 2*(256/3);
+                switch (bpp) {
+                  case 8:
+                    *image.b++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 16:
+                    *image.w++ = toscreen? pixels[indx]: indx;
+                    break;
+                  case 32:
+                    *image.l++ = toscreen? pixels[indx]: indx;
+                    break;
+                } // end of switch (bpp)
+              }        // end of if (ix)
+            break;
+        } // end of switch (type)
+      }        // end of if (mode & TV_24) else if (threeColors)
+      else switch (type) {        // ordinary color table
+        case LUX_INT8:
+          for (iy = nyy - 1; iy >= 0; iy--)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_INT16:
+          for (iy = nyy - 1; iy >= 0; iy--)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.w[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_INT32:
+          for (iy = nyy - 1; iy >= 0; iy--)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.l[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_INT64:
+          for (iy = nyy - 1; iy >= 0; iy--)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.q[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_FLOAT:
+          for (iy = nyy - 1; iy >= 0; iy--)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.f[xsrc + ysrc*nx] - offset.f)*factor.f
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+        case LUX_DOUBLE:
+          for (iy = nyy - 1; iy >= 0; iy--)
+            for (ix = 0; ix < nxx; ix++) {
+              xsrc = x1 + ix/magx;
+              ysrc = y1 + iy/magy;
+              indx = (data.d[xsrc + ysrc*nx] - offset.d)*factor.d
+                + scalemin;
+              if (indx < scalemin)
+                indx = scalemin;
+              else if (indx > scalemax)
+                indx = scalemax;
+              switch (bpp) {
+                case 8:
+                  *image.b++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 16:
+                  *image.w++ = toscreen? pixels[indx]: indx;
+                  break;
+                case 32:
+                  *image.l++ = toscreen? pixels[indx]: indx;
+                  break;
+              }        // end of switch (bpp)
+            } // end of for (ix)
+          break;
+      }        // end of if (mode & TV_24) else if (threeColors) else switch (type)
     } // end of if (setup & 4) else
   } // end of if (!(mode & (TV_RAW | TV_MAP)))
-  else if (mode & TV_MAP) {	// must map to raw pixel values
+  else if (mode & TV_MAP) {        // must map to raw pixel values
     if (setup & 4) {
       if (mode & TV_24) {
-	for (iy = 0; iy < nyy; iy++)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    indx = data.b[xsrc + ysrc*nx];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b = (pixels[indx] & red_mask);
-		break;
-	      case 16:
-		*image.w = (pixels[indx] & red_mask);
-		break;
-	      case 32:
-		*image.l = (pixels[indx] & red_mask);
-		break;
-	    } // end of switch (bpp)
-	    indx = data.b[xsrc + ysrc*nx + s];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b |= (pixels[indx] & green_mask);
-		break;
-	      case 16:
-		*image.w |= (pixels[indx] & green_mask);
-		break;
-	      case 32:
-		*image.l |= (pixels[indx] & green_mask);
-		break;
-	    } // end of switch (bpp)
-	    indx = data.b[xsrc + ysrc*nx + 2*s];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ = (pixels[indx] & blue_mask);
-		break;
-	      case 16:
-		*image.w++ = (pixels[indx] & blue_mask);
-		break;
-	      case 32:
-		*image.l++ = (pixels[indx] & blue_mask);
-		break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
-      }	// end of if (mode & TV_24)
+        for (iy = 0; iy < nyy; iy++)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            indx = data.b[xsrc + ysrc*nx];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b = (pixels[indx] & red_mask);
+                break;
+              case 16:
+                *image.w = (pixels[indx] & red_mask);
+                break;
+              case 32:
+                *image.l = (pixels[indx] & red_mask);
+                break;
+            } // end of switch (bpp)
+            indx = data.b[xsrc + ysrc*nx + s];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b |= (pixels[indx] & green_mask);
+                break;
+              case 16:
+                *image.w |= (pixels[indx] & green_mask);
+                break;
+              case 32:
+                *image.l |= (pixels[indx] & green_mask);
+                break;
+            } // end of switch (bpp)
+            indx = data.b[xsrc + ysrc*nx + 2*s];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b++ = (pixels[indx] & blue_mask);
+                break;
+              case 16:
+                *image.w++ = (pixels[indx] & blue_mask);
+                break;
+              case 32:
+                *image.l++ = (pixels[indx] & blue_mask);
+                break;
+            } // end of switch (bpp)
+          } // end of for (ix)
+      }        // end of if (mode & TV_24)
       else {
-	for (iy = 0; iy < nyy; iy++)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    indx = data.b[xsrc + ysrc*nx];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ = toscreen? pixels[indx]: indx;
-		break;
-	      case 16:
-		*image.w++ = toscreen? pixels[indx]: indx;
-		break;
-	      case 32:
-		*image.l++ = toscreen? pixels[indx]: indx;
-		break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
-      }	// end of if (mode & TV_24) else
+        for (iy = 0; iy < nyy; iy++)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            indx = data.b[xsrc + ysrc*nx];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b++ = toscreen? pixels[indx]: indx;
+                break;
+              case 16:
+                *image.w++ = toscreen? pixels[indx]: indx;
+                break;
+              case 32:
+                *image.l++ = toscreen? pixels[indx]: indx;
+                break;
+            } // end of switch (bpp)
+          } // end of for (ix)
+      }        // end of if (mode & TV_24) else
     } // end of if (setup & 4)
     else {
       if (mode & TV_24) {
-	for (iy = nyy - 1; iy >= 0; iy--)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    indx = data.b[xsrc + ysrc*nx];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b = (pixels[indx] & red_mask);
-		break;
-	      case 16:
-		*image.w = (pixels[indx] & red_mask);
-		break;
-	      case 32:
-		*image.l = (pixels[indx] & red_mask);
-		break;
-	    } // end of switch (bpp)
-	    indx = data.b[xsrc + ysrc*nx + s];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b |= (pixels[indx] & green_mask);
-		break;
-	      case 16:
-		*image.w |= (pixels[indx] & green_mask);
-		break;
-	      case 32:
-		*image.l |= (pixels[indx] & green_mask);
-		break;
-	    } // end of switch (bpp)
-	    indx = data.b[xsrc + ysrc*nx + 2*s];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ |= (pixels[indx] & blue_mask);
-		break;
-	      case 16:
-		*image.w++ |= (pixels[indx] & blue_mask);
-		break;
-	      case 32:
-		*image.l++ |= (pixels[indx] & blue_mask);
-		break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
-      }	// end of if (mode & TV_24)
+        for (iy = nyy - 1; iy >= 0; iy--)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            indx = data.b[xsrc + ysrc*nx];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b = (pixels[indx] & red_mask);
+                break;
+              case 16:
+                *image.w = (pixels[indx] & red_mask);
+                break;
+              case 32:
+                *image.l = (pixels[indx] & red_mask);
+                break;
+            } // end of switch (bpp)
+            indx = data.b[xsrc + ysrc*nx + s];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b |= (pixels[indx] & green_mask);
+                break;
+              case 16:
+                *image.w |= (pixels[indx] & green_mask);
+                break;
+              case 32:
+                *image.l |= (pixels[indx] & green_mask);
+                break;
+            } // end of switch (bpp)
+            indx = data.b[xsrc + ysrc*nx + 2*s];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b++ |= (pixels[indx] & blue_mask);
+                break;
+              case 16:
+                *image.w++ |= (pixels[indx] & blue_mask);
+                break;
+              case 32:
+                *image.l++ |= (pixels[indx] & blue_mask);
+                break;
+            } // end of switch (bpp)
+          } // end of for (ix)
+      }        // end of if (mode & TV_24)
       else {
-	for (iy = nyy - 1; iy >= 0; iy--)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    indx = data.b[xsrc + ysrc*nx];
-	    if (indx < scalemin)
-	      indx = scalemin;
-	    else if (indx > scalemax)
-	      indx = scalemax;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ = toscreen? pixels[indx]: indx;
-		break;
-	      case 16:
-		*image.w++ = toscreen? pixels[indx]: indx;
-		break;
-	      case 32:
-		*image.l++ = toscreen? pixels[indx]: indx;
-	      break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
-      }	// end of if (mode & TV_24) else
+        for (iy = nyy - 1; iy >= 0; iy--)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            indx = data.b[xsrc + ysrc*nx];
+            if (indx < scalemin)
+              indx = scalemin;
+            else if (indx > scalemax)
+              indx = scalemax;
+            switch (bpp) {
+              case 8:
+                *image.b++ = toscreen? pixels[indx]: indx;
+                break;
+              case 16:
+                *image.w++ = toscreen? pixels[indx]: indx;
+                break;
+              case 32:
+                *image.l++ = toscreen? pixels[indx]: indx;
+              break;
+            } // end of switch (bpp)
+          } // end of for (ix)
+      }        // end of if (mode & TV_24) else
     } // end of if (setup & 4) else
   } // end of if (!(mode & (TV_RAW | TV_MAP))) else if (mode & TV_MAP)
-  else {			// must extract raw pixel values
+  else {                        // must extract raw pixel values
     if (setup & 4) {
       if (mode & TV_24) {
-	for (iy = 0; iy < nyy; iy++)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ = (data.b[xsrc + ysrc*nx] & red_mask)
-		  | (data.b[xsrc + ysrc*nx + s] & green_mask)
-		  | (data.b[xsrc + ysrc*nx + 2*s] & blue_mask);
-		break;
-	      case 16:
-		*image.w++ = (data.w[xsrc + ysrc*nx] & red_mask)
-		  | (data.w[xsrc + ysrc*nx + s] & green_mask)
-		  | (data.w[xsrc + ysrc*nx + 2*s] & blue_mask);
-		break;
-	      case 32:
-		*image.l++ = (data.l[xsrc + ysrc*nx] & red_mask)
-		  | (data.l[xsrc + ysrc*nx + s] & green_mask)
-		  | (data.l[xsrc + ysrc*nx + 2*s] & blue_mask);
-		break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
-      }	// end of if (mode & TV_24)
+        for (iy = 0; iy < nyy; iy++)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            switch (bpp) {
+              case 8:
+                *image.b++ = (data.b[xsrc + ysrc*nx] & red_mask)
+                  | (data.b[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.b[xsrc + ysrc*nx + 2*s] & blue_mask);
+                break;
+              case 16:
+                *image.w++ = (data.w[xsrc + ysrc*nx] & red_mask)
+                  | (data.w[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.w[xsrc + ysrc*nx + 2*s] & blue_mask);
+                break;
+              case 32:
+                *image.l++ = (data.l[xsrc + ysrc*nx] & red_mask)
+                  | (data.l[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.l[xsrc + ysrc*nx + 2*s] & blue_mask);
+                break;
+            } // end of switch (bpp)
+          } // end of for (ix)
+      }        // end of if (mode & TV_24)
       else {
-	for (iy = 0; iy < nyy; iy++)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ = data.b[xsrc + ysrc*nx];
-		break;
-	      case 16:
-		*image.w++ = data.w[xsrc + ysrc*nx];
-		break;
-	      case 32:
-		*image.l++ = data.l[xsrc + ysrc*nx];
-		break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
-      }	// end of if (mode & TV_24) else
+        for (iy = 0; iy < nyy; iy++)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            switch (bpp) {
+              case 8:
+                *image.b++ = data.b[xsrc + ysrc*nx];
+                break;
+              case 16:
+                *image.w++ = data.w[xsrc + ysrc*nx];
+                break;
+              case 32:
+                *image.l++ = data.l[xsrc + ysrc*nx];
+                break;
+            } // end of switch (bpp)
+          } // end of for (ix)
+      }        // end of if (mode & TV_24) else
     } // end of if (setup & 4)
     else {
       if (mode & TV_24) {
-	for (iy = nyy - 1; iy >= 0; iy--)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ = (data.b[xsrc + ysrc*nx] & red_mask)
-		  | (data.b[xsrc + ysrc*nx + s] & green_mask)
-		  | (data.b[xsrc + ysrc*nx + 2*s] & blue_mask);
-		break;
-	      case 16:
-		*image.w++ = (data.w[xsrc + ysrc*nx] & red_mask)
-		  | (data.w[xsrc + ysrc*nx + s] & green_mask)
-		  | (data.w[xsrc + ysrc*nx + 2*s] & blue_mask);
-		break;
-	      case 32:
-		*image.l++ = (data.l[xsrc + ysrc*nx] & red_mask)
-		  | (data.l[xsrc + ysrc*nx + s] & green_mask)
-		  | (data.l[xsrc + ysrc*nx + 2*s] & blue_mask);
-		break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
-      }	// end of if (mode & TV_24)
+        for (iy = nyy - 1; iy >= 0; iy--)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            switch (bpp) {
+              case 8:
+                *image.b++ = (data.b[xsrc + ysrc*nx] & red_mask)
+                  | (data.b[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.b[xsrc + ysrc*nx + 2*s] & blue_mask);
+                break;
+              case 16:
+                *image.w++ = (data.w[xsrc + ysrc*nx] & red_mask)
+                  | (data.w[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.w[xsrc + ysrc*nx + 2*s] & blue_mask);
+                break;
+              case 32:
+                *image.l++ = (data.l[xsrc + ysrc*nx] & red_mask)
+                  | (data.l[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.l[xsrc + ysrc*nx + 2*s] & blue_mask);
+                break;
+            } // end of switch (bpp)
+          } // end of for (ix)
+      }        // end of if (mode & TV_24)
       else {
-	for (iy = nyy - 1; iy >= 0; iy--)
-	  for (ix = 0; ix < nxx; ix++) {
-	    xsrc = x1 + ix/magx;
-	    ysrc = y1 + iy/magy;
-	    switch (bpp) {
-	      case 8:
-		*image.b++ = data.b[xsrc + ysrc*nx];
-		break;
-	      case 16:
-		*image.w++ = data.w[xsrc + ysrc*nx];
-		break;
-	      case 32:
-		*image.l++ = data.l[xsrc + ysrc*nx];
-		break;
-	    } // end of switch (bpp)
-	  } // end of for (ix)
+        for (iy = nyy - 1; iy >= 0; iy--)
+          for (ix = 0; ix < nxx; ix++) {
+            xsrc = x1 + ix/magx;
+            ysrc = y1 + iy/magy;
+            switch (bpp) {
+              case 8:
+                *image.b++ = data.b[xsrc + ysrc*nx];
+                break;
+              case 16:
+                *image.w++ = data.w[xsrc + ysrc*nx];
+                break;
+              case 32:
+                *image.l++ = data.l[xsrc + ysrc*nx];
+                break;
+            } // end of switch (bpp)
+          } // end of for (ix)
       } // end of if (mode & TV_24) else
     } // end of if (setup & 4) else
   } // end of if (!(mode & (TV_RAW | TV_MAP))) else if (mode & TV_MAP) else
-	
+        
   if (toscreen) {
     // create image structure
     xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) image0.b,
-		      nxx, nyy, bpp, 0);
+                      nxx, nyy, bpp, 0);
 /*    if (!XInitImage(xi))
       return luxerror("Error initializing image", 0); */
-    if (wid >= 0)		// window
+    if (wid >= 0)                // window
       XPutImage(display, win[wid], gc[wid], xi, 0, 0, sx, sy, nxx, nyy);
-    else			// pixmap
+    else                        // pixmap
       XPutImage(display, maps[-wid], gcmap[-wid], xi, 0, 0, sx, sy, nxx, nyy);
     // now dealloc the image structure but not the data
     xi->data = NULL;
     XDestroyImage(xi);
     XFlush(display);
     iq = LUX_OK;
-  } else {			// to postscript
+  } else {                        // to postscript
     // in older versions of LUX, when DVI coordinates were used to specify
     // positions in a postscript figure, they were exported to the file
     // without any additional transformations.  This meant that if the
@@ -3329,16 +3329,16 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
 int32_t lux_colorpixel(int32_t narg, int32_t ps[])
 // maps color indices to pixel values
 {
-  Pointer	p, q;
-  int32_t	n, iq, bpp;
+  Pointer        p, q;
+  int32_t        n, iq, bpp;
   Symboltype type;
-  extern int32_t	bits_per_pixel;
-  extern unsigned long	red_mask, green_mask, blue_mask;
+  extern int32_t        bits_per_pixel;
+  extern unsigned long        red_mask, green_mask, blue_mask;
 
   bpp = bits_per_pixel? bits_per_pixel:
     ((internalMode & TV_24)? 24: 8); /* bits_per_pixel is zero if we haven't
-					yet connected to the X server (e.g.,
-					tv,x,/post) */
+                                        yet connected to the X server (e.g.,
+                                        tv,x,/post) */
   switch (bpp) {
     case 8:
       type = LUX_INT8;
@@ -3357,26 +3357,26 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
     case LUX_ARRAY:
       n = array_size(*ps);
       if (internalMode & TV_24) {
-	if (n % 3)
-	  return luxerror("Need multiple of 3 elements for 24-bit color treatment", *ps);
-	n /= 3;
-	if (array_dims(*ps)[array_num_dims(*ps) - 1] == 3)
-	  iq = array_scratch(type, array_num_dims(*ps) - 1, array_dims(*ps));
-	else
-	  iq = array_scratch(type, 1, &n);
+        if (n % 3)
+          return luxerror("Need multiple of 3 elements for 24-bit color treatment", *ps);
+        n /= 3;
+        if (array_dims(*ps)[array_num_dims(*ps) - 1] == 3)
+          iq = array_scratch(type, array_num_dims(*ps) - 1, array_dims(*ps));
+        else
+          iq = array_scratch(type, 1, &n);
       } else {
-	if (isFreeTemp(*ps) && array_type(*ps) == type)
-	  iq = *ps;		// use input as output
-	else			// need a new variable
-	  iq = array_clone(*ps, type);
+        if (isFreeTemp(*ps) && array_type(*ps) == type)
+          iq = *ps;                // use input as output
+        else                        // need a new variable
+          iq = array_clone(*ps, type);
       }
       p.l = (int32_t*) array_data(*ps);
       q.b = (uint8_t*) array_data(iq);
       break;
     case LUX_SCALAR:
       if (internalMode & TV_24)
-	return luxerror("Need multiple of 3 elements for 24-bit color treatment",
-		     *ps);
+        return luxerror("Need multiple of 3 elements for 24-bit color treatment",
+                     *ps);
       n = 1;
       p.l = &scalar_value(*ps).l;
       iq = scalar_scratch(type);
@@ -3389,201 +3389,201 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
   switch (bpp) {
     case 8:
       if (internalMode & TV_24)
-	switch (symbol_type(*ps)) {
-	  case LUX_INT8:
-	    while (n--)
-	      *q.b++ = (pixels[(int32_t) *p.b] & red_mask)
-		| (pixels[(int32_t) p.b[n]] & green_mask)
-		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT16:
-	    while (n--)
-	      *q.b++ = (pixels[(int32_t) *p.w] & red_mask)
-		| (pixels[(int32_t) p.w[n]] & green_mask)
-		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT32:
-	    while (n--)
-	      *q.b++ = (pixels[(int32_t) *p.l] & red_mask)
-		| (pixels[(int32_t) p.l[n]] & green_mask)
-		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT64:
-	    while (n--)
-	      *q.b++ = (pixels[(int32_t) *p.q] & red_mask)
-		| (pixels[(int32_t) p.q[n]] & green_mask)
-		| (pixels[(int32_t) p.q[2*n]] & blue_mask);
-	    break;
-	  case LUX_FLOAT:
-	    while (n--)
-	      *q.b++ = (pixels[(int32_t) *p.f] & red_mask)
-		| (pixels[(int32_t) p.f[n]] & green_mask)
-		| (pixels[(int32_t) p.f[2*n]] & blue_mask);
-	    break;
-	  case LUX_DOUBLE:
-	    while (n--)
-	      *q.b++ = (pixels[(int32_t) *p.d] & red_mask)
-		| (pixels[(int32_t) p.d[n]] & green_mask)
-		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
-	    break;
-	} else switch (symbol_type(*ps)) {
-	  case LUX_INT8:
-	    while (n--)
-	      *q.b++ = pixels[(int32_t) *p.b++];
-	    break;
-	  case LUX_INT16:
-	    while (n--)
-	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.w++)];
-	    break;
-	  case LUX_INT32:
-	    while (n--)
-	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.l++)];
-	    break;
+        switch (symbol_type(*ps)) {
+          case LUX_INT8:
+            while (n--)
+              *q.b++ = (pixels[(int32_t) *p.b] & red_mask)
+                | (pixels[(int32_t) p.b[n]] & green_mask)
+                | (pixels[(int32_t) p.b[2*n]] & blue_mask);
+            break;
+          case LUX_INT16:
+            while (n--)
+              *q.b++ = (pixels[(int32_t) *p.w] & red_mask)
+                | (pixels[(int32_t) p.w[n]] & green_mask)
+                | (pixels[(int32_t) p.w[2*n]] & blue_mask);
+            break;
+          case LUX_INT32:
+            while (n--)
+              *q.b++ = (pixels[(int32_t) *p.l] & red_mask)
+                | (pixels[(int32_t) p.l[n]] & green_mask)
+                | (pixels[(int32_t) p.l[2*n]] & blue_mask);
+            break;
           case LUX_INT64:
-	    while (n--)
-	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.q++)];
-	    break;
-	  case LUX_FLOAT:
-	    while (n--)
-	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.f++)];
-	    break;
-	  case LUX_DOUBLE:
-	    while (n--)
-	      *q.b++ = pixels[(int32_t) ((uint8_t) *p.d++)];
-	    break;
-	}
+            while (n--)
+              *q.b++ = (pixels[(int32_t) *p.q] & red_mask)
+                | (pixels[(int32_t) p.q[n]] & green_mask)
+                | (pixels[(int32_t) p.q[2*n]] & blue_mask);
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q.b++ = (pixels[(int32_t) *p.f] & red_mask)
+                | (pixels[(int32_t) p.f[n]] & green_mask)
+                | (pixels[(int32_t) p.f[2*n]] & blue_mask);
+            break;
+          case LUX_DOUBLE:
+            while (n--)
+              *q.b++ = (pixels[(int32_t) *p.d] & red_mask)
+                | (pixels[(int32_t) p.d[n]] & green_mask)
+                | (pixels[(int32_t) p.d[2*n]] & blue_mask);
+            break;
+        } else switch (symbol_type(*ps)) {
+          case LUX_INT8:
+            while (n--)
+              *q.b++ = pixels[(int32_t) *p.b++];
+            break;
+          case LUX_INT16:
+            while (n--)
+              *q.b++ = pixels[(int32_t) ((uint8_t) *p.w++)];
+            break;
+          case LUX_INT32:
+            while (n--)
+              *q.b++ = pixels[(int32_t) ((uint8_t) *p.l++)];
+            break;
+          case LUX_INT64:
+            while (n--)
+              *q.b++ = pixels[(int32_t) ((uint8_t) *p.q++)];
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q.b++ = pixels[(int32_t) ((uint8_t) *p.f++)];
+            break;
+          case LUX_DOUBLE:
+            while (n--)
+              *q.b++ = pixels[(int32_t) ((uint8_t) *p.d++)];
+            break;
+        }
       break;
     case 16:
       if (internalMode & TV_24)
-	switch (symbol_type(*ps)) {
-	  case LUX_INT8:
-	    while (n--)
-	      *q.w++ = (pixels[(int32_t) *p.b] & red_mask)
-		| (pixels[(int32_t) p.b[n]] & green_mask)
-		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT16:
-	    while (n--)
-	      *q.w++ = (pixels[(int32_t) *p.w] & red_mask)
-		| (pixels[(int32_t) p.w[n]] & green_mask)
-		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT32:
-	    while (n--)
-	      *q.w++ = (pixels[(int32_t) *p.l] & red_mask)
-		| (pixels[(int32_t) p.l[n]] & green_mask)
-		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT64:
-	    while (n--)
-	      *q.w++ = (pixels[(int32_t) *p.q] & red_mask)
-		| (pixels[(int32_t) p.q[n]] & green_mask)
-		| (pixels[(int32_t) p.q[2*n]] & blue_mask);
-	    break;
-	  case LUX_FLOAT:
-	    while (n--)
-	      *q.w++ = (pixels[(int32_t) *p.f] & red_mask)
-		| (pixels[(int32_t) p.f[n]] & green_mask)
-		| (pixels[(int32_t) p.f[2*n]] & blue_mask);
-	    break;
-	  case LUX_DOUBLE:
-	    while (n--)
-	      *q.w++ = (pixels[(int32_t) *p.d] & red_mask)
-		| (pixels[(int32_t) p.d[n]] & green_mask)
-		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
-	    break;
-	} else switch (symbol_type(*ps)) {
-	  case LUX_INT8:
-	    while (n--)
-	      *q.w++ = pixels[(int32_t) *p.b++];
-	    break;
-	  case LUX_INT16:
-	    while (n--)
-	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.w++)];
-	    break;
-	  case LUX_INT32:
-	    while (n--)
-	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.l++)];
-	    break;
-	  case LUX_INT64:
-	    while (n--)
-	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.q++)];
-	    break;
-	  case LUX_FLOAT:
-	    while (n--)
-	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.f++)];
-	    break;
-	  case LUX_DOUBLE:
-	    while (n--)
-	      *q.w++ = pixels[(int32_t) ((uint8_t) *p.d++)];
-	    break;
-	}
+        switch (symbol_type(*ps)) {
+          case LUX_INT8:
+            while (n--)
+              *q.w++ = (pixels[(int32_t) *p.b] & red_mask)
+                | (pixels[(int32_t) p.b[n]] & green_mask)
+                | (pixels[(int32_t) p.b[2*n]] & blue_mask);
+            break;
+          case LUX_INT16:
+            while (n--)
+              *q.w++ = (pixels[(int32_t) *p.w] & red_mask)
+                | (pixels[(int32_t) p.w[n]] & green_mask)
+                | (pixels[(int32_t) p.w[2*n]] & blue_mask);
+            break;
+          case LUX_INT32:
+            while (n--)
+              *q.w++ = (pixels[(int32_t) *p.l] & red_mask)
+                | (pixels[(int32_t) p.l[n]] & green_mask)
+                | (pixels[(int32_t) p.l[2*n]] & blue_mask);
+            break;
+          case LUX_INT64:
+            while (n--)
+              *q.w++ = (pixels[(int32_t) *p.q] & red_mask)
+                | (pixels[(int32_t) p.q[n]] & green_mask)
+                | (pixels[(int32_t) p.q[2*n]] & blue_mask);
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q.w++ = (pixels[(int32_t) *p.f] & red_mask)
+                | (pixels[(int32_t) p.f[n]] & green_mask)
+                | (pixels[(int32_t) p.f[2*n]] & blue_mask);
+            break;
+          case LUX_DOUBLE:
+            while (n--)
+              *q.w++ = (pixels[(int32_t) *p.d] & red_mask)
+                | (pixels[(int32_t) p.d[n]] & green_mask)
+                | (pixels[(int32_t) p.d[2*n]] & blue_mask);
+            break;
+        } else switch (symbol_type(*ps)) {
+          case LUX_INT8:
+            while (n--)
+              *q.w++ = pixels[(int32_t) *p.b++];
+            break;
+          case LUX_INT16:
+            while (n--)
+              *q.w++ = pixels[(int32_t) ((uint8_t) *p.w++)];
+            break;
+          case LUX_INT32:
+            while (n--)
+              *q.w++ = pixels[(int32_t) ((uint8_t) *p.l++)];
+            break;
+          case LUX_INT64:
+            while (n--)
+              *q.w++ = pixels[(int32_t) ((uint8_t) *p.q++)];
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q.w++ = pixels[(int32_t) ((uint8_t) *p.f++)];
+            break;
+          case LUX_DOUBLE:
+            while (n--)
+              *q.w++ = pixels[(int32_t) ((uint8_t) *p.d++)];
+            break;
+        }
       break;
     case 24:
       if (internalMode & TV_24)
-	switch (symbol_type(*ps)) {
-	  case LUX_INT8:
-	    while (n--)
-	      *q.l++ = (pixels[(int32_t) *p.b] & red_mask)
-		| (pixels[(int32_t) p.b[n]] & green_mask)
-		| (pixels[(int32_t) p.b[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT16:
-	    while (n--)
-	      *q.l++ = (pixels[(int32_t) *p.w] & red_mask)
-		| (pixels[(int32_t) p.w[n]] & green_mask)
-		| (pixels[(int32_t) p.w[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT32:
-	    while (n--)
-	      *q.l++ = (pixels[(int32_t) *p.l] & red_mask)
-		| (pixels[(int32_t) p.l[n]] & green_mask)
-		| (pixels[(int32_t) p.l[2*n]] & blue_mask);
-	    break;
-	  case LUX_INT64:
-	    while (n--)
-	      *q.l++ = (pixels[(int32_t) *p.q] & red_mask)
-		| (pixels[(int32_t) p.q[n]] & green_mask)
-		| (pixels[(int32_t) p.q[2*n]] & blue_mask);
-	    break;
-	  case LUX_FLOAT:
-	    while (n--)
-	      *q.l++ = (pixels[(int32_t) *p.f] & red_mask)
-		| (pixels[(int32_t) p.f[n]] & green_mask)
-		| (pixels[(int32_t) p.f[2*n]] & blue_mask);
-	    break;
-	  case LUX_DOUBLE:
-	    while (n--)
-	      *q.l++ = (pixels[(int32_t) *p.d] & red_mask)
-		| (pixels[(int32_t) p.d[n]] & green_mask)
-		| (pixels[(int32_t) p.d[2*n]] & blue_mask);
-	    break;
-	} else switch (symbol_type(*ps)) {
-	  case LUX_INT8:
-	    while (n--)
-	      *q.l++ = pixels[(int32_t) *p.b++];
-	    break;
-	  case LUX_INT16:
-	    while (n--)
-	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.w++)];
-	    break;
-	  case LUX_INT32:
-	    while (n--)
-	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.l++)];
-	    break;
-	  case LUX_INT64:
-	    while (n--)
-	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.q++)];
-	    break;
-	  case LUX_FLOAT:
-	    while (n--)
-	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.f++)];
-	    break;
-	  case LUX_DOUBLE:
-	    while (n--)
-	      *q.l++ = pixels[(int32_t) ((uint8_t) *p.d++)];
-	    break;
-	}
+        switch (symbol_type(*ps)) {
+          case LUX_INT8:
+            while (n--)
+              *q.l++ = (pixels[(int32_t) *p.b] & red_mask)
+                | (pixels[(int32_t) p.b[n]] & green_mask)
+                | (pixels[(int32_t) p.b[2*n]] & blue_mask);
+            break;
+          case LUX_INT16:
+            while (n--)
+              *q.l++ = (pixels[(int32_t) *p.w] & red_mask)
+                | (pixels[(int32_t) p.w[n]] & green_mask)
+                | (pixels[(int32_t) p.w[2*n]] & blue_mask);
+            break;
+          case LUX_INT32:
+            while (n--)
+              *q.l++ = (pixels[(int32_t) *p.l] & red_mask)
+                | (pixels[(int32_t) p.l[n]] & green_mask)
+                | (pixels[(int32_t) p.l[2*n]] & blue_mask);
+            break;
+          case LUX_INT64:
+            while (n--)
+              *q.l++ = (pixels[(int32_t) *p.q] & red_mask)
+                | (pixels[(int32_t) p.q[n]] & green_mask)
+                | (pixels[(int32_t) p.q[2*n]] & blue_mask);
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q.l++ = (pixels[(int32_t) *p.f] & red_mask)
+                | (pixels[(int32_t) p.f[n]] & green_mask)
+                | (pixels[(int32_t) p.f[2*n]] & blue_mask);
+            break;
+          case LUX_DOUBLE:
+            while (n--)
+              *q.l++ = (pixels[(int32_t) *p.d] & red_mask)
+                | (pixels[(int32_t) p.d[n]] & green_mask)
+                | (pixels[(int32_t) p.d[2*n]] & blue_mask);
+            break;
+        } else switch (symbol_type(*ps)) {
+          case LUX_INT8:
+            while (n--)
+              *q.l++ = pixels[(int32_t) *p.b++];
+            break;
+          case LUX_INT16:
+            while (n--)
+              *q.l++ = pixels[(int32_t) ((uint8_t) *p.w++)];
+            break;
+          case LUX_INT32:
+            while (n--)
+              *q.l++ = pixels[(int32_t) ((uint8_t) *p.l++)];
+            break;
+          case LUX_INT64:
+            while (n--)
+              *q.l++ = pixels[(int32_t) ((uint8_t) *p.q++)];
+            break;
+          case LUX_FLOAT:
+            while (n--)
+              *q.l++ = pixels[(int32_t) ((uint8_t) *p.f++)];
+            break;
+          case LUX_DOUBLE:
+            while (n--)
+              *q.l++ = pixels[(int32_t) ((uint8_t) *p.d++)];
+            break;
+        }
       break;
   }
   return iq;
@@ -3614,28 +3614,28 @@ int32_t lux_xcopy(int32_t narg, int32_t ps[])
  GC      *cgc;
 
  ck_events();
- id1 = int_arg( ps[0] );		// source window
- id2 = int_arg( ps[1] );		// destination window
+ id1 = int_arg( ps[0] );                // source window
+ id2 = int_arg( ps[1] );                // destination window
  ixs = iys = ixd = iyd = 0;
  if (ck_window(id1) != 1) return -1;
  if (ck_window(id2) != 1) return -1;
  if (id1 < 0 ) { src = &(maps[-id1]);
-	 ws = wdmap[-id1];  hs = htmap[-id1]; }
-	 else { src = &(win[id1]);
-	 ws = wd[id1];  hs = ht[id1]; }
+         ws = wdmap[-id1];  hs = htmap[-id1]; }
+         else { src = &(win[id1]);
+         ws = wd[id1];  hs = ht[id1]; }
  if (id2 < 0 ) { dest = &(maps[-id2]); cgc = &gcmap[-id2]; }
-	 else { dest = &(win[id2]); cgc = &gc[id2]; }
+         else { dest = &(win[id2]); cgc = &gc[id2]; }
  w = ws; h = hs;
- if (narg > 2) ixs = int_arg( ps[2] );	// source x1
- if (narg > 3) iys = int_arg( ps[3] );	// source y1
- if (narg > 4) w = int_arg( ps[4] );	// source width
- if (narg > 5) h = int_arg( ps[5] );	// source height
- if (narg > 6) ixd = int_arg( ps[6] );	// destination x1
- if (narg > 7) iyd = int_arg( ps[7] );	// destination y1
+ if (narg > 2) ixs = int_arg( ps[2] );        // source x1
+ if (narg > 3) iys = int_arg( ps[3] );        // source y1
+ if (narg > 4) w = int_arg( ps[4] );        // source width
+ if (narg > 5) h = int_arg( ps[5] );        // source height
+ if (narg > 6) ixd = int_arg( ps[6] );        // destination x1
+ if (narg > 7) iyd = int_arg( ps[7] );        // destination y1
  if ( src == NULL ) { printf("source drawable not defined\n");
-		 return -1; }
+                 return -1; }
  if ( dest == NULL ) { printf("dest drawable not defined\n");
-		 return -1; }
+                 return -1; }
  // make w and h fit both
  if (!ck_area(id1, &ixs, &iys, &w, &h))
  { puts("xcopy - source area completely out of window"); return 1; }
@@ -3717,22 +3717,22 @@ int32_t lux_xplace(int32_t narg, int32_t ps[])
  /* response to a key or button press in an lux window and note the
  time and position */
 {
- int32_t	i, cs, nc;
- KeySym	keysym;
- char	buffer[16];
- int32_t	coordTrf(float *, float *, int32_t, int32_t);
- extern int32_t	lux_keysym, lux_keystate;
+ int32_t        i, cs, nc;
+ KeySym        keysym;
+ char        buffer[16];
+ int32_t        coordTrf(float *, float *, int32_t, int32_t);
+ extern int32_t        lux_keysym, lux_keystate;
 
  XEvent  report;
 
  if (ck_events() != LUX_OK)
    return LUX_ERROR;
-	// wait for a button or key press
-	// changed to a loop because may catch event for an LUX menu
-	// LS 10jun93
+        // wait for a button or key press
+        // changed to a loop because may catch event for an LUX menu
+        // LS 10jun93
  do {
    XMaskEvent(display, KeyPressMask | ButtonPressMask, &report);
-	// which window ?
+        // which window ?
    last_wid = -1;
    for (i = 0; i < MAXWINDOWS; i++)
      if (win[i] == report.xbutton.window) {
@@ -3740,7 +3740,7 @@ int32_t lux_xplace(int32_t narg, int32_t ps[])
        break;
      }
  } while (last_wid == -1);
-	 // preset key and button to 0, only one of these will be set
+         // preset key and button to 0, only one of these will be set
  lux_keycode = lux_keysym = lux_button = 0;
  xhair = report.xbutton.x;
  yhair = report.xbutton.y;
@@ -3757,7 +3757,7 @@ int32_t lux_xplace(int32_t narg, int32_t ps[])
    lux_button = report.xbutton.button;
    lux_keystate = report.xbutton.state;
    break;
- case KeyPress:	// keycode translation LS 1jun93
+ case KeyPress:        // keycode translation LS 1jun93
    lux_keycode = report.xkey.keycode;
    lux_keystate = report.xkey.state;
    nc = XLookupString(&(report.xkey), buffer, 15, &keysym, NULL);
@@ -3765,7 +3765,7 @@ int32_t lux_xplace(int32_t narg, int32_t ps[])
    lux_keysym = (int32_t) keysym;
    break;
  }
-	// return parameters if they were arguments
+        // return parameters if they were arguments
  switch (narg) {
  case 2:
    if (redef_scalar(ps[1], LUX_INT32, &ycoord) != 1)
@@ -3783,8 +3783,8 @@ int32_t xwindow_plot(int32_t ix, int32_t iy, int32_t mode)
 // added alternateDash - LS 16oct98
 {
  int32_t     wid, lux_xpen(int32_t, float);
- extern int32_t	alternateDash, current_pen;
- extern float	current_gray;
+ extern int32_t        alternateDash, current_pen;
+ extern float        current_gray;
 
  wid = last_wid;
  if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
@@ -3800,11 +3800,11 @@ int32_t xwindow_plot(int32_t ix, int32_t iy, int32_t mode)
    }
  }
 
- if (wid >= 0)			// window
+ if (wid >= 0)                        // window
    XDrawLine(display, win[wid], gc[wid], xold, yold, ix, iy);
- else				// pixmap
+ else                                // pixmap
    XDrawLine(display, maps[-wid], gcmap[-wid], xold, yold, ix, iy);
- if (!mode)			// we also have alternateDash
+ if (!mode)                        // we also have alternateDash
    lux_xpen(current_pen, current_gray);
  xold = ix;
  yold = iy;
@@ -3819,10 +3819,10 @@ int32_t lux_xflush(int32_t narg, int32_t ps[])
  //------------------------------------------------------------------------
 int32_t lux_xpen(int32_t pen, float gray)
 {
-  int32_t	wid;
-  extern int32_t	standardGray;
-  XColor	seek_color, *return_color;
-  XColor	*anaFindBestRGB(XColor *, int32_t);
+  int32_t        wid;
+  extern int32_t        standardGray;
+  XColor        seek_color, *return_color;
+  XColor        *anaFindBestRGB(XColor *, int32_t);
 
   /* lines on screen with a given non-unity pen width appear much
      fatter than the corresponding lines on paper, so reduce screen
@@ -3836,7 +3836,7 @@ int32_t lux_xpen(int32_t pen, float gray)
  if ((wid >= 0 && !win[wid]) || (wid < 0 && !maps[-wid]))
    lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
  XSetLineAttributes(display, gc[wid], pen, LineSolid, CapRound,
-		    JoinRound);
+                    JoinRound);
  if (gray < 0)
    gray = 0;
  else if (gray > 1)
@@ -3939,8 +3939,8 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
   Symboltype type;
  Pointer    ptr;
  Drawable        *src;
- int32_t	lux_zerof(int32_t, int32_t *);
- extern int32_t	bits_per_pixel;
+ int32_t        lux_zerof(int32_t, int32_t *);
+ extern int32_t        bits_per_pixel;
  int32_t lux_colorstogrey(int32_t, int32_t []);
  int32_t lux_delete(int32_t, int32_t []);
 
@@ -3952,10 +3952,10 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
    wid = int_arg(ps[0]);
  else if (narg > 4)
    wid = int_arg(ps[4]);
- if (wid >= 0) {		// window
+ if (wid >= 0) {                // window
    nx = wd[wid];
    ny = ht[wid];
- } else {			// pixmap
+ } else {                        // pixmap
    nx = wdmap[-wid];
    ny = htmap[-wid];
  }
@@ -3968,11 +3968,11 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
    ny = int_arg(ps[3]);
  }
  // check this window's size and decide whether real or mapped
- if (wid < 0) {			// pixmap
+ if (wid < 0) {                        // pixmap
    src = &(maps[-wid]);
    w = wdmap[-wid];
    hh = htmap[-wid];
- } else {			// window
+ } else {                        // window
    src = &(win[wid]);
    w = wd[wid];
    hh = ht[wid];
@@ -4001,7 +4001,7 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
  ptr.b = (uint8_t*) array_data(result_sym);
  // note that we create our own image and use XGetSubImage
  xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr.b,
-		   nx, ny, bits_per_pixel, 0);
+                   nx, ny, bits_per_pixel, 0);
  XGetSubImage(display, *src, ix, iy, nx, ny, 0xffffffffUL, ZPixmap, xi, 0, 0);
  xi->data = NULL;
  XDestroyImage(xi);
@@ -4019,7 +4019,7 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
 //------------------------------------------------------------------------
 int32_t lux_xquery(int32_t narg, int32_t ps[])
 {
-  int32_t	xquery(int32_t, int32_t []);
+  int32_t        xquery(int32_t, int32_t []);
 
   xquery(narg, ps);
   return 1;
@@ -4027,8 +4027,8 @@ int32_t lux_xquery(int32_t narg, int32_t ps[])
  //------------------------------------------------------------------------
 int32_t lux_xquery_f(int32_t narg, int32_t ps[])
 {
- int32_t	result;
- int32_t	xquery(int32_t, int32_t []);
+ int32_t        result;
+ int32_t        xquery(int32_t, int32_t []);
 
  result = scalar_scratch(LUX_INT32);
  sym[result].spec.scalar.l = xquery(narg, ps);
@@ -4038,8 +4038,8 @@ int32_t lux_xquery_f(int32_t narg, int32_t ps[])
 int32_t xquery(int32_t narg, int32_t ps[])
 // note time and position of mouse
 {
-  int32_t	wid;
-  Window	qroot, qchild;
+  int32_t        wid;
+  Window        qroot, qchild;
 
   wid = narg? int_arg(ps[0]): last_wid;
   if (!win[wid] && lux_xport(1, &wid) == LUX_ERROR)
@@ -4057,7 +4057,7 @@ Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
 /* returns True if the event is a ButtonPress in an LUX window,
    False otherwise */
 {
-  int32_t	i, num;
+  int32_t        i, num;
 
   if (event->type != ButtonPress) return False;
   if (arg) num = *((int32_t *) arg); else num = -1;
@@ -4070,14 +4070,14 @@ Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
 int32_t lux_check_window(int32_t narg, int32_t ps[])
      // checks event buffer for any pending window selections
 {
-  int32_t	num, w, i;
-  XEvent	event;
+  int32_t        num, w, i;
+  XEvent        event;
 
   if (setup_x() < 0)
     return LUX_ERROR;
   if (narg >= 1) num = int_arg(*ps); else num = -1;
   if (XCheckIfEvent(display, &event, windowButtonPress,
-		    (XPointer) ((num < 0)? NULL: &num)))
+                    (XPointer) ((num < 0)? NULL: &num)))
   { w = event.xbutton.window;
     for (i = 0; i < MAXWINDOWS; i++)
       if (win[i] == w) { last_wid = i;  break; }
@@ -4109,17 +4109,17 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
 // XANIMATE,data [, x, y, FR1=fr1, FR2=fr2, FRSTEP=frstep] [, /TIME,
 // /REPEAT]
 {
-  int32_t	wid, nx, ny, ix, iy, *dims, nFrame, i, nnx, nny, fr1, fr2, frs;
-  double	ts, tc;
-  struct timeval	tp;
-  struct timezone	tzp;
-  Pointer	data;
+  int32_t        wid, nx, ny, ix, iy, *dims, nFrame, i, nnx, nny, fr1, fr2, frs;
+  double        ts, tc;
+  struct timeval        tp;
+  struct timezone        tzp;
+  Pointer        data;
 
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(NEED_ARR, ps[0]);
   if (array_num_dims(ps[0]) < 3)
     return luxerror("XANIMATE needs data with at least 3 dimensions", ps[0]);
-  wid = last_wid;		// window
+  wid = last_wid;                // window
   if (wid < 0)
     return luxerror("XANIMATE does not work in pixmaps", ps[0]);
   if (narg > 1 && ps[1])
@@ -4136,7 +4136,7 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
   nFrame = array_size(ps[0])/(nx*ny);
   if (fr1 < 0 || fr1 >= nFrame - 1)
     return luxerror("Start frame number out of range: %1d vs. (0:%1d)",
-		 ps[3], fr1, 0, nFrame - 2);
+                 ps[3], fr1, 0, nFrame - 2);
   data.l = (int32_t*) array_data(ps[0]);
   ix = 0;
   iy = 0;
@@ -4146,7 +4146,7 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
     fr2 = nFrame - 1;
   if (fr2 < fr1 || fr2 >= nFrame)
     return luxerror("End frame number out of range: %1d vs. (%1d:%1d)",
-		 ps[4], fr2, fr1 + 1, nFrame - 1);
+                 ps[4], fr2, fr1 + 1, nFrame - 1);
   if (narg > 5 && ps[5])
     frs = int_arg(ps[5]);
   else
@@ -4161,7 +4161,7 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
     return luxerror("XANIMATE - completely off window", 0);
 
   xi = XCreateImage(display, visual, 8, ZPixmap, 0, (char *) data.b, nx,
-		    ny*nFrame, 8, 0);
+                    ny*nFrame, 8, 0);
 
   if (internalMode & 1)
   { gettimeofday(&tp, &tzp);
@@ -4174,9 +4174,9 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
     ts = tp.tv_sec + tp.tv_usec*1e-6 - ts;
     tc = (clock() - tc)/CLOCKS_PER_SEC;
     printf("XANIMATE systime: %1.2f sec, %1.2f frames/sec, %1g px/sec\n", ts,
-	   (fr2 - fr1 + 1)/ts, nnx*nny*(fr2 - fr1 + 1)/(ts*frs));
+           (fr2 - fr1 + 1)/ts, nnx*nny*(fr2 - fr1 + 1)/(ts*frs));
     printf("         cputime: %1.2f sec, %1.2f frames/sec, %1g px/sec\n", tc,
-	   (fr2 - fr1 + 1)/(tc*frs), nnx*nny*(fr2 - fr1 + 1)/(tc*frs)); }
+           (fr2 - fr1 + 1)/(tc*frs), nnx*nny*(fr2 - fr1 + 1)/(tc*frs)); }
 
   xi->data = NULL;
   XDestroyImage(xi);
@@ -4187,9 +4187,9 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
 int32_t lux_xzoom(int32_t narg, int32_t ps[])
 // ZOOM,image [,x,y,window]
 {
-  XEvent	event;
-  int32_t	wid, i, type, nx, ny;
-  Pointer	ptr;
+  XEvent        event;
+  int32_t        wid, i, type, nx, ny;
+  Pointer        ptr;
 
   if (symbol_class(ps[0]) != LUX_ARRAY)
     return cerror(NEED_ARR, ps[0]);
@@ -4197,19 +4197,19 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
   wid = last_wid;
   if (wid < 0)
     return luxerror("Cannot use ZOOM on pixmaps", 0);
-  if (lux_xtv(narg, ps) < 0)	// display image
-    return LUX_ERROR;		// some error
+  if (lux_xtv(narg, ps) < 0)        // display image
+    return LUX_ERROR;                // some error
   ptr.l = (int32_t*) array_data(ps[0]);
   type = array_type(ps[0]);
-  nx = *array_dims(ps[0]);	// width
-  ny = array_dims(ps[0])[1];	// height
+  nx = *array_dims(ps[0]);        // width
+  ny = array_dims(ps[0])[1];        // height
 
   // first remove all events pertaining to this window so we start with
   // a clean slate
   while (XCheckWindowEvent(display, win[wid],
-			   PointerMotionMask | ButtonPressMask, &event));
+                           PointerMotionMask | ButtonPressMask, &event));
 
-  while (1) {			// loop
+  while (1) {                        // loop
     XWindowEvent(display, win[wid],
                  PointerMotionMask | ButtonPressMask, &event);
     switch (event.type) {
@@ -4218,27 +4218,27 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
       while (XCheckWindowEvent(display, win[wid], PointerMotionMask, &event));
       printf("\r %10d %10d ", event.xmotion.x, event.xmotion.y);
       if (event.xmotion.x < nx && event.xmotion.y < ny) {
-	i = event.xmotion.x + event.xmotion.y*nx;
-	switch (type) {
-	case LUX_INT8:
-	  printf("%10d", ptr.b[i]);
-	  break;
-	case LUX_INT16:
-	  printf("%10d", ptr.w[i]);
-	  break;
-	case LUX_INT32:
-	  printf("%10d", ptr.l[i]);
-	  break;
-	case LUX_INT64:
-	  printf("%10jd", ptr.q[i]);
-	  break;
-	case LUX_FLOAT:
-	  printf("%10f", ptr.f[i]);
-	  break;
-	case LUX_DOUBLE:
-	  printf("%10g", ptr.d[i]);
-	  break;
-	}
+        i = event.xmotion.x + event.xmotion.y*nx;
+        switch (type) {
+        case LUX_INT8:
+          printf("%10d", ptr.b[i]);
+          break;
+        case LUX_INT16:
+          printf("%10d", ptr.w[i]);
+          break;
+        case LUX_INT32:
+          printf("%10d", ptr.l[i]);
+          break;
+        case LUX_INT64:
+          printf("%10jd", ptr.q[i]);
+          break;
+        case LUX_FLOAT:
+          printf("%10f", ptr.f[i]);
+          break;
+        case LUX_DOUBLE:
+          printf("%10g", ptr.d[i]);
+          break;
+        }
       }
       fflush(stdout);
       break;
@@ -4267,8 +4267,8 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
  */
 {
   int32_t iq, nx, ny, nz, nd, ix=0, iy=0, wid, hq, wq, ip;
-  int32_t	zoom_sym, ns, ms;
-  uint8_t	*ptr, *ptr2, *ptr0;
+  int32_t        zoom_sym, ns, ms;
+  uint8_t        *ptr, *ptr2, *ptr0;
   static uint8_t *subfree;
   int32_t zoomer2(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
     zoomer3(uint8_t *, int32_t, int32_t, int32_t *, int32_t *, int32_t *, int32_t),
@@ -4338,8 +4338,8 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
   if (ix != 0 || iy != 0 || nx != wq || ny != hq) {
     /* 2 obvious upgrades, if zooming, the extraction and zoom can be
        combined and the data could be re-oriented while extracting */
-    uint8_t	*sub, *p;
-    int32_t	m = hq, n, stride;
+    uint8_t        *sub, *p;
+    int32_t        m = hq, n, stride;
 
     p = ptr;
     sub = ptr = (uint8_t*) malloc(wq*hq);
@@ -4348,7 +4348,7 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
     while (m--) {
       n = wq;
       while (n--)
-	*sub++ = *p++;
+        *sub++ = *p++;
       p += stride;
     }
     nx = wq;
@@ -4360,28 +4360,28 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
     // now call zoomerx to get the expanded version
     switch (tvplanezoom) {
       case 2:
-	zoomer2(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
-	break;
+        zoomer2(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
+        break;
       case 3:
-	zoomer3(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
-	break;
+        zoomer3(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
+        break;
       case 4:
-	zoomer4(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
-	break;
+        zoomer4(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
+        break;
       case 8:
-	zoomer8(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
-	break;
+        zoomer8(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
+        break;
       case 16:
-	zoomer16(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
-	break;
+        zoomer16(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
+        break;
       case -2:
-	compress2(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
-	break;
+        compress2(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
+        break;
       case -4:
-	compress4(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
-	break;
+        compress4(ptr, nx, ny, &zoom_sym, &ns, &ms, 0);
+        break;
       default:
-	return luxerror("TVPLANE - illegal zoom factor %1d; only -4,-2,1,2,3,4,8,16 allowed", 0, tvplanezoom);
+        return luxerror("TVPLANE - illegal zoom factor %1d; only -4,-2,1,2,3,4,8,16 allowed", 0, tvplanezoom);
     }
     /* get pointer to this now, assume that ns and ms are the proper
        dimension */
@@ -4402,13 +4402,13 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
     ptr2 = ptr;
 
   ptr0 = ptr2;
-  wq = nx*ny;			// size of final image
+  wq = nx*ny;                        // size of final image
   while (wq--)
     *ptr2++ = pixels[(uint8_t) *ptr++];
 
-		 // create image structure
+                 // create image structure
   xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr0,
-		    nx, ny, 8, 0);
+                    nx, ny, 8, 0);
   XPutImage(display, win[wid], gc[wid], xi, 0, 0, 0, 0, nx, ny);
   // now dealloc the image structure but not the data
   xi->data = NULL;
@@ -4429,8 +4429,8 @@ int32_t lux_threecolors(int32_t narg, int32_t ps[])
    the blue domain from 2*threeColors through 3*threeColors - 1.
    LS 12nov98 */
 {
-  float	fraction, *list;
-  int32_t	threecolors(float *, int32_t);
+  float        fraction, *list;
+  int32_t        threecolors(float *, int32_t);
 
   if (ck_events() != LUX_OK)
     return LUX_ERROR;
@@ -4454,11 +4454,11 @@ int32_t lux_threecolors(int32_t narg, int32_t ps[])
 int32_t lux_tv3(int32_t narg, int32_t ps[])
 // TV3,<image>[,<bitmap1>,<bitmap2>]
 {
-  int32_t	iq, nx, ny, mode, i, wid;
-  float	fx, fy;
-  uint8_t	*bitmap1, *bitmap2;
-  Pointer	data;
-  int32_t	coordTrf(float *, float *, int32_t, int32_t);
+  int32_t        iq, nx, ny, mode, i, wid;
+  float        fx, fy;
+  uint8_t        *bitmap1, *bitmap2;
+  Pointer        data;
+  int32_t        coordTrf(float *, float *, int32_t, int32_t);
 
   if (!symbolIsNumericalArray(ps[0]) // <image>
       || isComplexType(array_type(ps[0]))
@@ -4468,23 +4468,23 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
   nx = array_dims(ps[0])[0];
   ny = array_dims(ps[0])[1];
 
-  if (narg > 1 && ps[1]) {	// <bitmap1>
+  if (narg > 1 && ps[1]) {        // <bitmap1>
     if (symbolIsScalar(ps[1]))
       bitmap1 = NULL;
     else if (symbolIsNumericalArray(ps[1])
-	     && array_size(ps[1]) == array_size(ps[0])) {
-      iq = lux_byte(1, &ps[1]);	// ensure BYTE
+             && array_size(ps[1]) == array_size(ps[0])) {
+      iq = lux_byte(1, &ps[1]);        // ensure BYTE
       bitmap1 = (uint8_t*) array_data(iq);
     } else
       return cerror(INCMP_ARG, ps[1]);
   } else
     bitmap1 = NULL;
 
-  if (narg > 2 && ps[2]) {	// <bitmap2>
+  if (narg > 2 && ps[2]) {        // <bitmap2>
     if (symbolIsScalar(ps[2]))
       bitmap2 = NULL;
     else if (symbolIsNumericalArray(ps[2])
-	     && array_size(ps[2]) == array_size(ps[0])) {
+             && array_size(ps[2]) == array_size(ps[0])) {
       iq = lux_byte(1, &ps[2]);
       bitmap2 = (uint8_t*) array_data(iq);
     } else
@@ -4492,14 +4492,14 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
   } else
     bitmap2 = NULL;
 
-  if (narg > 3 && ps[3]) {	// <x>
+  if (narg > 3 && ps[3]) {        // <x>
     if (!symbolIsScalar(ps[3]))
       return cerror(NEED_SCAL, ps[3]);
     fx = float_arg(ps[3]);
   } else
     fx = 0;
 
-  if (narg > 4 && ps[4]) {	// <y>
+  if (narg > 4 && ps[4]) {        // <y>
     if (!symbolIsScalar(ps[4]))
       return cerror(NEED_SCAL, ps[4]);
     fy = float_arg(ps[4]);
@@ -4507,17 +4507,17 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
     fy = 0;
 
   wid = last_wid;
-  if (narg > 5 && ps[5]) {	// window
+  if (narg > 5 && ps[5]) {        // window
     if (!symbolIsScalar(ps[5]))
       return cerror(NEED_SCAL, ps[5]);
     wid = int_arg(ps[5]);
   }
 
   mode = internalMode;
-  internalMode = 0;		/* or it may interfere with lux_scale() which
-				   is called by tvraw() */
+  internalMode = 0;                /* or it may interfere with lux_scale() which
+                                   is called by tvraw() */
 
-  if (narg > 6 && ps[6]) {	// <scale>
+  if (narg > 6 && ps[6]) {        // <scale>
     if (!symbolIsScalar(ps[6]))
       return cerror(NEED_SCAL, ps[6]);
     tvscale = float_arg(ps[6]);
@@ -4529,8 +4529,8 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
   if (!threeColors)
     lux_threecolors(0, NULL);
   i = tvraw(data, array_type(ps[0]), array_dims(ps[0])[0],
-	    array_dims(ps[0])[1], 0, nx - 1, 0, ny - 1, fx, fy,
-	    wid, &tvscale, mode, 0.0, 0.0, bitmap1, bitmap2);
+            array_dims(ps[0])[1], 0, nx - 1, 0, ny - 1, fx, fy,
+            wid, &tvscale, mode, 0.0, 0.0, bitmap1, bitmap2);
   return i;
 }
 //---------------------------------------------------------
@@ -4542,8 +4542,8 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
 // better for interactive graphics
 {
   int32_t     wid, ixs, iys, ix, iy;
-  Drawable	dq;
-  GC		gq;
+  Drawable        dq;
+  GC                gq;
 
   wid = last_wid;
   if (narg > 4) {
@@ -4554,7 +4554,7 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
     dq = maps[-wid];
     if (dq == 0) {
       lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
-      dq = maps[-wid];		// added LS 22mar99
+      dq = maps[-wid];                // added LS 22mar99
     } else
       set_defw(wid);
     gq = gcmap[-wid];
@@ -4562,7 +4562,7 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
     dq = win[wid];
     if (dq == 0) {
       lux_xcreat(wid, 512, 512, 0, 0, 0, NULL, NULL);
-      dq = win[wid];		// added LS 22mar99
+      dq = win[wid];                // added LS 22mar99
     } else
       set_defw(wid);
     gq = gc[wid];
@@ -4575,22 +4575,22 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
     /* assume all scalars, int_arg_stat will complain if that doesn't happen,
        it will also handle the class 8 for us */
     if (int_arg_stat(ps[0], &ixs) != 1
-	|| int_arg_stat(ps[1], &iys) != 1
-	|| int_arg_stat(ps[2], &ix) != 1
-	|| int_arg_stat(ps[3], &iy) != 1)
+        || int_arg_stat(ps[1], &iys) != 1
+        || int_arg_stat(ps[2], &ix) != 1
+        || int_arg_stat(ps[3], &iy) != 1)
       return LUX_ERROR;
 
     switch (invert_flag) {
       case 0:
-	XDrawLine(display, dq, gq, ixs, iys, ix, iy);
-	break;
+        XDrawLine(display, dq, gq, ixs, iys, ix, iy);
+        break;
       case 1:
-	XDrawLine(display, dq, gcnot, ixs, iys, ix, iy);
-	break;
+        XDrawLine(display, dq, gcnot, ixs, iys, ix, iy);
+        break;
     }
   } else {
     // here we expect 4 arrays of the same size
-    int32_t	*px1, *px2, *py1, *py2, n, nx, iq;
+    int32_t        *px1, *px2, *py1, *py2, n, nx, iq;
 
     iq = lux_long(1, &ps[0]);
     nx = array_size(iq);
@@ -4624,13 +4624,13 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
        connect */
     switch (invert_flag) {
       case 0:
-	while (n--)
-	  XDrawLine(display, dq, gq, *px1++, *py1++, *px2++, *py2++);
-	break;
+        while (n--)
+          XDrawLine(display, dq, gq, *px1++, *py1++, *px2++, *py2++);
+        break;
       case 1:
-	while (n--)
-	  XDrawLine(display, dq, gcnot, *px1++, *py1++, *px2++, *py2++);
-	break;
+        while (n--)
+          XDrawLine(display, dq, gcnot, *px1++, *py1++, *px2++, *py2++);
+        break;
     }
   }
   return LUX_OK;
@@ -4640,7 +4640,7 @@ int32_t lux_xinvertline(int32_t narg, int32_t ps[])
 // used for X window drawing with lower overhead than xymov calls
 // better for interactive graphics
 {
-  int32_t	iq;
+  int32_t        iq;
 
   invert_flag = 1;
   iq = lux_xdrawline(narg, ps);
@@ -4650,8 +4650,8 @@ int32_t lux_xinvertline(int32_t narg, int32_t ps[])
 //------------------------------------------------------------------------
 int32_t lux_xinvertarc(int32_t narg, int32_t ps[])
 {
-  int32_t	iq;
-  int32_t	lux_xdrawarc(int32_t, int32_t []);
+  int32_t        iq;
+  int32_t        lux_xdrawarc(int32_t, int32_t []);
 
   invert_flag = 1;
   iq = lux_xdrawarc(narg, ps);
@@ -4663,9 +4663,9 @@ int32_t lux_xdrawarc(int32_t narg, int32_t ps[])
 // subroutine, call is xdrawarc, x1, y1, w, h, [a1, a2, win]
 {
   int32_t     wid, ixs, iys, w, h, xa1, xa2;
-  float	a1, a2;
-  Drawable	dq;
-  GC		gq;
+  float        a1, a2;
+  Drawable        dq;
+  GC                gq;
 
   wid = last_wid;
   if (narg > 6 && int_arg_stat(ps[6], &wid) != 1)

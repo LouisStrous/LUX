@@ -32,7 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    0x40 may appear in a file name
 */
 
-char	eclass[] = {
+char        eclass[] = {
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -75,14 +75,14 @@ char	eclass[] = {
 #include "install.hh"
 
 char const* symbolStack[SYMBOLSTACKSIZE];
-hashTableEntry	*varHashTable[HASHSIZE], *subrHashTable[HASHSIZE],
-		*funcHashTable[HASHSIZE], *blockHashTable[HASHSIZE];
-symTableEntry	sym[NSYM];
-int32_t		scrat[NSCRAT], curSymbol;
-int16_t		listStack[NLIST];
-int16_t		curContext = 0;
-int32_t		lux_type_size[] =
+hashTableEntry        *varHashTable[HASHSIZE], *subrHashTable[HASHSIZE],
+                *funcHashTable[HASHSIZE], *blockHashTable[HASHSIZE];
+symTableEntry        sym[NSYM];
+int32_t                scrat[NSCRAT], curSymbol;
+int16_t                listStack[NLIST];
+int16_t                curContext = 0;
+int32_t                lux_type_size[] =
   { sizeof(uint8_t), sizeof(int16_t), sizeof(int32_t), sizeof(int64_t),
     sizeof(float), sizeof(double), sizeof(char), sizeof(char),
     sizeof(char *), sizeof(floatComplex), sizeof(doubleComplex) };
-char	*curScrat = (char *) scrat, *printString;
+char        *curScrat = (char *) scrat, *printString;

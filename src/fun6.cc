@@ -20,16 +20,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // fun6.c
 #include <math.h>
-#include <strings.h>		// for bzero
+#include <strings.h>                // for bzero
 #include "action.hh"
 
  //-------------------------------------------------------------------------
 static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
  // does reverse dct for one cell, specialize for a spike smooth
 {
-  float	tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-  float	tmp10, tmp11, tmp12, tmp13;
-  float	z5, z11, z13, z10, z12;
+  float        tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  float        tmp10, tmp11, tmp12, tmp13;
+  float        z5, z11, z13, z10, z12;
 
   // no de-zag and de-quantize here
   // Pass 1: process columns.
@@ -37,7 +37,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
      precision */
 {
   register float *wsptr = ws;
-  int32_t	nq = 8;
+  int32_t        nq = 8;
 
   while (nq--) {
     tmp0 = wsptr[0];
@@ -45,13 +45,13 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     tmp2 = wsptr[8*4];
     tmp3 = wsptr[8*6];
 
-    tmp10 = tmp0 + tmp2;	// phase 3
+    tmp10 = tmp0 + tmp2;        // phase 3
     tmp11 = tmp0 - tmp2;
 
-    tmp13 = tmp1 + tmp3;	// phases 5-3
+    tmp13 = tmp1 + tmp3;        // phases 5-3
     tmp12 = (tmp1 - tmp3) *  1.414213562 - tmp13; // 2*c4
 
-    tmp0 = tmp10 + tmp13;	// phase 2
+    tmp0 = tmp10 + tmp13;        // phase 2
     tmp3 = tmp10 - tmp13;
     tmp1 = tmp11 + tmp12;
     tmp2 = tmp11 - tmp12;
@@ -63,19 +63,19 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     tmp6 = wsptr[8*5];
     tmp7 = wsptr[8*7];
 
-    z13 = tmp6 + tmp5;		// phase 6
+    z13 = tmp6 + tmp5;                // phase 6
     z10 = tmp6 - tmp5;
     z11 = tmp4 + tmp7;
     z12 = tmp4 - tmp7;
 
-    tmp7 = z11 + z13;		// phase 5
+    tmp7 = z11 + z13;                // phase 5
     tmp11 = (z11 - z13) * ( 1.414213562); // 2*c4
 
     z5 = (z10 + z12) * ( 1.847759065); // 2*c2
     tmp10 = ( 1.082392200) * z12 - z5; // 2*(c2-c6)
     tmp12 = ( -2.613125930) * z10 + z5; // -2*(c2+c6)
 
-    tmp6 = tmp12 - tmp7;	// phase 2
+    tmp6 = tmp12 - tmp7;        // phase 2
     tmp5 = tmp11 - tmp6;
     tmp4 = tmp10 + tmp5;
 
@@ -89,7 +89,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     wsptr[8*3] = tmp3 - tmp4;
 
     // fqtptr++;
-    wsptr++;		// advance pointers to next column
+    wsptr++;                // advance pointers to next column
   }
 }
 
@@ -97,7 +97,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
 {
   register float *wsptr;
   register short *elemptr;
-  int32_t	nq = 8;
+  int32_t        nq = 8;
 
   wsptr = ws;
   elemptr = start;
@@ -147,27 +147,27 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
     elemptr[3] = (short) (tmp3 - tmp4);
 
     wsptr += 8;
-    elemptr += ystride;		// to next row
+    elemptr += ystride;                // to next row
   }
 }
 }
 //---------------------------------------------------------------------------
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
-int32_t	despike_count = 0, cell_smooth_type = 1;
+int32_t        despike_count = 0, cell_smooth_type = 1;
 int32_t lux_despike(int32_t narg, int32_t ps[])
 // despike function RAS
 // the call is x = despike(array, [frac, level, niter, cell_flag, rms])
 {
-  int32_t	iq, result_sym, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
+  int32_t        iq, result_sym, nx, ny, n, m, level=7, sum, nc, cell_flag=0;
   Symboltype type;
-  int32_t	lognb2, cell_malloc = 0, cell_count, jj, jc;
-  int32_t	nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
-  int32_t	sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
-  uint8_t	*cell_status;
-  float	frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
-  int16_t	*p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
-  int16_t	arr[16], *pps, *ss;
+  int32_t        lognb2, cell_malloc = 0, cell_count, jj, jc;
+  int32_t        nxc, nyc, cell_flag_sign, niter=1, rms_flag_sign, rms_flag;
+  int32_t        sign_flag, bad_flag, bb_flag, save_niter, ntotal, dim[2];
+  uint8_t        *cell_status;
+  float        frac = 0.25, fsum, cfrac, tq, rms=0.0, fdif;
+  int16_t        *p, *q, *ptr, *p1, *p2, *p3, *out, *out2;
+  int16_t        arr[16], *pps, *ss;
 
   lognb2 = (log((double) 16)*ALN2I+TINY);
 
@@ -218,7 +218,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  for TRACE style JPEG data so we insist that the dimensions are multiples
  of 8. Extend to include two checks indicated by cell_flag and rms_flag,
  both need bad cells marked */
- bb_flag = cell_flag || rms_flag;	// use bb_flag
+ bb_flag = cell_flag || rms_flag;        // use bb_flag
  if (bb_flag && (nx%8 || ny%8))
    bb_flag = 0;
  /* if we survived that, get the cell count, we use scrat to store cell
@@ -239,8 +239,8 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  dim[0] = nx;
  dim[1] = ny;
  result_sym = array_scratch(type, 2, dim); // for the result
- out = (int16_t*) array_data(result_sym);	// output
- p = (short *) ptr;		// input
+ out = (int16_t*) array_data(result_sym);        // output
+ p = (short *) ptr;                // input
  cfrac = 1.0 - frac;
  nc = ntotal = 0;
  nxc = nx/8;
@@ -299,7 +299,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
   }
     if (level < 0) { *q++ = 0; p++; } else {
      // load up sortie and find the desired one
-     ss = arr;	pps = p - 2*nx -2;
+     ss = arr;        pps = p - 2*nx -2;
      *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++; *ss++ = *pps++;
      *ss++ = *(p - nx -2);  *ss++ = *(p - nx +2);
      *ss++ = *(p -2);  *ss++ = *(p +2);
@@ -352,9 +352,9 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
 
  if (bb_flag) {
   int32_t badcells = 0;
-  float	dc[9], ws[64], *pf;
-  int32_t 	i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
-  int32_t	ioff[3], joff[3];
+  float        dc[9], ws[64], *pf;
+  int32_t         i, ix, jx, ic, stride = nx - 8, ii, jj, istart,k;
+  int32_t        ioff[3], joff[3];
   for (i=0;i<cell_count;i++) {
    /* we can have a bad cell by the number of spikes (the strike out
    option) and/or we can check the rms, if doing both we check the
@@ -362,33 +362,33 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     if (!cell_status[i]) continue;  // if no spikes at all, skip
     bad_flag = 0;
     if (cell_flag && (cell_status[i] >= cell_flag)) { bad_flag = 1;
-    	sign_flag = cell_flag_sign; }
+            sign_flag = cell_flag_sign; }
     if (rms_flag && !bad_flag) {
-     short	*ps1, *ps2, *tmp;
+     short        *ps1, *ps2, *tmp;
      sign_flag = rms_flag_sign;
      // check the rms for any cell with a spike
-     jc = i/nxc;		ic = i%nxc;
+     jc = i/nxc;                ic = i%nxc;
       istart = ic*8 + jc*8*nx;
       q = out + istart;
-      ps1 = q;	ps2 = q+1;
+      ps1 = q;        ps2 = q+1;
       fsum = 0.0;
       fdif = 0.0;
       nc = 8;
       // get the checkerboard metric
       while (nc--) { m = 4; while(m--) {
-      	fsum += (float) *q++; fsum += (float) *q++;
-	fdif = fdif + *ps1 - *ps2;
-	ps1 += 2;	ps2 += 2;
-      	}
+              fsum += (float) *q++; fsum += (float) *q++;
+        fdif = fdif + *ps1 - *ps2;
+        ps1 += 2;        ps2 += 2;
+              }
       tmp = ps1; ps1 = ps2 + stride;  ps2 = tmp + stride;
       q += stride; }
       // printf("rms/fsum = %12.2f,  i = %d\n", ABS(fdif)/fsum, i);
       if ( (ABS(fdif)/fsum) > rms) { bad_flag = 1;
-      	/* printf("hit at i = %d\n", i); */ }
+              /* printf("hit at i = %d\n", i); */ }
     }
     if (bad_flag) {
     badcells++;
-    jc = i/nxc;		ic = i%nxc;
+    jc = i/nxc;                ic = i%nxc;
     // testing various cell smooth options
     if (sign_flag == 0) cell_smooth_type = 0; else cell_smooth_type = 1;
     switch (cell_smooth_type) {
@@ -438,7 +438,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     break;
     case 1:
     {
-    int32_t	a1, a2, acc, t1, t2, nxmo=nx-8 , nymo=ny-8;
+    int32_t        a1, a2, acc, t1, t2, nxmo=nx-8 , nymo=ny-8;
     // get array index for start of cell
     ix = ic*8;  jx = jc*8;
     istart = ix + jx*nx;
@@ -446,16 +446,16 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     q = p;
     /* do 2 passes, first in x then y, allows in place smnoothing but
     loses a bit in the accumulation */
-    nc = 8;	// the 8 rows
+    nc = 8;        // the 8 rows
     while (nc--) {
     // get a point to left of cell if available
-    if (ix) { p--;	
-    	a2 = (int32_t)*p++;
-    	a1 = (int32_t)*p++;
-    	a2 = a2 + a1;
+    if (ix) { p--;        
+            a2 = (int32_t)*p++;
+            a1 = (int32_t)*p++;
+            a2 = a2 + a1;
      } else {
-    	a1 = (int32_t)*p++;
-    	a2 = a1 + a1;
+            a1 = (int32_t)*p++;
+            a2 = a1 + a1;
      }
      // proceed over 7 points
      m = 7;
@@ -469,27 +469,27 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
      } else {
      *q++ = (short) ((a1 + a1 + a2)>>2);
      }
-     p += stride;	q = p;
+     p += stride;        q = p;
     }
     // now in the other direction
     p = out + istart;  // first point in cell
     p2 = p;
     q = p;
-    nc = 8;	// the 8 columns
+    nc = 8;        // the 8 columns
     while (nc--) {
     // get a point to bottom of cell if available
     if (jx) { p = p - nx;
-   	a2 = (int32_t)*p;	p += nx;
-    	a1 = (int32_t)*p;	p += nx;
-    	a2 = a2 + a1;
+           a2 = (int32_t)*p;        p += nx;
+            a1 = (int32_t)*p;        p += nx;
+            a2 = a2 + a1;
      } else {
-    	a1 = (int32_t)*p;	p += nx;
-    	a2 = a1 + a1;
+            a1 = (int32_t)*p;        p += nx;
+            a2 = a1 + a1;
      }
      // proceed over 7 points
      m = 7;
      while (m--) {
-     acc = *p;	p += nx;  t1 = acc;  acc += a1;  a1 = t1;
+     acc = *p;        p += nx;  t1 = acc;  acc += a1;  a1 = t1;
      t2 = acc;  acc += a2;  a2 = t2;
      *q = (short) (acc>>2); q += nx; }
      // for the last value, use a point to right of cell if available
@@ -498,7 +498,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
      } else {
      *q = (short) ((a1 + a1 + a2)>>2);
      }
-     p = p2 + 1;	q = p2 = p;
+     p = p2 + 1;        q = p2 = p;
      }
 
 
@@ -551,515 +551,515 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
     // outer switch for type, inners for orientation
     switch (type) {
       case LUX_INT8:
-	if (iorder < 4) {
-	  register  uint8_t *pp, *qq;
-	  register  int32_t  nn, mm, nxx, inc;
+        if (iorder < 4) {
+          register  uint8_t *pp, *qq;
+          register  int32_t  nn, mm, nxx, inc;
 
-	  nxx = nx;
-	  mm = ny;
-	  qq = q;
+          nxx = nx;
+          mm = ny;
+          qq = q;
 
-	  switch (iorder) {
-	    case 1:		// reverse in x
-	      pp = p + nx;
-	      inc = 2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 2:		// just reverse in y
-	      pp = p + nx * ny - nx;
-	      inc = -2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *pp++;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 3:		// reverse in x and y
-	      pp = p + nx*ny;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-	      }
-	      break;
-	  }
-	} else {
-	  register  uint8_t *pp, *qq;
-	  register  int32_t  nn, mm, nyy, inc;
+          switch (iorder) {
+            case 1:                // reverse in x
+              pp = p + nx;
+              inc = 2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 2:                // just reverse in y
+              pp = p + nx * ny - nx;
+              inc = -2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *pp++;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 3:                // reverse in x and y
+              pp = p + nx*ny;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+              }
+              break;
+          }
+        } else {
+          register  uint8_t *pp, *qq;
+          register  int32_t  nn, mm, nyy, inc;
 
-	  mm = ny;
-	  qq = q;
-	  switch (iorder) {
-	    case 4:		// transpose in x and y
-	      pp = p;
-	      inc = -nx*ny + 1;
-	      nyy = ny;
-	      break;
-	    case 5:		// transpose plus reverse in y
-	      pp = p +nx*ny - ny;
-	      inc = nx*ny + 1;
-	      nyy = -ny;
-	      break;
-	    case 6:		// transpose plus reverse in x
-	      pp = p + ny - 1;
-	      inc = -nx*ny - 1;
-	      nyy = ny;
-	      break;
-	    case 7:		// transpose plus reverse in x,y
-	      pp = p + ny*nx - 1;
-	      inc = nx*ny - 1;
-	      nyy = -ny;
-	      break;
-	  }
-	  while (mm--) {
-	    nn= nx;
-	    while (nn) {
-	      *qq++ = *pp;
-	      pp += nyy;
-	      nn--;
-	    }
-	    pp += inc;
-	  }
-	}
-	break;
+          mm = ny;
+          qq = q;
+          switch (iorder) {
+            case 4:                // transpose in x and y
+              pp = p;
+              inc = -nx*ny + 1;
+              nyy = ny;
+              break;
+            case 5:                // transpose plus reverse in y
+              pp = p +nx*ny - ny;
+              inc = nx*ny + 1;
+              nyy = -ny;
+              break;
+            case 6:                // transpose plus reverse in x
+              pp = p + ny - 1;
+              inc = -nx*ny - 1;
+              nyy = ny;
+              break;
+            case 7:                // transpose plus reverse in x,y
+              pp = p + ny*nx - 1;
+              inc = nx*ny - 1;
+              nyy = -ny;
+              break;
+          }
+          while (mm--) {
+            nn= nx;
+            while (nn) {
+              *qq++ = *pp;
+              pp += nyy;
+              nn--;
+            }
+            pp += inc;
+          }
+        }
+        break;
       case LUX_INT16:
-	if (iorder < 4) {
-	  register  short *pp, *qq;
-	  register  int32_t  nn, mm, nxx, inc;
+        if (iorder < 4) {
+          register  short *pp, *qq;
+          register  int32_t  nn, mm, nxx, inc;
 
-	  nxx = nx;
-	  mm = ny;
-	  qq = (short *) q;
+          nxx = nx;
+          mm = ny;
+          qq = (short *) q;
 
-	  switch (iorder) {
-	    case 1:		// reverse in x
-	      pp = (short *) p + nx;
-	      inc = 2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 2:		// just reverse in y
-	      pp = (short *) p + nx * ny - nx;
-	      inc = -2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *pp++;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 3:		// reverse in x and y
-	      pp = (short *) p + nx*ny;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-	      }
-	      break;
-	  }
-	} else {
-	  register  short *pp, *qq;
-	  register  int32_t  nyy, nn, mm;
+          switch (iorder) {
+            case 1:                // reverse in x
+              pp = (short *) p + nx;
+              inc = 2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 2:                // just reverse in y
+              pp = (short *) p + nx * ny - nx;
+              inc = -2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *pp++;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 3:                // reverse in x and y
+              pp = (short *) p + nx*ny;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+              }
+              break;
+          }
+        } else {
+          register  short *pp, *qq;
+          register  int32_t  nyy, nn, mm;
 
-	  switch (iorder) {
-	    case 4:		// transpose in x and y
-	      pp = (short *) p;
-	      inc = -nx*ny + 1;
-	      nyy = ny;
-	      break;
-	    case 5:		// transpose plus reverse in y
-	      pp = (short *) p +nx*ny - ny;
-	      inc = nx*ny + 1;
-	      nyy = -ny;
-	      break;
-	    case 6:		// transpose plus reverse in x
-	      pp = (short *) p + ny - 1;
-	      inc = -nx*ny - 1;
-	      nyy = ny;
-	      break;
-	    case 7:        // transpose plus reverse in x,y
-	      pp = (short *) p + ny*nx - 1;
-	      inc = nx*ny - 1;
-	      nyy = -ny;
-	      break;
-	  }
-	  qq = (short *) q;
-	  mm = ny;
-	  while (mm--) {
-	    nn= nx;
-	    while (nn) {
-	      *qq++ = *pp;
-	      pp += nyy;
-	      nn--;
-	    }	
-	    pp += inc;
-	  }
-	}
-	break;
+          switch (iorder) {
+            case 4:                // transpose in x and y
+              pp = (short *) p;
+              inc = -nx*ny + 1;
+              nyy = ny;
+              break;
+            case 5:                // transpose plus reverse in y
+              pp = (short *) p +nx*ny - ny;
+              inc = nx*ny + 1;
+              nyy = -ny;
+              break;
+            case 6:                // transpose plus reverse in x
+              pp = (short *) p + ny - 1;
+              inc = -nx*ny - 1;
+              nyy = ny;
+              break;
+            case 7:        // transpose plus reverse in x,y
+              pp = (short *) p + ny*nx - 1;
+              inc = nx*ny - 1;
+              nyy = -ny;
+              break;
+          }
+          qq = (short *) q;
+          mm = ny;
+          while (mm--) {
+            nn= nx;
+            while (nn) {
+              *qq++ = *pp;
+              pp += nyy;
+              nn--;
+            }        
+            pp += inc;
+          }
+        }
+        break;
       case LUX_INT32:
-	if (iorder < 4) {
-	  register  int32_t *pp, *qq;
-	  register  int32_t  nn, mm, nxx;
+        if (iorder < 4) {
+          register  int32_t *pp, *qq;
+          register  int32_t  nn, mm, nxx;
 
-	  nxx = nx;
-	  mm = ny;
-	  qq = (int32_t *) q;
+          nxx = nx;
+          mm = ny;
+          qq = (int32_t *) q;
 
-	  switch (iorder) {
-	    case 1:		// reverse in x
-	    {
-	      register  int32_t *pp = (int32_t *) p + nx;
-	      register  int32_t inc = 2*nx;
+          switch (iorder) {
+            case 1:                // reverse in x
+            {
+              register  int32_t *pp = (int32_t *) p + nx;
+              register  int32_t inc = 2*nx;
 
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	    }
-	    break;
-	    case 2:		// just reverse in y
-	      pp = (int32_t *) p + nx * ny - nx;
-	      inc = -2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *pp++;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 3:		// reverse in x and y
-	      pp = (int32_t *) p + nx*ny;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-	      }
-	      break;
-	  }
-	} else {
-	  register  int32_t *pp, *qq;
-	  register  int32_t  nn, mm, nyy;
-	
-	  mm = ny;
-	  qq = (int32_t *) q;
-	  switch (iorder) {
-	    case 4:		// transpose in x and y
-	      pp = (int32_t *) p;
-	      inc = -nx*ny + 1;
-	      nyy = ny;
-	      break;
-	    case 5:		// transpose plus reverse in y
-	      pp = (int32_t *) p +nx*ny - ny;
-	      inc = nx*ny + 1;
-	      nyy = -ny;
-	      break;
-	    case 6:		// transpose plus reverse in x
-	      pp = (int32_t *) p + ny - 1;
-	      inc = -nx*ny - 1;
-	      nyy = ny;
-	      break;
-	    case 7:		// transpose plus reverse in x,y
-	      pp = (int32_t *) p + ny*nx - 1;
-	      inc = nx*ny - 1;
-	      nyy = -ny;
-	      break;
-	  }
-	  while (mm--) {
-	    nn= nx;
-	    while (nn) {
-	      *qq++ = *pp;
-	      pp += nyy;
-	      nn--;
-	    }
-	    pp += inc;
-	  }
-	}
-	break;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+                pp += inc;
+              }
+            }
+            break;
+            case 2:                // just reverse in y
+              pp = (int32_t *) p + nx * ny - nx;
+              inc = -2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *pp++;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 3:                // reverse in x and y
+              pp = (int32_t *) p + nx*ny;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+              }
+              break;
+          }
+        } else {
+          register  int32_t *pp, *qq;
+          register  int32_t  nn, mm, nyy;
+        
+          mm = ny;
+          qq = (int32_t *) q;
+          switch (iorder) {
+            case 4:                // transpose in x and y
+              pp = (int32_t *) p;
+              inc = -nx*ny + 1;
+              nyy = ny;
+              break;
+            case 5:                // transpose plus reverse in y
+              pp = (int32_t *) p +nx*ny - ny;
+              inc = nx*ny + 1;
+              nyy = -ny;
+              break;
+            case 6:                // transpose plus reverse in x
+              pp = (int32_t *) p + ny - 1;
+              inc = -nx*ny - 1;
+              nyy = ny;
+              break;
+            case 7:                // transpose plus reverse in x,y
+              pp = (int32_t *) p + ny*nx - 1;
+              inc = nx*ny - 1;
+              nyy = -ny;
+              break;
+          }
+          while (mm--) {
+            nn= nx;
+            while (nn) {
+              *qq++ = *pp;
+              pp += nyy;
+              nn--;
+            }
+            pp += inc;
+          }
+        }
+        break;
       case LUX_INT64:
-	if (iorder < 4) {
-	  register  int64_t *pp, *qq;
-	  register  int32_t  nn, mm, nxx;
+        if (iorder < 4) {
+          register  int64_t *pp, *qq;
+          register  int32_t  nn, mm, nxx;
 
-	  nxx = nx;
-	  mm = ny;
-	  qq = (int64_t *) q;
+          nxx = nx;
+          mm = ny;
+          qq = (int64_t *) q;
 
-	  switch (iorder) {
-	    case 1:		// reverse in x
-	    {
-	      pp = (int64_t *) p + nx;
-	      inc = 2*nx;
+          switch (iorder) {
+            case 1:                // reverse in x
+            {
+              pp = (int64_t *) p + nx;
+              inc = 2*nx;
 
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	    }
-	    break;
-	    case 2:		// just reverse in y
-	      pp = (int64_t *) p + nx * ny - nx;
-	      inc = -2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *pp++;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 3:		// reverse in x and y
-	      pp = (int64_t *) p + nx*ny;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-	      }
-	      break;
-	  }
-	} else {
-	  register  int64_t *pp, *qq;
-	  register  int32_t  nn, mm, nyy;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+                pp += inc;
+              }
+            }
+            break;
+            case 2:                // just reverse in y
+              pp = (int64_t *) p + nx * ny - nx;
+              inc = -2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *pp++;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 3:                // reverse in x and y
+              pp = (int64_t *) p + nx*ny;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+              }
+              break;
+          }
+        } else {
+          register  int64_t *pp, *qq;
+          register  int32_t  nn, mm, nyy;
 
-	  mm = ny;
-	  qq = (int64_t *) q;
-	  switch (iorder) {
-	    case 4:		// transpose in x and y
-	      pp = (int64_t *) p;
-	      inc = -nx*ny + 1;
-	      nyy = ny;
-	      break;
-	    case 5:		// transpose plus reverse in y
-	      pp = (int64_t *) p +nx*ny - ny;
-	      inc = nx*ny + 1;
-	      nyy = -ny;
-	      break;
-	    case 6:		// transpose plus reverse in x
-	      pp = (int64_t *) p + ny - 1;
-	      inc = -nx*ny - 1;
-	      nyy = ny;
-	      break;
-	    case 7:		// transpose plus reverse in x,y
-	      pp = (int64_t *) p + ny*nx - 1;
-	      inc = nx*ny - 1;
-	      nyy = -ny;
-	      break;
-	  }
-	  while (mm--) {
-	    nn= nx;
-	    while (nn) {
-	      *qq++ = *pp;
-	      pp += nyy;
-	      nn--;
-	    }
-	    pp += inc;
-	  }
-	}
-	break;
+          mm = ny;
+          qq = (int64_t *) q;
+          switch (iorder) {
+            case 4:                // transpose in x and y
+              pp = (int64_t *) p;
+              inc = -nx*ny + 1;
+              nyy = ny;
+              break;
+            case 5:                // transpose plus reverse in y
+              pp = (int64_t *) p +nx*ny - ny;
+              inc = nx*ny + 1;
+              nyy = -ny;
+              break;
+            case 6:                // transpose plus reverse in x
+              pp = (int64_t *) p + ny - 1;
+              inc = -nx*ny - 1;
+              nyy = ny;
+              break;
+            case 7:                // transpose plus reverse in x,y
+              pp = (int64_t *) p + ny*nx - 1;
+              inc = nx*ny - 1;
+              nyy = -ny;
+              break;
+          }
+          while (mm--) {
+            nn= nx;
+            while (nn) {
+              *qq++ = *pp;
+              pp += nyy;
+              nn--;
+            }
+            pp += inc;
+          }
+        }
+        break;
       case LUX_FLOAT:
-	if (iorder < 4) {
-	  register  float *pp, *qq;
-	  register  int32_t  nn, mm, nxx;
+        if (iorder < 4) {
+          register  float *pp, *qq;
+          register  int32_t  nn, mm, nxx;
 
-	  nxx = nx;
-	  mm = ny;
-	  qq = (float *) q;
+          nxx = nx;
+          mm = ny;
+          qq = (float *) q;
 
-	  switch (iorder) {
-	    case 1:		// reverse in x
-	      pp = (float *) p + nx;
-	      inc = 2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 2:		// just reverse in y
-	      pp = (float *) p + nx * ny - nx;
-	      inc = -2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *pp++;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 3:		// reverse in x and y
-	      pp = (float *) p + nx*ny;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-	      }
-	      break;
-	  }
-	} else {
-	  register  float *pp, *qq;
-	  register  int32_t  nn, mm, nyy;
-	
-	  mm = ny;
-	  qq = (float *) q;
-	  switch (iorder) {
-	    case 4:		// transpose in x and y
-	      pp = (float *) p;
-	      inc = -nx*ny + 1;
-	      nyy = ny;
-	      break;
-	    case 5:		// transpose plus reverse in y
-	      pp = (float *) p +nx*ny - ny;
-	      inc = nx*ny + 1;
-	      nyy = -ny;
-	      break;
-	    case 6:		// transpose plus reverse in x
-	      pp = (float *) p + ny - 1;
-	      inc = -nx*ny - 1;
-	      nyy = ny;
-	      break;
-	    case 7:		// transpose plus reverse in x,y
-	      pp = (float *) p + ny*nx - 1;
-	      inc = nx*ny - 1;
-	      nyy = -ny;
-	      break;
-	  }
-	  while (mm--) {
-	    nn= nx;
-	    while (nn) {
-	      *qq++ = *pp;
-	      pp += nyy;
-	      nn--;
-	    }
-	    pp += inc;
-	  }
-	}
-	break;
+          switch (iorder) {
+            case 1:                // reverse in x
+              pp = (float *) p + nx;
+              inc = 2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 2:                // just reverse in y
+              pp = (float *) p + nx * ny - nx;
+              inc = -2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *pp++;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 3:                // reverse in x and y
+              pp = (float *) p + nx*ny;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+              }
+              break;
+          }
+        } else {
+          register  float *pp, *qq;
+          register  int32_t  nn, mm, nyy;
+        
+          mm = ny;
+          qq = (float *) q;
+          switch (iorder) {
+            case 4:                // transpose in x and y
+              pp = (float *) p;
+              inc = -nx*ny + 1;
+              nyy = ny;
+              break;
+            case 5:                // transpose plus reverse in y
+              pp = (float *) p +nx*ny - ny;
+              inc = nx*ny + 1;
+              nyy = -ny;
+              break;
+            case 6:                // transpose plus reverse in x
+              pp = (float *) p + ny - 1;
+              inc = -nx*ny - 1;
+              nyy = ny;
+              break;
+            case 7:                // transpose plus reverse in x,y
+              pp = (float *) p + ny*nx - 1;
+              inc = nx*ny - 1;
+              nyy = -ny;
+              break;
+          }
+          while (mm--) {
+            nn= nx;
+            while (nn) {
+              *qq++ = *pp;
+              pp += nyy;
+              nn--;
+            }
+            pp += inc;
+          }
+        }
+        break;
       case LUX_DOUBLE:
-	if (iorder < 4) {
-	  register  double *pp, *qq;
-	  register  int32_t  nn, mm, nxx;
+        if (iorder < 4) {
+          register  double *pp, *qq;
+          register  int32_t  nn, mm, nxx;
 
-	  nxx = nx;
-	  mm = ny;
-	  qq = (double *) q;
+          nxx = nx;
+          mm = ny;
+          qq = (double *) q;
 
-	  switch (iorder) {
-	    case 1:		// reverse in x
-	      pp = (double *) p + nx;
-	      inc = 2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 2:		// just reverse in y
-	      pp = (double *) p + nx * ny - nx;
-	      inc = -2*nx;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *pp++;
-		  nn--;
-		}
-		pp += inc;
-	      }
-	      break;
-	    case 3:		// reverse in x and y
-	      pp = (double *) p + nx*ny;
-	      while (mm--) {
-		nn = nxx;
-		while (nn) {
-		  *qq++ = *--pp;
-		  nn--;
-		}
-	      }
-	      break;
-	  }
-	} else {
-	  register  double *pp, *qq;
-	  register  int32_t  nn, mm, nyy;
-	
-	  mm = ny;
-	  qq = (double *) q;
-	  switch (iorder) {
-	    case 4:		// transpose in x and y
-	      pp = (double *) p;
-	      inc = -nx*ny + 1;
-	      nyy = ny;
-	      break;
-	    case 5:		// transpose plus reverse in y
-	      pp = (double *) p +nx*ny - ny;
-	      inc = nx*ny + 1;
-	      nyy = -ny;
-	      break;
-	    case 6:		// transpose plus reverse in x
-	      pp = (double *) p + ny - 1;
-	      inc = -nx*ny - 1;
-	      nyy = ny;
-	      break;
-	    case 7:		// transpose plus reverse in x,y
-	      pp = (double *) p + ny*nx - 1;
-	      inc = nx*ny - 1;
-	      nyy = -ny;
-	      break;
-	  }
-	  while (mm--) {
-	    nn= nx;
-	    while (nn) {
-	      *qq++ = *pp;
-	      pp += nyy;
-	      nn--;
-	    }
-	    pp += inc;
-	  }
-	}
-	break;
+          switch (iorder) {
+            case 1:                // reverse in x
+              pp = (double *) p + nx;
+              inc = 2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 2:                // just reverse in y
+              pp = (double *) p + nx * ny - nx;
+              inc = -2*nx;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *pp++;
+                  nn--;
+                }
+                pp += inc;
+              }
+              break;
+            case 3:                // reverse in x and y
+              pp = (double *) p + nx*ny;
+              while (mm--) {
+                nn = nxx;
+                while (nn) {
+                  *qq++ = *--pp;
+                  nn--;
+                }
+              }
+              break;
+          }
+        } else {
+          register  double *pp, *qq;
+          register  int32_t  nn, mm, nyy;
+        
+          mm = ny;
+          qq = (double *) q;
+          switch (iorder) {
+            case 4:                // transpose in x and y
+              pp = (double *) p;
+              inc = -nx*ny + 1;
+              nyy = ny;
+              break;
+            case 5:                // transpose plus reverse in y
+              pp = (double *) p +nx*ny - ny;
+              inc = nx*ny + 1;
+              nyy = -ny;
+              break;
+            case 6:                // transpose plus reverse in x
+              pp = (double *) p + ny - 1;
+              inc = -nx*ny - 1;
+              nyy = ny;
+              break;
+            case 7:                // transpose plus reverse in x,y
+              pp = (double *) p + ny*nx - 1;
+              inc = nx*ny - 1;
+              nyy = -ny;
+              break;
+          }
+          while (mm--) {
+            nn= nx;
+            while (nn) {
+              *qq++ = *pp;
+              pp += nyy;
+              nn--;
+            }
+            pp += inc;
+          }
+        }
+        break;
     }
   }
   return result_sym;

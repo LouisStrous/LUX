@@ -30,32 +30,32 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
 #if DEBUG
-#define _Xdebug			// to get synchronous X error messages
+#define _Xdebug                        // to get synchronous X error messages
 #endif
 
-int32_t	ipen = 7, ipost = 0;
-extern int32_t	landscape;
-static int32_t	nline = 0,	// number of lines since last Stroke
-  icnt = 0;			// number of chars on current output line
-static float	xq, yq;
-extern float	current_gray;
-extern int32_t	current_pen;
-FILE	*postScriptFp;
-void	xyup(void), xydown(void);
+int32_t        ipen = 7, ipost = 0;
+extern int32_t        landscape;
+static int32_t        nline = 0,        // number of lines since last Stroke
+  icnt = 0;                        // number of chars on current output line
+static float        xq, yq;
+extern float        current_gray;
+extern int32_t        current_pen;
+FILE        *postScriptFp;
+void        xyup(void), xydown(void);
 //------------------------------------------------------------------------
 /*
-  x setgray		selects DeviceGray color space
+  x setgray                selects DeviceGray color space
   width height bits/sample matrix datasrc image
 
-  r g b setrgbcolor	selects DeviceRGB color space
+  r g b setrgbcolor        selects DeviceRGB color space
   width height bits/comp matrix datasrc false 3 colorimage
  */
 int32_t postreset(int32_t landscape)
 {
- char	*fname = NULL;
- extern int32_t	psfile, updateBoundingBox;
+ char        *fname = NULL;
+ extern int32_t        psfile, updateBoundingBox;
 
- if (ipost == 0) {	// check if already started up
+ if (ipost == 0) {        // check if already started up
    if (symbol_type(psfile) == LUX_TEMP_STRING)
      fname = string_value(psfile);
    if (fname)
@@ -107,7 +107,7 @@ int32_t postpen(int32_t pen, float gray)
 //------------------------------------------------------------------------
 int32_t postcolorpen(float red, float green, float blue)
 {
-  postreset(landscape);		// start up if not already
+  postreset(landscape);                // start up if not already
   if (nline) {
     fputs("\n", postScriptFp);
     xyup();
@@ -133,7 +133,7 @@ int32_t postvec(float xin, float yin, int32_t mode)
   else
     xyup();
   nline++;
-  if (nline > 500) {	// time for a stroke
+  if (nline > 500) {        // time for a stroke
     nline = icnt = 0;
     fputs("\n", postScriptFp);
     fputs("S\n", postScriptFp);
@@ -148,11 +148,11 @@ int32_t postvec(float xin, float yin, int32_t mode)
 //------------------------------------------------------------------------
 void xyup(void)
 {
-  extern int32_t	alternateDash;
+  extern int32_t        alternateDash;
 
   if (alternateDash)
     fprintf(postScriptFp, " %.6f setgray %.4f %.4f L %.6f setgray",
-	    1 - current_gray, xq, yq, current_gray);
+            1 - current_gray, xq, yq, current_gray);
   else
     fprintf(postScriptFp," %5.4f %5.4f M", xq, yq);
   icnt += 14;
@@ -166,9 +166,9 @@ void xydown(void)
 //------------------------------------------------------------------------
 int32_t postcopy()
 {
-  if (!ipost) {			// if the output file is not yet opened,
-	// then we don't need to generate an empty page with "showpage".
-	// LS 24oct95
+  if (!ipost) {                        // if the output file is not yet opened,
+        // then we don't need to generate an empty page with "showpage".
+        // LS 24oct95
     if (postreset(landscape) == LUX_ERROR)// start up if not already
       return LUX_ERROR;
   } else {
@@ -198,11 +198,11 @@ int32_t postrawout(char *s)
 }
 //------------------------------------------------------------------------
 int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, float ybot,
-	     float ytop, int32_t iorder)
+             float ytop, int32_t iorder)
 {
-  int32_t	matrx[6], i;
-  int32_t	c;
-  extern float	postXBot, postXTop, postYBot, postYTop;
+  int32_t        matrx[6], i;
+  int32_t        c;
+  extern float        postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
     matrx[i] = 0;
@@ -268,7 +268,7 @@ int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, f
     break;
   }
   fprintf(postScriptFp,"[ %d %d %d %d %d %d ]\n", matrx[0], matrx[1], matrx[2],
-	  matrx[3], matrx[4], matrx[5]);
+          matrx[3], matrx[4], matrx[5]);
   fputs(" {currentfile picstr readhexstring pop} image\n", postScriptFp);
   for (i = 1; i <= nx*ny; i++) {
     c = *barray++;
@@ -293,16 +293,16 @@ int32_t postgray(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, f
 }
 //------------------------------------------------------------------------
 int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, float ybot,
-	      float ytop, int32_t iorder)
+              float ytop, int32_t iorder)
 /* writes an RGB image to a postscript file.  The image has dimensions
  <nx> by <ny> and has three bytes of color information per pixel, in
  the order red, green, blue.  <xbot>, <xtop>, <ybot>, <ytop> selects
  the coordinate ranges (in PostScript units) where the image is displayed.
  LS 10oct99 */
 {
-  int32_t	matrx[6], i, s;
-  int32_t	c;
-  extern float	postXBot, postXTop, postYBot, postYTop;
+  int32_t        matrx[6], i, s;
+  int32_t        c;
+  extern float        postXBot, postXTop, postYBot, postYTop;
 
   for (i = 0; i < 6; i++)
     matrx[i] = 0;
@@ -368,7 +368,7 @@ int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, 
     break;
   }
   fprintf(postScriptFp,"[ %d %d %d %d %d %d ]\n", matrx[0], matrx[1], matrx[2],
-	  matrx[3], matrx[4], matrx[5]);
+          matrx[3], matrx[4], matrx[5]);
   fputs(" {currentfile picstr readhexstring pop} false 3 colorimage\n", postScriptFp);
   s = nx*ny;
   for (i = 1; i <= nx*ny; i++) {
@@ -399,9 +399,9 @@ int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, 
 int32_t postrelease(int32_t narg, int32_t ps[])
 {
   char  ok = 0;
-  int32_t	bb1, bb2, bb3, bb4;
-  extern float	postXBot, postXTop, postYBot, postYTop;
-  extern int32_t	psfile;
+  int32_t        bb1, bb2, bb3, bb4;
+  extern float        postXBot, postXTop, postYBot, postYTop;
+  extern int32_t        psfile;
 
   if (ipost) {
     if (narg)
@@ -418,37 +418,37 @@ int32_t postrelease(int32_t narg, int32_t ps[])
       fputs(" stroke\n", postScriptFp);
     fputs(" showpage\n", postScriptFp);
     // now insert bounding box  LS 18jan95
-    if (fseek(postScriptFp, 66, SEEK_SET)) {	// length of preamble
+    if (fseek(postScriptFp, 66, SEEK_SET)) {        // length of preamble
       printf("Could not reset file pointer to insert bounding box into %s\n",
-	     string_value(psfile));
+             string_value(psfile));
       puts("Using default.");
     } else {
       if (!narg) {
-	if (postXTop < postXBot
-	    || postYTop < postYBot) { // no bounding box
-	  bb1 = bb2 = 0;
-	  bb3 = 600;
-	  bb4 = 720;
-	  ok = 1;
-	}
+        if (postXTop < postXBot
+            || postYTop < postYBot) { // no bounding box
+          bb1 = bb2 = 0;
+          bb3 = 600;
+          bb4 = 720;
+          ok = 1;
+        }
       } else {
-	postXBot = bb1;
-	postXTop = bb2;
-	postYBot = bb3;
-	postYTop = bb4;
+        postXBot = bb1;
+        postXTop = bb2;
+        postYBot = bb3;
+        postYTop = bb4;
       }
       if (!ok) {
-	if (landscape) {
-	  bb1 = (int32_t) (594 - 720*postYTop);
-	  bb2 = (int32_t) (36 + 720*postXBot);
-	  bb3 = (int32_t) (594 - 720*postYBot);
-	  bb4 = (int32_t) (36 + 720*postXTop);
-	} else {
-	  bb1 = (int32_t) (720*(0.05 + postXBot));
-	  bb2 = (int32_t) (720*(0.025+ postYBot));
-	  bb3 = (int32_t) (720*(0.05 + postXTop));
-	  bb4 = (int32_t) (720*(0.025 + postYTop));
-	}	
+        if (landscape) {
+          bb1 = (int32_t) (594 - 720*postYTop);
+          bb2 = (int32_t) (36 + 720*postXBot);
+          bb3 = (int32_t) (594 - 720*postYBot);
+          bb4 = (int32_t) (36 + 720*postXTop);
+        } else {
+          bb1 = (int32_t) (720*(0.05 + postXBot));
+          bb2 = (int32_t) (720*(0.025+ postYBot));
+          bb3 = (int32_t) (720*(0.05 + postXTop));
+          bb4 = (int32_t) (720*(0.025 + postYTop));
+        }        
       }
       fprintf(postScriptFp, "% 4.4d % 4.4d % 4.4d % 4.4d", bb1, bb2, bb3, bb4);
     }

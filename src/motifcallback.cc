@@ -23,19 +23,19 @@ void execute_string(char *text)
  /* this needs to be re-entrant, the parser call here may cause
  this routine to be called, so be careful */
 {
- extern int32_t	nest, motif_input_flag;
- extern	int32_t	single_string_parse_flag, single_string_parse_nest, nest;
- extern uint8_t	*input_compile_string;	// used for compiling strings
+ extern int32_t        nest, motif_input_flag;
+ extern        int32_t        single_string_parse_flag, single_string_parse_nest, nest;
+ extern uint8_t        *input_compile_string;        // used for compiling strings
  extern uint8_t line2[];
- extern struct	sdesc	cur_line;
- extern	char	*strsavsd();
- struct	sdesc	save_cur_line;
- Arg	args[10];
- Cardinal	n;
+ extern struct        sdesc        cur_line;
+ extern        char        *strsavsd();
+ struct        sdesc        save_cur_line;
+ Arg        args[10];
+ Cardinal        n;
  unsigned char *new_text;
- int32_t	iq, mq, start_nest, nsym, prev_flag;
+ int32_t        iq, mq, start_nest, nsym, prev_flag;
  char *text, *p, *s;
- int32_t	result_position, result_string;
+ int32_t        result_position, result_string;
 
  mq = strlen(text);
  prev_flag = motif_input_flag; // save this state, allows for nesting
@@ -48,13 +48,13 @@ void execute_string(char *text)
  // if we entered with input_modal_flag on, we don't call parser
  if (input_modal_flag == 0) {
  single_string_parse_flag = 1;
- single_string_parse_nest = nest;	// set to current nest level
+ single_string_parse_nest = nest;        // set to current nest level
  start_nest = nest;
  // parse and execute it
  do {
  nsym = parser();
  /*printf("parsed symbol # = %d, nest = %d, start_nest = %d\n",
- 	 nsym, nest, start_nest);
+          nsym, nest, start_nest);
  */
  if (nsym > 0) execute( nsym);
  } while (nest > start_nest || cur_line.n > 0);

@@ -209,9 +209,9 @@ void dump_allocs(int32_t max_count)
   luxIter iter = luxIter_create(mallocmap);
   while (iter) {
     if (!luxMap_add_unique_ip(map, luxIter_value_i(iter),
-			      luxIter_key_p(iter))) {
+                              luxIter_key_p(iter))) {
       printf("MULTIPLE OCCURRENCE of num_allocs = %d\nmallocmap:\n%s\n",
-	     luxIter_value_i(iter), luxMap_to_text(mallocmap));
+             luxIter_value_i(iter), luxMap_to_text(mallocmap));
     }
     iter = luxIter_next(iter);
   }
@@ -266,12 +266,12 @@ int32_t check_net_allocs(unsigned long expected)
 
   if (net_allocs != luxMap_key_count(mallocmap)) {
     printf("\nDISCREPANCY: net_allocs = %lu but mallocmap key count = %d.\n",
-	   net_allocs, luxMap_key_count(mallocmap));
+           net_allocs, luxMap_key_count(mallocmap));
     bad = 1;
   }
   if (net_allocs != expected) {
     printf("\nExpected %lu but found %lu allocations.\n",
-	   expected, net_allocs);
+           expected, net_allocs);
     bad = 1;
   }
 #if MALLOCMAP

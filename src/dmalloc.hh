@@ -35,23 +35,23 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
        *Realloc(void *, size_t);
   FILE *Fopen(const char *, const char *), *Tmpfile(void);
   int32_t  Fclose(FILE *);
-#define free	Free
-#define malloc	Malloc
-#define calloc	Calloc
-#define realloc	Realloc
-#define fopen	Fopen
-#define tmpfile	Tmpfile
-#define fclose	Fclose
+#define free        Free
+#define malloc        Malloc
+#define calloc        Calloc
+#define realloc        Realloc
+#define fopen        Fopen
+#define tmpfile        Tmpfile
+#define fclose        Fclose
 #else
 #include <stdlib.h>
 #include <stdio.h>
-#define Free	free
-#define Malloc	malloc
-#define Calloc	calloc
-#define Realloc	realloc
-#define Fopen	fopen
-#define Tmpfile	tmpfile
-#define Fclose	fclose
+#define Free        free
+#define Malloc        malloc
+#define Calloc        calloc
+#define Realloc        realloc
+#define Fopen        fopen
+#define Tmpfile        tmpfile
+#define Fclose        fclose
 #endif
 #endif
 

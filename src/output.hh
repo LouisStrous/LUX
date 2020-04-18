@@ -27,18 +27,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdarg.h>
 
 // we want to have the old output macros available
-#define oldputc		putc
-#define oldputchar	putchar
-#define oldfputc	fputc
+#define oldputc                putc
+#define oldputchar        putchar
+#define oldfputc        fputc
 
 // redefine the output routine names to point at the enhanced ones
-#define printf		Printf
-#define fprintf		Fprintf
-#define vprintf		Vprintf
-#define vfprintf	Vfprintf
-#define puts		Puts
-#define fputs		Fputs
-#define fputc		Fputc
+#define printf                Printf
+#define fprintf                Fprintf
+#define vprintf                Vprintf
+#define vfprintf        Vfprintf
+#define puts                Puts
+#define fputs                Fputs
+#define fputc                Fputc
 
 extern char recording;
 extern FILE *recordFile;

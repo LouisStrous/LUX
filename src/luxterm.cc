@@ -26,10 +26,10 @@ void getTermCaps(void)
 // way.  Now, I read an "anatermcap" file depending on the TERM
 // environment variable.  LS 12jul96
 {
-  char	*term, *cscrat = (char *) scrat;
-  extern char	expname[];
-  FILE	*fp;
-  int32_t	i, n;
+  char        *term, *cscrat = (char *) scrat;
+  extern char        expname[];
+  FILE        *fp;
+  int32_t        i, n;
 
   term = getenv("TERM");
   if (!term)
@@ -45,17 +45,17 @@ void getTermCaps(void)
     else
     { i = 0;
       while (fgets(cscrat, 80, fp))
-      { if (*cscrat == '#')	// a comment line
-	  continue;
-	sprintf(cscrat + 80, cscrat);
-	n = strlen(cscrat + 80);
-	if (cscrat[n + 79] == '\n')
-	  cscrat[--n + 80] = '\0';
-	special[i] = (char *) malloc(n + 1);
-	strcpy(special[i], cscrat + 80);
-	i++;
-	if (i == 14)
-	  break; }
+      { if (*cscrat == '#')        // a comment line
+          continue;
+        sprintf(cscrat + 80, cscrat);
+        n = strlen(cscrat + 80);
+        if (cscrat[n + 79] == '\n')
+          cscrat[--n + 80] = '\0';
+        special[i] = (char *) malloc(n + 1);
+        strcpy(special[i], cscrat + 80);
+        i++;
+        if (i == 14)
+          break; }
       Fclose(fp); }
   }
   if (!special[0])

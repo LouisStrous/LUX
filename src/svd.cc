@@ -114,9 +114,9 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
 // A = U S V'
 // SVD,A,U,S,V
 {
-  int32_t	iq, nRow, nCol, *d, n;
-  double	*a, *z;
-  Pointer	src;
+  int32_t        iq, nRow, nCol, *d, n;
+  double        *a, *z;
+  Pointer        src;
 
 //  void SVD(double *W, double *Z, int32_t nRow, int32_t nCol)
 
@@ -135,32 +135,32 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   switch (symbol_type(ps[0])) {
     case LUX_INT8:
       while (n--)
-	*a++ = (double) *src.b++;
+        *a++ = (double) *src.b++;
       a -= n;
       break;
     case LUX_INT16:
       while (n--)
-	*a++ = (double) *src.w++;
+        *a++ = (double) *src.w++;
       a -= n;
       break;
     case LUX_INT32:
       while (n--)
-	*a++ = (double) *src.l++;
+        *a++ = (double) *src.l++;
       a -= n;
       break;
     case LUX_INT64:
       while (n--)
-	*a++ = (double) *src.q++;
+        *a++ = (double) *src.q++;
       a -= n;
       break;
     case LUX_FLOAT:
       while (n--)
-	*a++ = (double) *src.f++;
+        *a++ = (double) *src.f++;
       a -= n;
       break;
     case LUX_DOUBLE:
       while (n--)
-	*a++ = (double) *src.d++;
+        *a++ = (double) *src.d++;
       a -= n;
       break;
     }rlof

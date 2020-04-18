@@ -20,11 +20,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef INCLUDED_LUX_EDITOR_H
 #define INCLUDED_LUX_EDITOR_H
 
-	// buffer limits
-#define BUFSIZE		512	// line input buffer
-#define HISTORYSIZE	100	// # lines in historybuffer
+        // buffer limits
+#define BUFSIZE                512        // line input buffer
+#define HISTORYSIZE        100        // # lines in historybuffer
 
-#define HISTORYBUFFER	1	// in calls to getNewLine
+#define HISTORYBUFFER        1        // in calls to getNewLine
 
 int getSingleStdinChar(void);
 

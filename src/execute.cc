@@ -5238,10 +5238,10 @@ int32_t lux_test(int32_t narg, int32_t ps[])
   // set the edges to zero
   for (i = 0; i < 2*info.ndim; i++) {
     if (edge[i]) {
-      rearrangeEdgeLoop(&info, NULL, i);
+      info.rearrangeEdgeLoop(NULL, i);
       do
         *src.l = value;
-      while (advanceLoop(&info, &src) < info.ndim - 1);
+      while (info.advanceLoop(&src) < info.ndim - 1);
     }
   }
 

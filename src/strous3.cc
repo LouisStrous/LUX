@@ -55,12 +55,12 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
    bisector positions are returned in it. */
 // LS 7may98
 {
-  int32_t	result, iq, pos, nLev, outDims[MAX_DIMS], step,
+  int32_t       result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
-  double	xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
-  Pointer	src, trgt, level, ptr, rightedge, left, width, x;
-  csplineInfo	cspl;
-  LoopInfo	srcinfo;
+  double        xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
+  Pointer       src, trgt, level, ptr, rightedge, left, width, x;
+  csplineInfo   cspl;
+  LoopInfo      srcinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);
@@ -78,10 +78,10 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   }
 
   if (standardLoop(ySym, (narg > 3 && ps[3])? ps[3]: 0,
-		   SL_COMPRESS | SL_ONEAXIS | SL_NEGONED | SL_SRCUPGRADE
-		   | SL_EACHROW | SL_AXISCOORD, LUX_FLOAT,
-		   &srcinfo, &src, NULL, NULL, NULL) < 0) // <data>, <axis>
-    return LUX_ERROR;		// some error
+                   SL_COMPRESS | SL_ONEAXIS | SL_NEGONED | SL_SRCUPGRADE
+                   | SL_EACHROW | SL_AXISCOORD, LUX_FLOAT,
+                   &srcinfo, &src, NULL, NULL, NULL) < 0) // <data>, <axis>
+    return LUX_ERROR;           // some error
 
   if (xSym) {
     if (!symbolIsNumericalArray(xSym))
@@ -98,11 +98,11 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   iq = lux_converts[srcinfo.type](1, &vSym); // ensure proper type
   numerical(iq, NULL, NULL, &nLev, &level);
 
-  if (narg > 4 && ps[4]) { 	// have <pos>
+  if (narg > 4 && ps[4]) {      // have <pos>
     pos = int_arg(ps[4]);
     if (pos < 0 || pos >= srcinfo.rdims[0])
       return luxerror("Index out of range", ps[4]);
-  } else				// no <pos>
+  } else                                // no <pos>
     pos = -1;
 
   // create output symbol
@@ -110,29 +110,29 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
     outDims[0] = nLev;
     memcpy(outDims + 1, srcinfo.dims, srcinfo.raxes[0]*sizeof(int32_t));
     memcpy(outDims + srcinfo.raxes[0] + 1, srcinfo.dims + srcinfo.raxes[0] + 1,
-	   (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
+           (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
     result = array_scratch(srcinfo.type, srcinfo.ndim, outDims);
-    if (narg > 5 && ps[5])	// have <width>
+    if (narg > 5 && ps[5])      // have <width>
       if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
-	  == LUX_ERROR)
-	return LUX_ERROR;
+          == LUX_ERROR)
+        return LUX_ERROR;
   } else {
     if (srcinfo.ndim > 1) {
       memcpy(outDims, srcinfo.dims, srcinfo.raxes[0]*sizeof(int32_t));
       memcpy(outDims + srcinfo.raxes[0], srcinfo.dims + srcinfo.raxes[0] + 1,
-	     (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
+             (srcinfo.ndim - srcinfo.raxes[0] - 1)*sizeof(int32_t));
       result = array_scratch(srcinfo.type, srcinfo.ndim - 1, outDims);
-      if (narg > 5 && ps[5])	// have <width>
-	if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
-	    == LUX_ERROR)
-	  return LUX_ERROR;
-    } else {			// only one return value
+      if (narg > 5 && ps[5])    // have <width>
+        if (to_scratch_array(ps[5], srcinfo.type, srcinfo.ndim, outDims)
+            == LUX_ERROR)
+          return LUX_ERROR;
+    } else {                    // only one return value
       result = scalar_scratch(srcinfo.type);
-      if (narg > 5 && ps[5]) {	// have <width>
-	undefine(ps[5]);
-	symbol_class(ps[5]) = LUX_SCALAR;
-	scalar_type(ps[5]) = srcinfo.type;
-      }	
+      if (narg > 5 && ps[5]) {  // have <width>
+        undefine(ps[5]);
+        symbol_class(ps[5]) = LUX_SCALAR;
+        scalar_type(ps[5]) = srcinfo.type;
+      }         
     }
   }
   if (result < 0)
@@ -141,16 +141,16 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
     case LUX_ARRAY:
       trgt.f = (float *) array_data(result);
       if (narg > 5 && ps[5])
-	width.f = (float *) array_data(ps[5]);
+        width.f = (float *) array_data(ps[5]);
       else
-	width.f = NULL;
+        width.f = NULL;
       break;
     case LUX_SCALAR:
       trgt.f = &scalar_value(result).f;
       if (narg > 5 && ps[5])
-	width.f = &scalar_value(ps[5]).f;
+        width.f = &scalar_value(ps[5]).f;
       else
-	width.f = NULL;
+        width.f = NULL;
       break;
   }
 
@@ -160,245 +160,245 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   switch (srcinfo.type) {
     case LUX_FLOAT:
       do {
-	rightedge.f = src.f + step*(srcinfo.rdims[0] - 1);
-	if (pos >= 0) {
-	  ptr.f = src.f + pos*step; // start position
-	  // now seek the local minimum
-	  if (ptr.f > src.f && ptr.f[-step] < *ptr.f)
-	    while (ptr.f > src.f && ptr.f[-step] < *ptr.f)
-	      ptr.f -= step;
-	  else
-	    while (ptr.f < rightedge.f && ptr.f[step] < *ptr.f)
-	      ptr.f += step;
-	} else {		// find absolute minimum
-	  ptr.f = left.f = src.f;
-	  do {
-	    left.f += step;
-	    if (*left.f < *ptr.f)
-	      ptr.f = left.f;
-	  } while (left.f < rightedge.f);
-	}
+        rightedge.f = src.f + step*(srcinfo.rdims[0] - 1);
+        if (pos >= 0) {
+          ptr.f = src.f + pos*step; // start position
+          // now seek the local minimum
+          if (ptr.f > src.f && ptr.f[-step] < *ptr.f)
+            while (ptr.f > src.f && ptr.f[-step] < *ptr.f)
+              ptr.f -= step;
+          else
+            while (ptr.f < rightedge.f && ptr.f[step] < *ptr.f)
+              ptr.f += step;
+        } else {                // find absolute minimum
+          ptr.f = left.f = src.f;
+          do {
+            left.f += step;
+            if (*left.f < *ptr.f)
+              ptr.f = left.f;
+          } while (left.f < rightedge.f);
+        }
 
-	// install table for cubic spline interpolation
-	cubic_spline_tables(x.f, srcinfo.type, 1,
-			    src.f, srcinfo.type, step,
-			    srcinfo.rdims[0], 0, 0,
-			    &cspl);
+        // install table for cubic spline interpolation
+        cubic_spline_tables(x.f, srcinfo.type, 1,
+                            src.f, srcinfo.type, step,
+                            srcinfo.rdims[0], 0, 0,
+                            &cspl);
 
-	/* the cubic spline may dip below the lower of the surrounding
-	 specified data points: we must find the local minimum in
-	 the cubic spline. */
-	ir = (ptr.f - src.f)/step;
-	il = ir - 1;
-	if (x.f) {
-	  x1l = x.f[ir - 1];
-	  x1r = x2l = x.f[ir];
-	  x2r = x.f[ir + 1];
-	} else {
-	  x1l = ir - 1;
-	  x1r = x2l = ir;
-	  x2r = ir + 1;
-	}
-	find_cspline_extremes(x1l, x2r, &minpos, &min, NULL, NULL, &cspl);
+        /* the cubic spline may dip below the lower of the surrounding
+         specified data points: we must find the local minimum in
+         the cubic spline. */
+        ir = (ptr.f - src.f)/step;
+        il = ir - 1;
+        if (x.f) {
+          x1l = x.f[ir - 1];
+          x1r = x2l = x.f[ir];
+          x2r = x.f[ir + 1];
+        } else {
+          x1l = ir - 1;
+          x1r = x2l = ir;
+          x2r = ir + 1;
+        }
+        find_cspline_extremes(x1l, x2r, &minpos, &min, NULL, NULL, &cspl);
 
-	// the levels are assumed to be sorted in ascending order
-	for (lev = 0; lev < nLev; lev++) {
-	  if (min > level.f[lev]) {
-	    *trgt.f++ = -1.0;
-	    if (width.f != NULL)
-	      *width.f++ = 0.0;
-	  } else {
-	    if (*ptr.f > level.f[lev]) { // the current level is above
-	      /* the minimum of the spline fit, but below the local minimum of
-	       the tabular points */
-	      xl = find_cspline_value(level.f[lev], x1l, minpos, &cspl);
-	      xr = find_cspline_value(level.f[lev], minpos, x2r, &cspl);
-	      *trgt.f = (xl + xr)/2;
-	      if (width.f)
-		*width.f++ = xr - xl;
-	    } else {
-	      if (il >= 0) {
-		do {
-		  find_cspline_extremes(x1l, x2l, NULL, NULL, &maxpos,
-					&max, &cspl);
-		  if (max < level.f[lev]) {
-		    il--;
-		    if (x.f) {
-		      x1l = x.f[il];
-		      x2l = x.f[il + 1];
-		    } else {
-		      x1l = il;
-		      x2l = il + 1;
-		    }
-		  } else
-		    break;
-		} while (il >= 0);
-		if (il >= 0)
-		  xl = find_cspline_value(level.f[lev], maxpos, x2l, &cspl);
-		else
-		  xl = -DBL_MAX;
-	      } else
-		xl = -DBL_MAX;
+        // the levels are assumed to be sorted in ascending order
+        for (lev = 0; lev < nLev; lev++) {
+          if (min > level.f[lev]) {
+            *trgt.f++ = -1.0;
+            if (width.f != NULL)
+              *width.f++ = 0.0;
+          } else {
+            if (*ptr.f > level.f[lev]) { // the current level is above
+              /* the minimum of the spline fit, but below the local minimum of
+               the tabular points */
+              xl = find_cspline_value(level.f[lev], x1l, minpos, &cspl);
+              xr = find_cspline_value(level.f[lev], minpos, x2r, &cspl);
+              *trgt.f = (xl + xr)/2;
+              if (width.f)
+                *width.f++ = xr - xl;
+            } else {
+              if (il >= 0) {
+                do {
+                  find_cspline_extremes(x1l, x2l, NULL, NULL, &maxpos,
+                                        &max, &cspl);
+                  if (max < level.f[lev]) {
+                    il--;
+                    if (x.f) {
+                      x1l = x.f[il];
+                      x2l = x.f[il + 1];
+                    } else {
+                      x1l = il;
+                      x2l = il + 1;
+                    }
+                  } else
+                    break;
+                } while (il >= 0);
+                if (il >= 0)
+                  xl = find_cspline_value(level.f[lev], maxpos, x2l, &cspl);
+                else
+                  xl = -DBL_MAX;
+              } else
+                xl = -DBL_MAX;
 
-	      if (ir < srcinfo.rdims[0]) { // not yet at edge
-		do {
-		  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
-					&max, &cspl);
-		  if (max < level.f[lev]) {
-		    ir++;
-		    if (x.f) {
-		      x1r = x.f[ir];
-		      x2r = x.f[ir + 1];
-		    } else {
-		      x1r = ir;
-		      x2r = ir + 1;
-		    }
-		  } else
-		    break;
-		} while (ir < srcinfo.rdims[0]);
-		if (ir < srcinfo.rdims[0])
-		  xr = find_cspline_value(level.f[lev], x1r, maxpos, &cspl);
-		else
-		  xr = -DBL_MAX;	// flag: at edge
-	      } else
-		xr = -DBL_MAX;
+              if (ir < srcinfo.rdims[0]) { // not yet at edge
+                do {
+                  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
+                                        &max, &cspl);
+                  if (max < level.f[lev]) {
+                    ir++;
+                    if (x.f) {
+                      x1r = x.f[ir];
+                      x2r = x.f[ir + 1];
+                    } else {
+                      x1r = ir;
+                      x2r = ir + 1;
+                    }
+                  } else
+                    break;
+                } while (ir < srcinfo.rdims[0]);
+                if (ir < srcinfo.rdims[0])
+                  xr = find_cspline_value(level.f[lev], x1r, maxpos, &cspl);
+                else
+                  xr = -DBL_MAX;        // flag: at edge
+              } else
+                xr = -DBL_MAX;
 
-	      if (xl > -DBL_MAX && xr > -DBL_MAX) { // not at edge
-		*trgt.f = (xl + xr)/2;
-		if (width.f)
-		  *width.f++ = xr - xl;
-	      } else {
-		if (width.f)
-		  *width.f++ = 0;
-		*trgt.f = -1;	// not found
-	      }
-	    }
-	    trgt.f++;
-	  } // end of if (*ptr.f > level.f[lev]) else
-	} // end of for (lev = 0; ...)
-	src.f += step*srcinfo.rdims[0];
-      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+              if (xl > -DBL_MAX && xr > -DBL_MAX) { // not at edge
+                *trgt.f = (xl + xr)/2;
+                if (width.f)
+                  *width.f++ = xr - xl;
+              } else {
+                if (width.f)
+                  *width.f++ = 0;
+                *trgt.f = -1;   // not found
+              }
+            }
+            trgt.f++;
+          } // end of if (*ptr.f > level.f[lev]) else
+        } // end of for (lev = 0; ...)
+        src.f += step*srcinfo.rdims[0];
+      } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
     case LUX_DOUBLE:
       do {
-	rightedge.d = src.d + step*(srcinfo.rdims[0] - 1);
-	if (pos >= 0) {
-	  ptr.d = src.d + pos*step; // start position
-	  // now seek the local minimum
-	  if (ptr.d > src.d && ptr.d[-step] < *ptr.d)
-	    while (ptr.d > src.d && ptr.d[-step] < *ptr.d)
-	      ptr.d -= step;
-	  else
-	    while (ptr.d < rightedge.d && ptr.d[step] < *ptr.d)
-	      ptr.d += step;
-	} else {		// find absolute minimum
-	  ptr.d = left.d = src.d;
-	  do {
-	    left.d += step;
-	    if (*left.d < *ptr.d)
-	      ptr.d = left.d;
-	  } while (left.d < rightedge.d);
-	}
+        rightedge.d = src.d + step*(srcinfo.rdims[0] - 1);
+        if (pos >= 0) {
+          ptr.d = src.d + pos*step; // start position
+          // now seek the local minimum
+          if (ptr.d > src.d && ptr.d[-step] < *ptr.d)
+            while (ptr.d > src.d && ptr.d[-step] < *ptr.d)
+              ptr.d -= step;
+          else
+            while (ptr.d < rightedge.d && ptr.d[step] < *ptr.d)
+              ptr.d += step;
+        } else {                // find absolute minimum
+          ptr.d = left.d = src.d;
+          do {
+            left.d += step;
+            if (*left.d < *ptr.d)
+              ptr.d = left.d;
+          } while (left.d < rightedge.d);
+        }
 
-	// install table for cubic spline interpolation
-	cubic_spline_tables(x.d, srcinfo.type, 1,
-			    src.d, srcinfo.type, step,
-			    srcinfo.rdims[0], 0, 0,
-			    &cspl);
+        // install table for cubic spline interpolation
+        cubic_spline_tables(x.d, srcinfo.type, 1,
+                            src.d, srcinfo.type, step,
+                            srcinfo.rdims[0], 0, 0,
+                            &cspl);
 
-	/* the cubic spline may dip below the lower of the surrounding
-	 specified data points: we must find the local minimum in
-	 the cubic spline. */
-	ir = (ptr.d - src.d)/step;
-	il = ir - 1;
-	if (x.d) {
-	  x1l = x.d[ir - 1];
-	  x1r = x2l = x.d[ir];
-	  x2r = x.d[ir + 1];
-	} else {
-	  x1l = ir - 1;
-	  x1r = x2l = ir;
-	  x2r = ir + 1;
-	}
-	find_cspline_extremes(x1l, x2r, &minpos, &min, NULL, NULL, &cspl);
+        /* the cubic spline may dip below the lower of the surrounding
+         specified data points: we must find the local minimum in
+         the cubic spline. */
+        ir = (ptr.d - src.d)/step;
+        il = ir - 1;
+        if (x.d) {
+          x1l = x.d[ir - 1];
+          x1r = x2l = x.d[ir];
+          x2r = x.d[ir + 1];
+        } else {
+          x1l = ir - 1;
+          x1r = x2l = ir;
+          x2r = ir + 1;
+        }
+        find_cspline_extremes(x1l, x2r, &minpos, &min, NULL, NULL, &cspl);
 
-	// the levels are assumed to be sorted in ascending order
-	for (lev = 0; lev < nLev; lev++) {
-	  if (min > level.d[lev]) {
-	    *trgt.d++ = -1.0;
-	    if (width.d != NULL)
-	      *width.d++ = 0.0;
-	  } else {
-	    if (*ptr.d > level.d[lev]) { // the current level is above
-	      /* the minimum of the spline fit, but below the local minimum of
-	       the tabular points */
-	      xl = find_cspline_value(level.d[lev], x1l, minpos, &cspl);
-	      xr = find_cspline_value(level.d[lev], minpos, x2r, &cspl);
-	      *trgt.d = (xl + xr)/2;
-	      if (width.d)
-		*width.d++ = xr - xl;
-	    } else {
-	      if (il >= 0) {
-		do {
-		  find_cspline_extremes(x1l, x2l, NULL, NULL, &maxpos,
-					&max, &cspl);
-		  if (max < level.d[lev]) {
-		    il--;
-		    if (x.d) {
-		      x1l = x.d[il];
-		      x2l = x.d[il + 1];
-		    } else {
-		      x1l = il;
-		      x2l = il + 1;
-		    }
-		  } else
-		    break;
-		} while (il >= 0);
-		if (il >= 0)
-		  xl = find_cspline_value(level.d[lev], maxpos, x2l, &cspl);
-		else
-		  xl = -DBL_MAX;
-	      } else
-		xl = -DBL_MAX;
+        // the levels are assumed to be sorted in ascending order
+        for (lev = 0; lev < nLev; lev++) {
+          if (min > level.d[lev]) {
+            *trgt.d++ = -1.0;
+            if (width.d != NULL)
+              *width.d++ = 0.0;
+          } else {
+            if (*ptr.d > level.d[lev]) { // the current level is above
+              /* the minimum of the spline fit, but below the local minimum of
+               the tabular points */
+              xl = find_cspline_value(level.d[lev], x1l, minpos, &cspl);
+              xr = find_cspline_value(level.d[lev], minpos, x2r, &cspl);
+              *trgt.d = (xl + xr)/2;
+              if (width.d)
+                *width.d++ = xr - xl;
+            } else {
+              if (il >= 0) {
+                do {
+                  find_cspline_extremes(x1l, x2l, NULL, NULL, &maxpos,
+                                        &max, &cspl);
+                  if (max < level.d[lev]) {
+                    il--;
+                    if (x.d) {
+                      x1l = x.d[il];
+                      x2l = x.d[il + 1];
+                    } else {
+                      x1l = il;
+                      x2l = il + 1;
+                    }
+                  } else
+                    break;
+                } while (il >= 0);
+                if (il >= 0)
+                  xl = find_cspline_value(level.d[lev], maxpos, x2l, &cspl);
+                else
+                  xl = -DBL_MAX;
+              } else
+                xl = -DBL_MAX;
 
-	      if (ir < srcinfo.rdims[0]) { // not yet at edge
-		do {
-		  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
-					&max, &cspl);
-		  if (max < level.d[lev]) {
-		    ir++;
-		    if (x.d) {
-		      x1r = x.d[ir];
-		      x2r = x.d[ir + 1];
-		    } else {
-		      x1r = ir;
-		      x2r = ir + 1;
-		    }
-		  } else
-		    break;
-		} while (ir < srcinfo.rdims[0]);
-		if (ir < srcinfo.rdims[0])
-		  xr = find_cspline_value(level.d[lev], x1r, maxpos, &cspl);
-		else
-		  xr = -DBL_MAX;	// flag: at edge
-	      } else
-		xr = -DBL_MAX;
+              if (ir < srcinfo.rdims[0]) { // not yet at edge
+                do {
+                  find_cspline_extremes(x1r, x2r, NULL, NULL, &maxpos,
+                                        &max, &cspl);
+                  if (max < level.d[lev]) {
+                    ir++;
+                    if (x.d) {
+                      x1r = x.d[ir];
+                      x2r = x.d[ir + 1];
+                    } else {
+                      x1r = ir;
+                      x2r = ir + 1;
+                    }
+                  } else
+                    break;
+                } while (ir < srcinfo.rdims[0]);
+                if (ir < srcinfo.rdims[0])
+                  xr = find_cspline_value(level.d[lev], x1r, maxpos, &cspl);
+                else
+                  xr = -DBL_MAX;        // flag: at edge
+              } else
+                xr = -DBL_MAX;
 
-	      if (xl > -DBL_MAX && xr > -DBL_MAX) { // not at edge
-		*trgt.d = (xl + xr)/2;
-		if (width.d)
-		  *width.d++ = xr - xl;
-	      } else {
-		if (width.d)
-		  *width.d++ = 0;
-		*trgt.d = -1;	// not found
-	      }
-	    }
-	    trgt.d++;
-	  } // end of if (*ptr.d > level.d[lev]) else
-	} // end of for (lev = 0; ...)
-	src.d += step*srcinfo.rdims[0];
-      } while (advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+              if (xl > -DBL_MAX && xr > -DBL_MAX) { // not at edge
+                *trgt.d = (xl + xr)/2;
+                if (width.d)
+                  *width.d++ = xr - xl;
+              } else {
+                if (width.d)
+                  *width.d++ = 0;
+                *trgt.d = -1;   // not found
+              }
+            }
+            trgt.d++;
+          } // end of if (*ptr.d > level.d[lev]) else
+        } // end of for (lev = 0; ...)
+        src.d += step*srcinfo.rdims[0];
+      } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
   default:
     break;
@@ -539,7 +539,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
               Bytestack_push_data(b, c, (uint8_t *) c + csize);
             }
           }
-        } while ((i = advanceLoop(&srcinfo, &src)) == 0);
+        } while ((i = srcinfo.advanceLoop(&src)) == 0);
       } while (i < srcinfo.rndim);
       break;
   case LUX_DOUBLE:
@@ -583,7 +583,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
               Bytestack_push_data(b, c, (uint8_t *) c + csize);
             }
           }
-        } while ((i = advanceLoop(&srcinfo, &src)) == 0);
+        } while ((i = srcinfo.advanceLoop(&src)) == 0);
       } while (i < srcinfo.rndim);
     break;
   default:
@@ -692,11 +692,11 @@ int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
 REGISTER(monotone_interpolation, f, monotoneinterpolate, 3, 3, "1none:2circle:4square:8wide:16full");
 //--------------------------------------------------------------------------
 #ifdef WORDS_BIGENDIAN
-#define SYNCH_OK	0xaaaa5555
-#define SYNCH_REVERSE	0x5555aaaa
+#define SYNCH_OK        0xaaaa5555
+#define SYNCH_REVERSE   0x5555aaaa
 #else
-#define SYNCH_OK	0x5555aaaa
-#define SYNCH_REVERSE	0xaaaa5555
+#define SYNCH_OK        0x5555aaaa
+#define SYNCH_REVERSE   0xaaaa5555
 #endif
 int32_t lux_fitskey(int32_t narg, int32_t ps[])
 // FITSKEY(file, key) returns the value associated with the string <key>
@@ -712,32 +712,32 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
 // returned.  The key is transformed to all uppercase before it is sought
 // in the file.  LS 4jun98
 {
-  char	*file, *key, *key2, *scr, mustclose, ok;
-  int32_t	n, n2, i, evalString(char *, int32_t), ptr, iq, i0;
+  char  *file, *key, *key2, *scr, mustclose, ok;
+  int32_t       n, n2, i, evalString(char *, int32_t), ptr, iq, i0;
   Symboltype type;
-  Pointer	p;
-  Scalar	value;
-  FILE	*fp;
-  void	read_a_number(char **buf, Scalar *value, Symboltype *type);
+  Pointer       p;
+  Scalar        value;
+  FILE  *fp;
+  void  read_a_number(char **buf, Scalar *value, Symboltype *type);
 
   switch (symbol_class(ps[0])) {
     case LUX_STRING:
       file = expand_name(string_value(ps[0]), NULL); // full file name
       fp = fopen(file, "r");
       if (!fp)
-	return LUX_ZERO;
-      mustclose = 1;		// must close the file again when done
+        return LUX_ZERO;
+      mustclose = 1;            // must close the file again when done
       break;
     case LUX_SCALAR:
       i = int_arg(ps[0]);
       if (i < 0 || i >= MAXFILES)
-	return LUX_ZERO;
+        return LUX_ZERO;
       fp = lux_file[i];
       if (!fp)
-	return LUX_ZERO;
-      ptr = ftell(fp);		// current file pointer position
+        return LUX_ZERO;
+      ptr = ftell(fp);          // current file pointer position
       fseek(fp, 0, SEEK_SET);
-      mustclose = 0;		// leave file open when done
+      mustclose = 0;            // leave file open when done
       break;
     default:
       return LUX_ZERO;
@@ -759,37 +759,37 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   }
 
   key = string_value(ps[1]);
-  n2 = (n < 8)? n + 1: 8;	// because we add a space if it fits
+  n2 = (n < 8)? n + 1: 8;       // because we add a space if it fits
   key2 = (char*) malloc(n2 + 1);
   strcpy(key2, key);
-  if (n2 != n) {		// add a space at the end to prevent
-				// partial matches
+  if (n2 != n) {                // add a space at the end to prevent
+                                // partial matches
     key2[n] = ' ';
     key2[n + 1] = '\0';
   }
-  for (key = key2; *key; key++)	// make all uppercase
+  for (key = key2; *key; key++)         // make all uppercase
     *key = toupper(*key);
 
   scr = curScrat;
   scr = fgets(scr, 9, fp);
 
   ok = 1;
-  i0 = 0;			// default offset is 0
+  i0 = 0;                       // default offset is 0
   if (!scr)
     ok = 0;
   else if (strncmp(scr, "SIMPLE  ", 8)) { // no expected FITS key
     // we'll accept an FZ file if its has a FITS header
     p.s = scr;
-    if (*p.l == SYNCH_OK) {	// have an FZ file.  OK header?
+    if (*p.l == SYNCH_OK) {     // have an FZ file.  OK header?
       fseek(fp, 256, SEEK_SET); // to start of header
       scr = fgets(scr, 9, fp);
       if (!scr || strncmp(scr, "SIMPLE  ", 8)) // not OK
-	ok = 0;
-      else			// we have an FZ FITS header: adjust offset
-	i0 = 256;
+        ok = 0;
+      else                      // we have an FZ FITS header: adjust offset
+        i0 = 256;
     }
   }
-  if (!ok) {			// something was wrong
+  if (!ok) {                    // something was wrong
     if (mustclose)
       fclose(fp);
     else
@@ -802,9 +802,9 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   do {
     if (fseek(fp, i*80 + i0, SEEK_SET)) {
       if (mustclose)
-	fclose(fp);
+        fclose(fp);
       else
-	fseek(fp, ptr, SEEK_SET);
+        fseek(fp, ptr, SEEK_SET);
       free(key2);
       return LUX_ZERO;
     }
@@ -812,9 +812,9 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
     scr = fgets(scr, 80, fp);
     if (!scr) {
       if (mustclose)
-	fclose(fp);
+        fclose(fp);
       else
-	fseek(fp, ptr, SEEK_SET);
+        fseek(fp, ptr, SEEK_SET);
       free(key2);
       return LUX_ZERO;
     }
@@ -825,7 +825,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   else
     fseek(fp, ptr, SEEK_SET);
   free(key2);
-  if (!strncmp(scr, "END ", 4))	// found end of header but not the keyword
+  if (!strncmp(scr, "END ", 4))         // found end of header but not the keyword
     return LUX_ZERO;
 
   /* The FITS rules say that a comment is introduced by a forward slash.
@@ -835,37 +835,37 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   // if /COMMENT is specified, then we must return the comment value;
   // otherwise the data value.  Return comments always as strings.
   // LS 26may99
-  scr += 9;			// beginning of data value
+  scr += 9;                     // beginning of data value
   n = 0;
   while (isspace((int32_t) *scr))
     scr++;
   key = scr;
   while (*key) {
     switch (*key) {
-      case '\'':		// literal text string
-	n = !n;			// toggle string status
-	break;
-      case '/':			// maybe FITS comment
-	if (!n) { 		// not in a literal text string
-	  if (internalMode & 1) { // /COMMENT
-	    scr = key + 1;	// start reading here
-	    while (isspace((int32_t) *scr))
-	      scr++;		// skip initial whitespace
-	    key = scr + strlen(scr) - 1; // skip final whitespace
-	    while (key > scr && isspace((int32_t) *key))
-	      key--;
-	    key[1] = '\0';
-	    iq = string_scratch(strlen(scr));
-	    strcpy(string_value(iq), scr);
-	    return iq;
-	  } else {
-	    while (key > scr
-		   && isspace((int32_t) key[-1])) // skip trailing spaces
-	      key--;
-	    *key-- = '\0';	// terminate data value
-	  }
-	}
-	break;
+      case '\'':                // literal text string
+        n = !n;                         // toggle string status
+        break;
+      case '/':                         // maybe FITS comment
+        if (!n) {               // not in a literal text string
+          if (internalMode & 1) { // /COMMENT
+            scr = key + 1;      // start reading here
+            while (isspace((int32_t) *scr))
+              scr++;            // skip initial whitespace
+            key = scr + strlen(scr) - 1; // skip final whitespace
+            while (key > scr && isspace((int32_t) *key))
+              key--;
+            key[1] = '\0';
+            iq = string_scratch(strlen(scr));
+            strcpy(string_value(iq), scr);
+            return iq;
+          } else {
+            while (key > scr
+                   && isspace((int32_t) key[-1])) // skip trailing spaces
+              key--;
+            *key-- = '\0';      // terminate data value
+          }
+        }
+        break;
     }
     key++;
   }
@@ -874,22 +874,22 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   // as a string
   key = scr;
   switch (*key) {
-    case '\'':			// a string
+    case '\'':                  // a string
       scr = ++key;
       while (*key && *key != '\'') // find the closing quote
-	key++;
-      *key = '\0';		// terminate
+        key++;
+      *key = '\0';              // terminate
       break;
-    case '-': case '+':		// may be a number
+    case '-': case '+':                 // may be a number
       scr = key++;
       while (isspace((int32_t) *key)) // skip whitespace
-	key++;
+        key++;
       if (!isdigit((int32_t) *key)) { // treat it as a string
-	key += strlen(key);	// go to the end of the string
-	while (key > scr
-	       && isspace((int32_t) key[-1])) // skip trailing whitespace
-	  key--;
-	break;
+        key += strlen(key);     // go to the end of the string
+        while (key > scr
+               && isspace((int32_t) key[-1])) // skip trailing whitespace
+          key--;
+        break;
       }
       // else we treat it as a number; fall through to the next case
     case '0': case '1': case '2': case '3': case '4': case '5':
@@ -897,29 +897,29 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
       read_a_number(&scr, &value, &type);
       iq = scalar_scratch(type);
       switch (type) {
-	case LUX_INT8:
-	  scalar_value(iq).b = (uint8_t) value.l;
-	  break;
-	case LUX_INT16:
-	  scalar_value(iq).w = (int16_t) value.l;
-	  break;
-	case LUX_INT32:
-	  scalar_value(iq).l = value.l;
-	  break;
-	case LUX_INT64:
-	  scalar_value(iq).q = value.l;
-	  break;
-	case LUX_FLOAT:
-	  scalar_value(iq).f = (float) value.d;
-	  break;
-	case LUX_CFLOAT:
-	  complex_scalar_data(iq).cf->real = 0.0;
-	  complex_scalar_data(iq).cf->imaginary = (float) value.d;
-	  break;
-	case LUX_CDOUBLE:
-	  complex_scalar_data(iq).cd->real = 0.0;
-	  complex_scalar_data(iq).cd->imaginary = value.d;
-	  break;
+        case LUX_INT8:
+          scalar_value(iq).b = (uint8_t) value.l;
+          break;
+        case LUX_INT16:
+          scalar_value(iq).w = (int16_t) value.l;
+          break;
+        case LUX_INT32:
+          scalar_value(iq).l = value.l;
+          break;
+        case LUX_INT64:
+          scalar_value(iq).q = value.l;
+          break;
+        case LUX_FLOAT:
+          scalar_value(iq).f = (float) value.d;
+          break;
+        case LUX_CFLOAT:
+          complex_scalar_data(iq).cf->real = 0.0;
+          complex_scalar_data(iq).cf->imaginary = (float) value.d;
+          break;
+        case LUX_CDOUBLE:
+          complex_scalar_data(iq).cd->real = 0.0;
+          complex_scalar_data(iq).cd->imaginary = value.d;
+          break;
       }
       return iq;
       break;
@@ -930,12 +930,12 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   return iq;
 }
 //--------------------------------------------------------------------------
-#define LEFT	0
-#define DOWN	1
-#define RIGHT	2
-#define UP	3
-#define CENTER	4
-#define DONE	5
+#define LEFT    0
+#define DOWN    1
+#define RIGHT   2
+#define UP      3
+#define CENTER  4
+#define DONE    5
 
 int32_t sign(float x)
 {
@@ -958,7 +958,7 @@ int32_t sgnclass(float x)
 }
 //--------------------------------------------------------------------
 int32_t traverseElement(float xin, float yin, float vx, float vy,
-		    float *xout, float *yout)
+                    float *xout, float *yout)
 /* if you start at position (<xin>,<yin>), with 0 <= <xin>,<yin> <= 1,
    and move in the direction given by (<vx>,<vy>), then this routine
    determines which pixel boundary you cross (UP, DOWN, LEFT, RIGHT,
@@ -969,7 +969,7 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
 // We do that by moving the edges outward a tiny bit so that our
 // data point <xin>,<yin> is never actually one an edge.
 {
-  if (vx > 0) {			// to the right
+  if (vx > 0) {                         // to the right
     /* first we check for UP.  The vector that separates UP from RIGHT
        has coordinates (1 - xin, 1 - yin); rotated counterclockwise
        over 90 degrees this becomes (yin - 1, 1 - xin): if the inner
@@ -993,14 +993,14 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
     }
   }
 
-  if (vx < 0) {		// to the left
+  if (vx < 0) {                 // to the left
     // first we check for DOWN.  The vector that separates DOWN from LEFT
     // has coordinates (-xin,-yin); rotated counterclockwise over 90
     // degrees this becomes (yin,-xin): if the inner product of the velocity
     // vector (vx,vy) with this vector is positive, then we are going DOWN.
     // The vector that separates LEFT from UP is (-xin,1-yin), which leads
     // to (yin-1,-xin).
-    if (vx*(yin + FLT_EPSILON) - vy*(xin + FLT_EPSILON) > 0) {	// DOWN
+    if (vx*(yin + FLT_EPSILON) - vy*(xin + FLT_EPSILON) > 0) {  // DOWN
       *xout = vy? xin - yin/vy*vx: 0;
       *yout = 0;
       return DOWN;
@@ -1009,20 +1009,20 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
       *xout = 0;
       *yout = vx? yin - xin/vx*vy: 1;
       return LEFT;
-    } else {			// UP
+    } else {                    // UP
       *xout = vy? xin + (1 - yin)/vy*vx: 0;
       *yout = 1;
       return UP;
     }
   }
 
-  if (vy > 0) {		// straight up
+  if (vy > 0) {                 // straight up
     *xout = xin;
     *yout = 1;
     return UP;
   }
 
-  if (vy < 0) {		// straight down
+  if (vy < 0) {                 // straight down
     *xout = xin;
     *yout = 0;
     return DOWN;
@@ -1033,7 +1033,7 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
   return CENTER;
 }
 //--------------------------------------------------------------------
-#define FACTOR	(0.886226925)	// 0.5*sqrt(pi)
+#define FACTOR  (0.886226925)   // 0.5*sqrt(pi)
 int32_t lux_dir_smooth(int32_t narg, int32_t ps[])
 /* Y = DSMOOTH(<data>,<vx>,<vy> [, /TWOSIDED, /ONESIDED, /BOXCAR, /GAUSSIAN,
                /NORMALIZE])
@@ -1051,14 +1051,14 @@ int32_t lux_dir_smooth(int32_t narg, int32_t ps[])
 
 LS 9nov98 */
 {
-  int32_t	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
+  int32_t       iq, nx, ny, ix, iy, c, index, rindex, count, twosided, total,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
+  float         x1, y1, x2, y2, *vx0, *vy0, value, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1;
-  Pointer	src, trgt, src0;
-  LoopInfo	srcinfo, trgtinfo;
+  Pointer       src, trgt, src0;
+  LoopInfo      srcinfo, trgtinfo;
 
-  iq0 = ps[0];			// data
+  iq0 = ps[0];                  // data
   if (symbol_class(iq0) != LUX_ARRAY // not an array
       || array_num_dims(iq0) != 2) // or doesn't have 2 dimensions
     return cerror(NEED_2D_ARR, iq0);
@@ -1066,7 +1066,7 @@ LS 9nov98 */
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
-  iq = ps[1];			// vx
+  iq = ps[1];                   // vx
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1075,7 +1075,7 @@ LS 9nov98 */
   iq = lux_float(1, &iq);
   vx0 = (float*) array_data(iq);
 
-  iq = ps[2];			// vy
+  iq = ps[2];                   // vy
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1085,282 +1085,282 @@ LS 9nov98 */
   vy0 = (float*) array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
-		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
+                   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   src0.f = src.f;
 
   twosided = ((internalMode & 1) == 0); // /TWOSIDED
-  total = (internalMode & 4);	// /TOTAL
+  total = (internalMode & 4);   // /TOTAL
   gaussian = (internalMode & 2); // /GAUSSIAN
   straight = (internalMode & 16); // /STRAIGHT
 
-  if (!gaussian)		// boxcar
+  if (!gaussian)                // boxcar
     do {
       count = twosided + 1;
       /* we work up to the desired smoothing width by measuring the path
-	 lengths in each pixel and adding them up until we reach the
-	 desired path length.  This scheme backfires when the velocities
-	 at some point circle the common corner of four pixels: then the
-	 algorithm can keep circling that point in very small steps for
-	 a very long time.  If many small steps follow one another in
-	 succession, then we are probably in such a situation and it is
-	 then unlikely that we'll get out of it any time soon.  We guard
-	 against this by maintaining an exponentially weighted average
-	 of the past steps and quitting if the weighted average gets too
-	 small.  We use an exponential decay scale of 2 steps and
-	 a limit value of 0.2. */
-      dslimit = 1.0;		// current weighted average of step sizes
+         lengths in each pixel and adding them up until we reach the
+         desired path length.  This scheme backfires when the velocities
+         at some point circle the common corner of four pixels: then the
+         algorithm can keep circling that point in very small steps for
+         a very long time.  If many small steps follow one another in
+         succession, then we are probably in such a situation and it is
+         then unlikely that we'll get out of it any time soon.  We guard
+         against this by maintaining an exponentially weighted average
+         of the past steps and quitting if the weighted average gets too
+         small.  We use an exponential decay scale of 2 steps and
+         a limit value of 0.2. */
+      dslimit = 1.0;            // current weighted average of step sizes
       value = 0.0;
       *trgt.f = 0.0;
       while (count--) {
-	rindex = 0;		// index relative to current start location
-	ix = srcinfo.coords[0];	// x pixel coordinate
-	iy = srcinfo.coords[1];	// y pixel coordinate
-	index = src.f - src0.f;	// index relative to data start
+        rindex = 0;             // index relative to current start location
+        ix = srcinfo.coords[0];         // x pixel coordinate
+        iy = srcinfo.coords[1];         // y pixel coordinate
+        index = src.f - src0.f;         // index relative to data start
 
-	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
-	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
-	vx = vx0[index];	// x velocity
-	vy = vy0[index];	// y velocity
-	if (count) {
-	  vx = -vx;
-	  vy = -vy;
-	}
+        x1 = 0.5;               // x coordinate in pixel (between 0 and 1)
+        y1 = 0.5;               // y coordinate in pixel (between 0 and 1)
+        vx = vx0[index];        // x velocity
+        vy = vy0[index];        // y velocity
+        if (count) {
+          vx = -vx;
+          vy = -vy;
+        }
 
-	s0 = 0.5*hypot(vx, vy); // length indicates smoothing width
-	s1 = s0;
-	s = 0.0;
-	
-	while (s < s1) {
-	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  // calculate distance inside the current pixel
-	  x1 -= x2;
-	  y1 -= y2;
-	  ds = hypot(x1, y1);
-	  if (s + ds > s1)
-	    ds = s0 - s;
-	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
-	    value += src.f[rindex]*(s1 - s);
-	    s = s1;		// we break it off
-	    continue;
-	  }
-	  switch (c) {
-	    case UP:
-	      if (iy == ny - 1) { // already at top
-		value += src.f[rindex]*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = nx;
-	      x1 = x2;
-	      y1 = 0.0;
-	      iy++;
-	      break;
-	    case RIGHT:
-	      if (ix == nx - 1) { // already at right edge
-		value += src.f[rindex]*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = 1;
-	      x1 = 0.0;
-	      y1 = y2;
-	      ix++;
-	      break;
-	    case DOWN:
-	      if (iy == 0) {	// already at bottom
-		value += src.f[rindex]*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -nx;
-	      x1 = x2;
-	      y1 = 1.0;
-	      iy--;
-	      break;
-	    case LEFT:
-	      if (ix == 0) { 	// already at left edge
-		value += src.f[rindex]*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -1;
-	      x1 = 1.0;
-	      y1 = y2;
-	      ix--;
-	      break;
-	    case CENTER:
-	      value += src.f[rindex]*(s1 - s);
-	      s1 = s;
-	      continue;
-	  } // end of switch (c)
-	  value += src.f[rindex]*ds;
-	  index += di;
-	  rindex += di;
-	  s += ds;
-	  if (!straight) {
-	    vx = vx0[index];
-	    vy = vy0[index];
-	    if (count) {
-	      vx = -vx;
-	      vy = -vy;
-	    }
-	  } // end of if (straight)
-	} // end of while (s < s0)
+        s0 = 0.5*hypot(vx, vy); // length indicates smoothing width
+        s1 = s0;
+        s = 0.0;
+        
+        while (s < s1) {
+          c = traverseElement(x1, y1, vx, vy, &x2, &y2);
+          // calculate distance inside the current pixel
+          x1 -= x2;
+          y1 -= y2;
+          ds = hypot(x1, y1);
+          if (s + ds > s1)
+            ds = s0 - s;
+          dslimit = 0.5*(dslimit + ds);
+          if (dslimit < 0.2) {  // we fear a semi-infinite loop here
+            value += src.f[rindex]*(s1 - s);
+            s = s1;             // we break it off
+            continue;
+          }
+          switch (c) {
+            case UP:
+              if (iy == ny - 1) { // already at top
+                value += src.f[rindex]*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = nx;
+              x1 = x2;
+              y1 = 0.0;
+              iy++;
+              break;
+            case RIGHT:
+              if (ix == nx - 1) { // already at right edge
+                value += src.f[rindex]*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = 1;
+              x1 = 0.0;
+              y1 = y2;
+              ix++;
+              break;
+            case DOWN:
+              if (iy == 0) {    // already at bottom
+                value += src.f[rindex]*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -nx;
+              x1 = x2;
+              y1 = 1.0;
+              iy--;
+              break;
+            case LEFT:
+              if (ix == 0) {    // already at left edge
+                value += src.f[rindex]*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -1;
+              x1 = 1.0;
+              y1 = y2;
+              ix--;
+              break;
+            case CENTER:
+              value += src.f[rindex]*(s1 - s);
+              s1 = s;
+              continue;
+          } // end of switch (c)
+          value += src.f[rindex]*ds;
+          index += di;
+          rindex += di;
+          s += ds;
+          if (!straight) {
+            vx = vx0[index];
+            vy = vy0[index];
+            if (count) {
+              vx = -vx;
+              vy = -vy;
+            }
+          } // end of if (straight)
+        } // end of while (s < s0)
       } // end of while (count--)
       if (!total) {
-	value /= s1;
-	if (twosided)
-	  value *= 0.5;
+        value /= s1;
+        if (twosided)
+          value *= 0.5;
       }
       *trgt.f = value;
-    } while (advanceLoop(&trgtinfo, &trgt),
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
-  else				// gaussian smoothing
+    } while (trgtinfo.advanceLoop(&trgt),
+             srcinfo.advanceLoop(&src) < srcinfo.rndim);
+  else                          // gaussian smoothing
     do {
       count = twosided + 1;
       /* we work up to the desired smoothing width by measuring the path
-	 lengths in each pixel and adding them up until we reach the
-	 desired path length.  This scheme backfires when the velocities
-	 at some point circle the common corner of four pixels: then the
-	 algorithm can keep circling that point in very small steps for
-	 a very long time.  If many small steps follow one another in
-	 succession, then we are probably in such a situation and it is
-	 then unlikely that we'll get out of it any time soon.  We guard
-	 against this by maintaining an exponentially weighted average
-	 of the past steps and quitting if the weighted average gets too
-	 small.  We use an exponential decay scale of 2 steps and
-	 a limit value of 0.2. */
-      dslimit = 1.0;		// current weighted average of step sizes
+         lengths in each pixel and adding them up until we reach the
+         desired path length.  This scheme backfires when the velocities
+         at some point circle the common corner of four pixels: then the
+         algorithm can keep circling that point in very small steps for
+         a very long time.  If many small steps follow one another in
+         succession, then we are probably in such a situation and it is
+         then unlikely that we'll get out of it any time soon.  We guard
+         against this by maintaining an exponentially weighted average
+         of the past steps and quitting if the weighted average gets too
+         small.  We use an exponential decay scale of 2 steps and
+         a limit value of 0.2. */
+      dslimit = 1.0;            // current weighted average of step sizes
       value = 0.0;
       ws = 0.0;
       while (count--) {
-	rindex = 0;		// index relative to current start location
-	ix = srcinfo.coords[0];	// x pixel coordinate
-	iy = srcinfo.coords[1];	// y pixel coordinate
-	index = src.f - src0.f;	// index relative to data start
+        rindex = 0;             // index relative to current start location
+        ix = srcinfo.coords[0];         // x pixel coordinate
+        iy = srcinfo.coords[1];         // y pixel coordinate
+        index = src.f - src0.f;         // index relative to data start
 
-	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
-	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
-	vx = vx0[index];	// x velocity
-	vy = vy0[index];	// y velocity
-	if (count) {
-	  vx = -vx;
-	  vy = -vy;
-	}
+        x1 = 0.5;               // x coordinate in pixel (between 0 and 1)
+        y1 = 0.5;               // y coordinate in pixel (between 0 and 1)
+        vx = vx0[index];        // x velocity
+        vy = vy0[index];        // y velocity
+        if (count) {
+          vx = -vx;
+          vy = -vy;
+        }
 
-	s0 = 0.6005612*hypot(vx, vy); // smoothing width
-	s = 0.0;
-	s1 = 4*s0;
-	
-	while (s < s1) {
-	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  // calculate distance inside the current pixel
-	  x1 -= x2;
-	  y1 -= y2;
-	  ds = hypot(x1, y1);
-	  if (s + ds > s1)
-	    ds = s1 - s;
-	/* we must determine the weight to assign to the contributions.
-	   if gsmooth is used in one dimension, then the weights of the
-	   contributions are equal to exp(-(x/s0)^2) where x is the
-	   integer index of the data point relative to the point under
-	   consideration.  However, if this routine is used to mimic gsmooth,
-	   then s is only equal to 0.5 when x = +1 is reached, so
-	   using exp(-(s/s0)^2) with s the total distance from the central
-	   point does not yield good results.  We can't just add 0.5 to
-	   s from the beginning either, because we do want a weight of 1
-	   for the first included data. */
-	  weight = s? (s + 0.5)/s0: 0.0;
-	  weight = exp(-weight*weight);
-	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
-	    ds = 0.5;
-	    if (s + ds > s1)
-	      ds = s1 - s;
-	  }
-	  switch (c) {
-	    case UP:
-	      if (iy == ny - 1) { // already at top
-		value += src.f[rindex]*weight*ds;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = nx;
-	      x1 = x2;
-	      y1 = 0.0;
-	      iy++;
-	      break;
-	    case RIGHT:
-	      if (ix == nx - 1) { // already at right edge
-		value += src.f[rindex]*weight*ds;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = 1;
-	      x1 = 0.0;
-	      y1 = y2;
-	      ix++;
-	      break;
-	    case DOWN:
-	      if (iy == 0) {	// already at bottom
-		value += src.f[rindex]*weight*ds;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -nx;
-	      x1 = x2;
-	      y1 = 1.0;
-	      iy--;
-	      break;
-	    case LEFT:
-	      if (ix == 0) {	// already at left edge
-		value += src.f[rindex]*weight*ds;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -1;
-	      x1 = 1.0;
-	      y1 = y2;
-	      ix--;
-	      break;
-	    case CENTER:
-	      di = 0;
-	      break;
-	  } // end of switch (c)
-	  value += src.f[rindex]*weight*ds;
-	  rindex += di;
-	  index += di;
-	  ws += weight*ds;
-	  s += ds;
-	  if (!straight) {
-	    vx = vx0[index];
-	    vy = vy0[index];
-	    if (count) {
-	      vx = -vx;
-	      vy = -vy;
-	    } // end of if (count)
-	  } // end of if (straight)
-	} // end of while (d < DONE)
+        s0 = 0.6005612*hypot(vx, vy); // smoothing width
+        s = 0.0;
+        s1 = 4*s0;
+        
+        while (s < s1) {
+          c = traverseElement(x1, y1, vx, vy, &x2, &y2);
+          // calculate distance inside the current pixel
+          x1 -= x2;
+          y1 -= y2;
+          ds = hypot(x1, y1);
+          if (s + ds > s1)
+            ds = s1 - s;
+        /* we must determine the weight to assign to the contributions.
+           if gsmooth is used in one dimension, then the weights of the
+           contributions are equal to exp(-(x/s0)^2) where x is the
+           integer index of the data point relative to the point under
+           consideration.  However, if this routine is used to mimic gsmooth,
+           then s is only equal to 0.5 when x = +1 is reached, so
+           using exp(-(s/s0)^2) with s the total distance from the central
+           point does not yield good results.  We can't just add 0.5 to
+           s from the beginning either, because we do want a weight of 1
+           for the first included data. */
+          weight = s? (s + 0.5)/s0: 0.0;
+          weight = exp(-weight*weight);
+          dslimit = 0.5*(dslimit + ds);
+          if (dslimit < 0.2) {  // we fear a semi-infinite loop here
+            ds = 0.5;
+            if (s + ds > s1)
+              ds = s1 - s;
+          }
+          switch (c) {
+            case UP:
+              if (iy == ny - 1) { // already at top
+                value += src.f[rindex]*weight*ds;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = nx;
+              x1 = x2;
+              y1 = 0.0;
+              iy++;
+              break;
+            case RIGHT:
+              if (ix == nx - 1) { // already at right edge
+                value += src.f[rindex]*weight*ds;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = 1;
+              x1 = 0.0;
+              y1 = y2;
+              ix++;
+              break;
+            case DOWN:
+              if (iy == 0) {    // already at bottom
+                value += src.f[rindex]*weight*ds;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -nx;
+              x1 = x2;
+              y1 = 1.0;
+              iy--;
+              break;
+            case LEFT:
+              if (ix == 0) {    // already at left edge
+                value += src.f[rindex]*weight*ds;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -1;
+              x1 = 1.0;
+              y1 = y2;
+              ix--;
+              break;
+            case CENTER:
+              di = 0;
+              break;
+          } // end of switch (c)
+          value += src.f[rindex]*weight*ds;
+          rindex += di;
+          index += di;
+          ws += weight*ds;
+          s += ds;
+          if (!straight) {
+            vx = vx0[index];
+            vy = vy0[index];
+            if (count) {
+              vx = -vx;
+              vy = -vy;
+            } // end of if (count)
+          } // end of if (straight)
+        } // end of while (d < DONE)
       } // end of while (count--)
       if (!total)
-	value /= ws;
+        value /= ws;
       *trgt.f = value;
-    } while (advanceLoop(&trgtinfo, &trgt),
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+    } while (trgtinfo.advanceLoop(&trgt),
+             srcinfo.advanceLoop(&src) < srcinfo.rndim);
   return iq;
 }
 //--------------------------------------------------------------------
@@ -1370,14 +1370,14 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
    <v>. */
 {
-  int32_t	iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
+  int32_t       iq, nx, ny, ix, iy, c, index, rindex, count, twosided, normalize,
     gaussian, iq0, di, straight;
-  float	x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
+  float         x1, y1, x2, y2, *vx0, *vy0, vx, vy, s, s0, ds, dslimit,
     weight, ws, s1, norm;
-  Pointer	src, trgt, src0;
-  LoopInfo	srcinfo, trgtinfo;
+  Pointer       src, trgt, src0;
+  LoopInfo      srcinfo, trgtinfo;
 
-  iq0 = ps[0];			// data
+  iq0 = ps[0];                  // data
   if (symbol_class(iq0) != LUX_ARRAY // not an array
       || array_num_dims(iq0) != 2) // or doesn't have 2 dimensions
     return cerror(NEED_2D_ARR, iq0);
@@ -1385,7 +1385,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
   nx = array_dims(iq0)[0];
   ny = array_dims(iq0)[1];
 
-  iq = ps[1];			// vx
+  iq = ps[1];                   // vx
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1394,7 +1394,7 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
   iq = lux_float(1, &iq);
   vx0 = (float*) array_data(iq);
 
-  iq = ps[2];			// vy
+  iq = ps[2];                   // vy
   if (symbol_class(iq) != LUX_ARRAY
       || array_num_dims(iq) != 2
       || array_dims(iq)[0] != nx
@@ -1404,280 +1404,280 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
   vy0 = (float*) array_data(iq);
 
   if (standardLoop(iq0, 0, SL_ALLAXES | SL_SAMEDIMS | SL_EXACT | SL_EACHCOORD,
-		   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
+                   LUX_FLOAT, &srcinfo, &src, &iq, &trgtinfo, &trgt) < 0)
     return LUX_ERROR;
   src0.f = src.f;
 
   twosided = ((internalMode & 1) == 0); // /TWOSIDED
-  normalize = (internalMode & 4)? 1: 0;	// /NORMALIZE
+  normalize = (internalMode & 4)? 1: 0;         // /NORMALIZE
   gaussian = (internalMode & 2)? 1: 0; // /GAUSSIAN
   straight = (internalMode & 8);
 
   zerobytes(trgt.f, array_size(iq)*sizeof(float)); // set to zero
 
-  if (!gaussian) {		// boxcar
+  if (!gaussian) {              // boxcar
     if (!normalize)
       norm = 1.0;
     do {
       count = twosided + 1;
       /* we work up to the desired smoothing width by measuring the path
-	 lengths in each pixel and adding them up until we reach the
-	 desired path length.  This scheme backfires when the velocities
-	 at some point circle the common corner of four pixels: then the
-	 algorithm can keep circling that point in very small steps for
-	 a very long time.  If many small steps follow one another in
-	 succession, then we are probably in such a situation and it is
-	 then unlikely that we'll get out of it any time soon.  We guard
-	 against this by maintaining an exponentially weighted average
-	 of the past steps and quitting if the weighted average gets too
-	 small.  We use an exponential decay scale of 2 steps and
-	 a limit value of 0.2. */
-      dslimit = 1.0;		// current weighted average of step sizes
+         lengths in each pixel and adding them up until we reach the
+         desired path length.  This scheme backfires when the velocities
+         at some point circle the common corner of four pixels: then the
+         algorithm can keep circling that point in very small steps for
+         a very long time.  If many small steps follow one another in
+         succession, then we are probably in such a situation and it is
+         then unlikely that we'll get out of it any time soon.  We guard
+         against this by maintaining an exponentially weighted average
+         of the past steps and quitting if the weighted average gets too
+         small.  We use an exponential decay scale of 2 steps and
+         a limit value of 0.2. */
+      dslimit = 1.0;            // current weighted average of step sizes
       while (count--) {
-	rindex = 0;		// index relative to current start location
-	ix = srcinfo.coords[0];	// x pixel coordinate
-	iy = srcinfo.coords[1];	// y pixel coordinate
-	index = src.f - src0.f;	// index relative to data start
+        rindex = 0;             // index relative to current start location
+        ix = srcinfo.coords[0];         // x pixel coordinate
+        iy = srcinfo.coords[1];         // y pixel coordinate
+        index = src.f - src0.f;         // index relative to data start
 
-	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
-	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
-	vx = vx0[index];	// x velocity
-	vy = vy0[index];	// y velocity
-	if (count) {
-	  vx = -vx;
-	  vy = -vy;
-	}
+        x1 = 0.5;               // x coordinate in pixel (between 0 and 1)
+        y1 = 0.5;               // y coordinate in pixel (between 0 and 1)
+        vx = vx0[index];        // x velocity
+        vy = vy0[index];        // y velocity
+        if (count) {
+          vx = -vx;
+          vy = -vy;
+        }
 
-	s0 = 0.5*hypot(vx, vy); // smoothing width
-	s1 = s0;
-	s = 0.0;
-	if (normalize)
-	  norm = s0? 0.5/s0: 1.0;
-	
-	while (s < s1) {
-	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  // calculate distance inside the current pixel
-	  x1 -= x2;
-	  y1 -= y2;
-	  ds = hypot(x1, y1);
-	  if (s + ds > s1)
-	    ds = s0 - s;
-	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
-	    trgt.f[rindex] += *src.f*(s1 - s)*norm;
-	    s = s1;		// we break it off
-	    continue;
-	  }
-	  switch (c) {
-	    case UP:
-	      if (iy == ny - 1) { // already at top
-		trgt.f[rindex] += *src.f*ds*norm;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = nx;
-	      x1 = x2;
-	      y1 = 0.0;
-	      iy++;
-	      break;
-	    case RIGHT:
-	      if (ix == nx - 1) { // already at right edge
-		trgt.f[rindex] += *src.f*ds*norm;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = 1;
-	      x1 = 0.0;
-	      y1 = y2;
-	      ix++;
-	      break;
-	    case DOWN:
-	      if (iy == 0) {	// already at bottom
-		trgt.f[rindex] += *src.f*ds*norm;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -nx;
-	      x1 = x2;
-	      y1 = 1.0;
-	      iy--;
-	      break;
-	    case LEFT:
-	      if (ix == 0) { 	// already at left edge
-		trgt.f[rindex] += *src.f*ds*norm;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -1;
-	      x1 = 1.0;
-	      y1 = y2;
-	      ix--;
-	      break;
-	    case CENTER:
-	      trgt.f[rindex] += *src.f*(s1 - s)*norm;
-	      s1 = s;
-	      continue;
-	  } // end of switch (c)
-	  trgt.f[rindex] += *src.f*ds*norm;
-	  index += di;
-	  rindex += di;
-	  s += ds;
-	  if (!straight) {
-	    vx = vx0[index];
-	    vy = vy0[index];
-	    if (count) {
-	      vx = -vx;
-	      vy = -vy;
-	    }
-	  }
-	} // end of while (s < s0)
+        s0 = 0.5*hypot(vx, vy); // smoothing width
+        s1 = s0;
+        s = 0.0;
+        if (normalize)
+          norm = s0? 0.5/s0: 1.0;
+        
+        while (s < s1) {
+          c = traverseElement(x1, y1, vx, vy, &x2, &y2);
+          // calculate distance inside the current pixel
+          x1 -= x2;
+          y1 -= y2;
+          ds = hypot(x1, y1);
+          if (s + ds > s1)
+            ds = s0 - s;
+          dslimit = 0.5*(dslimit + ds);
+          if (dslimit < 0.2) {  // we fear a semi-infinite loop here
+            trgt.f[rindex] += *src.f*(s1 - s)*norm;
+            s = s1;             // we break it off
+            continue;
+          }
+          switch (c) {
+            case UP:
+              if (iy == ny - 1) { // already at top
+                trgt.f[rindex] += *src.f*ds*norm;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = nx;
+              x1 = x2;
+              y1 = 0.0;
+              iy++;
+              break;
+            case RIGHT:
+              if (ix == nx - 1) { // already at right edge
+                trgt.f[rindex] += *src.f*ds*norm;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = 1;
+              x1 = 0.0;
+              y1 = y2;
+              ix++;
+              break;
+            case DOWN:
+              if (iy == 0) {    // already at bottom
+                trgt.f[rindex] += *src.f*ds*norm;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -nx;
+              x1 = x2;
+              y1 = 1.0;
+              iy--;
+              break;
+            case LEFT:
+              if (ix == 0) {    // already at left edge
+                trgt.f[rindex] += *src.f*ds*norm;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -1;
+              x1 = 1.0;
+              y1 = y2;
+              ix--;
+              break;
+            case CENTER:
+              trgt.f[rindex] += *src.f*(s1 - s)*norm;
+              s1 = s;
+              continue;
+          } // end of switch (c)
+          trgt.f[rindex] += *src.f*ds*norm;
+          index += di;
+          rindex += di;
+          s += ds;
+          if (!straight) {
+            vx = vx0[index];
+            vy = vy0[index];
+            if (count) {
+              vx = -vx;
+              vy = -vy;
+            }
+          }
+        } // end of while (s < s0)
       } // end of while (count--)
-    } while (advanceLoop(&trgtinfo, &trgt),
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
-  } else {			// gaussian smoothing
+    } while (trgtinfo.advanceLoop(&trgt),
+             srcinfo.advanceLoop(&src) < srcinfo.rndim);
+  } else {                      // gaussian smoothing
     norm = 0.5*M_2_SQRTPI;
     do {
       count = twosided + 1;
       /* we work up to the desired smoothing width by measuring the path
-	 lengths in each pixel and adding them up until we reach the
-	 desired path length.  This scheme backfires when the velocities
-	 at some point circle the common corner of four pixels: then the
-	 algorithm can keep circling that point in very small steps for
-	 a very long time.  If many small steps follow one another in
-	 succession, then we are probably in such a situation and it is
-	 then unlikely that we'll get out of it any time soon.  We guard
-	 against this by maintaining an exponentially weighted average
-	 of the past steps and quitting if the weighted average gets too
-	 small.  We use an exponential decay scale of 2 steps and
-	 a limit value of 0.2. */
-      dslimit = 1.0;		// current weighted average of step sizes
+         lengths in each pixel and adding them up until we reach the
+         desired path length.  This scheme backfires when the velocities
+         at some point circle the common corner of four pixels: then the
+         algorithm can keep circling that point in very small steps for
+         a very long time.  If many small steps follow one another in
+         succession, then we are probably in such a situation and it is
+         then unlikely that we'll get out of it any time soon.  We guard
+         against this by maintaining an exponentially weighted average
+         of the past steps and quitting if the weighted average gets too
+         small.  We use an exponential decay scale of 2 steps and
+         a limit value of 0.2. */
+      dslimit = 1.0;            // current weighted average of step sizes
       ws = 0.0;
       while (count--) {
-	rindex = 0;		// index relative to current start location
-	ix = srcinfo.coords[0];	// x pixel coordinate
-	iy = srcinfo.coords[1];	// y pixel coordinate
-	index = src.f - src0.f;	// index relative to data start
+        rindex = 0;             // index relative to current start location
+        ix = srcinfo.coords[0];         // x pixel coordinate
+        iy = srcinfo.coords[1];         // y pixel coordinate
+        index = src.f - src0.f;         // index relative to data start
 
-	x1 = 0.5;		// x coordinate in pixel (between 0 and 1)
-	y1 = 0.5;		// y coordinate in pixel (between 0 and 1)
-	vx = vx0[index];	// x velocity
-	vy = vy0[index];	// y velocity
-	if (count) {
-	  vx = -vx;
-	  vy = -vy;
-	}
+        x1 = 0.5;               // x coordinate in pixel (between 0 and 1)
+        y1 = 0.5;               // y coordinate in pixel (between 0 and 1)
+        vx = vx0[index];        // x velocity
+        vy = vy0[index];        // y velocity
+        if (count) {
+          vx = -vx;
+          vy = -vy;
+        }
 
-	s0 = 0.6005612*hypot(vx, vy);	// smoothing width
-	s = 0.0;
-	s1 = 4*s0;
+        s0 = 0.6005612*hypot(vx, vy);   // smoothing width
+        s = 0.0;
+        s1 = 4*s0;
 
-	if (normalize)
-	  norm = s0? (0.5*M_2_SQRTPI)/s0: (0.5*M_2_SQRTPI);
-	
-	while (s < s1) {
-	  c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	  // calculate distance inside the current pixel
-	  x1 -= x2;
-	  y1 -= y2;
-	  ds = hypot(x1, y1);
-	  if (s + ds > s1)
-	    ds = s1 - s;
-	/* we must determine the weight to assign to the contributions.
-	   if gsmooth is used in one dimension, then the weights of the
-	   contributions are equal to exp(-(x/s0)^2) where x is the
-	   integer index of the data point relative to the point under
-	   consideration.  However, if this routine is used to mimic gsmooth,
-	   then s is only equal to 0.5 when x = +1 is reached, so
-	   using exp(-(s/s0)^2) with s the total distance from the central
-	   point does not yield good results.  We can't just add 0.5 to
-	   s from the beginning either, because we do want a weight of 1
-	   for the first included data. */
-	  weight = s? (s + 0.5)/s0: 0.0;
-	  weight = exp(-weight*weight);
-	  dslimit = 0.5*(dslimit + ds);
-	  if (dslimit < 0.2) {	// we fear a semi-infinite loop here
-	    ds = 0.5;
-	    if (s + ds > s1)
-	      ds = s1 - s;
-	  }
-	  switch (c) {
-	    case UP:
-	      if (iy == ny - 1) { // already at top
-		trgt.f[rindex] += *src.f*ds*weight*norm;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = nx;
-	      x1 = x2;
-	      y1 = 0.0;
-	      iy++;
-	      break;
-	    case RIGHT:
-	      if (ix == nx - 1) { // already at right edge
-		trgt.f[rindex] += *src.f*ds*weight*norm;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = 1;
-	      x1 = 0.0;
-	      y1 = y2;
-	      ix++;
-	      break;
-	    case DOWN:
-	      if (iy == 0) {	// already at bottom
-		trgt.f[rindex] += *src.f*ds*weight*norm;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -nx;
-	      x1 = x2;
-	      y1 = 1.0;
-	      iy--;
-	      break;
-	    case LEFT:
-	      if (ix == 0) {	// already at left edge
-		trgt.f[rindex] += *src.f*ds*weight*norm;
-		ws += weight*ds;
-		s += ds;
-		s1 = s;
-		continue;
-	      }
-	      di = -1;
-	      x1 = 1.0;
-	      y1 = y2;
-	      ix--;
-	      break;
-	    case CENTER:
-	      di = 0;
-	      break;
-	  } // end of switch (c)
-	  trgt.f[rindex] += *src.f*weight*ds*norm;
-	  rindex += di;
-	  index += di;
-	  ws += weight*ds;
-	  s += ds;
-	  if (!straight) {
-	    vx = vx0[index];
-	    vy = vy0[index];
-	    if (count) {
-	      vx = -vx;
-	      vy = -vy;
-	    }
-	  }
-	} // end of while (d < DONE)
+        if (normalize)
+          norm = s0? (0.5*M_2_SQRTPI)/s0: (0.5*M_2_SQRTPI);
+        
+        while (s < s1) {
+          c = traverseElement(x1, y1, vx, vy, &x2, &y2);
+          // calculate distance inside the current pixel
+          x1 -= x2;
+          y1 -= y2;
+          ds = hypot(x1, y1);
+          if (s + ds > s1)
+            ds = s1 - s;
+        /* we must determine the weight to assign to the contributions.
+           if gsmooth is used in one dimension, then the weights of the
+           contributions are equal to exp(-(x/s0)^2) where x is the
+           integer index of the data point relative to the point under
+           consideration.  However, if this routine is used to mimic gsmooth,
+           then s is only equal to 0.5 when x = +1 is reached, so
+           using exp(-(s/s0)^2) with s the total distance from the central
+           point does not yield good results.  We can't just add 0.5 to
+           s from the beginning either, because we do want a weight of 1
+           for the first included data. */
+          weight = s? (s + 0.5)/s0: 0.0;
+          weight = exp(-weight*weight);
+          dslimit = 0.5*(dslimit + ds);
+          if (dslimit < 0.2) {  // we fear a semi-infinite loop here
+            ds = 0.5;
+            if (s + ds > s1)
+              ds = s1 - s;
+          }
+          switch (c) {
+            case UP:
+              if (iy == ny - 1) { // already at top
+                trgt.f[rindex] += *src.f*ds*weight*norm;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = nx;
+              x1 = x2;
+              y1 = 0.0;
+              iy++;
+              break;
+            case RIGHT:
+              if (ix == nx - 1) { // already at right edge
+                trgt.f[rindex] += *src.f*ds*weight*norm;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = 1;
+              x1 = 0.0;
+              y1 = y2;
+              ix++;
+              break;
+            case DOWN:
+              if (iy == 0) {    // already at bottom
+                trgt.f[rindex] += *src.f*ds*weight*norm;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -nx;
+              x1 = x2;
+              y1 = 1.0;
+              iy--;
+              break;
+            case LEFT:
+              if (ix == 0) {    // already at left edge
+                trgt.f[rindex] += *src.f*ds*weight*norm;
+                ws += weight*ds;
+                s += ds;
+                s1 = s;
+                continue;
+              }
+              di = -1;
+              x1 = 1.0;
+              y1 = y2;
+              ix--;
+              break;
+            case CENTER:
+              di = 0;
+              break;
+          } // end of switch (c)
+          trgt.f[rindex] += *src.f*weight*ds*norm;
+          rindex += di;
+          index += di;
+          ws += weight*ds;
+          s += ds;
+          if (!straight) {
+            vx = vx0[index];
+            vy = vy0[index];
+            if (count) {
+              vx = -vx;
+              vy = -vy;
+            }
+          }
+        } // end of while (d < DONE)
       } // end of while (count--)
-    } while (advanceLoop(&trgtinfo, &trgt),
-	     advanceLoop(&srcinfo, &src) < srcinfo.rndim);
+    } while (trgtinfo.advanceLoop(&trgt),
+             srcinfo.advanceLoop(&src) < srcinfo.rndim);
   }
   return iq;
 }
@@ -1707,17 +1707,17 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
      gx,gy,vx,vy, n,ox,oy
   */
 {
-  int32_t	iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
+  int32_t       iq, nx, ny, ix, iy, c, index, di, n, i, dims[MAX_DIMS],
     ngrid, dv;
   Symboltype type;
-  float	x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
-  Pointer	gx, gy, vx0, vy0, ox, oy;
+  float         x1, y1, x2, y2, vx, vy, s, s0, ds, dslimit, s1;
+  Pointer       gx, gy, vx0, vy0, ox, oy;
   int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 
   // we treat all arguments.
   if (!symbolIsRealArray(ps[0]))// <gx> must be a real array
     return cerror(ILL_CLASS, ps[0]);
-  ngrid = array_size(ps[0]);	// number of grid points
+  ngrid = array_size(ps[0]);    // number of grid points
   if (!symbolIsRealArray(ps[1]) || // <gy> must be a real array
       array_size(ps[1]) != ngrid) // with the same size as <gx>
     return cerror(INCMP_ARG, ps[1]);
@@ -1754,7 +1754,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     nx = array_dims(ps[2])[0];
     ny = array_dims(ps[2])[1];
     if (array_size(ps[2]) != array_size(ps[3])
-	|| array_dims(ps[3])[0] != nx)
+        || array_dims(ps[3])[0] != nx)
       return cerror(INCMP_ARG, ps[3]);
     if (array_type(ps[3]) > type)
       type = array_type(ps[3]);
@@ -1777,7 +1777,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     n = 1;
 
   // check for <ox> and <oy>; prepare output variables
-  if (narg >= 5) {		// have <ox> and <oy>
+  if (narg >= 5) {              // have <ox> and <oy>
     // we prepare the output symbols
     i = 0;
     if (n > 1)
@@ -1788,7 +1788,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     ox.v = array_data(ps[narg - 2]);
     to_scratch_array(ps[narg - 1], type, i, dims);
     oy.v = array_data(ps[narg - 1]);
-  } else {			// use <gx> and <gy> for <ox> and <oy>
+  } else {                      // use <gx> and <gy> for <ox> and <oy>
     int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
     lux_convert(2, ps, type, 0);
     ox.v = array_data(ps[0]);
@@ -1825,7 +1825,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     dv = 1;
   }
 
-  while (ngrid--) {			// all grid points
+  while (ngrid--) {                     // all grid points
     /* we work up to the desired distance by measuring the path
        lengths in each pixel and adding them up.  This scheme backfires
        when the velocities
@@ -1839,214 +1839,214 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
        small.  We use an exponential decay scale of 2 steps and
        a limit value of 0.2. */
     for (i = 0; i < n; i++) {
-      dslimit = 1.0;		// current weighted average of step sizes
+      dslimit = 1.0;            // current weighted average of step sizes
       if (i) {
-	x1 = x2;
-	y1 = y2;
+        x1 = x2;
+        y1 = y2;
       } else {
-	switch (type) {
-	  case LUX_INT8:
-	    ix = (int32_t) *gx.b;	// x pixel coordinate
-	    iy = (int32_t) *gy.b;	// y pixel coordinate
-	    x1 = (double) *gx.b++ - ix;
-	    y1 = (double) *gy.b++ - iy;
-	    break;
-	  case LUX_INT16:
-	    ix = (int32_t) *gx.w;	// x pixel coordinate
-	    iy = (int32_t) *gy.w;	// y pixel coordinate
-	    x1 = (double) *gx.w++ - ix;
-	    y1 = (double) *gy.w++ - iy;
-	    break;
-	  case LUX_INT32:
-	    ix = (int32_t) *gx.l;	// x pixel coordinate
-	    iy = (int32_t) *gy.l;	// y pixel coordinate
-	    x1 = (double) *gx.l++ - ix;
-	    y1 = (double) *gy.l++ - iy;
-	    break;
-	  case LUX_INT64:
-	    ix = (int32_t) *gx.q;	// x pixel coordinate
-	    iy = (int32_t) *gy.q;	// y pixel coordinate
-	    x1 = (double) *gx.q++ - ix;
-	    y1 = (double) *gy.q++ - iy;
-	    break;
-	  case LUX_FLOAT:
-	    ix = (int32_t) *gx.f;	// x pixel coordinate
-	    iy = (int32_t) *gy.f;	// y pixel coordinate
-	    x1 = (double) *gx.f++ - ix;
-	    y1 = (double) *gy.f++ - iy;
-	    break;
-	  case LUX_DOUBLE:
-	    ix = (int32_t) *gx.d;	// x pixel coordinate
-	    iy = (int32_t) *gy.d;	// y pixel coordinate
-	    x1 = (double) *gx.d++ - ix;
-	    y1 = (double) *gy.d++ - iy;
-	    break;
-	}
-	if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { // out of range
-	  zerobytes(ox.b, lux_type_size[type]);
-	  zerobytes(oy.b, lux_type_size[type]);
-	  ox.b += lux_type_size[type];
-	  oy.b += lux_type_size[type];
-	  continue;
-	}
+        switch (type) {
+          case LUX_INT8:
+            ix = (int32_t) *gx.b;       // x pixel coordinate
+            iy = (int32_t) *gy.b;       // y pixel coordinate
+            x1 = (double) *gx.b++ - ix;
+            y1 = (double) *gy.b++ - iy;
+            break;
+          case LUX_INT16:
+            ix = (int32_t) *gx.w;       // x pixel coordinate
+            iy = (int32_t) *gy.w;       // y pixel coordinate
+            x1 = (double) *gx.w++ - ix;
+            y1 = (double) *gy.w++ - iy;
+            break;
+          case LUX_INT32:
+            ix = (int32_t) *gx.l;       // x pixel coordinate
+            iy = (int32_t) *gy.l;       // y pixel coordinate
+            x1 = (double) *gx.l++ - ix;
+            y1 = (double) *gy.l++ - iy;
+            break;
+          case LUX_INT64:
+            ix = (int32_t) *gx.q;       // x pixel coordinate
+            iy = (int32_t) *gy.q;       // y pixel coordinate
+            x1 = (double) *gx.q++ - ix;
+            y1 = (double) *gy.q++ - iy;
+            break;
+          case LUX_FLOAT:
+            ix = (int32_t) *gx.f;       // x pixel coordinate
+            iy = (int32_t) *gy.f;       // y pixel coordinate
+            x1 = (double) *gx.f++ - ix;
+            y1 = (double) *gy.f++ - iy;
+            break;
+          case LUX_DOUBLE:
+            ix = (int32_t) *gx.d;       // x pixel coordinate
+            iy = (int32_t) *gy.d;       // y pixel coordinate
+            x1 = (double) *gx.d++ - ix;
+            y1 = (double) *gy.d++ - iy;
+            break;
+        }
+        if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { // out of range
+          zerobytes(ox.b, lux_type_size[type]);
+          zerobytes(oy.b, lux_type_size[type]);
+          ox.b += lux_type_size[type];
+          oy.b += lux_type_size[type];
+          continue;
+        }
       }
 
-      index = ix + iy*nx;	// index relative to data start
+      index = ix + iy*nx;       // index relative to data start
 
       switch (type) {
-	case LUX_INT8:
-	  vx = (double) vx0.b[index*dv]; // x velocity
-	  vy = (double) vy0.b[index*dv]; // y velocity
-	  break;
-	case LUX_INT16:
-	  vx = (double) vx0.w[index*dv]; // x velocity
-	  vy = (double) vy0.w[index*dv]; // y velocity
-	  break;
-	case LUX_INT32:
-	  vx = (double) vx0.l[index*dv]; // x velocity
-	  vy = (double) vy0.l[index*dv]; // y velocity
-	  break;
-	case LUX_INT64:
-	  vx = (double) vx0.q[index*dv]; // x velocity
-	  vy = (double) vy0.q[index*dv]; // y velocity
-	  break;
-	case LUX_FLOAT:
-	  vx = (double) vx0.f[index*dv]; // x velocity
-	  vy = (double) vy0.f[index*dv]; // y velocity
-	  break;
-	case LUX_DOUBLE:
-	  vx = (double) vx0.d[index*dv]; // x velocity
-	  vy = (double) vy0.d[index*dv]; // y velocity
-	  break;
+        case LUX_INT8:
+          vx = (double) vx0.b[index*dv]; // x velocity
+          vy = (double) vy0.b[index*dv]; // y velocity
+          break;
+        case LUX_INT16:
+          vx = (double) vx0.w[index*dv]; // x velocity
+          vy = (double) vy0.w[index*dv]; // y velocity
+          break;
+        case LUX_INT32:
+          vx = (double) vx0.l[index*dv]; // x velocity
+          vy = (double) vy0.l[index*dv]; // y velocity
+          break;
+        case LUX_INT64:
+          vx = (double) vx0.q[index*dv]; // x velocity
+          vy = (double) vy0.q[index*dv]; // y velocity
+          break;
+        case LUX_FLOAT:
+          vx = (double) vx0.f[index*dv]; // x velocity
+          vy = (double) vy0.f[index*dv]; // y velocity
+          break;
+        case LUX_DOUBLE:
+          vx = (double) vx0.d[index*dv]; // x velocity
+          vy = (double) vy0.d[index*dv]; // y velocity
+          break;
       }
 
-      s0 = 0.5*hypot(vx, vy);	// length indicates desired distance
+      s0 = 0.5*hypot(vx, vy);   // length indicates desired distance
       s1 = s0;
       s = 0.0;
 
-      while (s < s1) {		// go the distance
-	c = traverseElement(x1, y1, vx, vy, &x2, &y2);
-	// calculate distance inside the current pixel
-	x1 -= x2;
-	y1 -= y2;
-	ds = hypot(x1, y1);	// distance in the current pixel
-	if (s + ds > s1) {	// we went a bit too far
-	  x2 -= x1*(s0 - s - ds)/ds;
-	  y2 -= y1*(s0 - s - ds)/ds;
-	  c = CENTER;
-	}
-	dslimit = 0.5*(dslimit + ds);
-	if (dslimit < 0.2) {	// we fear a semi-infinite loop here
-	  s = s1;		// we break it off
-	  continue;
-	}
-	switch (c) {
-	  case UP:
-	    if (iy == ny - 1) { // we're already at the top
-	      s += ds;
-	      s1 = s;
-	      continue;
-	    }
-	    di = nx;
-	    x1 = x2;
-	    y1 = 0.0;
-	    iy++;
-	    break;
-	  case RIGHT:
-	    if (ix == nx - 1) { // already at right edge
-	      s += ds;
-	      s1 = s;
-	      continue;
-	    }
-	    di = 1;
-	    x1 = 0.0;
-	    y1 = y2;
-	    ix++;
-	    break;
-	  case DOWN:
-	    if (iy == 0) {	// already at bottom
-	      s += ds;
-	      s1 = s;
-	      continue;
-	    }
-	    di = -nx;
-	    x1 = x2;
-	    y1 = 1.0;
-	    iy--;
-	    break;
-	  case LEFT:
-	    if (ix == 0) { 	// already at left edge
-	      s += ds;
-	      s1 = s;
-	      continue;
-	    }
-	    di = -1;
-	    x1 = 1.0;
-	    y1 = y2;
-	    ix--;
-	    break;
-	  case CENTER:
-	    s1 = s;
-	    continue;
-	} // end of switch (c)
-	index += di;
-	s += ds;
-	switch (type) {
-	  case LUX_INT8:
-	    vx = (double) vx0.b[index*dv];
-	    vy = (double) vy0.b[index*dv];
-	    break;
-	  case LUX_INT16:
-	    vx = (double) vx0.w[index*dv];
-	    vy = (double) vy0.w[index*dv];
-	    break;
-	  case LUX_INT32:
-	    vx = (double) vx0.l[index*dv];
-	    vy = (double) vy0.l[index*dv];
-	    break;
-	  case LUX_INT64:
-	    vx = (double) vx0.q[index*dv];
-	    vy = (double) vy0.q[index*dv];
-	    break;
-	  case LUX_FLOAT:
-	    vx = (double) vx0.f[index*dv];
-	    vy = (double) vy0.f[index*dv];
-	    break;
-	  case LUX_DOUBLE:
-	    vx = (double) vx0.d[index*dv];
-	    vy = (double) vy0.d[index*dv];
-	    break;
-	}
+      while (s < s1) {          // go the distance
+        c = traverseElement(x1, y1, vx, vy, &x2, &y2);
+        // calculate distance inside the current pixel
+        x1 -= x2;
+        y1 -= y2;
+        ds = hypot(x1, y1);     // distance in the current pixel
+        if (s + ds > s1) {      // we went a bit too far
+          x2 -= x1*(s0 - s - ds)/ds;
+          y2 -= y1*(s0 - s - ds)/ds;
+          c = CENTER;
+        }
+        dslimit = 0.5*(dslimit + ds);
+        if (dslimit < 0.2) {    // we fear a semi-infinite loop here
+          s = s1;               // we break it off
+          continue;
+        }
+        switch (c) {
+          case UP:
+            if (iy == ny - 1) { // we're already at the top
+              s += ds;
+              s1 = s;
+              continue;
+            }
+            di = nx;
+            x1 = x2;
+            y1 = 0.0;
+            iy++;
+            break;
+          case RIGHT:
+            if (ix == nx - 1) { // already at right edge
+              s += ds;
+              s1 = s;
+              continue;
+            }
+            di = 1;
+            x1 = 0.0;
+            y1 = y2;
+            ix++;
+            break;
+          case DOWN:
+            if (iy == 0) {      // already at bottom
+              s += ds;
+              s1 = s;
+              continue;
+            }
+            di = -nx;
+            x1 = x2;
+            y1 = 1.0;
+            iy--;
+            break;
+          case LEFT:
+            if (ix == 0) {      // already at left edge
+              s += ds;
+              s1 = s;
+              continue;
+            }
+            di = -1;
+            x1 = 1.0;
+            y1 = y2;
+            ix--;
+            break;
+          case CENTER:
+            s1 = s;
+            continue;
+        } // end of switch (c)
+        index += di;
+        s += ds;
+        switch (type) {
+          case LUX_INT8:
+            vx = (double) vx0.b[index*dv];
+            vy = (double) vy0.b[index*dv];
+            break;
+          case LUX_INT16:
+            vx = (double) vx0.w[index*dv];
+            vy = (double) vy0.w[index*dv];
+            break;
+          case LUX_INT32:
+            vx = (double) vx0.l[index*dv];
+            vy = (double) vy0.l[index*dv];
+            break;
+          case LUX_INT64:
+            vx = (double) vx0.q[index*dv];
+            vy = (double) vy0.q[index*dv];
+            break;
+          case LUX_FLOAT:
+            vx = (double) vx0.f[index*dv];
+            vy = (double) vy0.f[index*dv];
+            break;
+          case LUX_DOUBLE:
+            vx = (double) vx0.d[index*dv];
+            vy = (double) vy0.d[index*dv];
+            break;
+        }
       } // end of while (s < s0)
 
       // if we get here then we are at the desired spot, or we have overshot
       // it a bit.  We adjust.
 
       switch (type) {
-	case LUX_INT8:
-	  *ox.b++ = ix + x2;
-	  *oy.b++ = iy + y2;
-	  break;
-	case LUX_INT16:
-	  *ox.w++ = ix + x2;
-	  *oy.w++ = iy + y2;
-	  break;
-	case LUX_INT32:
-	  *ox.l++ = ix + x2;
-	  *oy.l++ = iy + y2;
-	  break;
-	case LUX_INT64:
-	  *ox.q++ = ix + x2;
-	  *oy.q++ = iy + y2;
-	  break;
-	case LUX_FLOAT:
-	  *ox.f++ = ix + x2;
-	  *oy.f++ = iy + y2;
-	  break;
-	case LUX_DOUBLE:
-	  *ox.d++ = ix + x2;
-	  *oy.d++ = iy + y2;
-	  break;
+        case LUX_INT8:
+          *ox.b++ = ix + x2;
+          *oy.b++ = iy + y2;
+          break;
+        case LUX_INT16:
+          *ox.w++ = ix + x2;
+          *oy.w++ = iy + y2;
+          break;
+        case LUX_INT32:
+          *ox.l++ = ix + x2;
+          *oy.l++ = iy + y2;
+          break;
+        case LUX_INT64:
+          *ox.q++ = ix + x2;
+          *oy.q++ = iy + y2;
+          break;
+        case LUX_FLOAT:
+          *ox.f++ = ix + x2;
+          *oy.f++ = iy + y2;
+          break;
+        case LUX_DOUBLE:
+          *ox.d++ = ix + x2;
+          *oy.d++ = iy + y2;
+          break;
       }
     } // end of for (i = 0; i < n; i++)
   } // end of while (ngrid--)
@@ -2066,15 +2066,15 @@ void legendre(double x, int32_t lmax, double *values)
 // (with n!! the product of all *odd* values between 1 and n)
 // P_{m+1}^m = x (2 m + 1) P_m^m
 {
-  int32_t	l, m, j1, j2, j3, j4;
-  double	z, *p, v1, v2;
+  int32_t       l, m, j1, j2, j3, j4;
+  double        z, *p, v1, v2;
 
   zerobytes(values, (lmax + 1)*(lmax + 2)*sizeof(double)/2);
 
   p = values;
   z = sqrt(1 - x*x);
   // first we calculate P_l^l for all <l>
-  v1 = *p = 1.0;		// P_0^0
+  v1 = *p = 1.0;                // P_0^0
   p += 2;
   //    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4
   //    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4
@@ -2096,7 +2096,7 @@ void legendre(double x, int32_t lmax, double *values)
   for (m = 0; m < lmax; m++) {
     v2 = values[(m + 1)*(m + 2)/2 - 1]; // P_m^m
     v1 = values[(m + 2)*(m + 3)/2 - 2] = x*(2*m + 1)*v2; // P_{m+1}^m
-    p = values + (m + 3)*(m + 4)/2 - 3;	// points at P_{m+2}^m
+    p = values + (m + 3)*(m + 4)/2 - 3;         // points at P_{m+2}^m
     j1 = 2*m + 3;
     j2 = j1 - 2;
     j3 = 2;
@@ -2125,13 +2125,13 @@ void spherical_harmonics(double x, int32_t lmax, double *values)
 // m 0 0 1 0 1 2 0 1 2 3
 // NOTE: doesn't seem quite OK yet
 {
-  int32_t	l, m, j4;
-  double	z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
+  int32_t       l, m, j4;
+  double        z, *p, v1, v2, w1, w2, w3, w4, w5, w6;
 
   p = values;
   z = sqrt(1 - x*x);
   // first we calculate y_l^l for all <l>
-  v1 = *p = 0.25*M_2_SQRTPI;	// P_0^0
+  v1 = *p = 0.25*M_2_SQRTPI;    // P_0^0
   p += 2;
   //    l 0 1 1 2 2 2 3 3 3 3 4 4 4 4 4
   //    m 0 0 1 0 1 2 0 1 2 3 0 1 2 3 4
@@ -2159,7 +2159,7 @@ void spherical_harmonics(double x, int32_t lmax, double *values)
   for (m = 0; m < lmax; m++) {
     v2 = values[(m + 1)*(m + 2)/2 - 1]; // P_m^m
     v1 = values[(m + 2)*(m + 3)/2 - 2] = x*sqrt(2*m + 3)*v2; // P_{m+1}^m
-    p = values + (m + 3)*(m + 4)/2 - 3;	// points at P_{m+2}^m
+    p = values + (m + 3)*(m + 4)/2 - 3;         // points at P_{m+2}^m
     j4 = m + 2;
     w2 = m*m;
     w3 = 2*(m + 2) + 1;
@@ -2183,8 +2183,8 @@ void spherical_harmonics(double x, int32_t lmax, double *values)
 int32_t lux_legendre(int32_t narg, int32_t ps[])
 // LEGENDRE(x, lmax)
 {
-  double	x, *values;
-  int32_t	lmax, out, n;
+  double        x, *values;
+  int32_t       lmax, out, n;
 
   x = double_arg(ps[0]);
   if (x < -1 || x > 1)
@@ -2251,12 +2251,12 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
     hist[x]++;
   }
   src.b = (uint8_t*) array_data(ps[0]);
-  for (i = 1; i < nhist; i++)	// calculate running sum
+  for (i = 1; i < nhist; i++)   // calculate running sum
     hist[i] += hist[i - 1];
   a = 2 - 4*target;
   b = 1 - a;
   m[0] = 1.0;
-  for (i = 1; i < nhist; i++) {	// calculate adjustment factors
+  for (i = 1; i < nhist; i++) {         // calculate adjustment factors
     float q;
 
     q = (float) hist[i]*dims[0]/nelem;
@@ -2276,7 +2276,7 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
 
       y = *src.b++ * m[x];
       if (y > 255)
-	y = 255;
+        y = 255;
       *tgt.b++ = y;
     }
   }
@@ -2739,6 +2739,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
 }
 REGISTER(polar_to_ssfc, f, polartossfc, 1, 2, 0);
 
+#if 0
 /// maxspan(<condition>[, <axis>][, /cycle])
 ///
 /// Returns the maximum length of a consecutive span of elements of
@@ -2796,4 +2797,5 @@ int32_t lux_maxspan(int32_t narg, int32_t ps[]) {
 
   return sa.result();
 }
-REGISTER(maxspan, f, maxspan, 1, 2, "1cycle");
+xREGISTER(maxspan, f, maxspan, 1, 2, "1cycle");
+#endif

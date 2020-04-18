@@ -204,10 +204,10 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
       return LUX_ERROR;
     axes = oneaxis;
     naxes = 1;
-    setAxes(&infos[0], 0, NULL, SL_EACHROW);
+    infos[0].setAxes(0, NULL, SL_EACHROW);
     if (isfunction) {
       iret = 1;
-      setAxes(&infos[iret], 0, NULL, SL_EACHROW);
+      infos[iret].setAxes(0, NULL, SL_EACHROW);
     } else
       iret = 0;
     break;
@@ -217,13 +217,13 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
       return LUX_ERROR;
     axes = ptrs[1].l;
     naxes = infos[1].nelem;
-    if (setAxes(&infos[0], infos[1].nelem, ptrs[1].l,
-                SL_EACHROW | SL_UNIQUEAXES) < 0)
+    if (infos[0].setAxes(infos[1].nelem, ptrs[1].l,
+                         SL_EACHROW | SL_UNIQUEAXES) < 0)
       return LUX_ERROR;
     if (isfunction) {
       iret = 2;
-      if (setAxes(&infos[iret], infos[1].nelem, ptrs[1].l,
-                  SL_EACHROW | SL_UNIQUEAXES) < 0)
+      if (infos[iret].setAxes(infos[1].nelem, ptrs[1].l,
+                              SL_EACHROW | SL_UNIQUEAXES) < 0)
         return LUX_ERROR;
     } else
       iret = 0;
@@ -249,16 +249,16 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
   }
   int32_t iaxis;
   for (iaxis = 0; iaxis < naxes; iaxis++) {
-    setAxes(&infos[0], 1, &axes[iaxis], SL_EACHROW);
+    infos[0].setAxes(1, &axes[iaxis], SL_EACHROW);
     ptrs[0] = ptrs0;
     if (isfunction) {
-      setAxes(&infos[iret], 1, &axes[iaxis], SL_EACHROW);
+      infos[iret].setAxes(1, &axes[iaxis], SL_EACHROW);
       ptrs[iret] = ptrsr;
     }
     do {
       f(ptrs[iret].d, infos[iret].rdims[0], infos[iret].rsinglestep[0]);
       ptrs[iret].d += infos[iret].rsinglestep[0]*infos[iret].rdims[0];
-    } while (advanceLoop(&infos[iret], &ptrs[iret]) < infos[iret].rndim);
+    } while (infos[iret].advanceLoop(&ptrs[iret]) < infos[iret].rndim);
   }
   if (allaxes)
     free(axes);
@@ -868,7 +868,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
       return LUX_ERROR;
     axes = oneaxis;
     naxes = 1;
-    setAxes(&infos[0], 0, NULL, SL_EACHROW);
+    infos[0].setAxes(0, NULL, SL_EACHROW);
     iret = 1;
     break;
   case 2:                       // source, axes
@@ -876,8 +876,8 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
       return LUX_ERROR;
     axes = ptrs[1].l;
     naxes = infos[1].nelem;
-    if (setAxes(&infos[0], infos[1].nelem, ptrs[1].l,
-                SL_EACHROW | SL_UNIQUEAXES) < 0)
+    if (infos[0].setAxes(infos[1].nelem, ptrs[1].l,
+                         SL_EACHROW | SL_UNIQUEAXES) < 0)
       return LUX_ERROR;
     iret = 2;
     break;
@@ -895,14 +895,14 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
   ptrsr = ptrs[iret];
   int32_t iaxis;
   for (iaxis = 0; iaxis < naxes; iaxis++) {
-    setAxes(&infos[0], 1, &axes[iaxis], SL_EACHROW);
+    infos[0].setAxes(1, &axes[iaxis], SL_EACHROW);
     ptrs[0] = ptrs0;
     ptrs[iret] = ptrsr;
     do {
       *ptrs[iret].d = f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0]);
       ptrs[0].d += infos[0].rsinglestep[1];
-    } while (advanceLoop(&infos[iret], &ptrs[iret]),
-             advanceLoop(&infos[0], &ptrs[0]) < infos[0].rndim);
+    } while (infos[iret].advanceLoop(&ptrs[iret]),
+             infos[0].advanceLoop(&ptrs[0]) < infos[0].rndim);
   }
   if (allaxes)
     free(axes);
@@ -1731,8 +1731,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     ipar1 = 1;
     ipar2 = -1;
     iret = 2;
-    setAxes(&infos[0], 0, NULL, SL_EACHROW);
-    setAxes(&infos[iret], 0, NULL, SL_EACHROW);
+    infos[0].setAxes(0, NULL, SL_EACHROW);
+    infos[iret].setAxes(0, NULL, SL_EACHROW);
     break;
   case 3:                       // source, param1, param2
     if ((iq = sa.set(narg, ps, "iD*;iD;iD;rD&", &ptrs, &infos)) < 0)
@@ -1740,8 +1740,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     ipar1 = 1;
     ipar2 = 2;
     iret = 3;
-    setAxes(&infos[0], 0, NULL, SL_EACHROW);
-    setAxes(&infos[iret], 0, NULL, SL_EACHROW);
+    infos[0].setAxes(0, NULL, SL_EACHROW);
+    infos[iret].setAxes(0, NULL, SL_EACHROW);
     break;
   case 4:                       // source, axis, param1, param2
     if ((iq = sa.set(narg, ps, "iD*;iL;iD;iD;rD&", &ptrs, &infos)) < 0)
@@ -1749,8 +1749,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     ipar1 = 2;
     ipar2 = 3;
     iret = 4;
-    setAxes(&infos[0], infos[1].nelem, ptrs[1].l, SL_EACHROW);
-    setAxes(&infos[iret], infos[1].nelem, ptrs[1].l, SL_EACHROW);
+    infos[0].setAxes(infos[1].nelem, ptrs[1].l, SL_EACHROW);
+    infos[iret].setAxes(infos[1].nelem, ptrs[1].l, SL_EACHROW);
     break;
   }
   do {
@@ -1759,8 +1759,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
       ptrs[iret].d, infos[0].rdims[0], infos[iret].rsinglestep[0]);
     ptrs[0].d += infos[0].rsinglestep[1];
     ptrs[iret].d += infos[iret].rsinglestep[1];
-  } while (advanceLoop(&infos[0], &ptrs[0]),
-           advanceLoop(&infos[iret], &ptrs[iret])
+  } while (infos[0].advanceLoop(&ptrs[0]),
+           infos[iret].advanceLoop(&ptrs[iret])
            < infos[iret].rndim);
   return iq;
 }
@@ -1806,10 +1806,10 @@ lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(int32_t narg, int32_t ps[],
     return LUX_ERROR;
   do {
     f(*ptrs[0].d, *ptrs[1].d, *ptrs[2].d, (double (*)[3]) ptrs[3].d);
-  } while (advanceLoop(&infos[0], &ptrs[3]),
-           advanceLoop(&infos[1], &ptrs[2]),
-           advanceLoop(&infos[2], &ptrs[1]),
-           advanceLoop(&infos[3], &ptrs[0]) < infos[0].rndim);
+  } while (infos[0].advanceLoop(&ptrs[3]),
+           infos[1].advanceLoop(&ptrs[2]),
+           infos[2].advanceLoop(&ptrs[1]),
+           infos[3].advanceLoop(&ptrs[0]) < infos[0].rndim);
   return sa.result();
 }
 //-----------------------------------------------------------------------

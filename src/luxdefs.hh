@@ -635,49 +635,6 @@ typedef struct {
   gsl_spline *spline; gsl_interp_accel *acc; double *x; double *y;
 } csplineInfo;
 
-/// axis loop information
-struct LoopInfo {
-  /// A pointer to a `pointer` to the current data element.  For
-  /// example, if the data type is LUX_DOUBLE, then the current data
-  /// element is at `data->d`.  Gets updated as appropriate when the
-  /// axes are traversed.
-  Pointer *data;
-
-  /// The start of the data.  Remains constant when the axes are
-  /// traversed.
-  void *data0;
-
-  /// The current (rearranged) coordinates, taking into account which
-  /// axes are traversed (and in what order), and taking into account
-  /// axis compression, if any.  `coords[i]` indicates the position
-  /// along axis `axes[i]` (for `i < naxes`).
-  int32_t coords[MAX_DIMS];
-
-  /// The step size (elements) per original dimension.  You have to
-  /// move the `data` pointer forward by `coords[i]` elements when
-  /// original dimension `i` increases by 1.
-  int32_t singlestep[MAX_DIMS];
-
-  int32_t step[MAX_DIMS];           //!< combined step size for loop transfer
-  int32_t dims[MAX_DIMS];           //!< original dimensions
-  int32_t nelem;                    //!< number of elements
-  int32_t ndim;                     //!< number of original dimensions
-  int32_t axes[MAX_DIMS];           //!< selected axes
-  int32_t naxes;                    //!< selected number of axes
-  int32_t rdims[MAX_DIMS];          //!< compressed rearranged dimensions
-  int32_t rndim;                    //!< number of compressed rearranged dims
-  int32_t rsinglestep[MAX_DIMS];    //!< step size per rearranged coordinate
-  int32_t axisindex;                //!< index to current axis (in axes[])
-  int32_t mode;                     //!< desired treatment modes
-  int32_t stride;                   //!< bytes per data element
-  Symboltype type;                  //!< data type
-  int32_t advanceaxis;              //!< how many axes not to advance (from start)
-  int32_t raxes[MAX_DIMS];          //!< from rearranged to old axes
-  int32_t iraxes[MAX_DIMS];         //!< from old to rearranged axes
-
-  void setAxes(int32_t nAxes, int32_t* axes, int32_t mode);
-  void setOneDimensional();
-};
 
 /// for nextCompileLevel
 typedef struct compileInfoStruct {

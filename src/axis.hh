@@ -24,160 +24,66 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "types.hh"
 
 /// \file
-/// Declares supporting data types and functions for standard_args().
 
-/// Selects how to handle a particular dimension, for use in
-/// standard_args().  Each constant is a bit flag that can be combined
-/// with others through the logical or operation.  Not all
-/// combinations are logical.
-enum dim_spec_type {
-  /// No selection.
-  DS_NONE = 0,
+/// axis loop information
+struct LoopInfo {
+  /// A pointer to a `pointer` to the current data element.  For
+  /// example, if the data type is LUX_DOUBLE, then the current data
+  /// element is at `data->d`.  Gets updated as appropriate when the
+  /// axes are traversed.
+  Pointer *data;
 
-  /// Accept the dimension as is.  Corresponds to `:` in the dimension
-  /// part of a standard_args() format specification.
-  DS_ACCEPT = (1<<0),
+  /// The start of the data.  Remains constant when the axes are
+  /// traversed.
+  void *data0;
 
-  /// Insert this dimension.  Corresponds to `+` in a format
-  /// specification.
-  DS_ADD = (1<<1),
+  /// The current (rearranged) coordinates, taking into account which
+  /// axes are traversed (and in what order), and taking into account
+  /// axis compression, if any.  `coords[i]` indicates the position
+  /// along axis `axes[i]` (for `i < naxes`).
+  int32_t coords[MAX_DIMS];
 
-  /// Remove this dimension.  Corresponds to `-` in a format
-  /// specification.
-  DS_REMOVE = (1<<2),
+  /// The step size (elements) per original dimension.  You have to
+  /// move the `data` pointer forward by `coords[i]` elements when
+  /// original dimension `i` increases by 1.
+  int32_t singlestep[MAX_DIMS];
 
-  /// Add or remove this dimension.
-  DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
+  int32_t step[MAX_DIMS];           //!< combined step size for loop transfer
+  int32_t dims[MAX_DIMS];           //!< original dimensions
+  int32_t nelem;                    //!< number of elements
+  int32_t ndim;                     //!< number of original dimensions
+  int32_t axes[MAX_DIMS];           //!< selected axes
+  int32_t naxes;                    //!< selected number of axes
+  int32_t rdims[MAX_DIMS];          //!< compressed rearranged dimensions
+  int32_t rndim;                    //!< number of compressed rearranged dims
+  int32_t rsinglestep[MAX_DIMS];    //!< step size per rearranged coordinate
+  int32_t axisindex;                //!< index to current axis (in axes[])
+  int32_t mode;                     //!< desired treatment modes
+  int32_t stride;                   //!< bytes per data element
+  Symboltype type;                  //!< data type
+  int32_t advanceaxis;              //!< how many axes not to advance (from start)
+  int32_t raxes[MAX_DIMS];          //!< from rearranged to old axes
+  int32_t iraxes[MAX_DIMS];         //!< from old to rearranged axes
 
-  /// Copy this dimension from the reference symbol.  Corresponds to
-  /// `&` in a format specification.
-  DS_COPY_REF = (1<<3),
+  int32_t setAxes(int32_t nAxes, int32_t *axes, int32_t mode);
+  int setupDimensionLoop(int32_t ndim, int32_t const *dims,
+                         Symboltype type, int32_t naxes, int32_t const *axes,
+                         Pointer *data, int32_t mode);
+  int32_t advanceLoop(Pointer *ptr);
+  int32_t loopIsAtStart() const;
+  void rearrangeDimensionLoop();
+  void setAxisMode(int32_t mode);
+  int32_t dimensionLoopResult1(int32_t tmode, Symboltype ttype,
+                               int32_t nMore, int32_t const * more,
+                               int32_t nLess, int32_t const * less,
+                               LoopInfo *tinfo, Pointer *tptr);
+  int32_t dimensionLoopResult(LoopInfo *tinfo, Symboltype ttype, Pointer *tptr);
+  int32_t nextLoop();
+  void subdataLoop(int32_t *range);
+  void rearrangeEdgeLoop(LoopInfo *trgt, int32_t index);
+  int32_t moveLoop(int32_t index, int32_t distance);
+  void returnLoop( Pointer *ptr, int32_t index);
 
-  /// This dimension must have exactly the specified size.
-  DS_EXACT = (1<<4),
-
-  /// This dimension must have at least the specified size.
-  /// Corresponds to `>` in a format specification.
-  DS_ATLEAST = (1<<5),
-};
-
-/// Represents a single dimension specification from a standard_args()
-/// format specification.
-struct Dims_spec {
-  /// How to handle the dimension.
-  enum dim_spec_type type;
-
-  /// The size to add, or 0 if not specified.
-  size_t size_add;
-
-  /// The size to remove, or 0 if not specified.
-  size_t size_remove;
-};
-
-/// Represents the parameter type from a standard_args() format
-/// specification.
-enum param_spec_type {
-  /// For an input parameter.  Corresponds to `i` in a standard_args()
-  /// format specification.
-  PS_INPUT,
-
-  /// For an output parameter.  Corresponds to `o` in a format
-  /// specification.
-  PS_OUTPUT,
-
-  /// For a return parameter.  Corresponds to `r` in a format
-  /// specification.
-  PS_RETURN
-};
-
-/// Represents how a data type specification in a standard_args()
-/// format specification should be interpreted.
-enum type_spec_limit_type {
-  /// The data type is exact.
-  PS_EXACT,
-
-  /// The data type is a lower limit: If an input argument has a data
-  /// type lower than this, then a copy converted to this type is used
-  /// instead.  Corresponds to `>` in the data type part of a
-  /// standard_args() format specification.
-  PS_LOWER_LIMIT
-};
-
-
-/// Represents how the remaining dimensions should be handled
-/// according to a standard_args() format specification.
-enum remaining_dims_type {
-  /// Only the explicitly mentioned dimensions are present.
-  PS_ABSENT,
-
-  /// Remaining dimensions are equal to the corresponding ones from
-  /// the reference parameter.  Corresponds to `&` in a
-  /// standard_args() format specification.
-  PS_EQUAL_TO_REFERENCE,
-
-  /// Remaining dimensions are equal to 1 or to the corresponding ones
-  /// from the reference parameter.  Corresponds to `#` in a format
-  /// specification.
-  PS_ONE_OR_EQUAL_TO_REFERENCE,
-
-  /// Remaining dimensions may have arbitrary sizes.  Corresponds to
-  /// `*` in a format specification.
-  PS_ARBITRARY
-};
-
-/// Represents the specification of a single parameter in a
-/// standard_args() format specification.
-struct Param_spec {
-  /// The parameter type.
-  enum param_spec_type logical_type;
-
-  /// `true` if the parameter is optional, `false` if is is mandatory.
-  bool is_optional;
-
-  /// The data type limitation.
-  enum type_spec_limit_type data_type_limit;
-
-  /// The data type.
-  Symboltype data_type;
-
-  /// The count of dimension specifications in \p Dims_spec.
-  size_t num_dims_spec;
-
-  /// A pointer to the beginning of the array of dimension
-  /// specifications.
-  Dims_spec *dims_spec;
-
-  /// The reference parameter index in \p Dims_spec.
-  int32_t ref_par;
-
-  /// The axis parameter index in \p Dims_spec.
-  int32_t axis_par;
-
-  /// How to handle dimensions that aren't explicitly specified.
-  enum remaining_dims_type remaining_dims;
-
-  /// `true` if the current dimension has the "common type" flag (`^`
-  /// in a standard_args() format specification), `false` otherwise.
-  bool common_type;
-
-  /// `true` if dimensions equal to one should be suppressed as far as
-  /// possible, `false` otherwise.
-  bool omit_dimensions_equal_to_one;
-};
-
-/// Represents a list of parameter specifications corresponding to a
-/// standard_args() format specification.
-struct param_spec_list {
-  /// The count of parameter specifications in \p param_specs.
-  size_t num_param_specs;
-
-  /// A pointer to the beginning of the list of parameter
-  /// specifications.
-  Param_spec *param_specs;
-
-  /// The index of the return parameter in the list of parameter
-  /// specifications.
-  int32_t return_param_index;
 };
 
 #endif

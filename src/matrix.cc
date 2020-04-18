@@ -65,7 +65,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   }
 
   int32_t i, *tdims, tndim;
-  if (internalMode & 1) {	// /OUTER
+  if (internalMode & 1) {       // /OUTER
     tndim = infos[0].ndim + infos[1].ndim - 2;
     if (tndim > MAX_DIMS) {
       iq = luxerror("Result would have %d dimensions, but at most %d"
@@ -98,12 +98,12 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   standard_redef_array(iq, LUX_DOUBLE, tndim, tdims, 0, NULL,
                        infos[2].mode, &ptrs[2], &infos[2]);
   free(tdims);
-  setAxes(&infos[0], 2, NULL, SL_EACHBLOCK);
-  setAxes(&infos[1], 2, NULL, SL_EACHBLOCK);
-  setAxes(&infos[2], 2, NULL, SL_EACHBLOCK);
+  infos[0].setAxes(2, NULL, SL_EACHBLOCK);
+  infos[1].setAxes(2, NULL, SL_EACHBLOCK);
+  infos[2].setAxes(2, NULL, SL_EACHBLOCK);
 
   int32_t j, k;
-  if (internalMode & 1) {	// /OUTER
+  if (internalMode & 1) {       // /OUTER
     do {
       do {
         for (i = 0; i < dims1[1]; i++) // rows of #1
@@ -115,11 +115,11 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
           }
         ptrs[0].d += infos[0].singlestep[2];
         ptrs[2].d += infos[2].singlestep[2];
-      } while (advanceLoop(&infos[0], &ptrs[0]),
-               advanceLoop(&infos[2], &ptrs[2]) < 2);
+      } while (infos[0].advanceLoop(&ptrs[0]),
+               infos[2].advanceLoop(&ptrs[2]) < 2);
       ptrs[0].d -= infos[0].ndim > 3? infos[0].singlestep[3]: infos[0].nelem;
       ptrs[1].d += infos[1].singlestep[2];
-    } while (advanceLoop(&infos[1], &ptrs[1]) < infos[1].ndim);
+    } while (infos[1].advanceLoop(&ptrs[1]) < infos[1].ndim);
   } else {                      // /INNER
     do {
       for (i = 0; i < dims1[1]; i++) // rows of #1
@@ -132,9 +132,9 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
       ptrs[0].d += infos[0].singlestep[2];
       ptrs[1].d += infos[1].singlestep[2];
       ptrs[2].d += infos[2].singlestep[2];
-    } while (advanceLoop(&infos[0], &ptrs[0]),
-             advanceLoop(&infos[1], &ptrs[1]),
-             advanceLoop(&infos[2], &ptrs[2]) < infos[2].ndim);
+    } while (infos[0].advanceLoop(&ptrs[0]),
+             infos[1].advanceLoop(&ptrs[1]),
+             infos[2].advanceLoop(&ptrs[2]) < infos[2].ndim);
   }
   return iq;
 
@@ -146,8 +146,8 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
 REGISTER(matrix_product, f, mproduct, 2, 2, "0inner:1outer");
 //-------------------------------------------------------------------------
 int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
-				 double *u_out, double *s_out,
-				 double *v_out)
+                                 double *u_out, double *s_out,
+                                 double *v_out)
 {
   if (!a_in || !u_out || !s_out || !v_out || !nrow || !ncol) {
     errno = EDOM;
@@ -179,7 +179,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
       memcpy(s_out, s->data, nmin*sizeof(*s_out));
       memcpy(v_out, v->data, nmin*nmin*sizeof(*v_out));
     }
-  } else {			// ncol > nrow
+  } else {                      // ncol > nrow
     nmin = nrow;
     nmax = ncol;
     a = gsl_matrix_alloc(nmax, nmin);
@@ -188,7 +188,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
 
     for (i = 0; i < nmax; i++)
       for (j = 0; j < nmin; j++)
-	a->data[i*a->tda + j] = a_in[i + j*nmax];
+        a->data[i*a->tda + j] = a_in[i + j*nmax];
 
     v = gsl_matrix_alloc(nmin, nmin);
     s = gsl_vector_alloc(nmin);
@@ -198,12 +198,12 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
 
     if (!result) {
       for (i = 0; i < nmax; i++)
-	for (j = 0; j < nmin; j++)
-	  v_out[i + j*nmax] = a->data[i*a->tda + j];
+        for (j = 0; j < nmin; j++)
+          v_out[i + j*nmax] = a->data[i*a->tda + j];
       memcpy(s_out, s->data, nmin*sizeof(*s_out));
       for (i = 0; i < nmin; i++)
-	for (j = 0; j < nmin; j++)
-	  u_out[i + j*nmin] = v->data[i*v->tda + j];
+        for (j = 0; j < nmin; j++)
+          u_out[i + j*nmin] = v->data[i*v->tda + j];
     }
   }
   gsl_matrix_free(a);
@@ -275,10 +275,10 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
     standard_redef_array(ps[1], LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
                          infos[1].mode, &ptrs[1], &infos[1]);
   }
-  setAxes(&infos[0], 2, NULL, SL_EACHBLOCK);
-  setAxes(&infos[1], 1, NULL, SL_EACHBLOCK);
-  setAxes(&infos[2], 2, NULL, SL_EACHBLOCK);
-  setAxes(&infos[3], 2, NULL, SL_EACHBLOCK);
+  infos[0].setAxes(2, NULL, SL_EACHBLOCK);
+  infos[1].setAxes(1, NULL, SL_EACHBLOCK);
+  infos[2].setAxes(2, NULL, SL_EACHBLOCK);
+  infos[3].setAxes(2, NULL, SL_EACHBLOCK);
   do {
     if (singular_value_decomposition(ptrs[0].d, infos[0].dims[0], // # cols
                                      infos[0].dims[1],          // # rows
@@ -289,10 +289,10 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
     ptrs[1].d += infos[1].singlestep[2];
     ptrs[2].d += infos[2].singlestep[1];
     ptrs[3].d += infos[3].singlestep[2];
-  } while (advanceLoop(&infos[0], &ptrs[0]),
-           advanceLoop(&infos[1], &ptrs[1]),
-           advanceLoop(&infos[2], &ptrs[2]),
-           advanceLoop(&infos[3], &ptrs[3]) < infos[3].ndim);
+  } while (infos[0].advanceLoop(&ptrs[0]),
+           infos[1].advanceLoop(&ptrs[1]),
+           infos[2].advanceLoop(&ptrs[2]),
+           infos[3].advanceLoop(&ptrs[3]) < infos[3].ndim);
   iq = LUX_OK;
   return iq;
 }
@@ -334,16 +334,16 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
                        infos[1].mode, &ptrs[1], &infos[1]);
   dims[0] = 0;
   dims[1] = 1;
-  setAxes(&infos[0], 2, dims, SL_EACHBLOCK);
-  setAxes(&infos[1], 2, dims, SL_EACHBLOCK);
+  infos[0].setAxes(2, dims, SL_EACHBLOCK);
+  infos[1].setAxes(2, dims, SL_EACHBLOCK);
   free(dims);
   n = infos[0].dims[0]*infos[0].dims[1];
   do {
     matrix_transpose(ptrs[0].d, ptrs[1].d, infos[0].dims[0], infos[0].dims[1]);
     ptrs[0].d += n;
     ptrs[1].d += n;
-  } while (advanceLoop(&infos[0], &ptrs[0]),
-           advanceLoop(&infos[1], &ptrs[1]) < infos[1].rndim);
+  } while (infos[0].advanceLoop(&ptrs[0]),
+           infos[1].advanceLoop(&ptrs[1]) < infos[1].rndim);
   return iq;
 }
 REGISTER(transpose_matrix, f, transpose, 1, 1, NULL);

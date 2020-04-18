@@ -25,36 +25,37 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "error.hh"
 #include "dmalloc.hh"
 #include "bindings.hh"
+#include "axis.hh"
 #include "StandardArguments.hh"
 
-extern char		expname[], line[], *curScrat;
+extern char             expname[], line[], *curScrat;
 extern char const* currentRoutineName;
-extern int16_t		listStack[],  curContext;
-extern int32_t		scrat[], lux_file_open[], errorSym,
-			MSBfirst, suppressMsg;
-extern int32_t	lux_type_size[];
+extern int16_t          listStack[],  curContext;
+extern int32_t          scrat[], lux_file_open[], errorSym,
+                        MSBfirst, suppressMsg;
+extern int32_t  lux_type_size[];
 
-extern FILE		*inputStream, *lux_file[];
-extern hashTableEntry	*varHashTable[], *subrHashTable[], *funcHashTable[],
-			*blockHashTable[];
-extern symTableEntry	sym[];
-extern internalRoutine	*subroutine, *function;
-extern int32_t		nSubroutine, nFunction, curLineNumber, compileLevel,
-			ignoreInput, curSymbol, axisTally[];
+extern FILE             *inputStream, *lux_file[];
+extern hashTableEntry   *varHashTable[], *subrHashTable[], *funcHashTable[],
+                        *blockHashTable[];
+extern symTableEntry    sym[];
+extern internalRoutine  *subroutine, *function;
+extern int32_t          nSubroutine, nFunction, curLineNumber, compileLevel,
+                        ignoreInput, curSymbol, axisTally[];
 extern unsigned int     internalMode;
-extern struct boundsStruct	bounds;
-extern int32_t	(*lux_converts[])(int32_t, int32_t []);
+extern struct boundsStruct      bounds;
+extern int32_t  (*lux_converts[])(int32_t, int32_t []);
 
-char 	*strsave(char const *), *symbolIdent(int32_t, int32_t),
-	*string_arg(int32_t), *expand_name(char const *, char const *),
-	*strsave_system(char *), *nextline(char *, size_t, FILE *);
+char    *strsave(char const *), *symbolIdent(int32_t, int32_t),
+        *string_arg(int32_t), *expand_name(char const *, char const *),
+        *strsave_system(char *), *nextline(char *, size_t, FILE *);
 char const* symbolProperName(int32_t);
 char const* symName(int32_t, hashTableEntry *[]);
 char const* className(int32_t);
 char const* typeName(int32_t);
 char const* keyName(internalRoutine *routine, int32_t number, int32_t index);
 
-int32_t 	dereferenceScalPointer(int32_t), scalar_scratch(Symboltype),
+int32_t         dereferenceScalPointer(int32_t), scalar_scratch(Symboltype),
   array_scratch(Symboltype, int32_t, int32_t []), int_arg(int32_t), array_clone(int32_t, Symboltype),
   convertRange(int32_t), popTempVariable(int32_t), int_arg_stat(int32_t, int32_t *),
   findSym(int32_t, hashTableEntry *[], int32_t), findInternalName(char const *, int32_t),
@@ -72,7 +73,7 @@ int32_t 	dereferenceScalPointer(int32_t), scalar_scratch(Symboltype),
   to_scratch_array(int32_t, Symboltype, int32_t, int32_t *), get_dims(int32_t *, int32_t *, int32_t *),
   listNumElements(int32_t), lux_zero(int32_t, int32_t []),
   cubic_spline_tables(void *, int32_t, int32_t, void *, int32_t, int32_t, int32_t,
-		      uint8_t, uint8_t, csplineInfo *),
+                      uint8_t, uint8_t, csplineInfo *),
   numerical_clone(int32_t, Symboltype),
   redef_array(int32_t, Symboltype, int32_t, int32_t *), string_scratch(int32_t),
   transferAll(int32_t symbol), transfer(int32_t), copySym(int32_t),
@@ -91,40 +92,35 @@ int32_t approximately_equal_z(doubleComplex, doubleComplex, double),
   essentially_equal_z(doubleComplex, doubleComplex, double),
   essentially_equal_z_f(floatComplex, floatComplex, float);
 
-int32_t	standardLoop(int32_t, int32_t, int32_t, Symboltype, LoopInfo *,
+int32_t         standardLoop(int32_t, int32_t, int32_t, Symboltype, LoopInfo *,
                      Pointer *, int32_t *, LoopInfo *, Pointer *),
   standardLoopX(int32_t, int32_t, int32_t, LoopInfo *, Pointer *, int32_t,
                 int32_t const*, int32_t, int32_t const*, Symboltype, int32_t,
                 int32_t*, LoopInfo*, Pointer*),
   standardLoop0(int32_t, int32_t, int32_t *, int32_t, Symboltype,
                 LoopInfo *, Pointer *, int32_t *, LoopInfo *, Pointer *),
-  advanceLoop(LoopInfo *, Pointer *),
-  nextLoop(LoopInfo *),
   nextLoops(LoopInfo *, LoopInfo *),
   prepareDiagonals(int32_t, LoopInfo *, int32_t, int32_t **, int32_t **, int32_t **, int32_t **),
-  moveLoop(LoopInfo *, int32_t, int32_t),
   standardLoopX(int32_t, int32_t, int32_t, LoopInfo *, Pointer *, int32_t, int32_t const *,
                 int32_t, int32_t const *, Symboltype, int32_t, int32_t *, LoopInfo *,
-                Pointer *),
-  loopIsAtStart(LoopInfo const *), setAxes(LoopInfo *, int32_t, int32_t *, int32_t);
+                Pointer *);
 
-void	subdataLoop(int32_t *, LoopInfo *), addVerify(char *, char),
+void    addVerify(char *, char),
   *seekFacts(int32_t symbol, int32_t type, int32_t flag),
   *setFacts(int32_t symbol, int32_t type, int32_t flag),
   deleteFacts(int32_t symbol, int32_t type), returnLoop(LoopInfo *, Pointer *, int32_t),
-  setAxisMode(LoopInfo *, int32_t mode),
   standard_redef_array(int32_t, Symboltype, int32_t, int32_t *, int32_t,
                        int32_t *, int32_t, Pointer *, LoopInfo *);
 void convertWidePointer(wideScalar *, int32_t, int32_t);
 
-void	newStack(int32_t), push(int32_t), deleteStack(void);
-int32_t	pop(void);
+void    newStack(int32_t), push(int32_t), deleteStack(void);
+int32_t         pop(void);
 
 #if HAVE_LIBX11
-int32_t	setup_x(void);
+int32_t         setup_x(void);
 #endif
 
-void	clearToPopTempVariable(int32_t), pushTempVariable(int32_t), printw(char const *),
+void    clearToPopTempVariable(int32_t), pushTempVariable(int32_t), printw(char const *),
   protect(int32_t *, int32_t), protectOne(int16_t), unProtect(int32_t *, int32_t),
   pushTempVariableIndex(void), checkErrno(void), updatIndices(void),
   zapTemp(int32_t), freeString(int32_t), unlinkString(int32_t), mark(int32_t),
@@ -133,7 +129,7 @@ void	clearToPopTempVariable(int32_t), pushTempVariable(int32_t), printw(char con
   cleanup_cubic_spline_tables(csplineInfo *),
   cspline_value_and_derivative(double, double *, double *, csplineInfo *),
   find_cspline_extremes(double, double, double *, double *,
-			double *, double *, csplineInfo *),
+                        double *, double *, csplineInfo *),
   undefine(int32_t),
   setPager(int32_t), resetPager(void), embed(int32_t, int32_t),
   convertPointer(Scalar *, Symboltype, Symboltype), zap(int32_t);
@@ -148,19 +144,19 @@ void endian(void *, int32_t, int32_t),
   rearrangeDimensionLoop(LoopInfo*),
   rearrangeEdgeLoop(LoopInfo *, LoopInfo *, int32_t);
 
-float	float_arg(int32_t);
-double	double_arg(int32_t), cspline_value(double, csplineInfo *),
-	find_cspline_value(double, double, double, csplineInfo *),
-	cspline_derivative(double, csplineInfo *),
+float   float_arg(int32_t);
+double  double_arg(int32_t), cspline_value(double, csplineInfo *),
+        find_cspline_value(double, double, double, csplineInfo *),
+        cspline_derivative(double, csplineInfo *),
   cspline_second_derivative(double, csplineInfo *), famod(double,double),
   fasmod(double,double), vhypot(int32_t, double, double, ...), hypota(int32_t, double *);
 int32_t iamod(int32_t,int32_t), iasmod(int32_t,int32_t);
-FILE	*openPathFile(char const *, int32_t);
+FILE    *openPathFile(char const *, int32_t);
 
 Symboltype combinedType(Symboltype, Symboltype);
 
-#define axisAxes(i)	(axisAxis? axisAxis[i]: (i))
+#define axisAxes(i)     (axisAxis? axisAxis[i]: (i))
 
-#define debugout(msg)	printf("DEBUG - %s [%s, line %d]\n", (msg), __FILE__, __LINE__)
-#define debugout1(fmt,arg)	printf("DEBUG - "); printf((fmt), (arg)); printf(" [%s, line %d]\n", __FILE__, __LINE__)
+#define debugout(msg)   printf("DEBUG - %s [%s, line %d]\n", (msg), __FILE__, __LINE__)
+#define debugout1(fmt,arg)      printf("DEBUG - "); printf((fmt), (arg)); printf(" [%s, line %d]\n", __FILE__, __LINE__)
 

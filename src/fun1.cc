@@ -829,7 +829,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
     return LUX_ERROR;
 
   if (narg == 1) {
-    memset(&data[2].b[0], '\0', info[2].nelem*info[0].stride);
+    memset(&data[2].b[0], '\0', info[2].nelem*info[2].stride);
   } else {
     do {
       bool mask;

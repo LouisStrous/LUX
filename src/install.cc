@@ -4330,7 +4330,8 @@ void symbolInitialization(void)
  subroutine = (internalRoutine*) malloc(registered_subroutines_size
                      + nSubroutine*sizeof(internalRoutine));
  if (registered_subroutines)
-   memcpy(subroutine, obstack_finish(registered_subroutines),
+   memcpy(subroutine,
+          (internalRoutineStruct*) obstack_finish(registered_subroutines),
           registered_subroutines_size);
  memcpy((char *) subroutine + registered_subroutines_size,
         subroutine_table, nSubroutine*sizeof(internalRoutine));
@@ -4344,7 +4345,8 @@ void symbolInitialization(void)
  function = (internalRoutine*) malloc(registered_functions_size
                      + nFunction*sizeof(internalRoutine));
  if (registered_functions)
-   memcpy(function, obstack_finish(registered_functions),
+   memcpy(function,
+          (internalRoutineStruct*) obstack_finish(registered_functions),
           registered_functions_size);
  memcpy((char *) function + registered_functions_size,
         function_table, nFunction*sizeof(internalRoutine));
@@ -4465,7 +4467,7 @@ void symbolInitialization(void)
  array_header(projectSym) = (array *) p;
  array_num_dims(projectSym) = 2;
  array_dims(projectSym)[0] = array_dims(projectSym)[1] = 4;
- memcpy(array_data(projectSym), defaultProjection, 16*sizeof(float));
+ memcpy((float*) array_data(projectSym), defaultProjection, 16*sizeof(float));
  p3d = (float *) array_data(projectSym);
  nFixed++;
 #endif
@@ -4480,7 +4482,7 @@ void symbolInitialization(void)
  iq = findVarName("#typesize", 0);
  i = LUX_NO_SYMBOLTYPE; // lux_type_size[] # elements!
  to_scratch_array(iq, LUX_INT32, 1, &i);
- memcpy(array_data(iq), lux_type_size, i*sizeof(int32_t));
+ memcpy((int32_t*) array_data(iq), lux_type_size, i*sizeof(int32_t));
 
  // s_fix("#nl",		"\n");
  l_ptr("#col",		&termCol);
@@ -5192,8 +5194,8 @@ int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
 	  memcpy((*se)->u.regular.spec.singular.dims,
 		 array_dims(symbol), array_num_dims(symbol)*sizeof(int32_t));
 	size = lux_type_size[array_type(symbol)]*array_size(symbol);
-	memcpy(data + *offset, array_data(symbol), size); // copy values
-	break;
+        memcpy(data + *offset, (char*) array_data(symbol), size); // copy values
+        break;
       case LUX_CLIST:
 	arg = clist_symbols(symbol);
 	n = clist_num_symbols(symbol);

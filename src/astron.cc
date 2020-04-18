@@ -4353,7 +4353,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
         || array_size(j) != 9)
       return luxerror("Need a 9-element array with ELEMENTS", j);
     j = lux_double(1, &j);
-    memcpy(extraElements, array_data(j), 9*sizeof(double));
+    memcpy(extraElements, (double*) array_data(j), 9*sizeof(double));
     haveExtraElements = (internalMode & S_QELEMENTS)? 6: 5; // 5->A, 6->Q
   } else haveExtraElements = 0;                 // none
 

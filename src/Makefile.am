@@ -19,7 +19,10 @@
 
 SUBDIRS = fonts
 
-AM_CPPFLAGS = -I$(top_srcdir)/sofa/src -I$(top_srcdir)/historicephemerides
+AM_CPPFLAGS = -Werror -include everywhere.hh \
+  -I$(top_srcdir)/sofa/src \
+  -I$(top_srcdir)/historicephemerides
+
 AM_YFLAGS = -d
 ACLOCAL_AMFLAGS = -I m4
 
@@ -68,6 +71,7 @@ nonbind_sources = \
 	error.cc\
 	error.hh\
 	eval.cc\
+	everywhere.hh\
 	execute.cc\
 	fft.cc\
 	filemap.cc\

@@ -197,6 +197,8 @@ Bytestack_push_data(Bytestack b,
 {
   size_t n;
   ssize_t p;
+  auto bbegin = reinterpret_cast<const unsigned char*>(begin);
+  auto bend = reinterpret_cast<const unsigned char*>(end);
 
   if (!begin)
     return -1;
@@ -215,7 +217,7 @@ Bytestack_push_data(Bytestack b,
   if ((b->cur + n < b->size	// enough room
        || enlarge(b, n + 1) == 0) // or enlarged sufficiently
       && end >= begin) {
-    memcpy(b->begin + b->cur, begin, n);
+    memcpy(b->begin + b->cur, bbegin, n);
     b->begin[b->cur + n] = '\0'; // always end with a '\0'
     p = b->cur;
     b->cur += n;

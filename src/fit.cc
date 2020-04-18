@@ -1562,7 +1562,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
 
     if (!bad) {
       result = array_scratch(partype, 1, &nPar);
-      memcpy(array_data(result), genes + nPar*rtoi[nPopulation - 1]*typesize,
+      memcpy((char*) array_data(result), genes + nPar*rtoi[nPopulation - 1]*typesize,
              size);
       if (vocal) {
         printf("%4d offspring (probability %g)\n%4d cross-overs (probability %g per gene pair)\n%4d mutations (probability %g per bit)\n",

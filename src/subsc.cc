@@ -469,7 +469,7 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
     q3.l = (int32_t*) array_data(result_sym);
   }
   if (n > 0)
-    memcpy(q3.v, q1.v, n);
+    memcpy(q3.b, q1.b, n);
   return result_sym;
 }
  //-------------------------------------------------------------------------
@@ -2287,7 +2287,7 @@ int32_t lux_dimen(int32_t narg, int32_t ps[])
       } else {                  // return all dimensions
         if (ndim > 1) {
           iq = array_scratch(LUX_INT32, 1, &ndim);
-          memcpy(array_data(iq), dims, ndim*sizeof(int32_t));
+          memcpy((int32_t*) array_data(iq), dims, ndim*sizeof(int32_t));
         } else {
           iq = scalar_scratch(LUX_INT32);
           scalar_value(iq).l = dims[0];
@@ -2353,7 +2353,8 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
         if (ndim + array_size(ps[i]) > MAX_DIMS)
           return luxerror("Too many dimensions specified", ps[i]);
         iq = lux_long(1, &ps[i]);
-        memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int32_t));
+        memcpy(dims + ndim, (int32_t*) array_data(iq),
+               array_size(iq)*sizeof(int32_t));
         ndim += array_size(iq);
         break;
       default:
@@ -2527,7 +2528,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
         nsym = array_scratch(scalar_type(iq), 1, dim);
         if (nsym == LUX_ERROR)
           return LUX_ERROR;
-        memcpy(array_data(nsym),
+        memcpy((char*) array_data(nsym),
                &scalar_value(iq).l,
                lux_type_size[scalar_type(iq)]);
         return nsym;
@@ -2536,7 +2537,8 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
         nsym = array_scratch(complex_scalar_type(iq), 1, dim);
         if (nsym == LUX_ERROR)
           return LUX_ERROR;
-        memcpy(complex_array_data(nsym), complex_scalar_data(iq).cf,
+        memcpy((char*) complex_array_data(nsym),
+               (char*) complex_scalar_data(iq).cf,
                lux_type_size[complex_scalar_type(nsym)]);
         return nsym;
       case LUX_STRING:  //string, turn into string array.  LS 21apr93
@@ -2568,7 +2570,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
         }
         // if we get here it is a numerical array
         mq = symbol_memory(iq) - sizeof(array);// actual data memory
-        memcpy(array_data(nsym), array_data(iq), mq);
+        memcpy((char*) array_data(nsym), (char*) array_data(iq), mq);
         return nsym;
       default:
         return cerror(ILL_CLASS, iq);
@@ -2624,7 +2626,8 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             iq = dereferenceScalPointer(iq);
             // fall-thru to LUX_SCALAR
           case LUX_SCALAR:
-            memcpy(&temp.b, &scalar_value(iq).b, lux_type_size[scalar_type(iq)]);
+            memcpy(&temp.b, &scalar_value(iq).b,
+                   lux_type_size[scalar_type(iq)]);
             if (scalar_type(iq) != toptype)
               convertPointer(&temp, scalar_type(iq), toptype);
             memcpy(q2.b, &temp.b, n);

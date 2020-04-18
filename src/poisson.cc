@@ -540,8 +540,8 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
     result = array_scratch(type, ndim + 1, dims);
     free(dims);
   }
-  memcpy(array_data(result), pyramid->levels[0].f,
-	 nx*ny*2*lux_type_size[type]);
+  memcpy((char*) array_data(result), pyramid->levels[0].f,
+         nx*ny*2*lux_type_size[type]);
 
  free_pyramid:
   free(pyramid->data.f);

@@ -465,9 +465,10 @@ int32_t lux_randomb(int32_t narg, int32_t ps[])
 	if (ndim + array_size(*ps) > MAX_DIMS)
 	  return luxerror("Too many dimensions specified", 0);
 	iq = lux_long(1, ps);	// ensure LONG dimensions
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int32_t));
 	ndim += array_size(iq);
 	break;
+        memcpy(dims + ndim, (int32_t*) array_data(iq),
+               array_size(iq)*sizeof(int32_t));
       default:
 	return cerror(ILL_CLASS, *ps);
     }
@@ -515,9 +516,10 @@ int32_t lux_randoml(int32_t narg, int32_t ps[])
 	if (ndim + array_size(*ps) > MAX_DIMS)
 	  return luxerror("Too many dimensions specified", 0);
 	iq = lux_long(1, ps);	// ensure LONG dimensions
-	memcpy(dims + ndim, array_data(iq), array_size(iq)*sizeof(int32_t));
 	ndim += array_size(iq);
 	break;
+        memcpy(dims + ndim, (int32_t*) array_data(iq),
+               array_size(iq)*sizeof(int32_t));
       default:
 	return cerror(ILL_CLASS, *ps);
     }
@@ -610,12 +612,12 @@ int32_t lux_random(int32_t narg, int32_t ps[])
 	  if (ndim + array_size(ps[i]) > MAX_DIMS)
 	    return luxerror("Too many dimensions", 0);
 	  iq = lux_long(1, &ps[i]); // ensure LONG dimensions
-	  memcpy(dims + ndim, array_data(iq), ndim*sizeof(int32_t));
 	  ndim += array_size(iq);
 	  break;
 	case LUX_SCALAR:
 	  if (ndim == MAX_DIMS)
 	    return luxerror("Too many dimensions", 0);
+          memcpy(dims + ndim, (int32_t*) array_data(iq), ndim*sizeof(int32_t));
           if (!symbolIsScalar(ps[i]))
             return cerror(NEED_SCAL, ps[i]);
 	  dims[ndim++] = int_arg(ps[i]);

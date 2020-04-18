@@ -140,7 +140,7 @@ int32_t copyToSym(int32_t target, int32_t source)
     case LUX_STRING: case LUX_FILEMAP: case LUX_ASSOC:
       size = symbol_memory(source);
       ALLOCATE(symbol_data(target), size, char);
-      memcpy(symbol_data(target), symbol_data(source), size);
+      memcpy((char*) symbol_data(target), (char*) symbol_data(source), size);
       symbol_memory(target) = size;
       if (symbol_class(source) == LUX_STRING)
         string_type(target) = LUX_TEMP_STRING;
@@ -199,7 +199,7 @@ int32_t copyToSym(int32_t target, int32_t source)
       symbol_data(target) = malloc(size);
       if (!symbol_data(target))
         return cerror(ALLOC_ERR, 0);
-      memcpy(symbol_data(target), symbol_data(source), size);
+      memcpy((char*) symbol_data(target), (char*) symbol_data(source), size);
       break;
     case LUX_ARRAY:
       size = symbol_memory(source);
@@ -220,7 +220,7 @@ int32_t copyToSym(int32_t target, int32_t source)
           optr.sp++;
         }
       } else {                  // numerical array
-        memcpy(array_data(target), array_data(source),
+        memcpy((char*) array_data(target), (char*) array_data(source),
                size*lux_type_size[array_type(source)]);
       }
       break;
@@ -2607,7 +2607,7 @@ int32_t insert(int32_t narg, int32_t ps[])
         return cerror(ILL_SUBSC_LHS, target);
       if (narg > 1) {           // more than one subscript
         i = array_scratch(LUX_INT32, 1, &narg);
-        memcpy(array_data(i), start, narg);
+        memcpy((char*) array_data(i), start, narg);
         offset = -1;
       } else {
         i = start[0];
@@ -4081,7 +4081,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       }
       if (narg > 1) {           // more than one subscript
         i = array_scratch(LUX_INT32, 1, &narg);
-        memcpy(array_data(i), start, narg);
+        memcpy((char*) array_data(i), start, narg);
         offset = -1;
       } else {
         i = start[0];

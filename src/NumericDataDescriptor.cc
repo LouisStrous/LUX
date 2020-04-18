@@ -86,7 +86,7 @@ NumericDataDescriptor::set_from(SymbolProxy_tp symbol)
 void
 NumericDataDescriptor::reset()
 {
-  std::memset(&m_data, 0, sizeof(m_data));
+  memset(&m_data, 0, sizeof(m_data));
   m_dimensions.clear();
 }
 

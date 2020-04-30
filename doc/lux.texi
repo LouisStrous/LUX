@@ -12085,6 +12085,7 @@ arguments.
 * filewrite::                   Unformatted writing to a file
 * find::                        Find the first occurrence of particular values
 * findfile::                    Find a particular file
+* findspans::                   Find spans of elements meeting a condition
 * find_max::                    Find the values of local maxima
 * find_maxloc::                 Find the locations of local maxima
 * find_min::                    Find the values of local minima
@@ -18254,7 +18255,7 @@ be a scalar or an array of the same size as @code{@var{key}}.
 See also: @ref{find_maxloc}
 
 @c -------------------------------------
-@node findfile, find_max, find, Internal Routines
+@node findfile, findspans, find, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection findfile
 @findex findfile
@@ -18269,7 +18270,28 @@ slashes and any preceding text is removed first.
 See also: @ref{getdirectories}, @ref{getfiles}, @ref{getmatchedfiles}
 
 @c -------------------------------------
-@node find_max, find_maxloc, findfile, Internal Routines
+@node findspans, find_max, findfile, Internal Routines
+@subsection findspans
+@findex findspans
+
+@code{findspans(@var{condition} [, /cycle])}
+
+Returns the location and length of consecutive spans of elements of
+@code{@var{condition}} for which the condition is non-zero.  If
+@code{/cycle} is specified, then the data is assumed to repeat itself,
+and a span may consist of some elements at the end of the data plus
+some elements at the beginning of the data.
+
+If any spans are found, then returns a 2-dimensional array with 2
+elements in its 2nd dimension and one element in its 1st dimension for
+each found span.  If we call the returned array @code{r}, then
+@code{r(*,0)} holds the index of the first member of each span, and
+@code{r(*,1)} holds the length of that span.
+
+If no spans are found, then return scalar -1.
+
+@c -------------------------------------
+@node find_max, find_maxloc, findspans, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection find_max
 @findex find_max

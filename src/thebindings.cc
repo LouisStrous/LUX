@@ -1793,4 +1793,7 @@ void register_the_bindings()
   int32_t lux_polar_to_ssfc(int32_t, int32_t []);
   register_lux_f(lux_polar_to_ssfc, "polartossfc", 1, 2, 0);
 
+  int32_t lux_findspans(int32_t, int32_t []);
+  register_lux_f(lux_findspans, "findspans", 1, 1, "1cycle");
+
 }

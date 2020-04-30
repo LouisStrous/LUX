@@ -17,6 +17,9 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+/// \file
+
 // File strous3.c
 // Various LUX routines by L. Strous
 #ifdef HAVE_CONFIG_H
@@ -2577,25 +2580,25 @@ int32_t essentially_equal_z_f(floatComplex a, floatComplex b, float eps)
   return md <= (ma > mb? mb: ma)*FLT_EPSILON*eps;
 }
 //--------------------------------------------------------------------
-/// SSFCTOPOLAR(<x> [, <level>]) interprets each element of <x> as an
-/// SSFC (Sierpiński Surface-Filling Coordinate) and returns the
-/// corresponding latitude, longitude, and precision for it, all
-/// measured in radians.  The precision is a measure for the angular
-/// size of the area indicated by the SSFC at that level.
-///
-/// If <level> has fewer elements than <x> has, then the last element
-/// of <level> is used for the remaining elements of <x>.
-///
-/// If <x> is of an integer type, then its values are interpreted as
-/// SSFC indices at the indicated <level>, and are expected to be
-/// between 0 and 2^<level> - 1, inclusive.  If no <level> is
-/// specified, then it is taken to be the least number that
-/// accommodates the greatest <x>, such that MAX(<x>) LT 2^<level>.
-///
-/// If <x> is of a floating-point type, then its values are taken MOD
-/// 1, and are interpreted as decimal SSFCs.  If <level> is not
-/// specified, then it is taken equal to the number of bits in <x>,
-/// minus 1.
+// SSFCTOPOLAR(<x> [, <level>]) interprets each element of <x> as an
+// SSFC (Sierpiński Surface-Filling Coordinate) and returns the
+// corresponding latitude, longitude, and precision for it, all
+// measured in radians.  The precision is a measure for the angular
+// size of the area indicated by the SSFC at that level.
+//
+// If <level> has fewer elements than <x> has, then the last element
+// of <level> is used for the remaining elements of <x>.
+//
+// If <x> is of an integer type, then its values are interpreted as
+// SSFC indices at the indicated <level>, and are expected to be
+// between 0 and 2^<level> - 1, inclusive.  If no <level> is
+// specified, then it is taken to be the least number that
+// accommodates the greatest <x>, such that MAX(<x>) LT 2^<level>.
+//
+// If <x> is of a floating-point type, then its values are taken MOD
+// 1, and are interpreted as decimal SSFCs.  If <level> is not
+// specified, then it is taken equal to the number of bits in <x>,
+// minus 1.
 int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
   if (!symbolIsNumerical(ps[0]))
     return luxerror("Need a numerical argument", ps[0]);
@@ -2674,18 +2677,18 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
 }
 REGISTER(ssfc_to_polar, f, ssfctopolar, 1, 2, 0);
 //--------------------------------------------------------------------
-//// POLARTOSSFC(<coords>, [<level>]) converts polar coordinates into
-/// SSFC (Sierpiński Surface-Filling Coordinate).  <coords> is
-/// expected to have at least 2 elements in its first dimension, which
-/// are interpreted as the latitude and longitude, measured in
-/// radians.
-///
-/// If <level> is specified, then the returned value is the SSFC index
-/// at the indicated <level>, and is a nonnegative integer less than
-/// 2^<level>.  Otherwise, the returned value is the decimal SSFC
-/// coordinate, as a nonnegative double-precision value less than 1.
-/// If <level> has fewer elements than <coords> has, then the last
-/// element of <level> is used for the remaining <coords>.
+// POLARTOSSFC(<coords>, [<level>]) converts polar coordinates into
+// SSFC (Sierpiński Surface-Filling Coordinate).  <coords> is
+// expected to have at least 2 elements in its first dimension, which
+// are interpreted as the latitude and longitude, measured in
+// radians.
+//
+// If <level> is specified, then the returned value is the SSFC index
+// at the indicated <level>, and is a nonnegative integer less than
+// 2^<level>.  Otherwise, the returned value is the decimal SSFC
+// coordinate, as a nonnegative double-precision value less than 1.
+// If <level> has fewer elements than <coords> has, then the last
+// element of <level> is used for the remaining <coords>.
 int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
   if (!symbolIsNumerical(ps[0]))
     return luxerror("Need a numerical argument", ps[0]);
@@ -2739,63 +2742,141 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
 }
 REGISTER(polar_to_ssfc, f, polartossfc, 1, 2, 0);
 
-#if 0
-/// maxspan(<condition>[, <axis>][, /cycle])
-///
-/// Returns the maximum length of a consecutive span of elements of
-/// <condition> for which the value is non-zero.  If <axis> is
-/// specified, then searches along the indicated axis and returns a
-/// value for each combination of indexes of the other dimensions.
-/// Otherwise treats <condition> as a one-dimensional array.  If
-/// /cycle is specified, then the data is assumed to repeat itself,
-/// and a span may consist of some elements at the end of the data
-/// plus some elements at the beginning of the data.  If all elements
-/// meet the condition, then the number of elements is returned.
-///
-/// LS 2020-04-12
-int32_t lux_maxspan(int32_t narg, int32_t ps[]) {
-  if (!symbolIsNumerical(ps[0]))
-    return luxerror("Need a numerical argument", ps[0]);
-  if (narg > 1 && !symbolIsInteger(ps[1]))
-    return cerror(NEED_INT_ARG, ps[1]);
+/// A description of a span of (consecutive) elements.
+struct Span {
+  int32_t location;     //!< the location of the beginning of the span.
+  int32_t size;         //!< the count of elements in the span.
+};
 
-  StandardArguments sa(narg, ps, "iL*;iL?;rL{1}");
-  if (sa.result() < 0)
+/// Finds the location and length of consecutive spans of elements for
+/// which a condition is non-zero.
+///
+/// \param[in] first is an iterator pointing at the first condition
+/// value.
+///
+/// \param[in] last is an iterator pointing at one past the last
+/// condition value.
+///
+/// \param[in] cycle says whether or not to treat the condition values
+/// as cyclical.  If yes, then the condition values repeat themselves.
+///
+/// \returns a vector describing the found spans.
+///
+/// If all condition values are non-zero, then returns a single span
+/// beginning at 0.  If \a cycle is true, the first and the last
+/// condition values are non-zero, and at least one condition value is
+/// zero, then the first element is included in the last reported
+/// span.  For example, if the condition values are
+///
+///     1 1 0 1 1 0 0 1
+///
+/// and if \a cycle is false, then reports a span of length 2
+/// beginning at 0, a span of length 2 beginning at 3, and a span of
+/// length 1 beginning at 7.  If \a cycle is true, then reports a span
+/// of length 2 beginning at 3 and a span of length 3 beginning at 7.
+/// That last span includes the elements at positions 7, 0, and 1.
+template<class Iterator,
+         class T = typename std::iterator_traits<Iterator>::value_type>
+std::vector<Span>
+findspans(const Iterator first, const Iterator last, bool cycle)
+{
+  std::vector<Span> spans;
+  if (last != first) {
+    int inspan = 0;
+    int location;
+    int index = 0;
+    for (auto it = first; it != last; ++it) {
+      if (*it++ != T()) {
+        if (!inspan)
+          location = index;
+        ++inspan;
+      } else if (inspan) {
+        spans.push_back({location, inspan});
+        inspan = 0;
+      }
+      ++index;
+    }
+    if (inspan > 0) {
+      if (cycle) {
+        if (inspan < index) {   // not all elements meet the condition
+          for (auto it = first; *it != T(); ++it)
+            ++inspan;
+          if (spans.size() > 0
+              && spans[0].location == 0)
+            // Already had a span with index 0 in it.  Will be
+            // replaced by the current span, so remove the earlier
+            // one.
+            spans.erase(spans.begin());
+        }
+      }
+      spans.push_back({location, inspan});
+    }
+  }
+  return spans;
+}
+
+// findspans(<condition>[, /cycle])
+//
+// Returns the location and length of spans of consecutive elements
+// of <condition> for which the condition is non-zero.  If /cycle is
+// specified, then the data is assumed to repeat itself, and a span
+// may consist of some elements at the end of the data plus some
+// elements at the beginning of the data.
+//
+// If any spans are found, then returns a 2-dimensional array with 2
+// elements in its 2nd dimension and one element in its 1st dimension
+// for each found span.  If we call the returned array <r>, then
+// <r(*,0)> holds the index of the first member of each span, and
+// <r(*,1)> holds the length of that span.
+//
+// If no spans are found, then return scalar -1.
+//
+// LS 2020-04-29
+int32_t lux_findspans(int32_t narg, int32_t ps[]) {
+  int32_t nelem;
+  Pointer src;
+  if (numerical(ps[0], NULL, NULL, &nelem, &src) < 0)
     return LUX_ERROR;
 
-  if (sa.datainfo(1).nelem > 0) {
-    // have an axis parameter
-    sa.datainfo(0).setAxes(sa.datainfo(1).ndim, sa.datainfo(1).dims,
-                           SL_AXESBLOCK);
-  } else {
-    sa.datainfo(0).setOneDimensional();
+  std::vector<Span> spans;
+  bool cycle = (internalMode & 1) != 0;
+  switch (symbol_type(ps[0])) {
+  case LUX_INT8:
+    spans = findspans(src.b, src.b + nelem, cycle);
+    break;
+  case LUX_INT16:
+    spans = findspans(src.w, src.w + nelem, cycle);
+    break;
+  case LUX_INT32:
+    spans = findspans(src.l, src.l + nelem, cycle);
+    break;
+  case LUX_INT64:
+    spans = findspans(src.q, src.q + nelem, cycle);
+    break;
+  case LUX_FLOAT:
+    spans = findspans(src.f, src.f + nelem, cycle);
+    break;
+  case LUX_DOUBLE:
+    spans = findspans(src.d, src.d + nelem, cycle);
+    break;
+  default:
+    return cerror(ILL_TYPE, ps[0]);
   }
 
-  int n;
-  do {
-    int maxspan = 0;            // maximum span so far
-    int thisspan;               // current span
-    bool inspan = false;        // are we inside a span?
-    do {
-      if (sa.datapointer(0).l) {         // condition is met
-        if (!inspan) {
-          inspan = true;
-          thisspan = 1;
-        } else
-          ++thisspan;
-      } else                    // condition not met
-        if (inspan) {
-          if (thisspan > maxspan)
-            maxspan = thisspan;
-          inspan = false;       // not in a span
-        }
-    } while ((n = sa.advanceLoop(0)) < 1);
-    if (inspan && thisspan > maxspan)
-      maxspan = thisspan;
-    *sa.datapointer(2).l = maxspan;
-  } while (sa.advanceLoop(2), n < sa.datainfo(0).rndim);
-
-  return sa.result();
+  int32_t result;
+  if (spans.size() == 0)
+    result = LUX_MINUS_ONE;
+  else {
+    int dims[2];
+    dims[0] = spans.size();
+    dims[1] = 2;
+    result = array_scratch(LUX_INT32, 2, dims);
+    int32_t* tgt = static_cast<int32_t*>(array_data(result));
+    for (auto it = spans.cbegin(); it != spans.cend(); ++it)
+      *tgt++ = it->location;
+    for (auto it = spans.cbegin(); it != spans.cend(); ++it)
+      *tgt++ = it->size;
+  }
+  return result;
 }
-xREGISTER(maxspan, f, maxspan, 1, 2, "1cycle");
-#endif
+REGISTER(findspans, f, findspans, 1, 1, "1cycle");

@@ -939,7 +939,7 @@ REGISTER(generalfit2, f, fit3, 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 // unsigned.
 union uscalar {
   uint8_t* ui8;
-  uint16_t* w;
+  uint16_t* i16;
   uint32_t* l;
   float *f;
   double *d;
@@ -996,7 +996,7 @@ void printgene(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits,
       printf("%u", p.ui8[j]);
       break;
     case LUX_INT16:
-      printf("%u", p.w[j]);
+      printf("%u", p.i16[j]);
       break;
     case LUX_INT32:
       printf("%u", p.l[j]);

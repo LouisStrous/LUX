@@ -404,7 +404,7 @@ union complexPointer {
 /// a union of scalar values */
 union Scalar {
   uint8_t ui8;
-  int16_t w;
+  int16_t i16;
   int32_t l;
   int64_t q;
   float f;
@@ -418,7 +418,7 @@ union Scalar {
 // not always desirable.
 union wideScalar {
   uint8_t ui8;
-  int16_t w;
+  int16_t i16;
   int32_t l;
   int64_t q;
   float f;
@@ -431,7 +431,7 @@ union wideScalar {
 
 union Pointer {
   uint8_t* ui8;
-  int16_t *w;
+  int16_t *i16;
   int32_t *l;
   int64_t *q;
   float *f;
@@ -523,7 +523,7 @@ typedef struct arrayStruct {
 struct boundsStruct {
   struct T {
     uint8_t ui8;
-    int16_t w;
+    int16_t i16;
     int32_t l;
     int64_t q;
     float f;
@@ -553,7 +553,7 @@ typedef struct structElemStruct {
 typedef struct {
   uint8_t type;
   uint16_t number;
-  union { int16_t *w; char **sp; } ptr;
+  union { int16_t* i16; char **sp; } ptr;
 } extractSec;
 
 typedef struct {
@@ -788,7 +788,7 @@ extern char const* symbolStack[];
 #define multiSwitch2(type, first, second) \
  switch (type) \
  { case LUX_INT8:   first .ui8 second ; break; \
-   case LUX_INT16:   first .w second ; break; \
+   case LUX_INT16:   first .i16 second ; break; \
    case LUX_INT32:   first .l second ; break; \
    case LUX_FLOAT:  first .f second ; break; \
    case LUX_DOUBLE: first .d second ; break; }
@@ -796,7 +796,7 @@ extern char const* symbolStack[];
 #define multiSwitch3(type, first, second, third) \
  switch (type) \
  { case LUX_INT8:   first .ui8 second .ui8 third ; break; \
-   case LUX_INT16:   first .w second .w third ; break; \
+   case LUX_INT16:   first .i16 second .i16 third ; break; \
    case LUX_INT32:   first .l second .l third ; break; \
    case LUX_FLOAT:  first .f second .f third ; break; \
    case LUX_DOUBLE: first .d second .d third ; break; }
@@ -804,7 +804,7 @@ extern char const* symbolStack[];
 #define multiSwitch4(type, first, second, third, fourth) \
  switch (type) \
  { case LUX_INT8:   first .ui8 second .ui8 third .ui8 fourth ; break; \
-   case LUX_INT16:   first .w second .w third .ui8 fourth ; break; \
+   case LUX_INT16:   first .i16 second .i16 third .ui8 fourth ; break; \
    case LUX_INT32:   first .l second .l third .ui8 fourth ; break; \
    case LUX_FLOAT:  first .f second .f third .ui8 fourth ; break; \
    case LUX_DOUBLE: first .d second .d third .ui8 fourth ; break; }
@@ -812,7 +812,7 @@ extern char const* symbolStack[];
 #define multiSwitch5(type, first, second, third, fourth, fifth) \
  switch (type) \
  { case LUX_INT8:   first .ui8 second .ui8 third .ui8 fourth .ui8 fifth ; break; \
-   case LUX_INT16:   first .w second .w third .ui8 fourth .ui8 fifth ; break; \
+   case LUX_INT16:   first .i16 second .i16 third .ui8 fourth .ui8 fifth ; break; \
    case LUX_INT32:   first .l second .l third .ui8 fourth .ui8 fifth ; break; \
    case LUX_FLOAT:  first .f second .f third .ui8 fourth .ui8 fifth ; break; \
    case LUX_DOUBLE: first .d second .d third .ui8 fourth .ui8 fifth ; break; }

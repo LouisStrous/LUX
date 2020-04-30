@@ -140,7 +140,7 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
       break;
     case LUX_INT16:
       while (n--)
-        *a++ = (double) *src.w++;
+        *a++ = (double) *src.i16++;
       a -= n;
       break;
     case LUX_INT32:

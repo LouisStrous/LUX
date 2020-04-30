@@ -904,7 +904,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
           scalar_value(iq).ui8 = (uint8_t) value.l;
           break;
         case LUX_INT16:
-          scalar_value(iq).w = (int16_t) value.l;
+          scalar_value(iq).i16 = (int16_t) value.l;
           break;
         case LUX_INT32:
           scalar_value(iq).l = value.l;
@@ -1855,10 +1855,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
             y1 = (double) *gy.ui8++ - iy;
             break;
           case LUX_INT16:
-            ix = (int32_t) *gx.w;       // x pixel coordinate
-            iy = (int32_t) *gy.w;       // y pixel coordinate
-            x1 = (double) *gx.w++ - ix;
-            y1 = (double) *gy.w++ - iy;
+            ix = (int32_t) *gx.i16;       // x pixel coordinate
+            iy = (int32_t) *gy.i16;       // y pixel coordinate
+            x1 = (double) *gx.i16++ - ix;
+            y1 = (double) *gy.i16++ - iy;
             break;
           case LUX_INT32:
             ix = (int32_t) *gx.l;       // x pixel coordinate
@@ -1902,8 +1902,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
           vy = (double) vy0.ui8[index*dv]; // y velocity
           break;
         case LUX_INT16:
-          vx = (double) vx0.w[index*dv]; // x velocity
-          vy = (double) vy0.w[index*dv]; // y velocity
+          vx = (double) vx0.i16[index*dv]; // x velocity
+          vy = (double) vy0.i16[index*dv]; // y velocity
           break;
         case LUX_INT32:
           vx = (double) vx0.l[index*dv]; // x velocity
@@ -2000,8 +2000,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
             vy = (double) vy0.ui8[index*dv];
             break;
           case LUX_INT16:
-            vx = (double) vx0.w[index*dv];
-            vy = (double) vy0.w[index*dv];
+            vx = (double) vx0.i16[index*dv];
+            vy = (double) vy0.i16[index*dv];
             break;
           case LUX_INT32:
             vx = (double) vx0.l[index*dv];
@@ -2031,8 +2031,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
           *oy.ui8++ = iy + y2;
           break;
         case LUX_INT16:
-          *ox.w++ = ix + x2;
-          *oy.w++ = iy + y2;
+          *ox.i16++ = ix + x2;
+          *oy.i16++ = iy + y2;
           break;
         case LUX_INT32:
           *ox.l++ = ix + x2;
@@ -2333,7 +2333,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         *tgt.l++ = dist;
         break;
       case LUX_INT16:
-        val = *src.w++;
+        val = *src.i16++;
         while (val) {
           ++dist;
           val &= val - 1;
@@ -2373,9 +2373,9 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         *tgt.l++ = dist;
         break;
       case LUX_INT16:
-        val = *src.w++ ^ *src2.w;
+        val = *src.i16++ ^ *src2.i16;
         if (nr2isarray)
-          src2.w++;
+          src2.i16++;
         while (val) {
           ++dist;
           val &= val - 1;
@@ -2845,7 +2845,7 @@ int32_t lux_findspans(int32_t narg, int32_t ps[]) {
     spans = findspans(src.ui8, src.ui8 + nelem, cycle);
     break;
   case LUX_INT16:
-    spans = findspans(src.w, src.w + nelem, cycle);
+    spans = findspans(src.i16, src.i16 + nelem, cycle);
     break;
   case LUX_INT32:
     spans = findspans(src.l, src.l + nelem, cycle);

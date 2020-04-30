@@ -631,7 +631,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       intval = (intmax_t) scalar_value(symbol).ui8;
       break;
     case LUX_INT16:
-      intval = (intmax_t) scalar_value(symbol).w;
+      intval = (intmax_t) scalar_value(symbol).i16;
       break;
     case LUX_INT32:
       intval = (intmax_t) scalar_value(symbol).l;
@@ -784,7 +784,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case LUX_INT16:
       while (j--) {
-        sprintf(curScrat, "%d", (int32_t) *ptr.w++);
+        sprintf(curScrat, "%d", (int32_t) *ptr.i16++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -941,7 +941,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       intval = (intmax_t) *scal_ptr_pointer(symbol).ui8;
       break;
     case LUX_INT16:
-      intval = (intmax_t) *scal_ptr_pointer(symbol).w;
+      intval = (intmax_t) *scal_ptr_pointer(symbol).i16;
       break;
     case LUX_INT32:
       intval = (intmax_t) *scal_ptr_pointer(symbol).l;
@@ -1044,7 +1044,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_CLIST: case LUX_PRE_CLIST: case LUX_CPLIST:
     strcpy(curScrat++, "{");
     n = clist_num_symbols(symbol);
-    ptr.w = clist_symbols(symbol);
+    ptr.i16 = clist_symbols(symbol);
     if ((mode & I_TRUNCATE)) {
       if (n > 3) {
         j = 3;                // number of elements to display
@@ -1062,7 +1062,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       // for CPLIST, show names if possible
       m &= ~I_VALUE;
     while (j--) {
-      symbolIdent(*ptr.w++, m);
+      symbolIdent(*ptr.i16++, m);
       curScrat += strlen(curScrat);
       if (j || i)
         strcpy(curScrat++, ",");
@@ -1256,7 +1256,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     } else
       strcpy(curScrat++, " ");
     n = routine_num_statements(symbol);
-    ptr.w = routine_statements(symbol);
+    ptr.i16 = routine_statements(symbol);
     if ((mode & I_TRUNCATE) && n > 1) {
       j = 1;
       i = 1;
@@ -1266,7 +1266,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     if (j) {                        // have statements
       while (j--) {
-        symbolIdent(*ptr.w++, mode & ~I_PARENT);
+        symbolIdent(*ptr.i16++, mode & ~I_PARENT);
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           if (!j && !i)
@@ -1423,9 +1423,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     if (n) {
       n = int_func_num_arguments(symbol);
-      ptr.w = int_func_arguments(symbol);
+      ptr.i16 = int_func_arguments(symbol);
       while (n--) {
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
         curScrat += strlen(curScrat);
         if (n)
           strcpy(curScrat++, ",");
@@ -1440,9 +1440,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     curScrat += strlen(curScrat);
     n = usr_func_num_arguments(symbol);
-    ptr.w = usr_func_arguments(symbol);
+    ptr.i16 = usr_func_arguments(symbol);
     while (n--) {
-      symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+      symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
       curScrat += strlen(curScrat);
       if (n)
         strcpy(curScrat++, ",");
@@ -1480,9 +1480,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       switch (sec->type) {
       case LUX_RANGE:
         strcpy(curScrat++, "(");
-        ptr.w = sec->ptr.w;
+        ptr.i16 = sec->ptr.i16;
         while (i--) {
-          symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+          symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
           curScrat += strlen(curScrat);
           if (i)
             strcpy(curScrat++, ",");
@@ -1503,7 +1503,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     break;
   case LUX_EVB:
     n = evb_num_elements(symbol);
-    ptr.w = evb_args(symbol);
+    ptr.i16 = evb_args(symbol);
     switch (evb_type(symbol)) {
     case EVB_RETURN:
       strcpy(curScrat, "return");
@@ -1675,28 +1675,28 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       switch (int_sub_routine_num(symbol)) {
       case LUX_INSERT_SUB: // INSERT
         n = int_sub_num_arguments(symbol) - 2;
-        ptr.w = int_sub_arguments(symbol);
-        symbolIdent(ptr.w[n + 1], mode & I_SINGLEMODE);
+        ptr.i16 = int_sub_arguments(symbol);
+        symbolIdent(ptr.i16[n + 1], mode & I_SINGLEMODE);
         curScrat += strlen(curScrat);
         strcpy(curScrat++, "(");
         while (n--) {
-          symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+          symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
           curScrat += strlen(curScrat);
           if (n)
             strcpy(curScrat++, ",");
         }
         strcpy(curScrat, ")=");
         curScrat += strlen(curScrat);
-        symbolIdent(*ptr.w, mode & I_SINGLEMODE);
+        symbolIdent(*ptr.i16, mode & I_SINGLEMODE);
         break;
       default:
         strcpy(curScrat, subroutine[int_sub_routine_num(symbol)].name);
         curScrat += strlen(curScrat);
         n = int_sub_num_arguments(symbol);
-        ptr.w = int_sub_arguments(symbol);
+        ptr.i16 = int_sub_arguments(symbol);
         while (n--) {
           strcpy(curScrat++, ",");
-          symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+          symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
           curScrat += strlen(curScrat);
         }
         break;
@@ -1711,10 +1711,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
       curScrat += strlen(curScrat);
       n = usr_sub_num_arguments(symbol);
-      ptr.w = usr_sub_arguments(symbol);
+      ptr.i16 = usr_sub_arguments(symbol);
       while (n--) {
         strcpy(curScrat++, ",");
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
         curScrat += strlen(curScrat);
       }
       break;
@@ -1725,9 +1725,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       }
       curScrat += strlen(curScrat);
       n = insert_num_target_indices(symbol);
-      ptr.w = insert_target_indices(symbol);
+      ptr.i16 = insert_target_indices(symbol);
       while (n--) {
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
         curScrat += strlen(curScrat);
         if (n)
           strcpy(curScrat++, ",");
@@ -1753,9 +1753,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         j = n;
         i = 0;
       }
-      ptr.w = case_statements(symbol);
+      ptr.i16 = case_statements(symbol);
       while (j--) {
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);        // condition
+        symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);        // condition
         curScrat += strlen(curScrat);
         strcpy(curScrat, " : ");
         curScrat += 3;
@@ -1766,11 +1766,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         } else
           strcpy(curScrat++, " ");
         curScrat += strlen(curScrat);
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);        // action
+        symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);        // action
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           indent -= 2;
-          if (!j && !*ptr.w) // last one and no ELSE
+          if (!j && !*ptr.i16) // last one and no ELSE
             indent -= 2;
           sprintf(curScrat, "\n%*s", indent, "");
           curScrat += strlen(curScrat);
@@ -1784,9 +1784,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           sprintf(curScrat, " (%1d#)", n);
           curScrat += strlen(curScrat);
         }
-        ptr.w += n - 1;
+        ptr.i16 += n - 1;
       }
-      if (*ptr.w) {                // have an ELSE clause
+      if (*ptr.i16) {                // have an ELSE clause
         strcpy(curScrat, "else ");
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
@@ -1795,7 +1795,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           curScrat += strlen(curScrat);
         } else
           strcpy(curScrat++, " ");
-        symbolIdent(*ptr.w, mode & I_SINGLEMODE);
+        symbolIdent(*ptr.i16, mode & I_SINGLEMODE);
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           indent -= 4;
@@ -1825,9 +1825,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         j = n;
         i = 0;
       }
-      ptr.w = ncase_statements(symbol);
+      ptr.i16 = ncase_statements(symbol);
       while (j--) {
-        symbolIdent(*ptr.w++, mode & I_SINGLEMODE);
+        symbolIdent(*ptr.i16++, mode & I_SINGLEMODE);
         curScrat += strlen(curScrat);
         if (mode & I_NL) {
           if (!j && !ncase_else(symbol))
@@ -1844,7 +1844,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
           sprintf(curScrat, " (%1d#)", n);
           curScrat += strlen(curScrat);
         }
-        ptr.w += n - 1;
+        ptr.i16 += n - 1;
       }
       if (ncase_else(symbol)) {
         strcpy(curScrat, "else ");
@@ -1872,7 +1872,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         indent += 2;
       curScrat += strlen(curScrat);
       n = block_num_statements(symbol);
-      ptr.w = block_statements(symbol);
+      ptr.i16 = block_statements(symbol);
       if ((mode & I_TRUNCATE) && n > 1) {
         j = 1;
         i = 1;
@@ -1881,7 +1881,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
         i = 0;
       }
       while (j--) {
-        symbolIdent(*ptr.w++, mode);
+        symbolIdent(*ptr.i16++, mode);
         curScrat += strlen(curScrat);
         if ((mode & I_NL) && (j || i)) {
           sprintf(curScrat, "\n%*s", indent, "");
@@ -2091,7 +2091,7 @@ void dumpTree(int32_t symbol)
         switch (eptr->type) {
           case LUX_RANGE:
             printf("range:\n");
-            ptr = eptr->ptr.w;
+            ptr = eptr->ptr.i16;
             while (i--)
               dumpTree(*ptr++);
             break;

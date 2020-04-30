@@ -1435,14 +1435,14 @@ void undefine(int32_t symbol)
           i = eptr->number;
           switch (eptr->type) {
             case LUX_RANGE:
-              p2.w = eptr->ptr.w;
+              p2.i16 = eptr->ptr.i16;
               while (i--) {
-                if (symbol_context(*p2.w) == symbol
-                    || (zapContext > 0 && symbol_context(*p2.w) == zapContext))
-                  zap(*p2.w);
-                p2.w++;
+                if (symbol_context(*p2.i16) == symbol
+                    || (zapContext > 0 && symbol_context(*p2.i16) == zapContext))
+                  zap(*p2.i16);
+                p2.i16++;
               }
-              free(eptr->ptr.w);
+              free(eptr->ptr.i16);
               break;
             case LUX_LIST:
               p2.sp = eptr->ptr.sp;
@@ -2194,11 +2194,11 @@ int32_t newSymbol(Symbolclass kind, ...)
           i = eptr->number;
           switch (eptr->type) {
             case LUX_RANGE:
-              eptr->ptr.w = (int16_t*) malloc(i*sizeof(int16_t));
-              p.w = eptr->ptr.w + i; // start at the end
+              eptr->ptr.i16 = (int16_t*) malloc(i*sizeof(int16_t));
+              p.i16 = eptr->ptr.i16 + i; // start at the end
               while (i--) {
-                *--p.w = popList();
-                embed(*p.w, n);
+                *--p.i16 = popList();
+                embed(*p.i16, n);
               }
               break;
             case LUX_LIST:
@@ -3562,7 +3562,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
   case LUX_INT8:
     switch (inType) {
     case LUX_INT16:
-      (*target).ui8 = (uint8_t) (*target).w;
+      (*target).ui8 = (uint8_t) (*target).i16;
       break;
     case LUX_INT32:
       (*target).ui8 = (uint8_t) (*target).l;
@@ -3581,19 +3581,19 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
   case LUX_INT16:
     switch (inType) {
     case LUX_INT8:
-      (*target).w = (int16_t) (*target).ui8;
+      (*target).i16 = (int16_t) (*target).ui8;
       break;
     case LUX_INT32:
-      (*target).w = (int16_t) (*target).l;
+      (*target).i16 = (int16_t) (*target).l;
       break;
     case LUX_INT64:
-      (*target).w = (int16_t) (*target).q;
+      (*target).i16 = (int16_t) (*target).q;
       break;
     case LUX_FLOAT:
-      (*target).w = (int16_t) (*target).f;
+      (*target).i16 = (int16_t) (*target).f;
       break;
     case LUX_DOUBLE:
-      (*target).w = (int16_t) (*target).d;
+      (*target).i16 = (int16_t) (*target).d;
       break;
     }
     break;
@@ -3603,7 +3603,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
       (*target).l = (int32_t) (*target).ui8;
       break;
     case LUX_INT16:
-      (*target).l = (int32_t) (*target).w;
+      (*target).l = (int32_t) (*target).i16;
       break;
     case LUX_INT64:
       (*target).l = (int32_t) (*target).q;
@@ -3622,7 +3622,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
       (*target).q = (int64_t) (*target).ui8;
       break;
     case LUX_INT16:
-      (*target).q = (int64_t) (*target).w;
+      (*target).q = (int64_t) (*target).i16;
       break;
     case LUX_INT32:
       (*target).q = (int64_t) (*target).l;
@@ -3641,7 +3641,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
       (*target).f = (float) (*target).ui8;
       break;
     case LUX_INT16:
-      (*target).f = (float) (*target).w;
+      (*target).f = (float) (*target).i16;
       break;
     case LUX_INT32:
       (*target).f = (float) (*target).l;
@@ -3660,7 +3660,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
       (*target).d = (double) (*target).ui8;
       break;
     case LUX_INT16:
-      (*target).d = (double) (*target).w;
+      (*target).d = (double) (*target).i16;
       break;
     case LUX_INT32:
       (*target).d = (double) (*target).l;
@@ -3685,7 +3685,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
     case LUX_INT8:
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->ui8;
+      target->i16 = (int16_t) target->ui8;
       break;
     case LUX_INT32:
       target->l = (int32_t) target->ui8;
@@ -3712,28 +3712,28 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_INT16:
     switch (outType) {
     case LUX_INT8:
-      target->ui8 = (uint8_t) target->w;
+      target->ui8 = (uint8_t) target->i16;
       break;
     case LUX_INT16:
       break;
     case LUX_INT32:
-      target->l = (int32_t) target->w;
+      target->l = (int32_t) target->i16;
       break;
     case LUX_INT64:
-      target->q = (int64_t) target->w;
+      target->q = (int64_t) target->i16;
       break;
     case LUX_FLOAT:
-      target->f = (float) target->w;
+      target->f = (float) target->i16;
       break;
     case LUX_DOUBLE:
-      target->d = (double) target->w;
+      target->d = (double) target->i16;
       break;
     case LUX_CFLOAT:
-      target->cf.real = (float) target->w;
+      target->cf.real = (float) target->i16;
       target->cf.imaginary = 0.0;
       break;
     case LUX_CDOUBLE:
-      target->cd.real = (double) target->w;
+      target->cd.real = (double) target->i16;
       target->cd.imaginary = 0.0;
       break;
     }
@@ -3745,7 +3745,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       break;
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->l;
+      target->i16 = (int16_t) target->l;
       break;
     case LUX_INT32:
       break;
@@ -3775,7 +3775,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       break;
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->q;
+      target->i16 = (int16_t) target->q;
       break;
     case LUX_INT32:
       target->l = (int32_t) target->q;
@@ -3804,7 +3804,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       target->ui8 = (uint8_t) target->f;
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->f;
+      target->i16 = (int16_t) target->f;
       break;
     case LUX_INT32:
       target->l = (int32_t) target->f;
@@ -3833,7 +3833,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       target->ui8 = (uint8_t) target->d;
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->d;
+      target->i16 = (int16_t) target->d;
       break;
     case LUX_INT32:
       target->l = (int32_t) target->d;
@@ -3862,7 +3862,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       target->ui8 = (uint8_t) target->cf.real;
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->cf.real;
+      target->i16 = (int16_t) target->cf.real;
       break;
     case LUX_INT32:
       target->l = (int32_t) target->cf.real;
@@ -3890,7 +3890,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
       target->ui8 = (uint8_t) target->cd.real;
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->cd.real;
+      target->i16 = (int16_t) target->cd.real;
       break;
     case LUX_INT32:
       target->l = (int32_t) target->cd.real;
@@ -3930,7 +3930,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
      (*target).ui8 = (uint8_t) *ptr.ui8;
      break;
    case LUX_INT16:
-     (*target).ui8 = (uint8_t) *ptr.w;
+     (*target).ui8 = (uint8_t) *ptr.i16;
      break;
    case LUX_INT32:
      (*target).ui8 = (uint8_t) *ptr.l;
@@ -3949,22 +3949,22 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
  case LUX_INT16:
    switch (n) {
    case LUX_INT8:
-     (*target).w = (int16_t) *ptr.ui8;
+     (*target).i16 = (int16_t) *ptr.ui8;
      break;
    case LUX_INT16:
-     (*target).w = (int16_t) *ptr.w;
+     (*target).i16 = (int16_t) *ptr.i16;
      break;
    case LUX_INT32:
-     (*target).w = (int16_t) *ptr.l;
+     (*target).i16 = (int16_t) *ptr.l;
      break;
    case LUX_INT64:
-     (*target).w = (int16_t) *ptr.q;
+     (*target).i16 = (int16_t) *ptr.q;
      break;
    case LUX_FLOAT:
-     (*target).w = (int16_t) *ptr.f;
+     (*target).i16 = (int16_t) *ptr.f;
      break;
    case LUX_DOUBLE:
-     (*target).w = (int16_t) *ptr.d;
+     (*target).i16 = (int16_t) *ptr.d;
      break;
    }
    break;
@@ -3974,7 +3974,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
      (*target).l = (int32_t) *ptr.ui8;
      break;
    case LUX_INT16:
-     (*target).l = (int32_t) *ptr.w;
+     (*target).l = (int32_t) *ptr.i16;
      break;
    case LUX_INT32:
      (*target).l = (int32_t) *ptr.l;
@@ -3996,7 +3996,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
      (*target).q = (int64_t) *ptr.ui8;
      break;
    case LUX_INT16:
-     (*target).q = (int64_t) *ptr.w;
+     (*target).q = (int64_t) *ptr.i16;
      break;
    case LUX_INT32:
      (*target).q = (int64_t) *ptr.l;
@@ -4018,7 +4018,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
      (*target).f = (float) *ptr.ui8;
      break;
    case LUX_INT16:
-     (*target).f = (float) *ptr.w;
+     (*target).f = (float) *ptr.i16;
      break;
    case LUX_INT32:
      (*target).f = (float) *ptr.l;
@@ -4040,7 +4040,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
      (*target).d = (double) *ptr.ui8;
      break;
    case LUX_INT16:
-     (*target).d = (double) *ptr.w;
+     (*target).d = (double) *ptr.i16;
      break;
    case LUX_INT32:
      (*target).d = (double) *ptr.l;
@@ -4381,12 +4381,12 @@ void symbolInitialization(void)
  cf_fix("#i",           0.0, 1.0); // imaginary unit
  l_fix("#max_args",     MAX_ARG);
  l_fix("#max_byte",     bounds.max.ui8);
- l_fix("#max_word",     bounds.max.w);
+ l_fix("#max_word",     bounds.max.i16);
  l_fix("#max_long",     bounds.max.l);
  q_fix("#max_int64",    bounds.max.q);
  f_fix("#max_float",    bounds.max.f);
  d_fix("#max_double",   bounds.max.d);
- l_fix("#min_word",     bounds.min.w);
+ l_fix("#min_word",     bounds.min.i16);
  l_fix("#min_long",     bounds.min.l);
  q_fix("#min_int64",    bounds.min.q);
  f_fix("#min_float",    FLT_MIN);
@@ -5112,12 +5112,12 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
       *nstruct = 1;
       return 1;
     case LUX_CLIST:
-      p.w = clist_symbols(symbol);
+      p.i16 = clist_symbols(symbol);
       n = clist_num_symbols(symbol);
       *nbyte = 0;
       *nstruct = 1;             // one extra for the struct info
       while (n--) {
-        if (structSize(*p.w++, &ns, &nb) == LUX_ERROR)
+        if (structSize(*p.i16++, &ns, &nb) == LUX_ERROR)
           return LUX_ERROR;
         *nbyte += nb;
         *nstruct += ns;

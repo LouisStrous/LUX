@@ -121,13 +121,13 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)// crunch subrout
     ctype += 2;
   switch (ctype) {
   case 0:
-    iq = anacrunch(q2.ui8, q1.w, slice, nx, outer, limit);
+    iq = anacrunch(q2.ui8, q1.i16, slice, nx, outer, limit);
     break;
   case 1:
     iq = anacrunch8(q2.ui8, q1.ui8, slice, nx, outer, limit);
     break;
   case 2:
-    iq = anacrunchrun(q2.ui8, q1.w, slice, nx, outer, limit);
+    iq = anacrunchrun(q2.ui8, q1.i16, slice, nx, outer, limit);
     break;
   case 3:
     iq = anacrunchrun8(q2.ui8, q1.ui8, slice, nx, outer, limit);
@@ -207,13 +207,13 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])                // decrunch subr
   q2.l = (int32_t *) ((char *)h + sizeof(struct ahead));
   switch (ctype) {
   case 0:
-    iq = anadecrunch(q1.ui8, q2.w, slice, nx, outer);
+    iq = anadecrunch(q1.ui8, q2.i16, slice, nx, outer);
     break;
   case 1:
     iq = anadecrunch8(q1.ui8, q2.ui8, slice, nx, outer);
     break;
   case 2:
-    iq = anadecrunchrun(q1.ui8, q2.w, slice, nx, outer);
+    iq = anadecrunchrun(q1.ui8, q2.i16, slice, nx, outer);
     break;
   case 3:
     iq = anadecrunchrun8(q1.ui8, q2.ui8, slice, nx, outer);

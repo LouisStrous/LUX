@@ -491,20 +491,20 @@ int32_t draw(int32_t ic)
   if (penDown)
   {
 #if WORDS_BIGENDIAN
-    is1 = *(p.w + 1);
+    is1 = *(p.i16 + 1);
     swab((char *) &is1, (char *) &is2, 2);
 #else
-    is2 = *(p.w + 1);
+    is2 = *(p.i16 + 1);
 #endif
     offset = (int32_t) is2;
                         // offset is in I*2 amounts
     p.ui8 = fontbase;
-    p.w += offset;
+    p.i16 += offset;
                         // check if abnormal
 #if WORDS_BIGENDIAN
-    is2 = *p.w;        swab((char *) &is2, (char *) &is1, 2);
+    is2 = *p.i16;        swab((char *) &is2, (char *) &is1, 2);
 #else
-    is1 = *p.w;
+    is1 = *p.i16;
 #endif
     if (is1 < 16384)
     { printf("special symbol, sorry - not supported\n");
@@ -512,10 +512,10 @@ int32_t draw(int32_t ic)
     while (nvec--)
     {
 #if WORDS_BIGENDIAN
-      is2 = *p.w++;        swab((char *) &is2, (char *) &is1, 2);
+      is2 = *p.i16++;        swab((char *) &is2, (char *) &is1, 2);
       iq = (int32_t) is1;
 #else
-      iq = (int32_t) *p.w++;
+      iq = (int32_t) *p.i16++;
 #endif
       if (iq & 0x4000) mode = 0; else mode = 1;
       iy = (iq & 0x7f);  ix = (iq/ 0x7f) & 0x7f;

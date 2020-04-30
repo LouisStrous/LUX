@@ -2328,9 +2328,9 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
     break;
   case LUX_INT16:
     do {
-      alpha = *src.w*DEG;
+      alpha = *src.i16*DEG;
       srcinfo.advanceLoop(&src);
-      delta = *src.w*DEG;
+      delta = *src.i16*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
       tgtinfo.advanceLoop(&tgt);
@@ -2339,7 +2339,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
         done = srcinfo.advanceLoop(&src);
         tgtinfo.advanceLoop(&tgt);
         if (!done)
-          *tgt.f = *src.w;
+          *tgt.f = *src.i16;
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
@@ -2491,9 +2491,9 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
     break;
   case LUX_INT16:
     do {
-      alpha = *src.w*DEG;
+      alpha = *src.i16*DEG;
       srcinfo.advanceLoop(&src);
-      delta = *src.w*DEG;
+      delta = *src.i16*DEG;
       do
         done = srcinfo.advanceLoop(&src);
       while (!done);
@@ -2618,12 +2618,12 @@ int32_t lux_constellationname(int32_t narg, int32_t ps[])
     break;
   case LUX_INT16:
     while (n--) {
-      if (*src.w < 0 || *src.w >= nc)
+      if (*src.i16 < 0 || *src.i16 >= nc)
         *tgt = strdup("***");
       else
-        *tgt = strdup(constellation_names[*src.w]);
+        *tgt = strdup(constellation_names[*src.i16]);
       tgt++;
-      src.w++;
+      src.i16++;
     }
     break;
   case LUX_INT32:
@@ -4018,8 +4018,8 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
         pos[1] = (double) src.ui8[1]*DEG;
         break;
       case LUX_INT16:
-        pos[0] = (double) src.w[0]*DEG;
-        pos[1] = (double) src.w[1]*DEG;
+        pos[0] = (double) src.i16[0]*DEG;
+        pos[1] = (double) src.i16[1]*DEG;
         break;
       case LUX_INT32:
         pos[0] = (double) src.l[0]*DEG;
@@ -4058,8 +4058,8 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
         pos[1] = (double) src.ui8[1]*DEG;
         break;
       case LUX_INT16:
-        pos[0] = (double) src.w[0]*DEG;
-        pos[1] = (double) src.w[1]*DEG;
+        pos[0] = (double) src.i16[0]*DEG;
+        pos[1] = (double) src.i16[1]*DEG;
         break;
       case LUX_INT32:
         pos[0] = (double) src.l[0]*DEG;

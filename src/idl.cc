@@ -153,7 +153,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 #if !LITTLEENDIAN
             endian(pp.ui8, 4, LUX_INT32);
 #endif
-            *data.w++ = *pp.l;
+            *data.i16++ = *pp.l;
           }
           break;
         case 3:        case 4: case 5:        // long, float, double
@@ -182,8 +182,8 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
 #if !LITTLEENDIAN
           endian(pp.ui8, 4, LUX_INT32);
 #endif
-          value.w = value.l;
-          redef_scalar(var, LUX_INT16, &value.w);
+          value.i16 = value.l;
+          redef_scalar(var, LUX_INT16, &value.i16);
           break;
         case 3:                        // long
           fread(pp.ui8, 1, 4, fp);
@@ -345,7 +345,7 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 #if LITTLEENDIAN
           endian(pp.ui8, 4, LUX_INT32);
 #endif
-          *data.w++ = *pp.l;
+          *data.i16++ = *pp.l;
         }
         break;
       case 3: case 4: case 5:        // long, float, double
@@ -373,8 +373,8 @@ int32_t lux_idlread_f(int32_t narg, int32_t ps[])
 #if LITTLEENDIAN
         endian(pp.ui8, 4, LUX_INT32);
 #endif
-        value.w = value.l;
-        redef_scalar(var, LUX_INT16, &value.w);
+        value.i16 = value.l;
+        redef_scalar(var, LUX_INT16, &value.i16);
         break;
       case 3:                        // long
         fread(pp.ui8, 1, 4, fp);

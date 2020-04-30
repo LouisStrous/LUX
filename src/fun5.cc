@@ -975,22 +975,22 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
       memcpy(out.ui8, data.ui8, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_INT16:
-      memcpy(out.w, data.w, nx*lux_type_size[type]); // top row: just copy
+      memcpy(out.i16, data.i16, nx*lux_type_size[type]); // top row: just copy
       ny -= 2;
-      out.w += nx;
-      data.w += nx;
+      out.i16 += nx;
+      data.i16 += nx;
       while (ny--) {
-        *out.w++ = *data.w++;        // left edge: just copy
+        *out.i16++ = *data.i16++;        // left edge: just copy
         n = nx - 2;
         while (n--) {
-          *out.w++ = (*data.w || data.w[1] || data.w[1 + nx] || data.w[nx]
-                      || data.w[nx - 1] || data.w[-1] || data.w[-1 - nx]
-                      || data.w[-nx] || data.w[-nx + 1]);
-          data.w++;
+          *out.i16++ = (*data.i16 || data.i16[1] || data.i16[1 + nx] || data.i16[nx]
+                      || data.i16[nx - 1] || data.i16[-1] || data.i16[-1 - nx]
+                      || data.i16[-nx] || data.i16[-nx + 1]);
+          data.i16++;
         }
-        *out.w++ = *data.w++;        // right edge: just copy
+        *out.i16++ = *data.i16++;        // right edge: just copy
       }
-      memcpy(out.w, data.w, nx*lux_type_size[type]); // top row: just copy
+      memcpy(out.i16, data.i16, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_INT32:
       memcpy(out.l, data.l, nx*lux_type_size[type]); // top row: just copy
@@ -1133,32 +1133,32 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
       n = nx;
       if (zeroedge) {
         while (n--)
-          *out.w++ = 0;
-        data.w += nx;
+          *out.i16++ = 0;
+        data.i16 += nx;
       } else
         while (n--)
-          *out.w++ = (*data.w++ != 0);
+          *out.i16++ = (*data.i16++ != 0);
       ny -= 2;
       while (ny--) {
-        *out.w++ = zeroedge? 0: (*data.w != 0); // left edge
-        data.w++;
+        *out.i16++ = zeroedge? 0: (*data.i16 != 0); // left edge
+        data.i16++;
         n = nx - 2;
         while (n--) {
-          *out.w++ = (*data.w && data.w[1] && data.w[1 + nx] && data.w[nx]
-                      && data.w[nx - 1] && data.w[-1] && data.w[-1 - nx]
-                      && data.w[-nx] && data.w[-nx + 1]);
-          data.w++;
+          *out.i16++ = (*data.i16 && data.i16[1] && data.i16[1 + nx] && data.i16[nx]
+                      && data.i16[nx - 1] && data.i16[-1] && data.i16[-1 - nx]
+                      && data.i16[-nx] && data.i16[-nx + 1]);
+          data.i16++;
         }
-        *out.w++ = zeroedge? 0: (*data.w != 0); // right edge
-        data.w++;
+        *out.i16++ = zeroedge? 0: (*data.i16 != 0); // right edge
+        data.i16++;
       }
       n = nx;
       if (zeroedge)
         while (n--)
-          *out.w++ = 0;
+          *out.i16++ = 0;
       else
         while (n--)
-          *out.w++ = (*data.w++ != 0);
+          *out.i16++ = (*data.i16++ != 0);
       break;
     case LUX_INT32:
       n = nx;

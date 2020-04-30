@@ -112,7 +112,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.ui8++ = *src.q++;
+              *trgt.ui8++ = *src.i64++;
             break;
           case LUX_FLOAT:
             while (nelem--)
@@ -142,7 +142,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.i16++ = *src.q++;
+              *trgt.i16++ = *src.i64++;
             break;
           case LUX_FLOAT:
             while (nelem--)
@@ -172,7 +172,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.i32++ = *src.q++;
+              *trgt.i32++ = *src.i64++;
             break;
           case LUX_FLOAT:
             while (nelem--)
@@ -190,27 +190,27 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.q++ = *src.ui8++;
+              *trgt.i64++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
-              *trgt.q++ = *src.i16++;
+              *trgt.i64++ = *src.i16++;
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.q++ = *src.i32++;
+              *trgt.i64++ = *src.i32++;
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.q++ = *src.q++;
+              *trgt.i64++ = *src.i64++;
             break;
           case LUX_FLOAT:
             while (nelem--)
-              *trgt.q++ = *src.f++;
+              *trgt.i64++ = *src.f++;
             break;
           case LUX_DOUBLE:
             while (nelem--)
-              *trgt.q++ = *src.d++;
+              *trgt.i64++ = *src.d++;
             break;
           default:
             return cerror(ILL_TYPE, ps[1]);
@@ -232,7 +232,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.f++ = *src.q++;
+              *trgt.f++ = *src.i64++;
             break;
           case LUX_FLOAT:
             while (nelem--)
@@ -1856,7 +1856,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
                 value.i32 += src.i32[offset];
                 break;
               case LUX_INT64:
-                value.q += src.i32[offset];
+                value.i64 += src.i32[offset];
                 break;
               case LUX_FLOAT:
                 value.f += src.f[offset];
@@ -1940,7 +1940,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
                 value.i32 += item.i32;
                 break;
               case LUX_INT64:
-                value.q += item.q;
+                value.i64 += item.i64;
                 break;
               case LUX_FLOAT:
                 value.f += item.f;
@@ -2774,19 +2774,19 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--)
-              *q2.q++ = (int64_t) *q1.ui8++;
+              *q2.i64++ = (int64_t) *q1.ui8++;
             break;
           case LUX_INT16:
             while (n--)
-              *q2.q++ = (int64_t) *q1.i16++;
+              *q2.i64++ = (int64_t) *q1.i16++;
             break;
           case LUX_INT32:
             while (n--)
-              *q2.q++ = (int64_t) *q1.i32++;
+              *q2.i64++ = (int64_t) *q1.i32++;
             break;
           case LUX_INT64:
             while (n--)
-              *q2.q++ = *q1.q++;
+              *q2.i64++ = *q1.i64++;
             break;
           }
           break;
@@ -2806,7 +2806,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (n--)
-              *q2.f++ = (float) *q1.q++;
+              *q2.f++ = (float) *q1.i64++;
             break;
           case LUX_FLOAT:
             while (n--)
@@ -2830,7 +2830,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (n--)
-              *q2.d++ = (double) *q1.q++;
+              *q2.d++ = (double) *q1.i64++;
             break;
           case LUX_FLOAT:
             while (n--)
@@ -2864,7 +2864,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (n--) {
-              q2.cf->real = *q1.q++;
+              q2.cf->real = *q1.i64++;
               q2.cf++->imaginary = 0.0;
             }
             break;
@@ -2904,7 +2904,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT64:
             while (n--) {
-              q2.cd->real = *q1.q++;
+              q2.cd->real = *q1.i64++;
               q2.cd++->imaginary = 0.0;
             }
             break;
@@ -3118,7 +3118,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
         break;
       case LUX_INT64:
         do {
-          cvalue.d = src.q[index];
+          cvalue.d = src.i64[index];
           for (i = 0; i < ndim; i++)
             cvalue.d *= d[i];
           for (j = 0; j < ndim; j++) {

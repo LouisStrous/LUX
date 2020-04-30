@@ -637,7 +637,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       intval = (intmax_t) scalar_value(symbol).i32;
       break;
     case LUX_INT64:
-      intval = (intmax_t) scalar_value(symbol).q;
+      intval = (intmax_t) scalar_value(symbol).i64;
       break;
     case LUX_FLOAT:
       fltval = (double) scalar_value(symbol).f;
@@ -800,7 +800,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case LUX_INT64:
       while (j--) {
-        sprintf(curScrat, "%jd", (intmax_t) *ptr.q++);
+        sprintf(curScrat, "%jd", (intmax_t) *ptr.i64++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -947,7 +947,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       intval = (intmax_t) *scal_ptr_pointer(symbol).i32;
       break;
     case LUX_INT64:
-      intval = (intmax_t) *scal_ptr_pointer(symbol).q;
+      intval = (intmax_t) *scal_ptr_pointer(symbol).i64;
       break;
     case LUX_FLOAT:
       fltval = (double) *scal_ptr_pointer(symbol).f;

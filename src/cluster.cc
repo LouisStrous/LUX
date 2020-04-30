@@ -359,8 +359,8 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
           break;
         case LUX_INT64:
           for (i = 0; i < nClusters; i++)
-            if (clusterNumber.q[i] < 0 // index too small
-                || clusterNumber.q[i] >= nClusters) { // index too large
+            if (clusterNumber.i64[i] < 0 // index too small
+                || clusterNumber.i64[i] >= nClusters) { // index too large
               printf("CLUSTER - illegal index #%1d (%1d), ignore all\n",
                      i, clusterNumber.i32[i]);
               useIndex = 0;
@@ -596,7 +596,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
         break;
       case LUX_INT64:
         for (i = 0; i < nSample; i++) {
-          j = clusterOtoC[clusterNumber.q[i]];
+          j = clusterOtoC[clusterNumber.i64[i]];
           clusterSize[j]++;
         }
         break;
@@ -672,7 +672,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
             curO = *clusterNumber.i32;
             break;
           case LUX_INT64:
-            curO = *clusterNumber.q;
+            curO = *clusterNumber.i64;
             break;
         }
       if (!useIndex || changedOld[curO] || !quick) {
@@ -945,7 +945,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
           *clusterNumber.i32++ = newO;
           break;
         case LUX_INT64:
-          *clusterNumber.q++ = newO;
+          *clusterNumber.i64++ = newO;
           break;
       }
 

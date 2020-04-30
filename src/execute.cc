@@ -517,7 +517,7 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
             *scal_ptr_pointer(lhs).i32 = scalar_value(rhs).i32;
             break;
           case LUX_INT64:
-            *scal_ptr_pointer(lhs).q = scalar_value(rhs).q;
+            *scal_ptr_pointer(lhs).i64 = scalar_value(rhs).i64;
             break;
           case LUX_FLOAT:
             *scal_ptr_pointer(lhs).f = scalar_value(rhs).f;
@@ -1415,7 +1415,7 @@ int32_t lux_for(int32_t nsym)
      forward = (inc.i32 >= 0)? 1: 0;
      break;
    case LUX_INT64:
-     forward = (inc.q >= 0)? 1: 0;
+     forward = (inc.i64 >= 0)? 1: 0;
      break;
    case LUX_FLOAT:
      forward = (inc.f >= 0)? 1: 0;
@@ -1437,7 +1437,7 @@ int32_t lux_for(int32_t nsym)
      *counter.i32 = start.i32;
      break;
    case LUX_INT64:
-     *counter.q = start.q;
+     *counter.i64 = start.i64;
      break;
    case LUX_FLOAT:
      *counter.f = start.f;
@@ -1459,7 +1459,7 @@ int32_t lux_for(int32_t nsym)
      n = *counter.i32 > end.i32? 0: 1;
      break;
    case LUX_INT64:
-     n = *counter.q > end.q? 0: 1;
+     n = *counter.i64 > end.i64? 0: 1;
      break;
    case LUX_FLOAT:
      n = *counter.f > end.f? 0: 1;
@@ -1479,7 +1479,7 @@ int32_t lux_for(int32_t nsym)
      n = *counter.i32 < end.i32? 0: 1;
      break;
    case LUX_INT64:
-     n = *counter.q < end.q? 0: 1;
+     n = *counter.i64 < end.i64? 0: 1;
      break;
    case LUX_FLOAT:
      n = *counter.f < end.f? 0: 1;
@@ -1615,8 +1615,8 @@ int32_t lux_for(int32_t nsym)
      if (action)
        while (n) {
          printf("FOR-loop: ");  // show for-loop status
-         printf("%1d,%1d,%1d; counter %s = %1d\n", start.q, end.q, inc.q,
-                symbolIdent(counterSym, 0), *counter.q);
+         printf("%1d,%1d,%1d; counter %s = %1d\n", start.i64, end.i64, inc.i64,
+                symbolIdent(counterSym, 0), *counter.i64);
          n = execute(temp);
          switch (n) {
            case LOOP_BREAK:
@@ -1629,8 +1629,8 @@ int32_t lux_for(int32_t nsym)
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.q += inc.q;
-         n = forward? (*counter.q > end.q? 0: 1): (*counter.q < end.q? 0: 1);
+         *counter.i64 += inc.i64;
+         n = forward? (*counter.i64 > end.i64? 0: 1): (*counter.i64 < end.i64? 0: 1);
        }
      else
        while (n) {
@@ -1646,8 +1646,8 @@ int32_t lux_for(int32_t nsym)
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.q += inc.q;
-         n = forward? (*counter.q > end.q? 0: 1): (*counter.q < end.q? 0: 1);
+         *counter.i64 += inc.i64;
+         n = forward? (*counter.i64 > end.i64? 0: 1): (*counter.i64 < end.i64? 0: 1);
        }
      break;
    case LUX_FLOAT:
@@ -2133,7 +2133,7 @@ int32_t execute(int32_t symbol)
         n = scalar_value(temp).i32? 1: 0;
         break;
       case LUX_INT64:
-        n = scalar_value(temp).q? 1: 0;
+        n = scalar_value(temp).i64? 1: 0;
         break;
       case LUX_FLOAT:
         n = scalar_value(temp).f? 1: 0;
@@ -2718,7 +2718,7 @@ int32_t insert(int32_t narg, int32_t ps[])
                   trgt.ui8[offset] = (uint8_t) *src.i32;
                   break;
                 case LUX_INT64:
-                  trgt.ui8[offset] = *src.q;
+                  trgt.ui8[offset] = *src.i64;
                   break;
                 case LUX_FLOAT:
                   trgt.ui8[offset] = (uint8_t) *src.f;
@@ -2746,7 +2746,7 @@ int32_t insert(int32_t narg, int32_t ps[])
                   trgt.i16[offset] = (int16_t) *src.i32;
                   break;
                 case LUX_INT64:
-                  trgt.i16[offset] = *src.q;
+                  trgt.i16[offset] = *src.i64;
                   break;
                 case LUX_FLOAT:
                   trgt.i16[offset] = (int16_t) *src.f;
@@ -2774,7 +2774,7 @@ int32_t insert(int32_t narg, int32_t ps[])
                   trgt.i32[offset] = *src.i32;
                   break;
                 case LUX_INT64:
-                  trgt.i32[offset] = *src.q;
+                  trgt.i32[offset] = *src.i64;
                   break;
                 case LUX_FLOAT:
                   trgt.i32[offset] = (int32_t) *src.f;
@@ -2793,28 +2793,28 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT64:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.q[offset] = *src.ui8;
+                  trgt.i64[offset] = *src.ui8;
                   break;
                 case LUX_INT16:
-                  trgt.q[offset] = *src.i16;
+                  trgt.i64[offset] = *src.i16;
                   break;
                 case LUX_INT32:
-                  trgt.q[offset] = *src.i32;
+                  trgt.i64[offset] = *src.i32;
                   break;
                 case LUX_INT64:
-                  trgt.q[offset] = *src.q;
+                  trgt.i64[offset] = *src.i64;
                   break;
                 case LUX_FLOAT:
-                  trgt.q[offset] = *src.f;
+                  trgt.i64[offset] = *src.f;
                   break;
                 case LUX_DOUBLE:
-                  trgt.q[offset] = *src.d;
+                  trgt.i64[offset] = *src.d;
                   break;
                 case LUX_CFLOAT:
-                  trgt.q[offset] = hypot(src.cf->real, src.cf->imaginary);
+                  trgt.i64[offset] = hypot(src.cf->real, src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  trgt.q[offset] = hypot(src.cd->real, src.cd->imaginary);
+                  trgt.i64[offset] = hypot(src.cd->real, src.cd->imaginary);
                   break;
               }
               break;
@@ -2830,7 +2830,7 @@ int32_t insert(int32_t narg, int32_t ps[])
                   trgt.f[offset] = (float) *src.i32;
                   break;
                 case LUX_INT64:
-                  trgt.f[offset] = *src.q;
+                  trgt.f[offset] = *src.i64;
                   break;
                 case LUX_FLOAT:
                   trgt.f[offset] = *src.f;
@@ -2858,7 +2858,7 @@ int32_t insert(int32_t narg, int32_t ps[])
                   trgt.d[offset] = (double) *src.i32;
                   break;
                 case LUX_INT64:
-                  trgt.d[offset] = *src.q;
+                  trgt.d[offset] = *src.i64;
                   break;
                 case LUX_FLOAT:
                   trgt.d[offset] = (double) *src.f;
@@ -2889,7 +2889,7 @@ int32_t insert(int32_t narg, int32_t ps[])
                   trgt.cf[offset].imaginary = 0;
                   break;
                 case LUX_INT64:
-                  trgt.cf[offset].real = *src.q;
+                  trgt.cf[offset].real = *src.i64;
                   trgt.cf[offset].imaginary = 0;
                   break;
                 case LUX_FLOAT:
@@ -2925,7 +2925,7 @@ int32_t insert(int32_t narg, int32_t ps[])
                   trgt.cd[offset].imaginary = 0;
                   break;
                 case LUX_INT64:
-                  trgt.cd[offset].real = *src.q;
+                  trgt.cd[offset].real = *src.i64;
                   trgt.cd[offset].imaginary = 0;
                   break;
                 case LUX_FLOAT:

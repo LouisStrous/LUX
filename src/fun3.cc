@@ -830,7 +830,7 @@ int32_t lux_arg(int32_t narg, int32_t ps[])
           break;
         case LUX_INT64:
           while (n--)
-            *trgt.f++ = (*value.q++ >= 0)? 0.0: M_PI;
+            *trgt.f++ = (*value.i64++ >= 0)? 0.0: M_PI;
           break;
         case LUX_FLOAT:
           while (n--)
@@ -860,7 +860,7 @@ int32_t lux_arg(int32_t narg, int32_t ps[])
           break;
         case LUX_INT64:
           while (n--)
-            *trgt.d++ = (*value.q++ >= 0)? 0.0: M_PI;
+            *trgt.d++ = (*value.i64++ >= 0)? 0.0: M_PI;
           break;
         case LUX_FLOAT:
           while (n--)
@@ -1477,7 +1477,7 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
       x = (int32_t) *src.i32++;
       break;
     case LUX_INT64:
-      x = *src.q++;
+      x = *src.i64++;
       break;
     case LUX_FLOAT:
       x = (int32_t) *src.f++;
@@ -1635,7 +1635,7 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) // histogram function
         { i = *q1.i32++ - histmin;  q2.i32[i]++; }  break;
       case LUX_INT64:
         while (n--)
-        { i = *q1.q++ - histmin;  q2.q[i]++; }  break;
+        { i = *q1.i64++ - histmin;  q2.i64[i]++; }  break;
       case LUX_FLOAT:
         while (n--)
         { i = *q1.f++ - histmin;  q2.i32[i]++; }  break;
@@ -1724,7 +1724,7 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
       break;
     case LUX_INT64:
       while (nc--)
-        if (*q3.q++)
+        if (*q3.i64++)
           cnt++;
       break;
     case LUX_FLOAT:
@@ -1769,7 +1769,7 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
         break;
       case LUX_INT64:
         while (nc--)
-        { if (*q3.q++)
+        { if (*q3.i64++)
             *q2.i32++ = n;
           n++; }
         break;
@@ -1812,8 +1812,8 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
         case LUX_INT64:
           while (nc--)
           { if (*q3.ui8++)
-              *q2.q++ = *q1.q;
-            q1.q++; }
+              *q2.i64++ = *q1.i64;
+            q1.i64++; }
           break;
         case LUX_FLOAT:
           while (nc--)
@@ -1851,8 +1851,8 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
         case LUX_INT64:
           while (nc--)
           { if (*q3.i16++)
-              *q2.q++ = *q1.q;
-            q1.q++; }
+              *q2.i64++ = *q1.i64;
+            q1.i64++; }
           break;
         case LUX_FLOAT:
           while (nc--)
@@ -1890,8 +1890,8 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
         case LUX_INT64:
           while (nc--)
           { if (*q3.i32++)
-              *q2.q++ = *q1.q;
-            q1.q++; }
+              *q2.i64++ = *q1.i64;
+            q1.i64++; }
           break;
         case LUX_FLOAT:
           while (nc--)
@@ -1910,37 +1910,37 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
       switch (type)
       { case LUX_INT8:
           while (nc--)
-          { if (*q3.q++)
+          { if (*q3.i64++)
               *q2.ui8++ = *q1.ui8;
             q1.ui8++; }
           break;
         case LUX_INT16:
           while (nc--)
-          { if (*q3.q++)
+          { if (*q3.i64++)
               *q2.i16++ = *q1.i16;
             q1.i16++; }
           break;
         case LUX_INT32:
           while (nc--)
-          { if (*q3.q++)
+          { if (*q3.i64++)
               *q2.i32++ = *q1.i32;
             q1.i32++; }
           break;
         case LUX_INT64:
           while (nc--)
-          { if (*q3.q++)
-              *q2.q++ = *q1.q;
-            q1.q++; }
+          { if (*q3.i64++)
+              *q2.i64++ = *q1.i64;
+            q1.i64++; }
           break;
         case LUX_FLOAT:
           while (nc--)
-          { if (*q3.q++)
+          { if (*q3.i64++)
               *q2.f++ = *q1.f;
             q1.f++; }
           break;
         case LUX_DOUBLE:
           while (nc--)
-          { if (*q3.q++)
+          { if (*q3.i64++)
               *q2.d++ = *q1.d;
             q1.d++; }
           break; }
@@ -1968,8 +1968,8 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
         case LUX_INT64:
           while (nc--)
           { if (*q3.f++)
-              *q2.q++ = *q1.q;
-            q1.q++; }
+              *q2.i64++ = *q1.i64;
+            q1.i64++; }
           break;
         case LUX_FLOAT:
           while (nc--)
@@ -2007,8 +2007,8 @@ int32_t lux_sieve(int32_t narg, int32_t ps[])
         case LUX_INT64:
           while (nc--)
           { if (*q3.d++)
-              *q2.q++ = *q1.q;
-            q1.q++; }
+              *q2.i64++ = *q1.i64;
+            q1.i64++; }
           break;
         case LUX_FLOAT:
           while (nc--)
@@ -2209,27 +2209,27 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
         switch (code) {
           case 0: // maxf
             if (any[*indx]) {
-              if (src.q[i] > trgt.q[*indx])
-                trgt.q[*indx] = src.q[i];
+              if (src.i64[i] > trgt.i64[*indx])
+                trgt.i64[*indx] = src.i64[i];
             } else {
-              trgt.q[*indx] = src.q[i];
+              trgt.i64[*indx] = src.i64[i];
               any[*indx] = 1;
             }
             indx++;
             break;
           case 1: // minf
             if (any[*indx]) {
-              if (src.q[i] < trgt.q[*indx])
-                trgt.q[*indx] = src.q[i];
+              if (src.i64[i] < trgt.i64[*indx])
+                trgt.i64[*indx] = src.i64[i];
             } else {
-              trgt.q[*indx] = src.q[i];
+              trgt.i64[*indx] = src.i64[i];
               any[*indx] = 1;
             }
             indx++;
             break;
           case 2: // maxloc
             if (any[*indx]) {
-              if (src.q[i] > src.q[trgt.i32[*indx]])
+              if (src.i64[i] > src.i64[trgt.i32[*indx]])
                 trgt.i32[*indx] = i;
             } else {
               trgt.i32[*indx] = i;
@@ -2239,7 +2239,7 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
             break;
           case 3: // minloc
             if (any[*indx]) {
-              if (src.q[i] < src.q[trgt.i32[*indx]])
+              if (src.i64[i] < src.i64[trgt.i32[*indx]])
                 trgt.i32[*indx] = i;
             } else {
               trgt.i32[*indx] = i;
@@ -2565,24 +2565,24 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
     case LUX_INT64:
       do {
         // take first value as initial values
-        memcpy(&min, src.q, srcinfo.stride);
-        memcpy(&max, src.q, srcinfo.stride);
-        minloc = maxloc = src.q - (int64_t *) srcinfo.data0;
+        memcpy(&min, src.i64, srcinfo.stride);
+        memcpy(&max, src.i64, srcinfo.stride);
+        minloc = maxloc = src.i64 - (int64_t *) srcinfo.data0;
         do {
-          if (*src.q > max.q) {
-            max.q = *src.q;
-            maxloc = src.q - (int64_t *) srcinfo.data0;
-          } else if (*src.q < min.q) {
-            min.q = *src.q;
-            minloc = src.q - (int64_t *) srcinfo.data0;
+          if (*src.i64 > max.i64) {
+            max.i64 = *src.i64;
+            maxloc = src.i64 - (int64_t *) srcinfo.data0;
+          } else if (*src.i64 < min.i64) {
+            min.i64 = *src.i64;
+            minloc = src.i64 - (int64_t *) srcinfo.data0;
           }
         } while ((n = srcinfo.advanceLoop(&src)) < n1);
         switch (code) {
           case 0:               // max value
-            *trgt.q++ = max.q;
+            *trgt.i64++ = max.i64;
             break;
           case 1:               // min value
-            *trgt.q++ = min.q;
+            *trgt.i64++ = min.i64;
             break;
           case 2:               // max location
             *trgt.i32++ = maxloc;
@@ -2846,11 +2846,11 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
         case LUX_INT64:
           while (size--) {
             if (*data.ui8 < datalow)
-              *trgt.q++ = trgtlow;
+              *trgt.i64++ = trgtlow;
             else if (*data.ui8 > datahigh)
-              *trgt.q++ = trgthigh;
+              *trgt.i64++ = trgthigh;
             else
-              *trgt.q++ = *data.ui8*ffac + foff;
+              *trgt.i64++ = *data.ui8*ffac + foff;
             data.ui8++;
           }
           break;
@@ -2896,11 +2896,11 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
         case LUX_INT64:
           while (size--) {
             if (*data.i16 < datalow)
-              *trgt.q++ = trgtlow;
+              *trgt.i64++ = trgtlow;
             else if (*data.i16 > datahigh)
-              *trgt.q++ = trgthigh;
+              *trgt.i64++ = trgthigh;
             else
-              *trgt.q++ = *data.i16*ffac + foff;
+              *trgt.i64++ = *data.i16*ffac + foff;
             data.i16++;
           }
           break;
@@ -2946,11 +2946,11 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
         case LUX_INT64:
           while (size--) {
             if (*data.i32 < datalow)
-              *trgt.q++ = trgtlow;
+              *trgt.i64++ = trgtlow;
             else if (*data.i32 > datahigh)
-              *trgt.q++ = trgthigh;
+              *trgt.i64++ = trgthigh;
             else
-              *trgt.q++ = *data.i32*ffac + foff;
+              *trgt.i64++ = *data.i32*ffac + foff;
             data.i32++;
           }
           break;
@@ -2962,46 +2962,46 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
       switch (colorIndexType) {
         case LUX_INT8:
           while (size--) {
-            if (*data.q < datalow)
+            if (*data.i64 < datalow)
               *trgt.ui8++ = trgtlow;
-            else if (*data.q > datahigh)
+            else if (*data.i64 > datahigh)
               *trgt.ui8++ = trgthigh;
             else
-              *trgt.ui8++ = *data.q*ffac + foff;
-            data.q++;
+              *trgt.ui8++ = *data.i64*ffac + foff;
+            data.i64++;
           }
           break;
         case LUX_INT16:
           while (size--) {
-            if (*data.q < datalow)
+            if (*data.i64 < datalow)
               *trgt.i16++ = trgtlow;
-            else if (*data.q > datahigh)
+            else if (*data.i64 > datahigh)
               *trgt.i16++ = trgthigh;
             else
-              *trgt.i16++ = *data.q*ffac + foff;
-            data.q++;
+              *trgt.i16++ = *data.i64*ffac + foff;
+            data.i64++;
           }
           break;
         case LUX_INT32:
           while (size--) {
-            if (*data.q < datalow)
+            if (*data.i64 < datalow)
               *trgt.i32++ = trgtlow;
-            else if (*data.q > datahigh)
+            else if (*data.i64 > datahigh)
               *trgt.i32++ = trgthigh;
             else
-              *trgt.i32++ = *data.q*ffac + foff;
-            data.q++;
+              *trgt.i32++ = *data.i64*ffac + foff;
+            data.i64++;
           }
           break;
         case LUX_INT64:
           while (size--) {
-            if (*data.q < datalow)
-              *trgt.q++ = trgtlow;
-            else if (*data.q > datahigh)
-              *trgt.q++ = trgthigh;
+            if (*data.i64 < datalow)
+              *trgt.i64++ = trgtlow;
+            else if (*data.i64 > datahigh)
+              *trgt.i64++ = trgthigh;
             else
-              *trgt.q++ = *data.q*ffac + foff;
-            data.q++;
+              *trgt.i64++ = *data.i64*ffac + foff;
+            data.i64++;
           }
           break;
       }
@@ -3046,11 +3046,11 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
         case LUX_INT64:
           while (size--) {
             if (*data.f < datalow)
-              *trgt.q++ = trgtlow;
+              *trgt.i64++ = trgtlow;
             else if (*data.f > datahigh)
-              *trgt.q++ = trgthigh;
+              *trgt.i64++ = trgthigh;
             else
-              *trgt.q++ = *data.f*ffac + foff;
+              *trgt.i64++ = *data.f*ffac + foff;
             data.f++;
           }
           break;
@@ -3095,11 +3095,11 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
         case LUX_INT64:
           while (size--) {
             if (*data.d < datalow)
-              *trgt.q++ = trgtlow;
+              *trgt.i64++ = trgtlow;
             else if (*data.d > datahigh)
-              *trgt.q++ = trgthigh;
+              *trgt.i64++ = trgthigh;
             else
-              *trgt.q++ = *data.d*dfac + doff;
+              *trgt.i64++ = *data.d*dfac + doff;
             data.d++;
           }
           break;
@@ -3368,19 +3368,19 @@ int32_t minmax(int32_t *p, int32_t n, int32_t type)
       scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_INT32;
       break;
     case LUX_INT64:
-      min.q = max.q = *q.q++;
+      min.i64 = max.i64 = *q.i64++;
       while (nc--) {
-        if (*q.q > max.q) {
-          max.q = *q.q;
-          maxloc = q.q;
-        } else if (*q.q < min.q) {
-          min.q = *q.q;
-          minloc = q.q;
+        if (*q.i64 > max.i64) {
+          max.i64 = *q.i64;
+          maxloc = q.i64;
+        } else if (*q.i64 < min.i64) {
+          min.i64 = *q.i64;
+          minloc = q.i64;
         }
-        q.q++;
+        q.i64++;
       }
-      lastmin.q = min.q;
-      lastmax.q = max.q;
+      lastmin.i64 = min.i64;
+      lastmax.i64 = max.i64;
       scalar_type(lastmin_sym) = scalar_type(lastmax_sym) = LUX_INT64;
       break;
     case LUX_FLOAT:
@@ -3468,7 +3468,7 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
           break;
         case LUX_INT64:
           while (n--)
-            *q2.q++ = (xq*(*q1.ui8++ - min.ui8))/range.i32 + scalemin;
+            *q2.i64++ = (xq*(*q1.ui8++ - min.ui8))/range.i32 + scalemin;
           break;
       }
       break;
@@ -3493,7 +3493,7 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
           break;
         case LUX_INT64:
           while (n--)
-            *q2.q++ = (xq*(*q1.i16++ - min.i16))/range.i32 + scalemin;
+            *q2.i64++ = (xq*(*q1.i16++ - min.i16))/range.i32 + scalemin;
           break;
       }
       break;
@@ -3519,33 +3519,33 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
           break;
         case LUX_INT64:
           while (n--)
-            *q2.q++ = (fq*(*q1.i32++ - min.i32)) + scalemin;
+            *q2.i64++ = (fq*(*q1.i32++ - min.i32)) + scalemin;
           break;
       }
       break;
     case LUX_INT64:
       // to avoid possible range problems, calculation is done in fp
-      min.q = lastmin.q;
-      range.q = lastmax.q - min.q;
-      if (range.q == 0)
+      min.i64 = lastmin.i64;
+      range.i64 = lastmax.i64 - min.i64;
+      if (range.i64 == 0)
         return neutral(p2, n);
-      fq = (float) (scalemax - scalemin)/(float) range.q;
+      fq = (float) (scalemax - scalemin)/(float) range.i64;
       switch (colorIndexType) {
         case LUX_INT8:
           while (n--)
-            *q2.ui8++ = (fq*(*q1.q++ - min.q)) + scalemin;
+            *q2.ui8++ = (fq*(*q1.i64++ - min.i64)) + scalemin;
           break;
         case LUX_INT16:
           while (n--)
-            *q2.i16++ = (fq*(*q1.q++ - min.q)) + scalemin;
+            *q2.i16++ = (fq*(*q1.i64++ - min.i64)) + scalemin;
           break;
         case LUX_INT32:
           while (n--)
-            *q2.i32++ = (fq*(*q1.q++ - min.q)) + scalemin;
+            *q2.i32++ = (fq*(*q1.i64++ - min.i64)) + scalemin;
           break;
         case LUX_INT64:
           while (n--)
-            *q2.q++ = (fq*(*q1.q++ - min.q)) + scalemin;
+            *q2.i64++ = (fq*(*q1.i64++ - min.i64)) + scalemin;
           break;
       }
       break;
@@ -3570,7 +3570,7 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
           break;
         case LUX_INT64:
           while (n--)
-            *q2.q++ = (fq*(*q1.f++ - min.f)) + scalemin;
+            *q2.i64++ = (fq*(*q1.f++ - min.f)) + scalemin;
           break;
       }
       break;
@@ -3595,7 +3595,7 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
           break;
         case LUX_INT64:
           while (n--)
-            *q2.q++ = (dq*(*q1.d++ - min.d)) + scalemin;
+            *q2.i64++ = (dq*(*q1.d++ - min.d)) + scalemin;
           break;
       }
       break;
@@ -3631,7 +3631,7 @@ int32_t neutral(void *p, int32_t n)
       break;
     case LUX_INT64:
       while (n--)
-        *pp.q++ = xq;
+        *pp.i64++ = xq;
       break;
   }
   return LUX_OK;
@@ -3718,8 +3718,8 @@ int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
       break;
     case LUX_INT64:
       while (n--) {
-        *x++ = (double) *xin.q;
-        xin.q += xStep;
+        *x++ = (double) *xin.i64;
+        xin.i64 += xStep;
       }
       break;
     case LUX_FLOAT:
@@ -3766,8 +3766,8 @@ int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
       break;
     case LUX_INT64:
       while (n--) {
-        *y++ = (double) *yin.q;
-        yin.q += yStep;
+        *y++ = (double) *yin.i64;
+        yin.i64 += yStep;
       }
       break;
     case LUX_FLOAT:

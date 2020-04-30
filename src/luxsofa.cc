@@ -218,12 +218,12 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
     break;
   case LUX_INT64:
     while (infos[1].nelem--) {
-      if (iauCal2jd(ptrs[0].q[0], ptrs[0].q[1], ptrs[0].q[2], &djm0, &djm))
-        *ptrs[1].q = 0;
+      if (iauCal2jd(ptrs[0].i64[0], ptrs[0].i64[1], ptrs[0].i64[2], &djm0, &djm))
+        *ptrs[1].i64 = 0;
       else
-        *ptrs[1].q = (djm0 + 0.5) + djm;
-      ptrs[0].q += 3;
-      ptrs[1].q++;
+        *ptrs[1].i64 = (djm0 + 0.5) + djm;
+      ptrs[0].i64 += 3;
+      ptrs[1].i64++;
     }
     break;
   case LUX_FLOAT:
@@ -308,8 +308,8 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
       break;
     case LUX_INT64:
       while (infos[1].nelem--) {
-        iauDat(ptrs[0].q[0], ptrs[0].q[1], ptrs[0].q[2], 0.0, ptrs[1].d++);
-        ptrs[0].q += 3;
+        iauDat(ptrs[0].i64[0], ptrs[0].i64[1], ptrs[0].i64[2], 0.0, ptrs[1].d++);
+        ptrs[0].i64 += 3;
       }
       break;
     case LUX_FLOAT:

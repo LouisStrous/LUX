@@ -406,7 +406,7 @@ union Scalar {
   uint8_t ui8;
   int16_t i16;
   int32_t i32;
-  int64_t q;
+  int64_t i64;
   float f;
   double d;
   char *s;
@@ -420,7 +420,7 @@ union wideScalar {
   uint8_t ui8;
   int16_t i16;
   int32_t i32;
-  int64_t q;
+  int64_t i64;
   float f;
   double d;
   floatComplex cf;
@@ -433,7 +433,7 @@ union Pointer {
   uint8_t* ui8;
   int16_t *i16;
   int32_t *i32;
-  int64_t *q;
+  int64_t *i64;
   float *f;
   double *d;
   char *s;
@@ -525,7 +525,7 @@ struct boundsStruct {
     uint8_t ui8;
     int16_t i16;
     int32_t i32;
-    int64_t q;
+    int64_t i64;
     float f;
     double d;
   };

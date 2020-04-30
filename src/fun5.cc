@@ -1013,20 +1013,20 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
     case LUX_INT64:
       n = nx;
       while (n--)
-        *out.i32++ = *data.q++;
+        *out.i32++ = *data.i64++;
       ny -= 2;
       while (ny--) {
-        *out.i32++ = *data.q++;        // left edge: just copy
+        *out.i32++ = *data.i64++;        // left edge: just copy
         n = nx - 2;
         while (n--) {
-          *out.i32++ = (*data.q || data.q[1] || data.q[1 + nx] || data.q[nx]
-                      || data.q[nx - 1] || data.q[-1] || data.q[-1 - nx]
-                      || data.q[-nx] || data.q[-nx + 1]);
-          data.q++;
+          *out.i32++ = (*data.i64 || data.i64[1] || data.i64[1 + nx] || data.i64[nx]
+                      || data.i64[nx - 1] || data.i64[-1] || data.i64[-1 - nx]
+                      || data.i64[-nx] || data.i64[-nx + 1]);
+          data.i64++;
         }
-        *out.i32++ = *data.q++;        // right edge: just copy
+        *out.i32++ = *data.i64++;        // right edge: just copy
       }
-      memcpy(out.q, data.q, nx*lux_type_size[type]); // top row: just copy
+      memcpy(out.i64, data.i64, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_FLOAT:
       n = nx;
@@ -1196,23 +1196,23 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
       if (zeroedge) {
         while (n--)
           *out.i32++ = 0;
-        data.q += nx;
+        data.i64 += nx;
       } else
         while (n--)
-          *out.i32++ = (*data.q++ != 0);
+          *out.i32++ = (*data.i64++ != 0);
       ny -= 2;
       while (ny--) {
-        *out.i32++ = zeroedge? 0: (*data.q != 0); // left edge
-        data.q++;
+        *out.i32++ = zeroedge? 0: (*data.i64 != 0); // left edge
+        data.i64++;
         n = nx - 2;
         while (n--) {
-          *out.i32++ = (*data.q && data.q[1] && data.q[1 + nx] && data.q[nx]
-                      && data.q[nx - 1] && data.q[-1] && data.q[-1 - nx]
-                      && data.q[-nx] && data.q[-nx + 1]);
-          data.q++;
+          *out.i32++ = (*data.i64 && data.i64[1] && data.i64[1 + nx] && data.i64[nx]
+                      && data.i64[nx - 1] && data.i64[-1] && data.i64[-1 - nx]
+                      && data.i64[-nx] && data.i64[-nx + 1]);
+          data.i64++;
         }
-        *out.i32++ = zeroedge? 0: (*data.q != 0); // right edge
-        data.q++;
+        *out.i32++ = zeroedge? 0: (*data.i64 != 0); // right edge
+        data.i64++;
       }
       n = nx;
       if (zeroedge)
@@ -1220,7 +1220,7 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
           *out.i32++ = 0;
       else
         while (n--)
-          *out.i32++ = (*data.q++ != 0);
+          *out.i32++ = (*data.i64++ != 0);
       break;
     case LUX_FLOAT:
       n = nx;

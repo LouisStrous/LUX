@@ -429,7 +429,7 @@ int32_t dereferenceScalPointer(int32_t nsym)
    scalar_value(n).i32 = *ptr.i32;
    break;
  case LUX_INT64:
-   scalar_value(n).q = *ptr.q;
+   scalar_value(n).i64 = *ptr.i64;
    break;
  case LUX_FLOAT:
    scalar_value(n).f = *ptr.f;
@@ -489,7 +489,7 @@ int32_t int_arg(int32_t nsym)
    case LUX_INT32:
      return (int32_t) scalar_value(nsym).i32;
    case LUX_INT64:
-     return (int32_t) scalar_value(nsym).q;
+     return (int32_t) scalar_value(nsym).i64;
    case LUX_FLOAT:
      return (int32_t) scalar_value(nsym).f;
    case LUX_DOUBLE:
@@ -519,7 +519,7 @@ int32_t int_arg_stat(int32_t nsym, int32_t *value)
    *value = (int32_t) scalar_value(nsym).i32;
    break;
  case LUX_INT64:
-   *value = (int32_t) scalar_value(nsym).q;
+   *value = (int32_t) scalar_value(nsym).i64;
    break;
  case LUX_FLOAT:
    *value = (int32_t) scalar_value(nsym).f;
@@ -547,7 +547,7 @@ float float_arg(int32_t nsym)
   case LUX_INT32:
     return (float) scalar_value(nsym).i32;
   case LUX_INT64:
-    return (float) scalar_value(nsym).q;
+    return (float) scalar_value(nsym).i64;
   case LUX_FLOAT:
     return (float) scalar_value(nsym).f;
   case LUX_DOUBLE:
@@ -577,7 +577,7 @@ int32_t float_arg_stat(int32_t nsym, float *value)
      *value = (float) scalar_value(nsym).i32;
      break;
    case LUX_INT64:
-     *value = (float) scalar_value(nsym).q;
+     *value = (float) scalar_value(nsym).i64;
      break;
    case LUX_FLOAT:
      *value = (float) scalar_value(nsym).f;
@@ -605,7 +605,7 @@ double double_arg(int32_t nsym)
    case LUX_INT32:
      return (double) scalar_value(nsym).i32;
    case LUX_INT64:
-     return (double) scalar_value(nsym).q;
+     return (double) scalar_value(nsym).i64;
    case LUX_FLOAT:
      return (double) scalar_value(nsym).f;
    case LUX_DOUBLE:
@@ -634,7 +634,7 @@ int32_t double_arg_stat(int32_t nsym, double *value)
      *value = (double) scalar_value(nsym).i32;
      break;
    case LUX_INT64:
-     *value = (double) scalar_value(nsym).q;
+     *value = (double) scalar_value(nsym).i64;
      break;
    case LUX_FLOAT:
      *value = (double) scalar_value(nsym).f;
@@ -768,7 +768,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
      break;
    case LUX_INT64:
      while (n--)
-       *trgt.i32++ = (int32_t) *src.q++;
+       *trgt.i32++ = (int32_t) *src.i64++;
      break;
    case LUX_FLOAT:
      while (n--)
@@ -886,7 +886,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
      break;
    case LUX_INT64:
      while (n--)
-       *trgt.i32++ = (int32_t) *src.q++;
+       *trgt.i32++ = (int32_t) *src.i64++;
      break;
    case LUX_FLOAT:
      while (n--)
@@ -1014,7 +1014,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               break;
             case LUX_INT64:
               fmttok(fmt_integer);
-              Sprintf_tok(curScrat, *src.q);
+              Sprintf_tok(curScrat, *src.i64);
               break;
             case LUX_FLOAT:
               fmttok(fmt_float);
@@ -1078,7 +1078,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             *trgt.i32 = value.i32;
             break;
           case LUX_INT64:
-            *trgt.q = value.q;
+            *trgt.i64 = value.i64;
             break;
           case LUX_FLOAT:
             *trgt.f = value.d;
@@ -1123,7 +1123,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               scalar_value(result).i32 = (int32_t) value.d;
               break;
             case LUX_INT64:
-              scalar_value(result).q = (int64_t) value.d;
+              scalar_value(result).i64 = (int64_t) value.d;
               break;
             case LUX_FLOAT:
               scalar_value(result).f = (float) value.d;
@@ -1152,7 +1152,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               break;
             case LUX_INT64:
               fmttok(fmt_integer);
-              Sprintf_tok(curScrat, (int64_t) *src.q);
+              Sprintf_tok(curScrat, (int64_t) *src.i64);
               break;
             case LUX_FLOAT:
               fmttok(fmt_float);
@@ -1256,7 +1256,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = *src.ui8;
+              *trgt.i64 = *src.ui8;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1324,7 +1324,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = *src.i16;
+              *trgt.i64 = *src.i16;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1392,7 +1392,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = *src.i32;
+              *trgt.i64 = *src.i32;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1446,42 +1446,42 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {                // target type
           case LUX_INT8:
             while (n--) {
-              *trgt.ui8 = *src.q;
+              *trgt.ui8 = *src.i64;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
             while (n--) {
-              *trgt.i16 = *src.q;
+              *trgt.i16 = *src.i64;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
-              *trgt.i32 = *src.q;
+              *trgt.i32 = *src.i64;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
-              *trgt.f = *src.q;
+              *trgt.f = *src.i64;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
-              *trgt.d = *src.q;
+              *trgt.d = *src.i64;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
-              trgt.cf->real = *src.q;
+              trgt.cf->real = *src.i64;
               trgt.cf->imaginary = 0.0;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
@@ -1489,7 +1489,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_CDOUBLE:
             while (n--) {
-              trgt.cd->real = *src.q;
+              trgt.cd->real = *src.i64;
               trgt.cd->imaginary = 0.0;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
@@ -1498,7 +1498,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           case LUX_STRING_ARRAY:
             fmttok(fmt_integer);
             while (n--) {
-              Sprintf_tok(curScrat, *src.q);
+              Sprintf_tok(curScrat, *src.i64);
               temp = strlen(curScrat) + 1;
               *trgt.sp = (char*) malloc(temp);
               if (!*trgt.sp)
@@ -1535,7 +1535,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = *src.f;
+              *trgt.i64 = *src.f;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1603,7 +1603,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = *src.d;
+              *trgt.i64 = *src.d;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1671,7 +1671,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = src.cf->real;
+              *trgt.i64 = src.cf->real;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1738,7 +1738,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = src.cd->real;
+              *trgt.i64 = src.cd->real;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1814,10 +1814,10 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             break;
           case LUX_INT64:
             while (n--) {
-              value.q = atoll(*src.sp);
+              value.i64 = atoll(*src.sp);
               if (iq == result && *src.sp)
                 free(*src.sp);
-              *trgt.q = value.q;
+              *trgt.i64 = value.i64;
               trgt.ui8 += trgtstep;
               src.ui8 += srcstep;
             }
@@ -1849,7 +1849,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (iq == result && *src.sp)
                 free(*src.sp);
               if (isIntegerType(thistype)) {
-                trgt.cf->real = value.q;
+                trgt.cf->real = value.i64;
               } else {
                 trgt.cf->real = value.d;
               }
@@ -1865,7 +1865,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (iq == result && *src.sp)
                 free(*src.sp);
               if (isIntegerType(thistype)) {
-                trgt.cd->real = value.q;
+                trgt.cd->real = value.i64;
               } else {
                 trgt.cd->real = value.d;
               }
@@ -2018,7 +2018,7 @@ int32_t redef_scalar(int32_t nsym, Symboltype ntype, void *val)
       scalar_value(nsym).i32 = value? value->i32: 0;
       break;
     case LUX_INT64:
-      scalar_value(nsym).q = value? value->q: 0;
+      scalar_value(nsym).i64 = value? value->i64: 0;
       break;
     case LUX_FLOAT:
       scalar_value(nsym).f = value? value->f: 0.0;
@@ -2415,7 +2415,7 @@ int32_t lux_rfix(int32_t narg, int32_t ps[])
    case LUX_INT16:
      while (size--) *trgt++ = (int32_t) *src.i16++;  break;
    case LUX_INT64:
-     while (size--) *trgt++ = (int32_t) *src.q++;  break;
+     while (size--) *trgt++ = (int32_t) *src.i64++;  break;
    case LUX_FLOAT:
      while (size--)
      { *trgt++ = (int32_t) (*src.f + ((*src.f >= 0)? 0.5: -0.5));
@@ -3026,13 +3026,13 @@ void read_a_number(char **buf, Scalar *value, Symboltype *type)
 /* reads the number at <*buf>, puts it in <*value> and its data type
    in <*type> (if <type> is not NULL), and modifies <*buf> to point
    just after the detected value.  NOTE: if the type is integer (BYTE,
-   WORD, LONG, INT64), then the value is returned in value->q; if the
+   WORD, LONG, INT64), then the value is returned in value->i64; if the
    type is floating-point (FLOAT, DOUBLE), then the value is returned
    in value->d.  if an I follows the number, then the type is complex
    (CFLOAT, CDOUBLE) and the value (transformed to real) is returned
    in value.d.  So, the union member that the value is in does not
    necessarily correspond exactly to the <*type>: e.g., a BYTE number
-   gets its value returned in value->q and *type set to LUX_INT8.  LS
+   gets its value returned in value->i64 and *type set to LUX_INT8.  LS
    17sep98 */
 {
   int32_t        base = 10, kind, sign;
@@ -3253,7 +3253,7 @@ void read_a_number(char **buf, Scalar *value, Symboltype *type)
   // has no trouble generating such numbers.  I.e., t,'%x',-0x35b9f040
   // yielded c9460fd0 but t,'%x',0xc9460fd0 when using strtol() yields
   // 0xffffffff.  LS 11nov99
-  value->q = strtoull(numstart, NULL, base)*sign;
+  value->i64 = strtoull(numstart, NULL, base)*sign;
   *p = c;
   switch (kind) {
   case 'B':
@@ -3273,7 +3273,7 @@ void read_a_number(char **buf, Scalar *value, Symboltype *type)
     p++;
     break;
   case 'I':
-    value->d = value->q;
+    value->d = value->i64;
     thetype = LUX_CFLOAT;
     p++;
     break;
@@ -3291,7 +3291,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
    <*type> (if <type> is not NULL).  Other than the source of the
    data, exactly the same as read_a_number().  NOTE: if the type is
    integer (BYTE, WORD, LONG, QUAD), then the value is returned in
-   value->q; if the type is floating-point (FLOAT, DOUBLE), then the
+   value->i64; if the type is floating-point (FLOAT, DOUBLE), then the
    value is returned in value->d.  if an I follows the number, then
    the type is complex (CFLOAT, CDOUBLE) and the value (transformed to
    real) is returned in value.d.  So, the union member that the value
@@ -3314,7 +3314,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
          && !isdigit(ch)
          && !strchr("+-", ch));
   if (ch == EOF) {                // end of file; return LONG 0
-    value->q = 0;
+    value->i64 = 0;
     if (type)
       *type = thetype;
     return;
@@ -3328,7 +3328,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
     sign = (ch == '-')? -1: 1;
     ch = nextchar(fp);
     if (ch == EOF) {
-      value->q = 0;
+      value->i64 = 0;
       if (type)
         *type = thetype;
       return;
@@ -3345,7 +3345,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
   while (isodigit((int32_t) p[-1]));
   ch = p[-1];                   // first char not an octal digit
   if (ch == EOF) {
-    value->q = 0;
+    value->i64 = 0;
     if (type)
       *type = thetype;
     return;
@@ -3364,7 +3364,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
     //                      ^
 
     if (ch == EOF) {
-      value->q = 0;
+      value->i64 = 0;
       if (type)
         *type = thetype;
       return;
@@ -3414,7 +3414,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
     base = 0;                        // count the number of elements
     ch = nextchar(fp);
     if (ch == EOF) {
-      value->q = (intmax_t) value->d;
+      value->i64 = (intmax_t) value->d;
       if (type)
         *type = thetype;
       return;
@@ -3424,7 +3424,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
         *p++ = ch;
         ch = nextchar(fp);
         if (ch == EOF) {
-          value->q = (intmax_t) value->d;
+          value->i64 = (intmax_t) value->d;
           if (type)
             *type = thetype;
           return;
@@ -3520,7 +3520,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
   // has no trouble generating such numbers.  I.e., t,'%x',-0x35b9f040
   // yielded c9460fd0 but t,'%x',0xc9460fd0 when using strtol() yields
   // 0xffffffff.  LS 11nov99
-  value->q = strtoull(numstart, NULL, base)*sign;
+  value->i64 = strtoull(numstart, NULL, base)*sign;
   switch (kind) {
   case 'B':
     thetype = LUX_INT8;
@@ -3535,7 +3535,7 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
     thetype = LUX_INT64;
     break;
   case 'I':
-    value->d = value->q;
+    value->d = value->i64;
     thetype = LUX_CFLOAT;
     break;
   default:

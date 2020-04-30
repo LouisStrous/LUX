@@ -910,7 +910,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
           scalar_value(iq).i32 = value.i32;
           break;
         case LUX_INT64:
-          scalar_value(iq).q = value.i32;
+          scalar_value(iq).i64 = value.i32;
           break;
         case LUX_FLOAT:
           scalar_value(iq).f = (float) value.d;
@@ -1867,10 +1867,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
             y1 = (double) *gy.i32++ - iy;
             break;
           case LUX_INT64:
-            ix = (int32_t) *gx.q;       // x pixel coordinate
-            iy = (int32_t) *gy.q;       // y pixel coordinate
-            x1 = (double) *gx.q++ - ix;
-            y1 = (double) *gy.q++ - iy;
+            ix = (int32_t) *gx.i64;       // x pixel coordinate
+            iy = (int32_t) *gy.i64;       // y pixel coordinate
+            x1 = (double) *gx.i64++ - ix;
+            y1 = (double) *gy.i64++ - iy;
             break;
           case LUX_FLOAT:
             ix = (int32_t) *gx.f;       // x pixel coordinate
@@ -1910,8 +1910,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
           vy = (double) vy0.i32[index*dv]; // y velocity
           break;
         case LUX_INT64:
-          vx = (double) vx0.q[index*dv]; // x velocity
-          vy = (double) vy0.q[index*dv]; // y velocity
+          vx = (double) vx0.i64[index*dv]; // x velocity
+          vy = (double) vy0.i64[index*dv]; // y velocity
           break;
         case LUX_FLOAT:
           vx = (double) vx0.f[index*dv]; // x velocity
@@ -2008,8 +2008,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
             vy = (double) vy0.i32[index*dv];
             break;
           case LUX_INT64:
-            vx = (double) vx0.q[index*dv];
-            vy = (double) vy0.q[index*dv];
+            vx = (double) vx0.i64[index*dv];
+            vy = (double) vy0.i64[index*dv];
             break;
           case LUX_FLOAT:
             vx = (double) vx0.f[index*dv];
@@ -2039,8 +2039,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
           *oy.i32++ = iy + y2;
           break;
         case LUX_INT64:
-          *ox.q++ = ix + x2;
-          *oy.q++ = iy + y2;
+          *ox.i64++ = ix + x2;
+          *oy.i64++ = iy + y2;
           break;
         case LUX_FLOAT:
           *ox.f++ = ix + x2;
@@ -2349,7 +2349,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         *tgt.i32++ = dist;
         break;
       case LUX_INT64:
-        val = *src.q++;
+        val = *src.i64++;
         while (val) {
           ++dist;
           val &= val - 1;
@@ -2393,9 +2393,9 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
         *tgt.i32++ = dist;
         break;
       case LUX_INT64:
-        val = *src.q++ ^ *src2.q;
+        val = *src.i64++ ^ *src2.i64;
         if (nr2isarray)
-          src2.q++;
+          src2.i64++;
         while (val) {
           ++dist;
           val &= val - 1;
@@ -2635,7 +2635,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
       break;
     case LUX_INT64:
       {
-        int64_t max = std::accumulate(ptrs[0].q, ptrs[0].q + infos[0].nelem,
+        int64_t max = std::accumulate(ptrs[0].i64, ptrs[0].i64 + infos[0].nelem,
                                       (int64_t) 0,
                                       [](int64_t a, int64_t b) {
                                         return std::max(a, b);
@@ -2658,7 +2658,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
       ssfc.set_ssfc(*ptrs[0].i32++, *ptrs[1].i32);
       break;
     case LUX_INT64:
-      ssfc.set_ssfc(*ptrs[0].q++, *ptrs[1].i32);
+      ssfc.set_ssfc(*ptrs[0].i64++, *ptrs[1].i32);
       break;
     case LUX_DOUBLE:
       ssfc.set_ssfc(*ptrs[0].d++, *ptrs[1].i32);
@@ -2724,7 +2724,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
     while (points_count--) {
       SSFC ssfc(ptrs[0].d[0], ptrs[0].d[1], level);
       if (level > 31) {
-        *ptrs[2].q++ = static_cast<int64_t>(ssfc.get_bits());
+        *ptrs[2].i64++ = static_cast<int64_t>(ssfc.get_bits());
       } else {
         *ptrs[2].i32++ = static_cast<int32_t>(ssfc.get_bits());
       }
@@ -2851,7 +2851,7 @@ int32_t lux_findspans(int32_t narg, int32_t ps[]) {
     spans = findspans(src.i32, src.i32 + nelem, cycle);
     break;
   case LUX_INT64:
-    spans = findspans(src.q, src.q + nelem, cycle);
+    spans = findspans(src.i64, src.i64 + nelem, cycle);
     break;
   case LUX_FLOAT:
     spans = findspans(src.f, src.f + nelem, cycle);

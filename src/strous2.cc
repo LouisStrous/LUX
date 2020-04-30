@@ -1994,10 +1994,9 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
          2 -> return maximum values, 3 -> return maximum locations
    LS 18may95 4aug97 */
 {
-  int32_t       result, sign, degree, n, i, *offset, k, j, ok, *edge, nok,
+  int32_t       result, sign, degree, n, i, *offset, k, j, *edge,
         *diagonal, nDiagonal, nDoDim, index, subgrid, ready, done;
-  Pointer       src, trgt, trgt0, srcl, srcr, trgt00;
-  float         *grad, *grad2, *hessian, value;
+  Pointer       src, trgt, srcl, srcr;
   LoopInfo      srcinfo, trgtinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
@@ -2020,27 +2019,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   if (n == LUX_ERROR)
     return LUX_ERROR;
 
-
-  if (!degree) {
-    // allocate some memory; we guess how many hits we might find
-    // NOTE: must check that we don't run out of memory!
-    if (diagonal) {
-      nDoDim = 0;
-      for (i = 0; i < srcinfo.ndim; i++)
-        if (diagonal[i])
-          nDoDim++;
-    } else
-      nDoDim = srcinfo.ndim;
-
-    i = srcinfo.nelem;
-    for (j = 0; j < nDoDim; j++)
-      i /= 2;
-    i++;
-    trgt0.l = trgt.l = trgt00.l = (int32_t *) malloc(i*sizeof(int32_t));
-    if (!trgt.l)
-      return cerror(ALLOC_ERR, 0);
-    zerobytes(trgt.l, i*sizeof(int32_t));
-  }
+  std::vector<size_t> hit_locations;
 
   // we exclude the selected edges
   for (i = 0; i < srcinfo.ndim; i++)
@@ -2068,24 +2047,24 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   switch (array_type(ps[0])) {
     case LUX_INT8:
       do {
-        nok = 1 - degree;
+        int ok_count = 1 - degree;
         for (j = 0; j < n; j++) {       // all directions
           k = offset[j];
           srcl.b = src.b + k;
           srcr.b = src.b - k;
-          ok = (sign && *src.b >= *srcl.b && *src.b > *srcr.b)
+          bool ok = (sign && *src.b >= *srcl.b && *src.b > *srcr.b)
             || (!sign && *src.b <= *srcl.b && *src.b < *srcr.b);
           if (degree)
-            nok += ok;
+            ok_count += ok;
           else if (!ok) {
-            nok = 0;
+            ok_count = 0;
             break;
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = nok;
-        else if (nok)
-          *trgt.l++ = src.b - (uint8_t *) srcinfo.data0;
+          *trgt.l = ok_count;
+        else if (ok_count)
+          hit_locations.push_back(src.b - (uint8_t *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
                         srcinfo.advanceLoop(&src)):
           srcinfo.advanceLoop(&src);
@@ -2093,24 +2072,24 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       break;
     case LUX_INT16:
       do {
-        nok = 1 - degree;
+        int ok_count = 1 - degree;
         for (j = 0; j < n; j++) {       // all directions
           k = offset[j];
           srcl.w = src.w + k;
           srcr.w = src.w - k;
-          ok = (sign && *src.w >= *srcl.w && *src.w > *srcr.w)
+          bool ok = (sign && *src.w >= *srcl.w && *src.w > *srcr.w)
             || (!sign && *src.w <= *srcl.w && *src.w < *srcr.w);
           if (degree)
-            nok += ok;
+            ok_count += ok;
           else if (!ok) {
-            nok = 0;
+            ok_count = 0;
             break;
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = nok;
-        else if (nok)
-          *trgt.l++ = src.w - (int16_t *) srcinfo.data0;
+          *trgt.l = ok_count;
+        else if (ok_count)
+          hit_locations.push_back(src.w - (int16_t *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
                         srcinfo.advanceLoop(&src)):
           srcinfo.advanceLoop(&src);
@@ -2118,24 +2097,24 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       break;
     case LUX_INT32:
       do {
-        nok = 1 - degree;
+        int ok_count = 1 - degree;
         for (j = 0; j < n; j++) {       // all directions
           k = offset[j];
           srcl.l = src.l + k;
           srcr.l = src.l - k;
-          ok = (sign && *src.l >= *srcl.l && *src.l > *srcr.l)
+          bool ok = (sign && *src.l >= *srcl.l && *src.l > *srcr.l)
             || (!sign && *src.l <= *srcl.l && *src.l < *srcr.l);
           if (degree)
-            nok += ok;
+            ok_count += ok;
           else if (!ok) {
-            nok = 0;
+            ok_count = 0;
             break;
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = nok;
-        else if (nok)
-          *trgt.l++ = src.l - (int32_t *) srcinfo.data0;
+          *trgt.l = ok_count;
+        else if (ok_count)
+          hit_locations.push_back(src.l - (int32_t *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
                         srcinfo.advanceLoop(&src)):
           srcinfo.advanceLoop(&src);
@@ -2143,24 +2122,24 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       break;
     case LUX_INT64:
       do {
-        nok = 1 - degree;
+        int ok_count = 1 - degree;
         for (j = 0; j < n; j++) {       // all directions
           k = offset[j];
           srcl.q = src.q + k;
           srcr.q = src.q - k;
-          ok = (sign && *src.q >= *srcl.q && *src.q > *srcr.q)
+          bool ok = (sign && *src.q >= *srcl.q && *src.q > *srcr.q)
             || (!sign && *src.q <= *srcl.q && *src.q < *srcr.q);
           if (degree)
-            nok += ok;
+            ok_count += ok;
           else if (!ok) {
-            nok = 0;
+            ok_count = 0;
             break;
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.q = nok;
-        else if (nok)
-          *trgt.q++ = src.q - (int64_t *) srcinfo.data0;
+          *trgt.q = ok_count;
+        else if (ok_count)
+          hit_locations.push_back(src.q - (int64_t *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
                         srcinfo.advanceLoop(&src)):
           srcinfo.advanceLoop(&src);
@@ -2168,24 +2147,24 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       break;
     case LUX_FLOAT:
       do {
-        nok = 1 - degree;
+        int ok_count = 1 - degree;
         for (j = 0; j < n; j++) {       // all directions
           k = offset[j];
           srcl.f = src.f + k;
           srcr.f = src.f - k;
-          ok = (sign && *src.f >= *srcl.f && *src.f > *srcr.f)
+          bool ok = (sign && *src.f >= *srcl.f && *src.f > *srcr.f)
             || (!sign && *src.f <= *srcl.f && *src.f < *srcr.f);
           if (degree)
-            nok += ok;
+            ok_count += ok;
           else if (!ok) {
-            nok = 0;
+            ok_count = 0;
             break;
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = nok;
-        else if (nok)
-          *trgt.l++ = src.f - (float *) srcinfo.data0;
+          *trgt.l = ok_count;
+        else if (ok_count)
+          hit_locations.push_back(src.f - (float *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
                         srcinfo.advanceLoop(&src)):
           srcinfo.advanceLoop(&src);
@@ -2193,24 +2172,24 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       break;
     case LUX_DOUBLE:
       do {
-        nok = 1 - degree;
+        int ok_count = 1 - degree;
         for (j = 0; j < n; j++) {       // all directions
           k = offset[j];
           srcl.d = src.d + k;
           srcr.d = src.d - k;
-          ok = (sign && *src.d >= *srcl.d && *src.d > *srcr.d)
+          bool ok = (sign && *src.d >= *srcl.d && *src.d > *srcr.d)
             || (!sign && *src.d <= *srcl.d && *src.d < *srcr.d);
           if (degree)
-            nok += ok;
+            ok_count += ok;
           else if (!ok) {
-            nok = 0;
+            ok_count = 0;
             break;
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = nok;
-        else if (nok)
-          *trgt.l++ = src.d - (double *) srcinfo.data0;
+          *trgt.l = ok_count;
+        else if (ok_count)
+          hit_locations.push_back(src.d - (double *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
                         srcinfo.advanceLoop(&src)):
           srcinfo.advanceLoop(&src);
@@ -2218,15 +2197,24 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       break;
   }
 
+  auto hitit = hit_locations.begin();
+  std::vector<float> grad2;
+  std::vector<float> grad;
+  std::vector<float> hessian;
+
   nDiagonal = 0;
   if (!degree) {
-    n = trgt.l - trgt0.l;       // number of found extrema
+    n = hit_locations.size();       // number of found extrema
     if (!n)                     // none found
       return LUX_MINUS_ONE;
     switch (code) {
       case 0: case 2:           // find values
-        result = array_scratch(LUX_FLOAT, 1, &n);
-        trgt.f = (float *) array_data(result);
+        if (subgrid)
+          result = array_scratch(LUX_FLOAT, 1, &n);
+        else
+          result = array_scratch(symbol_type(ps[0]), 1, &n);
+        trgt.v = array_data(result);
+        break;
       case 1: case 3:           // find positions
         if (!(internalMode & 4) && !subgrid) {  // not /COORDS, not /SUBGRID
           srcinfo.coords[0] = n;        // number of found extrema
@@ -2254,9 +2242,9 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
             nDiagonal++;
       }         // end of if (!diagonal) else
       if (nDiagonal) {
-        ALLOCATE(grad2, nDiagonal, float);
-        ALLOCATE(grad, nDiagonal, float);
-        ALLOCATE(hessian, nDiagonal*nDiagonal, float);
+        grad2.resize(nDiagonal);
+        grad.resize(nDiagonal);
+        hessian.resize(nDiagonal*nDiagonal);
         k = 0;
         for (i = 0; i < srcinfo.ndim; i++)
           if (!diagonal || diagonal[i])
@@ -2264,8 +2252,9 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       }         // end of if (nDiagonal)
 
       src.l = (int32_t *) array_data(ps[0]); // data
+      float value;
       while (n--) {             // all found extrema
-        index = k = *trgt0.l++;         // index of extremum
+        index = k = *hitit++;         // index of extremum
         for (i = 0; i < srcinfo.ndim; i++) { // calculate coordinates
           srcinfo.coords[i] = k % srcinfo.dims[i];
           k /= srcinfo.dims[i];
@@ -2450,7 +2439,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
           for (i = 0; i < nDiagonal; i++)
             grad2[i] = 0.0;
         else {          // solve hessian.x = gradient
-          f_decomp(hessian, nDiagonal, nDiagonal);
+          f_decomp(hessian.data(), nDiagonal, nDiagonal);
           ready = 1;
           for (i = nDiagonal*nDiagonal - 1; i >= 0; i -= nDiagonal + 1)
             if (!hessian[i]) { // zero determinant, indeterminate fit
@@ -2460,7 +2449,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
               break;
             }   // end of if (!hessian[i])
           if (ready) {
-            f_solve(hessian, grad2, nDiagonal, nDiagonal);
+            f_solve(hessian.data(), grad2.data(), nDiagonal, nDiagonal);
             for (i = 0; i < nDiagonal; i++)
               value -= 0.5*grad2[i]*grad[i];
           } // end of if (ready)
@@ -2476,7 +2465,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
     } else {                    // subgrid == 0
       if (code & 1) {           // positions
         while (n--) {
-          index = *trgt0.l++;
+          index = *hitit++;
           if (internalMode & 4)         // /COORDS
             for (i = 0; i < srcinfo.ndim; i++) {
               *trgt.l++ = index % srcinfo.dims[i];
@@ -2486,41 +2475,35 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
             *trgt.l++ = index;
         } // end of while (n--)
       } else {                  // values
+        src.v = srcinfo.data0; // reset to start of data
         while (n--) {
-          index = *trgt0.l++;
+          index = *hitit++;
           switch (symbol_type(ps[0])) {
             case LUX_INT8:
-              value = (float) src.b[index];
+              *trgt.b++ = src.b[index];
               break;
             case LUX_INT16:
-              value = (float) src.w[index];
+              *trgt.w++ = src.w[index];
               break;
             case LUX_INT32:
-              value = (float) src.l[index];
+              *trgt.l++ = src.l[index];
               break;
             case LUX_INT64:
-              value = (float) src.q[index];
+              *trgt.q++ = src.q[index];
               break;
             case LUX_FLOAT:
-              value = (float) src.f[index];
+              *trgt.f++ = src.f[index];
               break;
             case LUX_DOUBLE:
-              value = (float) src.d[index];
+              *trgt.d++ = src.d[index];
               break;
           } // end of switch (symbol_type(ps[0]))
-          *trgt.f++ = value;
         } // end of while (n--)
-      }         // end of if (code & 1)
+      } // end of if (code & 1)
     } // end of if (subgrid)
   } // end of if (!degree)
 
   free(offset);
-  free(trgt00.b);
-  if (nDiagonal) {
-    free(grad);
-    free(grad2);
-    free(hessian);
-  }
   return result;
 }
 //---------------------------------------------------------

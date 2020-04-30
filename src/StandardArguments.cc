@@ -1198,7 +1198,6 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
     = standard_args_common_symboltype(psl->num_param_specs,
                                       psl->param_specs,
                                       narg, ps);
-  // TODO: define o
   /* now we treat the parameters. */
   int32_t prev_ref_param = -1; // < 0 indicates no reference parameter set yet
 
@@ -1752,6 +1751,7 @@ StandardArguments_RAII::StandardArguments_RAII(int32_t narg, int32_t ps[],
                                                const std::string& fmt,
                                                Pointer** ptrs,
                                                LoopInfo** infos)
+  : m_pointers(), m_loopInfos(), m_result_symbol()
 {
   set(narg, ps, fmt, ptrs, infos);
 }

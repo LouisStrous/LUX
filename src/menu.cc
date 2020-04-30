@@ -655,7 +655,7 @@ int32_t define_menu(int32_t x, int32_t y, int32_t narg, int32_t ps[])
       && array_type(ps[1]) == LUX_STRING_ARRAY) {
     string_array = 1;                        // string array, one allowed
     narg = array_size(ps[1]);
-    ptr.l = (int32_t*) array_data(ps[1]);
+    ptr.i32 = (int32_t*) array_data(ps[1]);
   } else
     narg--;
   if (narg < 2)                 // just a title
@@ -856,7 +856,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
       case LUX_SCAL_PTR:
         iq = dereferenceScalPointer(iq); // fall-thru
       case LUX_SCALAR:
-        windows = &sym[iq].spec.scalar.l;
+        windows = &sym[iq].spec.scalar.i32;
         nWindow = 1;
         break;
       case LUX_ARRAY:
@@ -872,7 +872,7 @@ int32_t lux_register_event(int32_t narg, int32_t ps[])
     iq = lux_long(1, &ps[1]);
     switch (symbol_class(iq)) {
       case LUX_SCALAR:
-        menus = &scalar_value(iq).l;
+        menus = &scalar_value(iq).i32;
         nMenu = 1;
         break;
       case LUX_ARRAY:

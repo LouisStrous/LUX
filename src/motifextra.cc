@@ -33,7 +33,7 @@ int32_t lux_zeroifnotdefined(int32_t narg, int32_t ps[])
     if (symbol_class(*ps) == LUX_UNDEFINED) {
       symbol_class(*ps) = LUX_SCALAR;
       scalar_type(*ps) = LUX_INT32;
-      scalar_value(*ps).l = 0;
+      scalar_value(*ps).i32 = 0;
     }
     ps++;
   }

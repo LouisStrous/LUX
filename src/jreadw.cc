@@ -95,7 +95,7 @@ int32_t lux_write_jpeg(int32_t narg, int32_t ps[])        // jpeg write subrouti
  if (!symbolIsNumericalArray(iq))
    return cerror(NEED_NUM_ARR, iq);
  type = array_type(iq);
- q1.l = array_data(iq);
+ q1.i32 = array_data(iq);
  nd = array_num_dims(iq);
  if (nd != 2 || type != LUX_INT8)
   return luxerror("WRITE_JPEG only supports 2-D Byte arrays\n", iq);
@@ -187,7 +187,7 @@ METHODDEF void output_init (decompress_info_ptr cinfo)
  if (redef_array(iq, LUX_INT8, 2, dim) != 1) {
    ERREXIT(cinfo->emethods, "can't create result array");
  }
- q1.l = array_data(iq);
+ q1.i32 = array_data(iq);
  base = q1.ui8;        // for checks
 }
  //-------------------------------------------------------------------------

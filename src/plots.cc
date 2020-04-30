@@ -2087,7 +2087,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])                        // xymov ro
         nm = 1;
         iq = lux_long(1, &iq);
         dm = 0;
-        mp = &scalar_value(iq).l;
+        mp = &scalar_value(iq).i32;
         break;
       case LUX_ARRAY:
         iq = lux_long(1, &iq);
@@ -2115,7 +2115,7 @@ int32_t lux_xymov(int32_t narg, int32_t ps[])                        // xymov ro
     case LUX_SCALAR:
       nbreak = 1;
       iq = lux_long(1, &iq);
-      qi = &scalar_value(iq).l;
+      qi = &scalar_value(iq).i32;
       break;
     case LUX_ARRAY:
       iq = lux_long(1, &iq);

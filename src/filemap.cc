@@ -120,7 +120,7 @@ int32_t lux_i_file_output(FILE *fp, Pointer q, int32_t assoctype,
   { case LUX_SCAL_PTR:
       offsym = dereferenceScalPointer(offsym);
     case LUX_SCALAR:
-      qi = &sym[offsym].spec.scalar.l;
+      qi = &sym[offsym].spec.scalar.i32;
       dindx = 1;
       break;
     case LUX_ARRAY:
@@ -176,12 +176,12 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
    case LUX_SCAL_PTR: case LUX_SCALAR:
      done = ddat = 1;
      dat = &done;
-     q.l = &scalar_value(iq).l;
+     q.i32 = &scalar_value(iq).i32;
      break;
    case LUX_ARRAY:
      ddat = array_num_dims(jq);
      dat = array_dims(jq);
-     q.l = (int32_t*) array_data(jq);
+     q.i32 = (int32_t*) array_data(jq);
      break;
    default:
      return cerror(ILL_CLASS, jq);

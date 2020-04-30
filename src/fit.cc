@@ -940,7 +940,7 @@ REGISTER(generalfit2, f, fit3, 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 union uscalar {
   uint8_t* ui8;
   uint16_t* i16;
-  uint32_t* l;
+  uint32_t* i32;
   float *f;
   double *d;
 };
@@ -999,7 +999,7 @@ void printgene(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits,
       printf("%u", p.i16[j]);
       break;
     case LUX_INT32:
-      printf("%u", p.l[j]);
+      printf("%u", p.i32[j]);
       break;
     case LUX_FLOAT:
       printf("%g", p.f[j]);
@@ -1280,7 +1280,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
 
   // we fill <genes> with random bits.  <genes> exactly spans a number
   // of ints, so we don't need to worry about the exact type
-  p.l = (uint32_t *) genes;
+  p.i32 = (uint32_t *) genes;
   if (start) {                  // fill first member with start values
     memcpy(p.d, start, nPar*sizeof(double));
     p.d += nPar;
@@ -1288,7 +1288,7 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
   } else
     i = 0;
   for ( ; i < nPopulation*size/sizeof(int32_t); i++)
-    *p.l++ = random_bits();
+    *p.i32++ = random_bits();
   // if the parameter type is FLOAT or DOUBLE, then some of the bit patterns
   // may not correspond to representable values, but rather to NaNs.
   // We must fix those elements. We use a single scheme for both FLOAT

@@ -634,7 +634,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       intval = (intmax_t) scalar_value(symbol).i16;
       break;
     case LUX_INT32:
-      intval = (intmax_t) scalar_value(symbol).l;
+      intval = (intmax_t) scalar_value(symbol).i32;
       break;
     case LUX_INT64:
       intval = (intmax_t) scalar_value(symbol).q;
@@ -792,7 +792,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case LUX_INT32:
       while (j--) {
-        sprintf(curScrat, "%d", *ptr.l++);
+        sprintf(curScrat, "%d", *ptr.i32++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -862,10 +862,10 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       curScrat += strlen(curScrat);
       sprintf(curScrat, " (");
       curScrat += 2;
-      ptr.l = array_dims(symbol);
+      ptr.i32 = array_dims(symbol);
       n = array_num_dims(symbol);
       while (n--) {
-        sprintf(curScrat, "%1d", *ptr.l++);
+        sprintf(curScrat, "%1d", *ptr.i32++);
         curScrat += strlen(curScrat);
         if (n)
           strcpy(curScrat++, ",");
@@ -905,9 +905,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     }
     curScrat += strlen(curScrat);
     n = assoc_num_dims(symbol);
-    ptr.l = assoc_dims(symbol);
+    ptr.i32 = assoc_dims(symbol);
     while (n--) {
-      sprintf(curScrat, "%1d", *ptr.l++);
+      sprintf(curScrat, "%1d", *ptr.i32++);
       curScrat += strlen(curScrat);
       if (n)
         strcpy(curScrat++, ",");
@@ -944,7 +944,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       intval = (intmax_t) *scal_ptr_pointer(symbol).i16;
       break;
     case LUX_INT32:
-      intval = (intmax_t) *scal_ptr_pointer(symbol).l;
+      intval = (intmax_t) *scal_ptr_pointer(symbol).i32;
       break;
     case LUX_INT64:
       intval = (intmax_t) *scal_ptr_pointer(symbol).q;
@@ -1024,9 +1024,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     sprintf(curScrat, "'%s',", file_map_file_name(symbol));
     curScrat += strlen(curScrat);
     n = file_map_num_dims(symbol);
-    ptr.l = file_map_dims(symbol);
+    ptr.i32 = file_map_dims(symbol);
     while (n--) {
-      sprintf(curScrat, "%1d", *ptr.l++);
+      sprintf(curScrat, "%1d", *ptr.i32++);
       curScrat += strlen(curScrat);
       if (n)
         strcpy(curScrat++, ",");
@@ -1935,9 +1935,9 @@ char *symbolIdent(int32_t symbol, int32_t mode)
             j = spm->data.array.n_elem;
             if ((mode & I_TRUNCATE) && j > 3)
               j = 3;
-            ptr.l = spm->data.array.ptr;
+            ptr.i32 = spm->data.array.ptr;
             while (j--) {
-              sprintf(curScrat, "%1d", *ptr.l++);
+              sprintf(curScrat, "%1d", *ptr.i32++);
               curScrat += strlen(curScrat);
               if (j)
                 strcpy(curScrat++, ",");

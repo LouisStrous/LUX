@@ -64,7 +64,7 @@ void value_string(char *trgt, Pointer image, int32_t type, int32_t indx)
       sprintf(trgt, "Value:% 10d", image.i16[indx]);
       break;
     case LUX_INT32:
-      sprintf(trgt, "Value:% 10d", image.l[indx]);
+      sprintf(trgt, "Value:% 10d", image.i32[indx]);
       break;
     case LUX_INT64:
       sprintf(trgt, "Value:% 10jd", image.q[indx]);
@@ -595,7 +595,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                 case ZOOM_CONTRAST:
                   i = event.xbutton.x/fontwidth;
                   if (i < 8) {        // take from current image
-                    minmax(image.l, nx*ny, type);
+                    minmax(image.i32, nx*ny, type);
                     switch (type) {
                       case LUX_INT8:
                         zoom_clo = (double) lastmin.ui8;
@@ -606,8 +606,8 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                         zoom_chi = (double) lastmax.i16;
                         break;
                       case LUX_INT32:
-                        zoom_clo = (double) lastmin.l;
-                        zoom_chi = (double) lastmax.l;
+                        zoom_clo = (double) lastmin.i32;
+                        zoom_chi = (double) lastmax.i32;
                         break;
                       case LUX_INT64:
                         zoom_clo = (double) lastmin.q;

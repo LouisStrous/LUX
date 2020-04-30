@@ -96,7 +96,7 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)// crunch subrout
   type = array_type(iq);
   if (type > LUX_INT32)
     return luxerror("crunch only accepts I*1,2,4 arrays", iq);
-  q1.l = (int32_t*) array_data(iq);
+  q1.i32 = (int32_t*) array_data(iq);
   nx = array_dims(iq)[0];
   outer = array_size(iq)/nx;
   // get the fixed slice width
@@ -105,7 +105,7 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)// crunch subrout
   iq = ps[2];
   if (!symbolIsNumericalArray(iq))
     return cerror(NEED_ARR, iq);
-  q2.l = (int32_t*) array_data(iq);
+  q2.i32 = (int32_t*) array_data(iq);
   n = array_size(iq);
   limit = n*lux_type_size[array_type(iq)]; // use to avoid overflows
   /* the types in the compress structure are non-inuitive for historical
@@ -134,7 +134,7 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)// crunch subrout
     break;
   case 4:
 #if SIZEOF_LONG_LONG_INT == 8        // 64 bit integers
-    iq = anacrunch32(q2.ui8, q1.l, slice, nx, outer, limit);
+    iq = anacrunch32(q2.ui8, q1.i32, slice, nx, outer, limit);
     break;
 #else
     puts("32-bit compression was not compiled into your version of LUX.");
@@ -174,13 +174,13 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])                // decrunch subr
   if ( symbol_class(iq) != 4 ) return cerror(NEED_ARR, iq);
   // decrunch doesn't care about input array type since it looks at bit stream
   h = (struct ahead *) sym[iq].spec.array.ptr;
-  q1.l = (int32_t *) ((char *)h + sizeof(struct ahead));
+  q1.i32 = (int32_t *) ((char *)h + sizeof(struct ahead));
 #if WORDS_BIGENDIAN
-  bsize =  *q1.l++;
+  bsize =  *q1.i32++;
 #else
-  q1.l++;
+  q1.i32++;
 #endif
-  outer = *q1.l++; nx = *q1.l++;
+  outer = *q1.i32++; nx = *q1.i32++;
   // get the fixed slice width
   slice = *q1.ui8++;        ctype = *q1.ui8++;
   //printf("ctype = %d\n", ctype);
@@ -204,7 +204,7 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])                // decrunch subr
            nx, outer);
     return -1;}
   h = (struct ahead *) sym[iq].spec.array.ptr;
-  q2.l = (int32_t *) ((char *)h + sizeof(struct ahead));
+  q2.i32 = (int32_t *) ((char *)h + sizeof(struct ahead));
   switch (ctype) {
   case 0:
     iq = anadecrunch(q1.ui8, q2.i16, slice, nx, outer);
@@ -220,7 +220,7 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])                // decrunch subr
     break;
   case 4:
 #if SIZEOF_LONG_LONG_INT == 8        // 64-bit integers
-    iq = anadecrunch32(q1.ui8, q2.l, slice, nx, outer);
+    iq = anadecrunch32(q1.ui8, q2.i32, slice, nx, outer);
     break;
 #else
     puts("32-bit decompression was not compiled into your version of LUX.");

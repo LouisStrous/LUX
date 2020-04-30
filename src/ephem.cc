@@ -421,14 +421,14 @@ int32_t ephem_setup(int32_t narg, int32_t ps[])
  //switch on the class
  switch (symbol_class(nsym))        {
  case LUX_SCAL_PTR:             //scalar ptr
- result_sym = scalar_scratch(LUX_FLOAT); n=1; q1.l = scal_ptr_pointer(nsym).l;
- q3.l = &sym[result_sym].spec.scalar.l; break;
+ result_sym = scalar_scratch(LUX_FLOAT); n=1; q1.i32 = scal_ptr_pointer(nsym).i32;
+ q3.i32 = &sym[result_sym].spec.scalar.i32; break;
  case LUX_SCALAR:               //scalar
- result_sym = scalar_scratch(LUX_FLOAT); n=1; q1.l = &sym[nsym].spec.scalar.l;
- q3.l = &sym[result_sym].spec.scalar.l; break;
+ result_sym = scalar_scratch(LUX_FLOAT); n=1; q1.i32 = &sym[nsym].spec.scalar.i32;
+ q3.i32 = &sym[result_sym].spec.scalar.i32; break;
  case LUX_ARRAY:                //array
  h = (struct ahead *) sym[nsym].spec.array.ptr;
- q1.l = (int32_t *) ((char *)h + sizeof(struct ahead));
+ q1.i32 = (int32_t *) ((char *)h + sizeof(struct ahead));
  nd = h->ndim;
  n = 1; for (j=0;j<nd;j++) n *= h->dims[j];        // # of elements for nsym
  result_sym = array_clone(nsym,LUX_FLOAT);

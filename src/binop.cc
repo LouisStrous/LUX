@@ -110,7 +110,7 @@ int32_t evalBinOp(int32_t lhs, int32_t rhs,
       result = rhs;                // use rhs to store result
     else if ((result = array_clone(bigOne? bigOne: lhs, topType)) < 0)
       return LUX_ERROR;                // could not generate output symbol
-    tp.l = array_data(result);        // output data
+    tp.i32 = array_data(result);        // output data
     array_type(result) = topType;
     {
       int32_t repeat = nRepeat;
@@ -154,7 +154,7 @@ int32_t evalBinOp(int32_t lhs, int32_t rhs,
       rndims;
 
     // the result data pointer
-    tp.l = array_data(result);
+    tp.i32 = array_data(result);
     // now deduce step sizes
     *nCumulR = rStride = lux_type_size[rhsType];
     *nCumulL = lStride = lux_type_size[lhsType];

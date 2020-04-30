@@ -681,7 +681,7 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
   // create the output symbol
   if (ndim) {           // get an array
     target = array_scratch(ttype, ndim, dims);
-    ptr.l = (int32_t *) array_data(target);
+    ptr.i32 = (int32_t *) array_data(target);
   } else {                      // get a scalar
     if (isStringType(ttype)) {
       target = string_scratch(0);
@@ -696,7 +696,7 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
       if (isComplexType(ttype))
         ptr.cf = complex_scalar_data(target).cf;
       else
-        ptr.l = &scalar_value(target).l;
+        ptr.i32 = &scalar_value(target).i32;
     }
   }
 
@@ -838,9 +838,9 @@ int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode,
     numerical(i, NULL, NULL, &nAxes, &axes); // get info
   } else {
     nAxes = 0;
-    axes.l = NULL;
+    axes.i32 = NULL;
   }
-  return standardLoop0(data, nAxes, axes.l, mode, outType,
+  return standardLoop0(data, nAxes, axes.i32, mode, outType,
                        src, srcptr, output, trgt, trgtptr);
 
 }
@@ -876,9 +876,9 @@ int32_t standardLoopX(int32_t source, int32_t axisSym, int32_t srcMode,
     numerical(i, NULL, NULL, &nAxes, &axes); // get info
   } else {
     nAxes = 0;
-    axes.l = NULL;
+    axes.i32 = NULL;
   }
-  int32_t result = standardLoop1(source, nAxes, axes.l, srcMode,
+  int32_t result = standardLoop1(source, nAxes, axes.i32, srcMode,
                                  srcinf, srcptr, nMore, more, nLess, less,
                                  tgtType, tgtMode, target, tgtinf, tgtptr);
   return result;
@@ -1684,7 +1684,7 @@ static int32_t numerical_or_string_choice(int32_t data, int32_t **dims, int32_t 
     if (size)
       *size = 1;
     if (src)
-      (*src).l = &scalar_value(data).l;
+      (*src).i32 = &scalar_value(data).i32;
     break;
   case LUX_CSCALAR:
     if (dims)
@@ -1714,7 +1714,7 @@ static int32_t numerical_or_string_choice(int32_t data, int32_t **dims, int32_t 
     if (size)
       *size = array_size(data);
     if (src)
-      (*src).l = (int32_t*) array_data(data);
+      (*src).i32 = (int32_t*) array_data(data);
     break;
   }
   return 1;

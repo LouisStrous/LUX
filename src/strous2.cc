@@ -140,7 +140,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
   switch (symbol_class(iq)) {   // POWERS
     case LUX_SCALAR:
       nexponent = 1;
-      exponent = &scalar_value(iq).l;
+      exponent = &scalar_value(iq).i32;
       break;
     case LUX_ARRAY:
       nexponent = array_size(iq);
@@ -158,13 +158,13 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
     case LUX_SCALAR:
       ndim = 1;
       dims = &ndim;
-      src.l = &scalar_value(*ps).l;
+      src.i32 = &scalar_value(*ps).i32;
       size = 1;
       break;
     case LUX_ARRAY:
       ndim = array_num_dims(*ps);
       dims = array_dims(*ps);
-      src.l = (int32_t *) array_data(*ps);
+      src.i32 = (int32_t *) array_data(*ps);
       size = array_size(*ps);
       break;
     default:
@@ -180,7 +180,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
     switch (symbol_class(iq)) {
       case LUX_SCALAR:
         naxes = 1;
-        axes = &scalar_value(iq).l;
+        axes = &scalar_value(iq).i32;
         break;
       case LUX_ARRAY:
         naxes = array_size(iq);
@@ -216,12 +216,12 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       if (nIndex != size)
         return cerror(INCMP_ARR, ps[3]);
       minmax(index, nIndex, LUX_INT32); // determine range of indices
-      size = lastmax.l + 1;
+      size = lastmax.i32 + 1;
       offset = 0;
-      if (lastmin.l < 0)
-        size += (offset = -lastmin.l);
+      if (lastmin.i32 < 0)
+        size += (offset = -lastmin.i32);
       result_sym = array_scratch(LUX_DOUBLE, 1, &size);
-      trgt.l = (int32_t*) array_data(result_sym);
+      trgt.i32 = (int32_t*) array_data(result_sym);
       zerobytes(trgt.ui8, size*sizeof(double));
       ALLOCATE(bigweights, size, double);
       zerobytes(bigweights, size*sizeof(double));
@@ -243,7 +243,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
       result_sym = array_scratch(LUX_DOUBLE, 1, &n);
       array_num_dims(result_sym) = ndim - naxes;
       memcpy(array_dims(result_sym), outdims, (ndim - naxes)*sizeof(int32_t));
-      trgt.l = (int32_t*) array_data(result_sym);
+      trgt.i32 = (int32_t*) array_data(result_sym);
     }
   }
 
@@ -285,7 +285,7 @@ int32_t lux_psum(int32_t narg, int32_t ps[])
         value = (double) *src.i16;
         break;
       case LUX_INT32:
-        value = (double) *src.l;
+        value = (double) *src.i32;
         break;
       case LUX_INT64:
         value = (double) *src.q;
@@ -370,34 +370,34 @@ int32_t multiCompare(const void *arg1, const void *arg2)
   switch (multiCompType) {
   case LUX_INT8:
     for (i = 0; i < multiCompNCoord; i++) {
-      d.l = (int32_t) multiCompData.ui8[i1 + i*multiCompNPoints]
+      d.i32 = (int32_t) multiCompData.ui8[i1 + i*multiCompNPoints]
         - (int32_t) multiCompData.ui8[i2 + i*multiCompNPoints];
-      if (d.l)
-        return d.l;
+      if (d.i32)
+        return d.i32;
     }
     break;
   case LUX_INT16:
     for (i = 0; i < multiCompNCoord; i++) {
-      d.l = (int32_t) multiCompData.i16[i1 + i*multiCompNPoints]
+      d.i32 = (int32_t) multiCompData.i16[i1 + i*multiCompNPoints]
         - (int32_t) multiCompData.i16[i2 + i*multiCompNPoints];
-      if (d.l)
-        return d.l;
+      if (d.i32)
+        return d.i32;
     }
     break;
   case LUX_INT32:
     for (i = 0; i < multiCompNCoord; i++) {
-      d.l = (int32_t) multiCompData.l[i1 + i*multiCompNPoints]
-        - (int32_t) multiCompData.l[i2 + i*multiCompNPoints];
-      if (d.l)
-        return d.l;
+      d.i32 = (int32_t) multiCompData.i32[i1 + i*multiCompNPoints]
+        - (int32_t) multiCompData.i32[i2 + i*multiCompNPoints];
+      if (d.i32)
+        return d.i32;
     }
     break;
   case LUX_INT64:
     for (i = 0; i < multiCompNCoord; i++) {
-      d.l = (int32_t) multiCompData.q[i1 + i*multiCompNPoints]
+      d.i32 = (int32_t) multiCompData.q[i1 + i*multiCompNPoints]
         - (int32_t) multiCompData.q[i2 + i*multiCompNPoints];
-      if (d.l)
-        return d.l;
+      if (d.i32)
+        return d.i32;
     }
     break;
   case LUX_FLOAT:
@@ -436,7 +436,7 @@ int32_t lux_tolookup(int32_t narg, int32_t ps[])
   if (symbol_class(*ps) != LUX_ARRAY)
     return cerror(NEED_ARR, *ps);
   iq = *ps;                     // SRC
-  multiCompData.l = (int32_t *) array_data(iq);
+  multiCompData.i32 = (int32_t *) array_data(iq);
   multiCompType = array_type(iq);
   index = array_dims(iq);
   nd = array_num_dims(iq);
@@ -498,9 +498,9 @@ int32_t mcmp(const void *x1, const void *x2)
       d2.i16 = src.i16[*(int32_t *) x2];
       return d1.i16 < d2.i16? -1: (d1.i16 > d2.i16? 1: 0);
     case LUX_INT32:
-      d1.l = src.l[*(int32_t *) x1];
-      d2.l = src.l[*(int32_t *) x2];
-      return d1.l < d2.l? -1: (d1.l > d2.l? 1: 0);
+      d1.i32 = src.i32[*(int32_t *) x1];
+      d2.i32 = src.i32[*(int32_t *) x2];
+      return d1.i32 < d2.i32? -1: (d1.i32 > d2.i32? 1: 0);
     case LUX_INT64:
       d1.q = src.q[*(int32_t *) x1];
       d2.q = src.q[*(int32_t *) x2];
@@ -656,7 +656,7 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
         *trgt.i16 = src.i16[index[med]];
         break;
       case LUX_INT32:
-        *trgt.l = src.l[index[med]];
+        *trgt.i32 = src.i32[index[med]];
         break;
       case LUX_INT64:
         *trgt.q = src.q[index[med]];
@@ -764,10 +764,10 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
         }
         break;
       case LUX_INT32:
-        *trgt.l = tmp0.l[t];
+        *trgt.i32 = tmp0.i32[t];
         if (f) {
-          *trgt.l +=
-            static_cast<int32_t>((tmp0.l[t + 1] - tmp0.l[t])*f);
+          *trgt.i32 +=
+            static_cast<int32_t>((tmp0.i32[t + 1] - tmp0.i32[t])*f);
         }
         break;
       case LUX_INT64:
@@ -830,10 +830,10 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
       return luxerror("Number of widths must be 1 or equal to number of axes",
                    ps[2]);
     for (i = 0; i < nWidth; i++)
-      if (width.l[i] < 1)
+      if (width.i32[i] < 1)
         return luxerror("Width(s) must be positive", ps[2]);
   } else {
-    width.l = &three;
+    width.i32 = &three;
     nWidth = 1;
   }
   iq = ps[0];                   // data
@@ -841,9 +841,9 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
   if (!srcinfo.naxes)
     srcinfo.naxes++;
   for (loop = 0; loop < srcinfo.naxes; loop++) {
-    ww = (*width.l > srcinfo.rdims[0])? srcinfo.rdims[0]: *width.l;
+    ww = (*width.i32 > srcinfo.rdims[0])? srcinfo.rdims[0]: *width.i32;
     if (nWidth > 1)
-      width.l++;
+      width.i32++;
     stride = srcinfo.step[0];
     offset2 = -stride*ww;
     offset1 = offset2 + stride;
@@ -927,37 +927,37 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
         break;
       case LUX_INT32:
         do {
-          value.l = bounds.max.l;       // initialize
+          value.i32 = bounds.max.i32;       // initialize
           for (i = 0; i < ww; i++) { // do the left edge
-            if (*src.l < value.l)
-              value.l = *src.l;
-            src.l += stride;
+            if (*src.i32 < value.i32)
+              value.i32 = *src.i32;
+            src.i32 += stride;
           }
           for (i = 0; i < w1; i++) {
-            *trgt.l = value.l;
-            trgt.l += stride;
+            *trgt.i32 = value.i32;
+            trgt.i32 += stride;
           }
           for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
-            if (*src.l < value.l) {
-              value.l = *src.l;
-              src.l += stride;
-            } else if (src.l[offset2] == value.l) {
-              src.l += offset1;
-              value.l = *src.l;
-              src.l += stride;
+            if (*src.i32 < value.i32) {
+              value.i32 = *src.i32;
+              src.i32 += stride;
+            } else if (src.i32[offset2] == value.i32) {
+              src.i32 += offset1;
+              value.i32 = *src.i32;
+              src.i32 += stride;
               for (j = 1; j < ww; j++) {
-                if (*src.l < value.l)
-                value.l = *src.l;
-                src.l += stride;
+                if (*src.i32 < value.i32)
+                value.i32 = *src.i32;
+                src.i32 += stride;
               }
             } else
-              src.l += stride;
-            *trgt.l = value.l;
-            trgt.l += stride;
+              src.i32 += stride;
+            *trgt.i32 = value.i32;
+            trgt.i32 += stride;
           }
           for (i = w1; i < ww; i++) { // right edge
-            *trgt.l = value.l;
-            trgt.l += stride;
+            *trgt.i32 = value.i32;
+            trgt.i32 += stride;
           }
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.rndim);
@@ -1117,10 +1117,10 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
       return luxerror("Number of widths must be 1 or equal to number of axes",
                    ps[2]);
     for (i = 0; i < nWidth; i++)
-      if (width.l[i] < 1)
+      if (width.i32[i] < 1)
         return luxerror("Width(s) must be positive", ps[2]);
   } else {
-    width.l = &three;
+    width.i32 = &three;
     nWidth = 1;
   }
   iq = ps[0];                   // data
@@ -1128,9 +1128,9 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
   if (!srcinfo.naxes)
     srcinfo.naxes++;
   for (loop = 0; loop < srcinfo.naxes; loop++) {
-    ww = (*width.l > srcinfo.rdims[0])? srcinfo.rdims[0]: *width.l;
+    ww = (*width.i32 > srcinfo.rdims[0])? srcinfo.rdims[0]: *width.i32;
     if (nWidth > 1)
-      width.l++;
+      width.i32++;
     stride = srcinfo.step[0];
     offset2 = -stride*ww;
     offset1 = offset2 + stride;
@@ -1214,37 +1214,37 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
         break;
       case LUX_INT32:
         do {
-          value.l = bounds.min.l;       // initialize
+          value.i32 = bounds.min.i32;       // initialize
           for (i = 0; i < ww; i++) { // do the left edge
-            if (*src.l > value.l)
-              value.l = *src.l;
-            src.l += stride;
+            if (*src.i32 > value.i32)
+              value.i32 = *src.i32;
+            src.i32 += stride;
           }
           for (i = 0; i < w1; i++) {
-            *trgt.l = value.l;
-            trgt.l += stride;
+            *trgt.i32 = value.i32;
+            trgt.i32 += stride;
           }
           for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
-            if (*src.l > value.l) {
-              value.l = *src.l;
-              src.l += stride;
-            } else if (src.l[offset2] == value.l) {
-              src.l += offset1;
-              value.l = *src.l;
-              src.l += stride;
+            if (*src.i32 > value.i32) {
+              value.i32 = *src.i32;
+              src.i32 += stride;
+            } else if (src.i32[offset2] == value.i32) {
+              src.i32 += offset1;
+              value.i32 = *src.i32;
+              src.i32 += stride;
               for (j = 1; j < ww; j++) {
-                if (*src.l > value.l)
-                value.l = *src.l;
-                src.l += stride;
+                if (*src.i32 > value.i32)
+                value.i32 = *src.i32;
+                src.i32 += stride;
               }
             } else
-              src.l += stride;
-            *trgt.l = value.l;
-            trgt.l += stride;
+              src.i32 += stride;
+            *trgt.i32 = value.i32;
+            trgt.i32 += stride;
           }
           for (i = w1; i < ww; i++) { // right edge
-            *trgt.l = value.l;
-            trgt.l += stride;
+            *trgt.i32 = value.i32;
+            trgt.i32 += stride;
           }
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.rndim);
@@ -1398,7 +1398,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
       ndim = array_size(iq);
       break;
     case LUX_SCALAR:
-      dims = &scalar_value(iq).l;
+      dims = &scalar_value(iq).i32;
       ndim = 1;
       break;
     default:
@@ -1554,7 +1554,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
           break;
         case LUX_INT32:
           for (i = 0; i < ny; i++)
-            if (*xData.l == yData.l[i])
+            if (*xData.i32 == yData.i32[i])
             { match = i;
               indexData[match]++; // count
               break; }
@@ -1625,7 +1625,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   { undefine(ps[2]);
     symbol_class(ps[2]) = LUX_SCALAR;
     scalar_type(ps[2]) = LUX_INT32;
-    scalar_value(ps[2]).l = -1; }
+    scalar_value(ps[2]).i32 = -1; }
   else
   { if (redef_array(ps[2], LUX_INT32, 1, &nMatch) < 0) // <list>
       return -1;                // some error
@@ -1727,7 +1727,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
     if (!symbolIsScalar(ps[3]))
       return cerror(NEED_SCAL, ps[3]);
     iq = lux_converts[array_type(ps[0])](1, ps + 3);
-    blank.l = &scalar_value(iq).l;
+    blank.i32 = &scalar_value(iq).i32;
     internalMode |= 1;          // /TRANSLATE
   } else
     blank.d = &zero;
@@ -1756,14 +1756,14 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
   numerical(i, NULL, NULL, NULL, &shift);
   if (internalMode & 1) {       // non-circular shift
     for (i = 0; i < srcinfo.naxes; i++)
-      if (shift.l[i] >= srcinfo.rdims[0] || shift.l[i] <= -srcinfo.rdims[0]) {
+      if (shift.i32[i] >= srcinfo.rdims[0] || shift.i32[i] <= -srcinfo.rdims[0]) {
         // the requested shift distance is so great that no part of the
         // old image remains in the field of view
         zerobytes(trgt.v, srcinfo.nelem*lux_type_size[srcinfo.type]);
         return isFunction? iq: LUX_OK;
       }
     do {
-      i = *shift.l++;
+      i = *shift.i32++;
       offset = i*srcinfo.stride;
       step = srcinfo.step[0]*srcinfo.stride;
       src = src0;
@@ -1811,7 +1811,7 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
     } while (nextLoops(&srcinfo, &trgtinfo));
   } else                        // circular shift
     do {
-      i = *shift.l++;           // shift distance in current dimension
+      i = *shift.i32++;           // shift distance in current dimension
       // reduce shift distance to interval (0:srcinfo.rdims[0]-1)
       if (i < 0)
         i += srcinfo.rdims[0]*(1 - i/srcinfo.rdims[0]);
@@ -2034,7 +2034,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
       if (edge[i]) {
         trgtinfo.rearrangeEdgeLoop(NULL, i);
         do
-          *trgt.l = 0;
+          *trgt.i32 = 0;
         while (trgtinfo.advanceLoop(&trgt) < trgtinfo.ndim - 1);
       }
     // and exclude the edges from further dealings
@@ -2062,7 +2062,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = ok_count;
+          *trgt.i32 = ok_count;
         else if (ok_count)
           hit_locations.push_back(src.ui8 - (uint8_t *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
@@ -2087,7 +2087,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = ok_count;
+          *trgt.i32 = ok_count;
         else if (ok_count)
           hit_locations.push_back(src.i16 - (int16_t *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
@@ -2100,10 +2100,10 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
         int ok_count = 1 - degree;
         for (j = 0; j < n; j++) {       // all directions
           k = offset[j];
-          srcl.l = src.l + k;
-          srcr.l = src.l - k;
-          bool ok = (sign && *src.l >= *srcl.l && *src.l > *srcr.l)
-            || (!sign && *src.l <= *srcl.l && *src.l < *srcr.l);
+          srcl.i32 = src.i32 + k;
+          srcr.i32 = src.i32 - k;
+          bool ok = (sign && *src.i32 >= *srcl.i32 && *src.i32 > *srcr.i32)
+            || (!sign && *src.i32 <= *srcl.i32 && *src.i32 < *srcr.i32);
           if (degree)
             ok_count += ok;
           else if (!ok) {
@@ -2112,9 +2112,9 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = ok_count;
+          *trgt.i32 = ok_count;
         else if (ok_count)
-          hit_locations.push_back(src.l - (int32_t *) srcinfo.data0);
+          hit_locations.push_back(src.i32 - (int32_t *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
                         srcinfo.advanceLoop(&src)):
           srcinfo.advanceLoop(&src);
@@ -2162,7 +2162,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = ok_count;
+          *trgt.i32 = ok_count;
         else if (ok_count)
           hit_locations.push_back(src.f - (float *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
@@ -2187,7 +2187,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
           }     // end if (!ok)
         } // end for (j = 0; j < n; j++)
         if (degree)
-          *trgt.l = ok_count;
+          *trgt.i32 = ok_count;
         else if (ok_count)
           hit_locations.push_back(src.d - (double *) srcinfo.data0);
         done = degree? (trgtinfo.advanceLoop(&trgt),
@@ -2219,13 +2219,13 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
         if (!(internalMode & 4) && !subgrid) {  // not /COORDS, not /SUBGRID
           srcinfo.coords[0] = n;        // number of found extrema
           result = array_scratch(LUX_INT32, 1, srcinfo.coords);
-          trgt.l = (int32_t *) array_data(result);
+          trgt.i32 = (int32_t *) array_data(result);
         } else {
           srcinfo.coords[0] = srcinfo.ndim; // # dimensions in the data
           srcinfo.coords[1] = n;        // number of found extrema
           result = array_scratch(subgrid? LUX_FLOAT: LUX_INT32, 2,
                                  srcinfo.coords);
-          trgt.l = (int32_t *) array_data(result);
+          trgt.i32 = (int32_t *) array_data(result);
         }
         break;
     }
@@ -2251,7 +2251,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
             srcinfo.step[k] = srcinfo.step[i]; // participating dimensions
       }         // end of if (nDiagonal)
 
-      src.l = (int32_t *) array_data(ps[0]); // data
+      src.i32 = (int32_t *) array_data(ps[0]); // data
       float value;
       while (n--) {             // all found extrema
         index = k = *hitit++;         // index of extremum
@@ -2319,12 +2319,12 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
                                        - srcinfo.step[i]])/4;
             break;
           case LUX_INT32:
-            srcl.l = src.l + index;
-            value = (float) *srcl.l;
+            srcl.i32 = src.i32 + index;
+            value = (float) *srcl.i32;
             for (i = 0; i < nDiagonal; i++)
               grad[i] = grad2[i]
-                = ((float) srcl.l[srcinfo.step[i]]
-                   - (float) srcl.l[-srcinfo.step[i]])/2;
+                = ((float) srcl.i32[srcinfo.step[i]]
+                   - (float) srcl.i32[-srcinfo.step[i]])/2;
             ready = 1;  // zero gradient?
             for (i = 0; i < nDiagonal; i++)
               if (grad[i] != 0) {
@@ -2337,14 +2337,14 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
               for (j = 0; j <= i; j++)
                 if (i == j)
                   hessian[i + i*nDiagonal]
-                    = (float) srcl.l[srcinfo.step[i]]
-                    + (float) srcl.l[-srcinfo.step[i]] - 2*value;
+                    = (float) srcl.i32[srcinfo.step[i]]
+                    + (float) srcl.i32[-srcinfo.step[i]] - 2*value;
                 else
                   hessian[i + j*nDiagonal] = hessian[j + i*nDiagonal]
-                    = ((float) srcl.l[srcinfo.step[i] + srcinfo.step[j]]
-                       + (float) srcl.l[-srcinfo.step[i] - srcinfo.step[j]]
-                       - (float) srcl.l[srcinfo.step[i] - srcinfo.step[j]]
-                       - (float) srcl.l[srcinfo.step[j]
+                    = ((float) srcl.i32[srcinfo.step[i] + srcinfo.step[j]]
+                       + (float) srcl.i32[-srcinfo.step[i] - srcinfo.step[j]]
+                       - (float) srcl.i32[srcinfo.step[i] - srcinfo.step[j]]
+                       - (float) srcl.i32[srcinfo.step[j]
                                        - srcinfo.step[i]])/4;
             break;
           case LUX_INT64:
@@ -2468,11 +2468,11 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
           index = *hitit++;
           if (internalMode & 4)         // /COORDS
             for (i = 0; i < srcinfo.ndim; i++) {
-              *trgt.l++ = index % srcinfo.dims[i];
+              *trgt.i32++ = index % srcinfo.dims[i];
               index /= srcinfo.dims[i];
             } // end of for (i = 0;...)
           else
-            *trgt.l++ = index;
+            *trgt.i32++ = index;
         } // end of while (n--)
       } else {                  // values
         src.v = srcinfo.data0; // reset to start of data
@@ -2486,7 +2486,7 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
               *trgt.i16++ = src.i16[index];
               break;
             case LUX_INT32:
-              *trgt.l++ = src.l[index];
+              *trgt.i32++ = src.i32[index];
               break;
             case LUX_INT64:
               *trgt.q++ = src.q[index];
@@ -2611,20 +2611,20 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
     break;
   case LUX_INT32:
     mid = 0;
-    v.l = *data.l + 1;
+    v.i32 = *data.i32 + 1;
     while (nData--) {           // all data points
-      if (*data.l != v.l) { // we added this check because we
+      if (*data.i32 != v.i32) { // we added this check because we
         // hope there is coherence in the data so that the next data
         // value has a fair chance of being equal to the previous one.
         // In that case we can skip the binary search.
         low = 0;
         high = nSrc - 1;
-        v.l = *data.l;
+        v.i32 = *data.i32;
         while (low <= high) {
           mid = (low + high)/2;
-          if (v.l < src.l[mid])
+          if (v.i32 < src.i32[mid])
             high = mid - 1;
-          else if (v.l > src.l[mid])
+          else if (v.i32 > src.i32[mid])
             low = mid + 1;
           else {
             mid = -mid - 1;     // flag that we found it
@@ -2633,8 +2633,8 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
         }
       }
       if (mid < 0)              // found it
-        *data.l = trgt.l[-mid - 1];
-      data.l++;
+        *data.i32 = trgt.i32[-mid - 1];
+      data.i32++;
     }
     break;
   case LUX_INT64:
@@ -3471,13 +3471,13 @@ int32_t lux_runprod(int32_t narg, int32_t ps[])
       } while (n < srcinfo.rndim);
       break;
     case LUX_INT32:
-      value.l = 1;
+      value.i32 = 1;
       do {
-        value.l *= *src.l;
-        *trgt.l = value.l;
+        value.i32 *= *src.i32;
+        *trgt.i32 = value.i32;
         n = trgtinfo.advanceLoop(&trgt), srcinfo.advanceLoop(&src);
         if (n)
-          value.l = 1;
+          value.i32 = 1;
       } while (n < srcinfo.rndim);
       break;
     case LUX_INT64:

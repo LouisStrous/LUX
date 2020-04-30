@@ -215,14 +215,14 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
     if ((iq = sa.set(narg, ps, isfunction? "iD*;iL*;rD&": "iD*;iL*",
                      &ptrs, &infos)) < 0)
       return LUX_ERROR;
-    axes = ptrs[1].l;
+    axes = ptrs[1].i32;
     naxes = infos[1].nelem;
-    if (infos[0].setAxes(infos[1].nelem, ptrs[1].l,
+    if (infos[0].setAxes(infos[1].nelem, ptrs[1].i32,
                          SL_EACHROW | SL_UNIQUEAXES) < 0)
       return LUX_ERROR;
     if (isfunction) {
       iret = 2;
-      if (infos[iret].setAxes(infos[1].nelem, ptrs[1].l,
+      if (infos[iret].setAxes(infos[1].nelem, ptrs[1].i32,
                               SL_EACHROW | SL_UNIQUEAXES) < 0)
         return LUX_ERROR;
     } else
@@ -313,7 +313,7 @@ lux_d_dT3_iaiqiqrq_012_f_(int32_t narg, int32_t ps[],
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[1].nelem--)
-      *ptrs[3].d++ = f((double) *ptrs[0].l++, *ptrs[1].d++, *ptrs[2].d++);
+      *ptrs[3].d++ = f((double) *ptrs[0].i32++, *ptrs[1].d++, *ptrs[2].d++);
     break;
   case LUX_INT64:
     while (infos[1].nelem--)
@@ -505,7 +505,7 @@ lux_d_dT6_iaiT4rq_0z1T4_5_f_(int32_t narg, int32_t ps[],
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[0].nelem--)
-      *ptrs[5].d++ = f((double) *ptrs[0].l++, 0.0, *ptrs[1].d, *ptrs[2].d,
+      *ptrs[5].d++ = f((double) *ptrs[0].i32++, 0.0, *ptrs[1].d, *ptrs[2].d,
                        *ptrs[3].d, *ptrs[4].d);
     break;
   case LUX_INT64:
@@ -680,7 +680,7 @@ lux_d_dd_iarq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[1].nelem--)
-      *ptrs[1].d++ = f((double) *ptrs[0].l++, 0.0);
+      *ptrs[1].d++ = f((double) *ptrs[0].i32++, 0.0);
     break;
   case LUX_INT64:
     while (infos[1].nelem--)
@@ -874,9 +874,9 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
   case 2:                       // source, axes
     if ((iq = sa.set(narg, ps, "iD*;iL*;rD{-}&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
-    axes = ptrs[1].l;
+    axes = ptrs[1].i32;
     naxes = infos[1].nelem;
-    if (infos[0].setAxes(infos[1].nelem, ptrs[1].l,
+    if (infos[0].setAxes(infos[1].nelem, ptrs[1].i32,
                          SL_EACHROW | SL_UNIQUEAXES) < 0)
       return LUX_ERROR;
     iret = 2;
@@ -1135,7 +1135,7 @@ lux_i_dddp23T2_iaop2p3qocq_0z12_s_(int32_t narg, int32_t ps[],
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[0].nelem--) {
-      f((double) *ptrs[0].l++, 0.0, pvh, pvb);
+      f((double) *ptrs[0].i32++, 0.0, pvh, pvb);
       pvh += 2;
       pvb += 2;
     }
@@ -1243,7 +1243,7 @@ lux_i_ddidp23_iairp3p2q_0z12_f_(int32_t narg, int32_t ps[],
     return LUX_ERROR;
 
   while (infos[0].nelem--) {
-    f(*ptrs[0].d++, 0.0, *ptrs[1].l, (double (*)[3]) ptrs[2].d);
+    f(*ptrs[0].d++, 0.0, *ptrs[1].i32, (double (*)[3]) ptrs[2].d);
     ptrs[2].d += 6;
   }
   return sa.result();
@@ -1295,7 +1295,7 @@ lux_i_ddipT3dp_iarp3q_0z1111_f_(int32_t narg, int32_t ps[],
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[0].nelem--) {
-      if (f((double) *ptrs[0].l++, 0.0, &y, &m, &d, &fd)) {
+      if (f((double) *ptrs[0].i32++, 0.0, &y, &m, &d, &fd)) {
         ptrs[1].d[0] = 0.0;
         ptrs[1].d[1] = 0.0;
         ptrs[1].d[2] = 0.0;
@@ -1444,7 +1444,7 @@ lux_i_dpiT3dp_iaiirq_00T3_f_(int32_t narg, int32_t ps[],
     return LUX_ERROR;
   size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
   while (nrepeat--) {
-    f(ptrs[0].d, infos[0].rdims[0], *ptrs[1].l, *ptrs[2].l, ptrs[3].d);
+    f(ptrs[0].d, infos[0].rdims[0], *ptrs[1].i32, *ptrs[2].i32, ptrs[3].d);
     ptrs[0].d += infos[0].rdims[0];
     ptrs[3].d += infos[0].rdims[0];
   }
@@ -1487,7 +1487,7 @@ lux_i_dpiidp_iairq_00T2_f_(int32_t narg, int32_t ps[],
     return LUX_ERROR;
   size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
   while (nrepeat--) {
-    f(ptrs[0].d, infos[0].rdims[0], *ptrs[1].l, ptrs[2].d);
+    f(ptrs[0].d, infos[0].rdims[0], *ptrs[1].i32, ptrs[2].d);
     ptrs[0].d += infos[0].rdims[0];
     ptrs[2].d += infos[0].rdims[0];
   }
@@ -1531,7 +1531,7 @@ lux_i_idT3dp3_i3airq_10002_f_(int32_t narg, int32_t ps[],
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
   while (nelem--) {
-    f(*ptrs[1].l, ptrs[0].d[0], ptrs[0].d[1], ptrs[0].d[2], ptrs[2].d);
+    f(*ptrs[1].i32, ptrs[0].d[0], ptrs[0].d[1], ptrs[0].d[2], ptrs[2].d);
     ptrs[0].d += 3;
     ptrs[2].d += 3;
   }
@@ -1575,7 +1575,7 @@ lux_i_idp3dpT3_ii3arcq_0T222_f_(int32_t narg, int32_t ps[],
     return LUX_ERROR;
   size_t nelem = infos[1].nelem/3;
   while (nelem--) {
-    f(*ptrs[0].l, ptrs[1].d, &ptrs[2].d[0], &ptrs[2].d[1], &ptrs[2].d[2]);
+    f(*ptrs[0].i32, ptrs[1].d, &ptrs[2].d[0], &ptrs[2].d[1], &ptrs[2].d[2]);
     ptrs[1].d += 3;
     ptrs[2].d += 3;
   }
@@ -1615,7 +1615,7 @@ lux_i_idpdp_iarp2q_011_f_(int32_t narg, int32_t ps[],
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
-    f(*ptrs[0].l++, &ptrs[1].d[0], &ptrs[1].d[1]);
+    f(*ptrs[0].i32++, &ptrs[1].d[0], &ptrs[1].d[1]);
     ptrs[1].d += 2;
   }
   return sa.result();
@@ -1749,8 +1749,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     ipar1 = 2;
     ipar2 = 3;
     iret = 4;
-    infos[0].setAxes(infos[1].nelem, ptrs[1].l, SL_EACHROW);
-    infos[iret].setAxes(infos[1].nelem, ptrs[1].l, SL_EACHROW);
+    infos[0].setAxes(infos[1].nelem, ptrs[1].i32, SL_EACHROW);
+    infos[iret].setAxes(infos[1].nelem, ptrs[1].i32, SL_EACHROW);
     break;
   }
   do {
@@ -2482,7 +2482,7 @@ lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(int32_t narg, int32_t ps[],
   switch (infos[0].type) {
   case LUX_INT32:
     while (infos[0].nelem--) {
-      f((double) *ptrs[0].l++, 0.0, (double (*)[3]) ptrs[1].d,
+      f((double) *ptrs[0].i32++, 0.0, (double (*)[3]) ptrs[1].d,
         (double (*)[3]) ptrs[2].d, (double (*)[3]) ptrs[3].d);
       ptrs[2].d += 9;
       ptrs[3].d += 9;

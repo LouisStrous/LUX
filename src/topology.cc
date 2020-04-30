@@ -52,20 +52,20 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
   ny = srcinfo.dims[1];
 
   // top row: always zero
-  zerobytes(trgt.l, nx*sizeof(int32_t));
-  trgt.l += nx;
+  zerobytes(trgt.i32, nx*sizeof(int32_t));
+  trgt.i32 += nx;
   src.ui8 += nx*lux_type_size[array_type(ps[0])];
   ny -= 2;
   if (sign >= 0) {              // seek hill-like objects
     switch (array_type(ps[0])) {
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.ui8++;
           n = nx - 2;
           while (n--) {
             value.i16 = *src.ui8 * 2;
-            *trgt.l++ = ((int16_t) src.ui8[-1] + (int16_t) src.ui8[1] < value.i16
+            *trgt.i32++ = ((int16_t) src.ui8[-1] + (int16_t) src.ui8[1] < value.i16
                          && (int16_t) src.ui8[nx] + (int16_t) src.ui8[-nx] < value.i16
                          && (int16_t) src.ui8[1 + nx] + (int16_t) src.ui8[-1 - nx]
                          < value.i16
@@ -73,94 +73,94 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
                          < value.i16);
             src.ui8++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.ui8++;
         }
         break;
       case LUX_INT16:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.i16++;
           n = nx - 2;
           while (n--) {
-            value.l = (int32_t) *src.i16 * 2;
-            *trgt.l++ = ((int32_t) src.i16[-1] + (int32_t) src.i16[1] < value.l
-                         && (int32_t) src.i16[nx] + (int32_t) src.i16[-nx] < value.l
+            value.i32 = (int32_t) *src.i16 * 2;
+            *trgt.i32++ = ((int32_t) src.i16[-1] + (int32_t) src.i16[1] < value.i32
+                         && (int32_t) src.i16[nx] + (int32_t) src.i16[-nx] < value.i32
                          && (int32_t) src.i16[1 + nx] + (int32_t) src.i16[-1 - nx]
-                            < value.l
+                            < value.i32
                          && (int32_t) src.i16[1 - nx] + (int32_t) src.i16[-1 + nx]
-                            < value.l);
+                            < value.i32);
             src.i16++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.i16++;
         }
         break;
       case LUX_INT32:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
-          src.l++;
+          *trgt.i32++ = 0;
+          src.i32++;
           n = nx - 2;
           while (n--) {
-            value.l = *src.l * 2;
-            *trgt.l++ = (src.l[-1] + src.l[1] < value.l
-                         && src.l[nx] + src.l[-nx] < value.l
-                         && src.l[1 + nx] + src.l[-1 - nx] < value.l
-                         && src.l[1 - nx] + src.l[-1 + nx] < value.l);
-            src.l++;
+            value.i32 = *src.i32 * 2;
+            *trgt.i32++ = (src.i32[-1] + src.i32[1] < value.i32
+                         && src.i32[nx] + src.i32[-nx] < value.i32
+                         && src.i32[1 + nx] + src.i32[-1 - nx] < value.i32
+                         && src.i32[1 - nx] + src.i32[-1 + nx] < value.i32);
+            src.i32++;
           }
-          *trgt.l++ = 0;
-          src.l++;
+          *trgt.i32++ = 0;
+          src.i32++;
         }
         break;
       case LUX_INT64:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.q++;
           n = nx - 2;
           while (n--) {
             value.q = *src.q * 2;
-            *trgt.l++ = (src.q[-1] + src.q[1] < value.q
+            *trgt.i32++ = (src.q[-1] + src.q[1] < value.q
                          && src.q[nx] + src.q[-nx] < value.q
                          && src.q[1 + nx] + src.q[-1 - nx] < value.q
                          && src.q[1 - nx] + src.q[-1 + nx] < value.q);
             src.q++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.q++;
         }
         break;
       case LUX_FLOAT:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.f++;
           n = nx - 2;
           while (n--) {
             value.f = *src.f * 2;
-            *trgt.l++ = (src.f[-1] + src.f[1] < value.f
+            *trgt.i32++ = (src.f[-1] + src.f[1] < value.f
                          && src.f[nx] + src.f[-nx] < value.f
                          && src.f[1 + nx] + src.f[-1 - nx] < value.f
                          && src.f[1 - nx] + src.f[-1 + nx] < value.f);
             src.f++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.f++;
         }
         break;
       case LUX_DOUBLE:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.d++;
           n = nx - 2;
           while (n--) {
             value.d = *src.d * 2;
-            *trgt.l++ = (src.d[-1] + src.d[1] < value.d
+            *trgt.i32++ = (src.d[-1] + src.d[1] < value.d
                          && src.d[nx] + src.d[-nx] < value.d
                          && src.d[1 + nx] + src.d[-1 - nx] < value.d
                          && src.d[1 - nx] + src.d[-1 + nx] < value.d);
             src.d++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.d++;
         }
         break;
@@ -169,109 +169,109 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
     switch (array_type(ps[0])) {
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.ui8++;
           n = nx - 2;
           while (n--) {
             value.ui8 = *src.ui8 * (short) 2;
-            *trgt.l++ = (src.ui8[-1] + src.ui8[1] > value.ui8
+            *trgt.i32++ = (src.ui8[-1] + src.ui8[1] > value.ui8
                          && src.ui8[nx] + src.ui8[-nx] > value.ui8
                          && src.ui8[1 + nx] + src.ui8[-1 - nx] > value.ui8
                          && src.ui8[1 - nx] + src.ui8[-1 + nx] > value.ui8);
             src.ui8++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.ui8++;
         }
         break;
       case LUX_INT16:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.i16++;
           n = nx - 2;
           while (n--) {
             value.i16 = *src.i16 * 2;
-            *trgt.l++ = (src.i16[-1] + src.i16[1] > value.i16
+            *trgt.i32++ = (src.i16[-1] + src.i16[1] > value.i16
                          && src.i16[nx] + src.i16[-nx] > value.i16
                          && src.i16[1 + nx] + src.i16[-1 - nx] > value.i16
                          && src.i16[1 - nx] + src.i16[-1 + nx] > value.i16);
             src.i16++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.i16++;
         }
         break;
       case LUX_INT32:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
-          src.l++;
+          *trgt.i32++ = 0;
+          src.i32++;
           n = nx - 2;
           while (n--) {
-            value.l = *src.l * 2;
-            *trgt.l++ = (src.l[-1] + src.l[1] > value.l
-                         && src.l[nx] + src.l[-nx] > value.l
-                         && src.l[1 + nx] + src.l[-1 - nx] > value.l
-                         && src.l[1 - nx] + src.l[-1 + nx] > value.l);
-            src.l++;
+            value.i32 = *src.i32 * 2;
+            *trgt.i32++ = (src.i32[-1] + src.i32[1] > value.i32
+                         && src.i32[nx] + src.i32[-nx] > value.i32
+                         && src.i32[1 + nx] + src.i32[-1 - nx] > value.i32
+                         && src.i32[1 - nx] + src.i32[-1 + nx] > value.i32);
+            src.i32++;
           }
-          *trgt.l++ = 0;
-          src.l++;
+          *trgt.i32++ = 0;
+          src.i32++;
         }
         break;
       case LUX_INT64:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.q++;
           n = nx - 2;
           while (n--) {
             value.q = *src.q * 2;
-            *trgt.l++ = (src.q[-1] + src.q[1] > value.q
+            *trgt.i32++ = (src.q[-1] + src.q[1] > value.q
                          && src.q[nx] + src.q[-nx] > value.q
                          && src.q[1 + nx] + src.q[-1 - nx] > value.q
                          && src.q[1 - nx] + src.q[-1 + nx] > value.q);
             src.q++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.q++;
         }
         break;
       case LUX_FLOAT:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.f++;
           n = nx - 2;
           while (n--) {
             value.f = *src.f * 2;
-            *trgt.l++ = (src.f[-1] + src.f[1] > value.f
+            *trgt.i32++ = (src.f[-1] + src.f[1] > value.f
                          && src.f[nx] + src.f[-nx] > value.f
                          && src.f[1 + nx] + src.f[-1 - nx] > value.f
                          && src.f[1 - nx] + src.f[-1 + nx] > value.f);
             src.f++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.f++;
         }
         break;
       case LUX_DOUBLE:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.d++;
           n = nx - 2;
           while (n--) {
             value.d = *src.d * 2;
-            *trgt.l++ = (src.d[-1] + src.d[1] > value.d
+            *trgt.i32++ = (src.d[-1] + src.d[1] > value.d
                          && src.d[nx] + src.d[-nx] > value.d
                          && src.d[1 + nx] + src.d[-1 - nx] > value.d
                          && src.d[1 - nx] + src.d[-1 + nx] > value.d);
             src.d++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.d++;
         }
         break;
     }
   }
-  zerobytes(trgt.l, nx*sizeof(int32_t));
+  zerobytes(trgt.i32, nx*sizeof(int32_t));
   return result;
 }
 //-------------------------------------------------------------------------
@@ -311,7 +311,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
     if (edge[i]) {
       trgtinfo.rearrangeEdgeLoop(NULL, i);
       do
-        *trgt.l = 0;
+        *trgt.i32 = 0;
       while (trgtinfo.advanceLoop(&trgt) < trgtinfo.ndim - 1);
     }
   }
@@ -338,35 +338,35 @@ int32_t segment_general(int32_t narg, int32_t ps[])
             if (value.i16 <= (int16_t) *srcl.ui8 + (int16_t) *srcr.ui8)
               break;
           }
-          *trgt.l = (j == n);
+          *trgt.i32 = (j == n);
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
         break;
       case LUX_INT16:
         do {
-          value.l = 2 * *src.i16;
+          value.i32 = 2 * *src.i16;
           for (j = 0; j < n; j++) {     // all directions
             k = offset[j];
             srcl.i16 = src.i16 + k;
             srcr.i16 = src.i16 - k;
-            if (value.l <= (int32_t) *srcl.i16 + (int32_t) *srcr.i16)
+            if (value.i32 <= (int32_t) *srcl.i16 + (int32_t) *srcr.i16)
               break;
           }
-          *trgt.l = (j == n);
+          *trgt.i32 = (j == n);
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
         break;
       case LUX_INT32:
         do {
-          value.l = 2 * *src.l;
+          value.i32 = 2 * *src.i32;
           for (j = 0; j < n; j++) {     // all directions
             k = offset[j];
-            srcl.l = src.l + k;
-            srcr.l = src.l - k;
-            if (value.l <= *srcl.l + *srcr.l)
+            srcl.i32 = src.i32 + k;
+            srcr.i32 = src.i32 - k;
+            if (value.i32 <= *srcl.i32 + *srcr.i32)
               break;
           }
-          *trgt.l = (j == n);
+          *trgt.i32 = (j == n);
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
         break;
@@ -380,7 +380,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
             if (value.q <= *srcl.q + *srcr.q)
               break;
           }
-          *trgt.l = (j == n);
+          *trgt.i32 = (j == n);
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
         break;
@@ -394,7 +394,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
             if (value.f <= *srcl.f + *srcr.f)
               break;
           }
-          *trgt.l = (j == n);
+          *trgt.i32 = (j == n);
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
         break;
@@ -408,7 +408,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
             if (value.d <= *srcl.d + *srcr.d)
               break;
           }
-          *trgt.l = (j == n);
+          *trgt.i32 = (j == n);
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
         break;
@@ -431,7 +431,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
                 break;
               }
             }
-            *trgt.l = nok;
+            *trgt.i32 = nok;
           } while (trgtinfo.advanceLoop(&trgt),
                    srcinfo.advanceLoop(&src) < srcinfo.ndim);
           break;
@@ -452,20 +452,20 @@ int32_t segment_general(int32_t narg, int32_t ps[])
                 break;
               }
             }
-            *trgt.l = nok;
+            *trgt.i32 = nok;
           } while (trgtinfo.advanceLoop(&trgt),
                    srcinfo.advanceLoop(&src) < srcinfo.ndim);
           break;
         case LUX_INT32:
           do {
             nok = 1 - degree;
-            value.l = 2 * *src.l;
+            value.i32 = 2 * *src.i32;
             for (j = 0; j < n; j++) { // all directions
               k = offset[j];
-              srcl.l = src.l + k;
-              srcr.l = src.l - k;
-              ok = (sign && value.l > *srcl.l + *srcr.l)
-                || (!sign && value.l < *srcl.l + *srcr.l);
+              srcl.i32 = src.i32 + k;
+              srcr.i32 = src.i32 - k;
+              ok = (sign && value.i32 > *srcl.i32 + *srcr.i32)
+                || (!sign && value.i32 < *srcl.i32 + *srcr.i32);
               if (degree)
                 nok += ok;
               else if (!ok) {
@@ -473,7 +473,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
                 break;
               }
             }
-            *trgt.l = nok;
+            *trgt.i32 = nok;
           } while (trgtinfo.advanceLoop(&trgt),
                    srcinfo.advanceLoop(&src) < srcinfo.ndim);
           break;
@@ -494,7 +494,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
                 break;
               }
             }
-            *trgt.l = nok;
+            *trgt.i32 = nok;
           } while (trgtinfo.advanceLoop(&trgt),
                    srcinfo.advanceLoop(&src) < srcinfo.ndim);
           break;
@@ -515,7 +515,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
                 break;
               }
             }
-            *trgt.l = nok;
+            *trgt.i32 = nok;
           } while (trgtinfo.advanceLoop(&trgt),
                    srcinfo.advanceLoop(&src) < srcinfo.ndim);
           break;
@@ -536,7 +536,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
                 break;
               }
             }
-            *trgt.l = nok;
+            *trgt.i32 = nok;
           } while (trgtinfo.advanceLoop(&trgt),
                    srcinfo.advanceLoop(&src) < srcinfo.ndim);
           break;
@@ -595,7 +595,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
 
   // top row: always zero
   zerobytes(trgt.ui8, nx*sizeof(int32_t));
-  trgt.l += nx;
+  trgt.i32 += nx;
   angle += nx;
   src.ui8 += nx*lux_type_size[array_type(ps[0])];
   ny -= 2;
@@ -603,7 +603,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
     switch (array_type(ps[0])) {
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.ui8++;
           n = nx - 2;
@@ -613,17 +613,17 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.ui8[off[class_id]] + src.ui8[-off[class_id]] < value.ui8);
+            *trgt.i32++ = (src.ui8[off[class_id]] + src.ui8[-off[class_id]] < value.ui8);
             src.ui8++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.ui8++;
           angle++;
         }
         break;
       case LUX_INT16:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.i16++;
           n = nx - 2;
@@ -633,37 +633,37 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.i16[off[class_id]] + src.i16[-off[class_id]] < value.i16);
+            *trgt.i32++ = (src.i16[off[class_id]] + src.i16[-off[class_id]] < value.i16);
             src.i16++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.i16++;
           angle++;
         }
         break;
       case LUX_INT32:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
-          src.l++;
+          src.i32++;
           n = nx - 2;
           while (n--) {
-            value.l = *src.l * (short) 2;
+            value.i32 = *src.i32 * (short) 2;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.l[off[class_id]] + src.l[-off[class_id]] < value.l);
-            src.l++;
+            *trgt.i32++ = (src.i32[off[class_id]] + src.i32[-off[class_id]] < value.i32);
+            src.i32++;
           }
-          *trgt.l++ = 0;
-          src.l++;
+          *trgt.i32++ = 0;
+          src.i32++;
           angle++;
         }
         break;
       case LUX_INT64:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.q++;
           n = nx - 2;
@@ -673,17 +673,17 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.q[off[class_id]] + src.q[-off[class_id]] < value.q);
+            *trgt.i32++ = (src.q[off[class_id]] + src.q[-off[class_id]] < value.q);
             src.q++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.q++;
           angle++;
         }
         break;
       case LUX_FLOAT:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.f++;
           n = nx - 2;
@@ -693,17 +693,17 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.f[off[class_id]] + src.f[-off[class_id]] < value.f);
+            *trgt.i32++ = (src.f[off[class_id]] + src.f[-off[class_id]] < value.f);
             src.f++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.f++;
           angle++;
         }
         break;
       case LUX_DOUBLE:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.d++;
           n = nx - 2;
@@ -713,10 +713,10 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.d[off[class_id]] + src.d[-off[class_id]] < value.d);
+            *trgt.i32++ = (src.d[off[class_id]] + src.d[-off[class_id]] < value.d);
             src.d++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.d++;
           angle++;
         }
@@ -726,7 +726,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
     switch (array_type(ps[0])) {
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.ui8++;
           angle++;
           n = nx - 2;
@@ -736,17 +736,17 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.ui8[off[class_id]] + src.ui8[-off[class_id]] > value.ui8);
+            *trgt.i32++ = (src.ui8[off[class_id]] + src.ui8[-off[class_id]] > value.ui8);
             src.ui8++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.ui8++;
         }
         break;
       case LUX_INT16:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.i16++;
           angle++;
           n = nx - 2;
@@ -756,37 +756,37 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.i16[off[class_id]] + src.i16[-off[class_id]] > value.i16);
+            *trgt.i32++ = (src.i16[off[class_id]] + src.i16[-off[class_id]] > value.i16);
             src.i16++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.i16++;
         }
         break;
       case LUX_INT32:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
-          src.l++;
+          *trgt.i32++ = 0;
+          src.i32++;
           angle++;
           n = nx - 2;
           while (n--) {
-            value.l = *src.l * (short) 2;
+            value.i32 = *src.i32 * (short) 2;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.l[off[class_id]] + src.l[-off[class_id]] > value.l);
-            src.l++;
+            *trgt.i32++ = (src.i32[off[class_id]] + src.i32[-off[class_id]] > value.i32);
+            src.i32++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
-          src.l++;
+          src.i32++;
         }
         break;
       case LUX_INT64:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.q++;
           angle++;
           n = nx - 2;
@@ -796,17 +796,17 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.q[off[class_id]] + src.q[-off[class_id]] > value.q);
+            *trgt.i32++ = (src.q[off[class_id]] + src.q[-off[class_id]] > value.q);
             src.q++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.q++;
         }
         break;
       case LUX_FLOAT:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.f++;
           angle++;
           n = nx - 2;
@@ -816,17 +816,17 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.f[off[class_id]] + src.f[-off[class_id]] > value.f);
+            *trgt.i32++ = (src.f[off[class_id]] + src.f[-off[class_id]] > value.f);
             src.f++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.f++;
         }
         break;
       case LUX_DOUBLE:
         while (ny--) {          // all rows except for bottom one
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           src.d++;
           angle++;
           n = nx - 2;
@@ -836,17 +836,17 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.d[off[class_id]] + src.d[-off[class_id]] > value.d);
+            *trgt.i32++ = (src.d[off[class_id]] + src.d[-off[class_id]] > value.d);
             src.d++;
           }
-          *trgt.l++ = 0;
+          *trgt.i32++ = 0;
           angle++;
           src.d++;
         }
         break;
     }
   }
-  zerobytes(trgt.l, nx*sizeof(int32_t));
+  zerobytes(trgt.i32, nx*sizeof(int32_t));
   return result;
 }
 //-------------------------------------------------------------------------
@@ -941,20 +941,20 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
         while (ny--) {          // all rows except for bottom one
           *trgt.ui8++ = 0;
           angle++;
-          src.l++;
+          src.i32++;
           n = nx - 2;
           while (n--) {
-            value.l = *src.l;
+            value.i32 = *src.i32;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.ui8++ = (value.l > src.l[off[class_id]]
-                         && value.l > src.l[-off[class_id]]);
-            src.l++;
+            *trgt.ui8++ = (value.i32 > src.i32[off[class_id]]
+                         && value.i32 > src.i32[-off[class_id]]);
+            src.i32++;
           }
           *trgt.ui8++ = 0;
-          src.l++;
+          src.i32++;
           angle++;
         }
         break;
@@ -1069,22 +1069,22 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
       case LUX_INT32:
         while (ny--) {          // all rows except for bottom one
           *trgt.ui8++ = 0;
-          src.l++;
+          src.i32++;
           angle++;
           n = nx - 2;
           while (n--) {
-            value.l = *src.l;
+            value.i32 = *src.i32;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.ui8++ = (value.l < src.l[off[class_id]]
-                         && value.l < src.l[-off[class_id]]);
-            src.l++;
+            *trgt.ui8++ = (value.i32 < src.i32[off[class_id]]
+                         && value.i32 < src.i32[-off[class_id]]);
+            src.i32++;
           }
           *trgt.ui8++ = 0;
           angle++;
-          src.l++;
+          src.i32++;
         }
         break;
       case LUX_INT64:
@@ -1450,8 +1450,8 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
     if (edge[i]) {
       srcinfo.rearrangeEdgeLoop(NULL, i);
       do
-        if (*src.l == 1)
-          *src.l = EDGE;
+        if (*src.i32 == 1)
+          *src.i32 = EDGE;
       while (srcinfo.advanceLoop(&src) < srcinfo.ndim - 1);
     }
   }
@@ -1483,7 +1483,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
   } else
     areaNumber = 2;             // default start value
 
-  ptr0 = ptr = src.l;
+  ptr0 = ptr = src.i32;
   ptrend = ptr0 + array_size(ps[0]);
 
   ptr = ptr0;
@@ -1645,7 +1645,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 
   nx = array_dims(ps[0])[0];    // width
   ny = array_dims(ps[0])[1];    // height
-  dataptr0.l = (int32_t*) array_data(ps[1]);
+  dataptr0.i32 = (int32_t*) array_data(ps[1]);
 
   type = array_type(ps[1]);
   stride = lux_type_size[type];
@@ -1813,9 +1813,9 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
             }
             break;
           case SEEK_MAXIMUM + LUX_INT32:
-            if (dataptr.l[offset[direction]] > *dataptr2.l) {
+            if (dataptr.i32[offset[direction]] > *dataptr2.i32) {
               j = direction;
-              dataptr2.l = dataptr.l + offset[direction];
+              dataptr2.i32 = dataptr.i32 + offset[direction];
             }
             break;
           case SEEK_MAXIMUM + LUX_INT64:
@@ -1849,9 +1849,9 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
             }
             break;
           case LUX_INT32:
-            if (dataptr.l[offset[direction]] < *dataptr2.l) {
+            if (dataptr.i32[offset[direction]] < *dataptr2.i32) {
               j = direction;
-              dataptr2.l = dataptr.l + offset[direction];
+              dataptr2.i32 = dataptr.i32 + offset[direction];
             }
             break;
           case LUX_INT64:
@@ -1919,7 +1919,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT32:
-              if (dataptr.l[offset[direction]] >= *dataptr.l)
+              if (dataptr.i32[offset[direction]] >= *dataptr.i32)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT64:
@@ -1943,7 +1943,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT32:
-              if (dataptr.l[offset[direction]] <= *dataptr.l)
+              if (dataptr.i32[offset[direction]] <= *dataptr.i32)
                 continue;
               break;
             case LUX_INT64:
@@ -1991,7 +1991,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT32:
-              if (dataptr.l[offset[direction]] >= *dataptr.l)
+              if (dataptr.i32[offset[direction]] >= *dataptr.i32)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT64:
@@ -2015,7 +2015,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT32:
-              if (dataptr.l[offset[direction]] <= *dataptr.l)
+              if (dataptr.i32[offset[direction]] <= *dataptr.i32)
                 continue;
               break;
             case LUX_INT64:
@@ -2115,13 +2115,13 @@ int32_t area2_general(int32_t narg, int32_t ps[])
                    NULL, NULL, NULL) == LUX_ERROR)
     return LUX_ERROR;
 
-  ptr0 = src.l;
+  ptr0 = src.i32;
 
   if (!symbolIsNumericalArray(ps[1]))
     return cerror(NEED_NUM_ARR, ps[1]);
   if (array_size(ps[1]) != array_size(iq)) // must have same size
     return cerror(INCMP_ARG, ps[1]);
-  dataptr0.l = (int32_t*) array_data(ps[1]);
+  dataptr0.i32 = (int32_t*) array_data(ps[1]);
   type = array_type(ps[1]);
   stride = lux_type_size[type];
   maximum = (narg > 5 && ps[5])? (int_arg(ps[5]) >= 0 ? 1: 0): 1;
@@ -2169,8 +2169,8 @@ int32_t area2_general(int32_t narg, int32_t ps[])
   for (i = 0; i < 2*srcinfo.rndim; i++) {
     srcinfo.rearrangeEdgeLoop(NULL, i);
     do {
-      if (*src.l == 1)
-        *src.l = EDGE;
+      if (*src.i32 == 1)
+        *src.i32 = EDGE;
     } while (srcinfo.advanceLoop(&src) < srcinfo.rndim - 1);
   }
   free(edge);
@@ -2282,9 +2282,9 @@ int32_t area2_general(int32_t narg, int32_t ps[])
             }
             break;
           case SEEK_MAXIMUM + LUX_INT32:
-            if (dataptr.l[offset[direction]] > *dataptr2.l) {
+            if (dataptr.i32[offset[direction]] > *dataptr2.i32) {
               j = direction;
-              dataptr2.l = dataptr.l + offset[direction];
+              dataptr2.i32 = dataptr.i32 + offset[direction];
             }
             break;
           case SEEK_MAXIMUM + LUX_INT64:
@@ -2318,9 +2318,9 @@ int32_t area2_general(int32_t narg, int32_t ps[])
             }
             break;
           case LUX_INT32:
-            if (dataptr.l[offset[direction]] < *dataptr2.l) {
+            if (dataptr.i32[offset[direction]] < *dataptr2.i32) {
               j = direction;
-              dataptr2.l = dataptr.l + offset[direction];
+              dataptr2.i32 = dataptr.i32 + offset[direction];
             }
             break;
           case LUX_INT64:
@@ -2391,7 +2391,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT32:
-              if (dataptr.l[offset[direction]] >= *dataptr.l)
+              if (dataptr.i32[offset[direction]] >= *dataptr.i32)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT64:
@@ -2415,7 +2415,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT32:
-              if (dataptr.l[offset[direction]] <= *dataptr.l)
+              if (dataptr.i32[offset[direction]] <= *dataptr.i32)
                 continue;
               break;
             case LUX_INT64:
@@ -2463,7 +2463,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT32:
-              if (dataptr.l[offset[direction]] >= *dataptr.l)
+              if (dataptr.i32[offset[direction]] >= *dataptr.i32)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT64:
@@ -2487,7 +2487,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT32:
-              if (dataptr.l[offset[direction]] <= *dataptr.l)
+              if (dataptr.i32[offset[direction]] <= *dataptr.i32)
                 continue;
               break;
             case LUX_INT64:
@@ -2940,7 +2940,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now min[mini].ui8 is the lowest value
-        *trgt.l = -loc[mini] - n*mini;
+        *trgt.i32 = -loc[mini] - n*mini;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -3055,22 +3055,22 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now min[mini].i16 is the lowest value
-        *trgt.l = -loc[mini] - n*mini;
+        *trgt.i32 = -loc[mini] - n*mini;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
     case LUX_INT32:
-      min[0].l = min[1].l = bounds.max.l;
+      min[0].i32 = min[1].i32 = bounds.max.i32;
       do {
-        min[2].l = min[1].l;
-        min[1].l = min[0].l;
+        min[2].i32 = min[1].i32;
+        min[1].i32 = min[0].i32;
         loc[2] = loc[1];
         loc[1] = loc[0];
-        min[0].l = bounds.max.l;
+        min[0].i32 = bounds.max.i32;
         mini++;
         if (!srcinfo.coords[0]) {       // at left edge
-          src.l--;
-          min[2].l = min[1].l = bounds.max.l;
+          src.i32--;
+          min[2].i32 = min[1].i32 = bounds.max.i32;
           mini = 3;
           edge = 0;
           for (i = 1; i < srcinfo.ndim; i++)
@@ -3088,45 +3088,45 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any other edge
-                if (src.l[offsets[i]] < min[0].l) { // update
-                  min[0].l = src.l[offsets[i]];
+                if (src.i32[offsets[i]] < min[0].i32) { // update
+                  min[0].i32 = src.i32[offsets[i]];
                   loc[0] = i;
                 }
               }
             } else for (i = 0; i < n; i++) {
-              if (src.l[offsets[i]] < min[0].l) { // update
-                min[0].l = src.l[offsets[i]];
+              if (src.i32[offsets[i]] < min[0].i32) { // update
+                min[0].i32 = src.i32[offsets[i]];
                 loc[0] = i;
               }
             }
           if (mini < 3) {       // previous lowest is now in 1 or 2
-            if (min[0].l < min[mini].l)
+            if (min[0].i32 < min[mini].i32)
               mini = 0;
           } else {              // previous lowest is too far away: find new
-            if (min[0].l < min[1].l) {
-              if (min[0].l < min[2].l)
+            if (min[0].i32 < min[1].i32) {
+              if (min[0].i32 < min[2].i32)
                 mini = 0;
               else
                 mini = 2;
             } else {
-              if (min[1].l < min[2].l)
+              if (min[1].i32 < min[2].i32)
                 mini = 1;
               else
                 mini = 2;
             }
           }
-          src.l++;              // back to current position
-          min[2].l = min[1].l;
-          min[1].l = min[0].l;
+          src.i32++;              // back to current position
+          min[2].i32 = min[1].i32;
+          min[1].i32 = min[0].i32;
           loc[2] = loc[1];
           loc[1] = loc[0];
-          min[0].l = bounds.max.l;
+          min[0].i32 = bounds.max.i32;
           mini++;
         }
 
         if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { // at right edge
           if (mini == 3) {
-            if (min[1].l < min[2].l)
+            if (min[1].i32 < min[2].i32)
               mini = 1;
             else
               mini = 2;
@@ -3141,36 +3141,36 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any edge
-                if (src.l[offsets[i]] < min[0].l) { // update
-                  min[0].l = src.l[offsets[i]];
+                if (src.i32[offsets[i]] < min[0].i32) { // update
+                  min[0].i32 = src.i32[offsets[i]];
                   loc[0] = i;
                 }
               }
             }
           else for (i = 0; i < n; i++)
-            if (src.l[offsets[i]] < min[0].l) { // update
-              min[0].l = src.l[offsets[i]];
+            if (src.i32[offsets[i]] < min[0].i32) { // update
+              min[0].i32 = src.i32[offsets[i]];
               loc[0] = i;
             }
           if (mini < 3) {       // previous lowest is now in 1 or 2
-            if (min[0].l < min[mini].l)
+            if (min[0].i32 < min[mini].i32)
               mini = 0;
           } else {              // previous lowest is too far away: find new
-            if (min[0].l < min[1].l) {
-              if (min[0].l < min[2].l)
+            if (min[0].i32 < min[1].i32) {
+              if (min[0].i32 < min[2].i32)
                 mini = 0;
               else
                 mini = 2;
             } else {
-              if (min[1].l < min[2].l)
+              if (min[1].i32 < min[2].i32)
                 mini = 1;
               else
                 mini = 2;
             }
           }
         }
-        // now min[mini].l is the lowest value
-        *trgt.l = -loc[mini] - n*mini;
+        // now min[mini].i32 is the lowest value
+        *trgt.i32 = -loc[mini] - n*mini;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -3285,7 +3285,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now min[mini].q is the lowest value
-        *trgt.l = -loc[mini] - n*mini;
+        *trgt.i32 = -loc[mini] - n*mini;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -3400,7 +3400,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now min[mini].f is the lowest value
-        *trgt.l = -loc[mini] - n*mini;
+        *trgt.i32 = -loc[mini] - n*mini;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -3515,7 +3515,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now min[mini].d is the lowest value
-        *trgt.l = -loc[mini] - n*mini;
+        *trgt.i32 = -loc[mini] - n*mini;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -3631,7 +3631,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now max[maxi].ui8 is the highest value
-        *trgt.l = -loc[maxi] - n*maxi;
+        *trgt.i32 = -loc[maxi] - n*maxi;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -3746,22 +3746,22 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now max[maxi].i16 is the highest value
-        *trgt.l = -loc[maxi] - n*maxi;
+        *trgt.i32 = -loc[maxi] - n*maxi;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
     case LUX_INT32 | 0x20:
-      max[0].l = max[1].l = bounds.min.l;
+      max[0].i32 = max[1].i32 = bounds.min.i32;
       do {
-        max[2].l = max[1].l;
-        max[1].l = max[0].l;
+        max[2].i32 = max[1].i32;
+        max[1].i32 = max[0].i32;
         loc[2] = loc[1];
         loc[1] = loc[0];
-        max[0].l = bounds.min.l;
+        max[0].i32 = bounds.min.i32;
         maxi++;
         if (!srcinfo.coords[0]) {       // at left edge
-          src.l--;
-          max[2].l = max[1].l = bounds.min.l;
+          src.i32--;
+          max[2].i32 = max[1].i32 = bounds.min.i32;
           maxi = 3;
           edge = 0;
           for (i = 1; i < srcinfo.ndim; i++)
@@ -3779,45 +3779,45 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any other edge
-                if (src.l[offsets[i]] > max[0].l) { // update
-                  max[0].l = src.l[offsets[i]];
+                if (src.i32[offsets[i]] > max[0].i32) { // update
+                  max[0].i32 = src.i32[offsets[i]];
                   loc[0] = i;
                 }
               }
             } else for (i = 0; i < n; i++) {
-              if (src.l[offsets[i]] > max[0].l) { // update
-                max[0].l = src.l[offsets[i]];
+              if (src.i32[offsets[i]] > max[0].i32) { // update
+                max[0].i32 = src.i32[offsets[i]];
                 loc[0] = i;
               }
             }
           if (maxi < 3) {       // previous highest is now in 1 or 2
-            if (max[0].l > max[maxi].l)
+            if (max[0].i32 > max[maxi].i32)
               maxi = 0;
           } else { // previous highest is too far away: find new
-            if (max[0].l > max[1].l) {
-              if (max[0].l > max[2].l)
+            if (max[0].i32 > max[1].i32) {
+              if (max[0].i32 > max[2].i32)
                 maxi = 0;
               else
                 maxi = 2;
             } else {
-              if (max[1].l > max[2].l)
+              if (max[1].i32 > max[2].i32)
                 maxi = 1;
               else
                 maxi = 2;
             }
           }
-          src.l++;              // back to current position
-          max[2].l = max[1].l;
-          max[1].l = max[0].l;
+          src.i32++;              // back to current position
+          max[2].i32 = max[1].i32;
+          max[1].i32 = max[0].i32;
           loc[2] = loc[1];
           loc[1] = loc[0];
-          max[0].l = bounds.min.l;
+          max[0].i32 = bounds.min.i32;
           maxi++;
         }
 
         if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { // at right edge
           if (maxi == 3) {
-            if (max[1].l > max[2].l)
+            if (max[1].i32 > max[2].i32)
               maxi = 1;
             else
               maxi = 2;
@@ -3832,36 +3832,36 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any edge
-                if (src.l[offsets[i]] > max[0].l) { // update
-                  max[0].l = src.l[offsets[i]];
+                if (src.i32[offsets[i]] > max[0].i32) { // update
+                  max[0].i32 = src.i32[offsets[i]];
                   loc[0] = i;
                 }
               }
             }
           else for (i = 0; i < n; i++)
-            if (src.l[offsets[i]] > max[0].l) { // update
-              max[0].l = src.l[offsets[i]];
+            if (src.i32[offsets[i]] > max[0].i32) { // update
+              max[0].i32 = src.i32[offsets[i]];
               loc[0] = i;
             }
           if (maxi < 3) {       // previous highest is now in 1 or 2
-            if (max[0].l > max[maxi].l)
+            if (max[0].i32 > max[maxi].i32)
               maxi = 0;
           } else { // previous highest is too far away: find new
-            if (max[0].l > max[1].l) {
-              if (max[0].l > max[2].l)
+            if (max[0].i32 > max[1].i32) {
+              if (max[0].i32 > max[2].i32)
                 maxi = 0;
               else
                 maxi = 2;
             } else {
-              if (max[1].l > max[2].l)
+              if (max[1].i32 > max[2].i32)
                 maxi = 1;
               else
                 maxi = 2;
             }
           }
         }
-        // now max[maxi].l is the highest value
-        *trgt.l = -loc[maxi] - n*maxi;
+        // now max[maxi].i32 is the highest value
+        *trgt.i32 = -loc[maxi] - n*maxi;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -3976,7 +3976,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now max[maxi].q is the highest value
-        *trgt.l = -loc[maxi] - n*maxi;
+        *trgt.i32 = -loc[maxi] - n*maxi;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -4091,7 +4091,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now max[maxi].f is the highest value
-        *trgt.l = -loc[maxi] - n*maxi;
+        *trgt.i32 = -loc[maxi] - n*maxi;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -4206,7 +4206,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
           }
         }
         // now max[maxi].d is the highest value
-        *trgt.l = -loc[maxi] - n*maxi;
+        *trgt.i32 = -loc[maxi] - n*maxi;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
       break;
@@ -4219,10 +4219,10 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       // fall-thru
     case 1:                     // /SINK: assign label equal to sink index
       while (nel--) {
-        if (*trgt.l <= 0) {     // still needs treatment
+        if (*trgt.i32 <= 0) {     // still needs treatment
           i = 0;
           do {
-            j = -trgt.l[i];
+            j = -trgt.i32[i];
             if (j >= 0) {
               j = offsets[j % n] - (j/n);       // 0 -> found minimum
               if (j)
@@ -4231,14 +4231,14 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
               break;
           } while (j);
           if (j)                // found one already treated: copy number
-            *trgt.l = trgt.l[i];
+            *trgt.i32 = trgt.i32[i];
           else {                // found sink: assign number & copy
-            mini = mode? trgt.l + i - trgt0.l: label++;
+            mini = mode? trgt.i32 + i - trgt0.i32: label++;
             i = 0;
             do {
-              j = -trgt.l[i];
+              j = -trgt.i32[i];
               if (j >= 0) {
-                trgt.l[i] = mini;
+                trgt.i32[i] = mini;
                 j = offsets[j % n] - (j/n);
                 if (j)
                   i += j;
@@ -4246,13 +4246,13 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
             } while (j > 0);
           }
         }
-        trgt.l++;
+        trgt.i32++;
       }
       break;
     case 2:                     // /DIFFERENCE: index difference
       while (nel--) {
-        i = -*trgt.l;
-        *trgt.l++ = offsets[i % n] - (i/n);
+        i = -*trgt.i32;
+        *trgt.i32++ = offsets[i % n] - (i/n);
       }
       break;
   }
@@ -4468,23 +4468,23 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
           if (edge) {
             zerobytes(trgt.ui8, nElem);
             trgt.ui8 += nElem;
-            src.l += nElem;
+            src.i32 += nElem;
           } else {
             *trgt.ui8++ = 0;              // left edge
-            src.l++;
+            src.i32++;
             for (i = i1; i < i2; i++) { // center data points
               *trgt.ui8 = 0;
               for (j = 0; j < n; j++) {         /* all directions */
                 k = offset[j];
-                srcl.l = src.l + k;
-                srcr.l = src.l - k;
-                *trgt.ui8 += (*src.l > *srcl.l && *src.l > *srcr.l);
+                srcl.i32 = src.i32 + k;
+                srcr.i32 = src.i32 - k;
+                *trgt.ui8 += (*src.i32 > *srcl.i32 && *src.i32 > *srcr.i32);
               }
-              src.l++;
+              src.i32++;
               trgt.ui8++;
             }
             *trgt.ui8++ = 0;              // right edge
-            src.l++;
+            src.i32++;
           }
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
@@ -4667,29 +4667,29 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
             if (edge) {
               zerobytes(trgt.ui8, nElem);
               trgt.ui8 += nElem;
-              src.l += nElem;
+              src.i32 += nElem;
             } else {
               if (!diagonal || diagonal[0]) {
                 *trgt.ui8++ = 0; // left edge
-                src.l++;
+                src.i32++;
               }
               for (i = i1; i < i2; i++) { // center data points
                 *trgt.ui8 = 0;
                 for (j = 0; j < n; j++) { /* all directions */
                   k = offset[j];
-                  srcl.l = src.l + k;
-                  srcr.l = src.l - k;
-                  *trgt.ui8 += ((sign && *src.l > *srcl.l + *t.l
-                               && *src.l > *srcr.l + *t.l)
-                              || (!sign && *src.l < *srcl.l - *t.l
-                                  && *src.l < *srcr.l - *t.l));
+                  srcl.i32 = src.i32 + k;
+                  srcr.i32 = src.i32 - k;
+                  *trgt.ui8 += ((sign && *src.i32 > *srcl.i32 + *t.i32
+                               && *src.i32 > *srcr.i32 + *t.i32)
+                              || (!sign && *src.i32 < *srcl.i32 - *t.i32
+                                  && *src.i32 < *srcr.i32 - *t.i32));
                 }
                 trgt.ui8++;
-                src.l++;
+                src.i32++;
               }
               if (!diagonal || diagonal[0]) {
                 *trgt.ui8++ = 0;          // right edge
-                src.l++;
+                src.i32++;
               }
             }
           } while (trgtinfo.advanceLoop(&trgt),
@@ -4874,8 +4874,8 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
         thisy.f = (float) *y.i16++;
         break;
       case LUX_INT32:
-        thisx.f = (float) *x.l++;
-        thisy.f = (float) *y.l++;
+        thisx.f = (float) *x.i32++;
+        thisy.f = (float) *y.i32++;
         break;
       case LUX_INT64:
         thisx.f = *x.q++;
@@ -4939,7 +4939,7 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
     undefine(result);
     symbol_class(result) = LUX_SCALAR;
     scalar_type(result) = LUX_INT32;
-    scalar_value(result).l = -1;
+    scalar_value(result).i32 = -1;
   }
   return result;
 }
@@ -5141,7 +5141,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     out1 = (int32_t*) array_data(qsplit1);
   } else {                      // no splitters to store: output scalar -1
     to_scalar(qsplit1, LUX_INT32);
-    scalar_value(qsplit1).l = -1;
+    scalar_value(qsplit1).i32 = -1;
   }
   qsplit2list = findVarName("$SPLIT2_INDEX", 0);
   if (qsplit2list == LUX_ERROR) {
@@ -5163,7 +5163,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     v1--;                       // return to previous value
   } else {
     to_scalar(qsplit2list, LUX_INT32);
-    scalar_value(qsplit2list).l = -1;
+    scalar_value(qsplit2list).i32 = -1;
   }
   qsplit2 = findVarName("$SPLIT2", 0);
   if (qsplit2 == LUX_ERROR) {
@@ -5180,7 +5180,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     out2 = (int32_t*) array_data(qsplit2);
   } else {
     to_scalar(qsplit2, LUX_INT32);
-    scalar_value(qsplit2).l = -1;
+    scalar_value(qsplit2).i32 = -1;
   }
 
   // now write the area numbers to the output variables.
@@ -5244,7 +5244,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     out1 = (int32_t*) array_data(qmerge2);
   } else {
     to_scalar(qmerge2, LUX_INT32);
-    scalar_value(qmerge2).l = -1;
+    scalar_value(qmerge2).i32 = -1;
   }
   qmerge1list = findVarName("$MERGE1_INDEX", 0);
   if (qmerge1list == LUX_ERROR) {
@@ -5263,7 +5263,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     v1--;
   } else {
     to_scalar(qmerge1list, LUX_INT32);
-    scalar_value(qmerge1list).l = -1;
+    scalar_value(qmerge1list).i32 = -1;
   }
   qmerge1 = findVarName("$MERGE1", 0);
   if (qmerge1 == LUX_ERROR) {
@@ -5280,7 +5280,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     out2 = (int32_t*) array_data(qmerge1);
   } else {
     to_scalar(qmerge1, LUX_INT32);
-    scalar_value(qmerge1).l = -1;
+    scalar_value(qmerge1).i32 = -1;
   }
 
   i = j = v1 = v2 = 0;
@@ -5346,7 +5346,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       *ptr++ = ptr2[order[n2 - 1]];
   } else {
     to_scalar(qapp, LUX_INT32);
-    scalar_value(qapp).l = -1;
+    scalar_value(qapp).i32 = -1;
   }
 
   /* The areas in image 1 that have no counterparts in image 2 have just
@@ -5389,7 +5389,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
       *ptr++ = ptr1[n2 - 1];
   } else {
     to_scalar(qdisapp, LUX_INT32);
-    scalar_value(qdisapp).l = -1;
+    scalar_value(qdisapp).i32 = -1;
   }
 
   /* Those regions that neither appear nor disappear, split, or merge,
@@ -5441,7 +5441,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     out1 = (int32_t*) array_data(qstay1);
   } else {
     to_scalar(qstay1, LUX_INT32);
-    scalar_value(qstay1).l = -1;
+    scalar_value(qstay1).i32 = -1;
   }
 
   qstay2 = findVarName("$STAY2", 0);
@@ -5459,7 +5459,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
     out2 = (int32_t*) array_data(qstay2);
   } else {
     to_scalar(qstay2, LUX_INT32);
-    scalar_value(qstay2).l = -1;
+    scalar_value(qstay2).i32 = -1;
   }
 
   if (n) {
@@ -5683,7 +5683,7 @@ int32_t lux_area_connect(int32_t narg, int32_t ps[])
         // store highest assigned number in <compact>, if it is a
         // named variable (and not an expression)
         to_scalar(ps[2], LUX_INT32);
-        scalar_value(ps[2]).l = j;
+        scalar_value(ps[2]).i32 = j;
       }
     }
     free(flags);

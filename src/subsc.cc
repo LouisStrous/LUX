@@ -108,7 +108,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.ui8++ = *src.l++;
+              *trgt.ui8++ = *src.i32++;
             break;
           case LUX_INT64:
             while (nelem--)
@@ -138,7 +138,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.i16++ = *src.l++;
+              *trgt.i16++ = *src.i32++;
             break;
           case LUX_INT64:
             while (nelem--)
@@ -160,27 +160,27 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.l++ = *src.ui8++;
+              *trgt.i32++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
-              *trgt.l++ = *src.i16++;
+              *trgt.i32++ = *src.i16++;
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.l++ = *src.l++;
+              *trgt.i32++ = *src.i32++;
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.l++ = *src.q++;
+              *trgt.i32++ = *src.q++;
             break;
           case LUX_FLOAT:
             while (nelem--)
-              *trgt.l++ = *src.f++;
+              *trgt.i32++ = *src.f++;
             break;
           case LUX_DOUBLE:
             while (nelem--)
-              *trgt.l++ = *src.d++;
+              *trgt.i32++ = *src.d++;
             break;
           default:
             return cerror(ILL_TYPE, ps[1]);
@@ -198,7 +198,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.q++ = *src.l++;
+              *trgt.q++ = *src.i32++;
             break;
           case LUX_INT64:
             while (nelem--)
@@ -228,7 +228,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = *src.l++;
+              *trgt.f++ = *src.i32++;
             break;
           case LUX_INT64:
             while (nelem--)
@@ -258,11 +258,11 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.d++ = *src.l++;
+              *trgt.d++ = *src.i32++;
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.d++ = *src.l++;
+              *trgt.d++ = *src.i32++;
             break;
           case LUX_FLOAT:
             while (nelem--)
@@ -302,10 +302,10 @@ int32_t lux_smap(int32_t narg, int32_t ps[])
       break;
     case LUX_SCALAR:            //scalar
       n = 1;
-      q1.l = &scalar_value(nsym).l;
+      q1.i32 = &scalar_value(nsym).i32;
       break;
     case LUX_ARRAY:                     //array
-      q1.l = (int32_t *) array_data(nsym);
+      q1.i32 = (int32_t *) array_data(nsym);
       nd = array_num_dims(nsym);
       n = array_size(nsym);
       break;
@@ -409,7 +409,7 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
       break;
     case LUX_SCALAR:
       n = lux_type_size[type];
-      q1.l = &scalar_value(nsym).l;
+      q1.i32 = &scalar_value(nsym).i32;
       break;
     case LUX_CSCALAR:
       n = lux_type_size[type];
@@ -422,7 +422,7 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
     case LUX_ARRAY: case LUX_CARRAY:
       nd = array_num_dims(nsym);
       n = array_size(nsym)*lux_type_size[type];
-      q1.l = (int32_t*) array_data(nsym);
+      q1.i32 = (int32_t*) array_data(nsym);
       /* n must be a multiple of type size or the inner dimension is not
          compatible */
       if ((array_dims(nsym)[0]*lux_type_size[type]) % lux_type_size[new_type])
@@ -445,7 +445,7 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
       q3.cf = complex_scalar_data(result_sym).cf;
       symbol_class(result_sym) = LUX_CSCALAR;
     } else {
-      q3.l = &scalar_value(result_sym).l;
+      q3.i32 = &scalar_value(result_sym).i32;
       symbol_class(result_sym) = LUX_SCALAR;
     }
   } else {
@@ -466,7 +466,7 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
       array_dims(result_sym)[0] =
         (array_dims(result_sym)[0]*lux_type_size[type])/lux_type_size[new_type];
     }
-    q3.l = (int32_t*) array_data(result_sym);
+    q3.i32 = (int32_t*) array_data(result_sym);
   }
   if (n > 0)
     memcpy(q3.ui8, q1.ui8, n);
@@ -1081,7 +1081,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       type = file_map_type(nsym);
       break;
     case LUX_ARRAY: case LUX_CARRAY:
-      src.l = (int32_t *) array_data(nsym);
+      src.i32 = (int32_t *) array_data(nsym);
       ndim = array_num_dims(nsym);
       dims = array_dims(nsym);
       nelem = array_size(nsym);
@@ -1095,7 +1095,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       type = complex_scalar_type(nsym);
       break;
     case LUX_SCALAR:
-      src.l = &scalar_value(nsym).l;
+      src.i32 = &scalar_value(nsym).i32;
       ndim = 1;
       dims = &one;
       nelem = 1;
@@ -1546,11 +1546,11 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       else                      // must be a range
         iq = array_scratch(type, 1, &size[n]);
       nelem = array_size(iq);
-      trgt.l = (int32_t *) array_data(iq);
+      trgt.i32 = (int32_t *) array_data(iq);
     } else {
       iq = scalar_scratch(type);
       nelem = 1;
-      trgt.l = &scalar_value(iq).l;
+      trgt.i32 = &scalar_value(iq).i32;
     }
 
     // for LUX_ARRAY subscripts the offset is calculated for each index;
@@ -1696,7 +1696,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
           trgtdims[n++] = 1;
       }         // end of for (i = 0...)
       iq = array_scratch(type, noutdim, trgtdims);
-      trgt.l = (int32_t *) array_data(iq);
+      trgt.i32 = (int32_t *) array_data(iq);
     } // end of if (noutdim)
     else if (class_id == LUX_ARRAY && type == LUX_STRING_ARRAY) { // string from string array
       if (src.sp[start[0]]) {   // non-null string
@@ -1713,7 +1713,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       if (isComplexType(type))
         trgt.cf = complex_scalar_data(iq).cf;
       else
-        trgt.l = &scalar_value(iq).l;
+        trgt.i32 = &scalar_value(iq).i32;
     }
 
     // now we have the output symbol ready for use, with the data
@@ -1853,10 +1853,10 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
                 value.i16 += src.i16[offset];
                 break;
               case LUX_INT32:
-                value.l += src.l[offset];
+                value.i32 += src.i32[offset];
                 break;
               case LUX_INT64:
-                value.q += src.l[offset];
+                value.q += src.i32[offset];
                 break;
               case LUX_FLOAT:
                 value.f += src.f[offset];
@@ -1937,7 +1937,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
                 value.i16 += item.i16;
                 break;
               case LUX_INT32:
-                value.l += item.l;
+                value.i32 += item.i32;
                 break;
               case LUX_INT64:
                 value.q += item.q;
@@ -2049,12 +2049,12 @@ int32_t string_sub(int32_t narg, int32_t ps[])
     case LUX_ARRAY:
       // a string is created with length = # elements in array
       iq = lux_long(1, &iq);    // get a long version
-      p2.l = (int32_t *) array_data(iq);
+      p2.i32 = (int32_t *) array_data(iq);
       ns = array_size(iq);
       result_sym = string_scratch(ns);
       q = string_value(result_sym);
       while (ns) {
-        i = *p2.l++;
+        i = *p2.i32++;
         if (i < 0) i += n;      // (*-expr)
         if ( i >= n || i < 0 )
         { cerror(SUBSC_RANGE, iq);
@@ -2116,7 +2116,7 @@ int32_t lux_symclass(int32_t narg, int32_t ps[])
     nd = symbol_class(nsym);
   if (nd == LUX_SCAL_PTR)
     nd = LUX_SCALAR;
-  scalar_value(result_sym).l = nd;
+  scalar_value(result_sym).i32 = nd;
   return result_sym;
 }
  //-------------------------------------------------------------------------
@@ -2133,7 +2133,7 @@ int32_t lux_symdtype(int32_t narg, int32_t ps[])
     t = LUX_TEMP_STRING;
     // no break
   default:
-    sym[result_sym].spec.scalar.l = t;
+    sym[result_sym].spec.scalar.i32 = t;
   }
   return result_sym;
 }
@@ -2155,7 +2155,7 @@ int32_t lux_num_elem(int32_t narg, int32_t ps[])
         naxes = array_size(temp);
         break;
       case LUX_SCALAR:
-        axes = &scalar_value(temp).l;
+        axes = &scalar_value(temp).i32;
         naxes = 1;
         break;
       default:
@@ -2207,7 +2207,7 @@ int32_t lux_num_elem(int32_t narg, int32_t ps[])
     default:
       return cerror(ILL_CLASS, nsym);
   }
-  scalar_value(result_sym).l = n;
+  scalar_value(result_sym).i32 = n;
   if (naxes)
     zapTemp(temp);
   return result_sym;
@@ -2234,7 +2234,7 @@ int32_t lux_num_dimen(int32_t narg, int32_t ps[])
       default:
         return cerror(ILL_CLASS, nsym);
   }
-  sym[result_sym].spec.scalar.l = nd;
+  sym[result_sym].spec.scalar.i32 = nd;
   return result_sym;
 }
  //-------------------------------------------------------------------------
@@ -2258,8 +2258,8 @@ int32_t lux_dimen(int32_t narg, int32_t ps[])
   switch (symbol_class(ps[0])) { // <x>
     case LUX_SCAL_PTR: case LUX_SCALAR: case LUX_STRING:
       for (i = 0; i < nAxes; i++)
-        if (axes.l[i] != 0)
-          return cerror(ILL_AXIS, ps[1], axes.l[i]);
+        if (axes.i32[i] != 0)
+          return cerror(ILL_AXIS, ps[1], axes.i32[i]);
       if (nAxes > 1) {
         iq = array_scratch(LUX_INT32, 1, &nAxes);
         out = (int32_t *) array_data(iq);
@@ -2267,30 +2267,30 @@ int32_t lux_dimen(int32_t narg, int32_t ps[])
           *out++ = 1;
       } else {
         iq = scalar_scratch(LUX_INT32);
-        scalar_value(iq).l = 1;
+        scalar_value(iq).i32 = 1;
       }
       break;
     case LUX_ARRAY: case LUX_FILEMAP: case LUX_CARRAY:
       ndim = array_num_dims(ps[0]);
       dims = array_dims(ps[0]);
       for (i = 0; i < nAxes; i++)
-        if (axes.l[i] < 0 || axes.l[i] >= ndim)
-          return cerror(ILL_AXIS, ps[1], axes.l[i]);
+        if (axes.i32[i] < 0 || axes.i32[i] >= ndim)
+          return cerror(ILL_AXIS, ps[1], axes.i32[i]);
       if (nAxes > 1) {
         iq = array_scratch(LUX_INT32, 1, &nAxes);
         out = (int32_t *) array_data(iq);
         while (nAxes--)
-          *out++ = dims[*axes.l++];
+          *out++ = dims[*axes.i32++];
       } else if (nAxes == 1) {
         iq = scalar_scratch(LUX_INT32);
-        scalar_value(iq).l = dims[*axes.l];
+        scalar_value(iq).i32 = dims[*axes.i32];
       } else {                  // return all dimensions
         if (ndim > 1) {
           iq = array_scratch(LUX_INT32, 1, &ndim);
           memcpy((int32_t*) array_data(iq), dims, ndim*sizeof(int32_t));
         } else {
           iq = scalar_scratch(LUX_INT32);
-          scalar_value(iq).l = dims[0];
+          scalar_value(iq).i32 = dims[0];
         }
       }
       break;
@@ -2347,7 +2347,7 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
         if (ndim + 1> MAX_DIMS)
           return luxerror("Too many dimensions specified", ps[i]);
         iq = lux_long(1, &ps[i]); // ensure LONG
-        dims[ndim++] = scalar_value(iq).l;
+        dims[ndim++] = scalar_value(iq).i32;
         break;
       case LUX_ARRAY:
         if (ndim + array_size(ps[i]) > MAX_DIMS)
@@ -2529,7 +2529,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
         if (nsym == LUX_ERROR)
           return LUX_ERROR;
         memcpy((char*) array_data(nsym),
-               &scalar_value(iq).l,
+               &scalar_value(iq).i32,
                lux_type_size[scalar_type(iq)]);
         return nsym;
       case LUX_CSCALAR:                 // complex scalar case LS 4aug98
@@ -2758,15 +2758,15 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--)
-              *q2.l++ = (int32_t) *q1.ui8++;
+              *q2.i32++ = (int32_t) *q1.ui8++;
             break;
           case LUX_INT16:
             while (n--)
-              *q2.l++ = (int32_t) *q1.i16++;
+              *q2.i32++ = (int32_t) *q1.i16++;
             break;
           case LUX_INT32:
             while (n--)
-              *q2.l++ = *q1.l++;
+              *q2.i32++ = *q1.i32++;
             break;
           }
           break;
@@ -2782,7 +2782,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (n--)
-              *q2.q++ = (int64_t) *q1.l++;
+              *q2.q++ = (int64_t) *q1.i32++;
             break;
           case LUX_INT64:
             while (n--)
@@ -2802,7 +2802,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (n--)
-              *q2.f++ = (float) *q1.l++;
+              *q2.f++ = (float) *q1.i32++;
             break;
           case LUX_INT64:
             while (n--)
@@ -2826,7 +2826,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (n--)
-              *q2.d++ = (double) *q1.l++;
+              *q2.d++ = (double) *q1.i32++;
             break;
           case LUX_INT64:
             while (n--)
@@ -2858,7 +2858,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (n--) {
-              q2.cf->real = *q1.l++;
+              q2.cf->real = *q1.i32++;
               q2.cf++->imaginary = 0.0;
             }
             break;
@@ -2898,7 +2898,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             break;
           case LUX_INT32:
             while (n--) {
-              q2.cd->real = *q1.l++;
+              q2.cd->real = *q1.i32++;
               q2.cd++->imaginary = 0.0;
             }
             break;
@@ -2984,7 +2984,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
       type = array_type(ps[narg]);
       if (type > LUX_DOUBLE)    // string array
         return cerror(ILL_TYPE, ps[narg]);
-      src.l = (int32_t*) array_data(ps[narg]);
+      src.i32 = (int32_t*) array_data(ps[narg]);
       ndim = array_num_dims(ps[narg]);
       dims = array_dims(ps[narg]);
       break;
@@ -3102,7 +3102,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
         break;
       case LUX_INT32:
         do {
-          cvalue.f = (float) src.l[index];
+          cvalue.f = (float) src.i32[index];
           for (i = 0; i < ndim; i++)
             cvalue.f *= d[i];
           for (j = 0; j < ndim; j++) {
@@ -3216,12 +3216,12 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
       result -= (result/nd)*nd;
     // we must construct an array containing the target list of dimensions
     iq = array_scratch(LUX_INT32, 1, &nd);
-    src.l = (int32_t*) array_data(iq);
+    src.i32 = (int32_t*) array_data(iq);
     for (i = 0; i < nd; i++) {
-      *src.l = i + result;
-      if (*src.l >= nd)
-        *src.l -= nd;
-      src.l++;
+      *src.i32 = i + result;
+      if (*src.i32 >= nd)
+        *src.i32 -= nd;
+      src.i32++;
     }
     temp = 1;
   } else if (symbolIsNumericalArray(ps[1])) {

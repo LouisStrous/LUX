@@ -583,7 +583,7 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
             scalar_value(iq).i16 = 0;
             break;
           case LUX_INT32:
-            scalar_value(iq).l = 0;
+            scalar_value(iq).i32 = 0;
             break;
           case LUX_INT64:
             scalar_value(iq).q = 0;
@@ -613,7 +613,7 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
             *scal_ptr_pointer(iq).i16 = 0;
             break;
           case LUX_INT32:
-            *scal_ptr_pointer(iq).l = 0;
+            *scal_ptr_pointer(iq).i32 = 0;
             break;
           case LUX_INT64:
             *scal_ptr_pointer(iq).q = 0;
@@ -711,7 +711,7 @@ int32_t lux_onef(int32_t narg, int32_t ps[])
       break;
     case LUX_INT32:
       while (n--)
-        *p.l++ = 1;
+        *p.i32++ = 1;
       break;
     case LUX_INT64:
       while (n--)
@@ -779,7 +779,7 @@ int32_t lux_one(int32_t narg, int32_t ps[])
           break;
         case LUX_INT32:
           while (n--)
-            *p.l++ = 1;
+            *p.i32++ = 1;
           break;
         case LUX_INT64:
           while (n--)
@@ -841,7 +841,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
         mask = (*data[1].i16 != 0);
         break;
       case LUX_INT32:
-        mask = (*data[1].l != 0);
+        mask = (*data[1].i32 != 0);
         break;
       case LUX_INT64:
         mask = (*data[1].q != 0);
@@ -900,7 +900,7 @@ int32_t lux_setnan(int32_t narg, int32_t ps[])
       mask = *data[1].i16 != 0;
       break;
     case LUX_INT32:
-      mask = *data[1].l != 0;
+      mask = *data[1].i32 != 0;
       break;
     case LUX_INT64:
       mask = *data[1].q != 0;
@@ -984,7 +984,7 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
       break;
     case LUX_INT32:
       do
-        *trgt.l = (int32_t) trgtinfo.coords[0];
+        *trgt.i32 = (int32_t) trgtinfo.coords[0];
       while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
       break;
     case LUX_INT64:
@@ -1052,7 +1052,7 @@ int32_t lux_neg_func(int32_t narg, int32_t ps[])
       break;
     case LUX_INT32:
       while (n--)
-        *trgt.l++ = -*src.l++;
+        *trgt.i32++ = -*src.i32++;
       break;
     case LUX_INT64:
       while (n--)
@@ -1100,13 +1100,13 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
       n = 1;
       src.f = &scalar_value(iq).f;
       result = scalar_scratch(LUX_INT32);
-      trgt = &scalar_value(result).l;
+      trgt = &scalar_value(result).i32;
       break;
     case LUX_CSCALAR:
       n = 1;
       src.cf = complex_scalar_data(iq).cf;
       result = scalar_scratch(LUX_CFLOAT);
-      trgt = &scalar_value(result).l;
+      trgt = &scalar_value(result).i32;
       break;
     case LUX_ARRAY:
       if (array_type(iq) < LUX_FLOAT)
@@ -1311,8 +1311,8 @@ int32_t lux_abs(int32_t narg, int32_t ps[])
       break;
     case LUX_INT32:
       while (n--) {
-        *trgt.l++ = (*src.l > 0)? *src.l: -*src.l;
-        src.l++;
+        *trgt.i32++ = (*src.i32 > 0)? *src.i32: -*src.i32;
+        src.i32++;
       }
       break;
     case LUX_INT64:
@@ -1427,12 +1427,12 @@ int32_t lux_complexsquare(int32_t narg, int32_t ps[])
       break;
     case LUX_INT32:
       n2 = n - (n%2);
-      trgt.l[0] = src.l[0]*src.l[0];
+      trgt.i32[0] = src.i32[0]*src.i32[0];
       for (i = 1; i < n/2; i++)
-        trgt.l[i] = src.l[i]*src.l[i] + src.l[n2 - i]*src.l[n2 - i];
-      trgt.l[n/2] = src.l[n/2]*src.l[n/2];
+        trgt.i32[i] = src.i32[i]*src.i32[i] + src.i32[n2 - i]*src.i32[n2 - i];
+      trgt.i32[n/2] = src.i32[n/2]*src.i32[n/2];
       for (i = n/2 + 1; i < n; i++)
-        trgt.l[i] = 0;
+        trgt.i32[i] = 0;
       break;
     case LUX_INT64:
       n2 = n - (n%2);
@@ -1593,10 +1593,10 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   indices2 = lux_long(1, &ps[1]); // force LUX_INT32
   indx = (int32_t*) array_data(indices2);       // assumed of same size as <source>!
   minmax(indx, nElem, LUX_INT32);
-  size = lastmax.l + 1;
+  size = lastmax.i32 + 1;
   offset = 0;
-  if (lastmin.l < 0)
-    size += (offset = -lastmin.l);
+  if (lastmin.i32 < 0)
+    size += (offset = -lastmin.i32);
   result = array_scratch(outType, 1, &size);
   trgt.v = array_data(result);
   zerobytes(trgt.ui8, size*lux_type_size[outType]);
@@ -1629,7 +1629,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
               case LUX_INT32:
                 while (i--) {           // first, get the sum
                   hist.f[*indx] += *weights.f;
-                  trgt.f[*indx] += (float) *src.l++ * *weights.f++;
+                  trgt.f[*indx] += (float) *src.i32++ * *weights.f++;
                   indx++;
                 }
                 break;
@@ -1672,7 +1672,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
               case LUX_INT32:
                 while (i--) {           // first, get the sum
                   hist.d[*indx] += *weights.d;
-                  trgt.d[*indx] += (double) *src.l++ * *weights.d++;
+                  trgt.d[*indx] += (double) *src.i32++ * *weights.d++;
                   indx++;
                 }
                 break;
@@ -1759,7 +1759,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--)             // first, get the sum
-                  trgt.f[*indx++] += (float) *src.l++ * *weights.f++;
+                  trgt.f[*indx++] += (float) *src.i32++ * *weights.f++;
                 break;
               case LUX_INT64:
                 while (i--)             // first, get the sum
@@ -1783,7 +1783,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--)             // first, get the sum
-                  trgt.d[*indx++] += (double) *src.l++ * *weights.d++;
+                  trgt.d[*indx++] += (double) *src.i32++ * *weights.d++;
                 break;
               case LUX_INT64:
                 while (i--)             // first, get the sum
@@ -1827,43 +1827,43 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
       }         // end of if (mean) else
     } else {                    // no <weights>: each element counts once
       if (mean) {               // want average
-        ALLOCATE(hist.l, size, int32_t);
-        zerobytes(hist.l, size*sizeof(int32_t));
-        hist.l += offset;
+        ALLOCATE(hist.i32, size, int32_t);
+        zerobytes(hist.i32, size*sizeof(int32_t));
+        hist.i32 += offset;
         switch (outType) {
           case LUX_FLOAT:
             switch (type) {
               case LUX_INT8:
                 while (i--) {           // get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.f[*indx] += (float) *src.ui8++;
                   indx++;
                 }
                 break;
               case LUX_INT16:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.f[*indx] += (float) *src.i16++;
                   indx++;
                 }
                 break;
               case LUX_INT32:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
-                  trgt.f[*indx] += (float) *src.l++;
+                  hist.i32[*indx]++;
+                  trgt.f[*indx] += (float) *src.i32++;
                   indx++;
                 }
                 break;
               case LUX_INT64:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.f[*indx] += (float) *src.q++;
                   indx++;
                 }
                 break;
               case LUX_FLOAT:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.f[*indx] += (float) *src.f++;
                   indx++;
                 }
@@ -1871,49 +1871,49 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
             } // end of switch (type)
             // and divide by number
             for (i = -offset; i < size - offset; i++)
-              if (hist.l[i])
-                trgt.f[i] /= hist.l[i];
+              if (hist.i32[i])
+                trgt.f[i] /= hist.i32[i];
             break;
           case LUX_DOUBLE:
             switch (type) {
               case LUX_INT8:
                 while (i--) {           // get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.d[*indx] += *src.ui8++;
                   indx++;
                 }
                 break;
               case LUX_INT16:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.d[*indx] += *src.i16++;
                   indx++;
                 }
                 break;
               case LUX_INT32:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
-                  trgt.d[*indx] += *src.l++;
+                  hist.i32[*indx]++;
+                  trgt.d[*indx] += *src.i32++;
                   indx++;
                 }
                 break;
               case LUX_INT64:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.d[*indx] += *src.q++;
                   indx++;
                 }
                 break;
               case LUX_FLOAT:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.d[*indx] += *src.f++;
                   indx++;
                 }
                 break;
               case LUX_DOUBLE:
                 while (i--) {           // first, get the sum
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.d[*indx] += *src.d++;
                   indx++;
                 }
@@ -1921,19 +1921,19 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
             } // end of switch (type)
             // and divide by number
             for (i = -offset; i < size - offset; i++)
-              if (hist.l[i])
-                trgt.d[i] /= hist.l[i];
+              if (hist.i32[i])
+                trgt.d[i] /= hist.i32[i];
             break;
           case LUX_CFLOAT:
             while (i--) {
-              hist.l[*indx]++;
+              hist.i32[*indx]++;
               trgt.cf[*indx].real += (float) src.cf->real;
               trgt.cf[*indx++].imaginary += (float) src.cf++->imaginary;
             }
             for (i = -offset; i < size - offset; i++)
-              if (hist.l[i]) {
-                trgt.cf[i].real /= hist.l[i];
-                trgt.cf[i].imaginary /= hist.l[i];
+              if (hist.i32[i]) {
+                trgt.cf[i].real /= hist.i32[i];
+                trgt.cf[i].imaginary /= hist.i32[i];
               } else
                 trgt.cf[i].real = trgt.cf->imaginary = 0.0;
             break;
@@ -1941,28 +1941,28 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
             switch (type) {
               case LUX_CFLOAT:
                 while (i--) {
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.cd[*indx].real += (float) src.cf->real;
                   trgt.cd[*indx++].imaginary += (float) src.cf++->imaginary;
                 }
                 break;
               case LUX_CDOUBLE:
                 while (i--) {
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   trgt.cd[*indx].real += (float) src.cd->real;
                   trgt.cd[*indx++].imaginary += (float) src.cd++->imaginary;
                 }
                 break;
             } // end of switch (type)
             for (i = -offset; i < size - offset; i++)
-              if (hist.l[i]) {
-                trgt.cd[i].real /= hist.l[i];
-                trgt.cd[i].imaginary /= hist.l[i];
+              if (hist.i32[i]) {
+                trgt.cd[i].real /= hist.i32[i];
+                trgt.cd[i].imaginary /= hist.i32[i];
               } else
                 trgt.cd[i].real = trgt.cf->imaginary = 0.0;
             break;
         } // end of switch (outType)
-        free(hist.l - offset);
+        free(hist.i32 - offset);
       } else {                  // want totals
         switch (outType) {
           case LUX_FLOAT:
@@ -1977,7 +1977,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--)             // first, get the sum
-                  trgt.f[*indx++] += (float) *src.l++;
+                  trgt.f[*indx++] += (float) *src.i32++;
                 break;
               case LUX_INT64:
                 while (i--)             // first, get the sum
@@ -2001,7 +2001,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--)             // first, get the sum
-                  trgt.d[*indx++] += *src.l++;
+                  trgt.d[*indx++] += *src.i32++;
                 break;
               case LUX_INT64:
                 while (i--)             // first, get the sum
@@ -2103,7 +2103,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.f = *src.l++; // data value
+                  temp.f = *src.i32++; // data value
                   value.f = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -2211,7 +2211,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.d = *src.l++; // data value
+                  temp.d = *src.i32++; // data value
                   value.d = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -2479,7 +2479,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.f = *src.l++; // data value
+                  temp.f = *src.i32++; // data value
                   value.f = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -2583,7 +2583,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.d = *src.l++; // data value
+                  temp.d = *src.i32++; // data value
                   value.d = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -2791,9 +2791,9 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
       }         // end of if (mean) else
     } else {                    // unweighted power summation
       if (mean) {               // want averages
-        ALLOCATE(hist.l, size, int32_t);
-        zerobytes(hist.l, size*sizeof(int32_t));
-        hist.l += offset;
+        ALLOCATE(hist.i32, size, int32_t);
+        zerobytes(hist.i32, size*sizeof(int32_t));
+        hist.i32 += offset;
         switch (outType) {
           case LUX_FLOAT:
             switch (type) {
@@ -2811,7 +2811,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   trgt.f[*indx] += value.f;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2829,13 +2829,13 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   trgt.f[*indx] += value.f;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.f = *src.l++; // data value
+                  temp.f = *src.i32++; // data value
                   value.f = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -2847,7 +2847,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   trgt.f[*indx] += value.f;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2865,7 +2865,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   trgt.f[*indx] += value.f;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2883,7 +2883,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   trgt.f[*indx] += value.f;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2891,7 +2891,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
             // and divide by number
             for (i = -offset; i < size - offset; i++)
               if (hist.f[i])
-                trgt.f[i] /= hist.l[i];
+                trgt.f[i] /= hist.i32[i];
             break;
           case LUX_DOUBLE:
             switch (type) {
@@ -2909,7 +2909,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   trgt.d[*indx] += value.d;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2927,13 +2927,13 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   trgt.d[*indx] += value.d;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.d = *src.l++; // data value
+                  temp.d = *src.i32++; // data value
                   value.d = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -2945,7 +2945,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   trgt.d[*indx] += value.d;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2963,7 +2963,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   trgt.d[*indx] += value.d;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2981,7 +2981,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   trgt.d[*indx] += value.d;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -2999,15 +2999,15 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1)// negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   trgt.d[*indx] += value.d;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
             } // end of switch (type)
             // and divide by number
             for (i = -offset; i < size - offset; i++)
-              if (hist.l[i])
-                trgt.d[i] /= hist.l[i];
+              if (hist.i32[i])
+                trgt.d[i] /= hist.i32[i];
             break;
           case LUX_CFLOAT:
             while (i--) {
@@ -3042,14 +3042,14 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
               }
               trgt.cf[*indx].real += valuecf.real;
               trgt.cf[*indx].imaginary += valuecf.imaginary;
-              hist.l[*indx]++;
+              hist.i32[*indx]++;
               indx++;
             }
             // and divide by number
             for (i = -offset; i < size - offset; i++)
               if (hist.f[i]) {
-                trgt.cf[i].real /= hist.l[i];
-                trgt.cf[i].imaginary /= hist.l[i];
+                trgt.cf[i].real /= hist.i32[i];
+                trgt.cf[i].imaginary /= hist.i32[i];
               }
             break;
           case LUX_CDOUBLE:
@@ -3087,7 +3087,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   }
                   trgt.cd[*indx].real += valuecd.real;
                   trgt.cd[*indx].imaginary += valuecd.imaginary;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
@@ -3124,20 +3124,20 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                   }
                   trgt.cd[*indx].real += valuecd.real;
                   trgt.cd[*indx].imaginary += valuecd.imaginary;
-                  hist.l[*indx]++;
+                  hist.i32[*indx]++;
                   indx++;
                 }
                 break;
             } // end of switch (type)
             // and divide by number
             for (i = -offset; i < size - offset; i++)
-              if (hist.l[i]) {
-                trgt.cd[i].real /= hist.l[i];
-                trgt.cd[i].imaginary /= hist.l[i];
+              if (hist.i32[i]) {
+                trgt.cd[i].real /= hist.i32[i];
+                trgt.cd[i].imaginary /= hist.i32[i];
               }
             break;
         } // end of switch (outType)
-        free(hist.l - offset);
+        free(hist.i32 - offset);
       } else {                  // want unweighted power totals
         switch (outType) {
           case LUX_FLOAT:
@@ -3178,7 +3178,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.f = *src.l++; // data value
+                  temp.f = *src.i32++; // data value
                   value.f = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -3267,7 +3267,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
                 break;
               case LUX_INT32:
                 while (i--) {
-                  temp.d = *src.l++; // data value
+                  temp.d = *src.i32++; // data value
                   value.d = 1.0;
                   for (j = 0; j < nbase; j++) {
                     if (present[j])
@@ -3627,41 +3627,41 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
           switch (type) {
             case LUX_INT8:
               do {
-                sum.l = 0.0;
-                w.l = 0.0;
+                sum.i32 = 0.0;
+                w.i32 = 0.0;
                 do {
-                  sum.l += *src.ui8 * *weights.ui8;
-                  w.l += *weights.ui8;
+                  sum.i32 += *src.ui8 * *weights.ui8;
+                  w.i32 += *weights.ui8;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
-                *trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
+                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT16:
               do {
-                sum.l = 0.0;
-                w.l = 0.0;
+                sum.i32 = 0.0;
+                w.i32 = 0.0;
                 do {
-                  sum.l += *src.i16 * *weights.i16;
-                  w.l += *weights.i16;
+                  sum.i32 += *src.i16 * *weights.i16;
+                  w.i32 += *weights.i16;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
-                *trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
+                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT32:
               do {
-                sum.l = 0.0;
-                w.l = 0.0;
+                sum.i32 = 0.0;
+                w.i32 = 0.0;
                 do {
-                  sum.l += *src.l * *weights.l;
-                  w.l += *weights.l;
+                  sum.i32 += *src.i32 * *weights.i32;
+                  w.i32 += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
-                *trgt.l++ = mean? (w.l? sum.l/w.l: 0): sum.l;
+                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
               } while (done < srcinfo.rndim);
               break;
           } // end of switch (type)
@@ -3699,8 +3699,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.q = 0.0;
                 w.q = 0.0;
                 do {
-                  sum.q += *src.l * *weights.l;
-                  w.q += *weights.l;
+                  sum.q += *src.i32 * *weights.i32;
+                  w.q += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
@@ -3755,8 +3755,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.f = 0.0;
                 w.f = 0.0;
                 do {
-                  sum.f += *src.l * *weights.l;
-                  w.f += *weights.l;
+                  sum.f += *src.i32 * *weights.i32;
+                  w.f += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
@@ -3842,8 +3842,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.d = 0.0;
                 w.d = 0.0;
                 do {
-                  sum.d += (double) *src.l * *weights.l;
-                  w.d += *weights.l;
+                  sum.d += (double) *src.i32 * *weights.i32;
+                  w.d += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
@@ -4013,29 +4013,29 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
           switch (type) {
             case LUX_INT8:
               do {
-                sum.l = 0.0;
+                sum.i32 = 0.0;
                 do
-                  sum.l += *src.ui8;
+                  sum.i32 += *src.ui8;
                 while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.l++ = mean? sum.l/n: sum.l;
+                *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT16:
               do {
-                sum.l = 0.0;
+                sum.i32 = 0.0;
                 do
-                  sum.l += *src.i16;
+                  sum.i32 += *src.i16;
                 while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.l++ = mean? sum.l/n: sum.l;
+                *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT32:
               do {
-                sum.l = 0.0;
+                sum.i32 = 0.0;
                 do
-                  sum.l += *src.l;
+                  sum.i32 += *src.i32;
                 while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.l++ = mean? sum.l/n: sum.l;
+                *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
           } // end of switch (type)
@@ -4104,7 +4104,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.f = 0.0;
                 do
-                  sum.f += *src.l;
+                  sum.f += *src.i32;
                 while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
@@ -4168,7 +4168,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.d = 0.0;
                 do
-                  sum.d += *src.l;
+                  sum.d += *src.i32;
                 while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
               } while (done < srcinfo.rndim);
@@ -4308,77 +4308,77 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
           switch (type) {
             case LUX_INT8:
               do {
-                sum.l = w.l = 0.0;
+                sum.i32 = w.i32 = 0.0;
                 do {
-                  temp.l = *src.ui8; // data value
-                  value.l = 1.0;
+                  temp.i32 = *src.ui8; // data value
+                  value.i32 = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
-                      value.l *= temp.l;
-                    temp.l *= temp.l;
+                      value.i32 *= temp.i32;
+                    temp.i32 *= temp.i32;
                   }
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.l = value.l? *weights.ui8/value.l: 0.0;
+                    value.i32 = value.i32? *weights.ui8/value.i32: 0.0;
                   else
-                    value.l *= *weights.ui8;
-                  sum.l += value.l;
-                  w.l += *weights.ui8;
+                    value.i32 *= *weights.ui8;
+                  sum.i32 += value.i32;
+                  w.i32 += *weights.ui8;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
-                *trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
+                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT16:
               do {
-                sum.l = w.l = 0.0;
+                sum.i32 = w.i32 = 0.0;
                 do {
-                  temp.l = *src.i16; // data value
-                  value.l = 1.0;
+                  temp.i32 = *src.i16; // data value
+                  value.i32 = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
-                      value.l *= temp.l;
-                    temp.l *= temp.l;
+                      value.i32 *= temp.i32;
+                    temp.i32 *= temp.i32;
                   }
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.l = value.l? *weights.i16/value.l: 0.0;
+                    value.i32 = value.i32? *weights.i16/value.i32: 0.0;
                   else
-                    value.l *= *weights.i16;
-                  sum.l += value.l;
-                  w.l += *weights.i16;
+                    value.i32 *= *weights.i16;
+                  sum.i32 += value.i32;
+                  w.i32 += *weights.i16;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
-                *trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
+                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT32:
               do {
-                sum.l = w.l = 0.0;
+                sum.i32 = w.i32 = 0.0;
                 do {
-                  temp.l = *src.l; // data value
-                  value.l = 1.0;
+                  temp.i32 = *src.i32; // data value
+                  value.i32 = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
-                      value.l *= temp.l;
-                    temp.l *= temp.l;
+                      value.i32 *= temp.i32;
+                    temp.i32 *= temp.i32;
                   }
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.l = value.l? *weights.l/value.l: 0.0;
+                    value.i32 = value.i32? *weights.i32/value.i32: 0.0;
                   else
-                    value.l *= *weights.l;
-                  sum.l += value.l;
-                  w.l += *weights.l;
+                    value.i32 *= *weights.i32;
+                  sum.i32 += value.i32;
+                  w.i32 += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
-                *trgt.l++ = mean? (w.l? sum.l/w.l: 0.0): sum.l;
+                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
               } while (done < srcinfo.rndim);
               break;
           } // end of switch (type)
@@ -4439,7 +4439,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.q = w.q = 0.0;
                 do {
-                  temp.q = *src.l; // data value
+                  temp.q = *src.i32; // data value
                   value.q = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
@@ -4449,11 +4449,11 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.q = value.q? *weights.l/value.q: 0.0;
+                    value.q = value.q? *weights.i32/value.q: 0.0;
                   else
-                    value.q *= *weights.l;
+                    value.q *= *weights.i32;
                   sum.q += value.q;
-                  w.q += *weights.l;
+                  w.q += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
@@ -4543,7 +4543,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.f = w.f = 0.0;
                 do {
-                  temp.f = *src.l; // data value
+                  temp.f = *src.i32; // data value
                   value.f = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
@@ -4553,11 +4553,11 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? *weights.l/value.f: 0.0;
+                    value.f = value.f? *weights.i32/value.f: 0.0;
                   else
-                    value.f *= *weights.l;
+                    value.f *= *weights.i32;
                   sum.f += value.f;
-                  w.f += *weights.l;
+                  w.f += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
@@ -4701,7 +4701,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.d = w.d = 0.0;
                 do {
-                  temp.d = *src.l; // data value
+                  temp.d = *src.i32; // data value
                   value.d = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
@@ -4711,11 +4711,11 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? *weights.l/value.d: 0.0;
+                    value.d = value.d? *weights.i32/value.d: 0.0;
                   else
-                    value.d *= *weights.l;
+                    value.d *= *weights.i32;
                   sum.d += value.d;
-                  w.d += *weights.l;
+                  w.d += *weights.i32;
                 } while ((done = (winfo.advanceLoop(&weights),
                                   srcinfo.advanceLoop(&src)))
                          < srcinfo.naxes);
@@ -5030,62 +5030,62 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
           switch (type) {
             case LUX_INT8:
               do {
-                sum.l = 0.0;
+                sum.i32 = 0.0;
                 do {
-                  temp.l = *src.ui8; // data value
-                  value.l = 1.0;
+                  temp.i32 = *src.ui8; // data value
+                  value.i32 = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
-                      value.l *= temp.l;
-                    temp.l *= temp.l;
+                      value.i32 *= temp.i32;
+                    temp.i32 *= temp.i32;
                   }
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.l = value.l? 1.0/value.l: 0.0;
-                  sum.l += value.l;
+                    value.i32 = value.i32? 1.0/value.i32: 0.0;
+                  sum.i32 += value.i32;
                 } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.l++ = mean? sum.l/n: sum.l;
+                *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT16:
               do {
-                sum.l = 0.0;
+                sum.i32 = 0.0;
                 do {
-                  temp.l = *src.i16; // data value
-                  value.l = 1.0;
+                  temp.i32 = *src.i16; // data value
+                  value.i32 = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
-                      value.l *= temp.l;
-                    temp.l *= temp.l;
+                      value.i32 *= temp.i32;
+                    temp.i32 *= temp.i32;
                   }
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.l = value.l? 1.0/value.l: 0.0;
-                  sum.l += value.l;
+                    value.i32 = value.i32? 1.0/value.i32: 0.0;
+                  sum.i32 += value.i32;
                 } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.l++ = mean? sum.l/n: sum.l;
+                *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT32:
               do {
-                sum.l = 0.0;
+                sum.i32 = 0.0;
                 do {
-                  temp.l = *src.l; // data value
-                  value.l = 1.0;
+                  temp.i32 = *src.i32; // data value
+                  value.i32 = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
-                      value.l *= temp.l;
-                    temp.l *= temp.l;
+                      value.i32 *= temp.i32;
+                    temp.i32 *= temp.i32;
                   }
                   // we now have the data value to the given unsigned power
                   // add in the exponent sign and the weight
                   if (psign == -1) // negative exponent: must divide
-                    value.l = value.l? 1.0/value.l: 0.0;
-                  sum.l += value.l;
+                    value.i32 = value.i32? 1.0/value.i32: 0.0;
+                  sum.i32 += value.i32;
                 } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.l++ = mean? sum.l/n: sum.l;
+                *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
           } // end of switch (type)
@@ -5136,7 +5136,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.q = 0.0;
                 do {
-                  temp.q = *src.l; // data value
+                  temp.q = *src.i32; // data value
                   value.q = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
@@ -5220,7 +5220,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.f = 0.0;
                 do {
-                  temp.f = *src.l; // data value
+                  temp.f = *src.i32; // data value
                   value.f = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
@@ -5350,7 +5350,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               do {
                 sum.d = 0.0;
                 do {
-                  temp.d = *src.l; // data value
+                  temp.d = *src.i32; // data value
                   value.d = 1.0;
                   for (i = 0; i < nbase; i++) {
                     if (present[i])
@@ -6056,7 +6056,7 @@ int32_t math_funcs(int32_t nsym, int32_t code)
           break;
         case LUX_INT32:
           while (n--)
-            *trgt.f++ = (*func_d[code])(*src.l++);
+            *trgt.f++ = (*func_d[code])(*src.i32++);
           break;
         case LUX_INT64:
           while (n--)
@@ -6080,7 +6080,7 @@ int32_t math_funcs(int32_t nsym, int32_t code)
           break;
         case LUX_INT32:
           while (n--)
-            *trgt.d++ = (*func_d[code])(*src.l++);
+            *trgt.d++ = (*func_d[code])(*src.i32++);
           break;
         case LUX_INT64:
           while (n--)
@@ -6197,10 +6197,10 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
       else
         result_sym = array_clone(nsym1, out_type);
     }
-    trgt.l = (int32_t*) array_data(result_sym);
+    trgt.i32 = (int32_t*) array_data(result_sym);
   } else {                      // a scalar will do
     result_sym = scalar_scratch(out_type);
-    trgt.l = &scalar_value(result_sym).l;
+    trgt.i32 = &scalar_value(result_sym).i32;
   }
 
   if (n1 == n2) {               // advance both argument pointers
@@ -6217,7 +6217,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.ui8++, *src2.l++);
+              *trgt.f++ = (*func_dd[code])(*src1.ui8++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6245,7 +6245,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.i16++, *src2.l++);
+              *trgt.f++ = (*func_dd[code])(*src1.i16++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6265,27 +6265,27 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
         switch (type2) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.l++, *src2.ui8++);
+              *trgt.f++ = (*func_dd[code])(*src1.i32++, *src2.ui8++);
             break;
           case LUX_INT16:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.l++, *src2.i16++);
+              *trgt.f++ = (*func_dd[code])(*src1.i32++, *src2.i16++);
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.l++, *src2.l++);
+              *trgt.f++ = (*func_dd[code])(*src1.i32++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.l++, *src2.q++);
+              *trgt.f++ = (*func_dd[code])(*src1.i32++, *src2.q++);
             break;
           case LUX_FLOAT:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.l++, *src2.f++);
+              *trgt.f++ = (*func_dd[code])(*src1.i32++, *src2.f++);
             break;
           case LUX_DOUBLE:
             while (nelem--)
-              *trgt.d++ = (*func_dd[code])(*src1.l++, *src2.d++);
+              *trgt.d++ = (*func_dd[code])(*src1.i32++, *src2.d++);
             break;
         }
         break;
@@ -6301,7 +6301,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.q++, *src2.l++);
+              *trgt.f++ = (*func_dd[code])(*src1.q++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6329,7 +6329,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_dd[code])(*src1.f++, *src2.l++);
+              *trgt.f++ = (*func_dd[code])(*src1.f++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6357,7 +6357,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.d++ = (*func_dd[code])(*src1.d++, *src2.l++);
+              *trgt.d++ = (*func_dd[code])(*src1.d++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6383,7 +6383,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
         value = *src2.i16;
         break;
       case LUX_INT32:
-        value = *src2.l;
+        value = *src2.i32;
         break;
       case LUX_INT64:
         value = *src2.q;
@@ -6407,7 +6407,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.f++ = (*func_dd[code])(*src1.l++, value);
+            *trgt.f++ = (*func_dd[code])(*src1.i32++, value);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6434,7 +6434,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.d++ = (*func_dd[code])(*src1.l++, value);
+            *trgt.d++ = (*func_dd[code])(*src1.i32++, value);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6458,7 +6458,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
         value = *src1.i16;
         break;
       case LUX_INT32:
-        value = *src1.l;
+        value = *src1.i32;
         break;
       case LUX_INT64:
         value = *src1.q;
@@ -6482,7 +6482,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.f++ = (*func_dd[code])(value, *src2.l++);
+            *trgt.f++ = (*func_dd[code])(value, *src2.i32++);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6509,7 +6509,7 @@ int32_t math_funcs_2f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.d++ = (*func_dd[code])(value, *src2.l++);
+            *trgt.d++ = (*func_dd[code])(value, *src2.i32++);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6601,10 +6601,10 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
     }
     if (!result_sym)
       result_sym = array_clone(i, out_type);
-    trgt.l = (int32_t*) array_data(result_sym);
+    trgt.i32 = (int32_t*) array_data(result_sym);
   } else {                      // a scalar will do
     result_sym = scalar_scratch(out_type);
-    trgt.l = &scalar_value(result_sym).l;
+    trgt.i32 = &scalar_value(result_sym).i32;
   }
 
   if (n1 == n2) {               // advance both argument pointers
@@ -6621,7 +6621,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.ui8++, *src2.l++);
+              *trgt.f++ = (*func_id[code])(*src1.ui8++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6649,7 +6649,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.i16++, *src2.l++);
+              *trgt.f++ = (*func_id[code])(*src1.i16++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6669,27 +6669,27 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
         switch (type2) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.l++, *src2.ui8++);
+              *trgt.f++ = (*func_id[code])(*src1.i32++, *src2.ui8++);
             break;
           case LUX_INT16:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.l++, *src2.i16++);
+              *trgt.f++ = (*func_id[code])(*src1.i32++, *src2.i16++);
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.l++, *src2.l++);
+              *trgt.f++ = (*func_id[code])(*src1.i32++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.l++, *src2.q++);
+              *trgt.f++ = (*func_id[code])(*src1.i32++, *src2.q++);
             break;
           case LUX_FLOAT:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.l++, *src2.f++);
+              *trgt.f++ = (*func_id[code])(*src1.i32++, *src2.f++);
             break;
           case LUX_DOUBLE:
             while (nelem--)
-              *trgt.d++ = (*func_id[code])(*src1.l++, *src2.d++);
+              *trgt.d++ = (*func_id[code])(*src1.i32++, *src2.d++);
             break;
         }
         break;
@@ -6705,7 +6705,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.q++, *src2.l++);
+              *trgt.f++ = (*func_id[code])(*src1.q++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6733,7 +6733,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.f++, *src2.l++);
+              *trgt.f++ = (*func_id[code])(*src1.f++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6761,7 +6761,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.f++ = (*func_id[code])(*src1.d++, *src2.l++);
+              *trgt.f++ = (*func_id[code])(*src1.d++, *src2.i32++);
             break;
           case LUX_INT64:
             while (nelem--)
@@ -6787,7 +6787,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
         valuei = *src2.i16;
         break;
       case LUX_INT32:
-        valuei = *src2.l;
+        valuei = *src2.i32;
         break;
       case LUX_INT64:
         valuei = *src2.q;
@@ -6811,7 +6811,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.f++ = (*func_id[code])(*src1.l++, valuei);
+            *trgt.f++ = (*func_id[code])(*src1.i32++, valuei);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6838,7 +6838,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.d++ = (*func_id[code])(*src1.l++, valuei);
+            *trgt.d++ = (*func_id[code])(*src1.i32++, valuei);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6862,7 +6862,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
         valued = *src1.i16;
         break;
       case LUX_INT32:
-        valued = *src1.l;
+        valued = *src1.i32;
         break;
       case LUX_INT64:
         valued = *src1.q;
@@ -6886,7 +6886,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.f++ = (*func_id[code])(valued, *src2.l++);
+            *trgt.f++ = (*func_id[code])(valued, *src2.i32++);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6913,7 +6913,7 @@ int32_t math_funcs_i_f(int32_t nsym1, int32_t nsym2, int32_t code)
           break;
         case LUX_INT32:
           while (nelem--)
-            *trgt.d++ = (*func_id[code])(valued, *src2.l++);
+            *trgt.d++ = (*func_id[code])(valued, *src2.i32++);
           break;
         case LUX_INT64:
           while (nelem--)
@@ -6997,7 +6997,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
         val1 = (double) *src1.i16;
         break;
       case LUX_INT32:
-        val1 = (double) *src1.l;
+        val1 = (double) *src1.i32;
         break;
       case LUX_INT64:
         val1 = (double) *src1.q;
@@ -7018,7 +7018,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
         val2 = (double) *src2.i16;
         break;
       case LUX_INT32:
-        val2 = (double) *src2.l;
+        val2 = (double) *src2.i32;
         break;
       case LUX_INT64:
         val2 = (double) *src2.q;
@@ -7039,7 +7039,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
         val3 = (double) *src3.i16;
         break;
       case LUX_INT32:
-        val3 = (double) *src3.l;
+        val3 = (double) *src3.i32;
         break;
       case LUX_INT64:
         val3 = (double) *src3.q;
@@ -7061,7 +7061,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
           val1 = (double) *src1.i16;
           break;
         case LUX_INT32:
-          val1 = (double) *src1.l;
+          val1 = (double) *src1.i32;
           break;
         case LUX_INT64:
           val1 = (double) *src1.q;
@@ -7083,7 +7083,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
           val2 = (double) *src2.i16;
           break;
         case LUX_INT32:
-          val2 = (double) *src2.l;
+          val2 = (double) *src2.i32;
           break;
         case LUX_INT64:
           val2 = (double) *src2.q;
@@ -7106,7 +7106,7 @@ int32_t math_funcs_3f(int32_t sym1, int32_t sym2, int32_t sym3, int32_t code)
           val3 = (double) *src3.i16;
           break;
         case LUX_INT32:
-          val3 = (double) *src3.l;
+          val3 = (double) *src3.i32;
           break;
         case LUX_INT64:
           val3 = (double) *src3.q;

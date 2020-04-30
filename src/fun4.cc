@@ -110,11 +110,11 @@ int32_t lux_gridmatch(int32_t narg, int32_t ps[])/* gridmatch function */
  type = array_type(ps[0]);
  if (array_type(ps[1]) > type) {
    type = array_type(ps[1]);
-   p1.l = (int32_t*) array_data(lux_converts[type](1, &ps[0]));
-   p2.l = (int32_t*) array_data(ps[1]);
+   p1.i32 = (int32_t*) array_data(lux_converts[type](1, &ps[0]));
+   p2.i32 = (int32_t*) array_data(ps[1]);
  } else {
-   p1.l = (int32_t*) array_data(ps[0]);
-   p2.l = (int32_t*) array_data(lux_converts[type](1, &ps[1]));
+   p1.i32 = (int32_t*) array_data(ps[0]);
+   p2.i32 = (int32_t*) array_data(lux_converts[type](1, &ps[1]));
  }
  dstype = type;
 
@@ -172,7 +172,7 @@ int32_t lux_gridmatch(int32_t narg, int32_t ps[])/* gridmatch function */
    j2--;
    // get gaussian masks
    gwind0(gwx, gwy, gwid, i1, i2, j1, j2);
-   match_1(p1.l, p2.l, i1, i2, j1, j2, nx, ny, gwx, gwy);
+   match_1(p1.i32, p2.i32, i1, i2, j1, j2, nx, ny, gwx, gwy);
    *out++ = xoffset;
    *out++ = yoffset;
    if (mode != 0)
@@ -332,7 +332,7 @@ float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_
   int32_t       nxc, nxd, nyc, nyd, i, j, jj;
   float         sum, sumg, sumx, sumgx;
 
-  p.l = (int32_t*) m;
+  p.i32 = (int32_t*) m;
   // fix limits so sum doesn't run off edge of image
   if (nxa + idx < 0)
     nxc = -idx;
@@ -368,7 +368,7 @@ float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_
         break;
       case LUX_INT32:
         for (i = nxc; i < nxd; i++)
-          sumx += gx[i]*p.l[i + jj];
+          sumx += gx[i]*p.i32[i + jj];
         break;
       case LUX_INT64:
         for (i = nxc; i < nxd; i++)
@@ -448,8 +448,8 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
 
   //printf("nxc, nxd, nyc, nyd = %d %d %d %d\n",nxc, nxd, nyc, nyd);
   //get start of m1 and m2 and the increments
-  m1p.l = m1;
-  m2p.l = m2;
+  m1p.i32 = m1;
+  m2p.i32 = m2;
   //printf("m1p.ui8, m2p.ui8 = %x %x\n",m1p.ui8, m2p.ui8);
   m1p.ui8 = m1p.ui8 + lux_type_size[dstype] * ((nyc * nxs ) + nxc);
   m2p.ui8 = m2p.ui8 + lux_type_size[dstype] * (( (nyc+ idy) * nxs ) + nxc + idx);
@@ -506,7 +506,7 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
         p1 = ps;
         sumx = 0.0;
         while (i) {
-          t = ((float) *m1p.l++) - ((float) *m2p.l++);
+          t = ((float) *m1p.i32++) - ((float) *m2p.i32++);
           t = t + bs;
           t = t*t;
           t = MIN(t, ndmx2);
@@ -514,8 +514,8 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
           i--;
         }
         sum += (*p2++) * sumx;
-        m1p.l += ny;
-        m2p.l += ny;
+        m1p.i32 += ny;
+        m2p.i32 += ny;
         j--;
       }
       break;
@@ -599,7 +599,7 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])// stretch function
   if (!symbolIsNumericalArray(iq) || array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
   type = array_type(iq);
-  base.l = (int32_t*) array_data(iq);
+  base.i32 = (int32_t*) array_data(iq);
   n = array_dims(iq)[0];
   m = array_dims(iq)[1];
   nm1 = n - 1;
@@ -610,7 +610,7 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])// stretch function
   fm = m;
                                         // make the output array
   result_sym = array_clone(iq, type);
-  out.l = (int32_t*) array_data(result_sym);
+  out.i32 = (int32_t*) array_data(result_sym);
                                 // second arg must be a displacement grid
   iq = ps[1];
   if (!symbolIsNumericalArray(iq))
@@ -767,19 +767,19 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])// stretch function
           *out.i16++ = xq;
           break;
         case LUX_INT32:
-          bb.l = base.l+iq;
-          xq = b1*(c1 * *(bb.l) + c2 * *(bb.l+i2)
-                   + c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
-          bb.l += j2;
-          xq += b2*(c1 * *(bb.l) + c2 * *(bb.l+i2)
-                    + c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
-          bb.l += j3;
-          xq += b3*(c1 * *(bb.l) + c2 * *(bb.l+i2)
-                    + c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
-          bb.l += j4;
-          xq += b4*(c1 * *(bb.l) + c2 * *(bb.l+i2)
-                    + c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
-          *out.l++ = xq;
+          bb.i32 = base.i32+iq;
+          xq = b1*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)
+                   + c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
+          bb.i32 += j2;
+          xq += b2*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)
+                    + c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
+          bb.i32 += j3;
+          xq += b3*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)
+                    + c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
+          bb.i32 += j4;
+          xq += b4*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)
+                    + c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
+          *out.i32++ = xq;
           break;
         case LUX_INT64:
           bb.q = base.q+iq;
@@ -976,7 +976,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
   CK_ARR(iq, 1);
   type = sym[iq].type;
   h = (array *) sym[iq].spec.array.ptr;
-  base.l = (int32_t *) ((char *)h + sizeof(array));
+  base.i32 = (int32_t *) ((char *)h + sizeof(array));
                                         // we want a 1 or 2-D array only
   if ( h->ndim > 2 )
     return cerror(NEED_1D_2D_ARR, iq);
@@ -1004,7 +1004,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
   dim[1] = ms;
   result_sym = array_scratch(type, h->ndim, dim);
   h = (array *) sym[result_sym].spec.array.ptr;
-  out.l = jout.l = (int32_t *) ((char *)h + sizeof(array));
+  out.i32 = jout.i32 = (int32_t *) ((char *)h + sizeof(array));
                                                         // setup the steps
   stepx = 1.0 / sx;
   stepy = 1.0 /sy;
@@ -1038,8 +1038,8 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
         z00 = *(jbase.i16);
         z01 = *(jbase.i16 + n); break;
       case 2:
-        z00 = *(jbase.l);
-        z01 = *(jbase.l + n); break;
+        z00 = *(jbase.i32);
+        z01 = *(jbase.i32 + n); break;
       case 3:
         z00 = *(jbase.f);
         z01 = *(jbase.f + n); break;
@@ -1068,8 +1068,8 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
             z10 = *(jbase.i16 + i);
             z11 = *(jbase.i16 + i + n); break;
           case 2:
-            z10 = *(jbase.l + i);
-            z11 = *(jbase.l + i + n); break;
+            z10 = *(jbase.i32 + i);
+            z11 = *(jbase.i32 + i + n); break;
           case 3:
             z10 = *(jbase.f + i);
             z11 = *(jbase.f + i + n); break;
@@ -1085,7 +1085,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
         switch (type) {
         case 0: *out.ui8++ = xq; break;
         case 1: *out.i16++ = xq; break;
-        case 2: *out.l++ = xq; break;
+        case 2: *out.i32++ = xq; break;
         case 3: *out.f++ = xq; break;
         case 4: *out.d++ = xq; break;
         }
@@ -1101,7 +1101,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
         switch (type) {
         case 0: *out.ui8++ = xq; break;
         case 1: *out.i16++ = xq; break;
-        case 2: *out.l++ = xq; break;
+        case 2: *out.i32++ = xq; break;
         case 3: *out.f++ = xq; break;
         case 4: *out.d++ = xq; break;
         }
@@ -1129,7 +1129,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
         switch (type) {
         case 0: *out.ui8++ = *(jbase.ui8 + i); break;
         case 1: *out.i16++ = *(jbase.i16 + i); break;
-        case 2: *out.l++ = *(jbase.l + i); break;
+        case 2: *out.i32++ = *(jbase.i32 + i); break;
         case 3: *out.f++ = *(jbase.f + i); break;
         case 4: *out.d++ = *(jbase.d + i); break;
         }
@@ -1142,7 +1142,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
                         switch (type) {
                         case 0: *out.ui8++ = *(jbase.ui8 + i); break;
                         case 1: *out.i16++ = *(jbase.i16 + i); break;
-                        case 2: *out.l++ = *(jbase.l + i); break;
+                        case 2: *out.i32++ = *(jbase.i32 + i); break;
                         case 3: *out.f++ = *(jbase.f + i); break;
                         case 4: *out.d++ = *(jbase.d + i); break;
                         }
@@ -1213,7 +1213,7 @@ void bicubic_f(void)    // internal routine for single pixel
            switch (regrid_type) {
            case 0: *out.ui8++ = 0; break;
            case 1: *out.i16++ = 0; break;
-           case 2: *out.l++ = 0; break;
+           case 2: *out.i32++ = 0; break;
            case 3: *out.f++ = 0; break;
            case 4: *out.d++ = 0; break;
            }
@@ -1242,7 +1242,7 @@ void bicubic_f(void)    // internal routine for single pixel
            switch (regrid_type) {
            case 0: *out.ui8++ = 0; break;
            case 1: *out.i16++ = 0; break;
-           case 2: *out.l++ = 0; break;
+           case 2: *out.i32++ = 0; break;
            case 3: *out.f++ = 0; break;
            case 4: *out.d++ = 0; break;
            }
@@ -1290,16 +1290,16 @@ void bicubic_f(void)    // internal routine for single pixel
  // also we need to round rather than truncate, taking that extra care
  *out.i16++ = rint(xq); break;
  case 2:
- bb.l = base.l+iq;
- xq = b1*(c1 * *(bb.l) + c2 * *(bb.l+i2)+ c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
- bb.l += j2;
- xq += b2*(c1 * *(bb.l) + c2 * *(bb.l+i2)+ c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
- bb.l += j3;
- xq += b3*(c1 * *(bb.l) + c2 * *(bb.l+i2)+ c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
- bb.l += j4;
- xq += b4*(c1 * *(bb.l) + c2 * *(bb.l+i2)+ c3 * *(bb.l+i3) + c4 * *(bb.l+i4));
+ bb.i32 = base.i32+iq;
+ xq = b1*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)+ c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
+ bb.i32 += j2;
+ xq += b2*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)+ c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
+ bb.i32 += j3;
+ xq += b3*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)+ c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
+ bb.i32 += j4;
+ xq += b4*(c1 * *(bb.i32) + c2 * *(bb.i32+i2)+ c3 * *(bb.i32+i3) + c4 * *(bb.i32+i4));
  // also we need to round rather than truncate, taking that extra care
- *out.l++ = rint(xq); break;
+ *out.i32++ = rint(xq); break;
  case 3:
  bb.f = base.f+iq;
  xq = b1*(c1 * *(bb.f) + c2 * *(bb.f+i2)+ c3 * *(bb.f+i3) + c4 * *(bb.f+i4));
@@ -1355,7 +1355,7 @@ void bicubic_fc()       // internal routine for single pixel
             *out.i16++ = 0;
             break;
           case LUX_INT32:
-            *out.l++ = 0;
+            *out.i32++ = 0;
             break;
           case LUX_INT64:
             *out.q++ = 0;
@@ -1412,7 +1412,7 @@ void bicubic_fc()       // internal routine for single pixel
             *out.i16++ = 0;
             break;
           case LUX_INT32:
-            *out.l++ = 0;
+            *out.i32++ = 0;
             break;
           case LUX_INT64:
             *out.q++ = 0;
@@ -1482,16 +1482,16 @@ void bicubic_fc()       // internal routine for single pixel
       *out.i16++ = rint(xq);
       break;
     case LUX_INT32:
-      bb.l = base.l+iq;
-      xq = b1*(c1*bb.l[0] + c2*bb.l[i2]+ c3*bb.l[i3] + c4*bb.l[i4]);
-      bb.l += j2;
-      xq += b2*(c1*bb.l[0] + c2*bb.l[i2]+ c3*bb.l[i3] + c4*bb.l[i4]);
-      bb.l += j3;
-      xq += b3*(c1*bb.l[0] + c2*bb.l[i2]+ c3*bb.l[i3] + c4*bb.l[i4]);
-      bb.l += j4;
-      xq += b4*(c1*bb.l[0] + c2*bb.l[i2]+ c3*bb.l[i3] + c4*bb.l[i4]);
+      bb.i32 = base.i32+iq;
+      xq = b1*(c1*bb.i32[0] + c2*bb.i32[i2]+ c3*bb.i32[i3] + c4*bb.i32[i4]);
+      bb.i32 += j2;
+      xq += b2*(c1*bb.i32[0] + c2*bb.i32[i2]+ c3*bb.i32[i3] + c4*bb.i32[i4]);
+      bb.i32 += j3;
+      xq += b3*(c1*bb.i32[0] + c2*bb.i32[i2]+ c3*bb.i32[i3] + c4*bb.i32[i4]);
+      bb.i32 += j4;
+      xq += b4*(c1*bb.i32[0] + c2*bb.i32[i2]+ c3*bb.i32[i3] + c4*bb.i32[i4]);
       // also we need to round rather than truncate, taking that extra care
-      *out.l++ = rint(xq);
+      *out.i32++ = rint(xq);
       break;
     case LUX_INT64:
       bb.q = base.q+iq;
@@ -1573,7 +1573,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
   if (!symbolIsNumericalArray(iq))
     return cerror(NEED_NUM_ARR, iq);
   regrid_type = array_type(iq);         // data type
-  base.l = (int32_t*) array_data(iq);   // pointer to start of data
+  base.i32 = (int32_t*) array_data(iq);   // pointer to start of data
                                          // we want a 2-D array only
   if (array_num_dims(iq) != 2)
     return cerror(NEED_2D_ARR, iq);
@@ -1594,7 +1594,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
   if (ng < 2 || mg < 2)
     return cerror(NEED_NTRV_2D_ARR, ps[1]);
   iq = lux_float(1, &ps[1]);
-  xgbase.l = (int32_t*) array_data(iq);         // x grid data
+  xgbase.i32 = (int32_t*) array_data(iq);         // x grid data
 
   if (!symbolIsNumericalArray(ps[2]))
     return cerror(NEED_NUM_ARR, ps[2]);
@@ -1605,7 +1605,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
       || mg != array_dims(ps[2])[1])
     return cerror(INCMP_ARG, ps[2]);
   iq = lux_float(1, &ps[2]);
-  ygbase.l = (int32_t*) array_data(iq);         // y grid data
+  ygbase.i32 = (int32_t*) array_data(iq);         // y grid data
                          // get dx and dy which are put in ns and ms
   ns = int_arg(ps[3]);          // x scale
   ms = int_arg(ps[4]);          // y scale
@@ -1623,7 +1623,7 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
     return LUX_ERROR;
   }
   result_sym = array_scratch(regrid_type, 2, dim);
-  jpbase.l = (int32_t*) array_data(result_sym); // output
+  jpbase.i32 = (int32_t*) array_data(result_sym); // output
   yrun = 1.0/ (float) ms;
   i = lux_type_size[regrid_type];
   // various increments, in bytes!
@@ -1705,9 +1705,9 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
               case LUX_INT32:
                 while (ic--) {
                   if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
-                    *out.l++ = 0;
+                    *out.i32++ = 0;
                   else
-                    *out.l++ = *(base.l + (int32_t) xl + n * (int32_t) yl);
+                    *out.i32++ = *(base.i32 + (int32_t) xl + n * (int32_t) yl);
                   xl += xinc;
                   yl += yinc;
                 }
@@ -1868,7 +1868,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
     case LUX_SCALAR:
       iq = lux_long(1, &iq);    // ensure LONG
       nFac = 1;
-      factors = &scalar_value(iq).l;
+      factors = &scalar_value(iq).i32;
       break;
     case LUX_ARRAY:
       iq = lux_long(1, &iq);    // ensure LONG
@@ -1946,7 +1946,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
         outDims[srcinfo.axes[i]] = 1;
     }
   iq = array_scratch(symbol_type(ps[0]), srcinfo.ndim, outDims);
-  trgt.l = (int32_t*) array_data(iq);
+  trgt.i32 = (int32_t*) array_data(iq);
   zerobytes(trgt.ui8, array_size(iq)*lux_type_size[array_type(iq)]);
 
   trgtinfo.setupDimensionLoop(srcinfo.ndim, outDims, symbol_type(ps[0]),
@@ -1968,11 +1968,11 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
   switch (array_type(iq)) {
     case LUX_INT8:
       do {
-        sum.l = 0;
+        sum.i32 = 0;
         do
-          sum.l += (int32_t) src.ui8[offset];
+          sum.i32 += (int32_t) src.ui8[offset];
         while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
-        *trgt.ui8 = sum.l/nel;
+        *trgt.ui8 = sum.i32/nel;
         src.ui8 = (uint8_t *) tmpinfo.data0;
         n = trgtinfo.advanceLoop(&trgt);
         offset = 0;
@@ -1982,11 +1982,11 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
       break;
     case LUX_INT16:
       do {
-        sum.l = 0;
+        sum.i32 = 0;
         do
-          sum.l += (int32_t) src.i16[offset];
+          sum.i32 += (int32_t) src.i16[offset];
         while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
-        *trgt.i16 = sum.l/nel;
+        *trgt.i16 = sum.i32/nel;
         src.i16 = (int16_t *) tmpinfo.data0;
         n = trgtinfo.advanceLoop(&trgt);
         offset = 0;
@@ -1996,12 +1996,12 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
       break;
     case LUX_INT32:
       do {
-        sum.l = 0;
+        sum.i32 = 0;
         do
-          sum.l += src.l[offset];
+          sum.i32 += src.i32[offset];
         while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
-        *trgt.l = sum.l/nel;
-        src.l = (int32_t *) tmpinfo.data0;
+        *trgt.i32 = sum.i32/nel;
+        src.i32 = (int32_t *) tmpinfo.data0;
         n = trgtinfo.advanceLoop(&trgt);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
@@ -2069,7 +2069,7 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) // compress function
   CK_ARR(iq, 1);
   type = sym[iq].type;
   h = (array *) sym[iq].spec.array.ptr;
-  q1.l = (int32_t *) ((char *)h + sizeof(array));
+  q1.i32 = (int32_t *) ((char *)h + sizeof(array));
   nd = h->ndim;
   // we want a 1 or 2-D array only
   if ( nd > 2 ) return cerror(NEED_1D_2D_ARR, iq);
@@ -2083,7 +2083,7 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) // compress function
   dim[0] = nx;  dim[1] = ny;    nxx = h->dims[0];
   result_sym = array_scratch(type, nd, dim);
   h = (array *) sym[result_sym].spec.array.ptr;
-  q2.l = (int32_t *) ((char *)h + sizeof(array));
+  q2.i32 = (int32_t *) ((char *)h + sizeof(array));
   fac = 1.0 / ( (float) cx * (float) cy );
   n = nxx - cx;                                         // step bewteen lines
   switch (type)
@@ -2112,14 +2112,14 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) // compress function
       break;
     case LUX_INT32:
       while (ny--)
-      {         base.l = q1.l;  iq = nx;
+      {         base.i32 = q1.i32;  iq = nx;
         while (iq--)
-        { p.l = base.l; xq = 0.0;
+        { p.i32 = base.i32; xq = 0.0;
           for (j=0;j<cy;j++)
-          { for (i=0;i<cx;i++) xq += *p.l++; p.l += n; }
-          *q2.l++ = (int32_t) ( xq * fac );
-          base.l += cx; }
-        q1.l +=  nxx * cy; }
+          { for (i=0;i<cx;i++) xq += *p.i32++; p.i32 += n; }
+          *q2.i32++ = (int32_t) ( xq * fac );
+          base.i32 += cx; }
+        q1.i32 +=  nxx * cy; }
       break;
     case LUX_INT64:
       while (ny--)
@@ -2199,7 +2199,7 @@ int32_t lux_sort(int32_t narg, int32_t ps[])
      original is already a temp, there is no copy and it is sorted in place */
   if (lux_replace(result_sym, iq) != 1)
     return cerror(IMPOSSIBLE, 0);
-  p.l = (int32_t*) array_data(result_sym);
+  p.i32 = (int32_t*) array_data(result_sym);
   n = array_size(result_sym);
   if (n <= 1)                   // nothing to sort
     return result_sym;
@@ -2240,7 +2240,7 @@ int32_t lux_sort(int32_t narg, int32_t ps[])
       break;
     case LUX_INT32:
       for ( ; nloop--; p.ui8 += step)
-        sort_l(n, p.l);
+        sort_l(n, p.i32);
       break;
     case LUX_INT64:
       for ( ; nloop--; p.ui8 += step)
@@ -2274,7 +2274,7 @@ int32_t lux_sort(int32_t narg, int32_t ps[])
       break;
     case LUX_INT32:
       for ( ; nloop--; p.ui8 += step)
-        shell_l(n, p.l);
+        shell_l(n, p.i32);
       break;
     case LUX_INT64:
       for ( ; nloop--; p.ui8 += step)
@@ -2322,12 +2322,12 @@ int32_t lux_index(int32_t narg, int32_t ps[])
   type = symbol_type(iq);
   if (type >= LUX_CFLOAT)
     return cerror(ILL_TYPE, iq, typeName(type));
-  q.l = (int32_t *) array_data(iq);
+  q.i32 = (int32_t *) array_data(iq);
   n = array_size(iq);
   if (n <= 1)                   // nothing to sort
     return LUX_ZERO;
   result_sym = array_clone(iq, LUX_INT32);
-  p.l = (int32_t *) array_data(result_sym);
+  p.i32 = (int32_t *) array_data(result_sym);
   if (internalMode & 1) {       // along 0th dimension
     nloop = n/array_dims(iq)[0];
     n = array_dims(iq)[0];
@@ -2341,15 +2341,15 @@ int32_t lux_index(int32_t narg, int32_t ps[])
   switch (type) {
   case LUX_INT8:
     for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
-      indexx_b(n, q.ui8, p.l);
+      indexx_b(n, q.ui8, p.i32);
     break;
   case LUX_INT16:
     for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
-      indexx_w(n, q.i16, p.l);
+      indexx_w(n, q.i16, p.i32);
     break;
   case LUX_INT32:
     for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
-      indexx_l(n, q.l, p.l);
+      indexx_l(n, q.i32, p.i32);
     break;
   case LUX_INT64:
     for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
@@ -2357,30 +2357,30 @@ int32_t lux_index(int32_t narg, int32_t ps[])
     break;
   case LUX_FLOAT:
     for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
-      indexx_f(n, q.f, p.l);
+      indexx_f(n, q.f, p.i32);
     break;
   case LUX_DOUBLE:
     for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
-      indexx_d(n, q.d, p.l);
+      indexx_d(n, q.d, p.i32);
     break;
   case LUX_TEMP_STRING:
     for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
-      indexx_s(n, q.sp, p.l);
+      indexx_s(n, q.sp, p.i32);
     break;
   default:
     return cerror(ILL_TYPE, ps[0]);
   }
   if (internalMode & 2) {       // reverse index to get list of ranks
-    p.l = (int32_t *) array_data(result_sym); // back to start of data
+    p.i32 = (int32_t *) array_data(result_sym); // back to start of data
     // we reverse the list by moving each number x to the position
-    // indicated at p.l[x], and moving the old value at that
+    // indicated at p.i32[x], and moving the old value at that
     // position in the same fashion until we've completed a cycle
     // and returned to the first x.  There may be more than one
     // cycles in the data, so we keep track of the number we've
     // already shifted to determine if we're all done.  LS 6may96
     while (nloop2--) {
-      invertPermutation(p.l, n);
-      p.l += n;
+      invertPermutation(p.i32, n);
+      p.i32 += n;
     }
   }
   return result_sym;
@@ -3129,8 +3129,8 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
       float     z4, z1, z2, z3, yq;
       int32_t   *p, *q;
       for (k=0;k<ny;k++) {
-        p = base.l + k*dline + rflag;
-        q = out.l  + k*dline + rflag;
+        p = base.i32 + k*dline + rflag;
+        q = out.i32  + k*dline + rflag;
         z1 = (float) *(p + i1);         z2 = (float) *(p + i2);
         z3 = (float) *(p + i3);         z4 = (float) *(p + i4);
         p = p + i4;
@@ -3288,7 +3288,7 @@ int32_t lux_shift3(int32_t narg, int32_t ps[])  // shift3, bicubic image shift
   if (!symbolIsNumericalArray(iq))
     return cerror(NEED_NUM_ARR, iq);
   regrid_type = array_type(iq);
-  base.l = (int32_t*) array_data(iq);
+  base.i32 = (int32_t*) array_data(iq);
                                          // we want a 2-D array only
   nd = array_num_dims(iq);
   if (nd > 2)
@@ -3310,7 +3310,7 @@ int32_t lux_shift3(int32_t narg, int32_t ps[])  // shift3, bicubic image shift
     return LUX_ERROR;
 
   result_sym = array_clone(iq, regrid_type);
-  out.l = (int32_t*) array_data(result_sym);
+  out.i32 = (int32_t*) array_data(result_sym);
 
   // first the shifts in x
   if (dx == 0.0)                // just copy over the original
@@ -3388,14 +3388,14 @@ void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
                + px3*src.i16[i + 2*nsx + 1] + px4*src.i16[i + 2*nsx + 2]);
       break;
     case LUX_INT32:
-      *trgt.l = py1*(px1*src.l[i - nsx - 1] + px2*src.l[i - nsx]
-                     + px3*src.l[i - nsx + 1] + px4*src.l[i - nsx + 2])
-        + py2*(px1*src.l[i - 1] + px2*src.l[i] + px3*src.l[i + 1]
-               + px4*src.l[i + 2])
-        + py3*(px1*src.l[i + nsx - 1] + px2*src.l[i + nsx]
-               + px3*src.l[i + nsx + 1] + px4*src.l[i + nsx + 2])
-        + py4*(px1*src.l[i + 2*nsx - 1] + px2*src.l[i + 2*nsx]
-               + px3*src.l[i + 2*nsx + 1] + px4*src.l[i + 2*nsx + 2]);
+      *trgt.i32 = py1*(px1*src.i32[i - nsx - 1] + px2*src.i32[i - nsx]
+                     + px3*src.i32[i - nsx + 1] + px4*src.i32[i - nsx + 2])
+        + py2*(px1*src.i32[i - 1] + px2*src.i32[i] + px3*src.i32[i + 1]
+               + px4*src.i32[i + 2])
+        + py3*(px1*src.i32[i + nsx - 1] + px2*src.i32[i + nsx]
+               + px3*src.i32[i + nsx + 1] + px4*src.i32[i + nsx + 2])
+        + py4*(px1*src.i32[i + 2*nsx - 1] + px2*src.i32[i + 2*nsx]
+               + px3*src.i32[i + 2*nsx + 1] + px4*src.i32[i + 2*nsx + 2]);
       break;
     case LUX_INT64:
       *trgt.q = py1*(px1*src.q[i - nsx - 1] + px2*src.q[i - nsx]
@@ -3634,10 +3634,10 @@ int32_t lux_bigger235(int32_t narg, int32_t ps[])
       break;
     case LUX_SCALAR:
       iq = lux_long(1, ps);
-      src = &scalar_value(iq).l;
+      src = &scalar_value(iq).i32;
       n = 1;
       result = scalar_scratch(LUX_INT32);
-      trgt = &scalar_value(result).l;
+      trgt = &scalar_value(result).i32;
       break;
     default:
       return cerror(ILL_CLASS, ps[0]);

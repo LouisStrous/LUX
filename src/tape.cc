@@ -191,7 +191,7 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
   if (symbol_class(iq) != LUX_ARRAY)
     return cerror(NEED_ARR, iq);
 
-  q1.l = (int32_t *) array_data(iq);
+  q1.i32 = (int32_t *) array_data(iq);
   type = array_type(iq);
   n = cur = lux_type_size[type]*array_size(iq);
   nread = 0;
@@ -228,7 +228,7 @@ int32_t lux_tapwrt(int32_t narg, int32_t ps[]) // read tape record
  iq = ps[1];
  CK_ARR(iq, 1);
  h = (array *) sym[iq].spec.array.ptr;
- q1.l = (int32_t *) ((char *)h + sizeof(array));
+ q1.i32 = (int32_t *) ((char *)h + sizeof(array));
  nd = h->ndim;
  type = sym[iq].type;
  n = lux_type_size[type]; errno = 0;
@@ -265,7 +265,7 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])                        // wri
  iq = ps[1];
  CK_ARR(iq, 1);
  h = (array *) sym[iq].spec.array.ptr;
- q1.l = (int32_t *) ((char *)h + sizeof(array));
+ q1.i32 = (int32_t *) ((char *)h + sizeof(array));
  nd = h->ndim;
  type = sym[iq].type;
  nb = n = lux_type_size[sym[iq].type];
@@ -329,7 +329,7 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])// read tape record
  iq = ps[1];
  if (symbol_class(iq) != LUX_ARRAY)
    return cerror(NEED_ARR, iq);
- q1.l = (int32_t *) array_data(iq);
+ q1.i32 = (int32_t *) array_data(iq);
  type = array_type(iq);
  nb = n = lux_type_size[type];
  errno = 0;

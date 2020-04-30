@@ -478,12 +478,12 @@ int32_t lux_randomb(int32_t narg, int32_t ps[])
   result = array_scratch((internalMode & 1)? LUX_INT32: LUX_INT8, ndim, dims);
   if (result == LUX_ERROR)        // some error?
     return LUX_ERROR;
-  p.l = (int32_t*) array_data(result);        // pointer to result data
+  p.i32 = (int32_t*) array_data(result);        // pointer to result data
 
   n = array_size(result);        // number of bits to get
   if (internalMode &1)          // /LONG: get a LONG-full of bits
     while (n--)
-      *p.l++ = random_bits();
+      *p.i32++ = random_bits();
   else
     while (n--)
       *p.ui8++ = random_bit();        // get one bit
@@ -546,9 +546,9 @@ int32_t lux_randoml(int32_t narg, int32_t ps[])
   // number.
   while (n--) {
     do
-      *p.l = random_bits();        // get one int32_t-full of bits
+      *p.i32 = random_bits();        // get one int32_t-full of bits
     while (isnan(*p.f));
-    p.l++;
+    p.i32++;
   }
 
   return result;

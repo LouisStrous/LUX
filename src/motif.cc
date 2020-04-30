@@ -413,7 +413,7 @@ int32_t lux_xmcommand(narg, ps) //see next line for args
  XtManageChild(lux_widget_id[command]);
  XmStringFree(prompt);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = command;
+ sym[result_sym].spec.scalar.i32 = command;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -490,7 +490,7 @@ int32_t lux_xmdialog_board(narg, ps)        // see next line for args
  end of old close_flag code */
  XmStringFree(title);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = board;
+ sym[result_sym].spec.scalar.i32 = board;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -538,7 +538,7 @@ int32_t lux_xmdialog_form(narg, ps)        // see next line for args
 
  XmStringFree(title);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = form;
+ sym[result_sym].spec.scalar.i32 = form;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -571,7 +571,7 @@ int32_t lux_xmtoplevel_form(narg, ps)        // see next line for args
  lux_widget_id[form] = xmtoplevel_form(dx, dy, s, hs, vs, mx, my);
 
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = form;
+ sym[result_sym].spec.scalar.i32 = form;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -600,7 +600,7 @@ int32_t lux_xmtoplevel_board(narg, ps)        // see next line for args
  board = n_widgets++;
  lux_widget_id[board] = xmtoplevel_board(dx, dy, s, mx, my);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = board;
+ sym[result_sym].spec.scalar.i32 = board;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -631,7 +631,7 @@ int32_t lux_xmboard(narg, ps)        // (parent, [width, height, lr_margin, tb_m
          XmCreateBulletinBoard(lux_widget_id[parent], "board",wargs, n);
  XtManageChild(lux_widget_id[board]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = board;
+ sym[result_sym].spec.scalar.i32 = board;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -666,7 +666,7 @@ int32_t lux_xmform(narg, ps)        // (parent, [width,height,hspace,vspace,mx,m
  lux_widget_id[form] = XmCreateForm(lux_widget_id[parent], "form",wargs, n);
  XtManageChild(lux_widget_id[form]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = form;
+ sym[result_sym].spec.scalar.i32 = form;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -705,7 +705,7 @@ int32_t lux_xmframe(narg, ps) // (parent, [lr_margin, tb_margin, width, type])
          XmCreateFrame(lux_widget_id[parent], "frame",wargs, n);
  XtManageChild(lux_widget_id[frame]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = frame;
+ sym[result_sym].spec.scalar.i32 = frame;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -741,7 +741,7 @@ int32_t lux_xmseparator(narg, ps) // (parent, [orient, margin, type])
          XmCreateSeparator(lux_widget_id[parent], "separator",wargs, n);
  XtManageChild(lux_widget_id[sep]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = sep;
+ sym[result_sym].spec.scalar.i32 = sep;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -786,7 +786,7 @@ int32_t rows_or_columns(narg, ps,mode)        //(parent, width, height, [ncolumn
          XmCreateRowColumn(lux_widget_id[parent], "rowcolumn",wargs, n);
  XtManageChild(lux_widget_id[rowcolumn]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = rowcolumn;
+ sym[result_sym].spec.scalar.i32 = rowcolumn;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -812,7 +812,7 @@ int32_t lux_xmscrolledwindow(narg, ps)        // (parent, width, height)
          XmCreateScrolledWindow(lux_widget_id[parent], "scroll",wargs, n);
  XtManageChild(lux_widget_id[scroll]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = scroll;
+ sym[result_sym].spec.scalar.i32 = scroll;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -841,7 +841,7 @@ int32_t lux_xmscrolledwindowapp(narg, ps)        // (parent,hmargin,vmargin,spac
          XmCreateScrolledWindow(lux_widget_id[parent], "scroll",wargs, n);
  XtManageChild(lux_widget_id[scroll]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = scroll;
+ sym[result_sym].spec.scalar.i32 = scroll;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -900,7 +900,7 @@ int32_t lux_int_xmscrollbar(narg, ps, mode)  // internal, mode = 1 for horizonta
                 scroll_callback, (XtPointer) nsym);
         }
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = scroll;
+ sym[result_sym].spec.scalar.i32 = scroll;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1004,7 +1004,7 @@ int32_t lux_xmdrawingarea(narg, ps)  //(parent,lux_win,w,h,input_cb,resize_cb,ex
  XtManageChild(lux_widget_id[draw]);
 
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = drawingareas[lux_win] = draw;
+ sym[result_sym].spec.scalar.i32 = drawingareas[lux_win] = draw;
 #ifdef DEPRECATED
  printf("created widget %d, %d\n", draw, (uint32_t) wdraw);
 #endif
@@ -1118,7 +1118,7 @@ int32_t lux_xmtextfromfile(narg, ps)//(parent, filename, [rows, cols, font,color
  XtFree(buffer);
  XtManageChild(lux_widget_id[text]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = text;
+ sym[result_sym].spec.scalar.i32 = text;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1157,7 +1157,7 @@ int32_t lux_xmtext(narg, ps)//(parent, rows, cols, [font,color])
          "text",wargs, n);
  XtManageChild(lux_widget_id[text]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = text;
+ sym[result_sym].spec.scalar.i32 = text;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1192,7 +1192,7 @@ int32_t lux_xmtextbox(narg, ps)//(parent, rows, cols, [font,color])
          "text",wargs, n);
  XtManageChild(lux_widget_id[text]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = text;
+ sym[result_sym].spec.scalar.i32 = text;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1280,7 +1280,7 @@ int32_t lux_xmtextgetlastposition(narg, ps) // (widget)
 
  i = XmTextGetLastPosition(lux_widget_id[w]);
  result_sym = scalar_scratch(2);                //for position
- sym[result_sym].spec.scalar.l = i;
+ sym[result_sym].spec.scalar.i32 = i;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1293,7 +1293,7 @@ int32_t lux_xmtextgetinsertposition(narg, ps) // (widget)
 
  i = XmTextGetInsertionPosition(lux_widget_id[w]);
  result_sym = scalar_scratch(2);                //for position
- sym[result_sym].spec.scalar.l = i;
+ sym[result_sym].spec.scalar.i32 = i;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1418,7 +1418,7 @@ int32_t lux_xmtextfield(narg, ps) /* (parent, text, length, callback, ... see ne
  XmTextSetString(lux_widget_id[textfield], ls);
  XtManageChild(lux_widget_id[textfield]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = textfield;
+ sym[result_sym].spec.scalar.i32 = textfield;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1685,7 +1685,7 @@ int32_t lux_xmlistfromfile(narg, ps) /*(parent, callback, filename,
  XtAddCallback(lux_widget_id[list], XmNbrowseSelectionCallback,
                 browse_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = list;
+ sym[result_sym].spec.scalar.i32 = list;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1810,7 +1810,7 @@ int32_t lux_xmlist(narg, ps) //(parent, callback, nvisible,[font,color, resize_f
  XtAddCallback(lux_widget_id[list], XmNbrowseSelectionCallback,
                 browse_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = list;
+ sym[result_sym].spec.scalar.i32 = list;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1868,7 +1868,7 @@ int32_t lux_xmlistcount(narg, ps)        // (widget_id)
  XtSetArg(wargs[n], XmNitemCount, &i); n++;
  XtGetValues(lux_widget_id[w], wargs, n);
  result_sym = scalar_scratch(2);
- sym[result_sym].spec.scalar.l = i;
+ sym[result_sym].spec.scalar.i32 = i;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -1931,7 +1931,7 @@ int32_t lux_xmlabel(narg, ps)        // (parent, label, [font, color, size_flag]
  XtManageChild(lux_widget_id[label]);
  XmStringFree(ms);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = label;
+ sym[result_sym].spec.scalar.i32 = label;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2050,7 +2050,7 @@ int32_t lux_xmfileselect(narg, ps) /*(parent, title, ok_callback, (more on next 
  XtAddCallback(dialog,XmNcancelCallback,fcancel_callback,(XtPointer)nsym_cancel);
  XtManageChild(lux_widget_id[fselect]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = fselect;
+ sym[result_sym].spec.scalar.i32 = fselect;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2222,7 +2222,7 @@ int32_t lux_xmbutton(narg, ps) // (parent, label, callback, [font,color])
  XtAddCallback(lux_widget_id[push], XmNactivateCallback,
                 button_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = push;
+ sym[result_sym].spec.scalar.i32 = push;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2324,7 +2324,7 @@ int32_t lux_xmpixmapbutton(narg, ps) // (parent, pixmap_file, callback)
  XtAddCallback(lux_widget_id[push], XmNactivateCallback,
                 button_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = push;
+ sym[result_sym].spec.scalar.i32 = push;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2419,7 +2419,7 @@ int32_t lux_xmtogglegetstate(narg, ps) // (widget)
  iq = 0;
  if ( XmToggleButtonGadgetGetState(lux_widget_id[w]) ) iq = 1;
  result_sym = scalar_scratch(2);                // state
- sym[result_sym].spec.scalar.l = iq;
+ sym[result_sym].spec.scalar.i32 = iq;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2714,7 +2714,7 @@ int32_t lux_xmgetoptionselection(narg, ps)
  XtSetArg(wargs[n], XmNmenuHistory, &lux_widget_id[wm]); n++;
  XtGetValues(lux_widget_id[w], wargs, n);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = wm;
+ sym[result_sym].spec.scalar.i32 = wm;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2893,7 +2893,7 @@ int32_t lux_xmgetwidgetaddress(narg, ps)
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  wm = (int32_t) lux_widget_id[w];
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = wm;
+ sym[result_sym].spec.scalar.i32 = wm;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2932,7 +2932,7 @@ int32_t lux_xmarrow(narg, ps) // (parent, direction, callback, [color])
  XtAddCallback(lux_widget_id[arrow], XmNactivateCallback,
                 button_callback, (XtPointer) nsym);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = arrow;
+ sym[result_sym].spec.scalar.i32 = arrow;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -2995,7 +2995,7 @@ int32_t lux_int_xmscale(narg, ps, mode)        // internal, mode = 1 for horizon
                 scale_callback, (XtPointer) nsym);
         }
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = scale;
+ sym[result_sym].spec.scalar.i32 = scale;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -3020,7 +3020,7 @@ int32_t lux_xmscalegetvalue(narg, ps) // (widget)
 
  XmScaleGetValue(lux_widget_id[w], &value);
  result_sym = scalar_scratch(2);                // for returned value
- sym[result_sym].spec.scalar.l = value;
+ sym[result_sym].spec.scalar.i32 = value;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -3558,7 +3558,7 @@ int32_t lux_xtparent(narg, ps)
  parent = n_widgets++;
  lux_widget_id[parent] = XtParent(lux_widget_id[w]);
  result_sym = scalar_scratch(2);                //for widget id
- sym[result_sym].spec.scalar.l = parent;
+ sym[result_sym].spec.scalar.i32 = parent;
  return result_sym;
  }
  //-------------------------------------------------------------------------
@@ -3574,7 +3574,7 @@ int32_t lux_xtwindow(narg, ps)
  printf("XTWINDOW: no such window, invalid object or object not yet realized\n");
  return -1; }
  result_sym = scalar_scratch(2);                //for window id
- sym[result_sym].spec.scalar.l = wid;
+ sym[result_sym].spec.scalar.i32 = wid;
  return result_sym;
  }
  //-------------------------------------------------------------------------

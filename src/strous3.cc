@@ -412,12 +412,12 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
 //---------------------------------------------------------------------
 static int32_t cmp0(const void *a, const void *b)
 {
-  struct c { double v; int32_t l; } aa, bb;
+  struct c { double v; int32_t i32; } aa, bb;
   int32_t d;
 
   aa = *(struct c *) a;
   bb = *(struct c *) b;
-  d = aa.l - bb.l;
+  d = aa.i32 - bb.i32;
   if (d)
     return d;
   else {
@@ -783,7 +783,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
   else if (strncmp(scr, "SIMPLE  ", 8)) { // no expected FITS key
     // we'll accept an FZ file if its has a FITS header
     p.s = scr;
-    if (*p.l == SYNCH_OK) {     // have an FZ file.  OK header?
+    if (*p.i32 == SYNCH_OK) {     // have an FZ file.  OK header?
       fseek(fp, 256, SEEK_SET); // to start of header
       scr = fgets(scr, 9, fp);
       if (!scr || strncmp(scr, "SIMPLE  ", 8)) // not OK
@@ -901,16 +901,16 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
       iq = scalar_scratch(type);
       switch (type) {
         case LUX_INT8:
-          scalar_value(iq).ui8 = (uint8_t) value.l;
+          scalar_value(iq).ui8 = (uint8_t) value.i32;
           break;
         case LUX_INT16:
-          scalar_value(iq).i16 = (int16_t) value.l;
+          scalar_value(iq).i16 = (int16_t) value.i32;
           break;
         case LUX_INT32:
-          scalar_value(iq).l = value.l;
+          scalar_value(iq).i32 = value.i32;
           break;
         case LUX_INT64:
-          scalar_value(iq).q = value.l;
+          scalar_value(iq).q = value.i32;
           break;
         case LUX_FLOAT:
           scalar_value(iq).f = (float) value.d;
@@ -1861,10 +1861,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
             y1 = (double) *gy.i16++ - iy;
             break;
           case LUX_INT32:
-            ix = (int32_t) *gx.l;       // x pixel coordinate
-            iy = (int32_t) *gy.l;       // y pixel coordinate
-            x1 = (double) *gx.l++ - ix;
-            y1 = (double) *gy.l++ - iy;
+            ix = (int32_t) *gx.i32;       // x pixel coordinate
+            iy = (int32_t) *gy.i32;       // y pixel coordinate
+            x1 = (double) *gx.i32++ - ix;
+            y1 = (double) *gy.i32++ - iy;
             break;
           case LUX_INT64:
             ix = (int32_t) *gx.q;       // x pixel coordinate
@@ -1906,8 +1906,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
           vy = (double) vy0.i16[index*dv]; // y velocity
           break;
         case LUX_INT32:
-          vx = (double) vx0.l[index*dv]; // x velocity
-          vy = (double) vy0.l[index*dv]; // y velocity
+          vx = (double) vx0.i32[index*dv]; // x velocity
+          vy = (double) vy0.i32[index*dv]; // y velocity
           break;
         case LUX_INT64:
           vx = (double) vx0.q[index*dv]; // x velocity
@@ -2004,8 +2004,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
             vy = (double) vy0.i16[index*dv];
             break;
           case LUX_INT32:
-            vx = (double) vx0.l[index*dv];
-            vy = (double) vy0.l[index*dv];
+            vx = (double) vx0.i32[index*dv];
+            vy = (double) vy0.i32[index*dv];
             break;
           case LUX_INT64:
             vx = (double) vx0.q[index*dv];
@@ -2035,8 +2035,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
           *oy.i16++ = iy + y2;
           break;
         case LUX_INT32:
-          *ox.l++ = ix + x2;
-          *oy.l++ = iy + y2;
+          *ox.i32++ = ix + x2;
+          *oy.i32++ = iy + y2;
           break;
         case LUX_INT64:
           *ox.q++ = ix + x2;
@@ -2314,10 +2314,10 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
 
   if (symbolIsScalar(ps[0])) {
     result = scalar_scratch(LUX_INT32);
-    tgt.l = &scalar_value(result).l;
+    tgt.i32 = &scalar_value(result).i32;
   } else {
     result = array_scratch(LUX_INT32, ndim, dims);
-    tgt.l = (int32_t*) array_data(result);
+    tgt.i32 = (int32_t*) array_data(result);
   }
 
   if (narg == 1) {
@@ -2330,7 +2330,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       case LUX_INT16:
         val = *src.i16++;
@@ -2338,15 +2338,15 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       case LUX_INT32:
-        val = *src.l++;
+        val = *src.i32++;
         while (val) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       case LUX_INT64:
         val = *src.q++;
@@ -2354,7 +2354,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       }
     }
@@ -2370,7 +2370,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       case LUX_INT16:
         val = *src.i16++ ^ *src2.i16;
@@ -2380,17 +2380,17 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       case LUX_INT32:
-        val = *src.l++ ^ *src2.l;
+        val = *src.i32++ ^ *src2.i32;
         if (nr2isarray)
-          src2.l++;
+          src2.i32++;
         while (val) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       case LUX_INT64:
         val = *src.q++ ^ *src2.q;
@@ -2400,7 +2400,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
           ++dist;
           val &= val - 1;
         }
-        *tgt.l++ = dist;
+        *tgt.i32++ = dist;
         break;
       }
     }
@@ -2625,7 +2625,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
     switch (infos[0].type) {
     case LUX_INT32:
       {
-        int32_t max = std::accumulate(ptrs[0].l, ptrs[0].l + infos[0].nelem,
+        int32_t max = std::accumulate(ptrs[0].i32, ptrs[0].i32 + infos[0].nelem,
                                       (int32_t) 0,
                                       [](int32_t a, int32_t b) {
                                         return std::max(a, b);
@@ -2647,7 +2647,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
       // accept default level
       break;
     }
-    ptrs[1].l = &default_level;
+    ptrs[1].i32 = &default_level;
     level_nelem = 1;
   }
 
@@ -2655,13 +2655,13 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
     SSFC ssfc;
     switch (infos[0].type) {
     case LUX_INT32:
-      ssfc.set_ssfc(*ptrs[0].l++, *ptrs[1].l);
+      ssfc.set_ssfc(*ptrs[0].i32++, *ptrs[1].i32);
       break;
     case LUX_INT64:
-      ssfc.set_ssfc(*ptrs[0].q++, *ptrs[1].l);
+      ssfc.set_ssfc(*ptrs[0].q++, *ptrs[1].i32);
       break;
     case LUX_DOUBLE:
-      ssfc.set_ssfc(*ptrs[0].d++, *ptrs[1].l);
+      ssfc.set_ssfc(*ptrs[0].d++, *ptrs[1].i32);
       break;
     }
     *ptrs[2].d++ = ssfc.get_latitude_rad();
@@ -2669,7 +2669,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
     *ptrs[2].d++ = ssfc.get_precision_rad();
     if (level_nelem > 1) {
       --level_nelem;
-      ++ptrs[1].l;
+      ++ptrs[1].i32;
     }
   }
 
@@ -2703,7 +2703,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
   if (narg > 1) {
     if ((iq = sa.set(narg, ps, "iD>2,*;iL;rL-,&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
-    level = *ptrs[1].l;
+    level = *ptrs[1].i32;
     if (level < 3)
       level = 3;
     else if (level > 64)
@@ -2726,7 +2726,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
       if (level > 31) {
         *ptrs[2].q++ = static_cast<int64_t>(ssfc.get_bits());
       } else {
-        *ptrs[2].l++ = static_cast<int32_t>(ssfc.get_bits());
+        *ptrs[2].i32++ = static_cast<int32_t>(ssfc.get_bits());
       }
       ptrs[0].d += infos[0].dims[0];
     }
@@ -2848,7 +2848,7 @@ int32_t lux_findspans(int32_t narg, int32_t ps[]) {
     spans = findspans(src.i16, src.i16 + nelem, cycle);
     break;
   case LUX_INT32:
-    spans = findspans(src.l, src.l + nelem, cycle);
+    spans = findspans(src.i32, src.i32 + nelem, cycle);
     break;
   case LUX_INT64:
     spans = findspans(src.q, src.q + nelem, cycle);

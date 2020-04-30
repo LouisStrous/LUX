@@ -1541,13 +1541,13 @@ int32_t standard_args(int32_t narg, int32_t ps[], char const *fmt,
             Pointer axes;
             numerical(aq, NULL, NULL, &nAxes, &axes);
             for (int32_t j = 0; j < nAxes; j++) {
-              if (axes.l[j] < 0 || axes.l[j] >= tgt_dims.size()) {
+              if (axes.i32[j] < 0 || axes.i32[j] >= tgt_dims.size()) {
                 returnSym = luxerror("Axis %d out of bounds for"
                                      " parameter %d", 0,
-                                     axes.l[j], param_ix + 1);
+                                     axes.i32[j], param_ix + 1);
                 goto error;
-              } // end if (axes.l[j] < 0 || axes.l[j] >= tgt_dims_ix)
-              tgt_dims[axes.l[j]] = 0; // flags removal.  Note: no check
+              } // end if (axes.i32[j] < 0 || axes.i32[j] >= tgt_dims_ix)
+              tgt_dims[axes.i32[j]] = 0; // flags removal.  Note: no check
                                        // for duplicate axes
             } // end for (j = 0; j < nAxes; j++)
             int32_t k;

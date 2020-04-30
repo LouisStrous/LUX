@@ -48,7 +48,7 @@ int32_t lux_memory(int32_t narg, int32_t ps[])
 
   p = (char*) sbrk(0);
   result = scalar_scratch(LUX_INT32);
-  sym[result].spec.scalar.l = p - firstbreak;
+  sym[result].spec.scalar.i32 = p - firstbreak;
   return result;
 }
 //-------------------------------------------------------------------

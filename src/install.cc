@@ -3562,26 +3562,26 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
   case LUX_INT8:
     switch (inType) {
     case LUX_INT16:
-      (*target).b = (uint8_t) (*target).w;
+      (*target).ui8 = (uint8_t) (*target).w;
       break;
     case LUX_INT32:
-      (*target).b = (uint8_t) (*target).l;
+      (*target).ui8 = (uint8_t) (*target).l;
       break;
     case LUX_INT64:
-      (*target).b = (uint8_t) (*target).q;
+      (*target).ui8 = (uint8_t) (*target).q;
       break;
     case LUX_FLOAT:
-      (*target).b = (uint8_t) (*target).f;
+      (*target).ui8 = (uint8_t) (*target).f;
       break;
     case LUX_DOUBLE:
-      (*target).b = (uint8_t) (*target).d;
+      (*target).ui8 = (uint8_t) (*target).d;
       break;
     }
     break;
   case LUX_INT16:
     switch (inType) {
     case LUX_INT8:
-      (*target).w = (int16_t) (*target).b;
+      (*target).w = (int16_t) (*target).ui8;
       break;
     case LUX_INT32:
       (*target).w = (int16_t) (*target).l;
@@ -3600,7 +3600,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
   case LUX_INT32:
     switch (inType) {
     case LUX_INT8:
-      (*target).l = (int32_t) (*target).b;
+      (*target).l = (int32_t) (*target).ui8;
       break;
     case LUX_INT16:
       (*target).l = (int32_t) (*target).w;
@@ -3619,7 +3619,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
   case LUX_INT64:
     switch (inType) {
     case LUX_INT8:
-      (*target).q = (int64_t) (*target).b;
+      (*target).q = (int64_t) (*target).ui8;
       break;
     case LUX_INT16:
       (*target).q = (int64_t) (*target).w;
@@ -3638,7 +3638,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
   case LUX_FLOAT:
     switch (inType) {
     case LUX_INT8:
-      (*target).f = (float) (*target).b;
+      (*target).f = (float) (*target).ui8;
       break;
     case LUX_INT16:
       (*target).f = (float) (*target).w;
@@ -3657,7 +3657,7 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
   case LUX_DOUBLE:
     switch (inType) {
     case LUX_INT8:
-      (*target).d = (double) (*target).b;
+      (*target).d = (double) (*target).ui8;
       break;
     case LUX_INT16:
       (*target).d = (double) (*target).w;
@@ -3685,26 +3685,26 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
     case LUX_INT8:
       break;
     case LUX_INT16:
-      target->w = (int16_t) target->b;
+      target->w = (int16_t) target->ui8;
       break;
     case LUX_INT32:
-      target->l = (int32_t) target->b;
+      target->l = (int32_t) target->ui8;
       break;
     case LUX_INT64:
-      target->q = (int64_t) target->b;
+      target->q = (int64_t) target->ui8;
       break;
     case LUX_FLOAT:
-      target->f = (float) target->b;
+      target->f = (float) target->ui8;
       break;
     case LUX_DOUBLE:
-      target->d = (double) target->b;
+      target->d = (double) target->ui8;
       break;
     case LUX_CFLOAT:
-      target->cf.real = (float) target->b;
+      target->cf.real = (float) target->ui8;
       target->cf.imaginary = 0.0;
       break;
     case LUX_CDOUBLE:
-      target->cd.real = (double) target->b;
+      target->cd.real = (double) target->ui8;
       target->cd.imaginary = 0.0;
       break;
     }
@@ -3712,7 +3712,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_INT16:
     switch (outType) {
     case LUX_INT8:
-      target->b = (uint8_t) target->w;
+      target->ui8 = (uint8_t) target->w;
       break;
     case LUX_INT16:
       break;
@@ -3741,7 +3741,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_INT32:
     switch (outType) {
     case LUX_INT8:
-      target->b = (uint8_t) target->l;
+      target->ui8 = (uint8_t) target->l;
       break;
       break;
     case LUX_INT16:
@@ -3771,7 +3771,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_INT64:
     switch (outType) {
     case LUX_INT8:
-      target->b = (uint8_t) target->q;
+      target->ui8 = (uint8_t) target->q;
       break;
       break;
     case LUX_INT16:
@@ -3801,7 +3801,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_FLOAT:
     switch (outType) {
     case LUX_INT8:
-      target->b = (uint8_t) target->f;
+      target->ui8 = (uint8_t) target->f;
       break;
     case LUX_INT16:
       target->w = (int16_t) target->f;
@@ -3830,7 +3830,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_DOUBLE:
     switch (outType) {
     case LUX_INT8:
-      target->b = (uint8_t) target->d;
+      target->ui8 = (uint8_t) target->d;
       break;
     case LUX_INT16:
       target->w = (int16_t) target->d;
@@ -3859,7 +3859,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_CFLOAT:
     switch (outType) {
     case LUX_INT8:
-      target->b = (uint8_t) target->cf.real;
+      target->ui8 = (uint8_t) target->cf.real;
       break;
     case LUX_INT16:
       target->w = (int16_t) target->cf.real;
@@ -3887,7 +3887,7 @@ void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
   case LUX_CDOUBLE:
     switch (outType) {
     case LUX_INT8:
-      target->b = (uint8_t) target->cd.real;
+      target->ui8 = (uint8_t) target->cd.real;
       break;
     case LUX_INT16:
       target->w = (int16_t) target->cd.real;
@@ -3922,34 +3922,34 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
  Pointer        ptr;
 
  n = scalar_type(nsym);
- ptr.b = &scalar_value(nsym).b;
+ ptr.ui8 = &scalar_value(nsym).ui8;
  switch (type) {
  case LUX_INT8:
    switch (n) {
    case LUX_INT8:
-     (*target).b = (uint8_t) *ptr.b;
+     (*target).ui8 = (uint8_t) *ptr.ui8;
      break;
    case LUX_INT16:
-     (*target).b = (uint8_t) *ptr.w;
+     (*target).ui8 = (uint8_t) *ptr.w;
      break;
    case LUX_INT32:
-     (*target).b = (uint8_t) *ptr.l;
+     (*target).ui8 = (uint8_t) *ptr.l;
      break;
    case LUX_INT64:
-     (*target).b = (uint8_t) *ptr.q;
+     (*target).ui8 = (uint8_t) *ptr.q;
      break;
    case LUX_FLOAT:
-     (*target).b = (uint8_t) *ptr.f;
+     (*target).ui8 = (uint8_t) *ptr.f;
      break;
    case LUX_DOUBLE:
-     (*target).b = (uint8_t) *ptr.d;
+     (*target).ui8 = (uint8_t) *ptr.d;
      break;
    }
    break;
  case LUX_INT16:
    switch (n) {
    case LUX_INT8:
-     (*target).w = (int16_t) *ptr.b;
+     (*target).w = (int16_t) *ptr.ui8;
      break;
    case LUX_INT16:
      (*target).w = (int16_t) *ptr.w;
@@ -3971,7 +3971,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
  case LUX_INT32:
    switch (n) {
    case LUX_INT8:
-     (*target).l = (int32_t) *ptr.b;
+     (*target).l = (int32_t) *ptr.ui8;
      break;
    case LUX_INT16:
      (*target).l = (int32_t) *ptr.w;
@@ -3993,7 +3993,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
  case LUX_INT64:
    switch (n) {
    case LUX_INT8:
-     (*target).q = (int64_t) *ptr.b;
+     (*target).q = (int64_t) *ptr.ui8;
      break;
    case LUX_INT16:
      (*target).q = (int64_t) *ptr.w;
@@ -4015,7 +4015,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
  case LUX_FLOAT:
    switch (n) {
    case LUX_INT8:
-     (*target).f = (float) *ptr.b;
+     (*target).f = (float) *ptr.ui8;
      break;
    case LUX_INT16:
      (*target).f = (float) *ptr.w;
@@ -4037,7 +4037,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
  case LUX_DOUBLE:
    switch (n) {
    case LUX_INT8:
-     (*target).d = (double) *ptr.b;
+     (*target).d = (double) *ptr.ui8;
      break;
    case LUX_INT16:
      (*target).d = (double) *ptr.w;
@@ -4380,7 +4380,7 @@ void symbolInitialization(void)
  f_fix("#nan",          acos(2));
  cf_fix("#i",           0.0, 1.0); // imaginary unit
  l_fix("#max_args",     MAX_ARG);
- l_fix("#max_byte",     bounds.max.b);
+ l_fix("#max_byte",     bounds.max.ui8);
  l_fix("#max_word",     bounds.max.w);
  l_fix("#max_long",     bounds.max.l);
  q_fix("#max_int64",    bounds.max.q);
@@ -5164,7 +5164,7 @@ int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
         (*se)->u.regular.spec.singular.ndim = 0; // 0 -> scalar
         // copy the value into the structure
         size = lux_type_size[scalar_type(symbol)];// bytes per value
-        memcpy(data + *offset, &scalar_value(symbol).b, size);
+        memcpy(data + *offset, &scalar_value(symbol).ui8, size);
         break;
       case LUX_STRING:
         (*se)->u.regular.type = LUX_TEMP_STRING; // data type

@@ -947,32 +947,32 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
   nx = array_dims(ps[0])[0];
   ny = array_dims(ps[0])[1];
 
-  data.b = (uint8_t*) array_data(ps[0]);
+  data.ui8 = (uint8_t*) array_data(ps[0]);
 
   type = array_type(ps[0]);
   if (type >= LUX_FLOAT)
     type = LUX_INT32;
   result = array_clone(ps[0], type);
-  out.b = (uint8_t*) array_data(result);
+  out.ui8 = (uint8_t*) array_data(result);
 
   switch (type) {
     case LUX_INT8:
-      memcpy(out.b, data.b, nx*lux_type_size[type]); // top row: just copy
+      memcpy(out.ui8, data.ui8, nx*lux_type_size[type]); // top row: just copy
       ny -= 2;
-      out.b += nx;
-      data.b += nx;
+      out.ui8 += nx;
+      data.ui8 += nx;
       while (ny--) {
-        *out.b++ = *data.b++;        // left edge: just copy
+        *out.ui8++ = *data.ui8++;        // left edge: just copy
         n = nx - 2;
         while (n--) {
-          *out.b++ = (*data.b || data.b[1] || data.b[1 + nx] || data.b[nx]
-                      || data.b[nx - 1] || data.b[-1] || data.b[-1 - nx]
-                      || data.b[-nx] || data.b[-nx + 1]);
-          data.b++;
+          *out.ui8++ = (*data.ui8 || data.ui8[1] || data.ui8[1 + nx] || data.ui8[nx]
+                      || data.ui8[nx - 1] || data.ui8[-1] || data.ui8[-1 - nx]
+                      || data.ui8[-nx] || data.ui8[-nx + 1]);
+          data.ui8++;
         }
-        *out.b++ = *data.b++;        // right edge: just copy
+        *out.ui8++ = *data.ui8++;        // right edge: just copy
       }
-      memcpy(out.b, data.b, nx*lux_type_size[type]); // top row: just copy
+      memcpy(out.ui8, data.ui8, nx*lux_type_size[type]); // top row: just copy
       break;
     case LUX_INT16:
       memcpy(out.w, data.w, nx*lux_type_size[type]); // top row: just copy
@@ -1087,13 +1087,13 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
   nx = array_dims(ps[0])[0];
   ny = array_dims(ps[0])[1];
 
-  data.b = (uint8_t*) array_data(ps[0]);
+  data.ui8 = (uint8_t*) array_data(ps[0]);
 
   type = array_type(ps[0]);
   if (type >= LUX_FLOAT)
     type = LUX_INT32;
   result = array_clone(ps[0], type);
-  out.b = (uint8_t*) array_data(result);
+  out.ui8 = (uint8_t*) array_data(result);
 
   zeroedge = (internalMode & 1); // /ZEROEDGE
 
@@ -1102,32 +1102,32 @@ int32_t lux_erode(int32_t narg, int32_t ps[])
       n = nx;
       if (zeroedge) {
         while (n--)
-          *out.b++ = 0;
-        data.b += nx;
+          *out.ui8++ = 0;
+        data.ui8 += nx;
       } else
         while (n--)
-          *out.b++ = (*data.b++ != 0);
+          *out.ui8++ = (*data.ui8++ != 0);
       ny -= 2;
       while (ny--) {
-        *out.b++ = zeroedge? 0: (*data.b != 0); // left edge
-        data.b++;
+        *out.ui8++ = zeroedge? 0: (*data.ui8 != 0); // left edge
+        data.ui8++;
         n = nx - 2;
         while (n--) {
-          *out.b++ = (*data.b && data.b[1] && data.b[1 + nx] && data.b[nx]
-                      && data.b[nx - 1] && data.b[-1] && data.b[-1 - nx]
-                      && data.b[-nx] && data.b[-nx + 1]);
-          data.b++;
+          *out.ui8++ = (*data.ui8 && data.ui8[1] && data.ui8[1 + nx] && data.ui8[nx]
+                      && data.ui8[nx - 1] && data.ui8[-1] && data.ui8[-1 - nx]
+                      && data.ui8[-nx] && data.ui8[-nx + 1]);
+          data.ui8++;
         }
-        *out.b++ = zeroedge? 0: (*data.b != 0); // right edge
-        data.b++;
+        *out.ui8++ = zeroedge? 0: (*data.ui8 != 0); // right edge
+        data.ui8++;
       }
       n = nx;
       if (zeroedge)
         while (n--)
-          *out.b++ = 0;
+          *out.ui8++ = 0;
       else
         while (n--)
-          *out.b++ = (*data.b++ != 0);
+          *out.ui8++ = (*data.ui8++ != 0);
       break;
     case LUX_INT16:
       n = nx;

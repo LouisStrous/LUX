@@ -486,7 +486,7 @@ int32_t lux_randomb(int32_t narg, int32_t ps[])
       *p.l++ = random_bits();
   else
     while (n--)
-      *p.b++ = random_bit();        // get one bit
+      *p.ui8++ = random_bit();        // get one bit
 
   return result;
 }

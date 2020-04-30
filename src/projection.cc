@@ -1304,9 +1304,9 @@ int32_t lux_projectmap(int32_t narg, int32_t ps[])
       v2 = (int32_t) (v*dd + sy);
       if (u2 >= 0 && u2 < imx && v2 >= 0 && v2 < imy) {
         index = u2 + v2*imx;
-        memcpy(trgt.b, src.b + index*stride, stride);
+        memcpy(trgt.ui8, src.ui8 + index*stride, stride);
       };
-      trgt.b += stride;
+      trgt.ui8 += stride;
     }
     y += d;
   }

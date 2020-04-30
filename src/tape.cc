@@ -196,10 +196,10 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
   n = cur = lux_type_size[type]*array_size(iq);
   nread = 0;
   do {
-    nbr = read(fd, q1.b, cur);
+    nbr = read(fd, q1.ui8, cur);
     if (nbr < 0)                // some error
       break;
-    q1.b += nbr;
+    q1.ui8 += nbr;
     nread += nbr;
     cur -= nbr;
   } while (cur > 0);
@@ -210,7 +210,7 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
     printf("Requested bytes: %1d; Read: %1d\n", n, nread);
   }
 #if !WORDS_BIGENDIAN
-  endian(q1.b, n, type);
+  endian(q1.ui8, n, type);
 #endif
   io_status = errno;
   if (errno > 0)
@@ -234,11 +234,11 @@ int32_t lux_tapwrt(int32_t narg, int32_t ps[]) // read tape record
  n = lux_type_size[type]; errno = 0;
  for(j=0;j<nd;j++) n *= h->dims[j];
 #if !WORDS_BIGENDIAN
- endian(q1.b, n, type);
+ endian(q1.ui8, n, type);
 #endif
- nbr = write(fd, q1.b, n);
+ nbr = write(fd, q1.ui8, n);
 #if !WORDS_BIGENDIAN
- endian(q1.b, n, type);                                // restore original
+ endian(q1.ui8, n, type);                                // restore original
 #endif
  byte_count = nbr;                                // want this for write
  io_status = errno;
@@ -284,15 +284,15 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])                        // wri
    printf("data size too small for a tape read/write, use >= 14, %d\n", n);
    return -1; }
 #if !WORDS_BIGENDIAN
- p = (char *) q1.b;
+ p = (char *) q1.ui8;
  endian((uint8_t *) p, n, type);
 #endif
- q1.b += offset;        // starting address for writing
+ q1.ui8 += offset;        // starting address for writing
  ic = n;
  //printf("in tapebufout, fd = %d, n = %d, recordsize = %d\n",fd,n,recsize);
  while (ic > 0) {
  recsize = MIN(recsize, ic);
- nbr = write (fd, q1.b, recsize);
+ nbr = write (fd, q1.ui8, recsize);
  byte_count = nbr;                                // want this for write
  io_status = errno;
  //printf("number written = %d\n",nbr);
@@ -300,7 +300,7 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])                        // wri
  if (nbr <= 0 ) {                                        //problem
          if (nbr == 0) { printf("returned 0 while writing array\n");  }
          else { perror("tapebufout"); } return 0; }
- ic -= nbr;        q1.b += nbr;
+ ic -= nbr;        q1.ui8 += nbr;
  }
 #if !WORDS_BIGENDIAN
  endian((uint8_t *) p, n, type);                                // restore original
@@ -356,16 +356,16 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])// read tape record
    return LUX_ERROR;
  }
 #if !WORDS_BIGENDIAN
- p = (char *) q1.b;
+ p = (char *) q1.ui8;
  if (offset != 0)                // need proper imbedding
    endian((uint8_t *) p, n, type);
 #endif
- q1.b += offset;
+ q1.ui8 += offset;
  ic = n;
  //printf("in tapebuferin, fd = %d, n = %d, recordsize = %d\n",fd,n,recsize);
  while (ic > 0) {
    recsize = MIN(recsize, ic);
-   nbr = read (fd, q1.b, recsize);
+   nbr = read (fd, q1.ui8, recsize);
  //printf("number read in = %d\n",nbr);
  /* the number read will be -1 for errors but a record larger than recsize
  is also tagged as an error, this often happens on the last record */
@@ -395,7 +395,7 @@ int32_t lux_tapebufin(int32_t narg, int32_t ps[])// read tape record
      }
    }
    ic -= nbr;
-   q1.b += nbr;
+   q1.ui8 += nbr;
  }
 #if !WORDS_BIGENDIAN
  endian((uint8_t *) p, n, type);

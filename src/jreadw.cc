@@ -49,7 +49,7 @@ METHODDEF void get_input_row (compress_info_ptr cinfo, JSAMPARRAY pixel_row)
 
   ptr0 = pixel_row[0];
   for (col = 0; col < cinfo->image_width; col++) {
-    *ptr0++ = (JSAMPLE) *q1.b++; // gray
+    *ptr0++ = (JSAMPLE) *q1.ui8++; // gray
   }
 }
  //-------------------------------------------------------------------------
@@ -188,7 +188,7 @@ METHODDEF void output_init (decompress_info_ptr cinfo)
    ERREXIT(cinfo->emethods, "can't create result array");
  }
  q1.l = array_data(iq);
- base = q1.b;        // for checks
+ base = q1.ui8;        // for checks
 }
  //-------------------------------------------------------------------------
 METHODDEF void
@@ -215,14 +215,14 @@ put_pixel_rows (decompress_info_ptr cinfo, int32_t num_rows, JSAMPIMAGE pixel_da
 
  /* printf("put_pixel_rows: num_rows, cinfo->image_width = %d, %d\n",
          num_rows, cinfo->image_width); */
- // printf("base, q1.b = %d, %d\n", base, q1.b);
- if ( q1.b - base > (nx*ny) ) {
+ // printf("base, q1.ui8 = %d, %d\n", base, q1.ui8);
+ if ( q1.ui8 - base > (nx*ny) ) {
          printf("array address problem\n");
         ERREXIT(cinfo->emethods, "array index out of range");  }
  for (row = 0; row < num_rows; row++) {
     ptr0 = pixel_data[0][row];
     for (col = 0; col < cinfo->image_width; col++) {
-     *q1.b++ = *ptr0++;
+     *q1.ui8++ = *ptr0++;
     }
   }
 }

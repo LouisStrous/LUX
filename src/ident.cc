@@ -628,7 +628,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_SCALAR: case LUX_FIXED_NUMBER:
     switch (scalar_type(symbol)) {
     case LUX_INT8:
-      intval = (intmax_t) scalar_value(symbol).b;
+      intval = (intmax_t) scalar_value(symbol).ui8;
       break;
     case LUX_INT16:
       intval = (intmax_t) scalar_value(symbol).w;
@@ -772,11 +772,11 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       j = n;                        // print all
       i = 0;                        // no truncation
     }
-    ptr.b = (uint8_t*) array_data(symbol);
+    ptr.ui8 = (uint8_t*) array_data(symbol);
     switch (array_type(symbol)) {
     case LUX_INT8:
       while (j--) {
-        sprintf(curScrat, "%d", (int32_t) *ptr.b++);
+        sprintf(curScrat, "%d", (int32_t) *ptr.ui8++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -938,7 +938,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   case LUX_SCAL_PTR:
     switch (scal_ptr_type(symbol)) {
     case LUX_INT8:
-      intval = (intmax_t) *scal_ptr_pointer(symbol).b;
+      intval = (intmax_t) *scal_ptr_pointer(symbol).ui8;
       break;
     case LUX_INT16:
       intval = (intmax_t) *scal_ptr_pointer(symbol).w;

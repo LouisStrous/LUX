@@ -519,7 +519,7 @@ int32_t format_check(char *format, char **next, int32_t store)
      lux_delete(1, &iformat);
      symbol_class(iformat) = LUX_SCAL_PTR;
      scal_ptr_type(iformat) = LUX_TEMP_STRING;
-     scal_ptr_pointer(iformat).b = (uint8_t*) malloc(n + 1);
+     scal_ptr_pointer(iformat).ui8 = (uint8_t*) malloc(n + 1);
      symbol_memory(iformat) = n + 1;
      strncpy(p = scal_ptr_pointer(iformat).s, format, n);
      p[n] = '\0';
@@ -527,7 +527,7 @@ int32_t format_check(char *format, char **next, int32_t store)
      lux_delete(1, &fformat);
      symbol_class(fformat) = LUX_SCAL_PTR;
      scal_ptr_type(fformat) = LUX_TEMP_STRING;
-     scal_ptr_pointer(fformat).b = (uint8_t*) Malloc(n + 1);
+     scal_ptr_pointer(fformat).ui8 = (uint8_t*) Malloc(n + 1);
      symbol_memory(fformat) = n + 1;
      strncpy(p = scal_ptr_pointer(fformat).s, format, n);
      p[n] = '\0';
@@ -536,7 +536,7 @@ int32_t format_check(char *format, char **next, int32_t store)
      lux_delete(1, &sformat);
      symbol_class(sformat) = LUX_SCAL_PTR;
      scal_ptr_type(sformat) = LUX_TEMP_STRING;
-     scal_ptr_pointer(sformat).b = (uint8_t*) malloc(n + 1);
+     scal_ptr_pointer(sformat).ui8 = (uint8_t*) malloc(n + 1);
      symbol_memory(sformat) = n + 1;
      strncpy(p = scal_ptr_pointer(sformat).s, format, n);
      p[n] = '\0';
@@ -806,7 +806,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
   case LUX_SCALAR: case LUX_FIXED_NUMBER:
     switch (scalar_type(symbol)) {
     case LUX_INT8:
-      intval = (intmax_t) scalar_value(symbol).b;
+      intval = (intmax_t) scalar_value(symbol).ui8;
       break;
     case LUX_INT16:
       intval = (intmax_t) scalar_value(symbol).w;
@@ -886,14 +886,14 @@ void type_ascii_one(int32_t symbol, FILE *fp)
     break;
   case LUX_ARRAY:
     j = array_size(symbol);
-    ptr.b = (uint8_t*) array_data(symbol);
+    ptr.ui8 = (uint8_t*) array_data(symbol);
     switch (array_type(symbol)) {
     case LUX_INT8:
       fmttok(fmt_integer);
       while (j--) {
         if (!j && (theFormat.flags & FMT_MIX2))
           theFormat.spec_char[1] = '\0';
-        Sprintf_tok(curScrat, (intmax_t) *ptr.b++);
+        Sprintf_tok(curScrat, (intmax_t) *ptr.ui8++);
         fprintw(fp, curScrat);
         if (j && (internalMode & 4))
           nextformat(NULL, 1);
@@ -976,7 +976,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
   case LUX_SCAL_PTR:
     switch (scal_ptr_type(symbol)) {
     case LUX_INT8:
-      intval = (intmax_t) *scal_ptr_pointer(symbol).b;
+      intval = (intmax_t) *scal_ptr_pointer(symbol).ui8;
       break;
     case LUX_INT16:
       intval = (intmax_t) *scal_ptr_pointer(symbol).w;
@@ -1327,13 +1327,13 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
               case LUX_INT8:
                 if (fp)
                   while (n--) {
-                    fprintf(fp, thefmt, (int32_t) *p.b++);
+                    fprintf(fp, thefmt, (int32_t) *p.ui8++);
                     if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
                       fputs(theFormat.plain, fp);
                   }
                 else
                   while (n--) {
-                    sprintf(curScrat, thefmt, (int32_t) *p.b++);
+                    sprintf(curScrat, thefmt, (int32_t) *p.ui8++);
                     curScrat += strlen(curScrat);
                     if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
                       strcpy(curScrat, theFormat.plain);
@@ -1476,13 +1476,13 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
               case LUX_INT8:
                 if (fp)
                   while (n--) {
-                    fprintf(fp, thefmt, (double) *p.b++);
+                    fprintf(fp, thefmt, (double) *p.ui8++);
                     if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2)))
                       fputs(theFormat.plain, fp);
                   }
                 else
                   while (n--) {
-                    sprintf(curScrat, thefmt, (double) *p.b++);
+                    sprintf(curScrat, thefmt, (double) *p.ui8++);
                     curScrat += strlen(curScrat);
                     if (haveTrailer && (n || !(theFormat.flags & FMT_MIX2))) {
                       strcpy(curScrat, theFormat.plain);
@@ -1623,7 +1623,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
             switch (symbol_type(iq)) {
               case LUX_INT8:
                 while (n--) {
-                  Sprintf(curScrat, thefmt, (double) *p.b++);
+                  Sprintf(curScrat, thefmt, (double) *p.ui8++);
                   if (fp)
                     fputs(curScrat, fp);
                   else
@@ -1729,7 +1729,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
             switch (symbol_type(iq)) {
               case LUX_INT8:
                 while (n--) {
-                  Sprintf(curScrat, thefmt, (double) *p.b++, (double) 0.0);
+                  Sprintf(curScrat, thefmt, (double) *p.ui8++, (double) 0.0);
                   if (fp)
                     fputs(curScrat, fp);
                   else
@@ -2290,7 +2290,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
           /* <iq> is returned as LUX_INT32, LUX_INT64, or LUX_DOUBLE
              by redef_scalar() */
         case LUX_INT8:
-          scalar_value(iq).b = (uint8_t) value.l;
+          scalar_value(iq).ui8 = (uint8_t) value.l;
           break;
         case LUX_INT16:
           scalar_value(iq).w = (int16_t) value.l;
@@ -2326,7 +2326,7 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
         break;
       case LUX_ARRAY:
         nelem = array_size(iq);
-        pp.b = (uint8_t*) array_data(iq);
+        pp.ui8 = (uint8_t*) array_data(iq);
         if (isNumericalType(array_type(iq))) {
           while (nelem--) {
             // for some strange reason feof(stdin) can return non-zero
@@ -2339,13 +2339,13 @@ int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
             case LUX_INT8:
               switch (type) {
               case LUX_INT8: case LUX_INT16: case LUX_INT32:
-                *pp.b++ = (uint8_t) value.l;
+                *pp.ui8++ = (uint8_t) value.l;
                 break;
               case LUX_INT64:
-                *pp.b++ = value.q;
+                *pp.ui8++ = value.q;
                 break;
               case LUX_FLOAT: case LUX_DOUBLE:
-                *pp.b++ = (uint8_t) value.d;
+                *pp.ui8++ = (uint8_t) value.d;
                 break;
               }
               break;
@@ -2793,7 +2793,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
               break;
             default:                // regular numbers
               if (!gscanf(ptr2, theFormat.current,
-                          (theFormat.flags & FMT_SUPPRESS)? NULL: trgt.b,
+                          (theFormat.flags & FMT_SUPPRESS)? NULL: trgt.ui8,
                           string2))
                 return showerrors?
                   luxerror("Expected a number at character index %d "
@@ -2802,7 +2802,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
               break;
             } // end of switch (theFormat.type)
           }   // end if (type == LUX_TEMP_STRING) else
-          trgt.b += lux_type_size[type];
+          trgt.ui8 += lux_type_size[type];
         } // end if (!(theFormat.flags & FMT_SUPPRESS))
       } // end while (theFormat.count--)
     } // end if (theFormat.type != FMT_PLAIN)
@@ -3048,8 +3048,8 @@ int32_t lux_assoc_input(int32_t narg, int32_t ps[])
     dout--; }
   if (!dout) done = 1;                // immediate exit of do-while
   do
-  { if (fread(q.b, n, 1, fp) != 1) return cerror(READ_ERR, iq);
-    q.b += n;
+  { if (fread(q.ui8, n, 1, fp) != 1) return cerror(READ_ERR, iq);
+    q.ui8 += n;
     for (i = 0; i < dout; i++)
     { if (tally[i]++ != out[i]) { done = 0; break; }
       tally[i] = 1; done = 1;
@@ -3172,8 +3172,8 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
    ddat--; }
  if (!ddat) done = 1;
  do
- { if (fwrite(q.b, n, 1, fp) != 1) return cerror(WRITE_ERR, iq);
-   q.b += n;
+ { if (fwrite(q.ui8, n, 1, fp) != 1) return cerror(WRITE_ERR, iq);
+   q.ui8 += n;
    for (i = 0; i < ddat; i++)
    { if (tally[i]++ != dat[i]) { done = 0; break; }
      tally[i] = 1; done = 1;
@@ -3485,7 +3485,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) // fzread subroutine
     endian(&ch.nblocks, sizeof(int32_t), LUX_INT32);
     endian(&ch.bsize, sizeof(int32_t), LUX_INT32);
     for (i = 0; i < 4; i++)
-      lmap.b[i] = fh->cbytes[i];
+      lmap.ui8[i] = fh->cbytes[i];
     endian(&lmap.i, sizeof(int32_t), LUX_INT32);
 #endif
     mq = ch.tsize - 14;
@@ -3517,13 +3517,13 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) // fzread subroutine
         iq = anadecrunch((uint8_t *) p, q1.w, sbit, ch.bsize, ch.nblocks);
         break;
       case 1:
-        iq = anadecrunch8((uint8_t *) p, q1.b, sbit, ch.bsize, ch.nblocks);
+        iq = anadecrunch8((uint8_t *) p, q1.ui8, sbit, ch.bsize, ch.nblocks);
         break;
       case 2:
         iq = anadecrunchrun((uint8_t *) p, q1.w, sbit, ch.bsize, ch.nblocks);
         break;
       case 3:
-        iq = anadecrunchrun8((uint8_t *) p, q1.b, sbit, ch.bsize, ch.nblocks);
+        iq = anadecrunchrun8((uint8_t *) p, q1.ui8, sbit, ch.bsize, ch.nblocks);
         break;
       case 4:
 #if SIZEOF_LONG_LONG_INT == 8        // 64-bit integers
@@ -3570,7 +3570,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) // fzread subroutine
         return flag? LUX_ERROR: cerror(READ_EOF, 0);
       }
       if (nq)
-        endian(q1.b, nb, type);        // swap bytes
+        endian(q1.ui8, nb, type);        // swap bytes
     }
   }
   // common section again
@@ -3851,20 +3851,20 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  switch (type) {
    case LUX_INT8:
      if (runlengthflag)
-       iq = anacrunchrun8(q2.b, q1.b, crunch_slice, nx, ny, limit);
+       iq = anacrunchrun8(q2.ui8, q1.ui8, crunch_slice, nx, ny, limit);
      else
-       iq = anacrunch8(q2.b, q1.b, crunch_slice, nx, ny, limit);
+       iq = anacrunch8(q2.ui8, q1.ui8, crunch_slice, nx, ny, limit);
      break;
    case LUX_INT16:
      if (runlengthflag)
-       iq = anacrunchrun(q2.b, q1.w, crunch_slice, nx, ny, limit);
+       iq = anacrunchrun(q2.ui8, q1.w, crunch_slice, nx, ny, limit);
      else
-       iq = anacrunch(q2.b, q1.w, crunch_slice, nx, ny, limit);
+       iq = anacrunch(q2.ui8, q1.w, crunch_slice, nx, ny, limit);
      break;
 #if SIZEOF_LONG_LONG_INT == 8
    case LUX_INT32:
      if (!runlengthflag)
-       iq = anacrunch32(q2.b, q1.l, crunch_slice, nx, ny, limit);
+       iq = anacrunch32(q2.ui8, q1.l, crunch_slice, nx, ny, limit);
      // else fall-through to default: we don't have a 32-bit crunchrun
 #endif
    default:
@@ -4021,7 +4021,7 @@ int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
    switch (symbol_class(iq))
    { case LUX_SCALAR:
        n = lux_type_size[sym[iq].type];
-       p.b = &sym[iq].spec.scalar.b;  break;
+       p.ui8 = &sym[iq].spec.scalar.ui8;  break;
      case LUX_STRING:
        n = sym[iq].spec.array.bstore - 1;
        p.s = sym[iq].spec.name.ptr;  break;
@@ -4043,7 +4043,7 @@ int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
         q = strsave((char *) scrat);
         p.sp++; }
     else
-    { fread(p.b, n, 1, fp);                                // numerical arg
+    { fread(p.ui8, n, 1, fp);                                // numerical arg
       if (feof(fp)) return (flag? 0: cerror(READ_EOF,0)); }
   }
   return 1;
@@ -4077,7 +4077,7 @@ int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
    switch (symbol_class(iq))
    { case LUX_SCALAR:
        n = lux_type_size[sym[iq].type];
-       p.b = &sym[iq].spec.scalar.b;  break;
+       p.ui8 = &sym[iq].spec.scalar.ui8;  break;
      case LUX_STRING:
        n = sym[iq].spec.array.bstore - 1;
        p.s = sym[iq].spec.name.ptr;  break;
@@ -4096,7 +4096,7 @@ int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
       { q = *p.sp;
         fwrite(q, strlen(q), 1, fp);
         p.sp++; }
-    else fwrite(p.b, n, 1, fp);                                // numerical arg
+    else fwrite(p.ui8, n, 1, fp);                                // numerical arg
   }
   return 1;
 }
@@ -4140,7 +4140,7 @@ void astore_one(FILE *fp, int32_t iq)
   case LUX_ARRAY:
     n = symbol_memory(iq);
     p.l = (int32_t *) array_header(iq);
-    fwrite(p.b, 1, n, fp);
+    fwrite(p.ui8, 1, n, fp);
     if (isStringType(array_type(iq))) { // string array
       sz = array_size(iq);        // number of elements
       p.sp = (char**) array_data(iq); // pointer to list of strings
@@ -4156,12 +4156,12 @@ void astore_one(FILE *fp, int32_t iq)
   case LUX_STRING:
     n = symbol_memory(iq);
     p.s = string_value(iq);
-    fwrite(p.b, 1, n, fp);
+    fwrite(p.ui8, 1, n, fp);
     break;
   case LUX_FILEMAP:
     n = symbol_memory(iq);
     p.s = (char *) file_map_header(iq);
-    fwrite(p.b, 1, n, fp);
+    fwrite(p.ui8, 1, n, fp);
     break;
   case LUX_CLIST:
     n = clist_num_symbols(iq);
@@ -4262,7 +4262,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
     n = symbol_memory(iq);
     ALLOCATE(p.v, n, char);
     array_header(iq) = (array *) p.v;
-    if (!fread(p.b, n, 1, fp))
+    if (!fread(p.ui8, n, 1, fp))
       return 1;
     n = array_num_dims(iq);
     if (reverseOrder) {
@@ -4298,7 +4298,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
       endian(&n, sizeof(int32_t), LUX_INT32);
     ALLOCATE(p.s, n, char);
     string_value(iq) = p.s;
-    if (!fread(p.b, n, 1, fp))
+    if (!fread(p.ui8, n, 1, fp))
       return 1;
     break;
   case LUX_FILEMAP:
@@ -4307,7 +4307,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
       endian(&n, sizeof(int32_t), LUX_INT32);
     ALLOCATE(p.s, n, char);
     file_map_header(iq) = (array *) p.s;
-    if (!fread(p.b, n, 1, fp))
+    if (!fread(p.ui8, n, 1, fp))
       return 1;
     n = file_map_num_dims(iq);
     endian(file_map_dims(iq), n*sizeof(int32_t), LUX_INT32);
@@ -5440,7 +5440,7 @@ int32_t lux_hex(int32_t narg, int32_t ps[])
       case LUX_UNDEFINED: return cerror(ILL_CLASS, iq);
       case LUX_SCALAR:                //scalar case
         switch (sym[iq].type) {
-          case 0: fprintf(fp, "      %#4x",sym[iq].spec.scalar.b); break;
+          case 0: fprintf(fp, "      %#4x",sym[iq].spec.scalar.ui8); break;
           case 1: fprintf(fp, "    %#6x",sym[iq].spec.scalar.w); break;
           case 2: fprintf(fp, "%#10x",sym[iq].spec.scalar.l); break;
           case 3: fprintf(fp, "%#10x",sym[iq].spec.scalar.f); break;
@@ -5469,8 +5469,8 @@ int32_t lux_hex(int32_t narg, int32_t ps[])
               { fprintf(fp, "%#10x",*p1.l++); if (j%8 == 7) fprintf(fp, "\n");}  break;
               case 3:  p1.f = (float *)ptr; k=6; for (j=0;j<nelem;j++)
               { fprintf(fp, "%#10x",*p1.f++); if (j%6 == 5) fprintf(fp, "\n");}  break;
-              case 0:  p1.b = (uint8_t *)ptr; k=8; for (j=0;j<nelem;j++)
-              { fprintf(fp, "      %#4x",*p1.b++); if (j%8 == 7) fprintf(fp, "\n");}  break;
+              case 0:  p1.ui8 = (uint8_t *)ptr; k=8; for (j=0;j<nelem;j++)
+              { fprintf(fp, "      %#4x",*p1.ui8++); if (j%8 == 7) fprintf(fp, "\n");}  break;
               case 1:  p1.w = (short *)ptr; k=8; for (j=0;j<nelem;j++)
               { fprintf(fp, "    %#6x",*p1.w++); if (j%8 == 7) fprintf(fp, "\n");}  break;
               case 4:  p1.d = (double *)ptr; k=4; for (j=0;j<nelem;j++)
@@ -5569,8 +5569,8 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
     // we must adjust the values for BSCALE, BZERO, and BLANK
     if (!bscale)
       bscale = 1.0;
-    q.b = ptr + lux_type_size[type]*(nelem - 1); // final data
-    p.b = ptr + lux_type_size[type0]*(nelem - 1); // raw data
+    q.ui8 = ptr + lux_type_size[type]*(nelem - 1); // final data
+    p.ui8 = ptr + lux_type_size[type0]*(nelem - 1); // raw data
     // we must start at the end so that we don't overwrite data that
     // we still need
     switch (type) {
@@ -5578,29 +5578,29 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
         switch (type0) {
           case LUX_INT8:
             while (nelem--) {
-              *q.b = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
-              q.b--;
-              p.b--;
+              *q.ui8 = (*p.ui8 == blank)? targetblank: *p.ui8 * bscale + bzero;
+              q.ui8--;
+              p.ui8--;
             }
             break;
           case LUX_INT16:
             while (nelem--) {
-              *q.b = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
-              q.b--;
+              *q.ui8 = (*p.w == blank)? targetblank: *p.w * bscale + bzero;
+              q.ui8--;
               p.w--;
             }
             break;
           case LUX_INT32:
             while (nelem--) {
-              *q.b = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
-              q.b--;
+              *q.ui8 = (*p.l == blank)? targetblank: *p.l * bscale + bzero;
+              q.ui8--;
               p.l--;
             }
             break;
           case LUX_INT64:
             while (nelem--) {
-              *q.b = (*p.q == blank)? targetblank: *p.q * bscale + bzero;
-              q.b--;
+              *q.ui8 = (*p.q == blank)? targetblank: *p.q * bscale + bzero;
+              q.ui8--;
               p.q--;
             }
             break;
@@ -5610,9 +5610,9 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
         switch (type0) {
           case LUX_INT8:
             while (nelem--) {
-              *q.w = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
+              *q.w = (*p.ui8 == blank)? targetblank: *p.ui8 * bscale + bzero;
               q.w--;
-              p.b--;
+              p.ui8--;
             }
             break;
           case LUX_INT16:
@@ -5642,9 +5642,9 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
         switch (type0) {
           case LUX_INT8:
             while (nelem--) {
-              *q.l = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
+              *q.l = (*p.ui8 == blank)? targetblank: *p.ui8 * bscale + bzero;
               q.l--;
-              p.b--;
+              p.ui8--;
             }
             break;
           case LUX_INT16:
@@ -5674,9 +5674,9 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
         switch (type0) {
           case LUX_INT8:
             while (nelem--) {
-              *q.f = (*p.b == blank)? targetblank: *p.b * bscale + bzero;
+              *q.f = (*p.ui8 == blank)? targetblank: *p.ui8 * bscale + bzero;
               q.f--;
-              p.b--;
+              p.ui8--;
             }
             break;
           case LUX_INT16:
@@ -6085,12 +6085,12 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
     } // end of if (!fread)
 
     if (internalMode & 1) {        // decompress
-      p.b = (uint8_t *) block;
-      slice = p.b[12];
+      p.ui8 = (uint8_t *) block;
+      slice = p.ui8[12];
       ny = p.l[1];
       nx = p.l[2];
       p.l += 3;
-      p.b += 2;
+      p.ui8 += 2;
 #if !WORDS_BIGENDIAN
 #else
       swapl(&nx, 1);
@@ -6099,13 +6099,13 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
       switch (type0) {
         case LUX_INT8:
           ok = runlength?
-            anadecrunchrun8(p.b, (uint8_t*) array_data(datasym), slice, nx, ny):
-              anadecrunch8(p.b, (uint8_t*) array_data(datasym), slice, nx, ny);
+            anadecrunchrun8(p.ui8, (uint8_t*) array_data(datasym), slice, nx, ny):
+              anadecrunch8(p.ui8, (uint8_t*) array_data(datasym), slice, nx, ny);
           break;
         case LUX_INT16:
           ok = runlength?
-            anadecrunchrun(p.b, (int16_t*) array_data(datasym), slice, nx, ny):
-            anadecrunch(p.b, (int16_t*) array_data(datasym), slice, nx, ny);
+            anadecrunchrun(p.ui8, (int16_t*) array_data(datasym), slice, nx, ny):
+            anadecrunch(p.ui8, (int16_t*) array_data(datasym), slice, nx, ny);
           break;
         case LUX_INT32:
 #if SIZEOF_LONG_LONG_INT == 8        // 64-bit integers
@@ -6115,7 +6115,7 @@ int32_t fits_read_compressed(int32_t mode, int32_t datasym, FILE *fp, int32_t he
             puts("32-bit run-length decompression was not compiled into this version of LUX.");
             return 0;
           } else
-            ok = anadecrunch32(p.b, array_data(datasym), slice, nx, ny);
+            ok = anadecrunch32(p.ui8, array_data(datasym), slice, nx, ny);
 #else
           puts("32-bit decompression was not compiled into this version of LUX.");
           if (!usescrat)

@@ -486,8 +486,8 @@ int32_t draw(int32_t ic)
   if (isprint(ic) == 0)
   { printf("illegal char. in callig\n");  return -1; }
   ic -= 32;
-  p.b = fontbase;
-  p.b = p.b + 4 * ic;        nvec = (int32_t) *p.b;        gap = (int32_t) *(p.b + 1);
+  p.ui8 = fontbase;
+  p.ui8 = p.ui8 + 4 * ic;        nvec = (int32_t) *p.ui8;        gap = (int32_t) *(p.ui8 + 1);
   if (penDown)
   {
 #if WORDS_BIGENDIAN
@@ -498,7 +498,7 @@ int32_t draw(int32_t ic)
 #endif
     offset = (int32_t) is2;
                         // offset is in I*2 amounts
-    p.b = fontbase;
+    p.ui8 = fontbase;
     p.w += offset;
                         // check if abnormal
 #if WORDS_BIGENDIAN

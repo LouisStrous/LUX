@@ -530,7 +530,7 @@ int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
   gp.sendf(gnuplot_command_fmt.c_str(), info[0].dims[0], info[0].dims[1],
            gnuplot_type)
     .send("\n")
-    .write(&data[0].b[0], info[0].nelem*lux_type_size[info[0].type])
+    .write(&data[0].ui8[0], info[0].nelem*lux_type_size[info[0].type])
     .flush();
 
   return LUX_OK;

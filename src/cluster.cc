@@ -326,13 +326,13 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
         && isIntegerType(array_type(ps[2]))) { // integer data type
       indexType = array_type(ps[2]);        // index data type
       useIndex = 1;                // default: useful indices
-      clusterNumber.b = (uint8_t *) array_data(ps[2]);
+      clusterNumber.ui8 = (uint8_t *) array_data(ps[2]);
       switch (indexType) {
         case LUX_INT8:
           for (i = 0; i < nVectors; i++)
-            if ((int32_t) clusterNumber.b[i] >= nClusters) { // index too large
+            if ((int32_t) clusterNumber.ui8[i] >= nClusters) { // index too large
               printf("CLUSTER - illegal index #%1d (%1d), ignore all\n",
-                     i, clusterNumber.b[i]);
+                     i, clusterNumber.ui8[i]);
               useIndex = 0;
               break;
             }
@@ -379,10 +379,10 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       indexType = LUX_INT32;
     if (gotIndex && !gotSample)        { // have a variable, redefine
       redef_array(ps[2], indexType , nDataDims - 1, dataDims + 1);
-      clusterNumber.b = (uint8_t *) array_data(ps[2]);
+      clusterNumber.ui8 = (uint8_t *) array_data(ps[2]);
     } else {                        // no variable, allocate
-      clusterNumber.b = (uint8_t*) malloc(nSample*lux_type_size[indexType]*sizeof(uint8_t));
-      if (!clusterNumber.b)
+      clusterNumber.ui8 = (uint8_t*) malloc(nSample*lux_type_size[indexType]*sizeof(uint8_t));
+      if (!clusterNumber.ui8)
         return cerror(ALLOC_ERR, 0);
     }
   }
@@ -578,7 +578,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     switch (indexType) {
       case LUX_INT8:
         for (i = 0; i < nSample; i++) {
-          j = clusterOtoC[clusterNumber.b[i]];
+          j = clusterOtoC[clusterNumber.ui8[i]];
           clusterSize[j]++;
         }
         break;
@@ -663,7 +663,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
       if (useIndex)                // get old cluster number
         switch (indexType) {
           case LUX_INT8:
-            curO = *clusterNumber.b;
+            curO = *clusterNumber.ui8;
             break;
           case LUX_INT16:
             curO = *clusterNumber.w;
@@ -936,7 +936,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 
       switch (indexType) {        // save cluster number
         case LUX_INT8:
-          *clusterNumber.b++ = newO;
+          *clusterNumber.ui8++ = newO;
           break;
         case LUX_INT16:
           *clusterNumber.w++ = newO;
@@ -1043,7 +1043,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
     nDistCal = 0;
 
                                 // reinitialize for a next iteration
-    clusterNumber.b -= nSample*lux_type_size[indexType];
+    clusterNumber.ui8 -= nSample*lux_type_size[indexType];
     if (iterate && nChanged) {
       if (useIndex)
         memcpy(changedOld, changed, nClusters);
@@ -1123,7 +1123,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
   free(changedOld);
   free(scrap);
   if (!gotIndex || gotSample)
-    free(clusterNumber.b);
+    free(clusterNumber.ui8);
   return LUX_OK;
 }
 //----------------------------------------------------------------

@@ -66,7 +66,7 @@ NumericDataDescriptor::set_from(SymbolProxy_tp symbol)
   switch (symbol_class(symbol)) {
   case LUX_SCALAR:
     m_dimensions.push_back(1);
-    m_data.b = &scalar_value(symbol).b;
+    m_data.ui8 = &scalar_value(symbol).ui8;
     break;
   case LUX_ARRAY:
     m_dimensions.resize(array_num_dims(symbol));

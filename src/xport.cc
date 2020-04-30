@@ -1391,33 +1391,33 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
       if (mode & TV_24) {                // three bytes per pixel
         switch (type) {
           case LUX_INT8:
-            min.b = UINT8_MAX;
-            max.b = 0;
+            min.ui8 = UINT8_MAX;
+            max.ui8 = 0;
             for (iy = y1; iy <= y2; iy++)
               for (ix = x1; ix <= x2; ix++) {
-                value.b = data.b[ix + iy*nx];
-                if (value.b < min.b)
-                  min.b = value.b;
-                if (value.b > max.b)
-                  max.b = value.b;
-                value.b = data.b[ix + iy*nx + s];
-                if (value.b < min.b)
-                  min.b = value.b;
-                if (value.b > max.b)
-                  max.b = value.b;
-                value.b = data.b[ix + iy*nx + 2*s];
-                if (value.b < min.b)
-                  min.b = value.b;
-                if (value.b > max.b)
-                  max.b = value.b;
+                value.ui8 = data.ui8[ix + iy*nx];
+                if (value.ui8 < min.ui8)
+                  min.ui8 = value.ui8;
+                if (value.ui8 > max.ui8)
+                  max.ui8 = value.ui8;
+                value.ui8 = data.ui8[ix + iy*nx + s];
+                if (value.ui8 < min.ui8)
+                  min.ui8 = value.ui8;
+                if (value.ui8 > max.ui8)
+                  max.ui8 = value.ui8;
+                value.ui8 = data.ui8[ix + iy*nx + 2*s];
+                if (value.ui8 < min.ui8)
+                  min.ui8 = value.ui8;
+                if (value.ui8 > max.ui8)
+                  max.ui8 = value.ui8;
               }
-            if (max.b == min.b)
+            if (max.ui8 == min.ui8)
               factor.f = 1;
             else if (threeColors)
-              factor.f = (256/3)/((float) max.b - min.b);
+              factor.f = (256/3)/((float) max.ui8 - min.ui8);
             else
-              factor.f = 255/((float) max.b - min.b);
-            offset.f = (float) min.b;
+              factor.f = 255/((float) max.ui8 - min.ui8);
+            offset.f = (float) min.ui8;
             break;
           case LUX_INT16:
             min.w = INT16_MAX;
@@ -1568,23 +1568,23 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
       } else {                        // one uint8_t per pixel
         switch (type) {
           case LUX_INT8:
-            min.b = UINT8_MAX;
-            max.b = 0;
+            min.ui8 = UINT8_MAX;
+            max.ui8 = 0;
             for (iy = y1; iy <= y2; iy++)
               for (ix = x1; ix <= x2; ix++) {
-                value.b = data.b[ix + iy*nx];
-                if (value.b < min.b)
-                  min.b = value.b;
-                if (value.b > max.b)
-                  max.b = value.b;
+                value.ui8 = data.ui8[ix + iy*nx];
+                if (value.ui8 < min.ui8)
+                  min.ui8 = value.ui8;
+                if (value.ui8 > max.ui8)
+                  max.ui8 = value.ui8;
               }
-            if (max.b == min.b)
+            if (max.ui8 == min.ui8)
               factor.f = 1;
             else if (threeColors)
-              factor.f = (256/3)/((float) max.b - min.b);
+              factor.f = (256/3)/((float) max.ui8 - min.ui8);
             else
-              factor.f = ((float) scalemax - scalemin)/((float) max.b - min.b);
-            offset.f = (float) min.b;
+              factor.f = ((float) scalemax - scalemin)/((float) max.ui8 - min.ui8);
+            offset.f = (float) min.ui8;
             break;
           case LUX_INT16:
             min.w = INT16_MAX;
@@ -1727,8 +1727,8 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     nxx = nx;                        // original dimensions
     nyy = ny;
   }
-  image.b = image0.b = (uint8_t*) malloc(nxx*nyy*(bpp/8)*((mode & TV_24)? 3: 1));
-  if (!image.b)
+  image.ui8 = image0.ui8 = (uint8_t*) malloc(nxx*nyy*(bpp/8)*((mode & TV_24)? 3: 1));
+  if (!image.ui8)
     return cerror(ALLOC_ERR, 0);
 
   // now generate the image data
@@ -1741,14 +1741,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
               for (ix = 0; ix < nxx; ix++) {
                 xsrc = x1 + ix/magx;
                 ysrc = y1 + iy/magy;
-                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx] - offset.f)*factor.f;
                 if (indx < scalemin)
                   indx = scalemin;
                 else if (indx > scalemax)
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -1757,14 +1757,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                     *image.l = (pixels[indx] & red_mask);
                     break;
                 } // end of switch (bpp)
-                indx = (data.b[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx + s] - offset.f)*factor.f;
                 if (indx < scalemin)
                   indx = scalemin;
                 else if (indx > scalemax)
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -1773,14 +1773,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                     *image.l |= (pixels[indx] & green_mask);
                     break;
                 } // end of switch (bpp)
-                indx = (data.b[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
                 if (indx < scalemin)
                   indx = scalemin;
                 else if (indx > scalemax)
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -1803,7 +1803,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -1819,7 +1819,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -1835,7 +1835,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -1858,7 +1858,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -1874,7 +1874,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -1890,7 +1890,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -1913,7 +1913,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -1929,7 +1929,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -1945,7 +1945,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -1968,7 +1968,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -1984,7 +1984,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2000,7 +2000,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2023,7 +2023,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -2039,7 +2039,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2055,7 +2055,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = scalemax;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2075,7 +2075,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
               for (ix = 0; ix < nxx; ix++) {
                 xsrc = x1 + ix/magx;
                 ysrc = y1 + iy/magy;
-                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx] - offset.f)*factor.f;
                 if (indx < 0)
                   indx = 0;
                 else if (indx >= 256/3)
@@ -2086,7 +2086,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2113,7 +2113,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2140,7 +2140,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2167,7 +2167,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2194,7 +2194,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2221,7 +2221,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2240,7 +2240,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
             for (ix = 0; ix < nxx; ix++) {
               xsrc = x1 + ix/magx;
               ysrc = y1 + iy/magy;
-              indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f
+              indx = (data.ui8[xsrc + ysrc*nx] - offset.f)*factor.f
                 + scalemin;
               if (indx < scalemin)
                 indx = scalemin;
@@ -2248,7 +2248,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2272,7 +2272,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2296,7 +2296,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2320,7 +2320,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2344,7 +2344,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2368,7 +2368,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2389,14 +2389,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
               for (ix = 0; ix < nxx; ix++) {
                 xsrc = x1 + ix/magx;
                 ysrc = y1 + iy/magy;
-                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx] - offset.f)*factor.f;
                 if (indx < 0)
                   indx = 0;
                 else if (indx > 255)
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -2405,14 +2405,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                     *image.l = (pixels[indx] & red_mask);
                     break;
                 } // end of switch (bpp)
-                indx = (data.b[xsrc + ysrc*nx + s] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx + s] - offset.f)*factor.f;
                 if (indx < 0)
                   indx = 0;
                 else if (indx > 255)
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2421,14 +2421,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                     *image.l |= (pixels[indx] & green_mask);
                     break;
                 } // end of switch (bpp)
-                indx = (data.b[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx + 2*s] - offset.f)*factor.f;
                 if (indx < 0)
                   indx = 0;
                 else if (indx > 255)
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2451,7 +2451,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -2467,7 +2467,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2483,7 +2483,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2506,7 +2506,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -2522,7 +2522,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2538,7 +2538,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2561,7 +2561,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -2577,7 +2577,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2593,7 +2593,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2616,7 +2616,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -2632,7 +2632,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2648,7 +2648,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2671,7 +2671,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b = (pixels[indx] & red_mask);
+                    *image.ui8 = (pixels[indx] & red_mask);
                     break;
                   case 16:
                     *image.w = (pixels[indx] & red_mask);
@@ -2687,7 +2687,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b |= (pixels[indx] & green_mask);
+                    *image.ui8 |= (pixels[indx] & green_mask);
                     break;
                   case 16:
                     *image.w |= (pixels[indx] & green_mask);
@@ -2703,7 +2703,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx = 255;
                 switch (bpp) {
                   case 8:
-                    *image.b++ |= (pixels[indx] & blue_mask);
+                    *image.ui8++ |= (pixels[indx] & blue_mask);
                     break;
                   case 16:
                     *image.w++ |= (pixels[indx] & blue_mask);
@@ -2723,7 +2723,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
               for (ix = 0; ix < nxx; ix++) {
                 xsrc = x1 + ix/magx;
                 ysrc = y1 + iy/magy;
-                indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f;
+                indx = (data.ui8[xsrc + ysrc*nx] - offset.f)*factor.f;
                 if (indx < 0)
                   indx = 0;
                 else if (indx >= 256/3)
@@ -2734,7 +2734,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2761,7 +2761,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2788,7 +2788,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2815,7 +2815,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2842,7 +2842,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2869,7 +2869,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                   indx += 2*(256/3);
                 switch (bpp) {
                   case 8:
-                    *image.b++ = toscreen? pixels[indx]: indx;
+                    *image.ui8++ = toscreen? pixels[indx]: indx;
                     break;
                   case 16:
                     *image.w++ = toscreen? pixels[indx]: indx;
@@ -2888,7 +2888,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
             for (ix = 0; ix < nxx; ix++) {
               xsrc = x1 + ix/magx;
               ysrc = y1 + iy/magy;
-              indx = (data.b[xsrc + ysrc*nx] - offset.f)*factor.f
+              indx = (data.ui8[xsrc + ysrc*nx] - offset.f)*factor.f
                 + scalemin;
               if (indx < scalemin)
                 indx = scalemin;
@@ -2896,7 +2896,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2920,7 +2920,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2944,7 +2944,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2968,7 +2968,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -2992,7 +2992,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -3016,7 +3016,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 indx = scalemax;
               switch (bpp) {
                 case 8:
-                  *image.b++ = toscreen? pixels[indx]: indx;
+                  *image.ui8++ = toscreen? pixels[indx]: indx;
                   break;
                 case 16:
                   *image.w++ = toscreen? pixels[indx]: indx;
@@ -3037,14 +3037,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
           for (ix = 0; ix < nxx; ix++) {
             xsrc = x1 + ix/magx;
             ysrc = y1 + iy/magy;
-            indx = data.b[xsrc + ysrc*nx];
+            indx = data.ui8[xsrc + ysrc*nx];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b = (pixels[indx] & red_mask);
+                *image.ui8 = (pixels[indx] & red_mask);
                 break;
               case 16:
                 *image.w = (pixels[indx] & red_mask);
@@ -3053,14 +3053,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 *image.l = (pixels[indx] & red_mask);
                 break;
             } // end of switch (bpp)
-            indx = data.b[xsrc + ysrc*nx + s];
+            indx = data.ui8[xsrc + ysrc*nx + s];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b |= (pixels[indx] & green_mask);
+                *image.ui8 |= (pixels[indx] & green_mask);
                 break;
               case 16:
                 *image.w |= (pixels[indx] & green_mask);
@@ -3069,14 +3069,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 *image.l |= (pixels[indx] & green_mask);
                 break;
             } // end of switch (bpp)
-            indx = data.b[xsrc + ysrc*nx + 2*s];
+            indx = data.ui8[xsrc + ysrc*nx + 2*s];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b++ = (pixels[indx] & blue_mask);
+                *image.ui8++ = (pixels[indx] & blue_mask);
                 break;
               case 16:
                 *image.w++ = (pixels[indx] & blue_mask);
@@ -3092,14 +3092,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
           for (ix = 0; ix < nxx; ix++) {
             xsrc = x1 + ix/magx;
             ysrc = y1 + iy/magy;
-            indx = data.b[xsrc + ysrc*nx];
+            indx = data.ui8[xsrc + ysrc*nx];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b++ = toscreen? pixels[indx]: indx;
+                *image.ui8++ = toscreen? pixels[indx]: indx;
                 break;
               case 16:
                 *image.w++ = toscreen? pixels[indx]: indx;
@@ -3117,14 +3117,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
           for (ix = 0; ix < nxx; ix++) {
             xsrc = x1 + ix/magx;
             ysrc = y1 + iy/magy;
-            indx = data.b[xsrc + ysrc*nx];
+            indx = data.ui8[xsrc + ysrc*nx];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b = (pixels[indx] & red_mask);
+                *image.ui8 = (pixels[indx] & red_mask);
                 break;
               case 16:
                 *image.w = (pixels[indx] & red_mask);
@@ -3133,14 +3133,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 *image.l = (pixels[indx] & red_mask);
                 break;
             } // end of switch (bpp)
-            indx = data.b[xsrc + ysrc*nx + s];
+            indx = data.ui8[xsrc + ysrc*nx + s];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b |= (pixels[indx] & green_mask);
+                *image.ui8 |= (pixels[indx] & green_mask);
                 break;
               case 16:
                 *image.w |= (pixels[indx] & green_mask);
@@ -3149,14 +3149,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
                 *image.l |= (pixels[indx] & green_mask);
                 break;
             } // end of switch (bpp)
-            indx = data.b[xsrc + ysrc*nx + 2*s];
+            indx = data.ui8[xsrc + ysrc*nx + 2*s];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b++ |= (pixels[indx] & blue_mask);
+                *image.ui8++ |= (pixels[indx] & blue_mask);
                 break;
               case 16:
                 *image.w++ |= (pixels[indx] & blue_mask);
@@ -3172,14 +3172,14 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
           for (ix = 0; ix < nxx; ix++) {
             xsrc = x1 + ix/magx;
             ysrc = y1 + iy/magy;
-            indx = data.b[xsrc + ysrc*nx];
+            indx = data.ui8[xsrc + ysrc*nx];
             if (indx < scalemin)
               indx = scalemin;
             else if (indx > scalemax)
               indx = scalemax;
             switch (bpp) {
               case 8:
-                *image.b++ = toscreen? pixels[indx]: indx;
+                *image.ui8++ = toscreen? pixels[indx]: indx;
                 break;
               case 16:
                 *image.w++ = toscreen? pixels[indx]: indx;
@@ -3201,9 +3201,9 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
             ysrc = y1 + iy/magy;
             switch (bpp) {
               case 8:
-                *image.b++ = (data.b[xsrc + ysrc*nx] & red_mask)
-                  | (data.b[xsrc + ysrc*nx + s] & green_mask)
-                  | (data.b[xsrc + ysrc*nx + 2*s] & blue_mask);
+                *image.ui8++ = (data.ui8[xsrc + ysrc*nx] & red_mask)
+                  | (data.ui8[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.ui8[xsrc + ysrc*nx + 2*s] & blue_mask);
                 break;
               case 16:
                 *image.w++ = (data.w[xsrc + ysrc*nx] & red_mask)
@@ -3225,7 +3225,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
             ysrc = y1 + iy/magy;
             switch (bpp) {
               case 8:
-                *image.b++ = data.b[xsrc + ysrc*nx];
+                *image.ui8++ = data.ui8[xsrc + ysrc*nx];
                 break;
               case 16:
                 *image.w++ = data.w[xsrc + ysrc*nx];
@@ -3245,9 +3245,9 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
             ysrc = y1 + iy/magy;
             switch (bpp) {
               case 8:
-                *image.b++ = (data.b[xsrc + ysrc*nx] & red_mask)
-                  | (data.b[xsrc + ysrc*nx + s] & green_mask)
-                  | (data.b[xsrc + ysrc*nx + 2*s] & blue_mask);
+                *image.ui8++ = (data.ui8[xsrc + ysrc*nx] & red_mask)
+                  | (data.ui8[xsrc + ysrc*nx + s] & green_mask)
+                  | (data.ui8[xsrc + ysrc*nx + 2*s] & blue_mask);
                 break;
               case 16:
                 *image.w++ = (data.w[xsrc + ysrc*nx] & red_mask)
@@ -3269,7 +3269,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
             ysrc = y1 + iy/magy;
             switch (bpp) {
               case 8:
-                *image.b++ = data.b[xsrc + ysrc*nx];
+                *image.ui8++ = data.ui8[xsrc + ysrc*nx];
                 break;
               case 16:
                 *image.w++ = data.w[xsrc + ysrc*nx];
@@ -3285,7 +3285,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
         
   if (toscreen) {
     // create image structure
-    xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) image0.b,
+    xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) image0.ui8,
                       nxx, nyy, bpp, 0);
 /*    if (!XInitImage(xi))
       return luxerror("Error initializing image", 0); */
@@ -3316,12 +3316,12 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
     fy2 = (float) (syf + nyyf)/maxdim;
     // NOTE: must modify this to support 16 and 32-bit color indices
     if (mode & TV_24)
-      iq = postcolor((char *) image0.b, nx, ny, fx, fx2, fy, fy2, 2);
+      iq = postcolor((char *) image0.ui8, nx, ny, fx, fx2, fy, fy2, 2);
     else
-      iq = postgray((char *) image0.b, nx, ny, fx, fx2, fy, fy2, 2);
+      iq = postgray((char *) image0.ui8, nx, ny, fx, fx2, fy, fy2, 2);
   }
 
-  free(image0.b);
+  free(image0.ui8);
 
   return iq;
 }
@@ -3371,7 +3371,7 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
           iq = array_clone(*ps, type);
       }
       p.l = (int32_t*) array_data(*ps);
-      q.b = (uint8_t*) array_data(iq);
+      q.ui8 = (uint8_t*) array_data(iq);
       break;
     case LUX_SCALAR:
       if (internalMode & TV_24)
@@ -3380,7 +3380,7 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
       n = 1;
       p.l = &scalar_value(*ps).l;
       iq = scalar_scratch(type);
-      q.b = &scalar_value(iq).b;
+      q.ui8 = &scalar_value(iq).ui8;
       break;
     default:
       return cerror(ILL_CLASS, *ps);
@@ -3392,64 +3392,64 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
         switch (symbol_type(*ps)) {
           case LUX_INT8:
             while (n--)
-              *q.b++ = (pixels[(int32_t) *p.b] & red_mask)
-                | (pixels[(int32_t) p.b[n]] & green_mask)
-                | (pixels[(int32_t) p.b[2*n]] & blue_mask);
+              *q.ui8++ = (pixels[(int32_t) *p.ui8] & red_mask)
+                | (pixels[(int32_t) p.ui8[n]] & green_mask)
+                | (pixels[(int32_t) p.ui8[2*n]] & blue_mask);
             break;
           case LUX_INT16:
             while (n--)
-              *q.b++ = (pixels[(int32_t) *p.w] & red_mask)
+              *q.ui8++ = (pixels[(int32_t) *p.w] & red_mask)
                 | (pixels[(int32_t) p.w[n]] & green_mask)
                 | (pixels[(int32_t) p.w[2*n]] & blue_mask);
             break;
           case LUX_INT32:
             while (n--)
-              *q.b++ = (pixels[(int32_t) *p.l] & red_mask)
+              *q.ui8++ = (pixels[(int32_t) *p.l] & red_mask)
                 | (pixels[(int32_t) p.l[n]] & green_mask)
                 | (pixels[(int32_t) p.l[2*n]] & blue_mask);
             break;
           case LUX_INT64:
             while (n--)
-              *q.b++ = (pixels[(int32_t) *p.q] & red_mask)
+              *q.ui8++ = (pixels[(int32_t) *p.q] & red_mask)
                 | (pixels[(int32_t) p.q[n]] & green_mask)
                 | (pixels[(int32_t) p.q[2*n]] & blue_mask);
             break;
           case LUX_FLOAT:
             while (n--)
-              *q.b++ = (pixels[(int32_t) *p.f] & red_mask)
+              *q.ui8++ = (pixels[(int32_t) *p.f] & red_mask)
                 | (pixels[(int32_t) p.f[n]] & green_mask)
                 | (pixels[(int32_t) p.f[2*n]] & blue_mask);
             break;
           case LUX_DOUBLE:
             while (n--)
-              *q.b++ = (pixels[(int32_t) *p.d] & red_mask)
+              *q.ui8++ = (pixels[(int32_t) *p.d] & red_mask)
                 | (pixels[(int32_t) p.d[n]] & green_mask)
                 | (pixels[(int32_t) p.d[2*n]] & blue_mask);
             break;
         } else switch (symbol_type(*ps)) {
           case LUX_INT8:
             while (n--)
-              *q.b++ = pixels[(int32_t) *p.b++];
+              *q.ui8++ = pixels[(int32_t) *p.ui8++];
             break;
           case LUX_INT16:
             while (n--)
-              *q.b++ = pixels[(int32_t) ((uint8_t) *p.w++)];
+              *q.ui8++ = pixels[(int32_t) ((uint8_t) *p.w++)];
             break;
           case LUX_INT32:
             while (n--)
-              *q.b++ = pixels[(int32_t) ((uint8_t) *p.l++)];
+              *q.ui8++ = pixels[(int32_t) ((uint8_t) *p.l++)];
             break;
           case LUX_INT64:
             while (n--)
-              *q.b++ = pixels[(int32_t) ((uint8_t) *p.q++)];
+              *q.ui8++ = pixels[(int32_t) ((uint8_t) *p.q++)];
             break;
           case LUX_FLOAT:
             while (n--)
-              *q.b++ = pixels[(int32_t) ((uint8_t) *p.f++)];
+              *q.ui8++ = pixels[(int32_t) ((uint8_t) *p.f++)];
             break;
           case LUX_DOUBLE:
             while (n--)
-              *q.b++ = pixels[(int32_t) ((uint8_t) *p.d++)];
+              *q.ui8++ = pixels[(int32_t) ((uint8_t) *p.d++)];
             break;
         }
       break;
@@ -3458,9 +3458,9 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
         switch (symbol_type(*ps)) {
           case LUX_INT8:
             while (n--)
-              *q.w++ = (pixels[(int32_t) *p.b] & red_mask)
-                | (pixels[(int32_t) p.b[n]] & green_mask)
-                | (pixels[(int32_t) p.b[2*n]] & blue_mask);
+              *q.w++ = (pixels[(int32_t) *p.ui8] & red_mask)
+                | (pixels[(int32_t) p.ui8[n]] & green_mask)
+                | (pixels[(int32_t) p.ui8[2*n]] & blue_mask);
             break;
           case LUX_INT16:
             while (n--)
@@ -3495,7 +3495,7 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
         } else switch (symbol_type(*ps)) {
           case LUX_INT8:
             while (n--)
-              *q.w++ = pixels[(int32_t) *p.b++];
+              *q.w++ = pixels[(int32_t) *p.ui8++];
             break;
           case LUX_INT16:
             while (n--)
@@ -3524,9 +3524,9 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
         switch (symbol_type(*ps)) {
           case LUX_INT8:
             while (n--)
-              *q.l++ = (pixels[(int32_t) *p.b] & red_mask)
-                | (pixels[(int32_t) p.b[n]] & green_mask)
-                | (pixels[(int32_t) p.b[2*n]] & blue_mask);
+              *q.l++ = (pixels[(int32_t) *p.ui8] & red_mask)
+                | (pixels[(int32_t) p.ui8[n]] & green_mask)
+                | (pixels[(int32_t) p.ui8[2*n]] & blue_mask);
             break;
           case LUX_INT16:
             while (n--)
@@ -3561,7 +3561,7 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
         } else switch (symbol_type(*ps)) {
           case LUX_INT8:
             while (n--)
-              *q.l++ = pixels[(int32_t) *p.b++];
+              *q.l++ = pixels[(int32_t) *p.ui8++];
             break;
           case LUX_INT16:
             while (n--)
@@ -3998,9 +3998,9 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
  }
  result_sym = array_scratch(type, 2, dim);
  result_sym = lux_zerof(1, &result_sym);  // zero it in case not filled
- ptr.b = (uint8_t*) array_data(result_sym);
+ ptr.ui8 = (uint8_t*) array_data(result_sym);
  // note that we create our own image and use XGetSubImage
- xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr.b,
+ xi = XCreateImage(display, visual, depth, ZPixmap, 0, (char *) ptr.ui8,
                    nx, ny, bits_per_pixel, 0);
  XGetSubImage(display, *src, ix, iy, nx, ny, 0xffffffffUL, ZPixmap, xi, 0, 0);
  xi->data = NULL;
@@ -4160,7 +4160,7 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
   if (!ck_area(wid, &ix, &iy, &nnx, &nny))
     return luxerror("XANIMATE - completely off window", 0);
 
-  xi = XCreateImage(display, visual, 8, ZPixmap, 0, (char *) data.b, nx,
+  xi = XCreateImage(display, visual, 8, ZPixmap, 0, (char *) data.ui8, nx,
                     ny*nFrame, 8, 0);
 
   if (internalMode & 1)
@@ -4221,7 +4221,7 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
         i = event.xmotion.x + event.xmotion.y*nx;
         switch (type) {
         case LUX_INT8:
-          printf("%10d", ptr.b[i]);
+          printf("%10d", ptr.ui8[i]);
           break;
         case LUX_INT16:
           printf("%10d", ptr.w[i]);
@@ -4464,7 +4464,7 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
       || isComplexType(array_type(ps[0]))
       || array_num_dims(ps[0]) != 2)
     return cerror(NEED_2D_ARR, ps[0]);
-  data.b = (uint8_t*) array_data(ps[0]);
+  data.ui8 = (uint8_t*) array_data(ps[0]);
   nx = array_dims(ps[0])[0];
   ny = array_dims(ps[0])[1];
 

@@ -360,7 +360,7 @@ float averag(void *m, int32_t nxa, int32_t nxb, int32_t nya, int32_t nyb, int32_
     switch (dstype) {
       case LUX_INT8:
         for (i = nxc; i < nxd; i++)
-          sumx += gx[i]*p.b[i + jj];
+          sumx += gx[i]*p.ui8[i + jj];
         break;
       case LUX_INT16:
         for (i = nxc; i < nxd; i++)
@@ -450,12 +450,12 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
   //get start of m1 and m2 and the increments
   m1p.l = m1;
   m2p.l = m2;
-  //printf("m1p.b, m2p.b = %x %x\n",m1p.b, m2p.b);
-  m1p.b = m1p.b + lux_type_size[dstype] * ((nyc * nxs ) + nxc);
-  m2p.b = m2p.b + lux_type_size[dstype] * (( (nyc+ idy) * nxs ) + nxc + idx);
+  //printf("m1p.ui8, m2p.ui8 = %x %x\n",m1p.ui8, m2p.ui8);
+  m1p.ui8 = m1p.ui8 + lux_type_size[dstype] * ((nyc * nxs ) + nxc);
+  m2p.ui8 = m2p.ui8 + lux_type_size[dstype] * (( (nyc+ idy) * nxs ) + nxc + idx);
   ny = nxs - nx; //residual increment after inner loop
   p2 = gy + nyc;
-  //printf("m1p.b, m2p.b = %x %x, ny %d, bs %e\n",m1p.b, m2p.b,ny,bs);
+  //printf("m1p.ui8, m2p.ui8 = %x %x, ny %d, bs %e\n",m1p.ui8, m2p.ui8,ny,bs);
 
   // now the loop to compute the residual
   // with switch on type of array
@@ -468,7 +468,7 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
         p1 = ps;
         sumx = 0.0;
         while (i) {
-          t = ((float) *m1p.b++) - ((float) *m2p.b++);
+          t = ((float) *m1p.ui8++) - ((float) *m2p.ui8++);
           t = t + bs;
           t = t*t;
           t = MIN(t, ndmx2);
@@ -476,8 +476,8 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
           i--;
         }
         sum += (*p2++) * sumx;
-        m1p.b += ny;
-        m2p.b += ny;
+        m1p.ui8 += ny;
+        m2p.ui8 += ny;
         j--;
       }
       break;
@@ -737,19 +737,19 @@ int32_t lux_stretch(int32_t narg, int32_t ps[])// stretch function
       j2 = (j2 - j1)*n;
       switch (type) {
         case LUX_INT8:
-          bb.b = base.b + iq;
-          xq = b1*(c1*(float) *(bb.b) + c2* (float) *(bb.b + i2)
-                   + c3 * (float) *(bb.b+i3) + c4 * (float) *(bb.b+i4));
-          bb.b += j2;
-          xq += b2*(c1 * *(bb.b) + c2 * *(bb.b+i2)
-                    + c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
-          bb.b += j3;
-          xq += b3*(c1 * *(bb.b) + c2 * *(bb.b+i2)
-                    + c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
-          bb.b += j4;
-          xq += b4*(c1 * *(bb.b) + c2 * *(bb.b+i2)
-                    + c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
-          *out.b++ = xq;
+          bb.ui8 = base.ui8 + iq;
+          xq = b1*(c1*(float) *(bb.ui8) + c2* (float) *(bb.ui8 + i2)
+                   + c3 * (float) *(bb.ui8+i3) + c4 * (float) *(bb.ui8+i4));
+          bb.ui8 += j2;
+          xq += b2*(c1 * *(bb.ui8) + c2 * *(bb.ui8+i2)
+                    + c3 * *(bb.ui8+i3) + c4 * *(bb.ui8+i4));
+          bb.ui8 += j3;
+          xq += b3*(c1 * *(bb.ui8) + c2 * *(bb.ui8+i2)
+                    + c3 * *(bb.ui8+i3) + c4 * *(bb.ui8+i4));
+          bb.ui8 += j4;
+          xq += b4*(c1 * *(bb.ui8) + c2 * *(bb.ui8+i2)
+                    + c3 * *(bb.ui8+i3) + c4 * *(bb.ui8+i4));
+          *out.ui8++ = xq;
           break;
         case LUX_INT16:
           bb.w = base.w + iq;
@@ -1011,29 +1011,29 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
   xbase = 0.5 + 0.5 * stepx;
   yrun = 0.5 + 0.5 * stepy;
   inc = lux_type_size[type];
-  nlast.b = base.b + inc * (m-2) * n;
-  jbase.b = base.b;
+  nlast.ui8 = base.ui8 + inc * (m-2) * n;
+  jbase.ui8 = base.ui8;
   // use nearest neighbor if smt = 0 and bilinear otherwise
   if ( smt != 0 ) {
     while (ms--) {                              // column loop
       j = yrun;
       q = yrun - j;
       if ( j < 1 ) {                            //bottom border region
-        jbase.b = base.b;
+        jbase.ui8 = base.ui8;
         q = 0.0;
       } else {
         if ( j >= m ) {                                 // upper border
           q = 1.0;
-          jbase.b = nlast.b;
+          jbase.ui8 = nlast.ui8;
         }
         else                                    // normal case
-          jbase.b = base.b + (j - 1) * n * inc;
+          jbase.ui8 = base.ui8 + (j - 1) * n * inc;
       }
       oldi = 0;                                 // for all cases
       switch (type) {
       case 0:
-        z00 = *(jbase.b);
-        z01 = *(jbase.b + n); break;
+        z00 = *(jbase.ui8);
+        z01 = *(jbase.ui8 + n); break;
       case 1:
         z00 = *(jbase.w);
         z01 = *(jbase.w + n); break;
@@ -1052,7 +1052,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
       zc1 = (z01 - z00) * q + z00;
       zc2 = 0.0;
       xrun = xbase;
-      out.b = jout.b;
+      out.ui8 = jout.ui8;
       while (1) {                               // row loop
         i = xrun;
         p = xrun - i;
@@ -1062,8 +1062,8 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
           oldi = i;
           switch (type) {
           case 0:
-            z10 = *(jbase.b + i);
-            z11 = *(jbase.b + i + n); break;
+            z10 = *(jbase.ui8 + i);
+            z11 = *(jbase.ui8 + i + n); break;
           case 1:
             z10 = *(jbase.w + i);
             z11 = *(jbase.w + i + n); break;
@@ -1083,7 +1083,7 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
         }
         xq = p * zc2 + zc1;
         switch (type) {
-        case 0: *out.b++ = xq; break;
+        case 0: *out.ui8++ = xq; break;
         case 1: *out.w++ = xq; break;
         case 2: *out.l++ = xq; break;
         case 3: *out.f++ = xq; break;
@@ -1094,12 +1094,12 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
       }
       // rest of row
       xq = zc1 + zc2;
-      jout.b += ns * inc;
-      nc = (jout.b - out.b) / inc;
+      jout.ui8 += ns * inc;
+      nc = (jout.ui8 - out.ui8) / inc;
       while (nc > 0 )
       { nc--;
         switch (type) {
-        case 0: *out.b++ = xq; break;
+        case 0: *out.ui8++ = xq; break;
         case 1: *out.w++ = xq; break;
         case 2: *out.l++ = xq; break;
         case 3: *out.f++ = xq; break;
@@ -1113,21 +1113,21 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
       j = yrun - 0.5;
       //printf("j, yrun = %d %f\n",j, yrun);
       if ( j < 1 ) {                            //bottom border region
-        jbase.b = base.b;
+        jbase.ui8 = base.ui8;
       } else {
         if ( j >= m ) {                                 // upper border
-          jbase.b = base.b + inc * (m-1) * n;
+          jbase.ui8 = base.ui8 + inc * (m-1) * n;
         }
         // normal case
-        jbase.b = base.b + j * n * inc;
-        //printf("normal, jbase.b = %d\n",jbase.b);
+        jbase.ui8 = base.ui8 + j * n * inc;
+        //printf("normal, jbase.ui8 = %d\n",jbase.ui8);
       }
-      xrun = xbase - 0.5;       out.b = jout.b;
+      xrun = xbase - 0.5;       out.ui8 = jout.ui8;
       ns2 = ns;
       while (ns2--) {                           // row loop
         i = xrun;
         switch (type) {
-        case 0: *out.b++ = *(jbase.b + i); break;
+        case 0: *out.ui8++ = *(jbase.ui8 + i); break;
         case 1: *out.w++ = *(jbase.w + i); break;
         case 2: *out.l++ = *(jbase.l + i); break;
         case 3: *out.f++ = *(jbase.f + i); break;
@@ -1136,11 +1136,11 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
         xrun = xrun + stepx;
       }
       // rest of row (if any)
-      i = n - 1;        jout.b += ns * inc;     nc = (jout.b - out.b) / inc;
+      i = n - 1;        jout.ui8 += ns * inc;     nc = (jout.ui8 - out.ui8) / inc;
       //printf("nc = %d\n",nc);
       while (nc > 0 ) { nc--;
                         switch (type) {
-                        case 0: *out.b++ = *(jbase.b + i); break;
+                        case 0: *out.ui8++ = *(jbase.ui8 + i); break;
                         case 1: *out.w++ = *(jbase.w + i); break;
                         case 2: *out.l++ = *(jbase.l + i); break;
                         case 3: *out.f++ = *(jbase.f + i); break;
@@ -1211,7 +1211,7 @@ void bicubic_f(void)    // internal routine for single pixel
          if (stretchmark_flag == 0) {
           if ( xl < -0.5 || xl > fnm5) {
            switch (regrid_type) {
-           case 0: *out.b++ = 0; break;
+           case 0: *out.ui8++ = 0; break;
            case 1: *out.w++ = 0; break;
            case 2: *out.l++ = 0; break;
            case 3: *out.f++ = 0; break;
@@ -1240,7 +1240,7 @@ void bicubic_f(void)    // internal routine for single pixel
          if (stretchmark_flag == 0) {
           if ( yl < -0.5 || yl > fmm5) {
            switch (regrid_type) {
-           case 0: *out.b++ = 0; break;
+           case 0: *out.ui8++ = 0; break;
            case 1: *out.w++ = 0; break;
            case 2: *out.l++ = 0; break;
            case 3: *out.f++ = 0; break;
@@ -1266,18 +1266,18 @@ void bicubic_f(void)    // internal routine for single pixel
  // printf("offset j1, j2, j3, j4 = %d %d %d %d\n", j1, j2, j3, j4);
  switch (regrid_type) {
  case 0:
- bb.b = base.b+iq;
- xq = b1*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
- bb.b += j2;
- xq += b2*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
- bb.b += j3;
- xq += b3*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
- bb.b += j4;
- xq += b4*(c1 * *(bb.b) + c2 * *(bb.b+i2)+ c3 * *(bb.b+i3) + c4 * *(bb.b+i4));
+ bb.ui8 = base.ui8+iq;
+ xq = b1*(c1 * *(bb.ui8) + c2 * *(bb.ui8+i2)+ c3 * *(bb.ui8+i3) + c4 * *(bb.ui8+i4));
+ bb.ui8 += j2;
+ xq += b2*(c1 * *(bb.ui8) + c2 * *(bb.ui8+i2)+ c3 * *(bb.ui8+i3) + c4 * *(bb.ui8+i4));
+ bb.ui8 += j3;
+ xq += b3*(c1 * *(bb.ui8) + c2 * *(bb.ui8+i2)+ c3 * *(bb.ui8+i3) + c4 * *(bb.ui8+i4));
+ bb.ui8 += j4;
+ xq += b4*(c1 * *(bb.ui8) + c2 * *(bb.ui8+i2)+ c3 * *(bb.ui8+i3) + c4 * *(bb.ui8+i4));
  // uint8_t arrays need to be range restricted, too many simple minds out there
  xq = MAX( 0, MIN( 255, xq));
  // also we need to round rather than truncate, taking that extra care
- *out.b++ = rint(xq); break;
+ *out.ui8++ = rint(xq); break;
  case 1:
  bb.w = base.w+iq;
  xq = b1*(c1 * *(bb.w) + c2 * *(bb.w+i2)+ c3 * *(bb.w+i3) + c4 * *(bb.w+i4));
@@ -1349,7 +1349,7 @@ void bicubic_fc()       // internal routine for single pixel
       if (xl < -0.5 || xl > fnm5) {
         switch (regrid_type) {
           case LUX_INT8:
-            *out.b++ = 0;
+            *out.ui8++ = 0;
             break;
           case LUX_INT16:
             *out.w++ = 0;
@@ -1406,7 +1406,7 @@ void bicubic_fc()       // internal routine for single pixel
       if (yl < -0.5 || yl > fmm5) {
         switch (regrid_type) {
           case LUX_INT8:
-            *out.b++ = 0;
+            *out.ui8++ = 0;
             break;
           case LUX_INT16:
             *out.w++ = 0;
@@ -1456,18 +1456,18 @@ void bicubic_fc()       // internal routine for single pixel
   // printf("offset j1, j2, j3, j4 = %d %d %d %d\n", j1, j2, j3, j4);
   switch (regrid_type) {
     case LUX_INT8:
-      bb.b = base.b+iq;
-      xq = b1*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
-      bb.b += j2;
-      xq += b2*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
-      bb.b += j3;
-      xq += b3*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
-      bb.b += j4;
-      xq += b4*(c1*bb.b[0] + c2*bb.b[i2]+ c3*bb.b[i3] + c4*bb.b[i4]);
+      bb.ui8 = base.ui8+iq;
+      xq = b1*(c1*bb.ui8[0] + c2*bb.ui8[i2]+ c3*bb.ui8[i3] + c4*bb.ui8[i4]);
+      bb.ui8 += j2;
+      xq += b2*(c1*bb.ui8[0] + c2*bb.ui8[i2]+ c3*bb.ui8[i3] + c4*bb.ui8[i4]);
+      bb.ui8 += j3;
+      xq += b3*(c1*bb.ui8[0] + c2*bb.ui8[i2]+ c3*bb.ui8[i3] + c4*bb.ui8[i4]);
+      bb.ui8 += j4;
+      xq += b4*(c1*bb.ui8[0] + c2*bb.ui8[i2]+ c3*bb.ui8[i3] + c4*bb.ui8[i4]);
       // uint8_t arrays need to be range restricted, too many simple minds out there
       xq = MAX( 0, MIN( 255, xq));
       // also we need to round rather than truncate, taking that extra care
-      *out.b++ = rint(xq);
+      *out.ui8++ = rint(xq);
       break;
     case LUX_INT16:
       bb.w = base.w+iq;
@@ -1636,8 +1636,8 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
     case 0:     // nearest neighbor regrid
                          // start 4 level loop
       while (mg--) {            // outer mg loop (over all grid y)
-        ipbase.b = jpbase.b;
-        jpbase.b = ipbase.b + jprun;
+        ipbase.ui8 = jpbase.ui8;
+        jpbase.ui8 = ipbase.ui8 + jprun;
         ig = ng;                // # grid cells horizontally
         j = ind;
                                 // ig loop
@@ -1667,14 +1667,14 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
           cx *= yrun;
           cy *= yrun;
                                                  // setup for jc loop
-          jbase.b = ipbase.b;
-          ipbase.b = ipbase.b + iprun;
+          jbase.ui8 = ipbase.ui8;
+          ipbase.ui8 = ipbase.ui8 + iprun;
           beta = 0.0;
           jc = ms;
           while (jc--) {
                                                  // setup for ic loop
-            out.b = jbase.b;
-            jbase.b = jbase.b + jrun;
+            out.ui8 = jbase.ui8;
+            jbase.ui8 = jbase.ui8 + jrun;
             xl = ax + beta*cx + 0.5;
             yl = ay + beta*cy + 0.5;
             xinc = (bx + beta*dx);
@@ -1685,9 +1685,9 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
               case LUX_INT8:
                 while (ic--) {
                   if (xl < 0 || xl >= fn || yl < 0 || yl >= fm)
-                    *out.b++ = 0;
+                    *out.ui8++ = 0;
                   else
-                    *out.b++ = *(base.b + (int32_t) xl + n * (int32_t) yl);
+                    *out.ui8++ = *(base.ui8 + (int32_t) xl + n * (int32_t) yl);
                   xl += xinc;
                   yl += yinc;
                 }
@@ -1763,8 +1763,8 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
       // start 4 level loop
       // printf("mg, ng = %d, %d\n", mg, ng);
       do {                      // outer mg loop
-        ipbase.b = jpbase.b;
-        jpbase.b = ipbase.b + jprun;
+        ipbase.ui8 = jpbase.ui8;
+        jpbase.ui8 = ipbase.ui8 + jprun;
         ig = ng;
         j = ind;
         // ig loop
@@ -1794,8 +1794,8 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
           cx *= yrun;
           cy *= yrun;
           // setup for jc loop
-          jbase.b = ipbase.b;
-          ipbase.b = ipbase.b + iprun;
+          jbase.ui8 = ipbase.ui8;
+          ipbase.ui8 = ipbase.ui8 + iprun;
           beta = 0.0;
           jc = ms;
           while (jc--) {
@@ -1803,8 +1803,8 @@ int32_t regrid_common(int32_t narg, int32_t ps[])// with branches for type
             // some optimizer trouble here on Alpha, re-arrange
             yinc = (by + beta*dy);
             ic = 0;
-            out.b = jbase.b;
-            jbase.b = jbase.b + jrun;
+            out.ui8 = jbase.ui8;
+            jbase.ui8 = jbase.ui8 + jrun;
             xl0 = ax + beta*cx;
             yl0 = ay + beta*cy; // different from regrid
             xinc = (bx + beta*dx);
@@ -1947,7 +1947,7 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
     }
   iq = array_scratch(symbol_type(ps[0]), srcinfo.ndim, outDims);
   trgt.l = (int32_t*) array_data(iq);
-  zerobytes(trgt.b, array_size(iq)*lux_type_size[array_type(iq)]);
+  zerobytes(trgt.ui8, array_size(iq)*lux_type_size[array_type(iq)]);
 
   trgtinfo.setupDimensionLoop(srcinfo.ndim, outDims, symbol_type(ps[0]),
                               srcinfo.naxes, srcinfo.axes, &trgt, SL_EACHCOORD);
@@ -1970,10 +1970,10 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
       do {
         sum.l = 0;
         do
-          sum.l += (int32_t) src.b[offset];
+          sum.l += (int32_t) src.ui8[offset];
         while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
-        *trgt.b = sum.l/nel;
-        src.b = (uint8_t *) tmpinfo.data0;
+        *trgt.ui8 = sum.l/nel;
+        src.ui8 = (uint8_t *) tmpinfo.data0;
         n = trgtinfo.advanceLoop(&trgt);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
@@ -2089,15 +2089,15 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) // compress function
   switch (type)
   { case LUX_INT8:
       while (ny--)
-      {         base.b = q1.b;  iq = nx;
+      {         base.ui8 = q1.ui8;  iq = nx;
         while (iq--)
-        { p.b = base.b; xq = 0.0;
+        { p.ui8 = base.ui8; xq = 0.0;
           for (j = 0; j < cy; j++)
-          { for (i = 0; i < cx; i++) xq += *p.b++;
-            p.b += n; }
-          *q2.b++ = (uint8_t) ( xq * fac );
-          base.b += cx; }
-        q1.b +=  nxx * cy; }
+          { for (i = 0; i < cx; i++) xq += *p.ui8++;
+            p.ui8 += n; }
+          *q2.ui8++ = (uint8_t) ( xq * fac );
+          base.ui8 += cx; }
+        q1.ui8 +=  nxx * cy; }
       break;
     case LUX_INT16:
       while (ny--)
@@ -2231,31 +2231,31 @@ int32_t lux_sort(int32_t narg, int32_t ps[])
   case 0:                       // heap sort
     switch (type) {
     case LUX_INT8:
-      for ( ; nloop--; p.b += step)
-        sort_b(n, p.b);
+      for ( ; nloop--; p.ui8 += step)
+        sort_b(n, p.ui8);
       break;
     case LUX_INT16:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         sort_w(n, p.w);
       break;
     case LUX_INT32:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         sort_l(n, p.l);
       break;
     case LUX_INT64:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         sort_int64(n, p.q);
       break;
     case LUX_FLOAT:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         sort_f(n, p.f);
       break;
     case LUX_DOUBLE:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         sort_d(n, p.d);
       break;
     case LUX_TEMP_STRING:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         sort_s(n, p.sp);
       break;
     default:
@@ -2265,31 +2265,31 @@ int32_t lux_sort(int32_t narg, int32_t ps[])
   case 1:                       // shell sort
     switch (type) {
     case LUX_INT8:
-      for ( ; nloop--; p.b += step)
-        shell_b(n, p.b);
+      for ( ; nloop--; p.ui8 += step)
+        shell_b(n, p.ui8);
       break;
     case LUX_INT16:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         shell_w(n, p.w);
       break;
     case LUX_INT32:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         shell_l(n, p.l);
       break;
     case LUX_INT64:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         shell_int64(n, p.q);
       break;
     case LUX_FLOAT:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         shell_f(n, p.f);
       break;
     case LUX_DOUBLE:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         shell_d(n, p.d);
       break;
     case LUX_TEMP_STRING:
-      for ( ; nloop--; p.b += step)
+      for ( ; nloop--; p.ui8 += step)
         shell_s(n, p.sp);
       break;
     default:
@@ -2340,31 +2340,31 @@ int32_t lux_index(int32_t narg, int32_t ps[])
     type = LUX_TEMP_STRING;
   switch (type) {
   case LUX_INT8:
-    for ( ; nloop--; q.b += step1, p.b += step2)
-      indexx_b(n, q.b, p.l);
+    for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
+      indexx_b(n, q.ui8, p.l);
     break;
   case LUX_INT16:
-    for ( ; nloop--; q.b += step1, p.b += step2)
+    for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
       indexx_w(n, q.w, p.l);
     break;
   case LUX_INT32:
-    for ( ; nloop--; q.b += step1, p.b += step2)
+    for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
       indexx_l(n, q.l, p.l);
     break;
   case LUX_INT64:
-    for ( ; nloop--; q.b += step1, p.b += step2)
+    for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
       indexx_int64(n, q.q, p.q);
     break;
   case LUX_FLOAT:
-    for ( ; nloop--; q.b += step1, p.b += step2)
+    for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
       indexx_f(n, q.f, p.l);
     break;
   case LUX_DOUBLE:
-    for ( ; nloop--; q.b += step1, p.b += step2)
+    for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
       indexx_d(n, q.d, p.l);
     break;
   case LUX_TEMP_STRING:
-    for ( ; nloop--; q.b += step1, p.b += step2)
+    for ( ; nloop--; q.ui8 += step1, p.ui8 += step2)
       indexx_s(n, q.sp, p.l);
     break;
   default:
@@ -3052,8 +3052,8 @@ void shift_bicubic(float dx, int32_t nx, int32_t ny, int32_t inc, int32_t dline,
       float     z4, z1, z2, z3, yq;
       uint8_t   *p, *q;
       for (k=0;k<ny;k++) {
-        p = base.b + k*dline + rflag;
-        q = out.b + k*dline + rflag;
+        p = base.ui8 + k*dline + rflag;
+        q = out.ui8 + k*dline + rflag;
         z1 = (float) *(p + i1);         z2 = (float) *(p + i2);
         z3 = (float) *(p + i3);         z4 = (float) *(p + i4);
         p = p + i4;
@@ -3314,7 +3314,7 @@ int32_t lux_shift3(int32_t narg, int32_t ps[])  // shift3, bicubic image shift
 
   // first the shifts in x
   if (dx == 0.0)                // just copy over the original
-    bcopy((char *) base.b, (char *) out.b, nb);
+    bcopy((char *) base.ui8, (char *) out.ui8, nb);
   else
     shift_bicubic(dx, nx, ny, 1, nx, base, out, regrid_type);
   // if dy is zip, we are done
@@ -3368,14 +3368,14 @@ void interpolate(void *srcv, int32_t type, float xsrc, float ysrc, int32_t nsx,
   i = ix + iy*nsx;
   switch (type) {
     case LUX_INT8:
-      *trgt.b = py1*(px1*src.b[i - nsx - 1] + px2*src.b[i - nsx]
-                     + px3*src.b[i - nsx + 1] + px4*src.b[i - nsx + 2])
-        + py2*(px1*src.b[i - 1] + px2*src.b[i] + px3*src.b[i + 1]
-               + px4*src.b[i + 2])
-        + py3*(px1*src.b[i + nsx - 1] + px2*src.b[i + nsx]
-               + px3*src.b[i + nsx + 1] + px4*src.b[i + nsx + 2])
-        + py4*(px1*src.b[i + 2*nsx - 1] + px2*src.b[i + 2*nsx]
-               + px3*src.b[i + 2*nsx + 1] + px4*src.b[i + 2*nsx + 2]);
+      *trgt.ui8 = py1*(px1*src.ui8[i - nsx - 1] + px2*src.ui8[i - nsx]
+                     + px3*src.ui8[i - nsx + 1] + px4*src.ui8[i - nsx + 2])
+        + py2*(px1*src.ui8[i - 1] + px2*src.ui8[i] + px3*src.ui8[i + 1]
+               + px4*src.ui8[i + 2])
+        + py3*(px1*src.ui8[i + nsx - 1] + px2*src.ui8[i + nsx]
+               + px3*src.ui8[i + nsx + 1] + px4*src.ui8[i + nsx + 2])
+        + py4*(px1*src.ui8[i + 2*nsx - 1] + px2*src.ui8[i + 2*nsx]
+               + px3*src.ui8[i + 2*nsx + 1] + px4*src.ui8[i + 2*nsx + 2]);
       break;
     case LUX_INT16:
       *trgt.w = py1*(px1*src.w[i - nsx - 1] + px2*src.w[i - nsx]
@@ -3528,7 +3528,7 @@ int32_t lux_regridls(int32_t narg, int32_t ps[])
           // now that we've found the source image location, we must
           // interpolate the image value there.
           interpolate(src.v, type, xsrc, ysrc, nsx, nsy, trgt.v);
-          trgt.b += step;
+          trgt.ui8 += step;
         } // end of for (s = 0; s < nx; s++)
       }         // end of for (t = 0; t < ny; t++)
       gridx++;
@@ -3718,9 +3718,9 @@ int32_t lux_cartesian_to_polar(int32_t narg, int32_t ps[])
       x = x0 + r*cos(az*daz);
       y = y0 + r*sin(az*daz);
       interpolate(src.v, type, x, y, nx, ny, trgt.v);
-      trgt.b += step;
+      trgt.ui8 += step;
     }
-    trgt.b -= n*step;
+    trgt.ui8 -= n*step;
     single_fft(trgt, n, type, 0);
     switch (type) {
       case LUX_FLOAT:
@@ -3732,14 +3732,14 @@ int32_t lux_cartesian_to_polar(int32_t narg, int32_t ps[])
           trgt.d[i] /= n;
         break;
     }
-    trgt.b += n*step;
+    trgt.ui8 += n*step;
     if (n < dims[0]) {
-      zerobytes(trgt.b, (dims[0] - n)*step);
-      trgt.b += (dims[0] - n)*step;
+      zerobytes(trgt.ui8, (dims[0] - n)*step);
+      trgt.ui8 += (dims[0] - n)*step;
     }
-    trgt.b -= dims[0]*step;
+    trgt.ui8 -= dims[0]*step;
     single_fft(trgt, dims[0], type, 1);
-    trgt.b += dims[0]*step;
+    trgt.ui8 += dims[0]*step;
   }
   return result;
 }
@@ -3786,7 +3786,7 @@ int32_t lux_polar_to_cartesian(int32_t narg, int32_t ps[])
         interpolate(src.v, type, az, r, nx, ny, trgt.v);
       else
         zerobytes(trgt.v, step);
-      trgt.b += step;
+      trgt.ui8 += step;
     }
   }
   return result;

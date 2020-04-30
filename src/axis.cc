@@ -240,7 +240,7 @@ LoopInfo::advanceLoop(Pointer *ptr)
   int32_t       i, done;
 
   // advance pointer
-  ptr->b += this->step[this->advanceaxis]*this->stride;
+  ptr->ui8 += this->step[this->advanceaxis]*this->stride;
 
   if (this->advanceaxis >= this->rndim)         // already done
     done = this->rndim;
@@ -255,7 +255,7 @@ LoopInfo::advanceLoop(Pointer *ptr)
       this->coords[i] = 0;      // back to start
       done = i + 1;             // keep track of last advanced dimension
       if (done < this->rndim)
-        ptr->b += this->step[i + 1]*this->stride;
+        ptr->ui8 += this->step[i + 1]*this->stride;
     }
   }
   return done;
@@ -1267,7 +1267,7 @@ LoopInfo::subdataLoop(int32_t *range)
   for (i = this->ndim - 1; i > 0; i--)
     this->step[i] -= this->step[i - 1]*this->rdims[i - 1];
 
-  (*this->data).b = (uint8_t *) this->data0 + offset*this->stride;
+  (*this->data).ui8 = (uint8_t *) this->data0 + offset*this->stride;
 }
 //--------------------------------------------------------------------
 /** Modifies LoopInfo objects for for walking along only the outer
@@ -1344,13 +1344,13 @@ LoopInfo::rearrangeEdgeLoop(LoopInfo *trgt, int32_t index)
     this->step[i] -= this->step[i - 1]*this->rdims[i - 1];
 
   zerobytes(this->coords, this->ndim*sizeof(int32_t));
-  this->data->b = (uint8_t*) this->data0;
+  this->data->ui8 = (uint8_t*) this->data0;
 
   if (back) {
     // adjust coordinate and pointer to point at back side
     index = this->ndim - 1;
     this->coords[index] = this->rdims[index] - 1;
-    this->data->b += this->coords[index]*this->rsinglestep[index]*this->stride;
+    this->data->ui8 += this->coords[index]*this->rsinglestep[index]*this->stride;
   }
 
   if (trgt) {
@@ -1361,11 +1361,11 @@ LoopInfo::rearrangeEdgeLoop(LoopInfo *trgt, int32_t index)
     trgt->stride = trgtstride;
     trgt->data = trgtdata;
     trgt->data0 = trgtdata0;
-    trgt->data->b = (uint8_t*) trgt->data0;
+    trgt->data->ui8 = (uint8_t*) trgt->data0;
     if (back) {
       // adjust coordinate and pointer to point at back side
       trgt->coords[index] = trgt->rdims[index] - 1;
-      trgt->data->b += trgt->coords[index]*trgt->rsinglestep[index]*trgt->stride;
+      trgt->data->ui8 += trgt->coords[index]*trgt->rsinglestep[index]*trgt->stride;
     }
   }
 }
@@ -1582,7 +1582,7 @@ LoopInfo::moveLoop(int32_t index, int32_t distance)
   if (index >= this->rndim)     // illegal axis; don't do anything
     return index + 1;
   // adjust data pointer
-  this->data->b += distance*this->rsinglestep[index]*this->stride;
+  this->data->ui8 += distance*this->rsinglestep[index]*this->stride;
   // adjust the coordinate
   this->coords[index] += distance;
   // the new coordinate may be out of range; either negative or greater
@@ -1595,7 +1595,7 @@ LoopInfo::moveLoop(int32_t index, int32_t distance)
       if (++index == this->rndim)
         break;
       this->coords[index] += i;
-      this->data->b += i*this->step[index]*this->stride;
+      this->data->ui8 += i*this->step[index]*this->stride;
     } while (i && index < this->rndim);
   } else if (this->coords[index] < 0) {         // negative
     i = this->coords[index];
@@ -1605,7 +1605,7 @@ LoopInfo::moveLoop(int32_t index, int32_t distance)
       if (++index == this->rndim)
         break;
       this->coords[index] += i;
-      this->data->b += i*this->step[index]*this->stride;
+      this->data->ui8 += i*this->step[index]*this->stride;
     } while (this->coords[index] < 0);
   }
   return index;
@@ -1630,7 +1630,7 @@ LoopInfo::returnLoop(Pointer *ptr, int32_t index)
   int32_t       i;
 
   for (i = 0; i <= index; i++) {
-    ptr->b -= this->coords[index]*this->rsinglestep[index]*this->stride;
+    ptr->ui8 -= this->coords[index]*this->rsinglestep[index]*this->stride;
     this->coords[index] = 0;
   }
 }

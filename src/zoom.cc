@@ -58,7 +58,7 @@ void value_string(char *trgt, Pointer image, int32_t type, int32_t indx)
 {
   switch (type) {
     case LUX_INT8:
-      sprintf(trgt, "Value:% 10d", image.b[indx]);
+      sprintf(trgt, "Value:% 10d", image.ui8[indx]);
       break;
     case LUX_INT16:
       sprintf(trgt, "Value:% 10d", image.w[indx]);
@@ -221,9 +221,9 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   internalMode = TV_CENTER;
 
   stride = lux_type_size[type];
-  image.b = (uint8_t*) malloc(nx*ny*stride);
-  bitmap1.b = (uint8_t*) (bitmapdata1.v? malloc(nx*ny): NULL);
-  bitmap2.b = (uint8_t*) (bitmapdata2.v? malloc(nx*ny): NULL);
+  image.ui8 = (uint8_t*) malloc(nx*ny*stride);
+  bitmap1.ui8 = (uint8_t*) (bitmapdata1.v? malloc(nx*ny): NULL);
+  bitmap2.ui8 = (uint8_t*) (bitmapdata2.v? malloc(nx*ny): NULL);
   coords[0] = 0;
   coords[1] = nx - 1;
   coords[2] = 0;
@@ -241,40 +241,40 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
     if (i != axes[0] && i != axes[1])
       offset += coords[2*i]*step[i];
   if (extractNumerical(data, image, type, ndim, dims, coords, 2, axes) < 0
-      || (bitmap1.b
+      || (bitmap1.ui8
           && extractNumerical(bitmapdata1, bitmap1, LUX_INT8, ndim, dims,
                               coords, 2, axes) < 0)
-      || (bitmap2.b
+      || (bitmap2.ui8
           && extractNumerical(bitmapdata2, bitmap2, LUX_INT8, ndim, dims,
                               coords, 2, axes) < 0)) {
-    free(image.b);
-    free(bitmap1.b);                /* it's OK to free something if it is
+    free(image.ui8);
+    free(bitmap1.ui8);                /* it's OK to free something if it is
                                    equal to NULL, so we do not have to
-                                   check if bitmap1.b is NULL here. */
-    free(bitmap2.b);
+                                   check if bitmap1.ui8 is NULL here. */
+    free(bitmap2.ui8);
     return LUX_ERROR;
   }
   lux_xport(0, NULL);
-  if ((bitmap1.b || bitmap2.b)
+  if ((bitmap1.ui8 || bitmap2.ui8)
       && !threeColors) {        // must install three-colors color table
     z = 1.0;
     threecolors(&z, 1);
   }
   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
             sx, sy, wid, &zoom_mag, 0, zoom_clo, zoom_chi,
-            bitmap1.b, bitmap2.b) == LUX_ERROR) {
-    free(image.b);
-    free(bitmap1.b);
-    free(bitmap2.b);
+            bitmap1.ui8, bitmap2.ui8) == LUX_ERROR) {
+    free(image.ui8);
+    free(bitmap1.ui8);
+    free(bitmap2.ui8);
     return LUX_ERROR;
   }
   ww = wd[wid];
   hw = ht[wid];
 
   if (!menu_setup_done && menu_setup() != LUX_OK) {
-    free(image.b);
-    free(bitmap1.b);
-    free(bitmap2.b);
+    free(image.ui8);
+    free(bitmap1.ui8);
+    free(bitmap2.ui8);
     return LUX_ERROR;
   }
   for (mid = 0; mid < MAXMENU; mid++)
@@ -291,9 +291,9 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
       return cerror(ALLOC_ERR, 0);
   }
   if (createMenu(mid, 0, 0, ntext, zoomText) == LUX_ERROR) {
-    free(image.b);
-    free(bitmap1.b);
-    free(bitmap2.b);
+    free(image.ui8);
+    free(bitmap1.ui8);
+    free(bitmap2.ui8);
     return LUX_ERROR;
   }
   for (i = 0; i < ntext; i++)
@@ -396,10 +396,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                   zoom_yc += dy;
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1, sx,
                             sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
-                            zoom_chi, bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            zoom_chi, bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                 }
@@ -426,10 +426,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                   zoom_yc += dy;
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
-                            zoom_chi, bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            zoom_chi, bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   sprintf(menu[mid].text[ZOOM_RECENTER], "Recenter        ");
@@ -495,10 +495,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                     y2 = ny;
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo, zoom_chi,
-                            bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   sprintf(menu[mid].text[ZOOM_MAG], "Magnify: %7.2f",
@@ -514,10 +514,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                   zoom_mag = 1.0;
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
-                            zoom_chi, bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            zoom_chi, bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   sprintf(menu[mid].text[ZOOM_MAG], "Magnify: %7.2f",
@@ -560,10 +560,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                   paint_pane(mid, ZOOM_MAG, WHITE);
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
-                            zoom_chi, bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            zoom_chi, bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   break;
@@ -598,8 +598,8 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                     minmax(image.l, nx*ny, type);
                     switch (type) {
                       case LUX_INT8:
-                        zoom_clo = (double) lastmin.b;
-                        zoom_chi = (double) lastmax.b;
+                        zoom_clo = (double) lastmin.ui8;
+                        zoom_chi = (double) lastmax.ui8;
                         break;
                       case LUX_INT16:
                         zoom_clo = (double) lastmin.w;
@@ -629,10 +629,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                   paint_pane(mid, ZOOM_CVALUES, WHITE);
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
-                            zoom_chi, bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            zoom_chi, bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   break;
@@ -648,10 +648,10 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER,
                             zoom_clo, zoom_chi,
-                            bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   break;
@@ -702,17 +702,17 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                           && extractNumerical(bitmapdata2, bitmap2, LUX_INT8,
                                               ndim, dims, coords, 2, axes)
                           < 0)) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
-                            zoom_chi, bitmap1.b, bitmap2.b) < 0) {
-                    free(image.b);
-                    free(bitmap1.b);
-                    free(bitmap2.b);
+                            zoom_chi, bitmap1.ui8, bitmap2.ui8) < 0) {
+                    free(image.ui8);
+                    free(bitmap1.ui8);
+                    free(bitmap2.ui8);
                     return LUX_ERROR;
                   }
                   sprintf(menu[mid].text[ZOOM_FRAME], "Frame:  %8d",
@@ -820,8 +820,8 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                         offset += coords[2*i]*step[i];
                       }
 
-                    image.b = (uint8_t*) Realloc(image.b, nx*ny*stride);
-                    if (!image.b)
+                    image.ui8 = (uint8_t*) Realloc(image.ui8, nx*ny*stride);
+                    if (!image.ui8)
                       return cerror(ALLOC_ERR, 0);
                     if (extractNumerical(data, image, type, ndim, dims,
                                          coords, 2, axes) < 0
@@ -833,18 +833,18 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
                             && extractNumerical(bitmapdata2, bitmap2, LUX_INT8,
                                                 ndim, dims, coords, 2, axes)
                             < 0)) {
-                      free(image.b);
-                      free(bitmap1.b);
-                      free(bitmap2.b);
+                      free(image.ui8);
+                      free(bitmap1.ui8);
+                      free(bitmap2.ui8);
                       return LUX_ERROR;
                     }
                     if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
                             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo,
-                            zoom_chi, bitmap1.b, bitmap2.b)
+                            zoom_chi, bitmap1.ui8, bitmap2.ui8)
                         < 0) {
-                      free(image.b);
-                      free(bitmap1.b);
-                      free(bitmap2.b);
+                      free(image.ui8);
+                      free(bitmap1.ui8);
+                      free(bitmap2.ui8);
                       return LUX_ERROR;
                     }
                     sprintf(menu[mid].text[ZOOM_FRAME], "Frame:  %8d",
@@ -929,17 +929,17 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
           || (bitmapdata2.v
               && extractNumerical(bitmapdata2, bitmap2, LUX_INT8,
                                   ndim, dims, coords, 2, axes) < 0)) {
-        free(image.b);
-        free(bitmap1.b);
-        free(bitmap2.b);
+        free(image.ui8);
+        free(bitmap1.ui8);
+        free(bitmap2.ui8);
         return LUX_ERROR;
       }
       if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1, sx, sy,
-                wid, &zoom_mag, TV_CENTER, zoom_clo, zoom_chi, bitmap1.b,
-                bitmap2.b) < 0) {
-        free(image.b);
-        free(bitmap1.b);
-        free(bitmap2.b);
+                wid, &zoom_mag, TV_CENTER, zoom_clo, zoom_chi, bitmap1.ui8,
+                bitmap2.ui8) < 0) {
+        free(image.ui8);
+        free(bitmap1.ui8);
+        free(bitmap2.ui8);
         return LUX_ERROR;
       }
       if (play) {
@@ -1037,8 +1037,8 @@ int32_t tvzoom(int32_t narg, int32_t ps[])
     y2 = ny;
 
   stride = lux_type_size[type];
-  image.b = (uint8_t*) malloc(nx*ny*stride);
-  bitmap.b = (uint8_t*) (bitmapdata.v? malloc(nx*ny): NULL);
+  image.ui8 = (uint8_t*) malloc(nx*ny*stride);
+  bitmap.ui8 = (uint8_t*) (bitmapdata.v? malloc(nx*ny): NULL);
   coords[0] = 0;
   coords[1] = nx - 1;
   coords[2] = 0;
@@ -1051,20 +1051,20 @@ int32_t tvzoom(int32_t narg, int32_t ps[])
     if (i != axes[0] && i != axes[1])
       offset += coords[2*i]*step[i];
   if (extractNumerical(data, image, type, ndim, dims, coords, 2, axes) < 0
-      || (bitmap.b
+      || (bitmap.ui8
           && extractNumerical(bitmapdata, bitmap, LUX_INT8, ndim, dims,
                               coords, 2, axes) < 0)) {
-    free(image.b);
-    free(bitmap.b);                /* it's OK to free something if it is
+    free(image.ui8);
+    free(bitmap.ui8);                /* it's OK to free something if it is
                                    equal to NULL, so we do not have to
-                                   check if bitmap.b is NULL here. */
+                                   check if bitmap.ui8 is NULL here. */
     return LUX_ERROR;
   }
   if (tvraw(image, type, nx, ny, x1, x2 - 1, y1, y2 - 1,
             sx, sy, wid, &zoom_mag, TV_CENTER, zoom_clo, zoom_chi,
-            bitmap.b, NULL) == LUX_ERROR) {
-    free(image.b);
-    free(bitmap.b);
+            bitmap.ui8, NULL) == LUX_ERROR) {
+    free(image.ui8);
+    free(bitmap.ui8);
     return LUX_ERROR;
   }
   return LUX_OK;

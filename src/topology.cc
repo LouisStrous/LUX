@@ -54,27 +54,27 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
   // top row: always zero
   zerobytes(trgt.l, nx*sizeof(int32_t));
   trgt.l += nx;
-  src.b += nx*lux_type_size[array_type(ps[0])];
+  src.ui8 += nx*lux_type_size[array_type(ps[0])];
   ny -= 2;
   if (sign >= 0) {              // seek hill-like objects
     switch (array_type(ps[0])) {
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
           *trgt.l++ = 0;
-          src.b++;
+          src.ui8++;
           n = nx - 2;
           while (n--) {
-            value.w = *src.b * 2;
-            *trgt.l++ = ((int16_t) src.b[-1] + (int16_t) src.b[1] < value.w
-                         && (int16_t) src.b[nx] + (int16_t) src.b[-nx] < value.w
-                         && (int16_t) src.b[1 + nx] + (int16_t) src.b[-1 - nx]
+            value.w = *src.ui8 * 2;
+            *trgt.l++ = ((int16_t) src.ui8[-1] + (int16_t) src.ui8[1] < value.w
+                         && (int16_t) src.ui8[nx] + (int16_t) src.ui8[-nx] < value.w
+                         && (int16_t) src.ui8[1 + nx] + (int16_t) src.ui8[-1 - nx]
                          < value.w
-                         && (int16_t) src.b[1 - nx] + (int16_t) src.b[-1 + nx]
+                         && (int16_t) src.ui8[1 - nx] + (int16_t) src.ui8[-1 + nx]
                          < value.w);
-            src.b++;
+            src.ui8++;
           }
           *trgt.l++ = 0;
-          src.b++;
+          src.ui8++;
         }
         break;
       case LUX_INT16:
@@ -170,18 +170,18 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
           *trgt.l++ = 0;
-          src.b++;
+          src.ui8++;
           n = nx - 2;
           while (n--) {
-            value.b = *src.b * (short) 2;
-            *trgt.l++ = (src.b[-1] + src.b[1] > value.b
-                         && src.b[nx] + src.b[-nx] > value.b
-                         && src.b[1 + nx] + src.b[-1 - nx] > value.b
-                         && src.b[1 - nx] + src.b[-1 + nx] > value.b);
-            src.b++;
+            value.ui8 = *src.ui8 * (short) 2;
+            *trgt.l++ = (src.ui8[-1] + src.ui8[1] > value.ui8
+                         && src.ui8[nx] + src.ui8[-nx] > value.ui8
+                         && src.ui8[1 + nx] + src.ui8[-1 - nx] > value.ui8
+                         && src.ui8[1 - nx] + src.ui8[-1 + nx] > value.ui8);
+            src.ui8++;
           }
           *trgt.l++ = 0;
-          src.b++;
+          src.ui8++;
         }
         break;
       case LUX_INT16:
@@ -330,12 +330,12 @@ int32_t segment_general(int32_t narg, int32_t ps[])
     switch (array_type(ps[0])) {
       case LUX_INT8:
         do {
-          value.w = 2 * (int16_t) *src.b;
+          value.w = 2 * (int16_t) *src.ui8;
           for (j = 0; j < n; j++) {     /* all directions */
             k = offset[j];
-            srcl.b = src.b + k;
-            srcr.b = src.b - k;
-            if (value.w <= (int16_t) *srcl.b + (int16_t) *srcr.b)
+            srcl.ui8 = src.ui8 + k;
+            srcr.ui8 = src.ui8 - k;
+            if (value.w <= (int16_t) *srcl.ui8 + (int16_t) *srcr.ui8)
               break;
           }
           *trgt.l = (j == n);
@@ -417,13 +417,13 @@ int32_t segment_general(int32_t narg, int32_t ps[])
         case LUX_INT8:
           do {
             nok = 1 - degree;
-            value.b = 2 * *src.b;
+            value.ui8 = 2 * *src.ui8;
             for (j = 0; j < n; j++) { // all directions
               k = offset[j];
-              srcl.b = src.b + k;
-              srcr.b = src.b - k;
-              ok = (sign && value.b > *srcl.b + *srcr.b)
-                || (!sign && value.b < *srcl.b + *srcr.b);
+              srcl.ui8 = src.ui8 + k;
+              srcr.ui8 = src.ui8 - k;
+              ok = (sign && value.ui8 > *srcl.ui8 + *srcr.ui8)
+                || (!sign && value.ui8 < *srcl.ui8 + *srcr.ui8);
               if (degree)
                 nok += ok;
               else if (!ok) {
@@ -594,10 +594,10 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
   off[3] = nx;
 
   // top row: always zero
-  zerobytes(trgt.b, nx*sizeof(int32_t));
+  zerobytes(trgt.ui8, nx*sizeof(int32_t));
   trgt.l += nx;
   angle += nx;
-  src.b += nx*lux_type_size[array_type(ps[0])];
+  src.ui8 += nx*lux_type_size[array_type(ps[0])];
   ny -= 2;
   if (sign >= 0) {              // seek hill-like objects
     switch (array_type(ps[0])) {
@@ -605,19 +605,19 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
         while (ny--) {          // all rows except for bottom one
           *trgt.l++ = 0;
           angle++;
-          src.b++;
+          src.ui8++;
           n = nx - 2;
           while (n--) {
-            value.b = *src.b * (short) 2;
+            value.ui8 = *src.ui8 * (short) 2;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.b[off[class_id]] + src.b[-off[class_id]] < value.b);
-            src.b++;
+            *trgt.l++ = (src.ui8[off[class_id]] + src.ui8[-off[class_id]] < value.ui8);
+            src.ui8++;
           }
           *trgt.l++ = 0;
-          src.b++;
+          src.ui8++;
           angle++;
         }
         break;
@@ -727,21 +727,21 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
           *trgt.l++ = 0;
-          src.b++;
+          src.ui8++;
           angle++;
           n = nx - 2;
           while (n--) {
-            value.b = *src.b * (short) 2;
+            value.ui8 = *src.ui8 * (short) 2;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.l++ = (src.b[off[class_id]] + src.b[-off[class_id]] > value.b);
-            src.b++;
+            *trgt.l++ = (src.ui8[off[class_id]] + src.ui8[-off[class_id]] > value.ui8);
+            src.ui8++;
           }
           *trgt.l++ = 0;
           angle++;
-          src.b++;
+          src.ui8++;
         }
         break;
       case LUX_INT16:
@@ -888,37 +888,37 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
   off[3] = nx;
 
   // top row: always zero
-  zerobytes(trgt.b, nx);
-  trgt.b += nx;
+  zerobytes(trgt.ui8, nx);
+  trgt.ui8 += nx;
   angle += nx;
-  src.b += nx*lux_type_size[array_type(ps[0])];
+  src.ui8 += nx*lux_type_size[array_type(ps[0])];
   ny -= 2;
   if (sign >= 0) {              // seek hill-like objects
     switch (array_type(ps[0])) {
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
-          src.b++;
+          src.ui8++;
           n = nx - 2;
           while (n--) {
-            value.b = *src.b;
+            value.ui8 = *src.ui8;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.b > src.b[off[class_id]]
-                         && value.b > src.b[-off[class_id]]);
-            src.b++;
+            *trgt.ui8++ = (value.ui8 > src.ui8[off[class_id]]
+                         && value.ui8 > src.ui8[-off[class_id]]);
+            src.ui8++;
           }
-          *trgt.b++ = 0;
-          src.b++;
+          *trgt.ui8++ = 0;
+          src.ui8++;
           angle++;
         }
         break;
       case LUX_INT16:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.w++;
           n = nx - 2;
@@ -928,18 +928,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.w > src.w[off[class_id]]
+            *trgt.ui8++ = (value.w > src.w[off[class_id]]
                          && value.w > src.w[-off[class_id]]);
             src.w++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.w++;
           angle++;
         }
         break;
       case LUX_INT32:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.l++;
           n = nx - 2;
@@ -949,18 +949,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.l > src.l[off[class_id]]
+            *trgt.ui8++ = (value.l > src.l[off[class_id]]
                          && value.l > src.l[-off[class_id]]);
             src.l++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.l++;
           angle++;
         }
         break;
       case LUX_INT64:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.q++;
           n = nx - 2;
@@ -970,18 +970,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.q > src.q[off[class_id]]
+            *trgt.ui8++ = (value.q > src.q[off[class_id]]
                          && value.q > src.q[-off[class_id]]);
             src.q++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.q++;
           angle++;
         }
         break;
       case LUX_FLOAT:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.f++;
           n = nx - 2;
@@ -991,18 +991,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.f > src.f[off[class_id]]
+            *trgt.ui8++ = (value.f > src.f[off[class_id]]
                          && value.f > src.f[-off[class_id]]);
             src.f++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.f++;
           angle++;
         }
         break;
       case LUX_DOUBLE:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.d++;
           n = nx - 2;
@@ -1012,11 +1012,11 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0) << 1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.d > src.d[off[class_id]]
+            *trgt.ui8++ = (value.d > src.d[off[class_id]]
                          && value.d > src.d[-off[class_id]]);
             src.d++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.d++;
           angle++;
         }
@@ -1026,28 +1026,28 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
     switch (array_type(ps[0])) {
       case LUX_INT8:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
-          src.b++;
+          *trgt.ui8++ = 0;
+          src.ui8++;
           angle++;
           n = nx - 2;
           while (n--) {
-            value.b = *src.b;
+            value.ui8 = *src.ui8;
             a = *angle++ + DEG22_5;
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.b < src.b[off[class_id]]
-                         && value.b < src.b[-off[class_id]]);
-            src.b++;
+            *trgt.ui8++ = (value.ui8 < src.ui8[off[class_id]]
+                         && value.ui8 < src.ui8[-off[class_id]]);
+            src.ui8++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
-          src.b++;
+          src.ui8++;
         }
         break;
       case LUX_INT16:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.w++;
           angle++;
           n = nx - 2;
@@ -1057,18 +1057,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.w < src.w[off[class_id]]
+            *trgt.ui8++ = (value.w < src.w[off[class_id]]
                          && value.w < src.w[-off[class_id]]);
             src.w++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.w++;
         }
         break;
       case LUX_INT32:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.l++;
           angle++;
           n = nx - 2;
@@ -1078,18 +1078,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.l < src.l[off[class_id]]
+            *trgt.ui8++ = (value.l < src.l[off[class_id]]
                          && value.l < src.l[-off[class_id]]);
             src.l++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.l++;
         }
         break;
       case LUX_INT64:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.q++;
           angle++;
           n = nx - 2;
@@ -1099,18 +1099,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.q < src.q[off[class_id]]
+            *trgt.ui8++ = (value.q < src.q[off[class_id]]
                          && value.q < src.q[-off[class_id]]);
             src.q++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.q++;
         }
         break;
       case LUX_FLOAT:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.f++;
           angle++;
           n = nx - 2;
@@ -1120,18 +1120,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.f < src.f[off[class_id]]
+            *trgt.ui8++ = (value.f < src.f[off[class_id]]
                          && value.f < src.f[-off[class_id]]);
             src.f++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.f++;
         }
         break;
       case LUX_DOUBLE:
         while (ny--) {          // all rows except for bottom one
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           src.d++;
           angle++;
           n = nx - 2;
@@ -1141,18 +1141,18 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
             s = sin(a);
             c = cos(a);
             class_id = ((s*c > 0)<<1) + (s*c*(2*c*c - 1) > 0);
-            *trgt.b++ = (value.d < src.d[off[class_id]]
+            *trgt.ui8++ = (value.d < src.d[off[class_id]]
                          && value.d < src.d[-off[class_id]]);
             src.d++;
           }
-          *trgt.b++ = 0;
+          *trgt.ui8++ = 0;
           angle++;
           src.d++;
         }
         break;
     }
   }
-  zerobytes(trgt.b, nx);
+  zerobytes(trgt.ui8, nx);
   return result;
 }
 //-------------------------------------------------------------------------
@@ -1778,7 +1778,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
 
     // We walk to the nearest extreme of the sought kind
     ptr = ptr1;
-    dataptr.b = dataptr0.b + (ptr1 - ptr0)*stride; // corresponding data
+    dataptr.ui8 = dataptr0.ui8 + (ptr1 - ptr0)*stride; // corresponding data
     while (1) {
       j = -1;
       dataptr2 = dataptr;
@@ -1801,9 +1801,9 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
         }
         switch (maximum + type) {
           case SEEK_MAXIMUM + LUX_INT8:
-            if (dataptr.b[offset[direction]] > *dataptr2.b) {
+            if (dataptr.ui8[offset[direction]] > *dataptr2.ui8) {
               j = direction;
-              dataptr2.b = dataptr.b + offset[direction];
+              dataptr2.ui8 = dataptr.ui8 + offset[direction];
             }
             break;
           case SEEK_MAXIMUM + LUX_INT16:
@@ -1837,9 +1837,9 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
             }
             break;
           case LUX_INT8:
-            if (dataptr.b[offset[direction]] < *dataptr2.b) {
+            if (dataptr.ui8[offset[direction]] < *dataptr2.ui8) {
               j = direction;
-              dataptr2.b = dataptr.b + offset[direction];
+              dataptr2.ui8 = dataptr.ui8 + offset[direction];
             }
             break;
           case LUX_INT16:
@@ -1877,7 +1877,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
       if (j != -1) {            // not yet found the extreme
         // update pointers
         ptr += offset[j];       // to bitmap
-        dataptr.b += offset[j]*stride; // to data
+        dataptr.ui8 += offset[j]*stride; // to data
       } else
         break;
     }
@@ -1911,7 +1911,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
             continue;
           switch (maximum + type) {
             case SEEK_MAXIMUM + LUX_INT8:
-              if (dataptr.b[offset[direction]] >= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] >= *dataptr.ui8)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT16:
@@ -1935,7 +1935,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT8:
-              if (dataptr.b[offset[direction]] <= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] <= *dataptr.ui8)
                 continue;
               break;
             case LUX_INT16:
@@ -1983,7 +1983,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
             continue;
           switch (maximum + type) {
             case SEEK_MAXIMUM + LUX_INT8:
-              if (dataptr.b[offset[direction]] >= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] >= *dataptr.ui8)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT16:
@@ -2007,7 +2007,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT8:
-              if (dataptr.b[offset[direction]] <= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] <= *dataptr.ui8)
                 continue;
               break;
             case LUX_INT16:
@@ -2058,7 +2058,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
         break;
       // stack is not yet empty: pop last position from stack
       ptr = *--stack;
-      dataptr.b = dataptr0.b + (ptr - ptr0)*stride; // corresponding data
+      dataptr.ui8 = dataptr0.ui8 + (ptr - ptr0)*stride; // corresponding data
     }
     // we are done with the current segment: update label
     areaNumber++;
@@ -2242,7 +2242,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
 
     // We walk to the nearest extreme of the sought kind
     ptr = ptr1;
-    dataptr.b = dataptr0.b + (ptr1 - ptr0)*stride; // corresponding data
+    dataptr.ui8 = dataptr0.ui8 + (ptr1 - ptr0)*stride; // corresponding data
     while (1) {
       j = -1;
       dataptr2 = dataptr;
@@ -2270,9 +2270,9 @@ int32_t area2_general(int32_t narg, int32_t ps[])
         }
         switch (maximum + type) {
           case SEEK_MAXIMUM + LUX_INT8:
-            if (dataptr.b[offset[direction]] > *dataptr2.b) {
+            if (dataptr.ui8[offset[direction]] > *dataptr2.ui8) {
               j = direction;
-              dataptr2.b = dataptr.b + offset[direction];
+              dataptr2.ui8 = dataptr.ui8 + offset[direction];
             }
             break;
           case SEEK_MAXIMUM + LUX_INT16:
@@ -2306,9 +2306,9 @@ int32_t area2_general(int32_t narg, int32_t ps[])
             }
             break;
           case LUX_INT8:
-            if (dataptr.b[offset[direction]] < *dataptr2.b) {
+            if (dataptr.ui8[offset[direction]] < *dataptr2.ui8) {
               j = direction;
-              dataptr2.b = dataptr.b + offset[direction];
+              dataptr2.ui8 = dataptr.ui8 + offset[direction];
             }
             break;
           case LUX_INT16:
@@ -2346,7 +2346,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
       if (j != -1) {            // not yet found the extreme
         // update pointers
         ptr += offset[j];       // to bitmap
-        dataptr.b += offset[j]*stride; // to data
+        dataptr.ui8 += offset[j]*stride; // to data
       } else
         break;
     }
@@ -2383,7 +2383,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
             continue;
           switch (maximum + type) {
             case SEEK_MAXIMUM + LUX_INT8:
-              if (dataptr.b[offset[direction]] >= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] >= *dataptr.ui8)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT16:
@@ -2407,7 +2407,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT8:
-              if (dataptr.b[offset[direction]] <= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] <= *dataptr.ui8)
                 continue;
               break;
             case LUX_INT16:
@@ -2455,7 +2455,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
             continue;
           switch (maximum + type) {
             case SEEK_MAXIMUM + LUX_INT8:
-              if (dataptr.b[offset[direction]] >= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] >= *dataptr.ui8)
                 continue;
               break;
             case SEEK_MAXIMUM + LUX_INT16:
@@ -2479,7 +2479,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
                 continue;
               break;
             case LUX_INT8:
-              if (dataptr.b[offset[direction]] <= *dataptr.b)
+              if (dataptr.ui8[offset[direction]] <= *dataptr.ui8)
                 continue;
               break;
             case LUX_INT16:
@@ -2529,7 +2529,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
         break;
       // stack is not yet empty: pop last position from stack
       ptr = *--stack;
-      dataptr.b = dataptr0.b + (ptr - ptr0)*stride; // corresponding data
+      dataptr.ui8 = dataptr0.ui8 + (ptr - ptr0)*stride; // corresponding data
     }
     // we are done with the current segment: update label
     if (nNumber) {
@@ -2830,17 +2830,17 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
   mini = 2;
   switch (symbol_type(ps[0]) | sign) {
     case LUX_INT8:
-      min[0].b = min[1].b = bounds.max.b;
+      min[0].ui8 = min[1].ui8 = bounds.max.ui8;
       do {
-        min[2].b = min[1].b;
-        min[1].b = min[0].b;
+        min[2].ui8 = min[1].ui8;
+        min[1].ui8 = min[0].ui8;
         loc[2] = loc[1];
         loc[1] = loc[0];
-        min[0].b = bounds.max.b;
+        min[0].ui8 = bounds.max.ui8;
         mini++;
         if (!srcinfo.coords[0]) {       // at left edge
-          src.b--;
-          min[2].b = min[1].b = bounds.max.b;
+          src.ui8--;
+          min[2].ui8 = min[1].ui8 = bounds.max.ui8;
           mini = 3;
           edge = 0;
           for (i = 1; i < srcinfo.ndim; i++)
@@ -2858,45 +2858,45 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any other edge
-                if (src.b[offsets[i]] < min[0].b) { // update
-                  min[0].b = src.b[offsets[i]];
+                if (src.ui8[offsets[i]] < min[0].ui8) { // update
+                  min[0].ui8 = src.ui8[offsets[i]];
                   loc[0] = i;
                 }
               }
             } else for (i = 0; i < n; i++) {
-              if (src.b[offsets[i]] < min[0].b) { // update
-                min[0].b = src.b[offsets[i]];
+              if (src.ui8[offsets[i]] < min[0].ui8) { // update
+                min[0].ui8 = src.ui8[offsets[i]];
                 loc[0] = i;
               }
             }
           if (mini < 3) {       // previous lowest is now in 1 or 2
-            if (min[0].b < min[mini].b)
+            if (min[0].ui8 < min[mini].ui8)
               mini = 0;
           } else {              // previous lowest is too far away: find new
-            if (min[0].b < min[1].b) {
-              if (min[0].b < min[2].b)
+            if (min[0].ui8 < min[1].ui8) {
+              if (min[0].ui8 < min[2].ui8)
                 mini = 0;
               else
                 mini = 2;
             } else {
-              if (min[1].b < min[2].b)
+              if (min[1].ui8 < min[2].ui8)
                 mini = 1;
               else
                 mini = 2;
             }
           }
-          src.b++;              // back to current position
-          min[2].b = min[1].b;
-          min[1].b = min[0].b;
+          src.ui8++;              // back to current position
+          min[2].ui8 = min[1].ui8;
+          min[1].ui8 = min[0].ui8;
           loc[2] = loc[1];
           loc[1] = loc[0];
-          min[0].b = bounds.max.b;
+          min[0].ui8 = bounds.max.ui8;
           mini++;
         }
 
         if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { // at right edge
           if (mini == 3) {
-            if (min[1].b < min[2].b)
+            if (min[1].ui8 < min[2].ui8)
               mini = 1;
             else
               mini = 2;
@@ -2911,35 +2911,35 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any edge
-                if (src.b[offsets[i]] < min[0].b) { // update
-                  min[0].b = src.b[offsets[i]];
+                if (src.ui8[offsets[i]] < min[0].ui8) { // update
+                  min[0].ui8 = src.ui8[offsets[i]];
                   loc[0] = i;
                 }
               }
             }
           else for (i = 0; i < n; i++)
-            if (src.b[offsets[i]] < min[0].b) { // update
-              min[0].b = src.b[offsets[i]];
+            if (src.ui8[offsets[i]] < min[0].ui8) { // update
+              min[0].ui8 = src.ui8[offsets[i]];
               loc[0] = i;
             }
           if (mini < 3) {       // previous lowest is now in 1 or 2
-            if (min[0].b < min[mini].b)
+            if (min[0].ui8 < min[mini].ui8)
               mini = 0;
           } else {              // previous lowest is too far away: find new
-            if (min[0].b < min[1].b) {
-              if (min[0].b < min[2].b)
+            if (min[0].ui8 < min[1].ui8) {
+              if (min[0].ui8 < min[2].ui8)
                 mini = 0;
               else
                 mini = 2;
             } else {
-              if (min[1].b < min[2].b)
+              if (min[1].ui8 < min[2].ui8)
                 mini = 1;
               else
                 mini = 2;
             }
           }
         }
-        // now min[mini].b is the lowest value
+        // now min[mini].ui8 is the lowest value
         *trgt.l = -loc[mini] - n*mini;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
@@ -3521,17 +3521,17 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
       break;
 
     case LUX_INT8 | 0x20:
-      max[0].b = max[1].b = bounds.min.b;
+      max[0].ui8 = max[1].ui8 = bounds.min.ui8;
       do {
-        max[2].b = max[1].b;
-        max[1].b = max[0].b;
+        max[2].ui8 = max[1].ui8;
+        max[1].ui8 = max[0].ui8;
         loc[2] = loc[1];
         loc[1] = loc[0];
-        max[0].b = bounds.min.b;
+        max[0].ui8 = bounds.min.ui8;
         maxi++;
         if (!srcinfo.coords[0]) {       // at left edge
-          src.b--;
-          max[2].b = max[1].b = bounds.min.b;
+          src.ui8--;
+          max[2].ui8 = max[1].ui8 = bounds.min.ui8;
           maxi = 3;
           edge = 0;
           for (i = 1; i < srcinfo.ndim; i++)
@@ -3549,45 +3549,45 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any other edge
-                if (src.b[offsets[i]] > max[0].b) { // update
-                  max[0].b = src.b[offsets[i]];
+                if (src.ui8[offsets[i]] > max[0].ui8) { // update
+                  max[0].ui8 = src.ui8[offsets[i]];
                   loc[0] = i;
                 }
               }
             } else for (i = 0; i < n; i++) {
-              if (src.b[offsets[i]] > max[0].b) { // update
-                max[0].b = src.b[offsets[i]];
+              if (src.ui8[offsets[i]] > max[0].ui8) { // update
+                max[0].ui8 = src.ui8[offsets[i]];
                 loc[0] = i;
               }
             }
           if (maxi < 3) {       // previous highest is now in 1 or 2
-            if (max[0].b > max[maxi].b)
+            if (max[0].ui8 > max[maxi].ui8)
               maxi = 0;
           } else {              // previous highest is too far away: find new
-            if (max[0].b > max[1].b) {
-              if (max[0].b > max[2].b)
+            if (max[0].ui8 > max[1].ui8) {
+              if (max[0].ui8 > max[2].ui8)
                 maxi = 0;
               else
                 maxi = 2;
             } else {
-              if (max[1].b > max[2].b)
+              if (max[1].ui8 > max[2].ui8)
                 maxi = 1;
               else
                 maxi = 2;
             }
           }
-          src.b++;              // back to current position
-          max[2].b = max[1].b;
-          max[1].b = max[0].b;
+          src.ui8++;              // back to current position
+          max[2].ui8 = max[1].ui8;
+          max[1].ui8 = max[0].ui8;
           loc[2] = loc[1];
           loc[1] = loc[0];
-          max[0].b = bounds.min.b;
+          max[0].ui8 = bounds.min.ui8;
           maxi++;
         }
 
         if (srcinfo.coords[0] == srcinfo.dims[0] - 1) { // at right edge
           if (maxi == 3) {
-            if (max[1].b > max[2].b)
+            if (max[1].ui8 > max[2].ui8)
               maxi = 1;
             else
               maxi = 2;
@@ -3602,35 +3602,35 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
                   break;
               }
               if (j == srcinfo.ndim - 1) {      // not across any edge
-                if (src.b[offsets[i]] > max[0].b) { // update
-                  max[0].b = src.b[offsets[i]];
+                if (src.ui8[offsets[i]] > max[0].ui8) { // update
+                  max[0].ui8 = src.ui8[offsets[i]];
                   loc[0] = i;
                 }
               }
             }
           else for (i = 0; i < n; i++)
-            if (src.b[offsets[i]] > max[0].b) { // update
-              max[0].b = src.b[offsets[i]];
+            if (src.ui8[offsets[i]] > max[0].ui8) { // update
+              max[0].ui8 = src.ui8[offsets[i]];
               loc[0] = i;
             }
           if (maxi < 3) {       // previous highest is now in 1 or 2
-            if (max[0].b > max[maxi].b)
+            if (max[0].ui8 > max[maxi].ui8)
               maxi = 0;
           } else { // previous highest is too far away: find new
-            if (max[0].b > max[1].b) {
-              if (max[0].b > max[2].b)
+            if (max[0].ui8 > max[1].ui8) {
+              if (max[0].ui8 > max[2].ui8)
                 maxi = 0;
               else
                 maxi = 2;
             } else {
-              if (max[1].b > max[2].b)
+              if (max[1].ui8 > max[2].ui8)
                 maxi = 1;
               else
                 maxi = 2;
             }
           }
         }
-        // now max[maxi].b is the highest value
+        // now max[maxi].ui8 is the highest value
         *trgt.l = -loc[maxi] - n*maxi;
       } while (trgtinfo.advanceLoop(&trgt),
                srcinfo.advanceLoop(&src) < srcinfo.rndim);
@@ -4311,7 +4311,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   if (narg > 3 && ps[3]) {      // have threshold
     if (symbolIsRealScalar(ps[3])) { // it's valid
       i = lux_converts[symbol_type(ps[0])](1, ps + 3);
-      t.b = &scalar_value(i).b;
+      t.ui8 = &scalar_value(i).ui8;
       haveThreshold = 1;
     } else
       return cerror(ILL_CLASS, ps[3]);
@@ -4406,25 +4406,25 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 || srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
               break;            // at edge
           if (edge) {
-            zerobytes(trgt.b, nElem);
-            trgt.b += nElem;
-            src.b += nElem;
+            zerobytes(trgt.ui8, nElem);
+            trgt.ui8 += nElem;
+            src.ui8 += nElem;
           } else {
-            *trgt.b++ = 0;              // left edge
-            src.b++;
+            *trgt.ui8++ = 0;              // left edge
+            src.ui8++;
             for (i = i1; i < i2; i++) { // center data points
-              *trgt.b = 0;
+              *trgt.ui8 = 0;
               for (j = 0; j < n; j++) {         /* all directions */
                 k = offset[j];
-                srcl.b = src.b + k;
-                srcr.b = src.b - k;
-                *trgt.b += (*src.b > *srcl.b && *src.b > *srcr.b);
+                srcl.ui8 = src.ui8 + k;
+                srcr.ui8 = src.ui8 - k;
+                *trgt.ui8 += (*src.ui8 > *srcl.ui8 && *src.ui8 > *srcr.ui8);
               }
-              src.b++;
-              trgt.b++;
+              src.ui8++;
+              trgt.ui8++;
             }
-            *trgt.b++ = 0;              // right edge
-            src.b++;
+            *trgt.ui8++ = 0;              // right edge
+            src.ui8++;
           }
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.ndim);
@@ -4436,24 +4436,24 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 || srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
               break;            // at edge
           if (edge) {
-            zerobytes(trgt.b, nElem);
-            trgt.b += nElem;
+            zerobytes(trgt.ui8, nElem);
+            trgt.ui8 += nElem;
             src.w += nElem;
           } else {
-            *trgt.b++ = 0;              // left edge
+            *trgt.ui8++ = 0;              // left edge
             src.w++;
             for (i = i1; i < i2; i++) { // center data points
-              *trgt.b = 0;
+              *trgt.ui8 = 0;
               for (j = 0; j < n; j++) {         /* all directions */
                 k = offset[j];
                 srcl.w = src.w + k;
                 srcr.w = src.w - k;
-                *trgt.b += (*src.w > *srcl.w && *src.w > *srcr.w);
+                *trgt.ui8 += (*src.w > *srcl.w && *src.w > *srcr.w);
               }
               src.w++;
-              trgt.b++;
+              trgt.ui8++;
             }
-            *trgt.b++ = 0;              // right edge
+            *trgt.ui8++ = 0;              // right edge
             src.w++;
           }
         } while (trgtinfo.advanceLoop(&trgt),
@@ -4466,24 +4466,24 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 || srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
               break;            // at edge
           if (edge) {
-            zerobytes(trgt.b, nElem);
-            trgt.b += nElem;
+            zerobytes(trgt.ui8, nElem);
+            trgt.ui8 += nElem;
             src.l += nElem;
           } else {
-            *trgt.b++ = 0;              // left edge
+            *trgt.ui8++ = 0;              // left edge
             src.l++;
             for (i = i1; i < i2; i++) { // center data points
-              *trgt.b = 0;
+              *trgt.ui8 = 0;
               for (j = 0; j < n; j++) {         /* all directions */
                 k = offset[j];
                 srcl.l = src.l + k;
                 srcr.l = src.l - k;
-                *trgt.b += (*src.l > *srcl.l && *src.l > *srcr.l);
+                *trgt.ui8 += (*src.l > *srcl.l && *src.l > *srcr.l);
               }
               src.l++;
-              trgt.b++;
+              trgt.ui8++;
             }
-            *trgt.b++ = 0;              // right edge
+            *trgt.ui8++ = 0;              // right edge
             src.l++;
           }
         } while (trgtinfo.advanceLoop(&trgt),
@@ -4496,24 +4496,24 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 || srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
               break;            // at edge
           if (edge) {
-            zerobytes(trgt.b, nElem);
-            trgt.b += nElem;
+            zerobytes(trgt.ui8, nElem);
+            trgt.ui8 += nElem;
             src.q += nElem;
           } else {
-            *trgt.b++ = 0;              // left edge
+            *trgt.ui8++ = 0;              // left edge
             src.q++;
             for (i = i1; i < i2; i++) { // center data points
-              *trgt.b = 0;
+              *trgt.ui8 = 0;
               for (j = 0; j < n; j++) {         // all directions
                 k = offset[j];
                 srcl.q = src.q + k;
                 srcr.q = src.q - k;
-                *trgt.b += (*src.q > *srcl.q && *src.q > *srcr.q);
+                *trgt.ui8 += (*src.q > *srcl.q && *src.q > *srcr.q);
               }
               src.q++;
-              trgt.b++;
+              trgt.ui8++;
             }
-            *trgt.b++ = 0;              // right edge
+            *trgt.ui8++ = 0;              // right edge
             src.q++;
           }
         } while (trgtinfo.advanceLoop(&trgt),
@@ -4526,24 +4526,24 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 || srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
               break;            // at edge
           if (edge) {
-            zerobytes(trgt.b, nElem);
-            trgt.b += nElem;
+            zerobytes(trgt.ui8, nElem);
+            trgt.ui8 += nElem;
             src.f += nElem;
           } else {
-            *trgt.b++ = 0;              // left edge
+            *trgt.ui8++ = 0;              // left edge
             src.f++;
             for (i = i1; i < i2; i++) { // center data points
-              *trgt.b = 0;
+              *trgt.ui8 = 0;
               for (j = 0; j < n; j++) {         // all directions
                 k = offset[j];
                 srcl.f = src.f + k;
                 srcr.f = src.f - k;
-                *trgt.b += (*src.f > *srcl.f && *src.f > *srcr.f);
+                *trgt.ui8 += (*src.f > *srcl.f && *src.f > *srcr.f);
               }
               src.f++;
-              trgt.b++;
+              trgt.ui8++;
             }
-            *trgt.b++ = 0;              // right edge
+            *trgt.ui8++ = 0;              // right edge
             src.f++;
           }
         } while (trgtinfo.advanceLoop(&trgt),
@@ -4556,24 +4556,24 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 || srcinfo.coords[edge] == srcinfo.dims[edge] - 1)
               break;            // at edge
           if (edge) {
-            zerobytes(trgt.b, nElem);
-            trgt.b += nElem;
+            zerobytes(trgt.ui8, nElem);
+            trgt.ui8 += nElem;
             src.d += nElem;
           } else {
-            *trgt.b++ = 0;              // left edge
+            *trgt.ui8++ = 0;              // left edge
             src.d++;
             for (i = i1; i < i2; i++) { // center data points
-              *trgt.b = 0;
+              *trgt.ui8 = 0;
               for (j = 0; j < n; j++) {         /* all directions */
                 k = offset[j];
                 srcl.d = src.d + k;
                 srcr.d = src.d - k;
-                *trgt.b += (*src.d > *srcl.d && *src.d > *srcr.d);
+                *trgt.ui8 += (*src.d > *srcl.d && *src.d > *srcr.d);
               }
               src.d++;
-              trgt.b++;
+              trgt.ui8++;
             }
-            *trgt.b++ = 0;              // right edge
+            *trgt.ui8++ = 0;              // right edge
             src.d++;
           }
         } while (trgtinfo.advanceLoop(&trgt),
@@ -4589,31 +4589,31 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                       || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
                 break;          // at edge
             if (edge) {
-              zerobytes(trgt.b, nElem);
-              trgt.b += nElem;
-              src.b += nElem;
+              zerobytes(trgt.ui8, nElem);
+              trgt.ui8 += nElem;
+              src.ui8 += nElem;
             } else {
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0; // left edge
-                src.b++;
+                *trgt.ui8++ = 0; // left edge
+                src.ui8++;
               }
               for (i = i1; i < i2; i++) { // center data points
-                *trgt.b = 0;
+                *trgt.ui8 = 0;
                 for (j = 0; j < n; j++) { /* all directions */
                   k = offset[j];
-                  srcl.b = src.b + k;
-                  srcr.b = src.b - k;
-                  *trgt.b += ((sign && *src.b > *srcl.b + *t.b
-                               && *src.b > *srcr.b + *t.b)
-                              || (!sign && *src.b < *srcl.b - *t.b
-                                  && *src.b < *srcr.b - *t.b));
+                  srcl.ui8 = src.ui8 + k;
+                  srcr.ui8 = src.ui8 - k;
+                  *trgt.ui8 += ((sign && *src.ui8 > *srcl.ui8 + *t.ui8
+                               && *src.ui8 > *srcr.ui8 + *t.ui8)
+                              || (!sign && *src.ui8 < *srcl.ui8 - *t.ui8
+                                  && *src.ui8 < *srcr.ui8 - *t.ui8));
                 }
-                trgt.b++;
-                src.b++;
+                trgt.ui8++;
+                src.ui8++;
               }
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0;          // right edge
-                src.b++;
+                *trgt.ui8++ = 0;          // right edge
+                src.ui8++;
               }
             }
           } while (trgtinfo.advanceLoop(&trgt),
@@ -4627,30 +4627,30 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                       || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
                 break;          // at edge
             if (edge) {
-              zerobytes(trgt.b, nElem);
-              trgt.b += nElem;
+              zerobytes(trgt.ui8, nElem);
+              trgt.ui8 += nElem;
               src.w += nElem;
             } else {
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0; // left edge
+                *trgt.ui8++ = 0; // left edge
                 src.w++;
               }
               for (i = i1; i < i2; i++) { // center data points
-                *trgt.b = 0;
+                *trgt.ui8 = 0;
                 for (j = 0; j < n; j++) { /* all directions */
                   k = offset[j];
                   srcl.w = src.w + k;
                   srcr.w = src.w - k;
-                  *trgt.b += ((sign && *src.w > *srcl.w + *t.w
+                  *trgt.ui8 += ((sign && *src.w > *srcl.w + *t.w
                                && *src.w > *srcr.w + *t.w)
                               || (!sign && *src.w < *srcl.w - *t.w
                                   && *src.w < *srcr.w - *t.w));
                 }
-                trgt.b++;
+                trgt.ui8++;
                 src.w++;
               }
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0;          // right edge
+                *trgt.ui8++ = 0;          // right edge
                 src.w++;
               }
             }
@@ -4665,30 +4665,30 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                       || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
                 break;          // at edge
             if (edge) {
-              zerobytes(trgt.b, nElem);
-              trgt.b += nElem;
+              zerobytes(trgt.ui8, nElem);
+              trgt.ui8 += nElem;
               src.l += nElem;
             } else {
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0; // left edge
+                *trgt.ui8++ = 0; // left edge
                 src.l++;
               }
               for (i = i1; i < i2; i++) { // center data points
-                *trgt.b = 0;
+                *trgt.ui8 = 0;
                 for (j = 0; j < n; j++) { /* all directions */
                   k = offset[j];
                   srcl.l = src.l + k;
                   srcr.l = src.l - k;
-                  *trgt.b += ((sign && *src.l > *srcl.l + *t.l
+                  *trgt.ui8 += ((sign && *src.l > *srcl.l + *t.l
                                && *src.l > *srcr.l + *t.l)
                               || (!sign && *src.l < *srcl.l - *t.l
                                   && *src.l < *srcr.l - *t.l));
                 }
-                trgt.b++;
+                trgt.ui8++;
                 src.l++;
               }
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0;          // right edge
+                *trgt.ui8++ = 0;          // right edge
                 src.l++;
               }
             }
@@ -4703,30 +4703,30 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                       || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
                 break;          // at edge
             if (edge) {
-              zerobytes(trgt.b, nElem);
-              trgt.b += nElem;
+              zerobytes(trgt.ui8, nElem);
+              trgt.ui8 += nElem;
               src.q += nElem;
             } else {
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0; // left edge
+                *trgt.ui8++ = 0; // left edge
                 src.q++;
               }
               for (i = i1; i < i2; i++) { // center data points
-                *trgt.b = 0;
+                *trgt.ui8 = 0;
                 for (j = 0; j < n; j++) { // all directions
                   k = offset[j];
                   srcl.q = src.q + k;
                   srcr.q = src.q - k;
-                  *trgt.b += ((sign && *src.q > *srcl.q + *t.q
+                  *trgt.ui8 += ((sign && *src.q > *srcl.q + *t.q
                                && *src.q > *srcr.q + *t.q)
                               || (!sign && *src.q < *srcl.q - *t.q
                                   && *src.q < *srcr.q - *t.q));
                 }
-                trgt.b++;
+                trgt.ui8++;
                 src.q++;
               }
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0;          // right edge
+                *trgt.ui8++ = 0;          // right edge
                 src.q++;
               }
             }
@@ -4741,30 +4741,30 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                       || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
                 break;          // at edge
             if (edge) {
-              zerobytes(trgt.b, nElem);
-              trgt.b += nElem;
+              zerobytes(trgt.ui8, nElem);
+              trgt.ui8 += nElem;
               src.f += nElem;
             } else {
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0; // left edge
+                *trgt.ui8++ = 0; // left edge
                 src.f++;
               }
               for (i = i1; i < i2; i++) { // center data points
-                *trgt.b = 0;
+                *trgt.ui8 = 0;
                 for (j = 0; j < n; j++) { /* all directions */
                   k = offset[j];
                   srcl.f = src.f + k;
                   srcr.f = src.f - k;
-                  *trgt.b += ((sign && *src.f > *srcl.f + *t.f
+                  *trgt.ui8 += ((sign && *src.f > *srcl.f + *t.f
                                && *src.f > *srcr.f + *t.f)
                               || (!sign && *src.f < *srcl.f - *t.f
                                   && *src.f < *srcr.f - *t.f));
                 }
-                trgt.b++;
+                trgt.ui8++;
                 src.f++;
               }
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0;          // right edge
+                *trgt.ui8++ = 0;          // right edge
                 src.f++;
               }
             }
@@ -4779,30 +4779,30 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                       || srcinfo.coords[edge] == srcinfo.dims[edge] - 1))
                 break;          // at edge
             if (edge) {
-              zerobytes(trgt.b, nElem);
-              trgt.b += nElem;
+              zerobytes(trgt.ui8, nElem);
+              trgt.ui8 += nElem;
               src.d += nElem;
             } else {
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0; // left edge
+                *trgt.ui8++ = 0; // left edge
                 src.d++;
               }
               for (i = i1; i < i2; i++) { // center data points
-                *trgt.b = 0;
+                *trgt.ui8 = 0;
                 for (j = 0; j < n; j++) { /* all directions */
                   k = offset[j];
                   srcl.d = src.d + k;
                   srcr.d = src.d - k;
-                  *trgt.b += ((sign && *src.d > *srcl.d + *t.d
+                  *trgt.ui8 += ((sign && *src.d > *srcl.d + *t.d
                                && *src.d > *srcr.d + *t.d)
                               || (!sign && *src.d < *srcl.d - *t.d
                                   && *src.d < *srcr.d - *t.d));
                 }
-                trgt.b++;
+                trgt.ui8++;
                 src.d++;
               }
               if (!diagonal || diagonal[0]) {
-                *trgt.b++ = 0;          // right edge
+                *trgt.ui8++ = 0;          // right edge
                 src.d++;
               }
             }
@@ -4866,8 +4866,8 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
   while (n--) {
     switch (type) {
       case LUX_INT8:
-        thisx.f = (float) *x.b++;
-        thisy.f = (float) *y.b++;
+        thisx.f = (float) *x.ui8++;
+        thisy.f = (float) *y.ui8++;
         break;
       case LUX_INT16:
         thisx.f = (float) *x.w++;

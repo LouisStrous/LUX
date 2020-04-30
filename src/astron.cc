@@ -1260,7 +1260,7 @@ int32_t lux_calendar_OLD(int32_t narg, int32_t ps[])
       iq = lux_double(1, ps);
       type = LUX_DOUBLE;
     }
-    data.b = &scalar_value(iq).b;
+    data.ui8 = &scalar_value(iq).ui8;
     break;
   case LUX_ARRAY:
     nRepeat = array_size(iq);
@@ -2311,9 +2311,9 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   switch (symbol_type(ps[0])) {
   case LUX_INT8:
     do {
-      alpha = *src.b*DEG;
+      alpha = *src.ui8*DEG;
       srcinfo.advanceLoop(&src);
-      delta = *src.b*DEG;
+      delta = *src.ui8*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
       tgtinfo.advanceLoop(&tgt);
@@ -2322,7 +2322,7 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
         done = srcinfo.advanceLoop(&src);
         tgtinfo.advanceLoop(&tgt);
         if (!done)
-          *tgt.f = *src.b;
+          *tgt.f = *src.ui8;
       } while (!done);
     } while (done < srcinfo.rndim);
     break;
@@ -2468,9 +2468,9 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
   switch (symbol_type(ps[0])) {
   case LUX_INT8:
     do {
-      alpha = *src.b*DEG;
+      alpha = *src.ui8*DEG;
       srcinfo.advanceLoop(&src);
-      delta = *src.b*DEG;
+      delta = *src.ui8*DEG;
       do
         done = srcinfo.advanceLoop(&src);
       while (!done);
@@ -2485,7 +2485,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showradhms(" alpha = ", alpha);
         showraddms(" delta = ", delta);
       }
-      *tgt.b = constellation(alpha*RAD, delta*RAD);
+      *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
       tgtinfo.advanceLoop(&tgt);
     } while (done < srcinfo.rndim);
     break;
@@ -2508,7 +2508,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showradhms(" alpha = ", alpha);
         showraddms(" delta = ", delta);
       }
-      *tgt.b = constellation(alpha*RAD, delta*RAD);
+      *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
       tgtinfo.advanceLoop(&tgt);
     } while (done < srcinfo.rndim);
     break;
@@ -2531,7 +2531,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showradhms(" alpha = ", alpha);
         showraddms(" delta = ", delta);
       }
-      *tgt.b = constellation(alpha*RAD, delta*RAD);
+      *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
       tgtinfo.advanceLoop(&tgt);
     } while (done < srcinfo.rndim);
     break;
@@ -2554,7 +2554,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showradhms(" alpha = ", alpha);
         showraddms(" delta = ", delta);
       }
-      *tgt.b = constellation(alpha*RAD, delta*RAD);
+      *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
       tgtinfo.advanceLoop(&tgt);
     } while (done < srcinfo.rndim);
     break;
@@ -2577,7 +2577,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showradhms(" alpha = ", alpha);
         showraddms(" delta = ", delta);
       }
-      *tgt.b = constellation(alpha*RAD, delta*RAD);
+      *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
       tgtinfo.advanceLoop(&tgt);
     } while (done < srcinfo.rndim);
     break;
@@ -2608,12 +2608,12 @@ int32_t lux_constellationname(int32_t narg, int32_t ps[])
   switch (symbol_type(ps[0])) {
   case LUX_INT8:
     while (n--) {
-      if (*src.b >= nc)
+      if (*src.ui8 >= nc)
         *tgt = strdup("***");
       else
-        *tgt = strdup(constellation_names[*src.b]);
+        *tgt = strdup(constellation_names[*src.ui8]);
       tgt++;
-      src.b++;
+      src.ui8++;
     }
     break;
   case LUX_INT16:
@@ -4014,8 +4014,8 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
     case LUX_FLOAT:
       switch (srcinfo.type) {
       case LUX_INT8:
-        pos[0] = (double) src.b[0]*DEG;
-        pos[1] = (double) src.b[1]*DEG;
+        pos[0] = (double) src.ui8[0]*DEG;
+        pos[1] = (double) src.ui8[1]*DEG;
         break;
       case LUX_INT16:
         pos[0] = (double) src.w[0]*DEG;
@@ -4054,8 +4054,8 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
     case LUX_DOUBLE:
       switch (srcinfo.type) {
       case LUX_INT8:
-        pos[0] = (double) src.b[0]*DEG;
-        pos[1] = (double) src.b[1]*DEG;
+        pos[0] = (double) src.ui8[0]*DEG;
+        pos[1] = (double) src.ui8[1]*DEG;
         break;
       case LUX_INT16:
         pos[0] = (double) src.w[0]*DEG;
@@ -4098,8 +4098,8 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
     default:
       break;
     }
-    src.b += srcinfo.rdims[0]*srcinfo.stride;
-    tgt.b += tgtinfo.rdims[0]*tgtinfo.stride;
+    src.ui8 += srcinfo.rdims[0]*srcinfo.stride;
+    tgt.ui8 += tgtinfo.rdims[0]*tgtinfo.stride;
   } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
   return result;
 }

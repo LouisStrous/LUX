@@ -901,7 +901,7 @@ int32_t lux_fitskey(int32_t narg, int32_t ps[])
       iq = scalar_scratch(type);
       switch (type) {
         case LUX_INT8:
-          scalar_value(iq).b = (uint8_t) value.l;
+          scalar_value(iq).ui8 = (uint8_t) value.l;
           break;
         case LUX_INT16:
           scalar_value(iq).w = (int16_t) value.l;
@@ -1814,7 +1814,7 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
     if (iq == LUX_ERROR)
       return LUX_ERROR;
     vx0.v = array_data(iq);
-    vy0.b = vx0.b + lux_type_size[type];
+    vy0.ui8 = vx0.ui8 + lux_type_size[type];
     dv = 2;
   } else {
     iq = lux_converts[type](1, ps + 2);
@@ -1849,10 +1849,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
       } else {
         switch (type) {
           case LUX_INT8:
-            ix = (int32_t) *gx.b;       // x pixel coordinate
-            iy = (int32_t) *gy.b;       // y pixel coordinate
-            x1 = (double) *gx.b++ - ix;
-            y1 = (double) *gy.b++ - iy;
+            ix = (int32_t) *gx.ui8;       // x pixel coordinate
+            iy = (int32_t) *gy.ui8;       // y pixel coordinate
+            x1 = (double) *gx.ui8++ - ix;
+            y1 = (double) *gy.ui8++ - iy;
             break;
           case LUX_INT16:
             ix = (int32_t) *gx.w;       // x pixel coordinate
@@ -1886,10 +1886,10 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
             break;
         }
         if (ix < 0 || ix > nx - 1 || iy < 0 || iy > ny - 1) { // out of range
-          zerobytes(ox.b, lux_type_size[type]);
-          zerobytes(oy.b, lux_type_size[type]);
-          ox.b += lux_type_size[type];
-          oy.b += lux_type_size[type];
+          zerobytes(ox.ui8, lux_type_size[type]);
+          zerobytes(oy.ui8, lux_type_size[type]);
+          ox.ui8 += lux_type_size[type];
+          oy.ui8 += lux_type_size[type];
           continue;
         }
       }
@@ -1898,8 +1898,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 
       switch (type) {
         case LUX_INT8:
-          vx = (double) vx0.b[index*dv]; // x velocity
-          vy = (double) vy0.b[index*dv]; // y velocity
+          vx = (double) vx0.ui8[index*dv]; // x velocity
+          vy = (double) vy0.ui8[index*dv]; // y velocity
           break;
         case LUX_INT16:
           vx = (double) vx0.w[index*dv]; // x velocity
@@ -1996,8 +1996,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
         s += ds;
         switch (type) {
           case LUX_INT8:
-            vx = (double) vx0.b[index*dv];
-            vy = (double) vy0.b[index*dv];
+            vx = (double) vx0.ui8[index*dv];
+            vy = (double) vy0.ui8[index*dv];
             break;
           case LUX_INT16:
             vx = (double) vx0.w[index*dv];
@@ -2027,8 +2027,8 @@ int32_t lux_trajectory(int32_t narg, int32_t ps[])
 
       switch (type) {
         case LUX_INT8:
-          *ox.b++ = ix + x2;
-          *oy.b++ = iy + y2;
+          *ox.ui8++ = ix + x2;
+          *oy.ui8++ = iy + y2;
           break;
         case LUX_INT16:
           *ox.w++ = ix + x2;
@@ -2245,15 +2245,15 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
     free(m);
     return result;
   }
-  tgt.b = (uint8_t*) array_data(result);
+  tgt.ui8 = (uint8_t*) array_data(result);
   for (i = 0; i < nelem; i += dims[0]) {
     int32_t j, x = 0;
 
     for (j = 0; j < dims[0]; j++) // over all color channels
-      x += *src.b++;
+      x += *src.ui8++;
     hist[x]++;
   }
-  src.b = (uint8_t*) array_data(ps[0]);
+  src.ui8 = (uint8_t*) array_data(ps[0]);
   for (i = 1; i < nhist; i++)   // calculate running sum
     hist[i] += hist[i - 1];
   a = 2 - 4*target;
@@ -2273,14 +2273,14 @@ int32_t lux_enhanceimage(int32_t narg, int32_t ps[])
     int32_t j, x = 0;
 
     for (j = 0; j < dims[0]; j++)
-      x += src.b[j];
+      x += src.ui8[j];
     for (j = 0; j < dims[0]; j++) {
       int32_t y;
 
-      y = *src.b++ * m[x];
+      y = *src.ui8++ * m[x];
       if (y > 255)
         y = 255;
-      *tgt.b++ = y;
+      *tgt.ui8++ = y;
     }
   }
   free(m);
@@ -2325,7 +2325,7 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
       uint32_t dist = 0, val;
       switch (type) {
       case LUX_INT8:
-        val = *src.b++;
+        val = *src.ui8++;
         while (val) {
           ++dist;
           val &= val - 1;
@@ -2363,9 +2363,9 @@ int32_t lux_hamming(int32_t narg, int32_t ps[]) {
       uint32_t dist = 0, val;
       switch (type) {
       case LUX_INT8:
-        val = *src.b++ ^ *src2.b;
+        val = *src.ui8++ ^ *src2.ui8;
         if (nr2isarray)
-          src2.b++;
+          src2.ui8++;
         while (val) {
           ++dist;
           val &= val - 1;
@@ -2842,7 +2842,7 @@ int32_t lux_findspans(int32_t narg, int32_t ps[]) {
   bool cycle = (internalMode & 1) != 0;
   switch (symbol_type(ps[0])) {
   case LUX_INT8:
-    spans = findspans(src.b, src.b + nelem, cycle);
+    spans = findspans(src.ui8, src.ui8 + nelem, cycle);
     break;
   case LUX_INT16:
     spans = findspans(src.w, src.w + nelem, cycle);

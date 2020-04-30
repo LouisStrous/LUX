@@ -128,7 +128,7 @@ int32_t copyToSym(int32_t target, int32_t source)
         target = string_scratch(strlen(scal_ptr_pointer(source).s));
         strcpy(string_value(target), scal_ptr_pointer(source).s);
       } else {                  // numerical
-        memcpy(&scalar_value(target), scal_ptr_pointer(source).b,
+        memcpy(&scalar_value(target), scal_ptr_pointer(source).ui8,
                sizeof(Scalar));
         symbol_class(target) = LUX_SCALAR;
       }
@@ -508,7 +508,7 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
         rhs = lux_convert(1, &rhs, scal_ptr_type(lhs), 1);
         switch (scal_ptr_type(lhs)) {
           case LUX_INT8:
-            *scal_ptr_pointer(lhs).b = scalar_value(rhs).b;
+            *scal_ptr_pointer(lhs).ui8 = scalar_value(rhs).ui8;
             break;
           case LUX_INT16:
             *scal_ptr_pointer(lhs).w = scalar_value(rhs).w;
@@ -1397,7 +1397,7 @@ int32_t lux_for(int32_t nsym)
  undefine(counterSym);          // loop counter
  symbol_type(counterSym) = hiType;      // give loop counter proper type
  symbol_class(counterSym) = LUX_SCALAR;
- counter.b = &scalar_value(counterSym).b;
+ counter.ui8 = &scalar_value(counterSym).ui8;
  convertScalar(&start, startSym, hiType); // and start, increment, end
  convertScalar(&end, endSym, hiType);
  convertScalar(&inc, stepSym, hiType);
@@ -1428,7 +1428,7 @@ int32_t lux_for(int32_t nsym)
  // initialize counter with start value
  switch (hiType) {
    case LUX_INT8:
-     *counter.b = start.b;
+     *counter.ui8 = start.ui8;
      break;
    case LUX_INT16:
      *counter.w = start.w;
@@ -1450,7 +1450,7 @@ int32_t lux_for(int32_t nsym)
  if (forward)
    switch (hiType) {
      case LUX_INT8:
-     n = *counter.b > end.b? 0: 1;
+     n = *counter.ui8 > end.ui8? 0: 1;
      break;
    case LUX_INT16:
      n = *counter.w > end.w? 0: 1;
@@ -1470,7 +1470,7 @@ int32_t lux_for(int32_t nsym)
    }
  else switch (hiType) {
    case LUX_INT8:
-     n = *counter.b < end.b? 0: 1;
+     n = *counter.ui8 < end.ui8? 0: 1;
      break;
    case LUX_INT16:
      n = *counter.w < end.w? 0: 1;
@@ -1498,8 +1498,8 @@ int32_t lux_for(int32_t nsym)
      if (action)
        while (n) {
          printf("FOR-loop: ");  // show for-loop status
-         printf("%1d,%1d,%1d; counter %s = %1d\n", start.b, end.b, inc.b,
-                symbolIdent(counterSym, 0), *counter.b);
+         printf("%1d,%1d,%1d; counter %s = %1d\n", start.ui8, end.ui8, inc.ui8,
+                symbolIdent(counterSym, 0), *counter.ui8);
          n = execute(temp);
          switch (n) {
            case LOOP_BREAK:
@@ -1507,13 +1507,13 @@ int32_t lux_for(int32_t nsym)
              continue;
            case LUX_ERROR:
              printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
-                    *counter.b);
+                    *counter.ui8);
              return LUX_ERROR;
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.b += inc.b;
-         n = forward? (*counter.b > end.b? 0: 1): (*counter.b < end.b? 0: 1);
+         *counter.ui8 += inc.ui8;
+         n = forward? (*counter.ui8 > end.ui8? 0: 1): (*counter.ui8 < end.ui8? 0: 1);
        }
      else
        while (n) {
@@ -1524,13 +1524,13 @@ int32_t lux_for(int32_t nsym)
              continue;
            case LUX_ERROR:
              printf("(counter %s = %1d)", symbolIdent(counterSym, 0),
-                    *counter.b);
+                    *counter.ui8);
              return LUX_ERROR;
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.b += inc.b;
-         n = forward? (*counter.b > end.b? 0: 1): (*counter.b < end.b? 0: 1);
+         *counter.ui8 += inc.ui8;
+         n = forward? (*counter.ui8 > end.ui8? 0: 1): (*counter.ui8 < end.ui8? 0: 1);
        }
      break;
    case LUX_INT16:
@@ -2124,7 +2124,7 @@ int32_t execute(int32_t symbol)
       }
       switch (scalar_type(temp)) {
       case LUX_INT8:
-        n = scalar_value(temp).b? 1: 0;
+        n = scalar_value(temp).ui8? 1: 0;
         break;
       case LUX_INT16:
         n = scalar_value(temp).w? 1: 0;
@@ -2709,35 +2709,35 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  trgt.b[offset] = *src.b;
+                  trgt.ui8[offset] = *src.ui8;
                   break;
                 case LUX_INT16:
-                  trgt.b[offset] = (uint8_t) *src.w;
+                  trgt.ui8[offset] = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  trgt.b[offset] = (uint8_t) *src.l;
+                  trgt.ui8[offset] = (uint8_t) *src.l;
                   break;
                 case LUX_INT64:
-                  trgt.b[offset] = *src.q;
+                  trgt.ui8[offset] = *src.q;
                   break;
                 case LUX_FLOAT:
-                  trgt.b[offset] = (uint8_t) *src.f;
+                  trgt.ui8[offset] = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  trgt.b[offset] = (uint8_t) *src.d;
+                  trgt.ui8[offset] = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  trgt.b[offset] = hypot(src.cf->real, src.cf->imaginary);
+                  trgt.ui8[offset] = hypot(src.cf->real, src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  trgt.b[offset] = hypot(src.cd->real, src.cd->imaginary);
+                  trgt.ui8[offset] = hypot(src.cd->real, src.cd->imaginary);
                   break;
               }
               break;
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.w[offset] = (int16_t) *src.b;
+                  trgt.w[offset] = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.w[offset] = *src.w;
@@ -2765,7 +2765,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.l[offset] = (int32_t) *src.b;
+                  trgt.l[offset] = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.l[offset] = (int32_t) *src.w;
@@ -2793,7 +2793,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT64:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.q[offset] = *src.b;
+                  trgt.q[offset] = *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.q[offset] = *src.w;
@@ -2821,7 +2821,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.f[offset] = (float) *src.b;
+                  trgt.f[offset] = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.f[offset] = (float) *src.w;
@@ -2849,7 +2849,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.d[offset] = (double) *src.b;
+                  trgt.d[offset] = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.d[offset] = (double) *src.w;
@@ -2877,7 +2877,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cf[offset].real = (float) *src.b;
+                  trgt.cf[offset].real = (float) *src.ui8;
                   trgt.cf[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -2913,7 +2913,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_CDOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cd[offset].real = (double) *src.b;
+                  trgt.cd[offset].real = (double) *src.ui8;
                   trgt.cd[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -2959,7 +2959,7 @@ int32_t insert(int32_t narg, int32_t ps[])
               }
               break;
           }
-          src.b += onestep;
+          src.ui8 += onestep;
         }
         break;
       case LUX_FILEMAP:
@@ -2976,26 +2976,26 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  value.b = *src.b;
+                  value.ui8 = *src.ui8;
                   break;
                 case LUX_INT16:
-                  value.b = (uint8_t) *src.w;
+                  value.ui8 = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  value.b = (uint8_t) *src.l;
+                  value.ui8 = (uint8_t) *src.l;
                   break;
                 case LUX_FLOAT:
-                  value.b = (uint8_t) *src.f;
+                  value.ui8 = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  value.b = (uint8_t) *src.d;
+                  value.ui8 = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  value.b = sqrt(src.cf->real*src.cf->real
+                  value.ui8 = sqrt(src.cf->real*src.cf->real
                                  + src.cf->imaginary*src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  value.b = sqrt(src.cd->real*src.cd->real
+                  value.ui8 = sqrt(src.cd->real*src.cd->real
                                  + src.cd->imaginary*src.cd->imaginary);
                   break;
               }
@@ -3003,7 +3003,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  value.w = (int16_t) *src.b;
+                  value.w = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.w = *src.w;
@@ -3030,7 +3030,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  value.l = (int32_t) *src.b;
+                  value.l = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.l = (int32_t) *src.w;
@@ -3057,7 +3057,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.f = (float) *src.b;
+                  value.f = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.f = (float) *src.w;
@@ -3084,7 +3084,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  value.d = (double) *src.b;
+                  value.d = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.d = (double) *src.w;
@@ -3111,7 +3111,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.cf.real = *src.b;
+                  value.cf.real = *src.ui8;
                   value.cf.imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -3141,12 +3141,12 @@ int32_t insert(int32_t narg, int32_t ps[])
               }
               break;
           }
-          fwrite(&value.b, unit, 1, fp);
+          fwrite(&value.ui8, unit, 1, fp);
           if (ferror(fp)) {
             fclose(fp);
             return cerror(WRITE_ERR, target);
           }
-          src.b += onestep;
+          src.ui8 += onestep;
         }
         fclose(fp);
         break;
@@ -3242,7 +3242,7 @@ int32_t insert(int32_t narg, int32_t ps[])
       offset0 += start[0]*unit;
       switch (class_id) {
         case LUX_ARRAY: case LUX_CARRAY:
-          memcpy(trgt.b + offset0, src.b, srcNelem*unit);
+          memcpy(trgt.ui8 + offset0, src.ui8, srcNelem*unit);
           break;
         case LUX_FILEMAP:
           if (fseek(fp, offset0, SEEK_SET)) {
@@ -3251,7 +3251,7 @@ int32_t insert(int32_t narg, int32_t ps[])
               perror("System message");
             return cerror(POS_ERR, target);
           }
-          fwrite(src.b, unit, srcNelem, fp);
+          fwrite(src.ui8, unit, srcNelem, fp);
           if (ferror(fp)) {
             fclose(fp);
             return cerror(WRITE_ERR, target);
@@ -3290,26 +3290,26 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  trgt.b[offset] = *src.b;
+                  trgt.ui8[offset] = *src.ui8;
                   break;
                 case LUX_INT16:
-                  trgt.b[offset] = (uint8_t) *src.w;
+                  trgt.ui8[offset] = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  trgt.b[offset] = (uint8_t) *src.l;
+                  trgt.ui8[offset] = (uint8_t) *src.l;
                   break;
                 case LUX_FLOAT:
-                  trgt.b[offset] = (uint8_t) *src.f;
+                  trgt.ui8[offset] = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  trgt.b[offset] = (uint8_t) *src.d;
+                  trgt.ui8[offset] = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
+                  trgt.ui8[offset] = sqrt(src.cf->real*src.cf->real
                                         + src.cf->imaginary*src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  trgt.b[offset] = sqrt(src.cd->real*src.cd->real
+                  trgt.ui8[offset] = sqrt(src.cd->real*src.cd->real
                                         + src.cd->imaginary*src.cd->imaginary);
                   break;
               }
@@ -3317,7 +3317,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.w[offset] = (int16_t) *src.b;
+                  trgt.w[offset] = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.w[offset] = *src.w;
@@ -3344,7 +3344,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.l[offset] = (int32_t) *src.b;
+                  trgt.l[offset] = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.l[offset] = (int32_t) *src.w;
@@ -3371,7 +3371,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.f[offset] = (float) *src.b;
+                  trgt.f[offset] = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.f[offset] = (float) *src.w;
@@ -3398,7 +3398,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.d[offset] = (double) *src.b;
+                  trgt.d[offset] = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.d[offset] = (double) *src.w;
@@ -3425,7 +3425,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cf[offset].real = *src.b;
+                  trgt.cf[offset].real = *src.ui8;
                   trgt.cf[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -3457,7 +3457,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_CDOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cd[offset].real = *src.b;
+                  trgt.cd[offset].real = *src.ui8;
                   trgt.cd[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -3499,7 +3499,7 @@ int32_t insert(int32_t narg, int32_t ps[])
               }
               break;
           }
-          src.b += onestep;
+          src.ui8 += onestep;
           for (i = 0; i < narg; i++) {
             if (i)
               tally[i - 1] = 0;
@@ -3524,26 +3524,26 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  value.b = *src.b;
+                  value.ui8 = *src.ui8;
                   break;
                 case LUX_INT16:
-                  value.b = (uint8_t) *src.w;
+                  value.ui8 = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  value.b = (uint8_t) *src.l;
+                  value.ui8 = (uint8_t) *src.l;
                   break;
                 case LUX_FLOAT:
-                  value.b = (uint8_t) *src.f;
+                  value.ui8 = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  value.b = (uint8_t) *src.d;
+                  value.ui8 = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  value.b = sqrt(src.cf->real*src.cf->real
+                  value.ui8 = sqrt(src.cf->real*src.cf->real
                                  + src.cf->imaginary*src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  value.b = sqrt(src.cd->real*src.cd->real
+                  value.ui8 = sqrt(src.cd->real*src.cd->real
                                  + src.cd->imaginary*src.cd->imaginary);
                   break;
               }
@@ -3551,7 +3551,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  value.w = (int16_t) *src.b;
+                  value.w = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.w = *src.w;
@@ -3578,7 +3578,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  value.l = (int32_t) *src.b;
+                  value.l = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.l = (int32_t) *src.w;
@@ -3605,7 +3605,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.f = (float) *src.b;
+                  value.f = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.f = (float) *src.w;
@@ -3632,7 +3632,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  value.d = (double) *src.b;
+                  value.d = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.d = (double) *src.w;
@@ -3659,7 +3659,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.cf.real = *src.b;
+                  value.cf.real = *src.ui8;
                   value.cf.imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -3691,7 +3691,7 @@ int32_t insert(int32_t narg, int32_t ps[])
             case LUX_CDOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  value.cd.real = *src.b;
+                  value.cd.real = *src.ui8;
                   value.cd.imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -3721,12 +3721,12 @@ int32_t insert(int32_t narg, int32_t ps[])
               }
               break;
           }
-          fwrite(&value.b, unit, 1, fp);
+          fwrite(&value.ui8, unit, 1, fp);
           if (ferror(fp)) {
             fclose(fp);
             return cerror(WRITE_ERR, target);
           }
-          src.b += onestep;
+          src.ui8 += onestep;
           for (i = 0; i < narg; i++) {
             if (i)
               tally[i - 1] = 0;
@@ -4196,26 +4196,26 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  trgt.b[offset] = *src.b;
+                  trgt.ui8[offset] = *src.ui8;
                   break;
                 case LUX_INT16:
-                  trgt.b[offset] = (uint8_t) *src.w;
+                  trgt.ui8[offset] = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  trgt.b[offset] = (uint8_t) *src.l;
+                  trgt.ui8[offset] = (uint8_t) *src.l;
                   break;
                 case LUX_FLOAT:
-                  trgt.b[offset] = (uint8_t) *src.f;
+                  trgt.ui8[offset] = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  trgt.b[offset] = (uint8_t) *src.d;
+                  trgt.ui8[offset] = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
+                  trgt.ui8[offset] = sqrt(src.cf->real*src.cf->real
                                         + src.cf->imaginary*src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  trgt.b[offset] = sqrt(src.cd->real*src.cd->real
+                  trgt.ui8[offset] = sqrt(src.cd->real*src.cd->real
                                         + src.cd->imaginary*src.cd->imaginary);
                   break;
               }
@@ -4223,7 +4223,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.w[offset] = (int16_t) *src.b;
+                  trgt.w[offset] = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.w[offset] = *src.w;
@@ -4250,7 +4250,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.l[offset] = (int32_t) *src.b;
+                  trgt.l[offset] = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.l[offset] = (int32_t) *src.w;
@@ -4277,7 +4277,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.f[offset] = (float) *src.b;
+                  trgt.f[offset] = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.f[offset] = (float) *src.w;
@@ -4304,7 +4304,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.d[offset] = (double) *src.b;
+                  trgt.d[offset] = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.d[offset] = (double) *src.w;
@@ -4331,7 +4331,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cf[offset].real = (float) *src.b;
+                  trgt.cf[offset].real = (float) *src.ui8;
                   trgt.cf[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -4363,7 +4363,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_CDOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cd[offset].real = (double) *src.b;
+                  trgt.cd[offset].real = (double) *src.ui8;
                   trgt.cd[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -4405,7 +4405,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
               }
               break;
           }
-          src.b += onestep;
+          src.ui8 += onestep;
         }
         break;
       case LUX_FILEMAP:
@@ -4423,26 +4423,26 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  value.b = *src.b;
+                  value.ui8 = *src.ui8;
                   break;
                 case LUX_INT16:
-                  value.b = (uint8_t) *src.w;
+                  value.ui8 = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  value.b = (uint8_t) *src.l;
+                  value.ui8 = (uint8_t) *src.l;
                   break;
                 case LUX_FLOAT:
-                  value.b = (uint8_t) *src.f;
+                  value.ui8 = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  value.b = (uint8_t) *src.d;
+                  value.ui8 = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  value.b = sqrt(src.cf->real*src.cf->real
+                  value.ui8 = sqrt(src.cf->real*src.cf->real
                                  + src.cf->imaginary*src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  value.b = sqrt(src.cd->real*src.cd->real
+                  value.ui8 = sqrt(src.cd->real*src.cd->real
                                  + src.cd->imaginary*src.cd->imaginary);
                   break;
               }
@@ -4450,7 +4450,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  value.w = (int16_t) *src.b;
+                  value.w = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.w = *src.w;
@@ -4477,7 +4477,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  value.l = (int32_t) *src.b;
+                  value.l = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.l = (int32_t) *src.w;
@@ -4504,7 +4504,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.f = (float) *src.b;
+                  value.f = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.f = (float) *src.w;
@@ -4531,7 +4531,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  value.d = (double) *src.b;
+                  value.d = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.d = (double) *src.w;
@@ -4558,7 +4558,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.cf.real = *src.b;
+                  value.cf.real = *src.ui8;
                   value.cf.imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -4588,13 +4588,13 @@ int32_t einsert(int32_t lhs, int32_t rhs)
               }
               break;
           }
-          fwrite(&value.b, unit, 1, fp);
+          fwrite(&value.ui8, unit, 1, fp);
           if (ferror(fp)) {
             fclose(fp);
             iq = cerror(WRITE_ERR, target);
             goto einsert_1;
           }
-          src.b += onestep;
+          src.ui8 += onestep;
         }
         fclose(fp);
         break;
@@ -4702,7 +4702,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       offset0 += start[0]*unit;
       switch (class_id) {
         case LUX_ARRAY: case LUX_CARRAY:
-          memcpy(trgt.b + offset0, src.b, srcNelem*unit);
+          memcpy(trgt.ui8 + offset0, src.ui8, srcNelem*unit);
           break;
         case LUX_FILEMAP:
           if (fseek(fp, offset0, SEEK_SET)) {
@@ -4712,7 +4712,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             iq = cerror(POS_ERR, target);
             goto einsert_1;
           }
-          fwrite(src.b, unit, srcNelem, fp);
+          fwrite(src.ui8, unit, srcNelem, fp);
           if (ferror(fp)) {
             fclose(fp);
             iq = cerror(WRITE_ERR, target);
@@ -4753,26 +4753,26 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  trgt.b[offset] = *src.b;
+                  trgt.ui8[offset] = *src.ui8;
                   break;
                 case LUX_INT16:
-                  trgt.b[offset] = (uint8_t) *src.w;
+                  trgt.ui8[offset] = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  trgt.b[offset] = (uint8_t) *src.l;
+                  trgt.ui8[offset] = (uint8_t) *src.l;
                   break;
                 case LUX_FLOAT:
-                  trgt.b[offset] = (uint8_t) *src.f;
+                  trgt.ui8[offset] = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  trgt.b[offset] = (uint8_t) *src.d;
+                  trgt.ui8[offset] = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  trgt.b[offset] = sqrt(src.cf->real*src.cf->real
+                  trgt.ui8[offset] = sqrt(src.cf->real*src.cf->real
                                         + src.cf->imaginary*src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  trgt.b[offset] = sqrt(src.cd->real*src.cd->real
+                  trgt.ui8[offset] = sqrt(src.cd->real*src.cd->real
                                         + src.cd->imaginary*src.cd->imaginary);
                   break;
               }
@@ -4780,7 +4780,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.w[offset] = (int16_t) *src.b;
+                  trgt.w[offset] = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.w[offset] = *src.w;
@@ -4807,7 +4807,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.l[offset] = (int32_t) *src.b;
+                  trgt.l[offset] = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.l[offset] = (int32_t) *src.w;
@@ -4834,7 +4834,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.f[offset] = (float) *src.b;
+                  trgt.f[offset] = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.f[offset] = (float) *src.w;
@@ -4861,7 +4861,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.d[offset] = (double) *src.b;
+                  trgt.d[offset] = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   trgt.d[offset] = (double) *src.w;
@@ -4888,7 +4888,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cf[offset].real = *src.b;
+                  trgt.cf[offset].real = *src.ui8;
                   trgt.cf[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -4920,7 +4920,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_CDOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  trgt.cd[offset].real = *src.b;
+                  trgt.cd[offset].real = *src.ui8;
                   trgt.cd[offset].imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -4962,7 +4962,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
               }
               break;
           }
-          src.b += onestep;
+          src.ui8 += onestep;
           for (i = 0; i < narg; i++) {
             if (i)
               tally[i - 1] = 0;
@@ -4988,26 +4988,26 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT8: case LUX_TEMP_STRING:
               switch (srcType) {
                 case LUX_INT8: case LUX_TEMP_STRING:
-                  value.b = *src.b;
+                  value.ui8 = *src.ui8;
                   break;
                 case LUX_INT16:
-                  value.b = (uint8_t) *src.w;
+                  value.ui8 = (uint8_t) *src.w;
                   break;
                 case LUX_INT32:
-                  value.b = (uint8_t) *src.l;
+                  value.ui8 = (uint8_t) *src.l;
                   break;
                 case LUX_FLOAT:
-                  value.b = (uint8_t) *src.f;
+                  value.ui8 = (uint8_t) *src.f;
                   break;
                 case LUX_DOUBLE:
-                  value.b = (uint8_t) *src.d;
+                  value.ui8 = (uint8_t) *src.d;
                   break;
                 case LUX_CFLOAT:
-                  value.b = sqrt(src.cf->real*src.cf->real
+                  value.ui8 = sqrt(src.cf->real*src.cf->real
                                  + src.cf->imaginary*src.cf->imaginary);
                   break;
                 case LUX_CDOUBLE:
-                  value.b = sqrt(src.cd->real*src.cd->real
+                  value.ui8 = sqrt(src.cd->real*src.cd->real
                                  + src.cd->imaginary*src.cd->imaginary);
                   break;
               }
@@ -5015,7 +5015,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT16:
               switch (srcType) {
                 case LUX_INT8:
-                  value.w = (int16_t) *src.b;
+                  value.w = (int16_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.w = *src.w;
@@ -5042,7 +5042,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_INT32:
               switch (srcType) {
                 case LUX_INT8:
-                  value.l = (int32_t) *src.b;
+                  value.l = (int32_t) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.l = (int32_t) *src.w;
@@ -5069,7 +5069,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_FLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.f = (float) *src.b;
+                  value.f = (float) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.f = (float) *src.w;
@@ -5096,7 +5096,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_DOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  value.d = (double) *src.b;
+                  value.d = (double) *src.ui8;
                   break;
                 case LUX_INT16:
                   value.d = (double) *src.w;
@@ -5123,7 +5123,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_CFLOAT:
               switch (srcType) {
                 case LUX_INT8:
-                  value.cf.real = *src.b;
+                  value.cf.real = *src.ui8;
                   value.cf.imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -5155,7 +5155,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
             case LUX_CDOUBLE:
               switch (srcType) {
                 case LUX_INT8:
-                  value.cd.real = *src.b;
+                  value.cd.real = *src.ui8;
                   value.cd.imaginary = 0;
                   break;
                 case LUX_INT16:
@@ -5185,13 +5185,13 @@ int32_t einsert(int32_t lhs, int32_t rhs)
               }
               break;
           }
-          fwrite(&value.b, unit, 1, fp);
+          fwrite(&value.ui8, unit, 1, fp);
           if (ferror(fp)) {
             fclose(fp);
             iq = cerror(WRITE_ERR, target);
             goto einsert_1;
           }
-          src.b += onestep;
+          src.ui8 += onestep;
           for (i = 0; i < narg; i++) {
             if (i)
               tally[i - 1] = 0;

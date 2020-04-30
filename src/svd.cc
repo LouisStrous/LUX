@@ -135,7 +135,7 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   switch (symbol_type(ps[0])) {
     case LUX_INT8:
       while (n--)
-        *a++ = (double) *src.b++;
+        *a++ = (double) *src.ui8++;
       a -= n;
       break;
     case LUX_INT16:

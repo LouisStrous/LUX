@@ -142,11 +142,11 @@ int32_t lux_i_file_output(FILE *fp, Pointer q, int32_t assoctype,
     else if (fseek(fp, *qi*size + baseOffset, SEEK_SET))
     { fclose(fp);
       return cerror(POS_ERR, -1); }
-    if (fwrite(q.b, size, 1, fp) != 1)
+    if (fwrite(q.ui8, size, 1, fp) != 1)
     { fclose(fp);
       return cerror(WRITE_ERR, -1); }
     qi++;
-    q.b += size; }
+    q.ui8 += size; }
   fclose(fp);
   if (error)
     printf("INSERT - %1d indices out of range\n", error);
@@ -285,9 +285,9 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
  if (!ddat)
    done = 1;
  do {
-   if (fwrite(q.b, n, 1, fp) != 1)
+   if (fwrite(q.ui8, n, 1, fp) != 1)
      return cerror(WRITE_ERR, iq);
-   q.b += n;
+   q.ui8 += n;
    for (i = 0; i < ddat; i++) {
      if (tally[i]++ != dat[i]) {
        done = 0;

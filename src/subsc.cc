@@ -100,27 +100,27 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.b++ = *src.b++;
+              *trgt.ui8++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
-              *trgt.b++ = *src.w++;
+              *trgt.ui8++ = *src.w++;
             break;
           case LUX_INT32:
             while (nelem--)
-              *trgt.b++ = *src.l++;
+              *trgt.ui8++ = *src.l++;
             break;
           case LUX_INT64:
             while (nelem--)
-              *trgt.b++ = *src.q++;
+              *trgt.ui8++ = *src.q++;
             break;
           case LUX_FLOAT:
             while (nelem--)
-              *trgt.b++ = *src.f++;
+              *trgt.ui8++ = *src.f++;
             break;
           case LUX_DOUBLE:
             while (nelem--)
-              *trgt.b++ = *src.d++;
+              *trgt.ui8++ = *src.d++;
             break;
           default:
             return cerror(ILL_TYPE, ps[1]);
@@ -130,7 +130,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.w++ = *src.b++;
+              *trgt.w++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
@@ -160,7 +160,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.l++ = *src.b++;
+              *trgt.l++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
@@ -190,7 +190,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.q++ = *src.b++;
+              *trgt.q++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
@@ -220,7 +220,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.f++ = *src.b++;
+              *trgt.f++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
@@ -250,7 +250,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
         switch (symbol_type(ps[1])) {
           case LUX_INT8:
             while (nelem--)
-              *trgt.d++ = *src.b++;
+              *trgt.d++ = *src.ui8++;
             break;
           case LUX_INT16:
             while (nelem--)
@@ -298,7 +298,7 @@ int32_t lux_smap(int32_t narg, int32_t ps[])
   switch (symbol_class(nsym))
   { case LUX_SCAL_PTR:          //scalar ptr
       n = 1;
-      q1.b = scal_ptr_pointer(nsym).b;
+      q1.ui8 = scal_ptr_pointer(nsym).ui8;
       break;
     case LUX_SCALAR:            //scalar
       n = 1;
@@ -327,14 +327,14 @@ int32_t lux_smap(int32_t narg, int32_t ps[])
     j = n/n1;
     while (j--)
     { *q3.sp = (char *) Malloc(n1 + 1);
-      memcpy(*q3.sp, q1.b, n1);
-      q1.b += n1;
+      memcpy(*q3.sp, q1.ui8, n1);
+      q1.ui8 += n1;
       (*q3.sp)[n1] = '\0';
       q3.sp++; }
     return result_sym; }
   result_sym = string_scratch(n);
   q3.s = string_value(result_sym);
-  memcpy(q3.s, q1.b, n);
+  memcpy(q3.s, q1.ui8, n);
   q3.s[n] = '\0';
   return result_sym;
 }
@@ -405,7 +405,7 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
   switch (symbol_class(nsym)) {
     case LUX_SCAL_PTR:
       n = lux_type_size[type];
-      q1.b = scal_ptr_pointer(nsym).b;
+      q1.ui8 = scal_ptr_pointer(nsym).ui8;
       break;
     case LUX_SCALAR:
       n = lux_type_size[type];
@@ -469,7 +469,7 @@ int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
     q3.l = (int32_t*) array_data(result_sym);
   }
   if (n > 0)
-    memcpy(q3.b, q1.b, n);
+    memcpy(q3.ui8, q1.ui8, n);
   return result_sym;
 }
  //-------------------------------------------------------------------------
@@ -535,83 +535,83 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
           if (n >= 0) {                 // reversal at the far end
             i = n;
             if (inplace) {      // in-place reversal
-              src.b += i*stride;
+              src.ui8 += i*stride;
               if (internalMode & 1) // /ZERO
                 while (i--) {
-                  zerobytes(trgt.b, srcinfo.stride);
-                  trgt.b += stride;
+                  zerobytes(trgt.ui8, srcinfo.stride);
+                  trgt.ui8 += stride;
                 }
             } else {            // target is different from source
               if ((internalMode & 1) == 0)
                 while (i--) {
-                  memcpy(trgt.b, src.b, srcinfo.stride);
-                  trgt.b += stride;
-                  src.b += stride;
+                  memcpy(trgt.ui8, src.ui8, srcinfo.stride);
+                  trgt.ui8 += stride;
+                  src.ui8 += stride;
                 }
               else {            // /ZERO
-                src.b += i*stride;
+                src.ui8 += i*stride;
                 while (i--) {
-                  zerobytes(trgt.b, srcinfo.stride);
-                  trgt.b += stride;
+                  zerobytes(trgt.ui8, srcinfo.stride);
+                  trgt.ui8 += stride;
                 } // end of while (i--)
               }         // end of if ((internalMode & 1) == 0) else
             } // end of if (inplace) else
-            trgt.b = trgt2.b + stride*srcinfo.rdims[0];
+            trgt.ui8 = trgt2.ui8 + stride*srcinfo.rdims[0];
           } else {              // n < 0 -> reversing at the near end
-            trgt.b += srcinfo.rdims[0]*stride;
-            src.b += srcinfo.rdims[0]*stride;
+            trgt.ui8 += srcinfo.rdims[0]*stride;
+            src.ui8 += srcinfo.rdims[0]*stride;
             n = -n;
             i = n;
             if (inplace) {
               if (internalMode & 1) // /ZERO
                 while (i--) {
-                  trgt.b -= stride;
-                  zerobytes(trgt.b, srcinfo.stride);
+                  trgt.ui8 -= stride;
+                  zerobytes(trgt.ui8, srcinfo.stride);
                 } // end of while (i--)
               else
-                trgt.b -= i*stride;
+                trgt.ui8 -= i*stride;
             } else {            // not in place
               if ((internalMode & 1) == 0)
                 while (i--) {
-                  trgt.b -= stride;
-                  src.b -= stride;
-                  memcpy(trgt.b, src.b, srcinfo.stride);
+                  trgt.ui8 -= stride;
+                  src.ui8 -= stride;
+                  memcpy(trgt.ui8, src.ui8, srcinfo.stride);
                 } // end of while (i--)
               else                      // /ZERO
                 while (i--) {
-                  trgt.b -= stride;
-                  zerobytes(trgt.b, srcinfo.stride);
+                  trgt.ui8 -= stride;
+                  zerobytes(trgt.ui8, srcinfo.stride);
                 } // end of while (i--)
             } // end of if (inplace) else
-            src.b = src2.b;
+            src.ui8 = src2.ui8;
           } // end of if (n >= 0) else
           i = srcinfo.rdims[0] - n;
           if (inplace) {
             i = i/2;
             while (i--) {
-              trgt.b -= stride;
-              memcpy(&value.b, trgt.b, srcinfo.stride);
-              memcpy(trgt.b, src.b, srcinfo.stride);
-              memcpy(src.b, &value.b, srcinfo.stride);
-              src.b += stride;
+              trgt.ui8 -= stride;
+              memcpy(&value.ui8, trgt.ui8, srcinfo.stride);
+              memcpy(trgt.ui8, src.ui8, srcinfo.stride);
+              memcpy(src.ui8, &value.ui8, srcinfo.stride);
+              src.ui8 += stride;
             } // end of while (i--)
           } else                // not in place
             while (i--) {
-              trgt.b -= stride;
-              memcpy(trgt.b, src.b, srcinfo.stride);
-              src.b += stride;
+              trgt.ui8 -= stride;
+              memcpy(trgt.ui8, src.ui8, srcinfo.stride);
+              src.ui8 += stride;
             } // end of while (i--)
-          src.b = src2.b + stride*srcinfo.rdims[0];
-          trgt.b = trgt2.b + stride*srcinfo.rdims[0];
+          src.ui8 = src2.ui8 + stride*srcinfo.rdims[0];
+          trgt.ui8 = trgt2.ui8 + stride*srcinfo.rdims[0];
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.rndim);
       else {                    // center is out of bounds
         if (internalMode & 1) {         // /ZERO
-          zerobytes(trgt.b, trgtinfo.nelem*trgtinfo.stride);
+          zerobytes(trgt.ui8, trgtinfo.nelem*trgtinfo.stride);
           return result;
         }
         if (!inplace)
-          memcpy(trgt.b, src.b, trgtinfo.nelem*trgtinfo.stride);
+          memcpy(trgt.ui8, src.ui8, trgtinfo.nelem*trgtinfo.stride);
       }         // end of if (w >= 0 && w < 2*(srcinfo.rdims[0] - 1)) else
       // "source" of next cycle was "target" of previous one
       srcinfo.data0 = trgtinfo.data0;
@@ -1593,8 +1593,8 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
                 offset += index[i][j]*stride[i];
               else if (size[i] > 1) // range
                 offset0 += stride[i];
-            memcpy(trgt.b, src.b + offset, width);
-            trgt.b += width;
+            memcpy(trgt.ui8, src.ui8 + offset, width);
+            trgt.ui8 += width;
           }
         }
         break;
@@ -1613,7 +1613,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
             cerror(POS_ERR, nsym);
             goto lux_subsc_1;
           }
-          if (fread(trgt.b, width, 1, fp) != 1) {
+          if (fread(trgt.ui8, width, 1, fp) != 1) {
             if (feof(fp))
               puts("Encountered EOF");
             else
@@ -1621,7 +1621,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
             cerror(READ_ERR, nsym);
             goto lux_subsc_1;
           }
-          trgt.b += width;
+          trgt.ui8 += width;
         }
         break;
       }
@@ -1839,7 +1839,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
             } while (i != trgtndim);
         } else {
           if (nsum) {           // have summation flag(s)
-            zerobytes(&value.b, lux_type_size[LUX_CDOUBLE]); // initialize
+            zerobytes(&value.ui8, lux_type_size[LUX_CDOUBLE]); // initialize
             do {
               offset = offset0;
               for (i = 0; i < trgtndim; i++) // add LUX_ARRAY indices
@@ -1847,7 +1847,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
                   offset += index[fromdim[i]][tally[i]]*stride[i];
               switch (type) {
               case LUX_INT8:
-                value.b += src.b[offset];
+                value.ui8 += src.ui8[offset];
                 break;
               case LUX_INT16:
                 value.w += src.w[offset];
@@ -1881,8 +1881,8 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
                 if (tally[i] != size[i]) // not yet done with this dimension
                   break;
                 if (i == nsum - 1) { // done with this one
-                  memcpy(trgt.b, &value.b, width); // store result
-                  trgt.b += width;
+                  memcpy(trgt.ui8, &value.ui8, width); // store result
+                  trgt.ui8 += width;
                   value.d = 0.0;
                 }
               } // end of for (i = 0)
@@ -1893,8 +1893,8 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
               for (i = 0; i < trgtndim; i++) // add LUX_ARRAY indices
                 if (subsc_type[i] == LUX_ARRAY)
                   offset += index[fromdim[i]][tally[i]]*stride[i];
-              memcpy(trgt.b, src.b + offset, width);
-              trgt.b += width;
+              memcpy(trgt.ui8, src.ui8 + offset, width);
+              trgt.ui8 += width;
               for (i = 0; i < trgtndim; i++) {
                 if (i)
                   tally[i - 1] = 0;
@@ -1921,7 +1921,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
               cerror(POS_ERR, nsym);
               goto lux_subsc_1;
             }
-            if (fread(&item.b, width, 1, fp) != 1) {
+            if (fread(&item.ui8, width, 1, fp) != 1) {
               if (feof(fp))
                 puts("Encountered EOF");
               else
@@ -1931,7 +1931,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
             }
             switch (type) {
               case LUX_INT8:
-                value.b += item.b;
+                value.ui8 += item.ui8;
                 break;
               case LUX_INT16:
                 value.w += item.w;
@@ -1957,8 +1957,8 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
               if (tally[i] != size[i])
                 break;
               if (i == nsum - 1) {
-                memcpy(trgt.b, &value.b, width);
-                trgt.b += width;
+                memcpy(trgt.ui8, &value.ui8, width);
+                trgt.ui8 += width;
                 value.d = 0.0;
               }
             }
@@ -1975,7 +1975,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
               cerror(POS_ERR, nsym);
               goto lux_subsc_1;
             }
-            if (fread(trgt.b, width, 1, fp) != 1) {
+            if (fread(trgt.ui8, width, 1, fp) != 1) {
               if (feof(fp))
                 puts("Encountered EOF");
               else
@@ -1983,7 +1983,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
               cerror(READ_ERR, nsym);
               goto lux_subsc_1;
             }
-            trgt.b += width;
+            trgt.ui8 += width;
             for (i = 0; i < trgtndim; i++) {
               if (i)
                 tally[i - 1] = 0;
@@ -2618,7 +2618,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
       dim[0] = mq;
       nsym = array_scratch(toptype, 1, dim);
       n = lux_type_size[toptype];
-      q2.b = (uint8_t*) array_data(nsym);
+      q2.ui8 = (uint8_t*) array_data(nsym);
       for (i = 0; i < narg; i++) {
         iq = ps[i];
         switch (symbol_class(iq)) {
@@ -2626,16 +2626,16 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
             iq = dereferenceScalPointer(iq);
             // fall-thru to LUX_SCALAR
           case LUX_SCALAR:
-            memcpy(&temp.b, &scalar_value(iq).b,
+            memcpy(&temp.ui8, &scalar_value(iq).ui8,
                    lux_type_size[scalar_type(iq)]);
             if (scalar_type(iq) != toptype)
               convertPointer(&temp, scalar_type(iq), toptype);
-            memcpy(q2.b, &temp.b, n);
-            q2.b += n;          // add the right Byte count for each element
+            memcpy(q2.ui8, &temp.ui8, n);
+            q2.ui8 += n;          // add the right Byte count for each element
             break;
           case LUX_CSCALAR:
-            memcpy(q2.b, complex_scalar_data(iq).cf, n);
-            q2.b += n;
+            memcpy(q2.ui8, complex_scalar_data(iq).cf, n);
+            q2.ui8 += n;
             break;
           case LUX_STRING:
             *q2.sp++ = strsave(string_value(iq));
@@ -2713,16 +2713,16 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
       n = lux_type_size[symbol_type(iq)];
       switch (symbol_class(iq))         {
         case LUX_SCALAR:        //scalar case
-          q1.b = &scalar_value(iq).b;
+          q1.ui8 = &scalar_value(iq).ui8;
           n = 1;
           break;
         case LUX_SCAL_PTR:
-          q1.b = scal_ptr_pointer(iq).b;
+          q1.ui8 = scal_ptr_pointer(iq).ui8;
           n = 1;
           break;
         case LUX_ARRAY: case LUX_CARRAY: // array
           n = array_size(iq);
-          q1.b = (uint8_t*) array_data(iq);
+          q1.ui8 = (uint8_t*) array_data(iq);
           break;
         case LUX_CSCALAR:
           q1 = complex_scalar_data(iq);
@@ -2740,13 +2740,13 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
         switch (toptype) {
         case LUX_INT8:
           while (n--)
-            *q2.b++ = *q1.b++;
+            *q2.ui8++ = *q1.ui8++;
           break;
         case LUX_INT16:
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--)
-              *q2.w++ = (int16_t) *q1.b++;
+              *q2.w++ = (int16_t) *q1.ui8++;
             break;
           case LUX_INT16:
             while (n--)
@@ -2758,7 +2758,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--)
-              *q2.l++ = (int32_t) *q1.b++;
+              *q2.l++ = (int32_t) *q1.ui8++;
             break;
           case LUX_INT16:
             while (n--)
@@ -2774,7 +2774,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--)
-              *q2.q++ = (int64_t) *q1.b++;
+              *q2.q++ = (int64_t) *q1.ui8++;
             break;
           case LUX_INT16:
             while (n--)
@@ -2794,7 +2794,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--)
-              *q2.f++ = (float) *q1.b++;
+              *q2.f++ = (float) *q1.ui8++;
             break;
           case LUX_INT16:
             while (n--)
@@ -2818,7 +2818,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--)
-              *q2.d++ = (double) *q1.b++;
+              *q2.d++ = (double) *q1.ui8++;
             break;
           case LUX_INT16:
             while (n--)
@@ -2846,7 +2846,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--) {
-              q2.cf->real = *q1.b++;
+              q2.cf->real = *q1.ui8++;
               q2.cf++->imaginary = 0.0;
             }
             break;
@@ -2886,7 +2886,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           switch (symbol_type(iq)) {
           case LUX_INT8:
             while (n--) {
-              q2.cd->real = *q1.b++;
+              q2.cd->real = *q1.ui8++;
               q2.cd++->imaginary = 0.0;
             }
             break;
@@ -3070,7 +3070,7 @@ int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
     switch (type) {
       case LUX_INT8:
         do {
-          cvalue.f = (float) src.b[index];
+          cvalue.f = (float) src.ui8[index];
           for (i = 0; i < ndim; i++)
             cvalue.f *= d[i];
           for (j = 0; j < ndim; j++) {
@@ -3181,8 +3181,8 @@ int32_t extractNumerical(Pointer src, Pointer trgt, Symboltype type,
   info.subdataLoop(coords);
 
   do {
-    memcpy(trgt.b, src.b, info.stride);
-    src.b += info.stride;
+    memcpy(trgt.ui8, src.ui8, info.stride);
+    src.ui8 += info.stride;
   } while (info.advanceLoop(&trgt) < info.rndim);
   return 1;
 }
@@ -3243,8 +3243,8 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
     zap(iq);                    // no longer needed
 
   do {
-    memcpy(trgt.b, src.b, srcinfo.stride);
-    trgt.b += srcinfo.stride;
+    memcpy(trgt.ui8, src.ui8, srcinfo.stride);
+    trgt.ui8 += srcinfo.stride;
   } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
 
   return result;

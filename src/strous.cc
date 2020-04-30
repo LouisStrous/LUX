@@ -81,7 +81,7 @@ int32_t lux_distr(int32_t narg, int32_t ps[])
  case LUX_INT8:
    while (n--) {
      if (*bin >= 0 && *bin < ntarget)
-       target.b[*bin] += *value.b++;
+       target.ui8[*bin] += *value.ui8++;
      else
        nout++;
      bin++;
@@ -201,38 +201,38 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     switch (type) {
     case LUX_INT8:
       while (n--) {
-        i = *arg1.b++ - histmin;
-        res.b[i] += *arg2.b++;
+        i = *arg1.ui8++ - histmin;
+        res.ui8[i] += *arg2.ui8++;
       }
       break;
     case LUX_INT16:
       while (n--) {
         i = *arg1.w++ - histmin;
-        res.b[i] += *arg2.b++;
+        res.ui8[i] += *arg2.ui8++;
       }
       break;
     case LUX_INT32:
       while (n--) {
         i = *arg1.l++ - histmin;
-        res.b[i] += *arg2.b++;
+        res.ui8[i] += *arg2.ui8++;
       }
       break;
     case LUX_INT64:
       while (n--) {
         i = *arg1.q++ - histmin;
-        res.b[i] += *arg2.b++;
+        res.ui8[i] += *arg2.ui8++;
       }
       break;
     case LUX_FLOAT:
       while (n--) {
         i = *arg1.f++ - histmin;
-        res.b[i] += *arg2.b++;
+        res.ui8[i] += *arg2.ui8++;
       }
       break;
     case LUX_DOUBLE:
       while (n--) {
         i = *arg1.d++ - histmin;
-        res.b[i] += *arg2.b++;
+        res.ui8[i] += *arg2.ui8++;
       }
       break;
     }
@@ -241,7 +241,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     switch (type) {
     case LUX_INT8:
       while (n--) {
-        i = *arg1.b++ - histmin;
+        i = *arg1.ui8++ - histmin;
         res.w[i] += *arg2.w++;
       }
       break;
@@ -281,7 +281,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     switch (type) {
     case LUX_INT8:
       while (n--) {
-        i = *arg1.b++ - histmin;
+        i = *arg1.ui8++ - histmin;
         res.l[i] += *arg2.l++;
       }
       break;
@@ -321,7 +321,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     switch (type) {
     case LUX_INT8:
       while (n--) {
-        i = *arg1.b++ - histmin;
+        i = *arg1.ui8++ - histmin;
         res.q[i] += *arg2.q++;
       }
       break;
@@ -361,7 +361,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     switch (type) {
     case LUX_INT8:
       while (n--) {
-        i = *arg1.b++ - histmin;
+        i = *arg1.ui8++ - histmin;
         res.f[i] += *arg2.f++;
       }
       break;
@@ -401,7 +401,7 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
     switch (type) {
     case LUX_INT8:
       while (n--) {
-        i = *arg1.b++ - histmin;
+        i = *arg1.ui8++ - histmin;
         res.d[i] += *arg2.d++;
       }
       break;
@@ -572,7 +572,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
   if (mode & 2) resulttype = type; else resulttype = LUX_INT32;
   if (!repeat && class_id == LUX_SCALAR)
   { result = scalar_scratch(resulttype);
-    indx.b = &sym[result].spec.scalar.b;
+    indx.ui8 = &sym[result].spec.scalar.ui8;
     nRepeat = 1; }
   else
   { if (!repeat)
@@ -607,8 +607,8 @@ int32_t lux_find(int32_t narg, int32_t ps[])
       { if ((mode & 3) == 0)                    // exact match
         { switch (type)
           { case LUX_INT8:
-              for (ar.b += offset; n && *(ar.b++) != *key.b; n--);
-              if (n) index = ar.b - base.b; break;
+              for (ar.ui8 += offset; n && *(ar.ui8++) != *key.ui8; n--);
+              if (n) index = ar.ui8 - base.ui8; break;
             case LUX_INT16:
               for (ar.w += offset; n && *(ar.w++) != *key.w; n--);
               if (n) index = ar.w - base.w; break;
@@ -628,8 +628,8 @@ int32_t lux_find(int32_t narg, int32_t ps[])
         else                                    // geq
           switch (type)
           { case LUX_INT8:
-              for (ar.b += offset; n && *(ar.b++) < *key.b; n--);
-              if (n) index = ar.b - base.b; break;
+              for (ar.ui8 += offset; n && *(ar.ui8++) < *key.ui8; n--);
+              if (n) index = ar.ui8 - base.ui8; break;
             case LUX_INT16:
               for (ar.w += offset; n && *(ar.w++) < *key.w; n--);
               if (n) index = ar.w - base.w; break;
@@ -646,11 +646,11 @@ int32_t lux_find(int32_t narg, int32_t ps[])
               for (ar.d += offset; n && *(ar.d++) < *key.d; n--);
               if (n) index = ar.d - base.d; break; }
       }
-      key.b += step;
+      key.ui8 += step;
       if ((mode & 2) == 0) *indx.l++ = index - 1;
       else switch (type)
       { case LUX_INT8:
-          *indx.b++ = (indx.b)? *(base.b+index-1): -1; break;
+          *indx.ui8++ = (indx.ui8)? *(base.ui8+index-1): -1; break;
         case LUX_INT16:
           *indx.w++ = (indx.w)? *(base.w+index-1): -1; break;
         case LUX_INT32:
@@ -663,7 +663,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
           *indx.d++ = (indx.d)? *(base.d+index-1): -1; break; }
       if (noff > 1) off.l++;
     }   // end of while (loop--)
-    base.b += nar*step;
+    base.ui8 += nar*step;
   } // end of while (nRepeat--)
   return result;
 }
@@ -693,7 +693,7 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
   switch (symbol_class(ps[1])) {
   case LUX_SCALAR: case LUX_STRING:
     result = scalar_scratch(LUX_INT32);
-    target.b = &scalar_value(result).b;
+    target.ui8 = &scalar_value(result).ui8;
     break;
   case LUX_ARRAY:
     result = array_clone(ps[1], LUX_INT32);
@@ -705,10 +705,10 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
   case LUX_INT8:
     for (i = 0; i < keys_count; i++) {
       for (j = 0; j < data_count; j++)
-        if (*keys.b == data.b[j])
+        if (*keys.ui8 == data.ui8[j])
           break;
       *target.l++ = (j == data_count? -1: j);
-      keys.b++;
+      keys.ui8++;
     }
     break;
   case LUX_INT16:
@@ -873,7 +873,7 @@ int32_t lux_endian(int32_t narg, int32_t ps[])
    default:
      return cerror(ILL_CLASS, iq);
  }
- endian(q.b, n, type);
+ endian(q.ui8, n, type);
  return 1;
 }
 //-------------------------------------------------------------------------
@@ -975,29 +975,29 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
           if (o > 0 || old) {
             if (circular)
               for (i = 0; i < w1 - old; i++) {
-                *trgt.b = *src.b - src.b[offset3];
-                trgt.b += stride;
+                *trgt.ui8 = *src.ui8 - src.ui8[offset3];
+                trgt.ui8 += stride;
               }
             else
               for (i = 0; i < w1 - old; i++) {
-                *trgt.b = 0;    // zeros
-                trgt.b += stride;
+                *trgt.ui8 = 0;    // zeros
+                trgt.ui8 += stride;
               }
-            src.b -= offset1;
+            src.ui8 -= offset1;
           } else
             for (i = 0; i < ww; i++) {
-              *trgt.b = *src.b; // original values
-              trgt.b += stride;
-              src.b += stride;
+              *trgt.ui8 = *src.ui8; // original values
+              trgt.ui8 += stride;
+              src.ui8 += stride;
             }
           for (i = ww; i < srcinfo.rdims[0]; i++) { // middle part
-            *trgt.b = *src.b - src.b[offset1];
-            src.b += stride;
-            trgt.b += stride;
+            *trgt.ui8 = *src.ui8 - src.ui8[offset1];
+            src.ui8 += stride;
+            trgt.ui8 += stride;
           }
           for (i = w1; i < ww; i++) { // right edge
-            *trgt.b = 0;        // zeros
-            trgt.b += stride;
+            *trgt.ui8 = 0;        // zeros
+            trgt.ui8 += stride;
           }
         } while (trgtinfo.advanceLoop(&trgt),
                  srcinfo.advanceLoop(&src) < srcinfo.rndim);
@@ -1249,8 +1249,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
       else                      // need new temp for next result
       { iq = result;
         result = array_clone(iq, type); }
-      src.b = (uint8_t*) array_data(iq);
-      trgt.b = (uint8_t*) array_data(result); }
+      src.ui8 = (uint8_t*) array_data(iq);
+      trgt.ui8 = (uint8_t*) array_data(result); }
   }
   return result;
 }
@@ -1336,7 +1336,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             i2 *= step;
             sum.l = 0.0;
             for (i = i1; i < i2; i += step)
-              sum.l += (int32_t) src.b[i];
+              sum.l += (int32_t) src.ui8[i];
             *trgt.l = sum.l;
             done = trgtinfo.advanceLoop(&trgt),
               srcinfo.advanceLoop(&src);
@@ -1417,7 +1417,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             i2 *= step;
             sum.q = 0.0;
             for (i = i1; i < i2; i += step)
-              sum.q += src.b[i];
+              sum.q += src.ui8[i];
             *trgt.q = sum.q;
             done = trgtinfo.advanceLoop(&trgt),
               srcinfo.advanceLoop(&src);
@@ -1525,7 +1525,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             sum.f = 0.0;
             weight = cumul? 1: (i2 - i1)/step;
             for (i = i1; i < i2; i += step)
-              sum.f += (float) src.b[i];
+              sum.f += (float) src.ui8[i];
             *trgt.f = sum.f/weight;
             done = trgtinfo.advanceLoop(&trgt),
               srcinfo.advanceLoop(&src);
@@ -1663,7 +1663,7 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             sum.d = 0.0;
             weight = cumul? 1: (i2 - i1)/step;
             for (i = i1; i < i2; i += step)
-              sum.d += (double) src.b[i];
+              sum.d += (double) src.ui8[i];
             *trgt.d = sum.d/weight;
             done = trgtinfo.advanceLoop(&trgt),
               srcinfo.advanceLoop(&src);
@@ -1946,68 +1946,68 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
           if (internalMode & 1) { // /PARTIAL_WIDTH
             norm = cumul? ww: 0;
             if (ww%2) {                 // odd width
-              value.l += *src.b;
-              src.b += stride;
+              value.l += *src.ui8;
+              src.ui8 += stride;
               if (!cumul)
                 ++norm;
-              *trgt.b = (uint8_t) (value.l/norm);
-              trgt.b += stride;
+              *trgt.ui8 = (uint8_t) (value.l/norm);
+              trgt.ui8 += stride;
               i = 1;
             } else
               i = 0;
             for ( ; i < w1; i++) {
-              value.l += *src.b;
-              src.b += stride;
-              value.l += *src.b;
-              src.b += stride;
+              value.l += *src.ui8;
+              src.ui8 += stride;
+              value.l += *src.ui8;
+              src.ui8 += stride;
               if (!cumul)
                 norm += 2;
-              *trgt.b = (uint8_t) (value.l/norm);
-              trgt.b += stride;
+              *trgt.ui8 = (uint8_t) (value.l/norm);
+              trgt.ui8 += stride;
             }
           } else {              // full width
             for (i = 0; i < ww; i++) { // do the left edge
-              value.l += *src.b;
-              src.b += stride;
+              value.l += *src.ui8;
+              src.ui8 += stride;
             }
             uint8_t v = (uint8_t) (value.l/norm);
             for (i = 0; i < w1; i++) {
-              *trgt.b = v;
-              trgt.b += stride;
+              *trgt.ui8 = v;
+              trgt.ui8 += stride;
             }
           }
           // middle part
           for ( ; i < w2; i++) {
-            value.l += *src.b - src.b[offset];
-            src.b += stride;
-            *trgt.b = (uint8_t) (value.l/norm);
-            trgt.b += stride;
+            value.l += *src.ui8 - src.ui8[offset];
+            src.ui8 += stride;
+            *trgt.ui8 = (uint8_t) (value.l/norm);
+            trgt.ui8 += stride;
           }
           // right-hand edge
           if (internalMode & 1) { // /PARTIAL_WIDTH
             for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
-              value.l -= src.b[offset];
+              value.l -= src.ui8[offset];
               offset += stride;
-              value.l -= src.b[offset];
+              value.l -= src.ui8[offset];
               offset += stride;
               if (!cumul)
                 norm -= 2;
-              *trgt.b = (uint8_t) (value.l/norm);
-              trgt.b += stride;
+              *trgt.ui8 = (uint8_t) (value.l/norm);
+              trgt.ui8 += stride;
             }
             if (!(ww%2)) {
-              value.l -= src.b[offset];
+              value.l -= src.ui8[offset];
               offset += stride;
               if (!cumul)
                 --norm;
-              *trgt.b = (uint8_t) (value.l/norm);
-              trgt.b += stride;
+              *trgt.ui8 = (uint8_t) (value.l/norm);
+              trgt.ui8 += stride;
             }
           } else {
             uint8_t v = (uint8_t) (value.l/norm);
             for ( ; i < srcinfo.rdims[0]; i++) { // right edge
-              *trgt.b = v;
-              trgt.b += stride;
+              *trgt.ui8 = v;
+              trgt.ui8 += stride;
             }
           }
         } while (trgtinfo.advanceLoop(&trgt),
@@ -2404,8 +2404,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
       srcinfo.type = type;
       srcinfo.stride = lux_type_size[type]; // original may be < LUX_FLOAT
       nextLoops(&srcinfo, &trgtinfo);
-      src.b = (uint8_t*) array_data(iq);
-      trgt.b = (uint8_t*) array_data(result);
+      src.ui8 = (uint8_t*) array_data(iq);
+      trgt.ui8 = (uint8_t*) array_data(result);
     }
   }
   return result;
@@ -2431,9 +2431,9 @@ int32_t pcmp(const void *arg1, const void *arg2)
 
   switch (pcmp_type) {
     case LUX_INT8:
-      d1.b = pcmp_ptr.b[*(int32_t *) arg1];
-      d2.b = pcmp_ptr.b[*(int32_t *) arg2];
-      return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
+      d1.ui8 = pcmp_ptr.ui8[*(int32_t *) arg1];
+      d2.ui8 = pcmp_ptr.ui8[*(int32_t *) arg2];
+      return d1.ui8 < d2.ui8? -1: (d1.ui8 > d2.ui8? 1: 0);
     case LUX_INT16:
       d1.w = pcmp_ptr.w[*(int32_t *) arg1];
       d2.w = pcmp_ptr.w[*(int32_t *) arg2];
@@ -2466,9 +2466,9 @@ int32_t pcmp2(const void *arg1, const void *arg2)
 
   switch (pcmp_type) {
     case LUX_INT8:
-      d1.b = *(uint8_t *) arg1;
-      d2.b = pcmp_ptr.b[*(int32_t *) arg2];
-      return d1.b < d2.b? -1: (d1.b > d2.b? 1: 0);
+      d1.ui8 = *(uint8_t *) arg1;
+      d2.ui8 = pcmp_ptr.ui8[*(int32_t *) arg2];
+      return d1.ui8 < d2.ui8? -1: (d1.ui8 > d2.ui8? 1: 0);
     case LUX_INT16:
       d1.w = *(int16_t *) arg1;
       d2.w = pcmp_ptr.w[*(int32_t *) arg2];
@@ -2540,9 +2540,9 @@ int32_t lux_match(int32_t narg, int32_t ps[])
 
  step = lux_type_size[maxType];
  while (nTarget--) {
-   p = (int32_t*) bsearch(target.b, ptr, nSet, sizeof(int32_t), pcmp2);
+   p = (int32_t*) bsearch(target.ui8, ptr, nSet, sizeof(int32_t), pcmp2);
    *result.l++ = p? *p: -1;
-   target.b += step;
+   target.ui8 += step;
  }
  free(ptr);
  return iq;
@@ -2565,12 +2565,12 @@ int32_t lux_not(int32_t narg, int32_t ps[])
    case LUX_SCALAR: iq = scalar_scratch(LUX_INT8);
                 result.l = &sym[iq].spec.scalar.l;  break; }
  switch (type)
- { case LUX_INT8:    while (narg--) *result.b++ = (*arg.b++)? 0: 1;  break;
-   case LUX_INT16:    while (narg--) *result.b++ = (*arg.w++)? 0: 1;  break;
-   case LUX_INT32:    while (narg--) *result.b++ = (*arg.l++)? 0: 1;  break;
-   case LUX_INT64:    while (narg--) *result.b++ = (*arg.q++)? 0: 1;  break;
-   case LUX_FLOAT:   while (narg--) *result.b++ = (*arg.f++)? 0: 1;  break;
-   case LUX_DOUBLE:  while (narg--) *result.b++ = (*arg.d++)? 0: 1;  break; }
+ { case LUX_INT8:    while (narg--) *result.ui8++ = (*arg.ui8++)? 0: 1;  break;
+   case LUX_INT16:    while (narg--) *result.ui8++ = (*arg.w++)? 0: 1;  break;
+   case LUX_INT32:    while (narg--) *result.ui8++ = (*arg.l++)? 0: 1;  break;
+   case LUX_INT64:    while (narg--) *result.ui8++ = (*arg.q++)? 0: 1;  break;
+   case LUX_FLOAT:   while (narg--) *result.ui8++ = (*arg.f++)? 0: 1;  break;
+   case LUX_DOUBLE:  while (narg--) *result.ui8++ = (*arg.d++)? 0: 1;  break; }
  return iq;
 }
 //----------------------------------------------------------------------
@@ -2672,8 +2672,8 @@ int32_t lux_table(int32_t narg, int32_t ps[])
  ox.l = x.l = LPTR(hx);
  oy.l = y.l = LPTR(hy);
  of.l = LPTR(hf);
- nx.b = ox.b + sym[symx].spec.array.bstore - sizeof(array);
- ny.b = oy.b + sym[symy].spec.array.bstore - sizeof(array);
+ nx.ui8 = ox.ui8 + sym[symx].spec.array.bstore - sizeof(array);
+ ny.ui8 = oy.ui8 + sym[symy].spec.array.bstore - sizeof(array);
  r.l = LPTR(hr);
         // now the real work
         /* Search strategy:  hope that the next xnew value is near
@@ -2858,16 +2858,16 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
  oy.l = LPTR(hy);
  if (symbol_class(nsymf) == LUX_ARRAY)
  { of.l = xf.l = LPTR(hf);
-   nf.b = of.b + sym[symf].spec.array.bstore - sizeof(array); }
+   nf.ui8 = of.ui8 + sym[symf].spec.array.bstore - sizeof(array); }
  else
  { of.l = xf.l = &sym[nsymf].spec.scalar.l;
-   nf.b = of.b + lux_type_size[topType]; }
+   nf.ui8 = of.ui8 + lux_type_size[topType]; }
  if (symbol_class(nsymi) == LUX_ARRAY)
  { oi.l = xi.l = LPTR(hi);
-   ni.b = oi.b + sym[symi].spec.array.bstore - sizeof(array); }
+   ni.ui8 = oi.ui8 + sym[symi].spec.array.bstore - sizeof(array); }
  else
  { oi.l = xi.l = &sym[nsymi].spec.scalar.l;
-   ni.b = oi.b + lux_type_size[topType]; }
+   ni.ui8 = oi.ui8 + lux_type_size[topType]; }
  nx = (sym[symx].spec.array.bstore - sizeof(array))
    / lux_type_size[topType];
  ny = (sym[symy].spec.array.bstore - sizeof(array))
@@ -3268,10 +3268,10 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
    if (filemap) {
      if (fseek(fp, typesize*currentIndex, SEEK_SET))
        return cerror(POS_ERR, iq);
-     if (fread(&nextValue.b, typesize, 1, fp) != 1)
+     if (fread(&nextValue.ui8, typesize, 1, fp) != 1)
        return cerror(READ_ERR, iq);
    } else
-     memcpy(&nextValue.b, data.b + typesize*currentIndex, typesize);
+     memcpy(&nextValue.ui8, data.ui8 + typesize*currentIndex, typesize);
    nextIndex = comparisonIndex = currentIndex;
    for (i = 0; i < ndim; i++) {
      indx[i] = nextIndex % dims[i] - 1;
@@ -3292,14 +3292,14 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
    do {
      do {
        if (filemap)
-         readGhost(fp, value.b, comparisonIndex, typesize);
+         readGhost(fp, value.ui8, comparisonIndex, typesize);
        switch (type) {
          case LUX_INT8:
            if (!filemap)
-             value.b = data.b[comparisonIndex];
-           if ((max)? value.b > nextValue.b: value.b < nextValue.b) {
+             value.ui8 = data.ui8[comparisonIndex];
+           if ((max)? value.ui8 > nextValue.ui8: value.ui8 < nextValue.ui8) {
              nextIndex = comparisonIndex;
-             nextValue.b = value.b;
+             nextValue.ui8 = value.ui8;
            }
            break;
          case LUX_INT16:
@@ -3399,11 +3399,11 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
          case LUX_INT8:
            // calculate gradient and hessian matrix
            if (!filemap) {
-             extr.b = &data.b[currentIndex];
-             v = (float) *extr.b;
+             extr.ui8 = &data.ui8[currentIndex];
+             v = (float) *extr.ui8;
              for (i = 0; i < ndim; i++)
-               grad[i] = grad2[i] = ((float) extr.b[size[i]]
-                                     - (float) extr.b[-size[i]])/2;
+               grad[i] = grad2[i] = ((float) extr.ui8[size[i]]
+                                     - (float) extr.ui8[-size[i]])/2;
              ready = 1;                 // zero gradient?
              for (i = 0; i < ndim; i++) {
                if (grad[i] != 0) {
@@ -3417,23 +3417,23 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
                for (j = 0; j <= i; j++) {
                  if (i == j)
                    hessian[i + i*ndim] = hessian2[i] =
-                     (float) extr.b[size[i]] + (float) extr.b[-size[i]] - 2*v;
+                     (float) extr.ui8[size[i]] + (float) extr.ui8[-size[i]] - 2*v;
                  else {
-                   x = ((float) extr.b[size[i] + size[j]]
-                        + (float) extr.b[-size[i] - size[j]]
-                        - (float) extr.b[size[i] - size[j]]
-                        - (float) extr.b[size[j] - size[i]])/4;
+                   x = ((float) extr.ui8[size[i] + size[j]]
+                        + (float) extr.ui8[-size[i] - size[j]]
+                        - (float) extr.ui8[size[i] - size[j]]
+                        - (float) extr.ui8[size[j] - size[i]])/4;
                    hessian[i + j*ndim] = hessian[j + i*ndim] = x;
                  }
                }
            } else {             // filemap array
-             readGhost(fp, value.b, currentIndex, typesize);
-             v = (float) value.b;
+             readGhost(fp, value.ui8, currentIndex, typesize);
+             v = (float) value.ui8;
              for (i = 0; i < ndim; i++) {
-               readGhost(fp, value.b, currentIndex + size[i], typesize);
-               grad[i] = (float) value.b;
-               readGhost(fp, value.b, currentIndex - size[i], typesize);
-               grad[i] = (grad[i] - (float) value.b)/2;
+               readGhost(fp, value.ui8, currentIndex + size[i], typesize);
+               grad[i] = (float) value.ui8;
+               readGhost(fp, value.ui8, currentIndex - size[i], typesize);
+               grad[i] = (grad[i] - (float) value.ui8)/2;
              }
              ready = 1;                 // zero gradient?
              for (i = 0; i < ndim; i++) {
@@ -3447,24 +3447,24 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
              for (i = 0; i < ndim; i++)
                for (j = 0; j <= i; j++) {
                  if (i == j) {
-                   readGhost(fp, value.b, currentIndex + size[i], typesize);
-                   x = (float) value.b;
-                   readGhost(fp, value.b, currentIndex - size[i], typesize);
+                   readGhost(fp, value.ui8, currentIndex + size[i], typesize);
+                   x = (float) value.ui8;
+                   readGhost(fp, value.ui8, currentIndex - size[i], typesize);
                    hessian[i + i*ndim] = hessian2[i] =
-                     x + (float) value.b - 2*v;
+                     x + (float) value.ui8 - 2*v;
                  } else {
-                   readGhost(fp, value.b, currentIndex + size[i] + size[j],
+                   readGhost(fp, value.ui8, currentIndex + size[i] + size[j],
                              typesize);
-                   x = (float) value.b;
-                   readGhost(fp, value.b, currentIndex - size[i] - size[j],
+                   x = (float) value.ui8;
+                   readGhost(fp, value.ui8, currentIndex - size[i] - size[j],
                              typesize);
-                   x += (float) value.b;
-                   readGhost(fp, value.b, currentIndex + size[i] - size[j],
+                   x += (float) value.ui8;
+                   readGhost(fp, value.ui8, currentIndex + size[i] - size[j],
                              typesize);
-                   x -= (float) value.b;
-                   readGhost(fp, value.b, currentIndex - size[i] + size[j],
+                   x -= (float) value.ui8;
+                   readGhost(fp, value.ui8, currentIndex - size[i] + size[j],
                              typesize);
-                   x -= (float) value.b;
+                   x -= (float) value.ui8;
                    hessian[i + j*ndim] = hessian[j + i*ndim] = x/4;
                  }
                }
@@ -3891,7 +3891,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
      if (code & 4) {            // subgrid value
        switch (type) {
        case LUX_INT8:
-         *trgt.f++ = (float) nextValue.b;
+         *trgt.f++ = (float) nextValue.ui8;
          break;
        case LUX_INT16:
          *trgt.f++ = (float) nextValue.w;
@@ -3912,7 +3912,7 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
      } else {                   // grid value
        switch (trgttype) {
        case LUX_INT8:
-         *trgt.b++ = nextValue.b;
+         *trgt.ui8++ = nextValue.ui8;
          break;
        case LUX_INT16:
          *trgt.w++ = nextValue.w;
@@ -3944,11 +3944,11 @@ int32_t local_maxormin(int32_t narg, int32_t ps[], int32_t code)
                 // prepare result
  if (max) {                     // sought maximum
    lastmaxloc = currentIndex;
-   memcpy(&lastmax.b, &nextValue.b, (code & 4)? sizeof(float): typesize);
+   memcpy(&lastmax.ui8, &nextValue.ui8, (code & 4)? sizeof(float): typesize);
    symbol_type(lastmax_sym) = (code & 4)? LUX_FLOAT: type;
  } else {
    lastminloc = currentIndex;
-   memcpy(&lastmin.b, &nextValue.b, (code & 4)? sizeof(float): typesize);
+   memcpy(&lastmin.ui8, &nextValue.ui8, (code & 4)? sizeof(float): typesize);
    symbol_type(lastmin_sym) = (code & 4)? LUX_FLOAT: type;
  }
  return iq;
@@ -4032,8 +4032,8 @@ int32_t lux_zinv(int32_t narg, int32_t ps[])
  switch (symbol_type(iq)) {
    case LUX_INT8:
      while (n--) {
-       *target.f++ = *data.b? 1.0/ *data.b: 0.0;
-       data.b++;
+       *target.f++ = *data.ui8? 1.0/ *data.ui8: 0.0;
+       data.ui8++;
      }
      break;
    case LUX_INT16:
@@ -4235,15 +4235,15 @@ int32_t lux_bsmooth(int32_t narg, int32_t ps[])
             trgt.d += stride;
             src.d += stride;
             break; }
-      src.b += step[1];
-      trgt.b += step[1];
+      src.ui8 += step[1];
+      trgt.ui8 += step[1];
       for (i = 1; i < ndim; i++)
       { if (tally[i]++ != xdims[i])
         { done = 0;
           break; }
         tally[i] = 1;
         done = 1;
-        src.b += step[i + 1]; }
+        src.ui8 += step[i + 1]; }
     } while (!done);
   }
   return result_sym;

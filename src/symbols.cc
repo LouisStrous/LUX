@@ -228,7 +228,7 @@ int32_t scalar_scratch_copy(int32_t nsym)
  symbol_class(n) = LUX_SCALAR;
  sym[n].type = sym[nsym].type;
  sym[n].line = curLineNumber;
- memcpy(&sym[n].spec.scalar.b, &sym[nsym].spec.scalar.b, sizeof(double));
+ memcpy(&sym[n].spec.scalar.ui8, &sym[nsym].spec.scalar.ui8, sizeof(double));
  return n;
 }
 //-----------------------------------------------------
@@ -420,7 +420,7 @@ int32_t dereferenceScalPointer(int32_t nsym)
  ptr = scal_ptr_pointer(nsym);
  switch (scal_ptr_type(nsym)) {
  case LUX_INT8:
-   scalar_value(n).b = *ptr.b;
+   scalar_value(n).ui8 = *ptr.ui8;
    break;
  case LUX_INT16:
    scalar_value(n).w = *ptr.w;
@@ -483,7 +483,7 @@ int32_t int_arg(int32_t nsym)
  }
  switch (scalar_type(nsym)) {
    case LUX_INT8:
-     return (int32_t) scalar_value(nsym).b;
+     return (int32_t) scalar_value(nsym).ui8;
    case LUX_INT16:
      return (int32_t) scalar_value(nsym).w;
    case LUX_INT32:
@@ -510,7 +510,7 @@ int32_t int_arg_stat(int32_t nsym, int32_t *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
  case LUX_INT8:
-   *value = (int32_t) scalar_value(nsym).b;
+   *value = (int32_t) scalar_value(nsym).ui8;
    break;
  case LUX_INT16:
    *value = (int32_t) scalar_value(nsym).w;
@@ -541,7 +541,7 @@ float float_arg(int32_t nsym)
   if (symbol_class(nsym) != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
   switch (scalar_type(nsym)) {
   case LUX_INT8:
-    return (float) scalar_value(nsym).b;
+    return (float) scalar_value(nsym).ui8;
   case LUX_INT16:
     return (float) scalar_value(nsym).w;
   case LUX_INT32:
@@ -568,7 +568,7 @@ int32_t float_arg_stat(int32_t nsym, float *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
    case LUX_INT8:
-     *value = (float) scalar_value(nsym).b;
+     *value = (float) scalar_value(nsym).ui8;
      break;
    case LUX_INT16:
      *value = (float) scalar_value(nsym).w;
@@ -599,7 +599,7 @@ double double_arg(int32_t nsym)
  if (symbol_class(nsym) != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
  switch (scalar_type(nsym))
  { case LUX_INT8:
-     return (double) scalar_value(nsym).b;
+     return (double) scalar_value(nsym).ui8;
    case LUX_INT16:
      return (double) scalar_value(nsym).w;
    case LUX_INT32:
@@ -625,7 +625,7 @@ int32_t double_arg_stat(int32_t nsym, double *value)
    return cerror(NO_SCAL, nsym);
  switch (scalar_type(nsym)) {
    case LUX_INT8:
-     *value = (double) scalar_value(nsym).b;
+     *value = (double) scalar_value(nsym).ui8;
      break;
    case LUX_INT16:
      *value = (double) scalar_value(nsym).w;
@@ -710,8 +710,8 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
        result = iq;
      else                        // need new scalar
        result = scalar_scratch(LUX_INT32);
-     trgt.b = &scalar_value(result).b;
-     src.b = &scalar_value(iq).b;
+     trgt.ui8 = &scalar_value(result).ui8;
+     src.ui8 = &scalar_value(iq).ui8;
      n = 1;
      break;
    case LUX_STRING:
@@ -731,7 +731,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
      result = scalar_scratch(LUX_INT32);
      temp = 0;
      n = 1;
-     trgt.b = &scalar_value(result).b;
+     trgt.ui8 = &scalar_value(result).ui8;
      src.cf = complex_scalar_data(iq).cf;
      break;
    case LUX_ARRAY:
@@ -756,7 +756,7 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
  switch (type) {
    case LUX_INT8:
      while (n--)
-       *trgt.l++ = (int32_t) *src.b++;
+       *trgt.l++ = (int32_t) *src.ui8++;
      break;
    case LUX_INT16:
      while (n--)
@@ -828,8 +828,8 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
        result = iq;
      else                        // need new scalar
        result = scalar_scratch(LUX_INT32);
-     trgt.b = &scalar_value(result).b;
-     src.b = &scalar_value(iq).b;
+     trgt.ui8 = &scalar_value(result).ui8;
+     src.ui8 = &scalar_value(iq).ui8;
      n = 1;
      break;
    case LUX_STRING:
@@ -849,7 +849,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
      result = scalar_scratch(LUX_INT32);
      temp = 0;
      n = 1;
-     trgt.b = &scalar_value(result).b;
+     trgt.ui8 = &scalar_value(result).ui8;
      src.cf = complex_scalar_data(iq).cf;
      break;
    case LUX_ARRAY:
@@ -874,7 +874,7 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
  switch (type) {
    case LUX_INT8:
      while (n--)
-       *trgt.l++ = (int32_t) *src.b++;
+       *trgt.l++ = (int32_t) *src.ui8++;
      break;
    case LUX_INT16:
      while (n--)
@@ -990,7 +990,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
       case LUX_SCALAR:
         if (isComplexType(totype)) {
           value = scalar_value(iq);
-          src.b = &value.b;
+          src.ui8 = &value.ui8;
           complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
           symbol_memory(result) = trgtstep;
           if (!complex_scalar_data(result).cf)
@@ -998,11 +998,11 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           trgt.cf = complex_scalar_data(result).cf;
           symbol_class(result) = LUX_CSCALAR;
         } else if (isStringType(totype)) {
-          src.b = &scalar_value(iq).b;
+          src.ui8 = &scalar_value(iq).ui8;
           switch (type) {
             case LUX_INT8:
               fmttok(fmt_integer);
-              Sprintf_tok(curScrat, (int32_t) *src.b);
+              Sprintf_tok(curScrat, (int32_t) *src.ui8);
               break;
             case LUX_INT16:
               fmttok(fmt_integer);
@@ -1038,8 +1038,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           continue;
         } else {
           symbol_class(result) = LUX_SCALAR;
-          src.b = &scalar_value(iq).b;
-          trgt.b = &scalar_value(result).b;
+          src.ui8 = &scalar_value(iq).ui8;
+          trgt.ui8 = &scalar_value(result).ui8;
         }
         n = 1;
         break;
@@ -1056,7 +1056,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           free(string_value(iq)); // change string to scalar: free up memory
         if (isRealType(totype)) {
           symbol_class(result) = LUX_SCALAR;
-          trgt.b = &scalar_value(result).b;
+          trgt.ui8 = &scalar_value(result).ui8;
         } else {                        // complex output
           symbol_class(result) = LUX_CSCALAR;
           complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
@@ -1069,7 +1069,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         }
         switch (totype) {
           case LUX_INT8:
-            *trgt.b = value.l;
+            *trgt.ui8 = value.l;
             break;
           case LUX_INT16:
             *trgt.w = value.l;
@@ -1114,7 +1114,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           symbol_class(result) = LUX_SCALAR;
           switch (totype) {
             case LUX_INT8:
-              scalar_value(result).b = (uint8_t) value.d;
+              scalar_value(result).ui8 = (uint8_t) value.d;
               break;
             case LUX_INT16:
               scalar_value(result).w = (int16_t) value.d;
@@ -1140,7 +1140,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           switch (type) {
             case LUX_INT8:
               fmttok(fmt_integer);
-              Sprintf_tok(curScrat, (int32_t) *src.b);
+              Sprintf_tok(curScrat, (int32_t) *src.ui8);
               break;
             case LUX_INT16:
               fmttok(fmt_integer);
@@ -1230,8 +1230,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
     if (trgtstep > srcstep) {
       // we must start at the end, or else we'll overwrite stuff we
       // need later
-      trgt.b += (n - 1)*trgtstep;
-      src.b += (n - 1)*srcstep;
+      trgt.ui8 += (n - 1)*trgtstep;
+      src.ui8 += (n - 1)*srcstep;
       trgtstep = -trgtstep;
       srcstep = -srcstep;
     }
@@ -1242,66 +1242,66 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {                // target type
           case LUX_INT16:
             while (n--) {
-              *trgt.w = (int16_t) *src.b;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.w = (int16_t) *src.ui8;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
-              *trgt.l = (int32_t) *src.b;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.l = (int32_t) *src.ui8;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
             while (n--) {
-              *trgt.q = *src.b;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.q = *src.ui8;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
-              *trgt.f = (float) *src.b;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.f = (float) *src.ui8;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
-              *trgt.d = (double) *src.b;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.d = (double) *src.ui8;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
-              trgt.cf->real = (float) *src.b;
+              trgt.cf->real = (float) *src.ui8;
               trgt.cf->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
             while (n--) {
-              trgt.cd->real = (double) *src.b;
+              trgt.cd->real = (double) *src.ui8;
               trgt.cd->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
             fmttok(fmt_integer);
             while (n--) {
-              Sprintf_tok(curScrat, (int32_t) *src.b);
+              Sprintf_tok(curScrat, (int32_t) *src.ui8);
               temp = strlen(curScrat) + 1;
               *trgt.sp = (char*) malloc(temp);
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1310,53 +1310,53 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {                // target type
           case LUX_INT8:
             while (n--) {
-              *trgt.b = (int16_t) *src.w;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = (int16_t) *src.w;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
               *trgt.l = (int16_t) *src.w;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
             while (n--) {
               *trgt.q = *src.w;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
               *trgt.f = (int16_t) *src.w;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
               *trgt.d = (int16_t) *src.w;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
               trgt.cf->real = (float) *src.w;
               trgt.cf->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
             while (n--) {
               trgt.cd->real = (double) *src.w;
               trgt.cd->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
@@ -1368,8 +1368,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1378,53 +1378,53 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {                // target type
           case LUX_INT8:
             while (n--) {
-              *trgt.b = (int32_t) *src.l;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = (int32_t) *src.l;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
             while (n--) {
               *trgt.w = (int32_t) *src.l;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
             while (n--) {
               *trgt.q = *src.l;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
               *trgt.f = (int32_t) *src.l;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
               *trgt.d = (int32_t) *src.l;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
               trgt.cf->real = (float) *src.l;
               trgt.cf->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
             while (n--) {
               trgt.cd->real = (double) *src.l;
               trgt.cd->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
@@ -1436,8 +1436,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1446,53 +1446,53 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {                // target type
           case LUX_INT8:
             while (n--) {
-              *trgt.b = *src.q;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = *src.q;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
             while (n--) {
               *trgt.w = *src.q;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
               *trgt.l = *src.q;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
               *trgt.f = *src.q;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
               *trgt.d = *src.q;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
               trgt.cf->real = *src.q;
               trgt.cf->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
             while (n--) {
               trgt.cd->real = *src.q;
               trgt.cd->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
@@ -1504,8 +1504,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1514,53 +1514,53 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {                // target type
           case LUX_INT8:
             while (n--) {
-              *trgt.b = (float) *src.f;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = (float) *src.f;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
             while (n--) {
               *trgt.w = (float) *src.f;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
               *trgt.l = (float) *src.f;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
             while (n--) {
               *trgt.q = *src.f;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
               *trgt.d = (float) *src.f;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
               trgt.cf->real = (float) *src.f;
               trgt.cf->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
             while (n--) {
               trgt.cd->real = (double) *src.f;
               trgt.cd->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
@@ -1572,8 +1572,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1582,53 +1582,53 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {                // target type
           case LUX_INT8:
             while (n--) {
-              *trgt.b = (double) *src.d;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = (double) *src.d;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
             while (n--) {
               *trgt.w = (double) *src.d;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
               *trgt.l = (double) *src.d;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
             while (n--) {
               *trgt.q = *src.d;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
               *trgt.f = (double) *src.d;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
               trgt.cf->real = (float) *src.d;
               trgt.cf->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
             while (n--) {
               trgt.cd->real = (double) *src.d;
               trgt.cd->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
@@ -1640,8 +1640,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1650,52 +1650,52 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {
           case LUX_INT8:
             while (n--) {
-              *trgt.b = (uint8_t) src.cf->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = (uint8_t) src.cf->real;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
             while (n--) {
               *trgt.w = (int16_t) src.cf->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
               *trgt.l = (int32_t) src.cf->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
             while (n--) {
               *trgt.q = src.cf->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
               *trgt.f = (float) src.cf->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
               *trgt.d = (double) src.cf->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
             while (n--) {
               trgt.cd->imaginary = src.cf->imaginary;
               trgt.cd->real = src.cf->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
@@ -1707,8 +1707,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1717,52 +1717,52 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {
           case LUX_INT8:
             while (n--) {
-              *trgt.b = (uint8_t) src.cd->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = (uint8_t) src.cd->real;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
             while (n--) {
               *trgt.w = (int16_t) src.cd->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
             while (n--) {
               *trgt.l = (int32_t) src.cd->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
             while (n--) {
               *trgt.q = src.cd->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
             while (n--) {
               *trgt.f = (float) src.cd->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
             while (n--) {
               *trgt.d = (double) src.cd->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
             while (n--) {
               trgt.cf->imaginary = src.cd->imaginary;
               trgt.cf->real = src.cd->real;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_STRING_ARRAY:
@@ -1774,8 +1774,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (!*trgt.sp)
                 return cerror(ALLOC_ERR, 0);
               memcpy(*trgt.sp, curScrat, temp);
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -1784,12 +1784,12 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         switch (totype) {
           case LUX_INT8:
             while (n--) {
-              value.b = atol(*src.sp);
+              value.ui8 = atol(*src.sp);
               if (iq == result && *src.sp)
                 free(*src.sp);
-              *trgt.b = value.b;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              *trgt.ui8 = value.ui8;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT16:
@@ -1798,8 +1798,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (iq == result && *src.sp)
                 free(*src.sp);
               *trgt.w = value.w;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT32:
@@ -1808,8 +1808,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (iq == result && *src.sp)
                 free(*src.sp);
               *trgt.l = value.l;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_INT64:
@@ -1818,8 +1818,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (iq == result && *src.sp)
                 free(*src.sp);
               *trgt.q = value.q;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_FLOAT:
@@ -1828,8 +1828,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (iq == result && *src.sp)
                 free(*src.sp);
               *trgt.f = value.f;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_DOUBLE:
@@ -1838,8 +1838,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
               if (iq == result && *src.sp)
                 free(*src.sp);
               *trgt.d = value.d;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CFLOAT:
@@ -1854,8 +1854,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
                 trgt.cf->real = value.d;
               }
               trgt.cf->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
           case LUX_CDOUBLE:
@@ -1870,8 +1870,8 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
                 trgt.cd->real = value.d;
               }
               trgt.cd->imaginary = 0.0;
-              trgt.b += trgtstep;
-              src.b += srcstep;
+              trgt.ui8 += trgtstep;
+              src.ui8 += srcstep;
             }
             break;
         }
@@ -2009,7 +2009,7 @@ int32_t redef_scalar(int32_t nsym, Symboltype ntype, void *val)
   symbol_type(nsym) = ntype;
   switch (ntype) {
     case LUX_INT8:
-      scalar_value(nsym).b = value? value->b: 0;
+      scalar_value(nsym).ui8 = value? value->ui8: 0;
       break;
     case LUX_INT16:
       scalar_value(nsym).w = value? value->w: 0;
@@ -2411,7 +2411,7 @@ int32_t lux_rfix(int32_t narg, int32_t ps[])
                  // now convert
  switch (type)
  { case LUX_INT8:
-     while (size--) *trgt++ = (int32_t) *src.b++;  break;
+     while (size--) *trgt++ = (int32_t) *src.ui8++;  break;
    case LUX_INT16:
      while (size--) *trgt++ = (int32_t) *src.w++;  break;
    case LUX_INT64:
@@ -2767,20 +2767,20 @@ int32_t getNumerical(int32_t iq, Symboltype minType, int32_t *n, Pointer *src, c
 
   switch (symbol_class(iq)) {
     case LUX_SCALAR:
-      (*src).b = &scalar_value(iq).b;
+      (*src).ui8 = &scalar_value(iq).ui8;
       *n = 1;
       if (trgt) {
         *result = scalar_scratch(type);
-        (*trgt).b = &scalar_value(*result).b;
+        (*trgt).ui8 = &scalar_value(*result).ui8;
       } else if (result)
         *result = iq;
       break;
     case LUX_ARRAY: case LUX_CARRAY:
-      (*src).b = (uint8_t *) array_data(iq);
+      (*src).ui8 = (uint8_t *) array_data(iq);
       *n = array_size(iq);
       if (trgt) {
         *result = array_clone(iq, type);
-        (*trgt).b = (uint8_t *) array_data(*result);
+        (*trgt).ui8 = (uint8_t *) array_data(*result);
       } else if (result)
         *result = iq;
       break;
@@ -2809,7 +2809,7 @@ int32_t getSimpleNumerical(int32_t iq, Pointer *data, int32_t *nelem)
     case LUX_SCAL_PTR:
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
-      (*data).b = &scalar_value(iq).b;
+      (*data).ui8 = &scalar_value(iq).ui8;
       *nelem = 1;
       break;
     case LUX_ARRAY:

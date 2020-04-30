@@ -121,20 +121,20 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)// crunch subrout
     ctype += 2;
   switch (ctype) {
   case 0:
-    iq = anacrunch(q2.b, q1.w, slice, nx, outer, limit);
+    iq = anacrunch(q2.ui8, q1.w, slice, nx, outer, limit);
     break;
   case 1:
-    iq = anacrunch8(q2.b, q1.b, slice, nx, outer, limit);
+    iq = anacrunch8(q2.ui8, q1.ui8, slice, nx, outer, limit);
     break;
   case 2:
-    iq = anacrunchrun(q2.b, q1.w, slice, nx, outer, limit);
+    iq = anacrunchrun(q2.ui8, q1.w, slice, nx, outer, limit);
     break;
   case 3:
-    iq = anacrunchrun8(q2.b, q1.b, slice, nx, outer, limit);
+    iq = anacrunchrun8(q2.ui8, q1.ui8, slice, nx, outer, limit);
     break;
   case 4:
 #if SIZEOF_LONG_LONG_INT == 8        // 64 bit integers
-    iq = anacrunch32(q2.b, q1.l, slice, nx, outer, limit);
+    iq = anacrunch32(q2.ui8, q1.l, slice, nx, outer, limit);
     break;
 #else
     puts("32-bit compression was not compiled into your version of LUX.");
@@ -182,7 +182,7 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])                // decrunch subr
 #endif
   outer = *q1.l++; nx = *q1.l++;
   // get the fixed slice width
-  slice = *q1.b++;        ctype = *q1.b++;
+  slice = *q1.ui8++;        ctype = *q1.ui8++;
   //printf("ctype = %d\n", ctype);
 #if WORDS_BIGENDIAN
   swapl(&bsize,1); swapl(&nx,1); swapl(&outer,1);
@@ -207,20 +207,20 @@ int32_t lux_decrunch(int32_t narg, int32_t ps[])                // decrunch subr
   q2.l = (int32_t *) ((char *)h + sizeof(struct ahead));
   switch (ctype) {
   case 0:
-    iq = anadecrunch(q1.b, q2.w, slice, nx, outer);
+    iq = anadecrunch(q1.ui8, q2.w, slice, nx, outer);
     break;
   case 1:
-    iq = anadecrunch8(q1.b, q2.b, slice, nx, outer);
+    iq = anadecrunch8(q1.ui8, q2.ui8, slice, nx, outer);
     break;
   case 2:
-    iq = anadecrunchrun(q1.b, q2.w, slice, nx, outer);
+    iq = anadecrunchrun(q1.ui8, q2.w, slice, nx, outer);
     break;
   case 3:
-    iq = anadecrunchrun8(q1.b, q2.b, slice, nx, outer);
+    iq = anadecrunchrun8(q1.ui8, q2.ui8, slice, nx, outer);
     break;
   case 4:
 #if SIZEOF_LONG_LONG_INT == 8        // 64-bit integers
-    iq = anadecrunch32(q1.b, q2.l, slice, nx, outer);
+    iq = anadecrunch32(q1.ui8, q2.l, slice, nx, outer);
     break;
 #else
     puts("32-bit decompression was not compiled into your version of LUX.");
@@ -266,9 +266,9 @@ int32_t anacrunch32(uint8_t *x, int32_t array[], int32_t slice, int32_t nx, int3
      it, but at least for our constant in hexadecimal notation the compiler
      regards the LL suffix as a parser error.  We construct the constant
      uint8_t by uint8_t instead.  LS 13mar99 */
-  c.b[0] = c.b[1] = c.b[2] = c.b[3] = 0xff;
-  c.b[4] = 0x1f;
-  c.b[5] = c.b[6] = c.b[7] = 0;
+  c.ui8[0] = c.ui8[1] = c.ui8[2] = c.ui8[3] = 0xff;
+  c.ui8[4] = 0x1f;
+  c.ui8[5] = c.ui8[6] = c.ui8[7] = 0;
   // printf("%x\n", c.l64);
 
   // c.l64 = 0x1ffffffff;
@@ -297,9 +297,9 @@ int32_t anacrunch32(uint8_t *x, int32_t array[], int32_t slice, int32_t nx, int3
   for (iy=0;iy<ny;iy++) {                 // start of iy (outer) loop
     // load the first value, reverse bytes (VAX style)
 #if WORDS_BIGENDIAN
-    y.i=array[in]; x[i]=y.b[3]; x[i+1]=y.b[2]; x[i+2]=y.b[1]; x[i+3]=y.b[0];
+    y.i=array[in]; x[i]=y.ui8[3]; x[i+1]=y.ui8[2]; x[i+2]=y.ui8[1]; x[i+3]=y.ui8[0];
 #else
-    y.i=array[in]; x[i]=y.b[0]; x[i+1]=y.b[1]; x[i+2]=y.b[2]; x[i+3]=y.b[3];
+    y.i=array[in]; x[i]=y.ui8[0]; x[i+1]=y.ui8[1]; x[i+2]=y.ui8[2]; x[i+3]=y.ui8[3];
 #endif
     r1=r1+32;
     ixa=1+iy*nx;    ixb=(iy+1)*nx;
@@ -360,11 +360,11 @@ int32_t anacrunch32(uint8_t *x, int32_t array[], int32_t slice, int32_t nx, int3
           if (j == 0) x[i]=0;     // gotta zero the virgins
           yy.l64=(((long long) array[in]- (long long) array[in-1])& c.l64) << j;
 #if WORDS_BIGENDIAN
-          x[i]=x[i] | yy.b[7]; x[i+1]=yy.b[6]; x[i+2]=yy.b[5];
-          x[i+3]=yy.b[4]; x[i+4]=yy.b[3];
+          x[i]=x[i] | yy.ui8[7]; x[i+1]=yy.ui8[6]; x[i+2]=yy.ui8[5];
+          x[i+3]=yy.ui8[4]; x[i+4]=yy.ui8[3];
 #else
-          x[i]=x[i] | yy.b[0]; x[i+1]=yy.b[1]; x[i+2]=yy.b[2];
-          x[i+3]=yy.b[3]; x[i+4]=yy.b[4];
+          x[i]=x[i] | yy.ui8[0]; x[i+1]=yy.ui8[1]; x[i+2]=yy.ui8[2];
+          x[i+3]=yy.ui8[3]; x[i+4]=yy.ui8[4];
 #endif
           r1=r1+33;       } // end of big one exception
       }       // end of (r3==0) conditional

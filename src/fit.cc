@@ -934,14 +934,16 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   return result;
 }
 REGISTER(generalfit2, f, fit3, 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
-//------------------------------------------------------------
-typedef union {
-  uint8_t  *b;
-  unsigned short        *w;
-  uint32_t  *l;
+//------------------------------------------------------------ This
+// This union differs from Pointer in that all integer members are
+// unsigned.
+union uscalar {
+  uint8_t* ui8;
+  uint16_t* w;
+  uint32_t* l;
   float *f;
-  double        *d;
-} uscalar;
+  double *d;
+};
 
 // replace NaN values by (other) random values
 void denan(uint8_t *data, int32_t size, int32_t partype)
@@ -958,7 +960,7 @@ void denan(uint8_t *data, int32_t size, int32_t partype)
     for (i = 0; i < size/sizeof(float); i++) {
       while (isnan(*p.f)) {
         uint32_t *r;
-        for (r = (uint32_t *) p.b; (uint8_t *) r < p.b + sizeof(float); r++)
+        for (r = (uint32_t *) p.ui8; (uint8_t *) r < p.ui8 + sizeof(float); r++)
           *r = random_bits();
       }
       p.f++;
@@ -969,7 +971,7 @@ void denan(uint8_t *data, int32_t size, int32_t partype)
     for (i = 0; i < size/sizeof(double); i++) {
       while (isnan(*p.d)) {
         uint32_t *r;
-        for (r = (uint32_t *) p.b; (uint8_t *) r < p.b + sizeof(double); r++) {
+        for (r = (uint32_t *) p.ui8; (uint8_t *) r < p.ui8 + sizeof(double); r++) {
           *r = random_bits();
         }
       }
@@ -984,14 +986,14 @@ void printgene(uint8_t *gene, int32_t nPar, int32_t partype, int32_t showbits,
   int32_t j;
   uscalar p;
 
-  p.b = gene;
+  p.ui8 = gene;
   putchar('[');
   for (j = 0; j < nPar; j++) {
     if (j)
       putchar(' ');
     switch (partype) {
     case LUX_INT8:
-      printf("%u", p.b[j]);
+      printf("%u", p.ui8[j]);
       break;
     case LUX_INT16:
       printf("%u", p.w[j]);
@@ -1333,10 +1335,10 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
     calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
 
     if (vocal > 1) {
-      p.b = genes;
+      p.ui8 = genes;
       for (i = 0; i < nPopulation; i++) {
         printf("%d/%d ", i, nPopulation);
-        printgene(p.b + rtoi[i]*size, nPar, partype, 0, &deviation[rtoi[i]]);
+        printgene(p.ui8 + rtoi[i]*size, nPar, partype, 0, &deviation[rtoi[i]]);
         putchar('\n');
       }
     }
@@ -1540,10 +1542,10 @@ int32_t lux_geneticfit(int32_t narg, int32_t ps[])
       calculate_distribution(distr, deviation, rtoi, nPopulation, mu);
 
       if (vocal > 1) {
-        p.b = genes;
+        p.ui8 = genes;
         for (i = 0; i < nPopulation; i++) {
           printf("%d/%d ", i, nPopulation);
-          printgene(p.b + rtoi[i]*size, nPar, partype, 0, &deviation[rtoi[i]]);
+          printgene(p.ui8 + rtoi[i]*size, nPar, partype, 0, &deviation[rtoi[i]]);
           putchar('\n');
         }
       }

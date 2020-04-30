@@ -117,7 +117,7 @@ int32_t evalBinOp(int32_t lhs, int32_t rhs,
 
       while (repeat--) {
         function(&lp, &rp, &tp, lhsType, rhsType, topType);
-        lp.b +=
+        lp.ui8 +=
     }
     return result;
   } else {                                // implicit dimensions
@@ -208,14 +208,14 @@ int32_t evalBinOp(int32_t lhs, int32_t rhs,
           (*function_as)();
           break;
       }
-      rp.b += *nCumulR;                // if this is an implicit dimension, then
+      rp.ui8 += *nCumulR;                // if this is an implicit dimension, then
       // pointer didn't get advanced in subroutine
-      lp.b += *nCumulL;
+      lp.ui8 += *nCumulL;
       done = 1;
       for (i = 1; i < nAction; i++) {
         if (tally[i]++ != nRepeats[i]) {
-          rp.b -= nCumulR[i];         // adjust pointers for next go
-          lp.b -= nCumulL[i];
+          rp.ui8 -= nCumulR[i];         // adjust pointers for next go
+          lp.ui8 -= nCumulL[i];
           done = 0;
           break;
         }

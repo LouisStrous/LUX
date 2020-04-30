@@ -870,7 +870,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
              info[1].advanceLoop( &data[1]),
              info[2].advanceLoop(&data[2]) < info[0].rndim);
   }
-  return iq;
+  return sa.result();
 }
 //-------------------------------------------------------------------------
 // <y> = setnan(<x>, <mask>)

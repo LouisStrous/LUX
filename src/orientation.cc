@@ -608,6 +608,7 @@ int32_t lux_orientation(int32_t narg, int32_t ps[])
 // returns the real roots of x^3 + a x^2 + b x + c = 0,
 int32_t lux_root3(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBGSL
   double a = double_arg(*ps++);
   double b = double_arg(*ps++);
   double c = double_arg(*ps);
@@ -617,6 +618,9 @@ int32_t lux_root3(int32_t narg, int32_t ps[])
   double* p = (double *) array_data(iq);
   memcpy(p, x, n*sizeof(double));
   return iq;
+#else
+  return cerror(NOSUPPORT, 0, "ROOT3", "libgsl");
+#endif
 }
 //--------------------------------------------------------------------
 /* The method:

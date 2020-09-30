@@ -19,16 +19,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // LUX routines dealing with cluster analysis
 // Louis Strous / started 18 August 1995
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <limits.h>
-#include <float.h>                // for DBL_MAX
-#include "action.hh"
+# include "config.h"
+# include <stdlib.h>
+# include <math.h>
+# include <string.h>
+# include <limits.h>
+# include <float.h>                // for DBL_MAX
+# include "action.hh"
 
 int32_t        lux_replace(int32_t, int32_t);
 void        randomu(int32_t seed, void *output, int32_t number, int32_t modulo);
@@ -137,6 +134,7 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
 // point.  update the closest cluster center and the PDGV condition
 // until the closest cluster center has been found.
 {
+#if HAVE_LIBGSL
   void        random_unique(int32_t seed, int32_t *output, int32_t number, int32_t modulo);
   int32_t        iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
   float        *data, *dataPoint, n1, n2, f;
@@ -1125,5 +1123,8 @@ int32_t lux_cluster(int32_t narg, int32_t ps[])
   if (!gotIndex || gotSample)
     free(clusterNumber.ui8);
   return LUX_OK;
+#else
+  return luxerror("CLUSTER not supported because the application was compiled without libgsl", 0);
+#endif
 }
 //----------------------------------------------------------------

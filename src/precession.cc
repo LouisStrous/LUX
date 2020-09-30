@@ -22,11 +22,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h> // for sin cos
 #include <string.h> // for memcpy
 // END HEADERS
+#include "config.h"
 #include "action.hh"
-#include <gsl/gsl_poly.h>
+#if HAVE_LIBGSL
+# include <gsl/gsl_poly.h>
+#endif
 
 // time in millennia since epoch 2000.0
-#define TM2000(JD) ((JD - 2451545.0)/365250)
+# define TM2000(JD) ((JD - 2451545.0)/365250)
 
 //--------------------------------------------------------------------------
 void matmul3(double *front, double *back, double *result)
@@ -77,7 +80,7 @@ void matmul3(double *front, double *back, double *result)
     + front[8]*back[8];
 }
 //--------------------------------------------------------------------------
-#define F(x) (x*1e-12)
+# define F(x) (x*1e-12)
 static double s11c[] = {  0,               0, F(-538867722),  F(-270670), F(1138205),  F(8604), F(-813) };
 static double c11c[] = {  1,               0,     F(-20728),   F(-19147), F(-149390),   F(-34),  F(617) };
 static double s12c[] = { -1,               0,    F(2575043),   F(-56157),  F(140001),   F(383), F(-613) };
@@ -95,6 +98,7 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
    for cartesian coordinates, for precession from <fromequinox> to
    <toequinox> (both measured in JDE) */
 {
+#if HAVE_LIBGSL
   int32_t is_new = (toequinox != a_toJ2000[9] || fromequinox != a_fromJ2000[9]);
   if (!is_new)
     return;
@@ -173,6 +177,7 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
   }
   if (is_new)
     matmul3(a_fromJ2000, a_toJ2000, a_from_to);
+#endif
 }
 //--------------------------------------------------------------------------
 double *XYZ_eclipticPrecessionMatrix(void)

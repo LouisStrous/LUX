@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.hh"
 #include "format.hh"
 #include "editor.hh"            // for BUFSIZE
-#include <readline/readline.h>
+#include "readline.h"
 
 int16_t         stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
 extern int32_t  stackSym;

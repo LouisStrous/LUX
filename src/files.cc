@@ -737,7 +737,7 @@ int32_t lux_format_set(int32_t narg, int32_t ps[])
     strcpy(p.s, "%14.7g");
     symbol_memory(fformat) = 7;
     p = scal_ptr_pointer(iformat);
-    p.s = (char*) realloc(p.s, 5);
+    p.s = (char*) realloc(p.s, 6);
     strcpy(p.s, "%10jd");
     symbol_memory(iformat) = 5;
     p = scal_ptr_pointer(sformat);

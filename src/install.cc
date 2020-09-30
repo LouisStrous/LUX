@@ -19,9 +19,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File install.c
-#if HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include "install.hh"
 #include <ctype.h> // for toupper(11) isdigit(3)
 #include <errno.h> // for errno(2)
@@ -134,9 +132,7 @@ extern LuxRoutine checkList, lux_whereisAddress, lux_show_temps,
                 lux_newallocs, show_files;
 #endif
 
-#if HAVE_LIBJPEG
 extern LuxRoutine lux_read_jpeg6b, lux_write_jpeg6b;
-#endif
 
 #if HAVE_SYS_MTIO_H
 extern LuxRoutine lux_tape_status, lux_rewind, lux_weof, lux_unload,
@@ -146,7 +142,6 @@ extern LuxRoutine lux_tape_status, lux_rewind, lux_weof, lux_unload,
 
 extern LuxRoutine lux_gifread, lux_gifwrite;
 
-#if HAVE_LIBX11
 extern LuxRoutine lux_menu, lux_menu_hide, lux_menu_item,
   lux_menu_kill, lux_menu_pop, lux_menu_read,
   lux_register_event, lux_window, lux_xcopy,
@@ -161,7 +156,6 @@ extern LuxRoutine lux_menu, lux_menu_hide, lux_menu_item,
   lux_zoom, lux_xtvplane, lux_threecolors, lux_tv3,
   lux_xinvertline, lux_xinvertarc, lux_xdrawarc, lux_colorComponents,
   lux_colorstogrey, lux_pixelsto8bit;
-#endif
 
 #if MOTIF
 extern LuxRoutine lux_xmalignment, lux_xmarmcolor, lux_xmattach,
@@ -302,10 +296,8 @@ internalRoutine         subroutine_table[] = {
   { "close",    1, 1, lux_close, 0 }, // files.c
   { "cluster",  2, 8, lux_cluster, // cluster.c
     "|32|:centers:index:size:sample:empty:maxit:rms:1update:2iterate:4vocal:8quick:16record:32ordered" },
-#if HAVE_LIBX11
   { "colorcomponents", 4, 4, lux_colorComponents, 0 }, // color.c
   { "colorstogrey", 1, 1, lux_colorstogrey, 0 }, // color.c
-#endif
 #if MOTIF
   { "compile_file", 1, 1, lux_compile_file, 0 }, // motifextra.c
 #endif
@@ -379,9 +371,7 @@ internalRoutine         subroutine_table[] = {
   { "getmin9",  3, 3, lux_getmin9, 0 }, // fun4.c
   { "gifread",  2, 3, lux_gifread, 0 }, // gifread_ana.c
   { "gifwrite",         2, 3, lux_gifwrite, 0 }, // gifwrite_ana.c
-#if HAVE_LIBX11
   { "hairs",    0, 0, lux_xplace, 0 }, // xport.c
-#endif
   { "help",     0, 1, lux_help,         "1manual" }, // strous.c
   { "hex",      1, MAX_ARG, lux_hex, 0 }, // files.c
   { "idlrestore", 1, 1, lux_idlrestore, 0 }, // idl.c
@@ -390,21 +380,17 @@ internalRoutine         subroutine_table[] = {
   { "insert",   2, 4, lux_inserter, 0 }, // subsc.c
   { "int",      1, MAX_ARG, lux_word_inplace, 0 }, // symbols.c
   { "int64",    1, MAX_ARG, lux_int64_inplace, 0 }, // symbols.c
-#if HAVE_LIBJPEG
   { "jpegread", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
   { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },// jpeg.c
-#endif
   { "limits",   0, 4, lux_limits, 0 }, // plots.c
   { "list",     1, 1, lux_list, 0 }, // ident.c
   { "long",     1, MAX_ARG, lux_long_inplace, 0 }, // symbols.c
-#if HAVE_LIBX11
   { "menu",     1, MAX_ARG, lux_menu, 0 }, // menu.c
   { "menuhide",         1, 1, lux_menu_hide, 0 }, // menu.c
   { "menuitem",         3, 3, lux_menu_item, 0 }, // menu.c
   { "menupop",  1, MAX_ARG, lux_menu_pop, 0 }, // menu.c
   { "menuread",         4, 4, lux_menu_read, 0 }, // menu.c
   { "menuzap",  1, 1, lux_menu_kill, 0 }, // menu.c
-#endif
   { "multisieve", 4, 4, lux_multisieve, 0 }, // strous2.c
 #if DEBUG
   { "newallocs", 0, 1, lux_newallocs, "1reset" }, // debug.c
@@ -423,9 +409,7 @@ internalRoutine         subroutine_table[] = {
   { "peek",     1, 2, peek, 0 }, // strous.c
   { "pen",      0, 2, lux_pen, "width:color:1standardgray" }, // plots.c
   { "pencolor", 0, 1, lux_pencolor, 0 }, // plots.c
-#if HAVE_LIBX11
   { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 }, // color.c
-#endif
   { "plot",     1, 15, lux_plot, // plots.c
     "1dvi:2dev:3img:4plt:5rim:6rpl:64keep:128whole:256clipbars:1024lii:1280lio:1536loi:1792loo:xdata:ydata:symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize:ybarsize:xfmt:yfmt" },
 #if DEVELOP
@@ -451,9 +435,7 @@ internalRoutine         subroutine_table[] = {
   { "readf",    2, MAX_ARG, lux_readf, "1askmore:2word" }, // files.c
   { "readorbits", 0, 1, lux_readorbits, "1list:2replace" }, // astron.c
   { "readu",    2, MAX_ARG, lux_readu, 0 }, // files.c
-#if HAVE_LIBJPEG
   { "read_jpeg", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
-#endif
   { "record",   0, 1, lux_record, "1input:2output:4reset" }, // symbols.c
   { "redim",    2, 9, lux_redim, 0 }, // subsc.c
   { "replace",  3, 3, lux_replace_values, 0 }, // strous2.c
@@ -469,15 +451,11 @@ internalRoutine         subroutine_table[] = {
   { "scb",      3, 3, lux_scb, "1even:2odd" }, // fun3.c
   { "set",      0, 1, lux_set,  // symbols.c
     "visual:1set:2reset:4showalloc:8whitebackground:16ulimcoords:32yreverseimg:64oldversion:128zoom:1024allowprompts:2048xsynchronize:4096parsesilent" },
-#if HAVE_LIBX11
   { "setbackground", 1, 2, lux_xsetbackground, 0 }, // xport.c
   { "setbg",    1, 2, lux_xsetbackground, 0 }, // xport.c
-#endif
   { "setenv",   1, 1, lux_setenv, 0 }, // files.c
-#if HAVE_LIBX11
   { "setfg",    1, 2, lux_xsetforeground, 0 }, // xport.c
   { "setforeground", 1, 2, lux_xsetforeground, 0 }, // xport.c
-#endif
   { "shift",    1, 4, lux_shift, ":::blank:1translate" }, // strous2.c
   { "show",     0, 1, lux_show, 0 }, // fun1.c
   { "showorbits", 0, 0, lux_showorbits, 0 }, // astron.c
@@ -490,9 +468,7 @@ internalRoutine         subroutine_table[] = {
 #if DEBUG
   { "show_temps", 0, 0, lux_show_temps, 0 }, // symbols.c
 #endif
-#if HAVE_LIBX11
   { "show_visuals", 0, 0, lux_show_visuals, 0 }, // xport.c
-#endif
 #if HAVE_SYS_MTIO_H
   { "skipf",    1, 2, lux_skipf, 0 }, // tape.c
   { "skipr",    1, 2, lux_skipr, 0 }, // tape.c
@@ -516,16 +492,13 @@ internalRoutine         subroutine_table[] = {
   { "taprd",    2, 2, lux_taprd, 0 }, // tape.c
   { "tapwrt",   2, 2, lux_tapwrt, 0 }, // tape.c
 #endif
-#if HAVE_LIBX11
   { "threecolors", 0, 1, lux_threecolors, 0 }, // xport.c
-#endif
   { "tolookup",         3, 3, lux_tolookup, "1one" }, // strous2.c
   { "trace",    0, 1, lux_trace, // install.c
     "1file:2loop:4braces:8routine:143all:16showstats:32cputime:64showexec:128enter" },
 #if DEVELOP
   { "trajectory", 3, 7, lux_trajectory, 0 }, // strous3.c
 #endif
-#if HAVE_LIBX11
   { "tv",       1, 5, lux_xtv,  // xport.c
     ":x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom:1024center:16384bit24" },
   { "tv3",      1, 7, lux_tv3, // xport.c
@@ -538,7 +511,6 @@ internalRoutine         subroutine_table[] = {
   { "tvraw",    1, 5, lux_xtvraw, // xport.c
     ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
   { "tvread",   0, 5, lux_xtvread, "1greyscale" }, // xport.c
-#endif
   { "ty",       1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
   { "type",     1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
   { "ulib",     0, 1, lux_ulib, 0 }, // files.c
@@ -547,9 +519,7 @@ internalRoutine         subroutine_table[] = {
 #endif
   { "verify",   0, 1, lux_verify, 0 }, // install.c
   { "wait",     1, 1, lux_wait, 0 }, // fun2.c
-#if HAVE_LIBX11
   { "wait_for_menu", 0, 1, lux_wait_for_menu, 0 }, // menu.c
-#endif
 #if HAVE_SYS_MTIO_H
   { "wait_for_tape", 1, 1, lux_wait_for_tape, 0 }, // tape.c
 #endif
@@ -560,15 +530,10 @@ internalRoutine         subroutine_table[] = {
 #if DEBUG
   { "where",    1, 1, lux_whereisAddress, "1cut" }, // debug.c
 #endif
-#if HAVE_LIBX11
   { "window",   0, 6, lux_window, 0 }, // plots.c
-#endif
   { "word",     1, 1, lux_word_inplace, 0 }, // symbols.c
   { "writeu",   2, MAX_ARG, lux_writeu, 0 }, // files.c
-#if HAVE_LIBJPEG
   { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, // jpeg.c
-#endif
-#if HAVE_LIBX11
   { "xanimate",         1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, // xport.c
   { "xclose",   0, 0, lux_xclose, 0 }, // xport.c
   { "xcopy",    2, 8, lux_xcopy, 0 }, // xport.c
@@ -666,16 +631,13 @@ internalRoutine         subroutine_table[] = {
   { "xwindow",  0, 7, lux_xport, 0 }, // xport.c
   { "xymov",    2, 4, lux_xymov, // plots.c
     "|192|:::breaks:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64boundingbox:128movefirst:256altdash" },
-#endif
   { "zap",      1, MAX_ARG, lux_zap, "+1pointer" }, // strous2.c
   { "zero",     1, MAX_ARG, lux_zero, 0 }, // fun1.c
 #if MOTIF
   { "zeroifnotdefined", 1, MAX_ARG, lux_zeroifnotdefined, 0}, // motifextra.c
 #endif
   { "zeronans",         1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
-#if HAVE_LIBX11
   { "zoom",     1, 3, lux_zoom, "1oldcontrast" }, // zoom.c
-#endif
 };
 int32_t nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
@@ -766,10 +728,8 @@ extern LuxRoutine lux_project, lux_bsmooth, lux_compile,
 
 extern LuxRoutine lux_gifread_f, lux_gifwrite_f;
 
-#if HAVE_LIBX11
 extern LuxRoutine lux_check_menu, lux_check_window, lux_colorpixel,
   lux_event_name, lux_xlabelwidth, lux_xquery_f, lux_xexist;
-#endif
 
 extern LuxRoutine lux_calendar, lux_EasterDate, // lux_orbitalElement,
   lux_astropos, lux_precess, lux_constellation,
@@ -797,9 +757,7 @@ extern LuxRoutine lux_xmarrow, lux_xmboard, lux_xmbutton,
 
 #endif
 
-#if HAVE_LIBJPEG
 extern LuxRoutine lux_read_jpeg6b_f, lux_write_jpeg6b_f;
-#endif
 
 extern int32_t  vargsmooth;
 extern LuxRoutine lux_test;
@@ -890,15 +848,11 @@ internalRoutine function_table[] = {
   { "cfltarr",  1, MAX_ARG, cfltarr, 0 }, // symbols.c
   { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, "%1%offset:1readonly:2swap" }, // filemap.c
   { "cfmap",    1, 1, lux_cfmap, 0 }, // subsc.c
-#if HAVE_LIBX11
   { "checkmenu", 0, 1, lux_check_menu, 0 }, // menu.c
   { "checkwindow", 0, 1, lux_check_window, 0 }, // xport.c
-#endif
   { "chi2",     2, 2, lux_chi_square, "*1complement:2log" }, // fun1.c
   { "classname", 1, 1, lux_classname, 0 }, // install.c
-#if HAVE_LIBX11
   { "colorpixel", 1, 1, lux_colorpixel, "*" }, // xport.c
-#endif
 #if DEVELOP
   { "compile",  1, 1, lux_compile, 0 }, // install.c
 #endif
@@ -944,9 +898,7 @@ internalRoutine function_table[] = {
   { "esegment",         1, 4, lux_extreme_general, /* topology.c */ ":sign:diagonal:threshold" },
   { "esmooth",  1, 3, lux_esmooth, 0 }, // fun2.c
   { "eval",     1, 2, lux_eval, "1allnumber" }, // fun3.c
-#if HAVE_LIBX11
   { "eventname", 0, 1, lux_event_name, 0 }, // menu.c
-#endif
   { "exp",      1, 1, lux_exp, "*" }, // fun1.c
   { "expand",   2, 4, lux_expand, "1smooth:2nearest" }, // fun4.c
   { "expm1",    1, 1, lux_expm1, "*" }, // fun1.c
@@ -1038,10 +990,8 @@ internalRoutine function_table[] = {
   { "isstring",         1, 1, lux_isstring, 0 }, // subsc.c
   { "ist",      1, 3, lux_istring, 0 }, // fun2.c
   { "istring",  1, 3, lux_istring, 0 }, // fun2.c
-#if HAVE_LIBJPEG
   { "jpegread",         2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.c
   { "jpegwrite", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.c
-#endif
   { "ksmooth",  2, 3, lux_ksmooth, "1balanced" }, // fun2.c
   { "laplace2d",        1, 1, lux_laplace2d, 0 }, // poisson.c
   { "legendre", 2, 2, lux_legendre, "1normalize" }, // strous3.c
@@ -1115,9 +1065,7 @@ internalRoutine function_table[] = {
   { "randomu",  3, MAX_DIMS, lux_randomu, "%2%seed:period" }, // random.c
   { "readf",    2, MAX_ARG, lux_readf_f, "1askmore:2word" }, // files.c
   { "readu",    2, MAX_ARG, lux_readu_f, 0 }, // files.c
-#if HAVE_LIBJPEG
   { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.c
-#endif
   { "real",     1, 1, lux_real, 0 }, // fun3.c
   { "redim",    2, 9, lux_redim_f, 0 }, // subsc.c
 #if HAVE_REGEX_H
@@ -1209,9 +1157,7 @@ internalRoutine function_table[] = {
   { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, // trace_decoder_ana.c
   { "trend",    1, 2, lux_trend, "*" }, // fun2.c
   { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, // ephem.c
-#if HAVE_LIBX11
   { "tvread",   1, 5, lux_xtvread, "1greyscale" }, // xport.c
-#endif
   { "typename",         1, 1, lux_typeName, 0 }, // install.c
   { "upcase",   1, 1, lux_upper, 0 }, // fun2.c
   { "upper",    1, 1, lux_upper, 0 }, // fun2.c
@@ -1222,10 +1168,7 @@ internalRoutine function_table[] = {
   { "wmap",     1, 1, lux_wmap, 0 }, // subsc.c
   { "word",     1, 1, lux_word, "*" }, // symbols.c
   { "writeu",   2, MAX_ARG, lux_writeu, 0 }, // files.c
-#if HAVE_LIBJPEG
   { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.c
-#endif
-#if HAVE_LIBX11
   { "xexist",   1, 1, lux_xexist, 0 }, // xport.c
   { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 }, // xport.c
 #if MOTIF
@@ -1285,7 +1228,6 @@ internalRoutine function_table[] = {
   { "xtvread",  1, 5, lux_xtvread, "1greyscale" }, // xport.c
 #if MOTIF
   { "xtwindow",         1, 1, lux_xtwindow, 0 }, // motif.c
-#endif
 #endif
   { "zero",     1, 2, lux_zerof, "*" }, // fun1.c
   { "zeronans",         1, 2, lux_zapnan_f, "*%1%value" }, // fun1.c

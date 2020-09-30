@@ -13229,8 +13229,14 @@ AU) for equinox J2000.0 are returned, referred to the VSOP dynamical
 ecliptic and equinox.  The data for the major planets and the Sun are
 derived from the VSOP87C or (by default) VSOP87A models of Bretagnon
 and Francou (@emph{Astronomy and Astrophysics}, Vol. 202, pp. 309-315,
-1988), optionally truncated as by Meeus (@emph{Astronomical
-Algorithms}, Willmann-Bell Inc., 1991, ISBN 0-943396-35-2).
+1988).
+
+If @code{/keepdims} is specified, then the result has a dimension 3,
+followed by the dimensions of @code{@var{objects}} (or 1 if
+@code{@var{objects}} is a scalar), followed by the dimensions of
+@code{@var{jds}} (or 1 if @code{@var{jds}} is a scalar).  If
+@code{/keepdims} is not specified, then dimensions equal to 1 are
+omitted.
 
 @table @var
 @item jds

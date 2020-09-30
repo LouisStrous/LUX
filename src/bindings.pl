@@ -50,27 +50,38 @@ foreach my $file (@files) {
         exit(1);
       }
       $declare =~ s/\(.*?\)/$data[0]/;
-      print $ofh <<EOD;
-int32_t lux_$data[0]_$data[2](int32_t narg, int32_t ps[]) {
-  $declare;
-  int32_t result = $f(narg, ps, $data[0]);
-  if (result < 0)
-    luxerror("Error in $data[3]", 0);
-  return result;
-}
-
-EOD
-      push @register_bindings, <<EOD;
-  register_lux_$data[2](lux_$data[0]_$data[2], "$data[3]", $data[4], $data[5], $data[6]);
-
-EOD
+      print $ofh "#if $data[7]\n" if $data[7];
+      print $ofh <<~EOD;
+      int32_t lux_$data[0]_$data[2](int32_t narg, int32_t ps[]) {
+        $declare;
+        int32_t result = $f(narg, ps, $data[0]);
+        if (result < 0)
+          luxerror("Error in $data[3]", 0);
+        return result;
+      }
+      EOD
+      print $ofh "#endif\n" if $data[7];
+      print $ofh "\n";
+      {
+        my $text = '';
+        $text .= "#if $data[7]\n" if $data[7];
+        $text .= "  register_lux_$data[2](lux_$data[0]_$data[2], \"$data[3]\", $data[4], $data[5], $data[6]);\n\n";
+        $text .= "#endif\n" if $data[7];
+        push @register_bindings, $text;
+      }
     } elsif (/^REGISTER\((.*?)\)/) {
       @data = split /\s*,\s*/, $1;
-      push @register_bindings, <<EOD;
-  int32_t lux_$data[0](int32_t, int32_t []);
-  register_lux_$data[1](lux_$data[0], "$data[2]", $data[3], $data[4], $data[5]);
-
-EOD
+      {
+        my $text = '';
+        $text .= "#if $data[6]\n" if $data[6];
+        $text .= <<~EOD;
+          int32_t lux_$data[0](int32_t, int32_t []);
+          register_lux_$data[1](lux_$data[0], "$data[2]", $data[3], $data[4], $data[5]);
+        EOD
+        $text .= "#endif\n" if $data[6];
+        $text .= "\n";
+        push @register_bindings, $text;
+      }
     }
   }
   close $ifh;

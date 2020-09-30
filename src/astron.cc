@@ -250,9 +250,11 @@ static char     haveExtraElements;
 extern int32_t getAstronError;
 extern int32_t fullVSOP;
 
-void LBRtoXYZ(double *pos, double *pos2),
-  XYZtoLBR(double *, double *),
-  XYZ_eclipticPrecession(double *pos, double equinox1, double equinox2);
+void LBRtoXYZ(double *pos, double *pos2);
+void XYZtoLBR(double *, double *);
+#if HAVE_LIBGSL
+void XYZ_eclipticPrecession(double *pos, double equinox1, double equinox2);
+#endif
 
 int32_t idiv(int32_t x, int32_t y)
      // returns the largest integer n such that x >= y*n
@@ -3628,9 +3630,13 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
       if ((internalMode & S_BARE) == 0) {
         if (internalMode & S_FK5) {
           if (J2000 != JDE) {
+#if HAVE_LIBGSL
             if (vocal)
               printf("ASTRON: precess ecliptic coordinates from J2000.0 to ecliptic of date (JD %1$.14g = %1$-#24.6J)\n", JDE);
             XYZ_eclipticPrecession(pos, J2000, JDE); // precess to equinox of date
+#else
+            luxerror("Precession is not supported because the application was compiled without libgsl", 0);
+#endif
             if (vocal)
               printXYZtoLBR(pos);
           }
@@ -3640,17 +3646,25 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
             printXYZtoLBR(pos);
           }
           if (JDE != equinox) {
+#if HAVE_LIBGSL
             if (vocal)
               printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
             XYZ_eclipticPrecession(pos, JDE, equinox); // precess to desired equinox
+#else
+            luxerror("Precession is not supported because the application was compiled without libgsl", 0);
+#endif
             if (vocal)
               printXYZtoLBR(pos);
           }
         } else {
           if (J2000 != equinox) {
+#if HAVE_LIBGSL
             if (vocal)
               printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", equinox);
             XYZ_eclipticPrecession(pos, J2000, equinox); // precess to desired equinox
+#else
+            luxerror("Precession is not supported because the application was compiled without libgsl", 0);
+#endif
           }
         }
       }
@@ -3673,9 +3687,13 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
           }
         }
         if (JDE != equinox) {
+#if HAVE_LIBGSL
           if (vocal)
             printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
           XYZ_eclipticPrecession(pos, JDE, equinox); // precess to desired equinox
+#else
+          luxerror("Precession is not supported because the application was compiled without libgsl", 0);
+#endif
         }
       }
       break;
@@ -4239,23 +4257,8 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
     coordSystem = S_ECLIPTICAL;         // default: ecliptical
   vocal = (internalMode & S_VOCAL); // print intermediate results
 
-  iq = *ps;                     // JDs
-  if (!iq)
-    return cerror(ILL_ARG, iq);
-  switch (symbol_class(iq)) {
-    case LUX_SCALAR:
-      iq = lux_double(1, &iq);
-      JD = &scalar_value(iq).d;
-      nJD = 1;
-      break;
-    case LUX_ARRAY:
-      iq = lux_double(1, &iq);
-      JD = (double *) array_data(iq);
-      nJD = array_size(iq);
-      break;
-    default:
-      return cerror(ILL_CLASS, *ps);
-  }
+  std::vector<int> outDims;
+  outDims.push_back(3);         // output values per JD/object
 
   iq = ps[1];                   // objects
   if (!iq) {
@@ -4269,14 +4272,45 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
       iq = lux_long(1, &iq);
       object = &scalar_value(iq).i32;
       nObjects = 1;
+      if (internalMode & S_KEEPDIMS) // always include objects dimensions
+        outDims.push_back(1);
       break;
     case LUX_ARRAY:
       iq = lux_long(1, &iq);
       object = (int32_t *) array_data(iq);
       nObjects = array_size(iq);
+      if ((internalMode & S_KEEPDIMS) // always include objects dimensions
+          || nObjects > 1) {
+        outDims.insert(outDims.end(), array_dims(iq),
+                       array_dims(iq) + array_num_dims(iq));
+      }
       break;
     default:
       return cerror(ILL_CLASS, ps[1]);
+  }
+
+  iq = *ps;                     // JDs
+  if (!iq)
+    return cerror(ILL_ARG, iq);
+  switch (symbol_class(iq)) {
+    case LUX_SCALAR:
+      iq = lux_double(1, &iq);
+      JD = &scalar_value(iq).d;
+      nJD = 1;
+      if (internalMode & S_KEEPDIMS) // always include JD dimensions
+        outDims.push_back(1);
+      break;
+    case LUX_ARRAY:
+      iq = lux_double(1, &iq);
+      JD = (double *) array_data(iq);
+      nJD = array_size(iq);
+      if ((internalMode & S_KEEPDIMS) // always include objects dimensions
+          || nJD > 1)
+        outDims.insert(outDims.end(), array_dims(iq),
+                       array_dims(iq) + array_num_dims(iq));
+      break;
+    default:
+      return cerror(ILL_CLASS, *ps);
   }
 
   if (narg > 2 && ps[2]) {      // object0
@@ -4358,14 +4392,7 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
   } else haveExtraElements = 0;                 // none
 
                                 // create result array
-  dims[0] = 3;
-  nDims = 1;
-  if ((nObjects > 1 || internalMode & S_KEEPDIMS)
-      && (internalMode & S_CONJSPREAD) == 0)
-    dims[nDims++] = nObjects;
-  if (nJD > 1 || internalMode & S_KEEPDIMS)
-    dims[nDims++] = nJD;
-  result = array_scratch(LUX_DOUBLE, nDims, dims);
+  result = array_scratch(LUX_DOUBLE, outDims.size(), &outDims[0]);
   f = f0 = (double *) array_data(result);
 
   tdt = internalMode & S_TDT;   // time is specified in TDT rather than UT

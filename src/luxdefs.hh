@@ -106,6 +106,34 @@ enum Symboltype {
   LUX_NO_SYMBOLTYPE,            //!< sentinel; not for use
 };
 
+template<class T>
+constexpr Symboltype
+lux_symboltype_for_type = LUX_NO_SYMBOLTYPE;
+
+template<>
+constexpr Symboltype
+lux_symboltype_for_type<uint8_t> = LUX_INT8;
+
+template<>
+constexpr Symboltype
+lux_symboltype_for_type<int16_t> = LUX_INT16;
+
+template<>
+constexpr Symboltype
+lux_symboltype_for_type<int32_t> = LUX_INT32;
+
+template<>
+constexpr Symboltype
+lux_symboltype_for_type<int64_t> = LUX_INT64;
+
+template<>
+constexpr Symboltype
+lux_symboltype_for_type<float> = LUX_FLOAT;
+
+template<>
+constexpr Symboltype
+lux_symboltype_for_type<double> = LUX_DOUBLE;
+
 /// LUX EVB classes
 enum EVBclass {
   EVB_BLOCK = 1,              //!< (1) statement block { }

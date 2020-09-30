@@ -22,9 +22,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 // File strous3.c
 // Various LUX routines by L. Strous
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
+#include <cassert>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -58,6 +57,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
    bisector positions are returned in it. */
 // LS 7may98
 {
+#if HAVE_LIBGSL
   int32_t       result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
   double        xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
@@ -408,6 +408,9 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
   }
   cleanup_cubic_spline_tables(&cspl);
   return result;
+#else
+  return cerror(NOSUPPORT, 0, "BISECT", "libgsl");
+#endif
 }
 //---------------------------------------------------------------------
 static int32_t cmp0(const void *a, const void *b)
@@ -447,6 +450,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
    index <index(i)> and run up to but not including index <index(i+1)>. */
 // LS 2009-08-09
 {
+#if HAVE_LIBGSL
   int32_t       result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   Pointer       src, level;
   csplineInfo   cspl;
@@ -651,6 +655,9 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
   free(c);
 
   return result;
+#else
+  return cerror(NOSUPPORT, 0, "CSPLINE_FIND", "libgsl");
+#endif
 }
 //----------------------------------------------------------------
 // MONOTONEINTERPOLATE(x,y,xnew[,/NONE,/CIRCLE,/SQUARE,/WIDE])
@@ -2777,10 +2784,11 @@ struct Span {
 /// That last span includes the elements at positions 7, 0, and 1.
 template<class Iterator,
          class T = typename std::iterator_traits<Iterator>::value_type>
-std::vector<Span>
-findspans(const Iterator first, const Iterator last, bool cycle)
+void
+findspans(const Iterator first, const Iterator last, bool cycle,
+          std::vector<Span>& spans)
 {
-  std::vector<Span> spans;
+  spans.clear();
   if (last != first) {
     int inspan = 0;
     int location;
@@ -2812,7 +2820,6 @@ findspans(const Iterator first, const Iterator last, bool cycle)
       spans.push_back({location, inspan});
     }
   }
-  return spans;
 }
 
 // findspans(<condition>[, /cycle])
@@ -2842,22 +2849,22 @@ int32_t lux_findspans(int32_t narg, int32_t ps[]) {
   bool cycle = (internalMode & 1) != 0;
   switch (symbol_type(ps[0])) {
   case LUX_INT8:
-    spans = findspans(src.ui8, src.ui8 + nelem, cycle);
+    findspans(src.ui8, src.ui8 + nelem, cycle, spans);
     break;
   case LUX_INT16:
-    spans = findspans(src.i16, src.i16 + nelem, cycle);
+    findspans(src.i16, src.i16 + nelem, cycle, spans);
     break;
   case LUX_INT32:
-    spans = findspans(src.i32, src.i32 + nelem, cycle);
+    findspans(src.i32, src.i32 + nelem, cycle, spans);
     break;
   case LUX_INT64:
-    spans = findspans(src.i64, src.i64 + nelem, cycle);
+    findspans(src.i64, src.i64 + nelem, cycle, spans);
     break;
   case LUX_FLOAT:
-    spans = findspans(src.f, src.f + nelem, cycle);
+    findspans(src.f, src.f + nelem, cycle, spans);
     break;
   case LUX_DOUBLE:
-    spans = findspans(src.d, src.d + nelem, cycle);
+    findspans(src.d, src.d + nelem, cycle, spans);
     break;
   default:
     return cerror(ILL_TYPE, ps[0]);
@@ -2880,3 +2887,321 @@ int32_t lux_findspans(int32_t narg, int32_t ps[]) {
   return result;
 }
 REGISTER(findspans, f, findspans, 1, 1, "1cycle");
+
+template<class T>
+int32_t
+convert_vector_to_lux_array(const std::vector<T>& data, int32_t lux_symbol)
+{
+  // convert <data> to a one-dimensional LUX array
+  int32_t size = static_cast<int32_t>(data.size());
+  Symboltype t = lux_symboltype_for_type<T>;
+  auto result = to_scratch_array(lux_symbol, t, 1, &size);
+  if (result < 0)
+    return result;
+  Pointer tgt;
+  tgt.v = array_data(lux_symbol);
+  switch (t) {
+  case LUX_INT8:
+    for (auto it = data.begin(); it != data.end(); ++it)
+      *tgt.ui8++ = *it;
+    break;
+  case LUX_INT16:
+    for (auto it = data.begin(); it != data.end(); ++it)
+      *tgt.i16++ = *it;
+    break;
+  case LUX_INT32:
+    for (auto it = data.begin(); it != data.end(); ++it)
+      *tgt.i32++ = *it;
+    break;
+  case LUX_INT64:
+    for (auto it = data.begin(); it != data.end(); ++it)
+      *tgt.i64++ = *it;
+    break;
+  case LUX_FLOAT:
+    for (auto it = data.begin(); it != data.end(); ++it)
+      *tgt.f++ = *it;
+    break;
+  case LUX_DOUBLE:
+    for (auto it = data.begin(); it != data.end(); ++it)
+      *tgt.d++ = *it;
+    break;
+  default:
+    return cerror(ILL_TYPE, lux_symbol);
+  }
+  return result;
+}
+
+template<typename Integer,
+         std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
+Integer
+nn_mod(Integer a, Integer b)
+{
+  Integer result = a%b;
+  if (result < 0)
+    result += std::abs(b);
+  return result;
+}
+
+template<typename Float,
+  std::enable_if_t<std::is_floating_point<Float>::value, int> = 0>
+Float
+nn_mod(Float a, Float b)
+{
+  Float result = fmod(a, b);
+  if (result < 0)
+    result += std::abs(b);
+  return result;
+}
+
+/// Returns a nonnegative common divisor if not less than a specified
+/// minimum value and (for floating-point data types) within a
+/// roundoff error tolerance.
+///
+/// \param[in] a is one of the two values to process.
+///
+/// \param[in] b is the other of the two values to process.
+///
+/// \param[in] min_value is the lower threshold for the intermediate
+/// value in searching for a common divisor.  It defaults to 0.
+///
+/// \param[in] tolerance specifies the nonnegative tolerance for
+/// accepting a match.  It defaults to
+/// 3*std::numeric_limits<T>::epsilon, which is 0 for integer data
+/// types.
+///
+/// \returns the detected common divisor, or 0 if none could be found
+/// that meets the specified conditions.
+///
+/// The common divisor is sought using a modified version of the
+/// Euclidean algorithm.  The modifications are:
+///
+/// - If it is detected that the common divisor cannot be greater than
+///   or equal to \a min_value, then returns 0.
+///
+/// - If the ratio between the mismatch and the candidate common
+///   divisor is not greater in magnitude than the tolerance, then
+///   that common divisor is returned.
+///
+/// For floating-point data types, the Euclidean algorithm isn't
+/// guaranteed to terminate, so then having a non-zero \a min_value
+/// and a \a tolerance comfortably greater than
+/// std::numeric_limits<T>::epsilon is a good idea.
+template<class T>
+T
+truncated_gcd(T a, T b, T min_value = 0,
+              T tolerance = 3*std::numeric_limits<T>::epsilon)
+{
+  if (a == 0 || b == 0)
+    return 0;
+  if (a < 0)
+    a = -a;
+  if (b < 0)
+    b = -b;
+  if (a < b)
+    std::swap(a, b);
+  // now a >= b > 0
+  T r;
+  while (1) {
+    r = nn_mod(a, b);
+    if (r <= tolerance*b)       // match
+      return b;
+    if (r < min_value)          // no match possible
+      return 0;
+    a = b;
+    b = r;
+  }
+}
+
+template<class T>
+struct Factor_index_less {
+  explicit Factor_index_less(const std::vector<T>& f) : m_f(f) { }
+  bool operator()(int a, int b) const { return m_f[a] < m_f[b]; }
+  const std::vector<T>& m_f;
+};
+
+/// Categorizes values by their lowest common factors.
+///
+/// \param[in] first is an iterator pointing at the first value.
+///
+/// \param[in] last is an iterator pointing at one past the last
+/// value.
+///
+/// \param[in] tolerance is the maximum tolerance for accepting
+/// near-common factors.  This parameter is used only for
+/// floating-point values.
+///
+/// \param[out] category receives the category number for each value.
+/// Its previous contents are lost.
+///
+/// \param[out] factor receives the common factors.  Its previous
+/// contents are lost.
+///
+/// The detection of common factors uses a modification of the
+/// Euclidean algorithm, see truncated_gcd().
+///
+/// If we regard the input values between \a first (inclusive) and \a
+/// last (exclusive) as members of an array `x`, then the lowest
+/// common factor for `x[i]` is `factors[category[i]]`.  For
+/// example, if the integer values are
+///
+///     8 5 6 3
+///
+/// then \a category ends up as
+///
+///     0 1 0 2
+///
+/// and \a dfactors as
+///
+///     2 5 3
+///
+/// so the `factors[category[i]]` are
+///
+///     2 5 2 3
+template<class Iterator,
+         class T = typename std::iterator_traits<Iterator>::value_type>
+void
+find_common_factor_category(const Iterator first, const Iterator last,
+                            T tolerance, std::vector<int32_t>& categories,
+                            std::vector<T>& factors)
+{
+  categories.clear();
+  factors.clear();
+
+  // We compare each value with the factors seen so far.  For the
+  // first value there aren't any such factors yet, so accept it
+  // outright.
+  auto it = first;
+  factors.push_back(*it);
+  categories.push_back(0);   // element 0 is associated with factor[0]
+  ++it;
+
+  // We iterate over the remaining values.  For each one, we compare
+  // it with all factors seen so far, from small to large.  Vector
+  // category relies on the order of elements in vector factor, so we
+  // must not sort vector factor itself.  Instead, we maintain a
+  // vector of indexes into factor that produce the factors from small
+  // to large.
+  std::vector<int> factor_indexes;
+  factor_indexes.push_back(0);
+
+  for ( ; it != last; ++it) {
+    bool found_one = false;
+    for (int i = 0; i < factor_indexes.size(); ++i) {
+      auto fi = factor_indexes[i];
+      auto f = factors[fi];
+
+      // truncated_gcd() stops (returns 0) when common factor cannot
+      // be greater than 3rd argument
+      T g = truncated_gcd(*it, f, factors[factor_indexes[0]], tolerance);
+      if (g == f) { // multiple of existing factor
+        categories.push_back(fi);
+        found_one = true;
+        break;                  // done
+      } else if (g != 0) {
+        // The common factor differs from f so must be less than f.
+        // We try known factors in ascending order, so the detected
+        // common factor must not be in the list yet.  We replace f
+        // with g.
+        factors[fi] = g;
+        // keep factor_index sorted
+        Factor_index_less<T> fil(factors);
+        std::sort(factor_indexes.begin(), factor_indexes.end(), fil);
+        categories.push_back(fi);
+        found_one = true;
+        break;
+      }
+    }
+    if (!found_one) {
+      // none of the current factors match, so the current value is an
+      // entirely new factor
+      auto fi = factors.size();
+      factors.push_back(*it);
+      factor_indexes.push_back(fi);
+      // keep factor_index sorted
+      std::sort(factor_indexes.begin(), factor_indexes.end(),
+                Factor_index_less<T>(factors));
+      categories.push_back(fi);
+    }
+  }
+}
+
+// commonfactors, <x>, <factors>, <categories> [, tolerance=<tol>]
+//
+// Assigns the values of <x> to categories depending on factors that
+// they have in common.  <tol> is the tolerance for detecting the
+// common factors (for floating-point <x>).  The found common factors
+// are returned in <factors> if specified.  The category that each
+// value of <x> belongs to is returned in <categories> if specified.
+// <factors>(<categories)> has the same dimensions as <x> and provides
+// the common factor for each element of <x>.
+int32_t lux_commonfactors(int32_t narg, int32_t ps[]) {
+
+  // the input values
+  int32_t nelem;
+  Pointer src;
+  if (numerical(ps[0], NULL, NULL, &nelem, &src) < 0)
+    return LUX_ERROR;
+
+  double tol;
+  if (narg >= 3 && ps[3]) {     // <tol>
+    tol = double_arg(ps[3]);
+  } else {
+    tol = 0.01;
+  }
+
+  std::vector<int32_t> categories;
+  switch (symbol_type(ps[0])) {
+  case LUX_INT8:
+    {
+      std::vector<uint8_t> factors;
+      find_common_factor_category(src.ui8, src.ui8 + nelem, uint8_t(0),
+                                  categories, factors);
+      convert_vector_to_lux_array(factors, ps[1]);
+    }
+    break;
+  case LUX_INT16:
+    {
+      std::vector<int16_t> factors;
+      find_common_factor_category(src.i16, src.i16 + nelem, int16_t(0),
+                                  categories, factors);
+      convert_vector_to_lux_array(factors, ps[1]);
+    }
+    break;
+  case LUX_INT32:
+    {
+      std::vector<int32_t> factors;
+      find_common_factor_category(src.i32, src.i32 + nelem, int32_t(0),
+                                  categories, factors);
+      convert_vector_to_lux_array(factors, ps[1]);
+    }
+    break;
+  case LUX_INT64:
+    {
+      std::vector<int64_t> factors;
+      find_common_factor_category(src.i64, src.i64 + nelem, int64_t(0),
+                                  categories, factors);
+      convert_vector_to_lux_array(factors, ps[1]);
+    }
+    break;
+  case LUX_FLOAT:
+    {
+      std::vector<float> factors;
+      find_common_factor_category(src.f, src.f + nelem, float(tol),
+                                  categories, factors);
+      convert_vector_to_lux_array(factors, ps[1]);
+    }
+    break;
+  case LUX_DOUBLE:
+    {
+      std::vector<double> factors;
+      find_common_factor_category(src.d, src.d + nelem, tol, categories,
+                                  factors);
+      convert_vector_to_lux_array(factors, ps[1]);
+    }
+    break;
+  default:
+    return cerror(ILL_TYPE, ps[0]);
+  }
+  convert_vector_to_lux_array(categories, ps[2]);
+  return LUX_OK;
+}

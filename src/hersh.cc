@@ -557,6 +557,7 @@ int32_t fontchange(int32_t font)
       "$LUXFONTSDIR",
       "/usr/local/share/lux",
       "/usr/share/lux",
+      ""
     };
     int i;
     fin = NULL;
@@ -565,6 +566,19 @@ int32_t fontchange(int32_t font)
       name2 = expand_name(name1, NULL);
       if (fin = fopen(name2, "r"))
         break;
+    }
+    if (!fin) {
+      extern char* programName;
+      // try "fonts" subdirectory of directory holding the executable
+      char* p = strrchr(programName, '/');
+      if (!p)
+        ++p;
+      else
+        p = programName;
+      strncpy(name1, programName, p - programName);
+      sprintf(name1 + (p - programName), "fonts/font%03d.hex0", font);
+      name2 = expand_name(name1, NULL);
+      fin = fopen(name2, "r");
     }
   }
   if (!fin) {

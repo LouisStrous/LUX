@@ -27,8 +27,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include "readline.h"
+#include "history.h"
 #include "action.hh"
 #include "luxparser.hh"
 #include "editor.hh"
@@ -1103,16 +1103,16 @@ int32_t readNumber(YYSTYPE *lvalp)
       switch(type) {            /* non-zero return value (??) */
                                 /* insert value of proper type */
       case LUX_INT8:
-        scalar_value(*lvalp).b = (uint8_t) v.q;
+        scalar_value(*lvalp).ui8 = (uint8_t) v.i64;
         break;
       case LUX_INT16:
-        scalar_value(*lvalp).w = (int16_t) v.q;
+        scalar_value(*lvalp).i16 = (int16_t) v.i64;
         break;
       case LUX_INT32:
-        scalar_value(*lvalp).l = (int32_t) v.q;
+        scalar_value(*lvalp).i32 = (int32_t) v.i64;
         break;
       case LUX_INT64:
-        scalar_value(*lvalp).q = v.q;
+        scalar_value(*lvalp).i64 = v.i64;
         break;
       case LUX_FLOAT:
         scalar_value(*lvalp).f = (float) v.d;
@@ -1573,7 +1573,9 @@ void gehandler(const char *reason, const char *file, int32_t line, int32_t gsl_e
   luxerror("GSL error %d (%s line %d): %s", 0, gsl_errno, file, line, reason);
 }
 /*--------------------------------------------------------------*/
-#include <gsl/gsl_errno.h>      // for gsl_set_error_handler
+#if HAVE_LIBGSL
+# include <gsl/gsl_errno.h>      // for gsl_set_error_handler
+#endif
 char    *programName;
 int do_main(int argc, char *argv[])
      /* main program */
@@ -1601,9 +1603,11 @@ int do_main(int argc, char *argv[])
   *line = '\0';                 /* start with an empty line */
   p = line;
 
+#if HAVE_LIBGSL
   void gehandler(const char *, const char *, int32_t, int32_t);
 
   gsl_set_error_handler(&gehandler);
+#endif
   /* seek .luxinit in home directory */
   fp = fopen(expand_name("~/.luxinit", NULL), "r");
   if (fp) {

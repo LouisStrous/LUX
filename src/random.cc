@@ -19,38 +19,44 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File random.c
 // Various functions related to pseudo-random numbers
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include <math.h> // for cos(2) sqrt(2) log(2) sin(1) isnan(1)
-#include <string.h> // for memcpy(5)
-#include "action.hh"
-#include "install.hh"
+# include "config.h"
+# include <math.h> // for cos(2) sqrt(2) log(2) sin(1) isnan(1)
+# include <string.h> // for memcpy(5)
+# include "action.hh"
+# include "install.hh"
 
-#include <gsl/gsl_rng.h>
-
-static uint32_t        currentBitSeed = 123459876;
+#if HAVE_LIBGSL
+# include <gsl/gsl_rng.h>
 
 static gsl_rng *rng;
+#endif
+
+static uint32_t        currentBitSeed = 123459876;
 
 //-------------------------------------------------------------------------
 void random_init(int32_t seed)
 {
+#if HAVE_LIBGSL
   uint64_t s;
 
   s = (uint64_t) seed;
   if (!rng)
     rng = gsl_rng_alloc(gsl_rng_mt19937);
   gsl_rng_set(rng, s);
+#endif
 }
 //-------------------------------------------------------------------------
 double random_one(void)
 // Returns a single uniformly distributed pseudo-random number
 // between 0 and 1 (exclusive).
 {
+#if HAVE_LIBGSL
   if (!rng)
     rng = gsl_rng_alloc(gsl_rng_mt19937);
   return gsl_rng_uniform(rng);
+#else
+  return 0;
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t locate_value(double value, double *values, int32_t nElem)
@@ -80,10 +86,14 @@ int32_t random_distributed(int32_t modulus, double *distr)
 // <modulus> elements, with distr[0] == 0 and distr[modulus - 1] <= 1,
 // and no element smaller than the previous one.  LS 25aug2000
 {
+#if HAVE_LIBGSL
   double r;
 
   r = random_one();
   return locate_value(r, distr, modulus);
+#else
+  return 0;
+#endif
 }
 //-------------------------------------------------------------------------
 uint8_t random_bit(void)
@@ -132,6 +142,7 @@ void randomu(int32_t seed, void *output, int32_t number, int32_t modulo)
 // <output> is considered (int32_t *) and the generated random sequence
 // runs between 0 and <modulo> - 1 (inclusive)
 {
+#if HAVE_LIBGSL
  int32_t        j;
  double        *fp;
  int32_t        *ip;
@@ -150,6 +161,7 @@ void randomu(int32_t seed, void *output, int32_t number, int32_t modulo)
    for (j = 0; j < number; j++)
      *fp++ = random_one();
  }
+#endif
 }
 //-------------------------------------------------------------------------
 void randome(void *output, int32_t number, double limit)
@@ -159,6 +171,7 @@ void randome(void *output, int32_t number, double limit)
    numbers are returned.  If <limit> is greater than 0, then only
    numbers whose magnitude is at least <limit> are returned */
 {
+#if HAVE_LIBGSL
  int32_t        j;
  double        *fp, value;
 
@@ -196,6 +209,7 @@ void randome(void *output, int32_t number, double limit)
      value = - value;
    *fp++ = value;
  }
+#endif
 }
 //----------------------------------------------------------------------
 void random_unique(int32_t seed, int32_t *output, int32_t number, int32_t modulo)
@@ -210,6 +224,7 @@ void random_unique(int32_t seed, int32_t *output, int32_t number, int32_t modulo
 // <number> is more than <modulo>.
 // LS 24nov95
 {
+#if HAVE_LIBGSL
   int32_t        m, t;
 
   if (number > modulo) {        // both are assumed positive
@@ -229,6 +244,7 @@ void random_unique(int32_t seed, int32_t *output, int32_t number, int32_t modulo
     }
     t++;
   }
+#endif
 }
 //----------------------------------------------------------------------
 void random_unique_shuffle(int32_t seed, int32_t *output, int32_t number, int32_t modulo)
@@ -243,6 +259,7 @@ void random_unique_shuffle(int32_t seed, int32_t *output, int32_t number, int32_
 // <number> is less than <modulo>.  The random numbers are shuffled.
 // LS 5oct97
 {
+#if HAVE_LIBGSL
   int32_t        i, j, temp;
 
   random_unique(seed, output, number, modulo);
@@ -255,6 +272,7 @@ void random_unique_shuffle(int32_t seed, int32_t *output, int32_t number, int32_
     output[i] = output[j];
     output[j] = temp;
   }
+#endif
 }
 //----------------------------------------------------------------------
 void randomn(int32_t seed, double *output, int32_t number, char hasUniform)
@@ -266,6 +284,7 @@ void randomn(int32_t seed, double *output, int32_t number, char hasUniform)
 // pseudo-random numbers are already present in <output>,
 // otherwise they are generated in this routine.  LS 25oct95
 {
+#if HAVE_LIBGSL
   int32_t        n, i;
   double        r, a, extra[2];
 
@@ -285,11 +304,13 @@ void randomn(int32_t seed, double *output, int32_t number, char hasUniform)
     a = extra[1]*2*M_PI;
     *output++ = r*cos(a);
   }
+#endif
 }
 //----------------------------------------------------------------------
 int32_t lux_randomu(int32_t narg, int32_t ps[])
  //create an array of random elements in the [0,1.0] range (exclusive)
 {
+#if HAVE_LIBGSL
  double *p;
  int32_t        k, seed, cycle;
  int32_t        dims[8], *pd, j, result_sym, n;
@@ -331,6 +352,9 @@ int32_t lux_randomu(int32_t narg, int32_t ps[])
  n = array_size(result_sym);
  randomu(seed, p, n, cycle);
  return result_sym;
+#else
+ return cerror(NOSUPPORT, 0, "RANDOMU", "libgsl");
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t lux_randomd(int32_t narg, int32_t ps[])
@@ -341,6 +365,7 @@ int32_t lux_randomd(int32_t narg, int32_t ps[])
 // increasing, <distr(0)> must be greater than or equal to 0, and
 // <distr(*-1)> must be equal to one.  LS 25aug2000
 {
+#if HAVE_LIBGSL
   int32_t        result, dims[MAX_DIMS], *pd, n, j, modulus, seed;
   double        *distr;
 
@@ -379,6 +404,9 @@ int32_t lux_randomd(int32_t narg, int32_t ps[])
   while (n--)
     *pd++ = random_distributed(modulus, distr);
   return result;
+#else
+ return cerror(NOSUPPORT, 0, "RANDOMD", "libgsl");
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t lux_randomn(int32_t narg, int32_t ps[])
@@ -392,6 +420,7 @@ int32_t lux_randomn(int32_t narg, int32_t ps[])
 
  */
 {
+#if HAVE_LIBGSL
   int32_t        result_sym;
 
   // first get a uniform distribution
@@ -402,12 +431,16 @@ int32_t lux_randomn(int32_t narg, int32_t ps[])
   // then apply Box-Muller transformation
   randomn(0, (double *) array_data(result_sym), array_size(result_sym), 1);
   return result_sym;
+#else
+ return cerror(NOSUPPORT, 0, "RANDOMN", "libgsl");
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t lux_randome(int32_t narg, int32_t ps[])
  /* create an exponential distribution of pseudo-random #'s, centered
     at 0 with a given scale length */
 {
+#if HAVE_LIBGSL
   double *p, scale, limit;
   int32_t        k;
   int32_t        dims[8], *pd, j, result_sym, n;
@@ -439,6 +472,9 @@ int32_t lux_randome(int32_t narg, int32_t ps[])
     ++p;
   }
   return result_sym;
+#else
+ return cerror(NOSUPPORT, 0, "RANDOME", "libgsl");
+#endif
 }
 REGISTER(randome, f, randome, 3, MAX_DIMS, "%1%limit:scale");
 //-------------------------------------------------------------------------
@@ -601,8 +637,13 @@ int32_t lux_random(int32_t narg, int32_t ps[])
   if (internalMode == 5)         // /BITS
     currentBitSeed = (uint32_t) seed;
   else {                        // other distributions
-    if (seed) // need to (re)initialize
+    if (seed) { // need to (re)initialize
+#if HAVE_LIBGSL
       random_init(seed);
+#else
+      return cerror(NOSUPPORT, 0, "RANDOM SEED", "libgsl");
+#endif
+    }
   }
   ndim = 0;
   if (narg > 2)                        // dimensions were specified
@@ -633,6 +674,7 @@ int32_t lux_random(int32_t narg, int32_t ps[])
 
   switch (internalMode) {
     case 1:                        // /UNIFORM
+#if HAVE_LIBGSL
       if (narg > 1 && ps[1]) {        // PERIOD specified, so get LONGs
         if (!symbolIsScalar(ps[1]))
           return cerror(NEED_SCAL, ps[1]);
@@ -646,16 +688,24 @@ int32_t lux_random(int32_t narg, int32_t ps[])
         result = array_scratch(LUX_DOUBLE, ndim, dims);
         randomu(seed, (double *) array_data(result), array_size(result), 0);
       }
+#else
+      return cerror(NOSUPPORT, 0, "RANDOM /UNIFORM", "libgsl");
+#endif
       break;
     case 2:                        // /NORMAL
+#if HAVE_LIBGSL
       if (narg > 1 && ps[1])        // PERIOD specified - illegal
         return luxerror("RANDOM - no PERIOD allowed with /NORMAL", ps[1]);
       result = array_scratch(LUX_DOUBLE, ndim, dims);
       if (result == LUX_ERROR)
         return LUX_ERROR;
       randomn(seed, (double *) array_data(result), array_size(result), 0);
+#else
+      return cerror(NOSUPPORT, 0, "RANDOM /NORMAL", "libgsl");
+#endif
       break;
     case 3: case 4:                        // /SAMPLE, /SHUFFLE
+#if HAVE_LIBGSL
       if (narg < 1 || !ps[1])        // PERIOD absent, but is required
         return luxerror("RANDOM - need PERIOD with /SAMPLE", 0);
       period = int_arg(ps[1]);        // PERIOD
@@ -668,6 +718,9 @@ int32_t lux_random(int32_t narg, int32_t ps[])
       else
         random_unique_shuffle(seed, (int32_t *) array_data(result),
                               array_size(result), period);
+#else
+      return cerror(NOSUPPORT, 0, "RANDOM /SAMPLE, /SHUFFLE", "libgsl");
+#endif
       break;
     case 5:                        // /BITS
       if (narg > 1 && ps[1])        // PERIOD specified - illegal

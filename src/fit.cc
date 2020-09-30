@@ -728,6 +728,7 @@ double fit2_func(const gsl_vector *a, void *p)
 */
 int32_t lux_generalfit2(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBGSL
   int32_t nPar, nPoints, result, ithresh = 0, nithresh;
   gsl_multimin_fminimizer *minimizer = NULL;
   lux_func_if *afif = NULL;
@@ -932,6 +933,9 @@ int32_t lux_generalfit2(int32_t narg, int32_t ps[])
   if (symbol_context(d_step_sym) == 1)
     symbol_context(d_step_sym) = -compileLevel; // so it is deleted when appropriate
   return result;
+#else
+  return cerror(NOSUPPORT, 0, "FIT3", "libgsl");
+#endif
 }
 REGISTER(generalfit2, f, fit3, 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 //------------------------------------------------------------ This

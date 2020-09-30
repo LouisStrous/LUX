@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([lux], [1.2.0], [lux@quae.nl])
+AC_INIT([lux], [1.3.0], [lux@quae.nl])
 AM_EXTRA_RECURSIVE_TARGETS([debug])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/lux.cc])
@@ -25,6 +25,11 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
 AC_PROG_YACC
+if test "x$ac_cv_prog_YACC" = "xbison -y"; then
+   ac_cv_prog_YACC=bison
+else
+   AC_MSG_ERROR([need bison])
+fi
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 
 # Checks for libraries.  The order is important!

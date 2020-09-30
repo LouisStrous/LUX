@@ -20,9 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File fun4.c
 // Various LUX functions.
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -3649,6 +3647,7 @@ int32_t lux_bigger235(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
+#if HAVE_LIBGSL
 int32_t single_fft(Pointer data, int32_t n, int32_t type, int32_t back)
 // type = LUX_FLOAT or LUX_DOUBLE
 {
@@ -3671,10 +3670,12 @@ int32_t single_fft(Pointer data, int32_t n, int32_t type, int32_t back)
   }
   return 0;
 }
+#endif
 //-------------------------------------------------------------------------
 int32_t lux_cartesian_to_polar(int32_t narg, int32_t ps[])
 // y = CTOP(x [, x0, y0])
 {
+#if HAVE_LIBGSL
   int32_t       nx, ny, result, dims[2], r, rmax, n, az, step, i;
   Symboltype type;
   float         x0, y0, x, y, daz;
@@ -3742,11 +3743,15 @@ int32_t lux_cartesian_to_polar(int32_t narg, int32_t ps[])
     trgt.ui8 += dims[0]*step;
   }
   return result;
+#else
+  return cerror(NOSUPPORT, 0, "CTOP", "libgsl");
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t lux_polar_to_cartesian(int32_t narg, int32_t ps[])
 // y = PTOC(x [, nx, ny, x0, y0])
 {
+#if HAVE_LIBGSL
   int32_t       nx, ny, result, dims[2], step, ix, iy;
   Symboltype type;
   float         x0, y0, daz, dx, dy, az, r;
@@ -3790,5 +3795,8 @@ int32_t lux_polar_to_cartesian(int32_t narg, int32_t ps[])
     }
   }
   return result;
+#else
+  return cerror(NOSUPPORT, 0, "PTOC", "libgsl");
+#endif
 }
 //-------------------------------------------------------------------------

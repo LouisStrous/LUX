@@ -9,11 +9,83 @@
 
 int32_t luxerror(char const*, int32_t, ...);
 
-int32_t lux_kepler_v_f(int32_t narg, int32_t ps[]) {
-  double kepler_v(double, double);
-  int32_t result = lux_d_dd_iaibrq_01_2_f_(narg, ps, kepler_v);
+int32_t lux_esmooth_asymmetric_f(int32_t narg, int32_t ps[]) {
+  void esmooth_asymmetric(double *, size_t, size_t, double, double *, size_t, size_t);
+  int32_t result = lux_v_sddsd_iairq_012_f_(narg, ps, esmooth_asymmetric);
   if (result < 0)
-    luxerror("Error in kepler", 0);
+    luxerror("Error in esmooth1", 0);
+  return result;
+}
+
+int32_t lux_esmooth_symmetric_f(int32_t narg, int32_t ps[]) {
+  void esmooth_symmetric(double *, size_t, size_t, double, double *, size_t, size_t);
+  int32_t result = lux_v_sddsd_iairq_012_f_(narg, ps, esmooth_symmetric);
+  if (result < 0)
+    luxerror("Error in esmooth2", 0);
+  return result;
+}
+
+int32_t lux_runord_d_f(int32_t narg, int32_t ps[]) {
+  int32_t runord_d(double *, int32_t, int32_t, int32_t, double *);
+  int32_t result = lux_i_dpiT3dp_iaiirq_00T3_f_(narg, ps, runord_d);
+  if (result < 0)
+    luxerror("Error in runord", 0);
+  return result;
+}
+
+int32_t lux_runmax_d_f(int32_t narg, int32_t ps[]) {
+  int32_t runmax_d(double *, int32_t, int32_t, double *);
+  int32_t result = lux_i_dpiidp_iairq_00T2_f_(narg, ps, runmax_d);
+  if (result < 0)
+    luxerror("Error in RUNMAX", 0);
+  return result;
+}
+
+int32_t lux_runmin_d_f(int32_t narg, int32_t ps[]) {
+  int32_t runmin_d(double *, int32_t, int32_t, double *);
+  int32_t result = lux_i_dpiidp_iairq_00T2_f_(narg, ps, runmin_d);
+  if (result < 0)
+    luxerror("Error in RUNMIN", 0);
+  return result;
+}
+
+int32_t lux_unmod_slice_d_f(int32_t narg, int32_t ps[]) {
+  int32_t unmod_slice_d(double *, size_t, size_t, double, double, double *, size_t, size_t);
+  int32_t result = lux_i_sdddsd_iaiiirq_000T333_f_(narg, ps, unmod_slice_d);
+  if (result < 0)
+    luxerror("Error in unmod", 0);
+  return result;
+}
+
+int32_t lux_hypot_stride_f(int32_t narg, int32_t ps[]) {
+  double hypot_stride(double *, size_t count, size_t stride);
+  int32_t result = lux_d_sd_iaiarxq_000_2_f_(narg, ps, hypot_stride);
+  if (result < 0)
+    luxerror("Error in hypot", 0);
+  return result;
+}
+
+int32_t lux_prutenic_longitude_sol_f(int32_t narg, int32_t ps[]) {
+  double prutenic_longitude_sol(double);
+  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_longitude_sol);
+  if (result < 0)
+    luxerror("Error in pruteniclongsol", 0);
+  return result;
+}
+
+int32_t lux_prutenic_longitude_luna_f(int32_t narg, int32_t ps[]) {
+  double prutenic_longitude_luna(double);
+  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_longitude_luna);
+  if (result < 0)
+    luxerror("Error in pruteniclongluna", 0);
+  return result;
+}
+
+int32_t lux_prutenic_nearest_new_moon_f(int32_t narg, int32_t ps[]) {
+  double prutenic_nearest_new_moon(double);
+  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_nearest_new_moon);
+  if (result < 0)
+    luxerror("Error in prutenicnewmoon", 0);
   return result;
 }
 
@@ -1249,46 +1321,6 @@ int32_t lux_sincos_s(int32_t narg, int32_t ps[]) {
   return result;
 }
 
-int32_t lux_esmooth_asymmetric_f(int32_t narg, int32_t ps[]) {
-  void esmooth_asymmetric(double *, size_t, size_t, double, double *, size_t, size_t);
-  int32_t result = lux_v_sddsd_iairq_012_f_(narg, ps, esmooth_asymmetric);
-  if (result < 0)
-    luxerror("Error in esmooth1", 0);
-  return result;
-}
-
-int32_t lux_esmooth_symmetric_f(int32_t narg, int32_t ps[]) {
-  void esmooth_symmetric(double *, size_t, size_t, double, double *, size_t, size_t);
-  int32_t result = lux_v_sddsd_iairq_012_f_(narg, ps, esmooth_symmetric);
-  if (result < 0)
-    luxerror("Error in esmooth2", 0);
-  return result;
-}
-
-int32_t lux_prutenic_longitude_sol_f(int32_t narg, int32_t ps[]) {
-  double prutenic_longitude_sol(double);
-  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_longitude_sol);
-  if (result < 0)
-    luxerror("Error in pruteniclongsol", 0);
-  return result;
-}
-
-int32_t lux_prutenic_longitude_luna_f(int32_t narg, int32_t ps[]) {
-  double prutenic_longitude_luna(double);
-  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_longitude_luna);
-  if (result < 0)
-    luxerror("Error in pruteniclongluna", 0);
-  return result;
-}
-
-int32_t lux_prutenic_nearest_new_moon_f(int32_t narg, int32_t ps[]) {
-  double prutenic_nearest_new_moon(double);
-  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_nearest_new_moon);
-  if (result < 0)
-    luxerror("Error in prutenicnewmoon", 0);
-  return result;
-}
-
 int32_t lux_gsl_fft_f(int32_t narg, int32_t ps[]) {
   int32_t gsl_fft(double *, size_t, size_t);
   int32_t result = lux_i_sd_iaiarq_000_f_(narg, ps, gsl_fft);
@@ -1337,43 +1369,11 @@ int32_t lux_hilbert_s(int32_t narg, int32_t ps[]) {
   return result;
 }
 
-int32_t lux_runord_d_f(int32_t narg, int32_t ps[]) {
-  int32_t runord_d(double *, int32_t, int32_t, int32_t, double *);
-  int32_t result = lux_i_dpiT3dp_iaiirq_00T3_f_(narg, ps, runord_d);
+int32_t lux_kepler_v_f(int32_t narg, int32_t ps[]) {
+  double kepler_v(double, double);
+  int32_t result = lux_d_dd_iaibrq_01_2_f_(narg, ps, kepler_v);
   if (result < 0)
-    luxerror("Error in runord", 0);
-  return result;
-}
-
-int32_t lux_runmax_d_f(int32_t narg, int32_t ps[]) {
-  int32_t runmax_d(double *, int32_t, int32_t, double *);
-  int32_t result = lux_i_dpiidp_iairq_00T2_f_(narg, ps, runmax_d);
-  if (result < 0)
-    luxerror("Error in RUNMAX", 0);
-  return result;
-}
-
-int32_t lux_runmin_d_f(int32_t narg, int32_t ps[]) {
-  int32_t runmin_d(double *, int32_t, int32_t, double *);
-  int32_t result = lux_i_dpiidp_iairq_00T2_f_(narg, ps, runmin_d);
-  if (result < 0)
-    luxerror("Error in RUNMIN", 0);
-  return result;
-}
-
-int32_t lux_unmod_slice_d_f(int32_t narg, int32_t ps[]) {
-  int32_t unmod_slice_d(double *, size_t, size_t, double, double, double *, size_t, size_t);
-  int32_t result = lux_i_sdddsd_iaiiirq_000T333_f_(narg, ps, unmod_slice_d);
-  if (result < 0)
-    luxerror("Error in unmod", 0);
-  return result;
-}
-
-int32_t lux_hypot_stride_f(int32_t narg, int32_t ps[]) {
-  double hypot_stride(double *, size_t count, size_t stride);
-  int32_t result = lux_d_sd_iaiarxq_000_2_f_(narg, ps, hypot_stride);
-  if (result < 0)
-    luxerror("Error in hypot", 0);
+    luxerror("Error in kepler", 0);
   return result;
 }
 
@@ -1391,13 +1391,64 @@ void register_the_bindings()
   int32_t lux_diagonal_matrix(int32_t, int32_t []);
   register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 1, NULL);
 
-  register_lux_f(lux_kepler_v_f, "kepler", 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount");
+  register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
 
-  int32_t lux_setnan(int32_t, int32_t []);
-  register_lux_f(lux_setnan, "setnan", 2, 2, NULL);
+  register_lux_f(lux_esmooth_symmetric_f, "esmooth2", 1, 2, NULL);
 
-  int32_t lux_indgen_s(int32_t, int32_t []);
-  register_lux_s(lux_indgen_s, "indgen", 1, 2, "*");
+  int32_t lux_randome(int32_t, int32_t []);
+  register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
+
+  int32_t lux_monotone_interpolation(int32_t, int32_t []);
+  register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");
+
+  register_lux_f(lux_runord_d_f, "runord", 3, 3, NULL);
+
+  register_lux_f(lux_runmax_d_f, "RUNMAX", 2, 2, NULL);
+
+  register_lux_f(lux_runmin_d_f, "RUNMIN", 2, 2, NULL);
+
+  register_lux_f(lux_unmod_slice_d_f, "unmod", 2, 4, ":axis:period:average");
+
+  register_lux_f(lux_hypot_stride_f, "hypot", 1, 2, ":axis");
+
+  int32_t lux_ssfc_to_polar(int32_t, int32_t []);
+  register_lux_f(lux_ssfc_to_polar, "ssfctopolar", 1, 2, 0);
+
+  int32_t lux_polar_to_ssfc(int32_t, int32_t []);
+  register_lux_f(lux_polar_to_ssfc, "polartossfc", 1, 2, 0);
+
+  int32_t lux_findspans(int32_t, int32_t []);
+  register_lux_f(lux_findspans, "findspans", 1, 1, "1cycle");
+
+  int32_t lux_gcommand(int32_t, int32_t []);
+  register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
+
+  int32_t lux_gterm(int32_t, int32_t []);
+  register_lux_s(lux_gterm, "gterm", 1, 1, "");
+
+  int32_t lux_gplot(int32_t, int32_t []);
+  register_lux_s(lux_gplot, "gplot", 1, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+
+  int32_t lux_goplot(int32_t, int32_t []);
+  register_lux_s(lux_goplot, "goplot", 1, 8, ":::linetype:pointtype:dashtype:color:legend");
+
+  int32_t lux_gaplot(int32_t, int32_t []);
+  register_lux_s(lux_gaplot, "gaplot", 0, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+
+  int32_t lux_gnutv(int32_t, int32_t []);
+  register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);
+
+  int32_t lux_gnuplot3d(int32_t, int32_t []);
+  register_lux_s(lux_gnuplot3d, "gplot3d", 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+
+  int32_t lux_gnucontour(int32_t, int32_t []);
+  register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
+
+  register_lux_f(lux_prutenic_longitude_sol_f, "pruteniclongsol", 1, 1, 0);
+
+  register_lux_f(lux_prutenic_longitude_luna_f, "pruteniclongluna", 1, 1, 0);
+
+  register_lux_f(lux_prutenic_nearest_new_moon_f, "prutenicnewmoon", 1, 1, 0);
 
   register_lux_f(lux_iauBi00_f, "bi00", 0, 0, 0);
 
@@ -1717,47 +1768,16 @@ void register_the_bindings()
 
   register_lux_s(lux_iauXys06a_s, "xys06a", 4, 4, 0);
 
+  register_lux_s(lux_sincos_s, "sincos", 3, 3, NULL);
+
   int32_t lux_generalfit2(int32_t, int32_t []);
   register_lux_f(lux_generalfit2, "fit3", 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 
-  register_lux_s(lux_sincos_s, "sincos", 3, 3, NULL);
+  int32_t lux_setnan(int32_t, int32_t []);
+  register_lux_f(lux_setnan, "setnan", 2, 2, NULL);
 
-  register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
-
-  register_lux_f(lux_esmooth_symmetric_f, "esmooth2", 1, 2, NULL);
-
-  int32_t lux_gcommand(int32_t, int32_t []);
-  register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
-
-  int32_t lux_gterm(int32_t, int32_t []);
-  register_lux_s(lux_gterm, "gterm", 1, 1, "");
-
-  int32_t lux_gplot(int32_t, int32_t []);
-  register_lux_s(lux_gplot, "gplot", 1, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
-
-  int32_t lux_goplot(int32_t, int32_t []);
-  register_lux_s(lux_goplot, "goplot", 1, 8, ":::linetype:pointtype:dashtype:color:legend");
-
-  int32_t lux_gaplot(int32_t, int32_t []);
-  register_lux_s(lux_gaplot, "gaplot", 0, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
-
-  int32_t lux_gnutv(int32_t, int32_t []);
-  register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);
-
-  int32_t lux_gnuplot3d(int32_t, int32_t []);
-  register_lux_s(lux_gnuplot3d, "gplot3d", 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
-
-  int32_t lux_gnucontour(int32_t, int32_t []);
-  register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
-
-  register_lux_f(lux_prutenic_longitude_sol_f, "pruteniclongsol", 1, 1, 0);
-
-  register_lux_f(lux_prutenic_longitude_luna_f, "pruteniclongluna", 1, 1, 0);
-
-  register_lux_f(lux_prutenic_nearest_new_moon_f, "prutenicnewmoon", 1, 1, 0);
-
-  int32_t lux_randome(int32_t, int32_t []);
-  register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
+  int32_t lux_indgen_s(int32_t, int32_t []);
+  register_lux_s(lux_indgen_s, "indgen", 1, 2, "*");
 
   register_lux_f(lux_gsl_fft_f, "fft", 1, 2, "1allaxes:2amplitudes");
 
@@ -1774,26 +1794,6 @@ void register_the_bindings()
   int32_t lux_fft_expand(int32_t, int32_t []);
   register_lux_f(lux_fft_expand, "fftexpand", 2, 2, NULL);
 
-  int32_t lux_monotone_interpolation(int32_t, int32_t []);
-  register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");
-
-  register_lux_f(lux_runord_d_f, "runord", 3, 3, NULL);
-
-  register_lux_f(lux_runmax_d_f, "RUNMAX", 2, 2, NULL);
-
-  register_lux_f(lux_runmin_d_f, "RUNMIN", 2, 2, NULL);
-
-  register_lux_f(lux_unmod_slice_d_f, "unmod", 2, 4, ":axis:period:average");
-
-  register_lux_f(lux_hypot_stride_f, "hypot", 1, 2, ":axis");
-
-  int32_t lux_ssfc_to_polar(int32_t, int32_t []);
-  register_lux_f(lux_ssfc_to_polar, "ssfctopolar", 1, 2, 0);
-
-  int32_t lux_polar_to_ssfc(int32_t, int32_t []);
-  register_lux_f(lux_polar_to_ssfc, "polartossfc", 1, 2, 0);
-
-  int32_t lux_findspans(int32_t, int32_t []);
-  register_lux_f(lux_findspans, "findspans", 1, 1, "1cycle");
+  register_lux_f(lux_kepler_v_f, "kepler", 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount");
 
 }

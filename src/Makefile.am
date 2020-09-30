@@ -89,6 +89,8 @@ nonbind_sources = \
 	gnuplot_interface.cc\
 	hersh.cc\
 	hershey.hh\
+	history.c\
+	history.h\
 	ident.cc\
 	idl.cc\
 	install.cc\
@@ -124,6 +126,8 @@ nonbind_sources = \
 	printf_extensions.cc\
 	projection.cc\
 	random.cc\
+	readline.c\
+	readline.h\
 	regex.cc\
 	replacements.h\
 	sincos.cc\

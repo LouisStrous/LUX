@@ -21,13 +21,16 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // LUX support of the Independent JPEG Group's JPEG
 // compression/decompression software, version 6b.
 
-#include <stdio.h>                // for FILE, fopen(), fclose(), printf()
-#include <setjmp.h>                // for setjmp(), longjmp()
-#include <ctype.h>                // for isprint()
-#include <jpeglib.h>                // for IJG JPEG v6b stuff
-#include <string.h>                // for memcpy()
-#include "action.hh"                // for LUX-specific stuff
+#include <stdio.h>              // for FILE, fopen(), fclose(), printf()
+#include <ctype.h>              // for isprint()
+#if HAVE_LIBJPEG
+# include <setjmp.h>             // for setjmp(), longjmp()
+# include <jpeglib.h>           // for IJG JPEG v6b stuff
+#endif
+#include <string.h>             // for memcpy()
+#include "action.hh"            // for LUX-specific stuff
 
+#if HAVE_LIBJPEG
 // a structure for our own error handler
 struct my_error_mgr {
   struct jpeg_error_mgr        pub;
@@ -48,10 +51,12 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
   // return control to the setjmp point
   longjmp(myerr->setjmp_buffer, 1);
 }
+#endif
 //--------------------------------------------------------------------------
 int32_t read_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
 // JREAD,<x>,<file>[,<header>,SHRINK=<shrink>][,/GREYSCALE]
 {
+#if HAVE_LIBJPEG
   char        *filename, *p;
   struct jpeg_decompress_struct        cinfo;
   struct my_error_mgr                jerr;
@@ -171,21 +176,33 @@ int32_t read_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
   jpeg_destroy_decompress(&cinfo);
 
   return LUX_OK;
+#else
+  return 0;
+#endif
 }
 //--------------------------------------------------------------------------
 int32_t lux_read_jpeg6b(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBJPEG
   return read_jpeg6b(narg, ps, 0);
+#else
+  return cerror(NOSUPPORT, 0, "JPEGREAD", "libjpeg");
+#endif
 }
 //--------------------------------------------------------------------------
 int32_t lux_read_jpeg6b_f(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBJPEG
   return (read_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
+#else
+  return cerror(NOSUPPORT, 0, "JPEGREAD", "libjpeg");
+#endif
 }
 //--------------------------------------------------------------------------
 int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
 // JWRITE,<x>,<file>[,<header>,<quality>]
 {
+#if HAVE_LIBJPEG
   int32_t        nx, ny, nd, quality, stride;
   struct jpeg_compress_struct        cinfo;
   struct my_error_mgr                jerr;
@@ -281,15 +298,26 @@ int32_t write_jpeg6b(int32_t narg, int32_t ps[], int32_t isFunc)
   fclose(outfile);
 
   return LUX_OK;
+#else
+  return 0;
+#endif
 }
 //--------------------------------------------------------------------------
 int32_t lux_write_jpeg6b(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBJPEG
   return write_jpeg6b(narg, ps, 0);
+#else
+  return cerror(NOSUPPORT, 0, "JPEGWRITE", "libjpeg");
+#endif
 }
 //--------------------------------------------------------------------------
 int32_t lux_write_jpeg6b_f(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBJPEG
   return (write_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
+#else
+  return cerror(NOSUPPORT, 0, "JPEGWRITE", "libjpeg");
+#endif
 }
 //--------------------------------------------------------------------------

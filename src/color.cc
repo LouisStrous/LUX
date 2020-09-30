@@ -13,27 +13,34 @@ LUX is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 for more details.
-
+ſ
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // This file contains routines dealing with X11 color maps and visuals.
 // Started 12 March 1999 by Louis Strous
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-#include <stdlib.h>
-#include <limits.h>
-#include <string.h>                // for memcpy
-#include <math.h>
-#include "action.hh"
-extern "C" {
-#include "visualclass.h"
-}
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>                // for XVisualInfo
+# include <stdlib.h>
+# include <limits.h>
+# include <string.h>                // for memcpy
+# include <math.h>
+# include "action.hh"
+# include "visualclass.h"
+#if HAVE_LIBX11
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>                // for XVisualInfo
 
 Display                *display;
+Colormap        colorMap;
+Visual                *visual;
+XColor                *colors;
+GC        gcnot;
+Atom        wm_delete;
+XColor        *anaFindBestRGB(XColor *color, int32_t mode);
+int32_t        xerr(Display *, XErrorEvent *), selectVisual(void);
+Status        anaAllocNamedColor(char const*, XColor **);
+#endif
+
 int32_t                screen_num, connect_flag = 0, private_colormap = 0,
   threeColors = 0, foreground_pixel, colormin, colormax, nColors,
   select_visual = 0, bits_per_rgb, bits_per_pixel, colorIndexType,
@@ -43,18 +50,9 @@ uint32_t        display_cells, depth, display_width, display_height,
 unsigned long        *pixels, black_pixel, white_pixel, red_mask, green_mask,
   blue_mask, red_mask_bits, green_mask_bits, blue_mask_bits,
   red_mask_lower, green_mask_lower, blue_mask_lower;
-Colormap        colorMap;
-Visual                *visual;
-XColor                *colors;
-GC        gcnot;
-Atom        wm_delete;
 
-int32_t        xerr(Display *, XErrorEvent *), selectVisual(void);
-XColor        *anaFindBestRGB(XColor *color, int32_t mode);
-Status        anaAllocNamedColor(char const*, XColor **);
-
-#define FBRGB_RAMP                1 // color ramp
-#define FBRGB_INCIDENTAL        2 // incidental colors
+# define FBRGB_RAMP                1 // color ramp
+# define FBRGB_INCIDENTAL        2 // incidental colors
 
 /*
   Global variables:
@@ -146,6 +144,7 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
 // routine returns LUX_OK immediately.  Sets some of the globals.
 // LS 12mar99
 {
+#if HAVE_LIBX11
   extern int32_t        scalemin, scalemax;
   Window        win;
   int32_t        i, j;
@@ -492,6 +491,9 @@ int32_t setup_x_visual(int32_t desiredVisualClass)
   wm_delete = XInternAtom(display, "WM_DELETE_WINDOW", False);
 
   return LUX_OK;
+#else
+  return cerror(NOSUPPORT, 0, "X11 windows", "libX11");
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t setup_x(void)
@@ -507,7 +509,9 @@ void disconnect_x(void)
   if (!connect_flag)
     return;
 
+#if HAVE_LIBX11
   XCloseDisplay(display);
+#endif
   connect_flag = 0;
 
   free(pixels);
@@ -517,6 +521,7 @@ void disconnect_x(void)
 int32_t selectVisual(void)
 // allow the user to select a visual
 {
+#if HAVE_LIBX11
   XVisualInfo        *vInfo, vTemplate;
   int32_t        nVisual, i, mask, j;
   int32_t        getNewLine(char *, size_t, char const *, char);
@@ -590,6 +595,7 @@ int32_t selectVisual(void)
   private_colormap = !(visual == DefaultVisual(display, screen_num));
 
   XFree(vInfo);
+#endif
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
@@ -611,6 +617,7 @@ void installPixel(int32_t pixel)
 // installs the indicated pixel value as one incidental color in the
 // colors[] database if it does not already exist there.
 {
+#if HAVE_LIBX11
   int32_t        i;
 
   for (i = nColors; i < nColorCells; i++)
@@ -621,6 +628,7 @@ void installPixel(int32_t pixel)
   colors[i].flags = DoRed | DoGreen | DoBlue;
   XQueryColor(display, colorMap, &colors[i]);
   nColorCells++;
+#endif
 }
 //-------------------------------------------------------------------------
 Status anaAllocNamedColor(char const* colorName, XColor **return_color)
@@ -644,6 +652,7 @@ Status anaAllocNamedColor(char const* colorName, XColor **return_color)
    Returns 0 if some fatal error occurs.
    LS 12mar99 - 17mar99 4oct99 */
 {
+#if HAVE_LIBX11
   unsigned long        pixel;
   XColor        color, color2, *bestcolor;
   static XColor        rcolor;
@@ -714,9 +723,11 @@ Status anaAllocNamedColor(char const* colorName, XColor **return_color)
   } /* end of if (visualclass(visual) == GrayScale
      || visualclass(visual) == PseudoColor) else if (visualIsRO(visualclass(visual))
      else */
+#endif
   return 1;
 }
 //-------------------------------------------------------------------------
+#if HAVE_LIBX11
 XColor *anaFindBestRGB(XColor *color, int32_t mode)
 // finds the color in the current colormap that has RGB values closest to
 // those in <color>, and returns a pointer to the associated color.
@@ -999,6 +1010,7 @@ int32_t threecolors(float *list, int32_t n)
   XFlush(display);
   return LUX_OK;
 }
+#endif
 //---------------------------------------------------------
 int32_t lux_colorComponents(int32_t narg, int32_t ps[])
 // colorcomponents,pixels,r,g,b
@@ -1006,6 +1018,7 @@ int32_t lux_colorComponents(int32_t narg, int32_t ps[])
 // and blue components in <r>, <g>, and <b>, which range between 0 and 255.
 // <pixels> must have type
 {
+#if HAVE_LIBX11
   uint8_t        *data;
   int32_t *q1, *q2, *q3;
   uint8_t        *red, *green, *blue;
@@ -1087,6 +1100,9 @@ int32_t lux_colorComponents(int32_t narg, int32_t ps[])
     break;
   }
   return LUX_OK;
+#else
+  return cerror(NOSUPPORT, 0, "COLORCOMPONENTS", "libX11");
+#endif
 }
 //---------------------------------------------------------
 int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
@@ -1095,6 +1111,7 @@ int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
     based on the pixel values in <pixels>.
   */
 {
+#if HAVE_LIBX11
   int32_t result, ncolors, iq;
   int32_t lux_tolookup(int32_t, int32_t *);
   int32_t lux_byte_inplace(int32_t, int32_t *);
@@ -1212,6 +1229,9 @@ int32_t lux_pixelsto8bit(int32_t narg, int32_t ps[])
   zapTemp(ps[1]);
   ps[1] = iq;
   return LUX_ERROR;
+#else
+  return cerror(NOSUPPORT, 0, "PIXELSTO8BIT", "libX11");
+#endif
 }
 //---------------------------------------------------------
 int32_t lux_colorstogrey(int32_t narg, int32_t ps[])
@@ -1220,6 +1240,7 @@ int32_t lux_colorstogrey(int32_t narg, int32_t ps[])
    scale values, which range between 0 and 255.
    LS 2003mar08 */
 {
+#if HAVE_LIBX11
   int32_t *q1, *q2, *q3, i;
   uint8_t *data;
   int32_t nelem, red, green, blue, grey, pix = 0, step;
@@ -1291,4 +1312,7 @@ int32_t lux_colorstogrey(int32_t narg, int32_t ps[])
     break;
   }
   return LUX_OK;
+#else
+  return cerror(NOSUPPORT, 0, "COLORSTOGREY", "libX11");
+#endif
 }

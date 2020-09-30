@@ -145,6 +145,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
 }
 REGISTER(matrix_product, f, mproduct, 2, 2, "0inner:1outer");
 //-------------------------------------------------------------------------
+#if HAVE_LIBGSL
 int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
                                  double *u_out, double *s_out,
                                  double *v_out)
@@ -212,6 +213,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
   gsl_vector_free(w);
   return result;
 }
+#endif
 //--------------------------------------------------------------------
 /*
    SVD,A,U2,S2,V2
@@ -246,6 +248,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
 */
 int32_t lux_svd(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBGSL
   Pointer *ptrs;
   LoopInfo *infos;
   int32_t iq;
@@ -295,6 +298,9 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
            infos[3].advanceLoop(&ptrs[3]) < infos[3].ndim);
   iq = LUX_OK;
   return iq;
+#else
+  return cerror(NOSUPPORT, 0, "SVD", "libgsl");
+#endif
 }
 REGISTER(svd, s, svd, 4, 4, NULL);
 //--------------------------------------------------------------------

@@ -19,9 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File editor.c
 // Command line editor.
-#if HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
@@ -32,8 +30,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "editor.hh"
 
 #include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include "readline.h"
+#include "history.h"
 
 char        line[BUFSIZE], tLine[BUFSIZE], recording = 0;
 FILE        *inputStream;

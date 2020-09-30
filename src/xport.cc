@@ -19,9 +19,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // LUX routines dealing with (X window) data windows.
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>                // key symbol definitions LS 23nov92

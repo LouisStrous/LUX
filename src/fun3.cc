@@ -20,9 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File fun3.c
 // Various LUX functions.
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <limits>
 #include <sys/types.h>
 #include <malloc.h>
@@ -37,6 +35,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 #include "editorcharclass.hh"
 #include "luxparser.hh"
+#if HAVE_LIBGSL
+# include <gsl/gsl_fft_real.h>
+# include <gsl/gsl_fft_halfcomplex.h>
+#endif
 
 int32_t         ezffti(int32_t *, float *), fade_xsize, fade_ysize, fade_dim[2];
 int32_t rffti(int32_t *, float *);
@@ -420,8 +422,7 @@ int32_t lux_sc(int32_t narg, int32_t ps[])      // sc routine
   return 1;
 }
 //-------------------------------------------------------------------------
-#include <gsl/gsl_fft_real.h>
-#include <gsl/gsl_fft_halfcomplex.h>
+#if HAVE_LIBGSL
 static gsl_fft_real_wavetable* rwave = NULL;
 static int32_t nrwave = -1;
 static gsl_fft_real_workspace* rwork = NULL;
@@ -498,9 +499,11 @@ void clear_ffttemp(void)
   ffttemp = NULL;
   nffttemp = -1;
 }
+#endif
 //-------------------------------------------------------------------------
 int32_t gsl_fft(double *data, size_t n, size_t stride)
 {
+#if HAVE_LIBGSL
   if (!update_rwave(n) || !update_rwork(n))
     return 1;
 
@@ -523,12 +526,16 @@ int32_t gsl_fft(double *data, size_t n, size_t stride)
       *data *= factor1;
   }
   return result;
+#else
+      return cerror(NOSUPPORT, 0, "FFT", "libgsl");
+#endif
 }
 BIND(gsl_fft, i_sd_iaiarq_000, f, fft, 1, 2, "1allaxes:2amplitudes");
 BIND(gsl_fft, i_sd_iaia_000, s, fft, 1, 2, "1allaxes:2amplitudes");
 //-------------------------------------------------------------------------
 int32_t gsl_fft_back(double *data, size_t n, size_t stride)
 {
+#if HAVE_LIBGSL
   if (!update_hwave(n) || !update_rwork(n))
     return 1;
 
@@ -550,12 +557,16 @@ int32_t gsl_fft_back(double *data, size_t n, size_t stride)
       *data *= factor1;
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
+#else
+  return cerror(NOSUPPORT, 0, "FFTB", "libgsl");
+#endif
 }
 BIND(gsl_fft_back, i_sd_iaiarq_000, f, fftb, 1, 2, "1allaxes:2amplitudes");
 BIND(gsl_fft_back, i_sd_iaia_000, s, fftb, 1, 2, "1allaxes:2amplitudes");
 //-------------------------------------------------------------------------
 int32_t hilbert(double *data, size_t n, size_t stride)
 {
+#if HAVE_LIBGSL
   if (!update_rwave(n) || !update_hwave(n) || !update_rwork(n))
     return 1;
 
@@ -570,6 +581,9 @@ int32_t hilbert(double *data, size_t n, size_t stride)
     data[(i + 1)*stride] = t;
   }
   return gsl_fft_halfcomplex_inverse(data, stride, n, hwave, rwork);
+#else
+  return cerror(NOSUPPORT, 0, "HILBERT", "libgsl");
+#endif
 }
 BIND(hilbert, i_sd_iaiarq_000, f, hilbert, 1, 2, "1allaxes");
 BIND(hilbert, i_sd_iaia_000, s, hilbert, 1, 2, "1allaxes");
@@ -577,6 +591,7 @@ BIND(hilbert, i_sd_iaia_000, s, hilbert, 1, 2, "1allaxes");
 int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
                    double *tdata, size_t tcount, size_t tstride)
 {
+#if HAVE_LIBGSL
   if (!update_rwave(scount) || !update_hwave(tcount))
     return 1;
 
@@ -631,11 +646,13 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
     }
     free(temp);
   }
+#endif
   return 0;
 }
 //-------------------------------------------------------------------------
 int32_t lux_fft_expand(int32_t narg, int32_t ps[])
 {
+#if HAVE_LIBGSL
   Pointer *ptrs;
   LoopInfo *infos;
 
@@ -667,6 +684,9 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   } while (infos[0].advanceLoop(&ptrs[0]),
            infos[2].advanceLoop(&ptrs[2]) < infos[2].ndim);
   return sa.result();
+#else
+  return cerror(NOSUPPORT, 0, "FFTEXPAND", "libgsl");
+#endif
 }
 REGISTER(fft_expand, f, fftexpand, 2, 2, NULL);
 //-------------------------------------------------------------------------
@@ -3637,6 +3657,7 @@ int32_t neutral(void *p, int32_t n)
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
+#if HAVE_LIBGSL
 const csplineInfo empty_cubic_spline(void) {
   const csplineInfo c = { NULL, NULL, NULL, NULL };
   return c;
@@ -3830,6 +3851,7 @@ double cspline_derivative(double x, csplineInfo *cspl)
   }
   return gsl_spline_eval_deriv(cspl->spline, x, cspl->acc);
 }
+#endif
 //-------------------------------------------------------------------------
 double integrate_linear(double a, double b,
                         double x1, double y1, double x2, double y2)
@@ -3842,6 +3864,7 @@ double integrate_linear(double a, double b,
   return d*((x1 - s)*y2 + (s - x2)*y1)/(x1 - x2);
 }
 //-------------------------------------------------------------------------
+#if HAVE_LIBGSL
 double cspline_integral(double x1, double x2, csplineInfo *cspl)
 // returns the integral of a cubic spline between positions <x1> and
 // <x2>.  Assumes that the required information about the spline is
@@ -4040,6 +4063,7 @@ void find_cspline_extremes(double x1, double x2, double *minpos, double *min,
       *min = (v1 < v2)? v1: v2;
   }
 }
+#endif
 //-------------------------------------------------------------------------
 int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 /* Cubic spline interpolation along the first dimension of an array.
@@ -4077,6 +4101,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
      rid of it.)
    LS 29apr96 */
 {
+#if HAVE_LIBGSL
   static char   haveTable = '\0';
   static csplineInfo    cspl = { NULL, NULL, NULL, NULL };
   int32_t       xNewSym, xNew2Sym, xTabSym, yTabSym, size, oldType, result_sym;
@@ -4210,6 +4235,9 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
     haveTable = 0;
   }
   return result_sym;
+#else
+  return cerror(NOSUPPORT, 0, "CSPLINE", "libgsl");
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
@@ -4217,6 +4245,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
    MINVAL=<min>, MAXPOS=<maxpos>, MAXVAL=<max>, /KEEPDIMS, /PERIODIC]
  */
 {
+#if HAVE_LIBGSL
   int32_t       iq, dims[MAX_DIMS], ndim, step, pos, i, mode;
   double        thisextpos, thisext, x1, x2;
   LoopInfo      yinfo;
@@ -4506,6 +4535,9 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
     break;
   }
   return LUX_OK;
+#else
+  return cerror(NOSUPPORT, 0, "CSPLINE_EXTREME", "libgsl");
+#endif
 }
 //-------------------------------------------------------------------------
 int32_t lux_strtol(int32_t narg, int32_t ps[])

@@ -118,7 +118,7 @@ void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t
                    int32_t max_arg, char const* spec);
 void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t min_arg,
                    int32_t max_arg, char const* spec);
-#define REGISTER(func, fs, name, minarg, maxarg, fsspec)
+#define REGISTER(func, ...)
 
 /// A macro to bind a C++ function to a LUX function or subroutine via
 /// a binding function.
@@ -150,7 +150,7 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t
 /// exist, most likely in file bindings.cc.
 // This macro expands to nothing.  Its presence is detected and acted
 // upon by an external script (bindings.pl).
-#define BIND(func, type, fs, name, minarg, maxarg, fsspec)
+#define BIND(func, ...)
 
 /// A macro to bind a C function to a LUX function or subroutine via a
 /// binding function.
@@ -182,5 +182,5 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t
 /// exist, most likely in file bindings.cc.
 // This macro expands to nothing.  Its presence is detected and acted
 // upon by an external script (bindings.pl).
-#define BINDC(func, type, fs, name, minarg, maxarg, fsspec)
+#define BINDC(func, ...)
 #endif

@@ -40,6 +40,8 @@ AC_CHECK_LIB([gslcblas], [cblas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_sf_bessel_J0])
 AC_CHECK_LIB([X11], [XOpenDisplay])
 AC_CHECK_LIB([readline], [readline])
+AC_CHECK_LIB([sofa_c], [iauBi00])
+AC_CHECK_LIB([calceph], [calceph_open])
 AC_CHECK_LIB([CppUTest], [cpputest_malloc],
   [AC_DEFINE(
     [HAVE_LIBCPPUTEST],
@@ -81,8 +83,6 @@ AC_REPLACE_FUNCS([sincos])
 AC_SUBST([CPPUTESTLIBS])
 
 AC_CONFIG_FILES([Makefile
-                 sofa/Makefile
-                 sofa/src/Makefile
                  historicephemerides/Makefile
                  src/Makefile
                  src/fonts/Makefile

@@ -89,6 +89,7 @@ int32_t lux_prutenic_nearest_new_moon_f(int32_t narg, int32_t ps[]) {
   return result;
 }
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauBi00_f(int32_t narg, int32_t ps[]) {
   void iauBi00(double *, double *, double *);
   int32_t result = lux_v_dpT3_r3_000_f_(narg, ps, iauBi00);
@@ -96,7 +97,9 @@ int32_t lux_iauBi00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in bi00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauBp00_s(int32_t narg, int32_t ps[]) {
   void iauBp00(double, double, double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(narg, ps, iauBp00);
@@ -104,7 +107,9 @@ int32_t lux_iauBp00_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in bp00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauBp06_s(int32_t narg, int32_t ps[]) {
   void iauBp06(double, double, double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(narg, ps, iauBp06);
@@ -112,7 +117,9 @@ int32_t lux_iauBp06_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in bp06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauBpn2xy_s(int32_t narg, int32_t ps[]) {
   void iauBpn2xy(double [3][3], double *, double *);
   int32_t result = lux_v_dp33dpdp_i33aommqocq_0T2_s_(narg, ps, iauBpn2xy);
@@ -120,7 +127,9 @@ int32_t lux_iauBpn2xy_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in bpn2xy", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2i00a_f(int32_t narg, int32_t ps[]) {
   void iauC2i00a(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauC2i00a);
@@ -128,7 +137,9 @@ int32_t lux_iauC2i00a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2i00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2i00b_f(int32_t narg, int32_t ps[]) {
   void iauC2i00b(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauC2i00b);
@@ -136,7 +147,9 @@ int32_t lux_iauC2i00b_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2i00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2i06a_f(int32_t narg, int32_t ps[]) {
   void iauC2i06a(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauC2i06a);
@@ -144,7 +157,9 @@ int32_t lux_iauC2i06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2i06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2ibpn_f(int32_t narg, int32_t ps[]) {
   void iauC2ibpn(double, double, double [3][3], double [3][3]);
   int32_t result = lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(narg, ps, iauC2ibpn);
@@ -152,7 +167,9 @@ int32_t lux_iauC2ibpn_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2ibpn", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2ixy_f(int32_t narg, int32_t ps[]) {
   void iauC2ixy(double, double, double, double, double [3][3]);
   int32_t result = lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(narg, ps, iauC2ixy);
@@ -160,7 +177,9 @@ int32_t lux_iauC2ixy_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2ixy", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2ixys_f(int32_t narg, int32_t ps[]) {
   void iauC2ixys(double, double, double, double [3][3]);
   int32_t result = lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(narg, ps, iauC2ixys);
@@ -168,7 +187,9 @@ int32_t lux_iauC2ixys_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2ixys", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2s_f(int32_t narg, int32_t ps[]) {
   void iauC2s(double [3], double *, double *);
   int32_t result = lux_v_dp3dpdp_i3arm3p2q_011_f_(narg, ps, iauC2s);
@@ -176,7 +197,9 @@ int32_t lux_iauC2s_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2s", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2t00a_f(int32_t narg, int32_t ps[]) {
   void iauC2t00a(double, double, double, double, double, double, double [3][3]);
   int32_t result = lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(narg, ps, iauC2t00a);
@@ -184,7 +207,9 @@ int32_t lux_iauC2t00a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2t00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2t00b_f(int32_t narg, int32_t ps[]) {
   void iauC2t00b(double, double, double, double, double, double, double [3][3]);
   int32_t result = lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(narg, ps, iauC2t00b);
@@ -192,7 +217,9 @@ int32_t lux_iauC2t00b_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2t00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2t06a_f(int32_t narg, int32_t ps[]) {
   void iauC2t06a(double, double, double, double, double, double, double [3][3]);
   int32_t result = lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(narg, ps, iauC2t06a);
@@ -200,7 +227,9 @@ int32_t lux_iauC2t06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2t06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2tcio_f(int32_t narg, int32_t ps[]) {
   void iauC2tcio(double [3][3], double, double [3][3], double [3][3]);
   int32_t result = lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(narg, ps, iauC2tcio);
@@ -208,7 +237,9 @@ int32_t lux_iauC2tcio_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2tcio", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2teqx_f(int32_t narg, int32_t ps[]) {
   void iauC2teqx(double [3][3], double, double [3][3], double [3][3]);
   int32_t result = lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(narg, ps, iauC2teqx);
@@ -216,7 +247,9 @@ int32_t lux_iauC2teqx_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2teqx", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2tpe_f(int32_t narg, int32_t ps[]) {
   void iauC2tpe(double, double, double, double, double, double, double, double, double [3][3]);
   int32_t result = lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(narg, ps, iauC2tpe);
@@ -224,7 +257,9 @@ int32_t lux_iauC2tpe_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2tpe", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauC2txy_f(int32_t narg, int32_t ps[]) {
   void iauC2txy(double, double, double, double, double, double, double, double, double [3][3]);
   int32_t result = lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(narg, ps, iauC2txy);
@@ -232,7 +267,9 @@ int32_t lux_iauC2txy_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in c2txy", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauDtdb_f(int32_t narg, int32_t ps[]) {
   double iauDtdb(double, double, double, double, double, double);
   int32_t result = lux_d_dT6_iaiT4rq_0z1T4_5_f_(narg, ps, iauDtdb);
@@ -240,7 +277,9 @@ int32_t lux_iauDtdb_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in dtdb", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_do_iauEe00_f(int32_t narg, int32_t ps[]) {
   double do_iauEe00(double, double, double);
   int32_t result = lux_d_dT3_iaiqiqrq_012_f_(narg, ps, do_iauEe00);
@@ -248,7 +287,9 @@ int32_t lux_do_iauEe00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ee00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEe00a_f(int32_t narg, int32_t ps[]) {
   double iauEe00a(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEe00a);
@@ -256,7 +297,9 @@ int32_t lux_iauEe00a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ee00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEe00b_f(int32_t narg, int32_t ps[]) {
   double iauEe00b(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEe00b);
@@ -264,7 +307,9 @@ int32_t lux_iauEe00b_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ee00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEe06a_f(int32_t narg, int32_t ps[]) {
   double iauEe06a(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEe06a);
@@ -272,7 +317,9 @@ int32_t lux_iauEe06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ee06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEect00_f(int32_t narg, int32_t ps[]) {
   double iauEect00(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEect00);
@@ -280,7 +327,9 @@ int32_t lux_iauEect00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in eect00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEform_f(int32_t narg, int32_t ps[]) {
   int32_t iauEform(int32_t, double *, double *);
   int32_t result = lux_i_idpdp_iarp2q_011_f_(narg, ps, iauEform);
@@ -288,7 +337,9 @@ int32_t lux_iauEform_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in eform", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEo06a_f(int32_t narg, int32_t ps[]) {
   double iauEo06a(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEo06a);
@@ -296,7 +347,9 @@ int32_t lux_iauEo06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in eo06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEors_f(int32_t narg, int32_t ps[]) {
   double iauEors(double [3][3], double);
   int32_t result = lux_d_dp33d_i33aimmqrcq_01_2_f_(narg, ps, iauEors);
@@ -304,7 +357,9 @@ int32_t lux_iauEors_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in eors", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEpb_f(int32_t narg, int32_t ps[]) {
   double iauEpb(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEpb);
@@ -312,7 +367,9 @@ int32_t lux_iauEpb_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in epb", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEpj_f(int32_t narg, int32_t ps[]) {
   double iauEpj(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEpj);
@@ -320,7 +377,9 @@ int32_t lux_iauEpj_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in epj", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEpv00_s(int32_t narg, int32_t ps[]) {
   int32_t iauEpv00(double, double, double [2][3], double [2][3]);
   int32_t result = lux_i_dddp23T2_iaop2p3qocq_0z12_s_(narg, ps, iauEpv00);
@@ -328,7 +387,9 @@ int32_t lux_iauEpv00_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in epv00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEqeq94_f(int32_t narg, int32_t ps[]) {
   double iauEqeq94(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEqeq94);
@@ -336,7 +397,9 @@ int32_t lux_iauEqeq94_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in eqeq94", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauEra00_f(int32_t narg, int32_t ps[]) {
   double iauEra00(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauEra00);
@@ -344,7 +407,9 @@ int32_t lux_iauEra00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in era00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFad03_f(int32_t narg, int32_t ps[]) {
   double iauFad03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFad03);
@@ -352,7 +417,9 @@ int32_t lux_iauFad03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fad03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFae03_f(int32_t narg, int32_t ps[]) {
   double iauFae03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFae03);
@@ -360,7 +427,9 @@ int32_t lux_iauFae03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fae03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFaf03_f(int32_t narg, int32_t ps[]) {
   double iauFaf03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFaf03);
@@ -368,7 +437,9 @@ int32_t lux_iauFaf03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in faf03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFaju03_f(int32_t narg, int32_t ps[]) {
   double iauFaju03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFaju03);
@@ -376,7 +447,9 @@ int32_t lux_iauFaju03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in faju03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFal03_f(int32_t narg, int32_t ps[]) {
   double iauFal03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFal03);
@@ -384,7 +457,9 @@ int32_t lux_iauFal03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fal03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFalp03_f(int32_t narg, int32_t ps[]) {
   double iauFalp03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFalp03);
@@ -392,7 +467,9 @@ int32_t lux_iauFalp03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in falp03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFama03_f(int32_t narg, int32_t ps[]) {
   double iauFama03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFama03);
@@ -400,7 +477,9 @@ int32_t lux_iauFama03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fama03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFame03_f(int32_t narg, int32_t ps[]) {
   double iauFame03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFame03);
@@ -408,7 +487,9 @@ int32_t lux_iauFame03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fame03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFane03_f(int32_t narg, int32_t ps[]) {
   double iauFane03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFane03);
@@ -416,7 +497,9 @@ int32_t lux_iauFane03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fane03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFaom03_f(int32_t narg, int32_t ps[]) {
   double iauFaom03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFaom03);
@@ -424,7 +507,9 @@ int32_t lux_iauFaom03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in faom03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFapa03_f(int32_t narg, int32_t ps[]) {
   double iauFapa03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFapa03);
@@ -432,7 +517,9 @@ int32_t lux_iauFapa03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fapa03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFasa03_f(int32_t narg, int32_t ps[]) {
   double iauFasa03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFasa03);
@@ -440,7 +527,9 @@ int32_t lux_iauFasa03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fasa03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFaur03_f(int32_t narg, int32_t ps[]) {
   double iauFaur03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFaur03);
@@ -448,7 +537,9 @@ int32_t lux_iauFaur03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in faur03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFave03_f(int32_t narg, int32_t ps[]) {
   double iauFave03(double);
   int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, iauFave03);
@@ -456,7 +547,9 @@ int32_t lux_iauFave03_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fave03", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFk52h_s(int32_t narg, int32_t ps[]) {
   void iauFk52h(double, double, double, double, double, double, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(narg, ps, iauFk52h);
@@ -464,7 +557,9 @@ int32_t lux_iauFk52h_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in fk52h", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFk5hip_s(int32_t narg, int32_t ps[]) {
   void iauFk5hip(double [3][3], double [3]);
   int32_t result = lux_v_dp3dp_o33o3_01_s_(narg, ps, iauFk5hip);
@@ -472,7 +567,9 @@ int32_t lux_iauFk5hip_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in fk5hip", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFk5hz_s(int32_t narg, int32_t ps[]) {
   void iauFk5hz(double, double, double, double, double *, double *);
   int32_t result = lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(narg, ps, iauFk5hz);
@@ -480,7 +577,9 @@ int32_t lux_iauFk5hz_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in fk5hz", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFw2m_f(int32_t narg, int32_t ps[]) {
   void iauFw2m(double, double, double, double, double [3][3]);
   int32_t result = lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(narg, ps, iauFw2m);
@@ -488,7 +587,9 @@ int32_t lux_iauFw2m_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in fw2m", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauFw2xy_s(int32_t narg, int32_t ps[]) {
   void iauFw2xy(double, double, double, double, double *, double *);
   int32_t result = lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(narg, ps, iauFw2xy);
@@ -496,7 +597,9 @@ int32_t lux_iauFw2xy_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in fw2xy", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGc2gd_f(int32_t narg, int32_t ps[]) {
   int32_t iauGc2gd(int32_t, double [3], double *, double *, double *);
   int32_t result = lux_i_idp3dpT3_ii3arcq_0T222_f_(narg, ps, iauGc2gd);
@@ -504,7 +607,9 @@ int32_t lux_iauGc2gd_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gc2gd", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGc2gde_f(int32_t narg, int32_t ps[]) {
   int32_t iauGc2gde(double, double, double [3], double *, double *, double *);
   int32_t result = lux_v_dddp3dpT3_i3aiirq_120333_f_(narg, ps, iauGc2gde);
@@ -512,7 +617,9 @@ int32_t lux_iauGc2gde_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gc2gde", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGd2gc_f(int32_t narg, int32_t ps[]) {
   int32_t iauGd2gc(int32_t, double, double, double, double [3]);
   int32_t result = lux_i_idT3dp3_i3airq_10002_f_(narg, ps, iauGd2gc);
@@ -520,7 +627,9 @@ int32_t lux_iauGd2gc_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gd2gc", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGd2gce_f(int32_t narg, int32_t ps[]) {
   int32_t iauGd2gce(double, double, double, double, double, double [3]);
   int32_t result = lux_i_dT5dp3_i3aiirq_120003_f_(narg, ps, iauGd2gce);
@@ -528,7 +637,9 @@ int32_t lux_iauGd2gce_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gd2gce", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGmst00_f(int32_t narg, int32_t ps[]) {
   double iauGmst00(double, double, double, double);
   int32_t result = lux_d_dT4_iaiqrq_01_2_f_(narg, ps, iauGmst00);
@@ -536,7 +647,9 @@ int32_t lux_iauGmst00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gmst00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGmst06_f(int32_t narg, int32_t ps[]) {
   double iauGmst06(double, double, double, double);
   int32_t result = lux_d_dT4_iaiqrq_01_2_f_(narg, ps, iauGmst06);
@@ -544,7 +657,9 @@ int32_t lux_iauGmst06_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gmst06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGmst82_f(int32_t narg, int32_t ps[]) {
   double iauGmst82(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauGmst82);
@@ -552,7 +667,9 @@ int32_t lux_iauGmst82_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gmst82", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGst00a_f(int32_t narg, int32_t ps[]) {
   double iauGst00a(double, double, double, double);
   int32_t result = lux_d_dT4_iaiqrq_01_2_f_(narg, ps, iauGst00a);
@@ -560,7 +677,9 @@ int32_t lux_iauGst00a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gst00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGst00b_f(int32_t narg, int32_t ps[]) {
   double iauGst00b(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauGst00b);
@@ -568,7 +687,9 @@ int32_t lux_iauGst00b_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gst00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGst06_f(int32_t narg, int32_t ps[]) {
   double iauGst06(double, double, double, double, double [3][3]);
   int32_t result = lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(narg, ps, iauGst06);
@@ -576,7 +697,9 @@ int32_t lux_iauGst06_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gst06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGst06a_f(int32_t narg, int32_t ps[]) {
   double iauGst06a(double, double, double, double);
   int32_t result = lux_d_dT4_iaiqrq_01_2_f_(narg, ps, iauGst06a);
@@ -584,7 +707,9 @@ int32_t lux_iauGst06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gst06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauGst94_f(int32_t narg, int32_t ps[]) {
   double iauGst94(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauGst94);
@@ -592,7 +717,9 @@ int32_t lux_iauGst94_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in gst94", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauH2fk5_s(int32_t narg, int32_t ps[]) {
   void iauH2fk5(double, double, double, double, double, double, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(narg, ps, iauH2fk5);
@@ -600,7 +727,9 @@ int32_t lux_iauH2fk5_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in h2fk5", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauHfk5z_s(int32_t narg, int32_t ps[]) {
   void iauHfk5z(double, double, double, double, double *, double *, double *, double *);
   int32_t result = lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(narg, ps, iauHfk5z);
@@ -608,7 +737,9 @@ int32_t lux_iauHfk5z_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in hfk5z", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauIr_f(int32_t narg, int32_t ps[]) {
   void iauIr(double [3][3]);
   int32_t result = lux_v_dp33_r33_0_f_(narg, ps, iauIr);
@@ -616,7 +747,9 @@ int32_t lux_iauIr_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ir", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauJd2cal_f(int32_t narg, int32_t ps[]) {
   int32_t iauJd2cal(double, double, int32_t *, int32_t *, int32_t *, double *);
   int32_t result = lux_i_ddipT3dp_iarp3q_0z1111_f_(narg, ps, iauJd2cal);
@@ -624,7 +757,9 @@ int32_t lux_iauJd2cal_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in jd2cal", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNum00a_f(int32_t narg, int32_t ps[]) {
   void iauNum00a(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauNum00a);
@@ -632,7 +767,9 @@ int32_t lux_iauNum00a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in num00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNum00b_f(int32_t narg, int32_t ps[]) {
   void iauNum00b(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauNum00b);
@@ -640,7 +777,9 @@ int32_t lux_iauNum00b_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in num00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNum06a_f(int32_t narg, int32_t ps[]) {
   void iauNum06a(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauNum06a);
@@ -648,7 +787,9 @@ int32_t lux_iauNum06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in num06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNumat_f(int32_t narg, int32_t ps[]) {
   void iauNumat(double, double, double, double [3][3]);
   int32_t result = lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(narg, ps, iauNumat);
@@ -656,7 +797,9 @@ int32_t lux_iauNumat_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in numat", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNut00a_s(int32_t narg, int32_t ps[]) {
   void iauNut00a(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iaoqoq_0z12_s_(narg, ps, iauNut00a);
@@ -664,7 +807,9 @@ int32_t lux_iauNut00a_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in nut00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNut00b_s(int32_t narg, int32_t ps[]) {
   void iauNut00b(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iaoqoq_0z12_s_(narg, ps, iauNut00b);
@@ -672,7 +817,9 @@ int32_t lux_iauNut00b_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in nut00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNut06a_s(int32_t narg, int32_t ps[]) {
   void iauNut06a(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iaoqoq_0z12_s_(narg, ps, iauNut06a);
@@ -680,7 +827,9 @@ int32_t lux_iauNut06a_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in nut06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNut80_s(int32_t narg, int32_t ps[]) {
   void iauNut80(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iaoqoq_0z12_s_(narg, ps, iauNut80);
@@ -688,7 +837,9 @@ int32_t lux_iauNut80_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in nut80", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauNutm80_f(int32_t narg, int32_t ps[]) {
   void iauNutm80(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauNutm80);
@@ -696,7 +847,9 @@ int32_t lux_iauNutm80_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in nutm80", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauObl06_f(int32_t narg, int32_t ps[]) {
   double iauObl06(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauObl06);
@@ -704,7 +857,9 @@ int32_t lux_iauObl06_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in obl06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauObl80_f(int32_t narg, int32_t ps[]) {
   double iauObl80(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauObl80);
@@ -712,7 +867,9 @@ int32_t lux_iauObl80_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in obl80", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauP06e_s(int32_t narg, int32_t ps[]) {
   void iauP06e(double, double, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dddpT16_iaoqT16_0z1T16_s_(narg, ps, iauP06e);
@@ -720,7 +877,9 @@ int32_t lux_iauP06e_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in p06e", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauP2s_f(int32_t narg, int32_t ps[]) {
   void iauP2s(double [3], double *, double *, double *);
   int32_t result = lux_v_dp3dpT3_i3arq_0111_f_(narg, ps, iauP2s);
@@ -728,7 +887,9 @@ int32_t lux_iauP2s_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in p2s", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPap_f(int32_t narg, int32_t ps[]) {
   double iauPap(double [3], double [3]);
   int32_t result = lux_d_dp3dp3_i3aiqrm3q_01_2_f_(narg, ps, iauPap);
@@ -736,7 +897,9 @@ int32_t lux_iauPap_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pap", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPas_f(int32_t narg, int32_t ps[]) {
   double iauPas(double, double, double, double);
   int32_t result = lux_d_dT4_iaiqT3rq_0T3_4_f_(narg, ps, iauPas);
@@ -744,7 +907,9 @@ int32_t lux_iauPas_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pas", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPb06_s(int32_t narg, int32_t ps[]) {
   void iauPb06(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iaoqT3_0z1T3_s_(narg, ps, iauPb06);
@@ -752,7 +917,9 @@ int32_t lux_iauPb06_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pb06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPdp_f(int32_t narg, int32_t ps[]) {
   double iauPdp(double [3], double [3]);
   int32_t result = lux_d_dp3dp3_i3aiqrm3q_01_2_f_(narg, ps, iauPdp);
@@ -760,7 +927,9 @@ int32_t lux_iauPdp_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pdp", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPfw06_s(int32_t narg, int32_t ps[]) {
   void iauPfw06(double, double, double *, double *, double *, double *);
   int32_t result = lux_v_dddpT4_iaoqT4_0z1T4_s_(narg, ps, iauPfw06);
@@ -768,7 +937,9 @@ int32_t lux_iauPfw06_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pfw06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPlan94_f(int32_t narg, int32_t ps[]) {
   int32_t iauPlan94(double, double, int32_t, double [2][3]);
   int32_t result = lux_i_ddidp23_iairp3p2q_0z12_f_(narg, ps, iauPlan94);
@@ -776,7 +947,9 @@ int32_t lux_iauPlan94_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in plan94", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPm_f(int32_t narg, int32_t ps[]) {
   double iauPm(double [3]);
   int32_t result = lux_d_dp3_i3arm3q_0_1_f_(narg, ps, iauPm);
@@ -784,7 +957,9 @@ int32_t lux_iauPm_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pm", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPmat00_f(int32_t narg, int32_t ps[]) {
   void iauPmat00(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauPmat00);
@@ -792,7 +967,9 @@ int32_t lux_iauPmat00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pmat00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPmat06_f(int32_t narg, int32_t ps[]) {
   void iauPmat06(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauPmat06);
@@ -800,7 +977,9 @@ int32_t lux_iauPmat06_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pmat06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPmat76_f(int32_t narg, int32_t ps[]) {
   void iauPmat76(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauPmat76);
@@ -808,7 +987,9 @@ int32_t lux_iauPmat76_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pmat76", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPn_s(int32_t narg, int32_t ps[]) {
   void iauPn(double [3], double *, double [3]);
   int32_t result = lux_v_dp3dpdp3_i3aomqoq_0T2_s_(narg, ps, iauPn);
@@ -816,7 +997,9 @@ int32_t lux_iauPn_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pn", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPn00_s(int32_t narg, int32_t ps[]) {
   void iauPn00(double, double, double, double, double *, double [3][3], double [3][3], double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(narg, ps, iauPn00);
@@ -824,7 +1007,9 @@ int32_t lux_iauPn00_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pn00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPn00a_s(int32_t narg, int32_t ps[]) {
   void iauPn00a(double, double, double *, double *, double *, double [3][3], double [3][3], double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(narg, ps, iauPn00a);
@@ -832,7 +1017,9 @@ int32_t lux_iauPn00a_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pn00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPn00b_s(int32_t narg, int32_t ps[]) {
   void iauPn00b(double, double, double *, double *, double *, double [3][3], double [3][3], double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(narg, ps, iauPn00b);
@@ -840,7 +1027,9 @@ int32_t lux_iauPn00b_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pn00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPn06_s(int32_t narg, int32_t ps[]) {
   void iauPn06(double, double, double, double, double *, double [3][3], double [3][3], double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(narg, ps, iauPn06);
@@ -848,7 +1037,9 @@ int32_t lux_iauPn06_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pn06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPn06a_s(int32_t narg, int32_t ps[]) {
   void iauPn06a(double, double, double *, double *, double *, double [3][3], double [3][3], double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(narg, ps, iauPn06a);
@@ -856,7 +1047,9 @@ int32_t lux_iauPn06a_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pn06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPnm00a_f(int32_t narg, int32_t ps[]) {
   void iauPnm00a(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauPnm00a);
@@ -864,7 +1057,9 @@ int32_t lux_iauPnm00a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pnm00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPnm00b_f(int32_t narg, int32_t ps[]) {
   void iauPnm00b(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauPnm00b);
@@ -872,7 +1067,9 @@ int32_t lux_iauPnm00b_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pnm00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPnm06a_f(int32_t narg, int32_t ps[]) {
   void iauPnm06a(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauPnm06a);
@@ -880,7 +1077,9 @@ int32_t lux_iauPnm06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pnm06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPnm80_f(int32_t narg, int32_t ps[]) {
   void iauPnm80(double, double, double [3][3]);
   int32_t result = lux_v_dddp33_iarp3p3q_0z1_f_(narg, ps, iauPnm80);
@@ -888,7 +1087,9 @@ int32_t lux_iauPnm80_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pnm80", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPom00_f(int32_t narg, int32_t ps[]) {
   void iauPom00(double, double, double, double [3][3]);
   int32_t result = lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(narg, ps, iauPom00);
@@ -896,7 +1097,9 @@ int32_t lux_iauPom00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pom00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPr00_s(int32_t narg, int32_t ps[]) {
   void iauPr00(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iaoqoq_0z12_s_(narg, ps, iauPr00);
@@ -904,7 +1107,9 @@ int32_t lux_iauPr00_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pr00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPrec76_s(int32_t narg, int32_t ps[]) {
   void iauPrec76(double, double, double, double, double *, double *, double *);
   int32_t result = lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(narg, ps, iauPrec76);
@@ -912,7 +1117,9 @@ int32_t lux_iauPrec76_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in prec76", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPv2s_s(int32_t narg, int32_t ps[]) {
   void iauPv2s(double [2][3], double *, double *, double *, double *, double *, double *);
   int32_t result = lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(narg, ps, iauPv2s);
@@ -920,7 +1127,9 @@ int32_t lux_iauPv2s_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pv25", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPvdpv_f(int32_t narg, int32_t ps[]) {
   void iauPvdpv(double [2][3], double [2][3], double [2]);
   int32_t result = lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(narg, ps, iauPvdpv);
@@ -928,7 +1137,9 @@ int32_t lux_iauPvdpv_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pvdpv", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPvm_s(int32_t narg, int32_t ps[]) {
   void iauPvm(double [2][3], double *, double *);
   int32_t result = lux_v_dp23dpdp_i23aommqocq_0T2_s_(narg, ps, iauPvm);
@@ -936,7 +1147,9 @@ int32_t lux_iauPvm_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pvm", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPvstar_s(int32_t narg, int32_t ps[]) {
   int32_t iauPvstar(double [2][3], double *, double *, double *, double *, double *, double *);
   int32_t result = lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(narg, ps, iauPvstar);
@@ -944,7 +1157,9 @@ int32_t lux_iauPvstar_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in pvstar", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPvxpv_f(int32_t narg, int32_t ps[]) {
   void iauPvxpv(double [2][3], double [2][3], double [2][3]);
   int32_t result = lux_v_dp23T3_i23aiqrq_0T2_f_(narg, ps, iauPvxpv);
@@ -952,7 +1167,9 @@ int32_t lux_iauPvxpv_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pvxpv", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauPxp_f(int32_t narg, int32_t ps[]) {
   void iauPxp(double [3], double [3], double [3]);
   int32_t result = lux_v_dp3T3_i3aiqrq_0T2_f_(narg, ps, iauPxp);
@@ -960,7 +1177,9 @@ int32_t lux_iauPxp_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in pxp", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRm2v_f(int32_t narg, int32_t ps[]) {
   void iauRm2v(double [3][3], double [3]);
   int32_t result = lux_v_dp33dp3_i33armq_01_f_(narg, ps, iauRm2v);
@@ -968,7 +1187,9 @@ int32_t lux_iauRm2v_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in rm2v", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRxp_f(int32_t narg, int32_t ps[]) {
   void iauRxp(double [3][3], double [3], double [3]);
   int32_t result = lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(narg, ps, iauRxp);
@@ -976,7 +1197,9 @@ int32_t lux_iauRxp_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in rxp", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRxr_f(int32_t narg, int32_t ps[]) {
   void iauRxr(double [3][3], double [3][3], double [3][3]);
   int32_t result = lux_v_dp33T3_i33aiqrq_0T2_f_(narg, ps, iauRxr);
@@ -984,7 +1207,9 @@ int32_t lux_iauRxr_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in rxr", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRv2m_f(int32_t narg, int32_t ps[]) {
   void iauRv2m(double [3], double [3][3]);
   int32_t result = lux_v_dp3dp33_i3arp3q_01_f_(narg, ps, iauRv2m);
@@ -992,7 +1217,9 @@ int32_t lux_iauRv2m_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in rv2m", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRx_s(int32_t narg, int32_t ps[]) {
   void iauRx(double, double [3][3]);
   int32_t result = lux_v_ddp33_iao33q_01_s_(narg, ps, iauRx);
@@ -1000,7 +1227,9 @@ int32_t lux_iauRx_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in rx", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRxpv_f(int32_t narg, int32_t ps[]) {
   void iauRxpv(double [3][3], double [2][3], double [2][3]);
   int32_t result = lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(narg, ps, iauRxpv);
@@ -1008,7 +1237,9 @@ int32_t lux_iauRxpv_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in rxpv", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRy_s(int32_t narg, int32_t ps[]) {
   void iauRy(double, double [3][3]);
   int32_t result = lux_v_ddp33_iao33q_01_s_(narg, ps, iauRy);
@@ -1016,7 +1247,9 @@ int32_t lux_iauRy_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in ry", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauRz_s(int32_t narg, int32_t ps[]) {
   void iauRz(double, double [3][3]);
   int32_t result = lux_v_ddp33_iao33q_01_s_(narg, ps, iauRz);
@@ -1024,7 +1257,9 @@ int32_t lux_iauRz_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in rz", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_do_iauS00_f(int32_t narg, int32_t ps[]) {
   double do_iauS00(double, double, double);
   int32_t result = lux_d_dT3_iaiqiqrq_012_f_(narg, ps, do_iauS00);
@@ -1032,7 +1267,9 @@ int32_t lux_do_iauS00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in s00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauS00a_f(int32_t narg, int32_t ps[]) {
   double iauS00a(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauS00a);
@@ -1040,7 +1277,9 @@ int32_t lux_iauS00a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in s00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauS00b_f(int32_t narg, int32_t ps[]) {
   double iauS00b(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauS00b);
@@ -1048,7 +1287,9 @@ int32_t lux_iauS00b_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in s00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_do_iauS06_f(int32_t narg, int32_t ps[]) {
   double do_iauS06(double, double, double);
   int32_t result = lux_d_dT3_iaiqiqrq_012_f_(narg, ps, do_iauS06);
@@ -1056,7 +1297,9 @@ int32_t lux_do_iauS06_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in s06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauS06a_f(int32_t narg, int32_t ps[]) {
   double iauS06a(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauS06a);
@@ -1064,7 +1307,9 @@ int32_t lux_iauS06a_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in s06a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauS2c_f(int32_t narg, int32_t ps[]) {
   void iauS2c(double, double, double [3]);
   int32_t result = lux_v_dddp3_iaiqrp3q_0T2_f_(narg, ps, iauS2c);
@@ -1072,7 +1317,9 @@ int32_t lux_iauS2c_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in S2C", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauS2p_f(int32_t narg, int32_t ps[]) {
   void iauS2p(double, double, double, double [3]);
   int32_t result = lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(narg, ps, iauS2p);
@@ -1080,7 +1327,9 @@ int32_t lux_iauS2p_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in s2p", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauS2pv_f(int32_t narg, int32_t ps[]) {
   void iauS2pv(double, double, double, double, double, double, double [2][3]);
   int32_t result = lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(narg, ps, iauS2pv);
@@ -1088,7 +1337,9 @@ int32_t lux_iauS2pv_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in s2pv", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauSepp_f(int32_t narg, int32_t ps[]) {
   double iauSepp(double [3], double [3]);
   int32_t result = lux_d_dp3dp3_i3aiqrm3q_01_2_f_(narg, ps, iauSepp);
@@ -1096,7 +1347,9 @@ int32_t lux_iauSepp_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in sepp", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauSeps_f(int32_t narg, int32_t ps[]) {
   double iauSeps(double, double, double, double);
   int32_t result = lux_d_dT4_iaiqT3rq_0T3_4_f_(narg, ps, iauSeps);
@@ -1104,7 +1357,9 @@ int32_t lux_iauSeps_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in seps", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauSp00_f(int32_t narg, int32_t ps[]) {
   double iauSp00(double, double);
   int32_t result = lux_d_dd_iarq_0z_1_f_(narg, ps, iauSp00);
@@ -1112,7 +1367,9 @@ int32_t lux_iauSp00_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in sp00", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauStarpm_s(int32_t narg, int32_t ps[]) {
   int32_t iauStarpm(double, double, double, double, double, double, double, double, double, double, double *, double *, double *, double *, double *, double *);
   int32_t result = lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(narg, ps, iauStarpm);
@@ -1120,7 +1377,9 @@ int32_t lux_iauStarpm_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in starpm", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauStarpv_f(int32_t narg, int32_t ps[]) {
   int32_t iauStarpv(double, double, double, double, double, double, double [2][3]);
   int32_t result = lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(narg, ps, iauStarpv);
@@ -1128,7 +1387,9 @@ int32_t lux_iauStarpv_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in starpv", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTaitt_f(int32_t narg, int32_t ps[]) {
   int32_t iauTaitt(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauTaitt);
@@ -1136,7 +1397,9 @@ int32_t lux_iauTaitt_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in taitt", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTaiut1_f(int32_t narg, int32_t ps[]) {
   int32_t iauTaiut1(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauTaiut1);
@@ -1144,7 +1407,9 @@ int32_t lux_iauTaiut1_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in taiut1", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTaiutc_f(int32_t narg, int32_t ps[]) {
   int32_t iauTaiutc(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauTaiutc);
@@ -1152,7 +1417,9 @@ int32_t lux_iauTaiutc_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in taiutc", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTcbtdb_f(int32_t narg, int32_t ps[]) {
   int32_t iauTcbtdb(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauTcbtdb);
@@ -1160,7 +1427,9 @@ int32_t lux_iauTcbtdb_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tcbtdb", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTcgtt_f(int32_t narg, int32_t ps[]) {
   int32_t iauTcgtt(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauTcgtt);
@@ -1168,7 +1437,9 @@ int32_t lux_iauTcgtt_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tcgtt", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTdbtcb_f(int32_t narg, int32_t ps[]) {
   int32_t iauTdbtcb(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauTdbtcb);
@@ -1176,7 +1447,9 @@ int32_t lux_iauTdbtcb_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tdbtcb", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTdbtt_f(int32_t narg, int32_t ps[]) {
   int32_t iauTdbtt(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauTdbtt);
@@ -1184,7 +1457,9 @@ int32_t lux_iauTdbtt_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tdbtt", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTr_f(int32_t narg, int32_t ps[]) {
   void iauTr(double [3][3], double [3][3]);
   int32_t result = lux_v_dp33T2_i33arq_01_f_(narg, ps, iauTr);
@@ -1192,7 +1467,9 @@ int32_t lux_iauTr_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tr", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTrxp_f(int32_t narg, int32_t ps[]) {
   void iauTrxp(double [3][3], double [3], double [3]);
   int32_t result = lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(narg, ps, iauTrxp);
@@ -1200,7 +1477,9 @@ int32_t lux_iauTrxp_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in trxp", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTrxpv_f(int32_t narg, int32_t ps[]) {
   void iauTrxpv(double [3][3], double [2][3], double [2][3]);
   int32_t result = lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(narg, ps, iauTrxpv);
@@ -1208,7 +1487,9 @@ int32_t lux_iauTrxpv_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in trxpv", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTttai_f(int32_t narg, int32_t ps[]) {
   int32_t iauTttai(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauTttai);
@@ -1216,7 +1497,9 @@ int32_t lux_iauTttai_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tttai", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTttcg_f(int32_t narg, int32_t ps[]) {
   int32_t iauTttcg(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauTttcg);
@@ -1224,7 +1507,9 @@ int32_t lux_iauTttcg_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tttcg", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTttdb_f(int32_t narg, int32_t ps[]) {
   int32_t iauTttdb(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauTttdb);
@@ -1232,7 +1517,9 @@ int32_t lux_iauTttdb_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in tttdb", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauTtut1_f(int32_t narg, int32_t ps[]) {
   int32_t iauTtut1(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauTtut1);
@@ -1240,7 +1527,9 @@ int32_t lux_iauTtut1_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ttut1", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauUt1tai_f(int32_t narg, int32_t ps[]) {
   int32_t iauUt1tai(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauUt1tai);
@@ -1248,7 +1537,9 @@ int32_t lux_iauUt1tai_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ut1tai", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauUt1tt_f(int32_t narg, int32_t ps[]) {
   int32_t iauUt1tt(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauUt1tt);
@@ -1256,7 +1547,9 @@ int32_t lux_iauUt1tt_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ut1tt", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauUt1utc_f(int32_t narg, int32_t ps[]) {
   int32_t iauUt1utc(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauUt1utc);
@@ -1264,7 +1557,9 @@ int32_t lux_iauUt1utc_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in ut1utc", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauUtctai_f(int32_t narg, int32_t ps[]) {
   int32_t iauUtctai(double, double, double *, double *);
   int32_t result = lux_i_dddpdp_iarq_0z11_f_(narg, ps, iauUtctai);
@@ -1272,7 +1567,9 @@ int32_t lux_iauUtctai_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in utctai", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauUtcut1_f(int32_t narg, int32_t ps[]) {
   int32_t iauUtcut1(double, double, double, double *, double *);
   int32_t result = lux_i_dT3dpdp_iaiqrq_0z122_f_(narg, ps, iauUtcut1);
@@ -1280,7 +1577,9 @@ int32_t lux_iauUtcut1_f(int32_t narg, int32_t ps[]) {
     luxerror("Error in utcut1", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauXy06_s(int32_t narg, int32_t ps[]) {
   void iauXy06(double, double, double *, double *);
   int32_t result = lux_v_dddpdp_iaoqoq_0z12_s_(narg, ps, iauXy06);
@@ -1288,7 +1587,9 @@ int32_t lux_iauXy06_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in xy06", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauXys00a_s(int32_t narg, int32_t ps[]) {
   void iauXys00a(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iaoqT3_0z1T3_s_(narg, ps, iauXys00a);
@@ -1296,7 +1597,9 @@ int32_t lux_iauXys00a_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in xys00a", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauXys00b_s(int32_t narg, int32_t ps[]) {
   void iauXys00b(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iaoqT3_0z1T3_s_(narg, ps, iauXys00b);
@@ -1304,7 +1607,9 @@ int32_t lux_iauXys00b_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in xys00b", 0);
   return result;
 }
+#endif
 
+#if HAVE_LIBSOFA_C
 int32_t lux_iauXys06a_s(int32_t narg, int32_t ps[]) {
   void iauXys06a(double, double, double *, double *, double *);
   int32_t result = lux_v_dddpT3_iaoqT3_0z1T3_s_(narg, ps, iauXys06a);
@@ -1312,6 +1617,7 @@ int32_t lux_iauXys06a_s(int32_t narg, int32_t ps[]) {
     luxerror("Error in xys06a", 0);
   return result;
 }
+#endif
 
 int32_t lux_sincos_s(int32_t narg, int32_t ps[]) {
   void sincos(double, double*, double*);
@@ -1450,324 +1756,638 @@ void register_the_bindings()
 
   register_lux_f(lux_prutenic_nearest_new_moon_f, "prutenicnewmoon", 1, 1, 0);
 
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauBi00_f, "bi00", 0, 0, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauBp00_s, "bp00", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauBp06_s, "bp06", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauBpn2xy_s, "bpn2xy", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2i00a_f, "c2i00a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2i00b_f, "c2i00b", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2i06a_f, "c2i06a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2ibpn_f, "c2ibpn", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2ixy_f, "c2ixy", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2ixys_f, "c2ixys", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2s_f, "c2s", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2t00a_f, "c2t00a", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2t00b_f, "c2t00b", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2t06a_f, "c2t06a", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2tcio_f, "c2tcio", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2teqx_f, "c2teqx", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2tpe_f, "c2tpe", 5, 5, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2txy_f, "c2txy", 5, 5, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   int32_t lux_iauCal2jd(int32_t, int32_t []);
   register_lux_f(lux_iauCal2jd, "cal2jd", 1, 1, 0);
+#endif
 
+#if HAVE_LIBSOFA_C
   int32_t lux_iauDat(int32_t, int32_t []);
   register_lux_f(lux_iauDat, "dat", 0, 1, "1valid");
+#endif
 
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauDtdb_f, "dtdb", 5, 5, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_do_iauEe00_f, "ee00", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEe00a_f, "ee00a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEe00b_f, "ee00b", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEe06a_f, "ee06a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEect00_f, "eect00", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEform_f, "eform", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEo06a_f, "eo06a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEors_f, "eors", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEpb_f, "epb", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   int32_t lux_iauEpb2jd(int32_t, int32_t []);
   register_lux_f(lux_iauEpb2jd, "epb2jd", 1, 1, 0);
+#endif
 
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEpj_f, "epj", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   int32_t lux_iauEpj2jd(int32_t, int32_t []);
   register_lux_f(lux_iauEpj2jd, "epj2jd", 1, 1, 0);
+#endif
 
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauEpv00_s, "epv00", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEqeq94_f, "eqeq94", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEra00_f, "era00", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFad03_f, "fad03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFae03_f, "fae03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaf03_f, "faf03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaju03_f, "faju03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFal03_f, "fal03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFalp03_f, "falp03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFama03_f, "fama03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFame03_f, "fame03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFane03_f, "fane03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaom03_f, "faom03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFapa03_f, "fapa03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFasa03_f, "fasa03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaur03_f, "faur03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFave03_f, "fave03", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFk52h_s, "fk52h", 12, 12, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFk5hip_s, "fk5hip", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFk5hz_s, "fk5hz", 5, 5, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFw2m_f, "fw2m", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFw2xy_s, "fw2xy", 6, 6, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGc2gd_f, "gc2gd", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGc2gde_f, "gc2gde", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGd2gc_f, "gd2gc", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGd2gce_f, "gd2gce", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGmst00_f, "gmst00", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGmst06_f, "gmst06", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGmst82_f, "gmst82", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst00a_f, "gst00a", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst00b_f, "gst00b", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst06_f, "gst06", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst06a_f, "gst06a", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst94_f, "gst94", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauH2fk5_s, "h2fk5", 12, 12, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauHfk5z_s, "hfk5z", 7, 7, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauIr_f, "ir", 0, 0, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauJd2cal_f, "jd2cal", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNum00a_f, "num00a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNum00b_f, "num00b", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNum06a_f, "num06a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNumat_f, "numat", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut00a_s, "nut00a", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut00b_s, "nut00b", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut06a_s, "nut06a", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut80_s, "nut80", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNutm80_f, "nutm80", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauObl06_f, "obl06", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauObl80_f, "obl80", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauP06e_s, "p06e", 17, 17, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauP2s_f, "p2s", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPap_f, "pap", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPas_f, "pas", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPb06_s, "pb06", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPdp_f, "pdp", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPfw06_s, "pfw06", 5, 5, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPlan94_f, "plan94", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPm_f, "pm", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPmat00_f, "pmat00", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPmat06_f, "pmat06", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPmat76_f, "pmat76", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn_s, "pn", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn00_s, "pn00", 9, 9, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn00a_s, "pn00a", 9, 9, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn00b_s, "pn00b", 9, 9, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn06_s, "pn06", 9, 9, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn06a_s, "pn06a", 9, 9, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm00a_f, "pnm00a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm00b_f, "pnm00b", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm06a_f, "pnm06a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm80_f, "pnm80", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPom00_f, "pom00", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPr00_s, "pr00", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPrec76_s, "prec76", 5, 5, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPv2s_s, "pv25", 7, 7, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPvdpv_f, "pvdpv", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPvm_s, "pvm", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPvstar_s, "pvstar", 7, 7, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPvxpv_f, "pvxpv", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPxp_f, "pxp", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRm2v_f, "rm2v", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRxp_f, "rxp", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRxr_f, "rxr", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRv2m_f, "rv2m", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauRx_s, "rx", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRxpv_f, "rxpv", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauRy_s, "ry", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauRz_s, "rz", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_do_iauS00_f, "s00", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS00a_f, "s00a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS00b_f, "s00b", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_do_iauS06_f, "s06", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS06a_f, "s06a", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS2c_f, "S2C", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS2p_f, "s2p", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS2pv_f, "s2pv", 6, 6, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauSepp_f, "sepp", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauSeps_f, "seps", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauSp00_f, "sp00", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauStarpm_s, "starpm", 14, 14, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauStarpv_f, "starpv", 6, 6, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTaitt_f, "taitt", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTaiut1_f, "taiut1", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTaiutc_f, "taiutc", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTcbtdb_f, "tcbtdb", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTcgtt_f, "tcgtt", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTdbtcb_f, "tdbtcb", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTdbtt_f, "tdbtt", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTr_f, "tr", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTrxp_f, "trxp", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTrxpv_f, "trxpv", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTttai_f, "tttai", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTttcg_f, "tttcg", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTttdb_f, "tttdb", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTtut1_f, "ttut1", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUt1tai_f, "ut1tai", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUt1tt_f, "ut1tt", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUt1utc_f, "ut1utc", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUtctai_f, "utctai", 1, 1, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUtcut1_f, "utcut1", 2, 2, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXy06_s, "xy06", 3, 3, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXys00a_s, "xys00a", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXys00b_s, "xys00b", 4, 4, 0);
 
+#endif
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXys06a_s, "xys06a", 4, 4, 0);
 
+#endif
   register_lux_s(lux_sincos_s, "sincos", 3, 3, NULL);
 
   int32_t lux_generalfit2(int32_t, int32_t []);

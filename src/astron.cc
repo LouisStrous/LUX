@@ -1,6 +1,6 @@
 /* This is file astron.cc.
 
-Copyright 2013-2014 Louis Strous
+Copyright 2013-2020 Louis Strous
 
 This file is part of LUX.
 
@@ -82,6 +82,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <time.h>
 
+#include "config.h"
+
 #include "AstronomicalConstants.hh"
 #include "Ellipsoid.hh"
 #include "Rotate3d.hh"
@@ -90,9 +92,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "astrodat3.hh"
 #include "astron.hh"
 #include "calendar.hh"
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
 #include "replacements.h"       // if sincos is missing
 #include "vsop.hh"
 

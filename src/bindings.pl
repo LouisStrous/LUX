@@ -25,9 +25,12 @@ print $ofh <<EOD;
 
 #include <cstdint>                 // for int32_t
 #include <cstdlib>                 // for size_t
+#include "config.h"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
-#include "sofa.h"
+#if HAVE_LIBSOFA_C
+# include "sofa.h"
+#endif
 #include "historicephemerides.h"
 
 int32_t luxerror(char const*, int32_t, ...);

@@ -2,9 +2,12 @@
 
 #include <cstdint>                 // for int32_t
 #include <cstdlib>                 // for size_t
+#include "config.h"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
-#include "sofa.h"
+#if HAVE_LIBSOFA_C
+# include "sofa.h"
+#endif
 #include "historicephemerides.h"
 
 int32_t luxerror(char const*, int32_t, ...);
@@ -1696,6 +1699,11 @@ void register_the_bindings()
 
   int32_t lux_diagonal_matrix(int32_t, int32_t []);
   register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 1, NULL);
+
+#if HAVE_LIBCALCEPH
+  int32_t lux_astron2(int32_t, int32_t []);
+  register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdimensions:~2ecliptic:2equatorial:~4polar:4xyz:8date:16conjspread");
+#endif
 
   register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
 

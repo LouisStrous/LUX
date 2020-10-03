@@ -48,6 +48,7 @@ nonbind_sources = \
 	astrodat3.hh\
 	astron.cc\
 	astron.hh\
+	astron2.cc\
 	axis.cc\
 	axis.hh\
 	bindings.cc\

@@ -17,8 +17,10 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "config.h"
+
 #if HAVE_LIBSOFA_C
-# include "sofam.h"
+# include "sofa.h"
 # include "action.hh"
 # include <string.h>
 # include <time.h>

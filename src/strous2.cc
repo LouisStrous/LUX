@@ -752,6 +752,8 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
       case LUX_INT8:
         *trgt.ui8 = tmp0.ui8[t];
         if (f) {
+          // the quantile doesn't correspond to a specific element; interpolate
+          // linearly between the next lower and higher elements
           *trgt.ui8 +=
             static_cast<uint8_t>((tmp0.ui8[t + 1] - tmp0.ui8[t])*f);
         }

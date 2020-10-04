@@ -419,7 +419,7 @@ LoopInfo::rearrangeDimensionLoop()
       this->rdims[0] = this->dims[0];
       for (i = 1; i < this->ndim; i++)
         this->rdims[0] *= this->dims[i];
-      this->rndim = 1;
+      this->rndim = this->ndim? 1: 0; // 0 means scalar
       this->rsinglestep[0] = 1;
       this->raxes[0] = 0;
       for (i = 0; i < this->ndim; i++)
@@ -429,8 +429,9 @@ LoopInfo::rearrangeDimensionLoop()
 
   // prepare step sizes for use in advanceLoop()
   memcpy(this->step, this->rsinglestep, this->rndim*sizeof(int32_t));
-  for (i = this->rndim - 1; i; i--)
-    this->step[i] -= this->step[i - 1]*this->rdims[i - 1];
+  if (this->rndim > 0)
+    for (i = this->rndim - 1; i; i--)
+      this->step[i] -= this->step[i - 1]*this->rdims[i - 1];
 
   for (i = 0; i < this->rndim; i++)
     this->coords[i] = 0;        // initialize coordinates

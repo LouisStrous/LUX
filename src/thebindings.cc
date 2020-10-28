@@ -1702,7 +1702,7 @@ void register_the_bindings()
 
 #if HAVE_LIBCALCEPH
   int32_t lux_astron2(int32_t, int32_t []);
-  register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdimensions:~2ecliptic:2equatorial:~4polar:4xyz:8date:16conjspread");
+  register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdimensions:~6ecliptic:2equatorial:4bare:~8polar:8xyz:16date:32conjspread");
 #endif
 
   register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
@@ -1734,6 +1734,22 @@ void register_the_bindings()
   int32_t lux_findspans(int32_t, int32_t []);
   register_lux_f(lux_findspans, "findspans", 1, 1, "1cycle");
 
+  int32_t lux_permutationnumber(int32_t, int32_t []);
+  register_lux_f(lux_permutationnumber, "permutationnumber", 1, 1, "1circular");
+
+  int32_t lux_permutation(int32_t, int32_t []);
+  register_lux_f(lux_permutation, "permutation", 2, 2, "1circular");
+
+#if HAVE_LIBGSL
+  int32_t lux_permutationdistance(int32_t, int32_t []);
+  register_lux_f(lux_permutationdistance, "permutationdistance", 2, 2, "1circular");
+#endif
+
+#if HAVE_LIBGSL
+  int32_t lux_factorial(int32_t, int32_t []);
+  register_lux_f(lux_factorial, "factorial", 1, 1, NULL);
+#endif
+
   int32_t lux_gcommand(int32_t, int32_t []);
   register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
 
@@ -1741,13 +1757,13 @@ void register_the_bindings()
   register_lux_s(lux_gterm, "gterm", 1, 1, "");
 
   int32_t lux_gplot(int32_t, int32_t []);
-  register_lux_s(lux_gplot, "gplot", 1, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+  register_lux_s(lux_gplot, "gplot", 1, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
   int32_t lux_goplot(int32_t, int32_t []);
-  register_lux_s(lux_goplot, "goplot", 1, 8, ":::linetype:pointtype:dashtype:color:legend");
+  register_lux_s(lux_goplot, "goplot", 1, 9, ":::linetype:pointtype:dashtype:color:legend:breaks");
 
   int32_t lux_gaplot(int32_t, int32_t []);
-  register_lux_s(lux_gaplot, "gaplot", 0, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+  register_lux_s(lux_gaplot, "gaplot", 0, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
   int32_t lux_gnutv(int32_t, int32_t []);
   register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);

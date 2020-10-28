@@ -939,15 +939,18 @@ int32_t standardLoop0(int32_t data, int32_t nAxes, int32_t *axes,
   }
 
   // The input is of legal classes and types.
-
+  int original_data = data;
   if ((mode & SL_SRCUPGRADE)    // upgrade source if necessary
       && (symbol_type(data) < outType))         { // source needs upgrading
     data = lux_convert(1, &data, outType, 1); // upgrade
-    numerical(data, NULL, NULL, NULL, srcptr);
+    // need new data's srcptr.  Also, dims may now be stale
+    numerical(data, &dims, &ndim, NULL, srcptr);
   }
 
-  src->setupDimensionLoop(ndim, dims, symbol_type(data), nAxes,
-                          axes, srcptr, mode);
+  int status;
+  if (status = src->setupDimensionLoop(ndim, dims, symbol_type(data), nAxes,
+                                       axes, srcptr, mode))
+    return luxerror("Error %d\n", original_data, status);
 
   if (output) {                         // user wants an output symbol
     if (((mode & SL_UPGRADE)

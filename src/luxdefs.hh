@@ -298,15 +298,20 @@ enum binaryOp {
 #define I_SINGLEMODE    (~(I_PARENT | I_LINE | I_FILELEVEL))
 #define I_SINGLEEXEC    (~(I_PARENT | I_LINE | I_FILELEVEL | I_VALUE))
 
-// traceMode definitions
-#define T_FILE          (1 << 0)
-#define T_LOOP          (1 << 1)
-#define T_BLOCK         (1 << 2)
-#define T_ROUTINE       (1 << 3)
-#define T_SHOWSTATS     (1 << 4)
-#define T_CPUTIME       (1 << 5)
-#define T_SHOWEXEC      (1 << 6)
-#define T_ROUTINEIO     (1 << 7)
+/// Trace Mode bit flags
+enum TraceMode {
+  T_FILE = (1 << 0),            //!< Trace @files.
+  T_LOOP = (1 << 1),            //!< Trace any kind of loop.
+  T_BLOCK = (1 << 2),           //!< Trace {} blocks.
+
+  /// Trace user-defined subroutines, functions, and block routines.
+  T_ROUTINE = (1 << 3),
+
+  T_SHOWSTATS = (1 << 4),       //!< Show execution statistics.
+  T_CPUTIME = (1 << 5),         //!< Show CPU time.
+  T_SHOWEXEC = (1 << 6),
+  T_ROUTINEIO = (1 << 7)
+};
 
 // sprintf modes
 #define FMT_LEFT_JUSTIFY        (1 << 0) // - modifier

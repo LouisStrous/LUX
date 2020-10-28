@@ -493,7 +493,7 @@ internalRoutine         subroutine_table[] = {
   { "tapwrt",   2, 2, lux_tapwrt, 0 }, // tape.c
 #endif
   { "threecolors", 0, 1, lux_threecolors, 0 }, // xport.c
-  { "tolookup",         3, 3, lux_tolookup, "1one" }, // strous2.c
+  { "tolookup", 2, 3, lux_tolookup, "1one" }, // strous2.c
   { "trace",    0, 1, lux_trace, // install.c
     "1file:2loop:4braces:8routine:143all:16showstats:32cputime:64showexec:128enter" },
 #if DEVELOP

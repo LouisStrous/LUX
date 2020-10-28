@@ -20,9 +20,6 @@ version.texi
 doxyfile.stamp
 lux.doxy
 
-# generated from Doxyfile.in
-Doxyfile
-
 # output
 lux.htp/
 lux.cps

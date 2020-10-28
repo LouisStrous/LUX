@@ -171,6 +171,33 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     ++eps;
   }
 
+  char* legend = 0;
+  if (enarg) {
+    if (*eps) {                 // legend
+      if (symbolIsString(*eps))
+        legend = string_value(*eps);
+      else
+        return cerror(NEED_STR, *eps);
+    }
+    --enarg;
+    ++eps;
+  }
+
+  int breaks_count = 0;
+  Pointer breaks;
+  if (enarg) {
+    if (*eps) {                 // breaks
+      int iq = lux_long(1, eps);
+      if (iq == LUX_ERROR)
+        return LUX_ERROR;
+      if (numerical(iq, NULL, NULL, &breaks_count, &breaks)
+          == LUX_ERROR)
+        return LUX_ERROR;
+    }
+    --enarg;
+    ++eps;
+  }
+
   bool done = false;
   if (status == GplotStatus::gplot || first_gaplot) {
     if (enarg) {
@@ -316,18 +343,6 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
       gp.send("set format \"%g\"\n");
   }
 
-  char* legend = 0;
-  if (enarg) {
-    if (*eps) {                 // legend
-      if (symbolIsString(*eps))
-        legend = string_value(*eps);
-      else
-        return cerror(NEED_STR, *eps);
-    }
-    --enarg;
-    ++eps;
-  }
-
   // transform the coordinates to type double
   int32_t myps[3];
   int32_t ndata = 0;
@@ -353,16 +368,32 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     case 1:
       for (int i = 0; i < info[0].nelem; ++i) {
         gp.sendf("%.10g\n", *data[0].d++);
+        if (breaks_count && i == *breaks.i32) {
+          gp.sendf("\n");       // empty line means break in plot
+          ++breaks.i32;
+          --breaks_count;
+        }
       }
       break;
     case 2:
       for (int i = 0; i < info[0].nelem; ++i) {
         gp.sendf("%.10g %.10g\n", *data[0].d++, *data[1].d++);
+        if (breaks_count && i == *breaks.i32) {
+          gp.sendf("\n");       // empty line means break in plot
+          ++breaks.i32;
+          --breaks_count;
+        }
       }
       break;
     case 3:
       for (int i = 0; i < info[0].nelem; ++i) {
-        gp.sendf("%.10g %.10g %.10g\n", *data[0].d++, *data[1].d++, *data[2].d++);
+        gp.sendf("%.10g %.10g %.10g\n", *data[0].d++, *data[1].d++,
+                 *data[2].d++);
+        if (breaks_count && i == *breaks.i32) {
+          gp.sendf("\n");       // empty line means break in plot
+          ++breaks.i32;
+          --breaks_count;
+        }
       }
       break;
     }
@@ -449,9 +480,9 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
 
 /// gplot[,<x>],<y>[,<z>]
 ///      [,linetype=<ltype>,pointtype=<ptype>,dashtype=<dtype>
-///      ,color=<color>,
+///      ,color=<color>
 ///      ,xtitle=<xtitle>,ytitle=<ytitle>,ztitle=<ztitle>,title=<title>
-///      ,legend=<legend>]
+///      ,legend=<legend>,breaks=<breaks>]
 ///      [,/lii,/lio,/loi,/loo]
 ///      [,/liii,/lioi,/loii,/looi,/liio,/lioo,/loio,/looo]
 ///
@@ -478,6 +509,9 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
 ///
 /// <legend> is the text to display in the legend.
 ///
+/// <breaks> is a sorted list of 0-based indexes of points after which the graph
+/// should have a break: the segment to the next point is not drawn.
+///
 /// /lii asks for linear x and y axes; /lio asks for linear x and
 /// logarithmic y axes; /loi asks for logarithmic x and linear y axes;
 /// and /loo asks for logarithmic x and y axes.  /liii through /looo
@@ -485,7 +519,7 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
 int32_t lux_gplot(int32_t narg, int32_t ps[]) {
   return lux_gplot_backend(GplotStatus::gplot, narg, ps);
 }
-REGISTER(gplot, s, gplot, 1, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+REGISTER(gplot, s, gplot, 1, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
 /// goplot[,<x>],<y>[,linetype=<ltype>,pointtype=<ptype>,dashtype=<dtype>,
 ///     color=<color>,legend=<legend>]
@@ -504,15 +538,18 @@ REGISTER(gplot, s, gplot, 1, 12, ":::linetype:pointtype:dashtype:color:xtitle:yt
 /// <color> is the color to use.
 ///
 /// <legend> is the text to display in the legend.
+///
+/// <breaks> is a sorted list of 0-based indexes of points after which the graph
+/// should have a break: the segment to the next point is not drawn.
 int32_t lux_goplot(int32_t narg, int32_t ps[]) {
   return lux_gplot_backend(GplotStatus::goplot, narg, ps);
 }
-REGISTER(goplot, s, goplot, 1, 8, ":::linetype:pointtype:dashtype:color:legend");
+REGISTER(goplot, s, goplot, 1, 9, ":::linetype:pointtype:dashtype:color:legend:breaks");
 
 int32_t lux_gaplot(int32_t narg, int32_t ps[]) {
   return lux_gplot_backend(GplotStatus::gaplot, narg, ps);
 }
-REGISTER(gaplot, s, gaplot, 0, 12, ":::linetype:pointtype:dashtype:color:xtitle:ytitle:ztitle:title:legend:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
+REGISTER(gaplot, s, gaplot, 0, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
 int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
                                std::string gnuplot_command_fmt) {

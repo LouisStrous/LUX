@@ -118,6 +118,7 @@ astropos(double JD, int target_object, int observer_object, double xyz[3])
 #endif
 }
 
+/// Get positions of astronomical objects from NASA JPL DE431.
 int32_t
 lux_astron2(int32_t narg, int32_t ps[])
 {
@@ -132,15 +133,16 @@ lux_astron2(int32_t narg, int32_t ps[])
 
   const int S_ECLIPTIC   = 0;   // ecliptic coordinates (default)
   const int S_EQUATORIAL = 2;   // equatorial coordinates
-  const int S_COORDAXES  = (S_ECLIPTIC | S_EQUATORIAL);
+  const int S_BARE       = 4;   // non-rotated coordinates
+  const int S_COORDAXES  = (S_BARE | S_ECLIPTIC | S_EQUATORIAL);
 
   const int S_POLAR      = 0;   // polar coordinates (default)
-  const int S_XYZ        = 4;   // cartesian coordinates
+  const int S_XYZ        = 8;   // cartesian coordinates
   const int S_COORDTYPE  = (S_POLAR | S_XYZ);
 
-  const int S_EQUINOX_DATE = 8;
+  const int S_EQUINOX_DATE = 16;
 
-  const int S_CONJUNCTION_SPREAD = 16;
+  const int S_CONJUNCTION_SPREAD = 32;
 
   {
     // process arguments, and determine the dimensions of the return symbol
@@ -225,6 +227,9 @@ lux_astron2(int32_t narg, int32_t ps[])
       // date.  TODO: SOFA documentation says "from GCRS to specified date".
       iauPmat06(JD_equinox, 0, M);
       break;
+    case S_BARE:
+      iauIr(M);
+      break;
     }
   }
 
@@ -240,6 +245,9 @@ lux_astron2(int32_t narg, int32_t ps[])
         // get matrix for precessing cartesian equatorial (ICRS) to target date.
         // TODO: SOFA documentation says "from GCRS to specified date".
         iauPmat06(*JDs.d, 0, M);
+        break;
+      case S_BARE:
+        iauIr(M);
         break;
       }
     }
@@ -293,4 +301,4 @@ lux_astron2(int32_t narg, int32_t ps[])
   return cerror(NOSUPPORT, 0, "ASTRON2", "libcalceph")
 #endif
 }
-REGISTER(astron2, f, astron2, 2, 4, ":::equinox:1keepdimensions:~2ecliptic:2equatorial:~4polar:4xyz:8date:16conjspread", HAVE_LIBCALCEPH)
+REGISTER(astron2, f, astron2, 2, 4, ":::equinox:1keepdimensions:~6ecliptic:2equatorial:4bare:~8polar:8xyz:16date:32conjspread", HAVE_LIBCALCEPH)

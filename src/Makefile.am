@@ -87,6 +87,9 @@ nonbind_sources = \
 	gifread_lux.cc\
 	gifwrite_lux.cc\
 	gnuplot_interface.cc\
+	gslpp_sort.hh\
+	gslpp_sort_vector.hh\
+	gslpp_vector.hh\
 	hersh.cc\
 	hershey.hh\
 	history.c\

@@ -12052,6 +12052,7 @@ arguments.
 * f0read::                      Retrieve data from an FZ file
 * f0w::                         Write data to an FZ file
 * f0write::                     Write data to an FZ file
+* factorial::
 * fad03::                       Mean elongation of Moon
 * fade::                        Fade between two images
 * fade_init::                   Initialize a fade between two images
@@ -12283,6 +12284,9 @@ arguments.
 * peek::                        Investigate memory locations
 * pen::                         Set pen width
 * pencolor::                    Set pen color
+* permutation::                 Permutation for permutation number
+* permutationdistance::         Kendall tau distance between permutations
+* permutationnumber::           Permutation number for permutation
 * pfw06::                       Fukushima-Williams precession angles, IAU 2006
 * pit::                         Polynomial fit
 * pixelsto8bit::                Convert pixel values to 8-bit values
@@ -17571,7 +17575,7 @@ See also: @ref{fcwrite}, @ref{fzread}, @ref{fzhead}
 Alias: @ref{fzwrite}, @ref{fzw}, @ref{f0write}
 
 @c -------------------------------------
-@node f0write, fad03, f0w, Internal Routines
+@node f0write, factorial, f0w, Internal Routines
 @subsection f0write
 @findex f0write
 
@@ -17585,7 +17589,26 @@ See also: @ref{fcwrite}, @ref{fzread}, @ref{fzhead}
 Alias: @ref{fzwrite}, @ref{fzw}, @ref{f0w}
 
 @c -------------------------------------
-@node fad03, fade, f0write, Internal Routines
+@node factorial, fad03, f0write, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection factorial
+@findex factorial
+
+@code{@var{factorial(x})}
+
+[GSL]
+
+Returns the factorial of each element of @code{@var{x}}.  For integer
+value @code{@var{n}} greater than 0, the factorial of @code{@var{n}}
+is equal to the product of all integer values from 1 through
+@code{@var{n}}.  0 is returned for values less than 0 (for which the
+factorial is mathematically not defined).  Non-integer values are
+truncated to integers before the factorial is calculated, so
+@samp{factorial(3.2)} returns the same as @samp{factorial(3)}, which
+is @samp{6}, the product of 1, 2, and 3.
+
+@c -------------------------------------
+@node fad03, fade, factorial, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection fad03
 @findex fad03
@@ -19499,9 +19522,9 @@ See also: @ref{igamma}, @ref{beta}
 
 @code{gaplot[,@var{x}],@var{y}[,@var{z}]
         [,linetype=@var{ltype},pointtype=@var{ptype},dashtype=@var{dtype}]
-        [,color=@var{color},legend=@var{legend},xtitle=@var{xtitle}]
-        [,ytitle=@var{ytitle},ztitle=@var{ztitle},title=@var{title}]
-        [,/lii,/loi,/lio,/loo]
+        [,color=@var{color},legend=@var{legend},breaks=@var{breaks}]
+        [,xtitle=@var{xtitle},ytitle=@var{ytitle},ztitle=@var{ztitle}]
+        [,title=@var{title},/lii,/loi,/lio,/loo]
         [,/liii,/loii,/lioi,/looi,/liio,/loio,/lioo,/looo]}
 
 Defines a plot of @code{@var{y}} versus @code{@var{x}}, or
@@ -19534,6 +19557,11 @@ lines, symbols, or both.
 
 @code{@var{legend}} specifies the text with which to identify the
 graph in the legend in the plot.
+
+@code{@var{breaks}} specifies a sorted list of 0-based indexes of data
+points after which the segment to the next data point should not be
+drawn.  @code{gaplot,[3,4,5,6],[1,5,2,4],breaks=1} says that the
+segment from (4,5) to (5,2) should not be drawn.
 
 @code{@var{xtitle}} provides the title for the x axis.
 
@@ -19925,7 +19953,7 @@ See also: @ref{Astronomical Coordinate Calculations}
 
 @code{goplot[,@var{x}],@var{y}[,linetype=@var{ltype}]
         [,pointtype=@var{ptype},dashtype=@var{dtype}]
-        [,color=@var{color},legend=@var{legend}]}
+        [,color=@var{color},legend=@var{legend},breaks=@code{breaks}]}
 
 Adds the graph of @code{@var{y}} versus @code{@var{x}} to the previous
 plot created using @code{gplot} or @code{goplot}, through the external
@@ -19949,6 +19977,11 @@ lines, symbols, or both.
 @code{@var{legend}} specifies the text with which to identify the
 graph in the legend in the plot.
 
+@code{@var{breaks}} specifies a sorted list of 0-based indexes of data
+points after which the segment to the next data point should not be
+drawn.  @code{goplot,[3,4,5,6],[1,5,2,4],breaks=1} says that the
+segment from (4,5) to (5,2) should not be drawn.
+
 @c -------------------------------------
 @node gplot, gplot3d, goplot, Internal Routines
 @subsection gplot
@@ -19956,9 +19989,9 @@ graph in the legend in the plot.
 
 @code{gplot[,@var{x}],@var{y}[,@var{z}]
         [,linetype=@var{ltype},pointtype=@var{ptype},dashtype=@var{dtype}]
-        [,color=@var{color},legend=@var{legend},xtitle=@var{xtitle}]
-        [,ytitle=@var{ytitle},ztitle=@var{ztitle},title=@var{title}]
-        [,/lii,/loi,/lio,/loo]
+        [,color=@var{color},legend=@var{legend},breaks=@var{breaks}]
+        [,xtitle=@var{xtitle},ytitle=@var{ytitle},ztitle=@var{ztitle}]
+        [,title=@var{title},/lii,/loi,/lio,/loo]
         [,/liii,/loii,/lioi,/looi,/liio,/loio,/lioo,/looo]}
 
 Plots @code{@var{y}} versus @code{@var{x}}, or @code{@var{z}} versus
@@ -19992,6 +20025,11 @@ these are specified, you get a graph showing lines, symbols, or both.
 
 @code{@var{legend}} specifies the text with which to identify the
 graph in the legend in the plot.
+
+@code{@var{breaks}} specifies a sorted list of 0-based indexes of data
+points after which the segment to the next data point should not be
+drawn.  @code{gplot,[3,4,5,6],[1,5,2,4],breaks=1} says that the
+segment from (4,5) to (5,2) should not be drawn.
 
 @code{@var{xtitle}} provides the title for the x axis.
 
@@ -22814,7 +22852,7 @@ value of 1 or more to white.
 
 a pen change affects output to the Postscript file as well as output in
 the current LUX window (indicated by @code{!window}), but not in other
-LUX windows. 
+LUX windows.
 
 If @code{/standardgray} is specified, then the used gray scale always
 has the gray level of 0 correspond to black, and a gray level of 1 to
@@ -22823,7 +22861,7 @@ white.
 See also: @ref{erase}, @ref{set}, @ref{!window}
 
 @c -------------------------------------
-@node pencolor, pfw06, pen, Internal Routines
+@node pencolor, permutation, pen, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection pencolor
 @findex pencolor
@@ -22849,7 +22887,113 @@ See also: @ref{Incidental Colors}, @ref{!pdev}, @ref{pdev}, @ref{xopen},
 @ref{xclose}
 
 @c -------------------------------------
-@node pfw06, pit, pencolor, Internal Routines
+@node permutation, permutationdistance, pencolor, Internal Routines
+@subsection permutation
+@findex permutation
+
+@code{p = permutation(@var{pn}, @var{count} [, /circular]}
+
+Calculates the linear or circular permutation that corresponds to
+permutation number @code{@var{pn}} for @code{@var{count}} element and
+that is made up of the smallest possible non-negative integers.
+
+@code{@var{count}} must be nonnegative.  @code{@var{pn}} must be
+nonnegative and less than the possible number of permutations of
+@code{@var{count}} elements, which is @code{factorial(@var{count})}
+for linear permutations, and @code{factorial(@var{count - 1})} for
+circular permutations.
+
+See also: @ref{factorial}, @ref{permutationnumber},
+@ref{permutationdistance}
+
+@c -------------------------------------
+@node permutationdistance, permutationnumber, permutation, Internal Routines
+@subsection permutationdistance
+@findex permutationdistance
+
+@code{d = permutationdistance(@var{x1}, @var{x2} [, /circular])}
+
+[GSL]
+
+Calculates the nonnegative Kendall tau distance between two
+permutations @code{@var{x1}} and @code{@var{x2}}.  The permutations
+must have the same number of elements.
+
+The Kendall tau distance is the count of swaps of adjacent elements
+that are needed to make the relative order of the permutations
+identical.
+
+For example, @samp{permutationdistance([7, 2, 5, 8], [7, 8, 2, 5])}
+returns @samp{2}, because first swapping elements @samp{5} and
+@samp{8}, and then swapping elements @samp{2} and @samp{8} turns the
+first permutation into the second one, so 2 adjacent swaps suffice.
+
+If the number of elements is @var{n} then the distance is at most
+@code{n*(n - 1)/2 - 1}.
+
+Only the relative order of the elements is taken into account, so if
+we change the elements without changing their relative order then the
+result remains the same.  For example, @samp{permutationdistance([7,
+2, 5, 8], [701, 801, 201, 501])} and @samp{permutationdistance([1142,
+-100, 3.14, 2000.3], [3, 4, 1, 2])} also yield @samp{2}, because the
+elements of the second array are in the same relative order as before
+(the 3rd smallest element first, then the largest element, then the
+smallest, and finally the 2nd smallest), and likewise for the first
+array.
+
+See also: @ref{permutation}, @ref{permutationnumber}
+
+@c -------------------------------------
+@node permutationnumber, pfw06, permutationdistance, Internal Routines
+@subsection permutationnumber
+@findex permutationnumber
+
+@code{permutationnumber(@var{values} [, /circular])}
+
+Calculates a nonnegative integer number (the Lehmer code) that
+uniquely identifies the permutation (the relative order) of numerical
+data @code{@var{values}}.  If @code{/circular} is specified, then the
+last element is assumed to be followed by the first element again,
+thus closing the circle.  If the permutation is not circular, then we
+refer to it here as @emph{linear}.
+
+If you rearrange the elements in a different order, then the
+permutation number changes.
+
+If the data elements are in ascending order, then the permutation
+number is 0.  The greatest permutation number is returned if the data
+elements are in descending order.  That number is equal to
+@code{factorial(n) − 1} for linear permutations, or @code{factorial(n
+- 1) - 1} for circular permutations.
+
+The following table lists all permutations of 3 elements, with the
+corresponding linear and circular permutation numbers.
+
+@multitable {Permutation} {Linear} {Circular}
+@headitem Permutation @tab Linear @tab Circular
+@item [0, 1, 2] @tab 0 @tab 0
+@item [0, 2, 1] @tab 1 @tab 1
+@item [1, 0, 2] @tab 2 @tab 1
+@item [1, 2, 0] @tab 3 @tab 0
+@item [2, 0, 1] @tab 4 @tab 0
+@item [2, 1, 0] @tab 5 @tab 1
+@end multitable
+
+The circular permutation @samp{[1, 2, 0]} is equivalent to the
+circular permutation @samp{[0, 1, 2]} because in both permutations 2
+follows 1 and 0 follows 2 and 1 follows 0.
+
+So, @samp{permutationnumber([1, 0, 2])} yields @samp{2}, and that same
+permutation number is returned for any array of 3 elements with that
+same relative order (i.e., with the second element the least, the last
+element the greatest, and the first element in between in value).  For
+example, @samp{permutationnumber([-325.3, -1000, 22.3])} also yields
+@samp{2}.
+
+See also: @ref{factorial}, @ref{permutation}, @ref{permutationdistance}
+
+@c -------------------------------------
+@node pfw06, pit, permutationnumber, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection pfw06
 @findex pfw06

@@ -36,6 +36,9 @@ int32_t         minmax(int32_t *, int32_t, int32_t),
   copySym(int32_t), f_decomp(float *, int32_t, int32_t),
   copyToSym(int32_t, int32_t),
   f_solve(float *, float *, int32_t, int32_t);
+
+int32_t d_decomp(double *, int32_t, int32_t),
+  d_solve(double *, double *, int32_t, int32_t);
 //---------------------------------------------------------
 int32_t lux_noop(int32_t narg, int32_t ps[])
      /* no operation - a dummy routine that provides an entry point
@@ -3110,6 +3113,8 @@ Theory:
   }
 
   type = combinedType(array_type(ps[0]), array_type(ps[1]));
+  if (narg >= 4 && ps[4])
+    type = combinedType(type, array_type(ps[4]));
   if (type < LUX_FLOAT)
     type = LUX_FLOAT;
 
@@ -3417,6 +3422,112 @@ Theory:
             }
           }
           pr.f += nPar;                 // get ready for the next one
+          break;
+        case LUX_DOUBLE:
+          // get (X'X) in pl
+          do {
+            do {
+              for (i = 0; i < n; i++) {
+                *pl.d += *px.d * *p2.d * *pw.d * *pk.d;
+                px.d += stride;
+                p2.d += stride;
+                if (dw)
+                  pw.d += stride;
+                pk.d += dk;
+              }
+              px.d -= bigstride;
+              p2.d -= bigstride;
+              if (dw)
+                pw.d -= bigstride;
+              pk.d -= n*dk;
+              pl.d++;
+            } while (xinfo.moveLoop(yinfo.rndim, 1) <= yinfo.rndim);
+            xinfo.moveLoop(yinfo.rndim, -nPar);
+          } while (p2info.moveLoop(yinfo.rndim, 1) <= yinfo.rndim);
+          p2info.moveLoop(yinfo.rndim, -nPar);
+          pl.d -= nPar*nPar;    // back to the start
+
+          // get (X'y) in pr
+          j = yinfo.naxes - 1;
+          do {
+            for (i = 0; i < n; i++) {
+              *pr.d += *px.d * *py.d * *pw.d * *pk.d;
+              px.d += stride;
+              py.d += stride;
+              if (dw)
+                pw.d += stride;
+              pk.d += dk;
+            }
+            pr.d++;
+            px.d -= bigstride;
+            py.d -= bigstride;
+            if (dw)
+              pw.d -= bigstride;
+            pk.d -= n*dk;
+          } while (xinfo.moveLoop(yinfo.rndim, 1) <= yinfo.rndim);
+          xinfo.moveLoop(yinfo.rndim, -nPar);
+          pr.d -= nPar;                 // back to the start
+          d_decomp(pl.d, nPar, nPar); // LU decomposition of pl
+          d_solve(pl.d, pr.d, nPar, nPar); // solve: pr gets parameters <a>
+
+          if (chisq.d != NULL || err.d != NULL
+              || (pc.d != NULL && (internalMode & 1))) { // need chi-square
+            chi2 = f = norm = 0.0;
+            // calculate the deviations from the fit
+            k = nData*nRepeat;
+            for (i = 0; i < n; i++) {
+              value.d = *py.d;
+              for (j = 0; j < nPar; j++)
+                value.d -= pr.d[j]*px.d[j*k];
+              chi2 += value.d*value.d * *pw.d * *pk.d;
+              norm += *pk.d;
+              f += *pw.d * *pk.d;
+              px.d += stride;
+              py.d += stride;
+              if (dw)
+                pw.d += stride;
+              pk.d += dk;
+            }
+            px.d -= bigstride;
+            py.d -= bigstride;
+            if (dw)
+              pw.d -= bigstride;
+            pk.d -= n*dk;
+            if (chisq.d != NULL)
+              *chisq.d++ = chi2/norm;
+            errv = sqrt(chi2/f);
+            if (err.d)
+              *err.d++ = errv;
+          } else
+            chi2 = 1.0;
+          if ((internalMode & 1) == 0)
+            chi2 = 1.0;
+          if (pc.d) {           // get covariances
+            for (i = 0; i < nPar; i++) {
+              d_solve(pl.d, pc.d, nPar, nPar);
+              pc.d += nPar;
+            }
+            pc.d -= nPar*nPar;  // back to the start
+            if (internalMode & 1) {
+              if (chisq.d != NULL)
+                *chisq.d = f - 1;
+              chi2 = chi2/(f - 1);
+              for (i = 0; i < nPar*nPar; i++)
+                pc.d[i] *= chi2;
+            }
+            if (internalMode & 2) {
+              /* we transform the covariance matrix so its diagonal contains
+                 standard errors, one triangle contains covariances, and
+                 the other triangle contains correlation coefficients */
+              for (i = 0; i < nPar; i++)
+                for (j = 0; j < i; j++)
+                  pc.d[i + j*nPar] /= sqrt(pc.d[i*(nPar + 1)]*pc.d[j*(nPar + 1)]);
+              for (i = 0; i < nPar; i++)
+                pc.d[i + i*nPar] = sqrt(pc.d[i + i*nPar]);
+              pc.d += nPar*nPar;
+            }
+          }
+          pr.d += nPar;                 // get ready for the next one
           break;
       }         // end of switch (type)
 

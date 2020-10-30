@@ -2577,7 +2577,7 @@ int32_t lux_basin(int32_t narg, int32_t ps[])
  int32_t        mode, i, n, nsinks, *code, n0;
  register uint8_t       loc;
  uint8_t        end, locs[3];
- array  *h;
+ Array *h;
  register float         *alt, min0, min1 = 0.0, min2 = 0.0, min;
 
  iq = ps[0];                            // altitude map
@@ -4932,7 +4932,7 @@ int32_t lux_inpolygon(int32_t narg, int32_t ps[])
   }
   n = trgt - trgt0;
   if (n) {
-    symbol_memory(result) = sizeof(array) + lux_type_size[temptype]*n;
+    symbol_memory(result) = sizeof(Array) + lux_type_size[temptype]*n;
     symbol_data(result) = realloc(symbol_data(result), symbol_memory(result));
     array_dims(result)[0] = n;
   } else {

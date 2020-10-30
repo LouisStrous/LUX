@@ -221,14 +221,14 @@ int32_t lux_taprd(int32_t narg, int32_t ps[])
 int32_t lux_tapwrt(int32_t narg, int32_t ps[]) // read tape record
  {
  int32_t        fd, nbr, iq, j, nd, n, type;
- array        *h;
+ Array *h;
  Pointer q1;
  if ( (fd = tape_setup(narg,ps)) < 0) return -1;
                                  // get the size of the input array to load
  iq = ps[1];
  CK_ARR(iq, 1);
- h = (array *) sym[iq].spec.array.ptr;
- q1.i32 = (int32_t *) ((char *)h + sizeof(array));
+ h = (Array *) sym[iq].spec.array.ptr;
+ q1.i32 = (int32_t *) ((char *)h + sizeof(Array));
  nd = h->ndim;
  type = sym[iq].type;
  n = lux_type_size[type]; errno = 0;
@@ -254,7 +254,7 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])                        // wri
  intended for dumping large amounts of data */
 {
  int32_t        fd, nbr, iq, j, nd, n, recsize, nb, ic, offset, len, type;
- array        *h;
+ Array *h;
  Pointer q1;
 #if !WORDS_BIGENDIAN
  char        *p;
@@ -264,8 +264,8 @@ int32_t lux_tapebufout(int32_t narg, int32_t ps[])                        // wri
                                  // get the size of the output array
  iq = ps[1];
  CK_ARR(iq, 1);
- h = (array *) sym[iq].spec.array.ptr;
- q1.i32 = (int32_t *) ((char *)h + sizeof(array));
+ h = (Array *) sym[iq].spec.array.ptr;
+ q1.i32 = (int32_t *) ((char *)h + sizeof(Array));
  nd = h->ndim;
  type = sym[iq].type;
  nb = n = lux_type_size[sym[iq].type];

@@ -20,8 +20,18 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 /// \file
 
-// File strous3.c
+// File strous3.cc
 // Various LUX routines by L. Strous
+
+/// \defgroup luxroutines LUX routines
+///
+/// C++ functions that implement LUX subroutines and functions.  Typically, a
+/// C++ function called `lux_X` implements a LUX subroutine or function named
+/// `X`.
+///
+/// @{
+/// @}
+
 #include "config.h"
 #include <cassert>
 #include <stdio.h>
@@ -3016,11 +3026,32 @@ truncated_gcd(T a, T b, T min_value = 0,
   }
 }
 
+/// A comparison function object to allow indirect sorting of a constant vector
+/// by rearranging a vector of indexes into the constant vector.
+///
+///     std::vector<T> v = { 3, 7, 5 };     // vector to sort indirectly
+///     std::vector<int> ix = { 0, 1, 2 };  // vector of indexes into <v>
+///     Index_less ixless(v);
+///     std::sort(ix.begin(), ix.end(), ixless);
+///     // now v[ix[i]] for i = 0 .. 2 produces 3, 5, 7
 template<class T>
-struct Factor_index_less {
-  explicit Factor_index_less(const std::vector<T>& f) : m_f(f) { }
-  bool operator()(int a, int b) const { return m_f[a] < m_f[b]; }
-  const std::vector<T>& m_f;
+struct Index_less {
+
+  /// Constructor.
+  ///
+  /// \param[in] v is the vector to sort indirectly.  It is not modified.
+  explicit Index_less(const std::vector<T>& v) : m_v(v) { }
+
+  /// Is the element at index \p a less than the element at index \p b?
+  ///
+  /// \param[in] a is the index of the left-hand element.
+  ///
+  /// \param[in] b is the index of the right-hand element.
+  ///
+  /// \returns `true` if \a is less than \b, otherwise `false`.
+  bool operator()(int a, int b) const { return m_v[a] < m_v[b]; }
+
+  const std::vector<T>& m_v;    //!< The vector of elements to sort indirectly.
 };
 
 /// Categorizes values by their lowest common factors.
@@ -3079,12 +3110,11 @@ find_common_factor_category(const Iterator first, const Iterator last,
   categories.push_back(0);   // element 0 is associated with factor[0]
   ++it;
 
-  // We iterate over the remaining values.  For each one, we compare
-  // it with all factors seen so far, from small to large.  Vector
-  // category relies on the order of elements in vector factor, so we
-  // must not sort vector factor itself.  Instead, we maintain a
-  // vector of indexes into factor that produce the factors from small
-  // to large.
+  // We iterate over the remaining values.  For each one, we compare it with all
+  // factors seen so far, from small to large.  Vector <categories> relies on
+  // the order of elements in vector <factors>, so we must not sort vector
+  // <factors> itself.  Instead, we maintain a vector of indexes into <factors>
+  // that produce the factors from small to large.
   std::vector<int> factor_indexes;
   factor_indexes.push_back(0);
 
@@ -3102,13 +3132,12 @@ find_common_factor_category(const Iterator first, const Iterator last,
         found_one = true;
         break;                  // done
       } else if (g != 0) {
-        // The common factor differs from f so must be less than f.
-        // We try known factors in ascending order, so the detected
-        // common factor must not be in the list yet.  We replace f
-        // with g.
+        // The common factor differs from <f> so must be less than <f>.  We try
+        // known factors in ascending order, so the detected common factor must
+        // not be in the list yet.  We replace <f> with <g>.
         factors[fi] = g;
-        // keep factor_index sorted
-        Factor_index_less<T> fil(factors);
+        // keep <factor_indexes> sorted
+        Index_less<T> fil(factors);
         std::sort(factor_indexes.begin(), factor_indexes.end(), fil);
         categories.push_back(fi);
         found_one = true;
@@ -3123,13 +3152,13 @@ find_common_factor_category(const Iterator first, const Iterator last,
       factor_indexes.push_back(fi);
       // keep factor_index sorted
       std::sort(factor_indexes.begin(), factor_indexes.end(),
-                Factor_index_less<T>(factors));
+                Index_less<T>(factors));
       categories.push_back(fi);
     }
   }
 }
 
-// commonfactors, <x>, <factors>, <categories> [, tolerance=<tol>]
+// commonfactors, <x>, <factors>, <categories> [, <tol>]
 //
 // Assigns the values of <x> to categories depending on factors that
 // they have in common.  <tol> is the tolerance for detecting the
@@ -3209,6 +3238,7 @@ int32_t lux_commonfactors(int32_t narg, int32_t ps[]) {
   convert_vector_to_lux_array(categories, ps[2]);
   return LUX_OK;
 }
+REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 
 /// Returns a number that uniquely identifies a permutation.  A permutation is
 /// determined by the ranks of the values, so every three-element array with the
@@ -3331,33 +3361,25 @@ lux_permutationnumber(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   size_t count = (size_t) icount;
 
+  // We first determine the ranks of the values (0 = least, 1 = next higher,
+  // etc.)
   std::vector<size_t> r(count);
-  {
-    // We first determine the indexes of the values that bring them into
-    // ascending numerical order.
-    std::vector<size_t> ix(count);
-    switch (symbol_type(ps[0])) {
-    case LUX_INT8:
-      gsl_sort_index(ix.data(), src.ui8, 1, count);
-      break;
-    case LUX_INT16:
-      gsl_sort_index(ix.data(), src.i16, 1, count);
-      break;
-    case LUX_INT32:
-      gsl_sort_index(ix.data(), src.i32, 1, count);
-      break;
-    case LUX_FLOAT:
-      gsl_sort_index(ix.data(), src.f, 1, count);
-      break;
-    case LUX_DOUBLE:
-      gsl_sort_index(ix.data(), src.d, 1, count);
-      break;
-    }
-
-    // Now transform the indexes into ranks
-    for (int i = 0; i < count; ++i) {
-      r[ix[i]] = i;
-    }
+  switch (symbol_type(ps[0])) {
+  case LUX_INT8:
+    sort_rank(r.data(), src.ui8, 1, count);
+    break;
+  case LUX_INT16:
+    sort_rank(r.data(), src.i16, 1, count);
+    break;
+  case LUX_INT32:
+    sort_rank(r.data(), src.i32, 1, count);
+    break;
+  case LUX_FLOAT:
+    sort_rank(r.data(), src.f, 1, count);
+    break;
+  case LUX_DOUBLE:
+    sort_rank(r.data(), src.d, 1, count);
+    break;
   }
 
   // Now we can calculate the permutation numbers from the ranks, which always
@@ -3512,6 +3534,15 @@ permutation_circular(size_t permutationnumber, size_t n)
   }
 }
 
+/// Implements the `permutation` function in LUX.
+///
+/// `    p = permutation(pn, n [, /circular])`
+///
+/// \param[in] narg is the number of arguments.
+///
+/// \param[in,out] points at the LUX symbol number of the first argument.
+///
+/// \returns the LUX symbol number of the result.
 int32_t
 lux_permutation(int32_t narg, int32_t ps[])
 {
@@ -3560,29 +3591,16 @@ template<typename T>
 size_t
 permutation_distance(size_t n, const T* p1, const T* p2)
 {
-  // 1. determine the indexes (0 .. n − 1) of the elements in both arrays
-  std::vector<size_t> i1(n);
-  gsl_sort_index(i1.data(), p1, 1, n);
-  // now p1[i1[i]] are in ascending order, for i = 0 .. n − 1
-
-  std::vector<size_t> i2(n);
-  gsl_sort_index(i2.data(), p2, 1, n);
-  // now p2[i2[i]] are in ascending order, for i = 0 .. n − 1
-
-  // 2. get the ranks of the elements in both arrays
+  // 1. determine the ranks (0 .. n − 1) of the elements in both arrays
   std::vector<size_t> r1(n);
-  for (size_t i = 0; i < n; ++i) {
-    r1[i1[i]] = i;
-  }
+  sort_rank(r1.data(), p1, 1, n);
+  // now r1[i] are the ranks (0 = least, n − 1 = greatest) of p1
 
   std::vector<size_t> r2(n);
-  for (size_t i = 0; i < n; ++i) {
-    r2[i2[i]] = i;
-  }
-  // now r1[i] are the ranks (0 = least, n − 1 = greatest) of p1
-  // and likewise r2 for p2
+  sort_rank(r2.data(), p2, 1, n);
+  // now r2[i] are the ranks (0 = least, n − 1 = greatest) of p2
 
-  // 3. calculate the number of inversions between r1 and r2
+  // 2. calculate the number of inversions between r1 and r2
   size_t d = 0;
   for (int i1 = 0; i1 < n - 1; ++i1) {
     for (int i2 = i1 + 1; i2 < n; ++i2) {
@@ -3606,47 +3624,34 @@ permutation_distance(size_t n, const T* p1, const T* p2)
 ///
 /// \tparam T is the data type of both permutations.
 ///
-/// \param[in] count is the number of elements in each permutation.
+/// \param[in] n is the number of elements in each permutation.
 ///
 /// \param[in] p1 points at the start of the first permutation.
 ///
 /// \param[in] p2 points at the start of the second permutation.
 ///
-/// \returns the nonnegative distance, which is less than `count`*(`count` −
-/// 1)/2.
+/// \returns the nonnegative distance, which is less than \f$n(n - 1)/2\f$.
 template<typename T>
 size_t
-permutation_distance_circular(size_t count, const T* p1, const T* p2)
+permutation_distance_circular(size_t n, const T* p1, const T* p2)
 {
-  // 1. determine the indexes (0 .. count − 1) of the elements in both arrays
-  std::vector<size_t> i1(count);
-  gsl_sort_index(i1.data(), p1, 1, count);
-  // now p1[i1[i]] are in ascending order, for i = 0 .. count − 1
+  // 1. determine the ranks (0 .. n − 1) of the elements in both arrays
+  std::vector<size_t> r1(n);
+  sort_rank(r1.data(), p1, 1, n);
 
-  std::vector<size_t> i2(count);
-  gsl_sort_index(i2.data(), p2, 1, count);
-  // now p2[i2[i]] are in ascending order, for i = 0 .. count − 1
+  std::vector<size_t> r2(n);
+  sort_rank(r2.data(), p2, 1, n);
 
-  // 2. get the ranks of the elements in both arrays
-  std::vector<size_t> r1(count);
-  for (size_t i = 0; i < count; ++i) {
-    r1[i1[i]] = i;
-  }
-
-  std::vector<size_t> r2(count);
-  for (size_t i = 0; i < count; ++i) {
-    r2[i2[i]] = i;
-  }
-  // now r1[i] are the ranks (0 = least, count − 1 = greatest) of p1
+  // now r1[i] are the ranks (0 = least, n − 1 = greatest) of p1
   // and likewise r2 for p2
 
   size_t d_min = std::numeric_limits<size_t>::max();
 
-  for (size_t s = 0; s < count; ++s) {
-    // 3. calculate the number of inversions between r1 and r2
+  for (size_t s = 0; s < n; ++s) {
+    // 2. calculate the number of inversions between r1 and r2
     size_t d = 0;
-    for (int i1 = 0; i1 < count - 1; ++i1) {
-      for (int i2 = i1 + 1; i2 < count; ++i2) {
+    for (int i1 = 0; i1 < n - 1; ++i1) {
+      for (int i2 = i1 + 1; i2 < n; ++i2) {
         d += (   ((r1[i1] > r1[i2]) && (r2[i1] < r2[i2]))
               || ((r1[i1] < r1[i2]) && (r2[i1] > r2[i2])));
       }
@@ -3654,10 +3659,10 @@ permutation_distance_circular(size_t count, const T* p1, const T* p2)
     if (d < d_min)
       d_min = d;
 
-    if (s < count - 1) {
+    if (s < n - 1) {
       // 5. adjust the p2 ranks for the next circular candidate
-      for (int i = 0; i < count; ++i) {
-        if (r2[i] == count - 1)
+      for (int i = 0; i < n; ++i) {
+        if (r2[i] == n - 1)
           r2[i] = 0;
         else
           ++r2[i];
@@ -3667,15 +3672,19 @@ permutation_distance_circular(size_t count, const T* p1, const T* p2)
   return d_min;
 }
 
+/// \ingroup luxroutines
+///
 /// Implements the `permutationdistance` function in LUX.
 ///
-/// `    d = permutationdistance(p1, p2 [, /circular])`
+///     d = permutationdistance(p1, p2 [, /circular])
 ///
 /// \param[in] narg is the number of arguments.
 ///
 /// \param[in,out] points at the LUX symbol number of the first argument.
 ///
 /// \returns the LUX symbol number of the result.
+///
+/// \sa permutation_distance()
 int32_t
 lux_permutationdistance(int32_t narg, int32_t ps[])
 {
@@ -3748,6 +3757,19 @@ REGISTER(permutationdistance, f, permutationdistance, 2, 2, "1circular", HAVE_LI
 #endif
 
 #if HAVE_LIBGSL
+/// \ingroup luxroutines
+///
+/// Implements the `factorial` function in LUX.
+///
+///     f = factorial(x)
+///
+/// Depends on the Gnu Scientific Library.
+///
+/// \param[in] narg is the number of arguments.
+///
+/// \param[in,out] points at the LUX symbol number of the first argument.
+///
+/// \returns the LUX symbol number of the result.
 int32_t
 lux_factorial(int32_t narg, int32_t ps[])
 {

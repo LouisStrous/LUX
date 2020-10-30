@@ -1,3 +1,4 @@
+/// @cond
 /*
  * jpegdata.h
  *
@@ -183,7 +184,6 @@ typedef UINT16 QUANT_VAL;	/* element of a quantization table */
 typedef QUANT_VAL QUANT_TBL[DCTSIZE2];	/* A quantization table */
 typedef QUANT_VAL * QUANT_TBL_PTR;	/* pointer to same */
 
-
 typedef struct {		/* A Huffman coding table */
   /* These two fields directly represent the contents of a JPEG DHT marker */
 	UINT8 bits[17];		/* bits[k] = # of symbols with codes of */
@@ -206,7 +206,6 @@ typedef struct {		/* A Huffman coding table */
 	/* (maxcode[17] is a sentinel to ensure huff_DECODE terminates) */
 	short valptr[17];	/* huffval[] index of 1st symbol of length k */
 } HUFF_TBL;
-
 
 #define NUM_QUANT_TBLS      4	/* quantization tables are numbered 0..3 */
 #define NUM_HUFF_TBLS       4	/* Huffman tables are numbered 0..3 */
@@ -883,3 +882,4 @@ EXTERN void jselmemmgr PP((external_methods_ptr emethods)); /* jmemmgr.c */
 
 
 #define RST0	0xD0		/* RST0 marker code */
+/// @endcond

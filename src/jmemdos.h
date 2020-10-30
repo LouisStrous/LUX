@@ -1,3 +1,4 @@
+/// @cond
 /*
  * jmemdos.h  (jmemsys.h)
  *
@@ -133,3 +134,4 @@ EXTERN void jopen_backing_store PP((backing_store_ptr info,
 
 EXTERN void jmem_init PP((external_methods_ptr emethods));
 EXTERN void jmem_term PP((void));
+/// @endcond

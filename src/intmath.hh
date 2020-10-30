@@ -23,10 +23,14 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include "action.hh"
 
-typedef struct {
-  int32_t quot;
-  int32_t rem;
-} Div_t;
+/// A struct with fields for the quotient and remainder of a division of
+/// `int32_t` values.  The standard std::div_t-like types are defined in terms
+/// of standard integer types of which the width is not necessarily the same on
+/// all systems.
+struct Div_t {
+  int32_t quot;                 //!< The quotient.
+  int32_t rem;                  //!< The remainder.
+};
 
 Div_t adiv(int32_t numerator, int32_t denominator);
 int32_t iaquot(int32_t numerator, int32_t denominator);

@@ -54,12 +54,12 @@ extern int32_t        screen_num, black_pixel, white_pixel;
 extern double        last_time;
 int32_t        theMenu, theItem;
 
+/// A menu pane.
 struct Menu {
-  int32_t          n_items;                // number of menu panes (including title)
-  char         **text;                // pointer to item strings
-  Window       *window;                // pointer to item windows
+  int32_t n_items;              //!< number of menu panes (including title)
+  char**  text;                 //!< pointer to item strings
+  Window* window;               //!< pointer to item windows
 };
-typedef        struct Menu     Menu;
 // title is # 0
 
 Menu        menu[MAXMENU];

@@ -200,7 +200,7 @@ int32_t lux_tense(int32_t narg, int32_t ps[])                   // tense functio
   int32_t       i, iq, len[3], n, result_sym, nf;
   double        sigma, der_left, der_right, *st, *yf;
   Pointer p[3];
-  array         *h;
+  Array         *h;
   int32_t       curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
            double *yp, double *temp, double *sigma, double *xf, double *yf,
            int32_t *nf);
@@ -208,13 +208,13 @@ int32_t lux_tense(int32_t narg, int32_t ps[])                   // tense functio
   for (i=0;i<3;i++) {
     iq = ps[i];
     if ( symbol_class(iq) != LUX_ARRAY ) return cerror(NEED_ARR, ps[i]);
-    h = (array *) sym[iq].spec.array.ptr;
+    h = (Array *) sym[iq].spec.array.ptr;
     if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]);       // ck if 1-D
     // double each one
     iq = lux_double(1, &iq);
-    h = (array *) sym[iq].spec.array.ptr;
+    h = (Array *) sym[iq].spec.array.ptr;
     len[i] = h->dims[0];
-    p[i].i32 = (int32_t *) ((char *)h + sizeof(array));
+    p[i].i32 = (int32_t *) ((char *)h + sizeof(Array));
   }
   // take smaller of X and Y size
   n = MIN( len[0], len[1]);
@@ -224,8 +224,8 @@ int32_t lux_tense(int32_t narg, int32_t ps[])                   // tense functio
   if (narg > 4)  { der_left = double_arg( ps[4] );  sigma = - sigma; }
   if (narg > 5) der_right = double_arg( ps[5] );
   result_sym = array_clone(ps[2], LUX_DOUBLE);
-  h = (array *) sym[result_sym].spec.array.ptr;
-  yf = (double *) ((char *)h + sizeof(array));
+  h = (Array *) sym[result_sym].spec.array.ptr;
+  yf = (double *) ((char *)h + sizeof(Array));
   nf = len[2];
   // scratch storage for 2 double arrays
   st = (double *) malloc( 16 * n );
@@ -254,7 +254,7 @@ int32_t lux_tense_curve(int32_t narg, int32_t ps[])// tense_curve function
   int32_t       i, iq, len[3], n, result_sym, dim[2], nf;
   double        sigma, der_left, der_right, *st, *yf, *xf;
   Pointer p[3];
-  array         *h;
+  Array         *h;
   int32_t       kurv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
            double *xp, double *yp, double *temp, double *sigma, double *t,
            double *xs, double *ys, int32_t *nf);
@@ -263,13 +263,13 @@ int32_t lux_tense_curve(int32_t narg, int32_t ps[])// tense_curve function
 for (i=0;i<3;i++) {
 iq = ps[i];
 if ( symbol_class(iq) != 4 ) return cerror(NEED_ARR, ps[i]);
-h = (array *) sym[iq].spec.array.ptr;
+h = (Array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]);   // ck if 1-D
                                                 // double each one
 iq = lux_double(1, &iq);
-h = (array *) sym[iq].spec.array.ptr;
+h = (Array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
-p[i].i32 = (int32_t *) ((char *)h + sizeof(array));
+p[i].i32 = (int32_t *) ((char *)h + sizeof(Array));
 }
 // take smaller of X and Y size
 n = MIN( len[0], len[1]);
@@ -280,8 +280,8 @@ if (narg > 5) der_right = double_arg( ps[5] );
 sigma = - sigma;
 dim[0] = nf = len[2];   dim[1] = 2;
 result_sym = array_scratch(LUX_DOUBLE, 2, dim);
-h = (array *) sym[result_sym].spec.array.ptr;
-xf = (double *) ((char *)h + sizeof(array));
+h = (Array *) sym[result_sym].spec.array.ptr;
+xf = (double *) ((char *)h + sizeof(Array));
 yf = xf + nf;
                                 // scratch storage for 3 double arrays
 st = (double *) malloc( 24 * n );
@@ -308,7 +308,7 @@ int32_t lux_tense_loop(int32_t narg, int32_t ps[])/* tense_loop function */
   int32_t       i, iq, len[3], n, result_sym, dim[2], nf;
   double        sigma, *st, *yf, *xf;
   Pointer p[3];
-  array         *h;
+  Array         *h;
   int32_t kurvp1_(int32_t *n, double *x, double *y, double *xp, double *yp,
               double *temp, double *sigma, double *t, double *xs, double *ys,
               int32_t *nf);
@@ -316,13 +316,13 @@ int32_t lux_tense_loop(int32_t narg, int32_t ps[])/* tense_loop function */
 for (i=0;i<3;i++) {
 iq = ps[i];
 if ( symbol_class(iq) != 4 ) return cerror(NEED_ARR, ps[i]);
-h = (array *) sym[iq].spec.array.ptr;
+h = (Array *) sym[iq].spec.array.ptr;
 if ( h->ndim != 1) return cerror(NEED_1D_ARR, ps[i]);   // ck if 1-D
                                                 // double each one
 iq = lux_double(1, &iq);
-h = (array *) sym[iq].spec.array.ptr;
+h = (Array *) sym[iq].spec.array.ptr;
 len[i] = h->dims[0];
-p[i].i32 = (int32_t *) ((char *)h + sizeof(array));
+p[i].i32 = (int32_t *) ((char *)h + sizeof(Array));
 }
 // take smaller of X and Y size
 n = MIN( len[0], len[1]);
@@ -331,8 +331,8 @@ if (narg > 3) sigma = double_arg( ps[3] );
 sigma = - sigma;
 dim[0] = nf = len[2];   dim[1] = 2;
 result_sym = array_scratch(LUX_DOUBLE, 2, dim);
-h = (array *) sym[result_sym].spec.array.ptr;
-xf = (double *) ((char *)h + sizeof(array));
+h = (Array *) sym[result_sym].spec.array.ptr;
+xf = (double *) ((char *)h + sizeof(Array));
 yf = xf + nf;
                                 // scratch storage for 3 double arrays
                                 // one of which is 2*nf long
@@ -1411,7 +1411,7 @@ int32_t lux_histr(int32_t narg, int32_t ps[]) // histr function
 {
   int32_t       iq, n, nd, j, type, size, nRepeat;
   float         sum, fac;
-  array         *h;
+  Array         *h;
   Pointer q1, q2;
   int32_t       lux_hist(int32_t, int32_t []);
 
@@ -1424,8 +1424,8 @@ int32_t lux_histr(int32_t narg, int32_t ps[]) // histr function
     return cerror(IMPOSSIBLE, iq);}
   type = sym[iq].type;
   if (type != LUX_INT32 ) return cerror(IMPOSSIBLE, iq);
-  h = (array *) sym[iq].spec.array.ptr;
-  q1.i32 = (int32_t *) ((char *)h + sizeof(array));
+  h = (Array *) sym[iq].spec.array.ptr;
+  q1.i32 = (int32_t *) ((char *)h + sizeof(Array));
   nd = h->ndim;         n = 1;
   for(j=0;j<nd;j++) n *= h->dims[j];
   sym[iq].type = LUX_FLOAT;             // change to float
@@ -1477,12 +1477,12 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
   if (numerical(ps[0], NULL, NULL, &nData, &src) == LUX_ERROR)
     return LUX_ERROR;
   nStore = 512;
-  avalue = (char *) malloc(nStore*sizeof(int32_t) + sizeof(array));
-  afreq = (char *) malloc(nStore*sizeof(int32_t) + sizeof(array));
+  avalue = (char *) malloc(nStore*sizeof(int32_t) + sizeof(Array));
+  afreq = (char *) malloc(nStore*sizeof(int32_t) + sizeof(Array));
   if (!avalue || !afreq)
     return cerror(ALLOC_ERR, 0);
-  value = (int32_t *) (avalue + sizeof(array));
-  freq = (int32_t *) (afreq + sizeof(array));
+  value = (int32_t *) (avalue + sizeof(Array));
+  freq = (int32_t *) (afreq + sizeof(Array));
 
   nValue = 0;
   while (nData--) {
@@ -1512,12 +1512,12 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
     else {                      // not yet in list
       if (++nValue == nStore) { // need to allocate more room
         nStore += 512;
-        avalue = (char *) realloc(avalue, nStore*sizeof(int32_t) + sizeof(array));
-        afreq = (char *) realloc(afreq, nStore*sizeof(int32_t) + sizeof(array));
+        avalue = (char *) realloc(avalue, nStore*sizeof(int32_t) + sizeof(Array));
+        afreq = (char *) realloc(afreq, nStore*sizeof(int32_t) + sizeof(Array));
         if (!avalue || !afreq)
           return cerror(ALLOC_ERR, 0);
-        value = (int32_t *) (avalue + sizeof(array));
-        freq = (int32_t *) (afreq + sizeof(array));
+        value = (int32_t *) (avalue + sizeof(Array));
+        freq = (int32_t *) (afreq + sizeof(Array));
       }
       y = -y;
       memmove(value + y, value + y - 1, (nValue - y)*sizeof(int32_t));
@@ -1526,30 +1526,26 @@ int32_t lux_hist_dense(int32_t narg, int32_t ps[])
       freq[y] = 1;
     }
   }
-  avalue = (char *) realloc(avalue, nValue*sizeof(int32_t) + sizeof(array));
-  afreq = (char *) realloc(afreq, nValue*sizeof(int32_t) + sizeof(array));
+  avalue = (char *) realloc(avalue, nValue*sizeof(int32_t) + sizeof(Array));
+  afreq = (char *) realloc(afreq, nValue*sizeof(int32_t) + sizeof(Array));
   if (!avalue || !afreq)
     return cerror(ALLOC_ERR, 0);
 
   getFreeTempVariable(result);
   symbol_class(result) = LUX_ARRAY;
   array_type(result) = LUX_INT32;
-  array_header(result) = (array *) afreq;
+  array_header(result) = (Array *) afreq;
   array_num_dims(result) = 1;
   *array_dims(result) = nValue;
-  array_header(result)->c1 = array_header(result)->c2
-    = array_header(result)->nfacts = 0;
-  array_header(result)->facts = NULL;
-  symbol_memory(result) = nValue*sizeof(int32_t) + sizeof(array);
+  array_header(result)->c1 = array_header(result)->c2 = 0;
+  symbol_memory(result) = nValue*sizeof(int32_t) + sizeof(Array);
 
   symbol_class(ps[1]) = LUX_ARRAY;
   array_type(ps[1]) = LUX_INT32;
-  array_header(ps[1]) = (array *) avalue;
+  array_header(ps[1]) = (Array *) avalue;
   array_num_dims(ps[1]) = 1;
   *array_dims(ps[1]) = nValue;
-  array_header(ps[1])->c1 = array_header(ps[1])->c2
-    = array_header(ps[1])->nfacts = 0;
-  array_header(ps[1])->facts = NULL;
+  array_header(ps[1])->c1 = array_header(ps[1])->c2 = 0;
   symbol_memory(ps[1]) = symbol_memory(result);
 
   return result;
@@ -1566,7 +1562,7 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) // histogram function
   int32_t       iq, i, n, range, result_sym, *dims, nRepeat,
         ndim, axis, one = 1, size;
   Symboltype type;
-  array         *h;
+  Array *h;
   Pointer q1, q2;
   int32_t       lux_zero(int32_t, int32_t []);
   void convertWidePointer(wideScalar *, int32_t, int32_t);
@@ -1638,7 +1634,7 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) // histogram function
     nRepeat = 1;
     result_sym = array_scratch(LUX_INT32, 1, &one);
     h = HEAD(result_sym); }
-  q2.i32 = (int32_t *) ((char *)h + sizeof(array));
+  q2.i32 = (int32_t *) ((char *)h + sizeof(Array));
   lux_zero( 1, &result_sym);            // need to zero initially
   // now accumulate the distribution
   while (nRepeat--)

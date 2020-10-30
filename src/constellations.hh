@@ -40,6 +40,7 @@ char const* constellation_names[] = {
   "Tuc", "UMa", "UMi", "Vel", "Vir", "Vol", "Vul"
 };
 
+/// A struct for defining constellation boundaries.
 struct constellation_struct {
   double alpha1;
   double alpha2;

@@ -271,195 +271,207 @@ internalRoutine         subroutine_table[] = {
   { "%insert",  3, MAX_ARG, insert, // execute.c
     "1inner:2outer:4onedim:8skipspace:16zero:32all:64separate" },
   { "area",     1, 4, lux_area, ":seed:numbers:diagonal" }, // topology.c
-  { "area2",    2, 6, lux_area2, // toplogy.c
+  { "area2",    2, 6, lux_area2,                            // toplogy.c
     "::seed:numbers:diagonal:sign" },
-  { "arestore",         1, MAX_ARG, lux_arestore, 0 }, // files.c
-  { "astore",   2, MAX_ARG, lux_astore, 0 }, // files.c
-  { "atomize",          1, 1, lux_atomize, "1tree:2line" }, // strous.c
-  { "batch",    0, 1, lux_batch, "1quit" }, // symbols.c
-  { "breakpoint", 0, 1, lux_breakpoint, // install.c
+  { "arestore", 1, MAX_ARG, lux_arestore, 0 },      // files.c
+  { "astore",   2, MAX_ARG, lux_astore, 0 },        // files.c
+  { "atomize",  1, 1, lux_atomize, "1tree:2line" }, // strous.c
+  { "batch",    0, 1, lux_batch, "1quit" },         // symbols.c
+  { "breakpoint", 0, 1, lux_breakpoint,             // install.c
     "0set:1enable:2disable:3delete:4list:8variable" },
   { "byte",     1, MAX_ARG, lux_byte_inplace, 0, }, // symbols.c
-  { "c",        1, 7, lux_callig, // hersh.c
+  { "c",        1, 7, lux_callig,                   // hersh.c
     "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
 #if CALCULATOR
-  { "calculator",       0, 0, lux_calculator, 0 }, // calculator.c
+  { "calculator", 0, 0, lux_calculator, 0 }, // calculator.c
 #endif
   { "callig",   1, 7, lux_callig, // hersh.c
     "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
   { "cdouble",  1, MAX_ARG, lux_cdouble_inplace, 0 }, // symbols.c
-  { "cfloat",   1, MAX_ARG, lux_cfloat_inplace, 0 }, // symbols.c
-  { "chdir",    0, 1, lux_chdir, "1show" }, // files.c
+  { "cfloat",   1, MAX_ARG, lux_cfloat_inplace, 0 },  // symbols.c
+  { "chdir",    0, 1, lux_chdir, "1show" },           // files.c
 #if DEBUG
   { "checklist", 0, 1, checkList, 0 }, // debug.c
 #endif
   { "close",    1, 1, lux_close, 0 }, // files.c
   { "cluster",  2, 8, lux_cluster, // cluster.c
-    "|32|:centers:index:size:sample:empty:maxit:rms:1update:2iterate:4vocal:8quick:16record:32ordered" },
+    "|32|:centers:index:size:sample:empty:maxit:rms:1update:2iterate"
+    ":4vocal:8quick:16record:32ordered" },
   { "colorcomponents", 4, 4, lux_colorComponents, 0 }, // color.c
-  { "colorstogrey", 1, 1, lux_colorstogrey, 0 }, // color.c
+  { "colorstogrey", 1, 1, lux_colorstogrey, 0 },       // color.c
 #if MOTIF
   { "compile_file", 1, 1, lux_compile_file, 0 }, // motifextra.c
 #endif
   { "contour",  1, 6, lux_contour, // contour.c
-    "image:levels:xmin:xmax:ymin:ymax:style:dashsize:1autocontour:2usercontour" },
-  { "coordtrf",         2, 4, lux_coordtrf, // coord.c
+    "image:levels:xmin:xmax:ymin:ymax:style:dashsize:1autocontour"
+    ":2usercontour" },
+  { "coordtrf", 2, 4, lux_coordtrf, // coord.c
    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:8todvi:16todev:24toimg:32toplt:40torim:48torpl:56tox11" },
   { "crunch",   3, 3, lux_crunch, 0 }, // crunch.c
   { "crunchrun",        3, 3, lux_crunchrun, 0 }, // crunch.c
   { "cspline_extr", 5, 8, lux_cubic_spline_extreme, "1keepdims:2periodic:4akima::::pos:minpos:minval:maxpos:maxval" }, // fun3.c
   { "d",        0, MAX_ARG, lux_dump, // fun1.c
     "+|36|1fixed:2system:4zero:8local:24context:32follow:64full" },
-  { "decomp",   1, 1, lux_decomp, 0 }, // fun2.c
-  { "decrunch",         2, 2, lux_decrunch, 0 }, // crunch.c
-  { "default",  2, MAX_ARG, lux_default, "+" }, // strous.c
+  { "decomp",   1, 1, lux_decomp, 0 },                 // fun2.c
+  { "decrunch", 2, 2, lux_decrunch, 0 },               // crunch.c
+  { "default",  2, MAX_ARG, lux_default, "+" },        // strous.c
   { "delete",   1, MAX_ARG, lux_delete, "+1pointer" }, // fun1.c
-  { "diagnostic", 0, 1, lux_redirect_diagnostic, 0 }, // strous.c
-  { "distr",    3, 3, lux_distr, 0 }, // strous.c
-  { "doub",     1, MAX_ARG, lux_double_inplace, 0 }, // symbols.c
-  { "double",   1, MAX_ARG, lux_double_inplace, 0 }, // symbols.c
-  { "dsolve",   2, 2, lux_dsolve, 0 }, // fun2.c
-  { "dump",     0, MAX_ARG, lux_dump, // fun1.c
+  { "diagnostic", 0, 1, lux_redirect_diagnostic, 0 },  // strous.c
+  { "distr",    3, 3, lux_distr, 0 },                  // strous.c
+  { "doub",     1, MAX_ARG, lux_double_inplace, 0 },   // symbols.c
+  { "double",   1, MAX_ARG, lux_double_inplace, 0 },   // symbols.c
+  { "dsolve",   2, 2, lux_dsolve, 0 },                 // fun2.c
+  { "dump",     0, MAX_ARG, lux_dump,                  // fun1.c
     "+|36|1fixed:2system:4zero:8local:24context:32follow:64full" },
-  { "dump_lun",         0, 0, lux_dump_lun, 0 }, // files.c
+  { "dump_lun", 0, 0, lux_dump_lun, 0 },     // files.c
   { "dump_stack", 0, 0, lux_dump_stack, 0 }, // strous.c
-  { "echo",     0, 1, lux_echo, 0 }, // symbols.c
-  { "endian",   1, 1, lux_endian, 0 }, // strous.c
-  { "erase",    0, 5, lux_erase, // plots.c
+  { "echo",     0, 1, lux_echo, 0 },         // symbols.c
+  { "endian",   1, 1, lux_endian, 0 },       // strous.c
+  { "erase",    0, 5, lux_erase,             // plots.c
     "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev" },
   { "error",    0, 2, lux_error, "1store:2restore" }, // error.c
-  { "execute",  1, 1, lux_execute, "1main" }, // execute.c
-  { "exit",     0, 1, lux_quit, 0 }, // fun1.c
-  { "extract_bits", 4, 4, lux_extract_bits, 0 }, // fun3.c
-  { "f0h",      1, 2, lux_fzhead, 0 }, // files.c
-  { "f0head",   1, 2, lux_fzhead, 0 }, // files.c
-  { "f0r",      2, 3, lux_fzread, "|1|1printheader" }, // files.c
-  { "f0read",   2, 3, lux_fzread, "|1|1printheader" }, // files.c
-  { "f0w",      2, 3, lux_fzwrite, 0 }, // files.c
-  { "f0write",  2, 3, lux_fzwrite, 0 }, // files.c
-  { "fade",     2, 2, lux_fade, 0 }, // fun3.c
-  { "fade_init", 2, 2, lux_fade_init, 0 }, // fun3.c
-  { "fcrunwrite", 2, 3, lux_fcrunwrite, 0 }, // files.c
-  { "fcrw",     2, 3, lux_fcrunwrite, 0 }, // files.c
-  { "fcw",      2, 3, lux_fcwrite, "1runlength" }, // files.c
-  { "fcwrite",  2, 3, lux_fcwrite, "1runlength" }, // files.c
-  { "fftshift",         2, 2, lux_fftshift, 0 }, // fun3.c
+  { "execute",  1, 1, lux_execute, "1main" },         // execute.c
+  { "exit",     0, 1, lux_quit, 0 },                  // fun1.c
+  { "extract_bits", 4, 4, lux_extract_bits, 0 },      // fun3.c
+  { "f0h",      1, 2, lux_fzhead, 0 },                // files.c
+  { "f0head",   1, 2, lux_fzhead, 0 },                // files.c
+  { "f0r",      2, 3, lux_fzread, "|1|1printheader" },       // files.c
+  { "f0read",   2, 3, lux_fzread, "|1|1printheader" },       // files.c
+  { "f0w",      2, 3, lux_fzwrite, 0 },                      // files.c
+  { "f0write",  2, 3, lux_fzwrite, 0 },                      // files.c
+  { "fade",     2, 2, lux_fade, 0 },                         // fun3.c
+  { "fade_init", 2, 2, lux_fade_init, 0 },                   // fun3.c
+  { "fcrunwrite", 2, 3, lux_fcrunwrite, 0 },                 // files.c
+  { "fcrw",     2, 3, lux_fcrunwrite, 0 },                   // files.c
+  { "fcw",      2, 3, lux_fcwrite, "1runlength" },           // files.c
+  { "fcwrite",  2, 3, lux_fcwrite, "1runlength" },           // files.c
+  { "fftshift", 2, 2, lux_fftshift, 0 },                     // fun3.c
   { "fileptr",  1, 2, lux_fileptr, "1start:2eof:4advance" }, // files.c
-  { "fileread", 5, 5, lux_fileread, 0 }, // files.c
-  { "filetofz",         3, 3, lux_file_to_fz, 0 }, // files.c
-  { "filewrite", 2, 3, lux_filewrite, 0 }, // files.c
+  { "fileread", 5, 5, lux_fileread, 0 },                     // files.c
+  { "filetofz", 3, 3, lux_file_to_fz, 0 },                   // files.c
+  { "filewrite", 2, 3, lux_filewrite, 0 },                   // files.c
 #if DEVELOP
   { "fit3dcube", 0, 0, lux_fitUnitCube, 0 }, // projection.c
 #endif
-  { "fits_read", 2, 7, lux_fits_read, "|1|1translate:2rawvalues::::::blank" }, // files.c
-  { "fits_write", 2, 4, lux_fits_write, "1vocal" }, // files.c
-  { "fix",      1, MAX_ARG, lux_long_inplace, 0 }, // symbols.c
-  { "float",    1, MAX_ARG, lux_float_inplace, 0 }, // symbols.c
-  { "format_set", 0, 1, lux_format_set, 0 }, // files.c
-  { "fprint",   1, MAX_ARG, lux_fprint, "1element" }, // files.c
-  { "fprintf",  2, MAX_ARG, lux_fprintf, "1element" }, // files.c
-  { "fread",    2, MAX_ARG, lux_fread, "1countspaces" }, // files.c
+  { "fits_read", 2, 7, lux_fits_read, // files.c
+    "|1|1translate:2rawvalues::::::blank" },
+  { "fits_write", 2, 4, lux_fits_write, "1vocal" },       // files.c
+  { "fix",      1, MAX_ARG, lux_long_inplace, 0 },        // symbols.c
+  { "float",    1, MAX_ARG, lux_float_inplace, 0 },       // symbols.c
+  { "format_set", 0, 1, lux_format_set, 0 },              // files.c
+  { "fprint",   1, MAX_ARG, lux_fprint, "1element" },     // files.c
+  { "fprintf",  2, MAX_ARG, lux_fprintf, "1element" },    // files.c
+  { "fread",    2, MAX_ARG, lux_fread, "1countspaces" },  // files.c
   { "freadf",   3, MAX_ARG, lux_freadf, "1countspaces" }, // files.c
   { "freads",   2, MAX_ARG, lux_freads, "1countspaces" }, // files.c
-  { "fzh",      1, 2, lux_fzhead, 0 }, // files.c
-  { "fzhead",   1, 2, lux_fzhead, 0 }, // files.c
-  { "fzinspect", 2, 3, lux_fzinspect, 0 }, // files.c
-  { "fzr",      2, 3, lux_fzread, "|1|1printheader" }, // files.c
-  { "fzread",   2, 3, lux_fzread, "|1|1printheader" }, // files.c
-  { "fzw",      2, 3, lux_fzwrite, "1safe" }, // files.c
-  { "fzwrite",  2, 3, lux_fzwrite, "1safe" }, // files.c
-  { "getmin9",  3, 3, lux_getmin9, 0 }, // fun4.c
-  { "gifread",  2, 3, lux_gifread, 0 }, // gifread_ana.c
-  { "gifwrite",         2, 3, lux_gifwrite, 0 }, // gifwrite_ana.c
-  { "hairs",    0, 0, lux_xplace, 0 }, // xport.c
-  { "help",     0, 1, lux_help,         "1manual" }, // strous.c
-  { "hex",      1, MAX_ARG, lux_hex, 0 }, // files.c
-  { "idlrestore", 1, 1, lux_idlrestore, 0 }, // idl.c
-  { "info",     0, 0, site, // site.c
-    "1table:2time:4platform:8packages:16warranty:32copy:64bugs:128keys:255all" },
-  { "insert",   2, 4, lux_inserter, 0 }, // subsc.c
-  { "int",      1, MAX_ARG, lux_word_inplace, 0 }, // symbols.c
-  { "int64",    1, MAX_ARG, lux_int64_inplace, 0 }, // symbols.c
+  { "fzh",      1, 2, lux_fzhead, 0 },                    // files.c
+  { "fzhead",   1, 2, lux_fzhead, 0 },                    // files.c
+  { "fzinspect", 2, 3, lux_fzinspect, 0 },                // files.c
+  { "fzr",      2, 3, lux_fzread, "|1|1printheader" },    // files.c
+  { "fzread",   2, 3, lux_fzread, "|1|1printheader" },    // files.c
+  { "fzw",      2, 3, lux_fzwrite, "1safe" },             // files.c
+  { "fzwrite",  2, 3, lux_fzwrite, "1safe" },             // files.c
+  { "getmin9",  3, 3, lux_getmin9, 0 },                   // fun4.c
+  { "gifread",  2, 3, lux_gifread, 0 },                   // gifread_lux.c
+  { "gifwrite", 2, 3, lux_gifwrite, 0 },                  // gifwrite_lux.c
+  { "hairs",    0, 0, lux_xplace, 0 },                    // xport.c
+  { "help",     0, 1, lux_help, "1manual" },              // strous.c
+  { "hex",      1, MAX_ARG, lux_hex, 0 },                 // files.c
+  { "idlrestore", 1, 1, lux_idlrestore, 0 },              // idl.c
+  { "info",     0, 0, site,                               // site.c
+    "1table:2time:4platform:8packages:16warranty:32copy"
+    ":64bugs:128keys:255all" },
+  { "insert",   2, 4, lux_inserter, 0 },                         // subsc.c
+  { "int",      1, MAX_ARG, lux_word_inplace, 0 },               // symbols.c
+  { "int64",    1, MAX_ARG, lux_int64_inplace, 0 },              // symbols.c
   { "jpegread", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
-  { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },// jpeg.c
-  { "limits",   0, 4, lux_limits, 0 }, // plots.c
-  { "list",     1, 1, lux_list, 0 }, // ident.c
-  { "long",     1, MAX_ARG, lux_long_inplace, 0 }, // symbols.c
-  { "menu",     1, MAX_ARG, lux_menu, 0 }, // menu.c
-  { "menuhide",         1, 1, lux_menu_hide, 0 }, // menu.c
-  { "menuitem",         3, 3, lux_menu_item, 0 }, // menu.c
-  { "menupop",  1, MAX_ARG, lux_menu_pop, 0 }, // menu.c
-  { "menuread",         4, 4, lux_menu_read, 0 }, // menu.c
-  { "menuzap",  1, 1, lux_menu_kill, 0 }, // menu.c
-  { "multisieve", 4, 4, lux_multisieve, 0 }, // strous2.c
+  { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },                    // jpeg.c
+  { "limits",   0, 4, lux_limits, 0 },                           // plots.c
+  { "list",     1, 1, lux_list, 0 },                             // ident.c
+  { "long",     1, MAX_ARG, lux_long_inplace, 0 },               // symbols.c
+  { "menu",     1, MAX_ARG, lux_menu, 0 },                       // menu.c
+  { "menuhide", 1, 1, lux_menu_hide, 0 },                        // menu.c
+  { "menuitem", 3, 3, lux_menu_item, 0 },                        // menu.c
+  { "menupop",  1, MAX_ARG, lux_menu_pop, 0 },                   // menu.c
+  { "menuread", 4, 4, lux_menu_read, 0 },                        // menu.c
+  { "menuzap",  1, 1, lux_menu_kill, 0 },                        // menu.c
+  { "multisieve", 4, 4, lux_multisieve, 0 },                     // strous2.c
 #if DEBUG
   { "newallocs", 0, 1, lux_newallocs, "1reset" }, // debug.c
 #endif
-  { "noecho",   0, 0, lux_noecho, 0 }, // symbols.c
-  { "noop",     0, 0, lux_noop, 0 }, // strous2.c
-  { "one",      1, 1, lux_one, 0 }, // fun1.c
+  { "noecho",   0, 0, lux_noecho, 0 },         // symbols.c
+  { "noop",     0, 0, lux_noop, 0 },           // strous2.c
+  { "one",      1, 1, lux_one, 0 },            // fun1.c
   { "openr",    2, 2, lux_openr, "1get_lun" }, // files.c
   { "openu",    2, 2, lux_openu, "1get_lun" }, // files.c
   { "openw",    2, 2, lux_openw, "1get_lun" }, // files.c
-  { "oplot",    1, 13, lux_oplot, // plots.c
-    "1dvi:2dev:3img:4plt:5rim:6rpl:128whole:256clipbars:xdata:ydata:symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize:ybarsize" },
+  { "oplot",    1, 13, lux_oplot,              // plots.c
+    "1dvi:2dev:3img:4plt:5rim:6rpl:128whole:256clipbars:xdata:ydata"
+    ":symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks"
+    ":xbarsize:ybarsize" },
   { "orientation", 3, 8, lux_orientation, // orientation.c
-  "1vocal:2getj:0parallel:4perpendicular:::orientation:values:wavenumber:grid:aspect:order" },
-  { "pdev",     0, 1, lux_pdev, 0 }, // plots.c
-  { "peek",     1, 2, peek, 0 }, // strous.c
+    "1vocal:2getj:0parallel:4perpendicular:::orientation:values"
+    ":wavenumber:grid:aspect:order" },
+  { "pdev",     0, 1, lux_pdev, 0 },                          // plots.c
+  { "peek",     1, 2, peek, 0 },                              // strous.c
   { "pen",      0, 2, lux_pen, "width:color:1standardgray" }, // plots.c
-  { "pencolor", 0, 1, lux_pencolor, 0 }, // plots.c
-  { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 }, // color.c
-  { "plot",     1, 15, lux_plot, // plots.c
-    "1dvi:2dev:3img:4plt:5rim:6rpl:64keep:128whole:256clipbars:1024lii:1280lio:1536loi:1792loo:xdata:ydata:symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize:ybarsize:xfmt:yfmt" },
+  { "pencolor", 0, 1, lux_pencolor, 0 },                      // plots.c
+  { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 },              // color.c
+  { "plot",     1, 15, lux_plot,                              // plots.c
+    "1dvi:2dev:3img:4plt:5rim:6rpl:64keep:128whole:256clipbars"
+    ":1024lii:1280lio:1536loi:1792loo:xdata:ydata:symbol:line"
+    ":xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize"
+    ":ybarsize:xfmt:yfmt" },
 #if DEVELOP
   { "plot3d",   1, 1, lux_plot3d, "1hide:2cube" }, // projection.c
 #endif
   { "pointer",  2, 2, lux_pointer, // symbols.c
     "+:1function:2subroutine:4internal:8main" },
-  { "pop",      1, MAX_ARG, lux_pop, "%1%num" }, // strous.c
-  { "postimage", 1, 5, lux_postimage, 0 }, // plots.c
-  { "postraw",  1, 1, lux_postraw, 0 }, // plots.c
-  { "postrel",  0, 4, postrelease, 0 }, // plots.c
-  { "postrelease", 0, 4, postrelease, 0 }, // plots.c
-  { "print",    1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
+  { "pop",      1, MAX_ARG, lux_pop, "%1%num" },                  // strous.c
+  { "postimage", 1, 5, lux_postimage, 0 },                        // plots.c
+  { "postraw",  1, 1, lux_postraw, 0 },                           // plots.c
+  { "postrel",  0, 4, postrelease, 0 },                           // plots.c
+  { "postrelease", 0, 4, postrelease, 0 },                        // plots.c
+  { "print",    1, MAX_ARG, lux_type, "1join:2raw:4separate" },   // files.c
   { "printf",   1, MAX_ARG, lux_printf, "1join:2raw:4separate" }, // files.c
 #if DEVELOP
   { "projection", 0, MAX_ARG, lux_projection, // projection.c
-        "1reset:2original::translate:rotate:scale:perspective:oblique" },
+    "1reset:2original::translate:rotate:scale:perspective:oblique" },
 #endif
-  { "push",     1, MAX_ARG, lux_push, 0 }, // strous.c
-  { "quit",     0, 1, lux_quit, 0 }, // fun1.c
-  { "read",     1, MAX_ARG, lux_read, "1askmore:2word:4flush" }, // files.c
-  { "readarr",  1, 1, lux_readarr, 0 }, // strous.c
-  { "readf",    2, MAX_ARG, lux_readf, "1askmore:2word" }, // files.c
-  { "readorbits", 0, 1, lux_readorbits, "1list:2replace" }, // astron.c
-  { "readu",    2, MAX_ARG, lux_readu, 0 }, // files.c
+  { "push",     1, MAX_ARG, lux_push, 0 },                        // strous.c
+  { "quit",     0, 1, lux_quit, 0 },                              // fun1.c
+  { "read",     1, MAX_ARG, lux_read, "1askmore:2word:4flush" },  // files.c
+  { "readarr",  1, 1, lux_readarr, 0 },                           // strous.c
+  { "readf",    2, MAX_ARG, lux_readf, "1askmore:2word" },        // files.c
+  { "readorbits", 0, 1, lux_readorbits, "1list:2replace" },       // astron.c
+  { "readu",    2, MAX_ARG, lux_readu, 0 },                       // files.c
   { "read_jpeg", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
-  { "record",   0, 1, lux_record, "1input:2output:4reset" }, // symbols.c
-  { "redim",    2, 9, lux_redim, 0 }, // subsc.c
-  { "replace",  3, 3, lux_replace_values, 0 }, // strous2.c
-  { "restart",  0, 0, lux_restart, 0 }, // install.c
-  { "restore",  2, 3, lux_fzread, "1printheader" }, // files.c
+  { "record",   0, 1, lux_record, "1input:2output:4reset" },      // symbols.c
+  { "redim",    2, 9, lux_redim, 0 },                             // subsc.c
+  { "replace",  3, 3, lux_replace_values, 0 },                    // strous2.c
+  { "restart",  0, 0, lux_restart, 0 },                           // install.c
+  { "restore",  2, 3, lux_fzread, "1printheader" },               // files.c
 #if HAVE_SYS_MTIO_H
   { "rewind",   1, 1, lux_rewind, 0 }, // tape.c
 #endif
-  { "rewindf",  1, 1, lux_rewindf, 0 }, // files.c
-  { "s",        0, 1, lux_show, 0 }, // fun1.c
-  { "sc",       3, 3, lux_sc, 0 }, // fun3.c
+  { "rewindf",  1, 1, lux_rewindf, 0 },                    // files.c
+  { "s",        0, 1, lux_show, 0 },                       // fun1.c
+  { "sc",       3, 3, lux_sc, 0 },                         // fun3.c
   { "scanf",    2, MAX_ARG, lux_freadf, "+1countspaces" }, // files.c
-  { "scb",      3, 3, lux_scb, "1even:2odd" }, // fun3.c
-  { "set",      0, 1, lux_set,  // symbols.c
-    "visual:1set:2reset:4showalloc:8whitebackground:16ulimcoords:32yreverseimg:64oldversion:128zoom:1024allowprompts:2048xsynchronize:4096parsesilent" },
-  { "setbackground", 1, 2, lux_xsetbackground, 0 }, // xport.c
-  { "setbg",    1, 2, lux_xsetbackground, 0 }, // xport.c
-  { "setenv",   1, 1, lux_setenv, 0 }, // files.c
-  { "setfg",    1, 2, lux_xsetforeground, 0 }, // xport.c
-  { "setforeground", 1, 2, lux_xsetforeground, 0 }, // xport.c
+  { "scb",      3, 3, lux_scb, "1even:2odd" },             // fun3.c
+  { "set",      0, 1, lux_set,                             // symbols.c
+    "visual:1set:2reset:4showalloc:8whitebackground:16ulimcoords"
+    ":32yreverseimg:64oldversion:128zoom:1024allowprompts"
+    ":2048xsynchronize:4096parsesilent" },
+  { "setbackground", 1, 2, lux_xsetbackground, 0 },       // xport.c
+  { "setbg",    1, 2, lux_xsetbackground, 0 },            // xport.c
+  { "setenv",   1, 1, lux_setenv, 0 },                    // files.c
+  { "setfg",    1, 2, lux_xsetforeground, 0 },            // xport.c
+  { "setforeground", 1, 2, lux_xsetforeground, 0 },       // xport.c
   { "shift",    1, 4, lux_shift, ":::blank:1translate" }, // strous2.c
-  { "show",     0, 1, lux_show, 0 }, // fun1.c
-  { "showorbits", 0, 0, lux_showorbits, 0 }, // astron.c
-  { "showstats", 0, 0, showstats, 0 }, // strous2.c
+  { "show",     0, 1, lux_show, 0 },                      // fun1.c
+  { "showorbits", 0, 0, lux_showorbits, 0 },              // astron.c
+  { "showstats", 0, 0, showstats, 0 },                    // strous2.c
 #if DEBUG
   { "show_files", 0, 0, show_files, 0 }, // debug.c
 #endif
@@ -473,52 +485,59 @@ internalRoutine         subroutine_table[] = {
   { "skipf",    1, 2, lux_skipf, 0 }, // tape.c
   { "skipr",    1, 2, lux_skipr, 0 }, // tape.c
 #endif
-  { "spawn",    1, 1, lux_spawn, "1silent" }, // files.c
-  { "sscanf",   2, MAX_ARG, lux_freads, "1countspaces" }, // files.c
-  { "step",     0, 1, lux_step, 0 }, // symbols.c
-  { "store",    2, 3, lux_fzwrite, "1safe" }, // files.c
-  { "string",   1, MAX_ARG, lux_string_inplace, 0 }, // symbols.c
-  { "subshift",         4, 4, lux_subshift, 0 }, // fun5.c
-  { "subshiftc", 4, 5, lux_subshiftc, 0 }, // fun5.c
-  { "swab",     1, MAX_ARG, lux_swab, 0 }, // fun2.c
-  { "swapb",    1, MAX_ARG, lux_swab, 0 }, // fun2.c
-  { "swaphalf",         1, 1, lux_swaphalf, 0 }, // strous2.c
-  { "switch",   2, 2, lux_switch, 0 }, // symbols.c
+  { "spawn",    1, 1, lux_spawn, "1silent" },                   // files.c
+  { "sscanf",   2, MAX_ARG, lux_freads, "1countspaces" },       // files.c
+  { "step",     0, 1, lux_step, 0 },                            // symbols.c
+  { "store",    2, 3, lux_fzwrite, "1safe" },                   // files.c
+  { "string",   1, MAX_ARG, lux_string_inplace, 0 },            // symbols.c
+  { "subshift", 4, 4, lux_subshift, 0 },                        // fun5.c
+  { "subshiftc", 4, 5, lux_subshiftc, 0 },                      // fun5.c
+  { "swab",     1, MAX_ARG, lux_swab, 0 },                      // fun2.c
+  { "swapb",    1, MAX_ARG, lux_swab, 0 },                      // fun2.c
+  { "swaphalf", 1, 1, lux_swaphalf, 0 },                        // strous2.c
+  { "switch",   2, 2, lux_switch, 0 },                          // symbols.c
   { "t",        1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
 #if HAVE_SYS_MTIO_H
-  { "tapebufin", 2, 5, lux_tapebufin, 0 }, // tape.c
-  { "tapebufout", 2, 5, lux_tapebufout, 0 }, // tape.c
+  { "tapebufin", 2, 5, lux_tapebufin, 0 },     // tape.c
+  { "tapebufout", 2, 5, lux_tapebufout, 0 },   // tape.c
   { "tape_status", 0, 0, lux_tape_status, 0 }, // tape.c
-  { "taprd",    2, 2, lux_taprd, 0 }, // tape.c
-  { "tapwrt",   2, 2, lux_tapwrt, 0 }, // tape.c
+  { "taprd",    2, 2, lux_taprd, 0 },          // tape.c
+  { "tapwrt",   2, 2, lux_tapwrt, 0 },         // tape.c
 #endif
   { "threecolors", 0, 1, lux_threecolors, 0 }, // xport.c
-  { "tolookup", 2, 3, lux_tolookup, "1one" }, // strous2.c
-  { "trace",    0, 1, lux_trace, // install.c
-    "1file:2loop:4braces:8routine:143all:16showstats:32cputime:64showexec:128enter" },
+  { "tolookup", 2, 3, lux_tolookup, "1one" },  // strous2.c
+  { "trace",    0, 1, lux_trace,               // install.c
+    "1file:2loop:4braces:8routine:143all:16showstats:32cputime"
+    ":64showexec:128enter" },
 #if DEVELOP
   { "trajectory", 3, 7, lux_trajectory, 0 }, // strous3.c
 #endif
   { "tv",       1, 5, lux_xtv,  // xport.c
-    ":x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom:1024center:16384bit24" },
-  { "tv3",      1, 7, lux_tv3, // xport.c
-    ":two:three:x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom:1024center" },
-  { "tvlab",    3, 4, lux_xlabel, 0 }, // xport.c
+    ":x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
+    ":64screen:128postscript:192pdev:256plotwindow:512zoom"
+    ":1024center:16384bit24" },
+  { "tv3",      1, 7, lux_tv3,  // xport.c
+    ":two:three:x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim"
+    ":6rpl:7x11:64screen:128postscript:192pdev:256plotwindow"
+    ":512zoom:1024center" },
+  { "tvlab",    3, 4, lux_xlabel, 0 },            // xport.c
   { "tvlct",    3, 3, lux_xtvlct, "1fixedsize" }, // xport.c
-  { "tvmap",    1, 5, lux_xtvmap, // xport.c
-    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
+  { "tvmap",    1, 5, lux_xtvmap,                 // xport.c
+    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
+    ":64screen:128postscript:192pdev:256plotwindow:512zoom" },
   { "tvplane",  1, 5, lux_xtvplane, 0 }, // xport.c
-  { "tvraw",    1, 5, lux_xtvraw, // xport.c
-    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
-  { "tvread",   0, 5, lux_xtvread, "1greyscale" }, // xport.c
+  { "tvraw",    1, 5, lux_xtvraw,        // xport.c
+    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
+    ":64screen:128postscript:192pdev:256plotwindow:512zoom" },
+  { "tvread",   0, 5, lux_xtvread, "1greyscale" },              // xport.c
   { "ty",       1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
   { "type",     1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
-  { "ulib",     0, 1, lux_ulib, 0 }, // files.c
+  { "ulib",     0, 1, lux_ulib, 0 },                            // files.c
 #if HAVE_SYS_MTIO_H
   { "unload",   1, 1, lux_unload, 0 }, // tape.c
 #endif
-  { "verify",   0, 1, lux_verify, 0 }, // install.c
-  { "wait",     1, 1, lux_wait, 0 }, // fun2.c
+  { "verify",   0, 1, lux_verify, 0 },             // install.c
+  { "wait",     1, 1, lux_wait, 0 },               // fun2.c
   { "wait_for_menu", 0, 1, lux_wait_for_menu, 0 }, // menu.c
 #if HAVE_SYS_MTIO_H
   { "wait_for_tape", 1, 1, lux_wait_for_tape, 0 }, // tape.c
@@ -530,114 +549,119 @@ internalRoutine         subroutine_table[] = {
 #if DEBUG
   { "where",    1, 1, lux_whereisAddress, "1cut" }, // debug.c
 #endif
-  { "window",   0, 6, lux_window, 0 }, // plots.c
-  { "word",     1, 1, lux_word_inplace, 0 }, // symbols.c
-  { "writeu",   2, MAX_ARG, lux_writeu, 0 }, // files.c
+  { "window",   0, 6, lux_window, 0 },         // plots.c
+  { "word",     1, 1, lux_word_inplace, 0 },   // symbols.c
+  { "writeu",   2, MAX_ARG, lux_writeu, 0 },   // files.c
   { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, // jpeg.c
-  { "xanimate",         1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, // xport.c
-  { "xclose",   0, 0, lux_xclose, 0 }, // xport.c
-  { "xcopy",    2, 8, lux_xcopy, 0 }, // xport.c
-  { "xcursor",  2, 4, lux_xcursor, 0 }, // xport.c
-  { "xdelete",  1, 1, lux_xdelete, 0 }, // xport.c
-  { "xdrawarc",         4, 7, lux_xdrawarc, 0 }, // xport.c
-  { "xdrawline", 4, 5, lux_xdrawline, 0 }, // xport.c
-  { "xevent",   0, 0, lux_xevent, 0 }, // xport.c
-  { "xflush",   0, 0, lux_xflush, 0 }, // xport.c
-  { "xfont",    1, 2, lux_xfont, 0 }, // xport.c
-  { "xinvertarc", 4, 7, lux_xinvertarc, 0 }, // xport.c
-  { "xinvertline", 4, 5, lux_xinvertline, 0 }, // xport.c
-  { "xlabel",   3, 4, lux_xlabel, 0 }, // xport.c
-  { "xloop",    0, 1, lux_xloop, 0 }, // menu.c
+  { "xanimate", 1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, // xport.c
+  { "xclose",   0, 0, lux_xclose, 0 },                        // xport.c
+  { "xcopy",    2, 8, lux_xcopy, 0 },                         // xport.c
+  { "xcursor",  2, 4, lux_xcursor, 0 },                       // xport.c
+  { "xdelete",  1, 1, lux_xdelete, 0 },                       // xport.c
+  { "xdrawarc", 4, 7, lux_xdrawarc, 0 },                      // xport.c
+  { "xdrawline", 4, 5, lux_xdrawline, 0 },                    // xport.c
+  { "xevent",   0, 0, lux_xevent, 0 },                        // xport.c
+  { "xflush",   0, 0, lux_xflush, 0 },                        // xport.c
+  { "xfont",    1, 2, lux_xfont, 0 },                         // xport.c
+  { "xinvertarc", 4, 7, lux_xinvertarc, 0 },                  // xport.c
+  { "xinvertline", 4, 5, lux_xinvertline, 0 },                // xport.c
+  { "xlabel",   3, 4, lux_xlabel, 0 },                        // xport.c
+  { "xloop",    0, 1, lux_xloop, 0 },                         // menu.c
 #if MOTIF
-  { "xmalignment", 2, 2, lux_xmalignment, 0 }, // motif.c
-  { "xmarmcolor", 2, 2, lux_xmarmcolor, 0 }, // motif.c
-  { "xmattach",         6, 6, lux_xmattach, 0 }, // motif.c
-  { "xmattach_relative", 5, 5, lux_xmattach_relative, 0 }, // motif.c
-  { "xmbackgroundcolor", 2, 2, lux_xmbackgroundcolor, 0 }, // motif.c
-  { "xmbordercolor", 2, 2, lux_xmbordercolor, 0 }, // motif.c
-  { "xmborderwidth", 2, 2, lux_xmborderwidth, 0 }, // motif.c
-  { "xmbottomshadowcolor", 2, 2, lux_xmbottomshadowcolor, 0 }, // motif.c
-  { "xmdestroy", 1, 1, lux_xmdestroy, 0 }, // motif.c
-  { "xmdrawinglink", 2, 2, lux_xmdrawinglink, 0 }, // motif.c
-  { "xmfont",   2, 2, lux_xmfont, 0 }, // motif.c
-  { "xmforegroundcolor", 2, 2, lux_xmforegroundcolor, 0 }, // motif.c
-  { "xmgetpixmap", 2, 2, lux_xmgetpixmap, 0 }, // motif.c
-  { "xmgetwidgetposition", 3, 3, lux_xmgetwidgetposition, 0 }, // motif.c
-  { "xmgetwidgetsize", 3, 3, lux_xmgetwidgetsize, 0 }, // motif.c
-  { "xminfo",   1, 1, lux_xminfo, 0 }, // motif.c
-  { "xmlistadditem", 2, 3, lux_xmlistadditem, 0 }, // motif.c
-  { "xmlistdeleteall", 1, 1, lux_xmlistdeleteall, 0 }, // motif.c
-  { "xmlistdeleteitem", 2, 2, lux_xmlistdeleteitem, 0 }, // motif.c
-  { "xmlistfunc", 1, 1, lux_xmlistfunc, 0 }, // motif.c
-  { "xmlistselect", 2, 3, lux_xmlistselect, 0 }, // motif.c
-  { "xmlistsubr", 1, 1, lux_xmlistsubr, 0 }, // motif.c
-  { "xmmessage", 1, 5, lux_xmmessage, 0 }, // motif.c
-  { "xmposition", 3, 5, lux_xmposition, 0 }, // motif.c
-  { "xmprompt",         3, 8, lux_xmprompt, 0 }, // motif.c
-  { "xmquery",  1, 1, lux_xmquery, 0 }, // motif.c
-  { "xmraise",  1, 1, lux_xmraise, 0 },  // motif.c
-  { "xmresizepolicy",   2, 2, lux_xmresizepolicy, 0 }, // motif.c
-  { "xmscaleresetlimits", 3, 4, lux_xmscaleresetlimits, 0 }, // motif.c
-  { "xmscalesetvalue", 2, 2, lux_xmscalesetvalue, 0 }, // motif.c
-  { "xmscrollbarsetvalues", 1, 5, lux_xmscrollbarsetvalues, 0 }, // motif.c
-  { "xmselectcolor", 2, 2, lux_xmselectcolor, 0 }, // motif.c
-  { "xmsensitive", 2, 2, lux_xmsensitive, 0 }, // motif.c
-  { "xmsetcolors", 2, 2, lux_xmsetcolors, 0 }, // motif.c
-  { "xmsetdirectory", 2, 2, lux_xmsetdirectory, 0 }, // motif.c
-  { "xmsetlabel", 2, 2, lux_xmsetlabel, 0 }, // motif.c
-  { "xmsetmargins", 3, 3, lux_xmsetmargins, 0 }, // motif.c
-  { "xmsetmnemonic", 2, 2, lux_xmsetmnemonic, 0 }, // motif.c
-  { "xmsetmodal", 2, 2, lux_xmsetmodal, 0 }, // motif.c
-  { "xmsetoptionselection", 2, 2, lux_xmsetoptionselection, 0 }, // motif.c
-  { "xmsetpixmap", 2, 2, lux_xmsetpixmap, 0 }, // motif.c
-  { "xmsettitle", 2, 2, lux_xmsettitle, 0 }, // motif.c
-  { "xmset_text_output", 1, 1, lux_xmset_text_output, 0 }, // motif.c
-  { "xmsize",   3, 3, lux_xmsize, 0 }, // motif.c
-  { "xmtextappend", 2, 3, lux_xmtextappend, 0 }, // motif.c
-  { "xmtexterase", 1, 1, lux_xmtexterase, 0 }, // motif.c
+  { "xmalignment", 2, 2, lux_xmalignment, 0 },                       // motif.c
+  { "xmarmcolor", 2, 2, lux_xmarmcolor, 0 },                         // motif.c
+  { "xmattach", 6, 6, lux_xmattach, 0 },                             // motif.c
+  { "xmattach_relative", 5, 5, lux_xmattach_relative, 0 },           // motif.c
+  { "xmbackgroundcolor", 2, 2, lux_xmbackgroundcolor, 0 },           // motif.c
+  { "xmbordercolor", 2, 2, lux_xmbordercolor, 0 },                   // motif.c
+  { "xmborderwidth", 2, 2, lux_xmborderwidth, 0 },                   // motif.c
+  { "xmbottomshadowcolor", 2, 2, lux_xmbottomshadowcolor, 0 },       // motif.c
+  { "xmdestroy", 1, 1, lux_xmdestroy, 0 },                           // motif.c
+  { "xmdrawinglink", 2, 2, lux_xmdrawinglink, 0 },                   // motif.c
+  { "xmfont",   2, 2, lux_xmfont, 0 },                               // motif.c
+  { "xmforegroundcolor", 2, 2, lux_xmforegroundcolor, 0 },           // motif.c
+  { "xmgetpixmap", 2, 2, lux_xmgetpixmap, 0 },                       // motif.c
+  { "xmgetwidgetposition", 3, 3, lux_xmgetwidgetposition, 0 },       // motif.c
+  { "xmgetwidgetsize", 3, 3, lux_xmgetwidgetsize, 0 },               // motif.c
+  { "xminfo",   1, 1, lux_xminfo, 0 },                               // motif.c
+  { "xmlistadditem", 2, 3, lux_xmlistadditem, 0 },                   // motif.c
+  { "xmlistdeleteall", 1, 1, lux_xmlistdeleteall, 0 },               // motif.c
+  { "xmlistdeleteitem", 2, 2, lux_xmlistdeleteitem, 0 },             // motif.c
+  { "xmlistfunc", 1, 1, lux_xmlistfunc, 0 },                         // motif.c
+  { "xmlistselect", 2, 3, lux_xmlistselect, 0 },                     // motif.c
+  { "xmlistsubr", 1, 1, lux_xmlistsubr, 0 },                         // motif.c
+  { "xmmessage", 1, 5, lux_xmmessage, 0 },                           // motif.c
+  { "xmposition", 3, 5, lux_xmposition, 0 },                         // motif.c
+  { "xmprompt", 3, 8, lux_xmprompt, 0 },                             // motif.c
+  { "xmquery",  1, 1, lux_xmquery, 0 },                              // motif.c
+  { "xmraise",  1, 1, lux_xmraise, 0 },                              // motif.c
+  { "xmresizepolicy",   2, 2, lux_xmresizepolicy, 0 },               // motif.c
+  { "xmscaleresetlimits", 3, 4, lux_xmscaleresetlimits, 0 },         // motif.c
+  { "xmscalesetvalue", 2, 2, lux_xmscalesetvalue, 0 },               // motif.c
+  { "xmscrollbarsetvalues", 1, 5, lux_xmscrollbarsetvalues, 0 },     // motif.c
+  { "xmselectcolor", 2, 2, lux_xmselectcolor, 0 },                   // motif.c
+  { "xmsensitive", 2, 2, lux_xmsensitive, 0 },                       // motif.c
+  { "xmsetcolors", 2, 2, lux_xmsetcolors, 0 },                       // motif.c
+  { "xmsetdirectory", 2, 2, lux_xmsetdirectory, 0 },                 // motif.c
+  { "xmsetlabel", 2, 2, lux_xmsetlabel, 0 },                         // motif.c
+  { "xmsetmargins", 3, 3, lux_xmsetmargins, 0 },                     // motif.c
+  { "xmsetmnemonic", 2, 2, lux_xmsetmnemonic, 0 },                   // motif.c
+  { "xmsetmodal", 2, 2, lux_xmsetmodal, 0 },                         // motif.c
+  { "xmsetoptionselection", 2, 2, lux_xmsetoptionselection, 0 },     // motif.c
+  { "xmsetpixmap", 2, 2, lux_xmsetpixmap, 0 },                       // motif.c
+  { "xmsettitle", 2, 2, lux_xmsettitle, 0 },                         // motif.c
+  { "xmset_text_output", 1, 1, lux_xmset_text_output, 0 },           // motif.c
+  { "xmsize",   3, 3, lux_xmsize, 0 },                               // motif.c
+  { "xmtextappend", 2, 3, lux_xmtextappend, 0 },                     // motif.c
+  { "xmtexterase", 1, 1, lux_xmtexterase, 0 },                       // motif.c
   { "xmtextfieldseteditable", 2, 2, lux_xmtextfieldseteditable, 0 }, // motif.c
-  { "xmtextfieldsetmaxlength", 2, 2, lux_xmtextfieldsetmaxlength, 0 }, // motif.c
-  { "xmtextfieldsetstring", 2, 3, lux_xmtextfieldsetstring, 0 }, // motif.c
-  { "xmtextreplace",    3, 4, lux_xmtextreplace, 0 }, // motif.c
-  { "xmtextseteditable", 2, 2, lux_xmtextseteditable, 0 }, // motif.c
-  { "xmtextsetposition", 2, 2, lux_xmtextsetposition, 0 }, // motif.c
+  { "xmtextfieldsetmaxlength", 2, 2, lux_xmtextfieldsetmaxlength,    // motif.c
+    0 },
+  { "xmtextfieldsetstring", 2, 3, lux_xmtextfieldsetstring, 0 },     // motif.c
+  { "xmtextreplace", 3, 4, lux_xmtextreplace, 0 },                   // motif.c
+  { "xmtextseteditable", 2, 2, lux_xmtextseteditable, 0 },           // motif.c
+  { "xmtextsetposition", 2, 2, lux_xmtextsetposition, 0 },           // motif.c
   { "xmtextsetrowcolumnsize", 3, 3, lux_xmtextsetrowcolumnsize, 0 }, // motif.c
-  { "xmtextsetstring", 2, 2, lux_xmtextsetstring, 0 }, // motif.c
-  { "xmtogglesetstate", 2, 3, lux_xmtogglesetstate, 0 }, // motif.c
-  { "xmtopshadowcolor", 2, 2, lux_xmtopshadowcolor, 0 }, // motif.c
+  { "xmtextsetstring", 2, 2, lux_xmtextsetstring, 0 },               // motif.c
+  { "xmtogglesetstate", 2, 3, lux_xmtogglesetstate, 0 },             // motif.c
+  { "xmtopshadowcolor", 2, 2, lux_xmtopshadowcolor, 0 },             // motif.c
 #endif
   { "xopen",    0, 1, lux_xopen, // xport.c
     "1private_colormap:2default_colormap:4selectvisual" },
   { "xplace",   0, 2, lux_xplace, // xport.c
     "1dvi:2dev:3img:4plt:5rim:6rpl:7x11" },
-  { "xport",    0, 7, lux_xport, 0 }, // xport.c
-  { "xpurge",   0, 0, lux_xpurge, 0 }, // xport.c
-  { "xquery",   0, 1, lux_xquery, 0 }, // xport.c
-  { "xraise",   1, 1, lux_xraise, 0 }, // xport.c
+  { "xport",    0, 7, lux_xport, 0 },       // xport.c
+  { "xpurge",   0, 0, lux_xpurge, 0 },      // xport.c
+  { "xquery",   0, 1, lux_xquery, 0 },      // xport.c
+  { "xraise",   1, 1, lux_xraise, 0 },      // xport.c
   { "xregister", 0, 3, lux_register_event , // menu.c
-    "1keypress:4buttonpress:8buttonrelease:16pointermotion:32enterwindow:64leavewindow:127allevents:128allwindows:256allmenus:512deselect::window:menu" },
+    "1keypress:4buttonpress:8buttonrelease:16pointermotion:32enterwindow"
+    ":64leavewindow:127allevents:128allwindows:256allmenus:512deselect"
+    "::window:menu" },
   { "xsetaction", 0, 2, lux_xsetaction, 0 }, // xport.c
 #if MOTIF
-  { "xtloop",   0, 1, lux_xtloop, 0 }, // motif.c
-  { "xtmanage",         1, 1, lux_xtmanage, 0 }, // motif.c
-  { "xtpopdown", 1, 1, lux_xtpopdown, 0 }, // motif.c
-  { "xtpopup",  1, 1, lux_xtpopup, 0 },         // motif.c
+  { "xtloop",   0, 1, lux_xtloop, 0 },       // motif.c
+  { "xtmanage", 1, 1, lux_xtmanage, 0 },     // motif.c
+  { "xtpopdown", 1, 1, lux_xtpopdown, 0 },   // motif.c
+  { "xtpopup",  1, 1, lux_xtpopup, 0 },      // motif.c
   { "xtunmanage", 1, 1, lux_xtunmanage, 0 }, // motif.c
 #endif
   { "xtv",      1, 4, lux_xtv,  // xport.c
-    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev:256plotwindow:512zoom" },
+    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
+    ":64screen:128postscript:192pdev:256plotwindow:512zoom" },
   { "xtvread",  0, 5, lux_xtvread, "1greyscale" }, // xport.c
-  { "xwin",     0, 7, lux_xport, 0 }, // xport.c
-  { "xwindow",  0, 7, lux_xport, 0 }, // xport.c
-  { "xymov",    2, 4, lux_xymov, // plots.c
-    "|192|:::breaks:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64boundingbox:128movefirst:256altdash" },
+  { "xwin",     0, 7, lux_xport, 0 },              // xport.c
+  { "xwindow",  0, 7, lux_xport, 0 },              // xport.c
+  { "xymov",    2, 4, lux_xymov,                   // plots.c
+    "|192|:::breaks:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
+    ":64boundingbox:128movefirst:256altdash" },
   { "zap",      1, MAX_ARG, lux_zap, "+1pointer" }, // strous2.c
-  { "zero",     1, MAX_ARG, lux_zero, 0 }, // fun1.c
+  { "zero",     1, MAX_ARG, lux_zero, 0 },          // fun1.c
 #if MOTIF
   { "zeroifnotdefined", 1, MAX_ARG, lux_zeroifnotdefined, 0}, // motifextra.c
 #endif
-  { "zeronans",         1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
-  { "zoom",     1, 3, lux_zoom, "1oldcontrast" }, // zoom.c
+  { "zeronans", 1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
+  { "zoom",     1, 3, lux_zoom, "1oldcontrast" },      // zoom.c
 };
 int32_t nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
 
@@ -763,475 +787,518 @@ extern int32_t  vargsmooth;
 extern LuxRoutine lux_test;
 
 internalRoutine function_table[] = {
-  { "%a_unary_negative", 1, 1, lux_neg_func, "*" },     // fun1.c
-  { "%b_subscript", 1, MAX_ARG, lux_subsc_func, /* subsc.c */ "1inner:2outer:4zero:8subgrid:16keepdims:32all:64separate" },
-  { "%c_cputime", 0, 0, lux_cputime, 0 }, // fun1.c
-  { "%d_power",         2, 2, lux_pow, "*" }, // fun1.c
-  { "%e_concat", 1, MAX_ARG, lux_concat, "1sloppy" }, // subsc.c
-  { "%f_ctime", 0, 0, lux_ctime, 0 }, // fun1.c
-  { "%g_time",          0, 0, lux_time, 0 }, // fun1.c
-  { "%h_date",          0, 0, lux_date, 0 }, // fun1.c
-  { "%i_readkey", 0, 0, lux_readkey, 0 }, // strous.c
-  { "%j_readkeyne", 0, 0, lux_readkeyne, 0 }, // strous.c
-  { "%k_systime", 0, 0, lux_systime, 0 }, // fun1.c
-  { "%l_jd",    0, 0, lux_jd, 0 }, // fun1.c
-  { "%m_cjd",   0, 0, lux_cjd, 0 },                // fun1.c
-  { "abs",      1, 1, lux_abs, "*" }, // fun1.c
-  { "acos",     1, 1, lux_acos, "*" }, // fun1.c
-  { "acosh",    1, 1, lux_acosh, "*" }, // fun1.c
-  { "alog",     1, 1, lux_log, "*" }, // fun1.c
-  { "alog10",   1, 1, lux_log10, "*" }, // fun1.c
-  { "antilaplace2d", 2, 2, lux_antilaplace2d, 0 }, // poisson.c
-  { "areaconnect", 2, 3, lux_area_connect, "::compact:1raw" }, // topology.c
-  { "arestore",         1, MAX_ARG, lux_arestore_f, 0 }, // files.c
-  { "arg",      1, 1, lux_arg, 0 }, // fun3.c
-  { "array",    1, MAX_DIMS + 1, lux_array, 0 }, // symbols.c
-  { "asin",     1, 1, lux_asin, "*" }, // fun1.c
-  { "asinh",    1, 1, lux_asinh, "*" }, // fun1.c
-  { "assoc",    2, 3, lux_assoc, "::offset" }, // symbols.c
-  { "astore",   2, MAX_ARG, lux_astore_f, 0 }, // files.c
-  { "astrf",    1, 2, lux_astrf, "1fromequatorial:2fromecliptical:4fromgalactic:8toequatorial:16toecliptical:32togalactic:64julian:128besselian" }, // astron.c
-  { "astron",   2, 7, lux_astropos, /* astron.c */ ":::observer:equinox:elements:tolerance:1ecliptical:2equatorial:3horizontal:4elongation:8xyz:16lighttime:32date:64tdt:256aberration:512nutation:2832apparent:1024qelements:2048fk5:8192conjspread:16384planetocentric:32768keepdimensions:65536vocal:~131072vsop87a:131072vsop87c:262144bare" },
-  { "atan",     1, 1, lux_atan, "*" }, // fun1.c
-  { "atan2",    2, 2, lux_atan2, "*" }, // fun1.c
-  { "atanh",    1, 1, lux_atanh, "*" }, // fun1.c
-  { "atol",     1, 2, lux_strtol, 0 }, // fun3.c
-  { "basin",    1, 2, lux_basin2, /* strous.c */ "*1number:2sink:4difference" },
+  { "%a_unary_negative", 1, 1, lux_neg_func, "*" }, // fun1.cc
+  { "%b_subscript", 1, MAX_ARG, lux_subsc_func,     // subsc.cc
+    "1inner:2outer:4zero:8subgrid:16keepdims:32all:64separate" },
+  { "%c_cputime", 0, 0, lux_cputime, 0 },                      // fun1.cc
+  { "%d_power", 2, 2, lux_pow, "*" },                          // fun1.cc
+  { "%e_concat", 1, MAX_ARG, lux_concat, "1sloppy" },          // subsc.cc
+  { "%f_ctime", 0, 0, lux_ctime, 0 },                          // fun1.cc
+  { "%g_time",  0, 0, lux_time, 0 },                           // fun1.cc
+  { "%h_date",  0, 0, lux_date, 0 },                           // fun1.cc
+  { "%i_readkey", 0, 0, lux_readkey, 0 },                      // strous.cc
+  { "%j_readkeyne", 0, 0, lux_readkeyne, 0 },                  // strous.cc
+  { "%k_systime", 0, 0, lux_systime, 0 },                      // fun1.cc
+  { "%l_jd",    0, 0, lux_jd, 0 },                             // fun1.cc
+  { "%m_cjd",   0, 0, lux_cjd, 0 },                            // fun1.cc
+  { "abs",      1, 1, lux_abs, "*" },                          // fun1.cc
+  { "acos",     1, 1, lux_acos, "*" },                         // fun1.cc
+  { "acosh",    1, 1, lux_acosh, "*" },                        // fun1.cc
+  { "alog",     1, 1, lux_log, "*" },                          // fun1.cc
+  { "alog10",   1, 1, lux_log10, "*" },                        // fun1.cc
+  { "antilaplace2d", 2, 2, lux_antilaplace2d, 0 },             // poisson.cc
+  { "areaconnect", 2, 3, lux_area_connect, "::compact:1raw" }, // topology.cc
+  { "arestore", 1, MAX_ARG, lux_arestore_f, 0 },               // files.cc
+  { "arg",      1, 1, lux_arg, 0 },                            // fun3.cc
+  { "array",    1, MAX_DIMS + 1, lux_array, 0 },               // symbols.cc
+  { "asin",     1, 1, lux_asin, "*" },                         // fun1.cc
+  { "asinh",    1, 1, lux_asinh, "*" },                        // fun1.cc
+  { "assoc",    2, 3, lux_assoc, "::offset" },                 // symbols.cc
+  { "astore",   2, MAX_ARG, lux_astore_f, 0 },                 // files.cc
+  { "astrf",    1, 2, lux_astrf,                               // astron.cc
+    "1fromequatorial:2fromecliptical:4fromgalactic:8toequatorial"
+    ":16toecliptical:32togalactic:64julian:128besselian" },
+  { "astron",   2, 7, lux_astropos, // astron.cc
+    ":::observer:equinox:elements:tolerance:1ecliptical:2equatorial"
+    ":3horizontal:4elongation:8xyz:16lighttime:32date:64tdt"
+    ":256aberration:512nutation:2832apparent:1024qelements:2048fk5"
+    ":8192conjspread:16384planetocentric:32768keepdimensions"
+    ":65536vocal:~131072vsop87a:131072vsop87c:262144bare" },
+  { "atan",     1, 1, lux_atan, "*" },  // fun1.cc
+  { "atan2",    2, 2, lux_atan2, "*" }, // fun1.cc
+  { "atanh",    1, 1, lux_atanh, "*" }, // fun1.cc
+  { "atol",     1, 2, lux_strtol, 0 },  // fun3.cc
+  { "basin",    1, 2, lux_basin2, "*1number:2sink:4difference" }, // strous.cc
 #if DEVELOP
-  { "bessel_i0",  1, 1, lux_bessel_i0, "*1deflate" }, // fun1.c
-  { "bessel_i1",  1, 1, lux_bessel_i1, "*" }, // fun1.c
+  { "bessel_i0", 1, 1, lux_bessel_i0, "*1deflate" }, // fun1.cc
+  { "bessel_i1", 1, 1, lux_bessel_i1, "*" },         // fun1.cc
 #endif
-  { "bessel_j0", 1, 1, lux_j0, "*" }, // fun1.c
-  { "bessel_j1", 1, 1, lux_j1, "*" }, // fun1.c
-  { "bessel_jn", 2, 2, lux_jn, "*" }, // fun1.c
+  { "bessel_j0", 1, 1, lux_j0, "*" }, // fun1.cc
+  { "bessel_j1", 1, 1, lux_j1, "*" }, // fun1.cc
+  { "bessel_jn", 2, 2, lux_jn, "*" }, // fun1.cc
 #if DEVELOP
-  { "bessel_k0", 1, 1, lux_bessel_k0, "*" }, // fun1.c
-  { "bessel_k1", 1, 1, lux_bessel_k1, "*" }, // fun1.c
-  { "bessel_kn", 2, 2, lux_bessel_kn, "*" }, // fun1.c
+  { "bessel_k0", 1, 1, lux_bessel_k0, "*" }, // fun1.cc
+  { "bessel_k1", 1, 1, lux_bessel_k1, "*" }, // fun1.cc
+  { "bessel_kn", 2, 2, lux_bessel_kn, "*" }, // fun1.cc
 #endif
-  { "bessel_y0", 1, 1, lux_y0, "*" }, // fun1.c
-  { "bessel_y1", 1, 1, lux_y1, "*" }, // fun1.c
-  { "bessel_yn", 2, 2, lux_yn, "*" }, // fun1.c
-  { "beta",     2, 2, lux_beta, "*1log" }, // fun1.c
+  { "bessel_y0", 1, 1, lux_y0, "*" }, // fun1.cc
+  { "bessel_y1", 1, 1, lux_y1, "*" }, // fun1.cc
+  { "bessel_yn", 2, 2, lux_yn, "*" }, // fun1.cc
+  { "beta",     2, 2, lux_beta, "*1log" }, // fun1.cc
 #if DEVELOP
-  { "bi0",      1, 1, lux_bessel_i0, "*1deflate" }, // fun1.c
-  { "bi1",      1, 1, lux_bessel_i1, "*" }, // fun1.c
-  { "bigger235", 1, 1, lux_bigger235, "*" }, // fun4.c
+  { "bi0",      1, 1, lux_bessel_i0, "*1deflate" }, // fun1.cc
+  { "bi1",      1, 1, lux_bessel_i1, "*" },         // fun1.cc
+  { "bigger235", 1, 1, lux_bigger235, "*" },        // fun4.cc
 #endif
-  { "bisect",   2, 6, lux_bisect, ":::axis:pos:width" }, // strous3.c
-  { "bj0",      1, 1, lux_j0, "*" }, // fun1.c
-  { "bj1",      1, 1, lux_j1, "*" }, // fun1.c
-  { "bjn",      2, 2, lux_jn, "*" }, // fun1.c
+  { "bisect",   2, 6, lux_bisect, ":::axis:pos:width" }, // strous3.cc
+  { "bj0",      1, 1, lux_j0, "*" },                     // fun1.cc
+  { "bj1",      1, 1, lux_j1, "*" },                     // fun1.cc
+  { "bjn",      2, 2, lux_jn, "*" },                     // fun1.cc
 #if DEVELOP
-  { "bk0",      1, 1, lux_bessel_k0, "*" }, // fun1.c
-  { "bk1",      1, 1, lux_bessel_k1, "*" }, // fun1.c
-  { "bkn",      2, 2, lux_bessel_kn, "*" }, // fun1.c
+  { "bk0",      1, 1, lux_bessel_k0, "*" }, // fun1.cc
+  { "bk1",      1, 1, lux_bessel_k1, "*" }, // fun1.cc
+  { "bkn",      2, 2, lux_bessel_kn, "*" }, // fun1.cc
 #endif
-  { "bmap",     1, 1, lux_bmap, "*" }, // subsc.c
+  { "bmap",     1, 1, lux_bmap, "*" }, // subsc.cc
 #if DEVELOP
-  { "bsmooth",  1, 3, lux_bsmooth, 0 }, // strous.c
+  { "bsmooth",  1, 3, lux_bsmooth, 0 }, // strous.cc
 #endif
-  { "by0",      1, 1, lux_y0, "*" }, // fun1.c
-  { "by1",      1, 1, lux_y1, "*" }, // fun1.c
-  { "byn",      2, 2, lux_yn, "*" }, // fun1.c
-  { "bytarr",   1, MAX_DIMS, bytarr, 0 }, // symbols.c
-  { "byte",     1, 1, lux_byte, "*" }, // symbols.c
-  { "bytfarr",  3, MAX_DIMS + 1, bytfarr, "%1%offset:1readonly:2swap" }, // filemap.c
-  { "calendar",         1, 1, lux_calendar, /* astron.c */ "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew:6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan:11fromlongcount:12fromlatin:16tocommon:32togregorian:48toislamic:64tojulian:80tohebrew:96toegyptian:112tojd:128tocjd:144tolunar:160tomayan:176tolongcount:192tolatin:0tonumeric:256toint:512todouble:768totext:0fromutc:1024fromtai:2048fromtt:3072fromlt:0toutc:4096totai:8192tott:12288tolt:0fromymd:16384fromdmy:0toymd:32768todmy" },
-  { "cbrt",     1, 1, lux_cbrt, "*" }, // fun1.c
-  { "cdblarr",  1, MAX_ARG, cdblarr, 0 }, // symbols.c
-  { "cdblfarr", 3, MAX_DIMS + 1, cdblfarr, "%1%offset:1readonly:2swap" }, // filemap.c
-  { "cdmap",    1, 1, lux_cdmap, 0 }, // subsc.c
-  { "cdouble",  1, 1, lux_cdouble, "*" }, // fun1.c
-  { "ceil",     1, 1, lux_ceil, "*" }, // symbols.c
-  { "cfloat",   1, 1, lux_cfloat, "*" }, // fun1.c
-  { "cfltarr",  1, MAX_ARG, cfltarr, 0 }, // symbols.c
-  { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, "%1%offset:1readonly:2swap" }, // filemap.c
-  { "cfmap",    1, 1, lux_cfmap, 0 }, // subsc.c
-  { "checkmenu", 0, 1, lux_check_menu, 0 }, // menu.c
-  { "checkwindow", 0, 1, lux_check_window, 0 }, // xport.c
-  { "chi2",     2, 2, lux_chi_square, "*1complement:2log" }, // fun1.c
-  { "classname", 1, 1, lux_classname, 0 }, // install.c
-  { "colorpixel", 1, 1, lux_colorpixel, "*" }, // xport.c
+  { "by0",      1, 1, lux_y0, "*" },      // fun1.cc
+  { "by1",      1, 1, lux_y1, "*" },      // fun1.cc
+  { "byn",      2, 2, lux_yn, "*" },      // fun1.cc
+  { "bytarr",   1, MAX_DIMS, bytarr, 0 }, // symbols.cc
+  { "byte",     1, 1, lux_byte, "*" },    // symbols.cc
+  { "bytfarr",  3, MAX_DIMS + 1, bytfarr, // filemap.cc
+    "%1%offset:1readonly:2swap" },
+  { "calendar", 1, 1, lux_calendar, // astron.cc
+    "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew"
+    ":6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan"
+    ":11fromlongcount:12fromlatin:16tocommon:32togregorian"
+    ":48toislamic:64tojulian:80tohebrew:96toegyptian:112tojd:128tocjd"
+    ":144tolunar:160tomayan:176tolongcount:192tolatin:0tonumeric"
+    ":256toint:512todouble:768totext:0fromutc:1024fromtai:2048fromtt"
+    ":3072fromlt:0toutc:4096totai:8192tott:12288tolt:0fromymd"
+    ":16384fromdmy:0toymd:32768todmy" },
+  { "cbrt",     1, 1, lux_cbrt, "*" },    // fun1.cc
+  { "cdblarr",  1, MAX_ARG, cdblarr, 0 }, // symbols.cc
+  { "cdblfarr", 3, MAX_DIMS + 1, cdblfarr, // filemap.cc
+    "%1%offset:1readonly:2swap" },
+  { "cdmap",    1, 1, lux_cdmap, 0 },     // subsc.cc
+  { "cdouble",  1, 1, lux_cdouble, "*" }, // fun1.cc
+  { "ceil",     1, 1, lux_ceil, "*" },    // symbols.cc
+  { "cfloat",   1, 1, lux_cfloat, "*" },  // fun1.cc
+  { "cfltarr",  1, MAX_ARG, cfltarr, 0 }, // symbols.cc
+  { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, // filemap.cc
+    "%1%offset:1readonly:2swap" },
+  { "cfmap",    1, 1, lux_cfmap, 0 },                        // subsc.cc
+  { "checkmenu", 0, 1, lux_check_menu, 0 },                  // menu.cc
+  { "checkwindow", 0, 1, lux_check_window, 0 },              // xport.cc
+  { "chi2",     2, 2, lux_chi_square, "*1complement:2log" }, // fun1.cc
+  { "classname", 1, 1, lux_classname, 0 },                   // install.cc
+  { "colorpixel", 1, 1, lux_colorpixel, "*" },               // xport.cc
 #if DEVELOP
-  { "compile",  1, 1, lux_compile, 0 }, // install.c
+  { "compile",  1, 1, lux_compile, 0 }, // install.cc
 #endif
-  { "complex",  1, 1, lux_complex, 0 },         // fun3.c
-  { "complexsquare", 1, 1, lux_complexsquare, 0 }, // fun1.c
-  { "compress",         2, 3, lux_compress, 0 }, // fun4.c
-  { "concat",   1, MAX_ARG, lux_concat, "1sloppy" }, // subsc.c
-  { "conjugate", 1, 1, lux_conjugate, "*" }, // fun1.c
-  { "constellation", 1, 2, lux_constellation, "1julian:2besselian:4vocal" }, // astron.c
-  { "constellationname", 1, 1, lux_constellationname, 0 }, // astron.c
-  { "convert",  2, 2, lux_convertsym, "*" }, // symbols.c
-  { "cos",      1, 1, lux_cos, "*" }, // fun1.c
-  { "cosh",     1, 1, lux_cosh, "*" }, // fun1.c
-  { "covariance", 2, 4, lux_covariance,
-    ":::weights:*0sample:1population:2keepdims:4double:8omitnans" }, // fun2.c
-  { "crosscorr", 2, 3, lux_crosscorr, 0 }, // fun2.c
-  { "crunch",   3, 3, lux_crunch_f, 0 }, // crunch.c
-  { "cspline",  0, 6, lux_cubic_spline, /* fun3.c */ "1keep:2periodic:4akima:8getderivative:16getintegral" },
-  { "cspline_find", 2, 4, lux_cspline_find, ":::axis:index" }, // strous3.c
-  { "ctop",     1, 3, lux_cartesian_to_polar, 0 }, // fun4.c
-  { "date_from_tai", 1, 2, lux_date_from_tai, 0 }, // ephem.c
-  { "dblarr",   1, MAX_DIMS, dblarr, 0 }, // symbols.c
-  { "dblfarr",  3, MAX_DIMS + 1, dblfarr, /* filemap.c */ "%1%offset:1readonly:2swap" },
-  { "defined",  1, 1, lux_defined, "+1target" }, // fun1.c
-  { "despike",  1, 6, lux_despike, ":frac:level:niter:spikes:rms" }, // fun6.c
-  { "detrend",  1, 2, lux_detrend, "*" }, // fun2.c
-  { "differ",   1, 3, lux_differ, "*1central:2circular" }, // strous.c
-  { "dilate",   1, 1, lux_dilate, 0 }, // fun5.c
-  { "dimen",    1, 2, lux_dimen, 0 }, // subsc.c
-  { "distarr",  1, 3, lux_distarr, 0 }, // strous2.c
-  { "distr",    2, 2, lux_distr_f, /* strous.c */ "2ignorelimit:4increaselimit" },
-  { "dmap",     1, 1, lux_dmap, 0 }, // subsc.c
-  { "doub",     1, 1, lux_double, "*" }, // symbols.c
-  { "double",   1, 1, lux_double, "*" }, // symbols.c
-  { "dsmooth",  3, 3, lux_dir_smooth, "0twosided:0boxcar:1onesided:2gaussian:4total:8straight" }, // strous3.c
-  { "dsum",     1, 4, lux_total, "|1|::power:weights:2keepdims" }, // fun1.c
-  { "easterdate", 1, 1, lux_EasterDate, 0 }, // astron.c
-  { "enhanceimage", 1, 3, lux_enhanceimage, ":part:target:1symmetric" }, // strous3.c
-  { "equivalence", 2, 2, lux_equivalence, 0 }, // strous2.c
-  { "erf",      1, 1, lux_erf, "*" }, // fun1.c
-  { "erfc",     1, 1, lux_erfc, "*" }, // fun1.c
-  { "erode",    1, 1, lux_erode, "1zeroedge" }, // fun5.c
-  { "esegment",         1, 4, lux_extreme_general, /* topology.c */ ":sign:diagonal:threshold" },
-  { "esmooth",  1, 3, lux_esmooth, 0 }, // fun2.c
-  { "eval",     1, 2, lux_eval, "1allnumber" }, // fun3.c
-  { "eventname", 0, 1, lux_event_name, 0 }, // menu.c
-  { "exp",      1, 1, lux_exp, "*" }, // fun1.c
-  { "expand",   2, 4, lux_expand, "1smooth:2nearest" }, // fun4.c
-  { "expm1",    1, 1, lux_expm1, "*" }, // fun1.c
-  { "extract_bits", 3, 3, lux_extract_bits_f, 0 }, // fun3.c
-  { "fcrunwrite", 2, 3, lux_fcrunwrite_f, 0 }, // files.c
-  { "fcrw",     2, 3, lux_fcrunwrite_f, 0 }, // files.c
-  { "fcw",      2, 3, lux_fcwrite_f, "1runlength" }, // files.c
-  { "fcwrite",  2, 3, lux_fcwrite_f, "1runlength" }, // files.c
-  { "fftshift",         2, 2, lux_fftshift_f, 0 }, // fun3.c
-  { "fileptr",  1, 2, lux_fileptr_f, "1start:2eof:4advance" }, // files.c
-  { "filesize",         1, 1, lux_filesize, 0 }, // files.c
-  { "filetype",         1, 1, lux_identify_file, 0 }, // files.c
-  { "filetypename", 1, 1, lux_filetype_name, 0 }, // install.c
-  { "find",     2, 4, lux_find,         /* strous.c */ "0exact:1index_ge:2value_ge:4first" },
-  { "find2",    2, 2, lux_find2, "0exact" },    // strous.c
-  { "findfile",         2, 2, lux_findfile, 0 }, // files.c
-  { "find_max",         1, 3, lux_find_max, /* strous2.c */ "::diagonal:1degree:2subgrid" },
-  { "find_maxloc", 1, 3, lux_find_maxloc, /* strous2.c */ "::diagonal:1degree:2subgrid:4coords:8old" },
-  { "find_min",         1, 3, lux_find_min, /* strous2.c */ "::diagonal:1degree:2subgrid" },
-  { "find_minloc", 1, 3, lux_find_minloc, /* strous2.c */ "::diagonal:1degree:2subgrid:4coords" },
-  { "fit",      3, 17, lux_generalfit, /* fit.c */ "|4|::start:step:lowbound:highbound:weights:qthresh:pthresh:ithresh:dthresh:fac:niter:nsame:err:fit:tthresh:1vocal:4down:8pchi:16gaussians:32powerfunc:64onebyone:129verr" },
+  { "complex",  1, 1, lux_complex, 0 },              // fun3.cc
+  { "complexsquare", 1, 1, lux_complexsquare, 0 },   // fun1.cc
+  { "compress", 2, 3, lux_compress, 0 },             // fun4.cc
+  { "concat",   1, MAX_ARG, lux_concat, "1sloppy" }, // subsc.cc
+  { "conjugate", 1, 1, lux_conjugate, "*" },         // fun1.cc
+  { "constellation", 1, 2, lux_constellation,        // astron.cc
+    "1julian:2besselian:4vocal" },
+  { "constellationname", 1, 1, lux_constellationname, 0 }, // astron.cc
+  { "convert",  2, 2, lux_convertsym, "*" },               // symbols.cc
+  { "cos",      1, 1, lux_cos, "*" },                      // fun1.cc
+  { "cosh",     1, 1, lux_cosh, "*" },                     // fun1.cc
+  { "covariance", 2, 4, lux_covariance,                    // fun2.cc
+    ":::weights:*0sample:1population:2keepdims:4double:8omitnans" },
+  { "crosscorr", 2, 3, lux_crosscorr, 0 }, // fun2.cc
+  { "crunch",   3, 3, lux_crunch_f, 0 },   // crunch.cc
+  { "cspline",  0, 6, lux_cubic_spline,    // fun3.cc
+    "1keep:2periodic:4akima:8getderivative:16getintegral" },
+  { "cspline_find", 2, 4, lux_cspline_find, ":::axis:index" }, // strous3.cc
+  { "ctop",     1, 3, lux_cartesian_to_polar, 0 },             // fun4.cc
+  { "date_from_tai", 1, 2, lux_date_from_tai, 0 },             // ephem.cc
+  { "dblarr",   1, MAX_DIMS, dblarr, 0 },                      // symbols.cc
+  { "dblfarr",  3, MAX_DIMS + 1, dblfarr,                      // filemap.cc
+    "%1%offset:1readonly:2swap" },
+  { "defined",  1, 1, lux_defined, "+1target" },                     // fun1.cc
+  { "despike",  1, 6, lux_despike, ":frac:level:niter:spikes:rms" }, // fun6.cc
+  { "detrend",  1, 2, lux_detrend, "*" },                            // fun2.cc
+  { "differ",   1, 3, lux_differ, "*1central:2circular" }, // strous.cc
+  { "dilate",   1, 1, lux_dilate, 0 },                     // fun5.cc
+  { "dimen",    1, 2, lux_dimen, 0 },                      // subsc.cc
+  { "distarr",  1, 3, lux_distarr, 0 },                    // strous2.cc
+  { "distr",    2, 2, lux_distr_f,                         // strous.cc
+    "2ignorelimit:4increaselimit" },
+  { "dmap",     1, 1, lux_dmap, 0 },     // subsc.cc
+  { "doub",     1, 1, lux_double, "*" }, // symbols.cc
+  { "double",   1, 1, lux_double, "*" }, // symbols.cc
+  { "dsmooth",  3, 3, lux_dir_smooth,    // strous3.cc
+    "0twosided:0boxcar:1onesided:2gaussian:4total:8straight" },
+  { "dsum",     1, 4, lux_total, "|1|::power:weights:2keepdims" }, // fun1.cc
+  { "easterdate", 1, 1, lux_EasterDate, 0 },                       // astron.cc
+  { "enhanceimage", 1, 3, lux_enhanceimage,                        // strous3.cc
+    ":part:target:1symmetric" },
+  { "equivalence", 2, 2, lux_equivalence, 0 },  // strous2.cc
+  { "erf",      1, 1, lux_erf, "*" },           // fun1.cc
+  { "erfc",     1, 1, lux_erfc, "*" },          // fun1.cc
+  { "erode",    1, 1, lux_erode, "1zeroedge" }, // fun5.cc
+  { "esegment", 1, 4, lux_extreme_general,      // topology.cc
+    ":sign:diagonal:threshold" },
+  { "esmooth",  1, 3, lux_esmooth, 0 },                        // fun2.cc
+  { "eval",     1, 2, lux_eval, "1allnumber" },                // fun3.cc
+  { "eventname", 0, 1, lux_event_name, 0 },                    // menu.cc
+  { "exp",      1, 1, lux_exp, "*" },                          // fun1.cc
+  { "expand",   2, 4, lux_expand, "1smooth:2nearest" },        // fun4.cc
+  { "expm1",    1, 1, lux_expm1, "*" },                        // fun1.cc
+  { "extract_bits", 3, 3, lux_extract_bits_f, 0 },             // fun3.cc
+  { "fcrunwrite", 2, 3, lux_fcrunwrite_f, 0 },                 // files.cc
+  { "fcrw",     2, 3, lux_fcrunwrite_f, 0 },                   // files.cc
+  { "fcw",      2, 3, lux_fcwrite_f, "1runlength" },           // files.cc
+  { "fcwrite",  2, 3, lux_fcwrite_f, "1runlength" },           // files.cc
+  { "fftshift", 2, 2, lux_fftshift_f, 0 },                     // fun3.cc
+  { "fileptr",  1, 2, lux_fileptr_f, "1start:2eof:4advance" }, // files.cc
+  { "filesize", 1, 1, lux_filesize, 0 },                       // files.cc
+  { "filetype", 1, 1, lux_identify_file, 0 },                  // files.cc
+  { "filetypename", 1, 1, lux_filetype_name, 0 },              // install.cc
+  { "find",     2, 4, lux_find,                                // strous.cc
+    "0exact:1index_ge:2value_ge:4first" },
+  { "find2",    2, 2, lux_find2, "0exact" },     // strous.cc
+  { "findfile", 2, 2, lux_findfile, 0 },         // files.cc
+  { "find_max", 1, 3, lux_find_max,              // strous2.cc
+    "::diagonal:1degree:2subgrid" },
+  { "find_maxloc", 1, 3, lux_find_maxloc, // strous2.cc
+    "::diagonal:1degree:2subgrid:4coords:8old" },
+  { "find_min", 1, 3, lux_find_min, // strous2.cc
+    "::diagonal:1degree:2subgrid" },
+  { "find_minloc", 1, 3, lux_find_minloc, // strous2.cc
+    "::diagonal:1degree:2subgrid:4coords" },
+  { "fit",      3, 17, lux_generalfit, // fit.cc
+    "|4|::start:step:lowbound:highbound:weights:qthresh:pthresh:ithresh"
+    ":dthresh:fac:niter:nsame:err:fit:tthresh:1vocal:4down:8pchi"
+    ":16gaussians:32powerfunc:64onebyone:129verr" },
 #if DEVELOP
-  { "fit2",     4, 11, lux_geneticfit, "x:y:npar:fit:weights:mu:generations:population:pcross:pmutate:vocal:1elite:2byte:4word:6long:8float:10double" }, // fit.c
+  { "fit2",     4, 11, lux_geneticfit, // fit.cc
+    "x:y:npar:fit:weights:mu:generations:population:pcross:pmutate:vocal"
+    ":1elite:2byte:4word:6long:8float:10double" },
 #endif
-  { "fits_header", 1, 4, lux_fits_header_f, 0 }, // files.c
-  { "fits_key",         2, 2, lux_fitskey, "1comment" }, // strous3.c
-  { "fits_read", 2, 7, lux_fits_read_f, "|1|1translate:2rawvalues::::::blank" }, // files.c
-  { "fits_xread", 2, 6, lux_fits_xread_f, 0 }, // files.c
-  { "fix",      1, 1, lux_long, "*" }, // symbols.c
-  { "float",    1, 1, lux_float, "*" }, // symbols.c
-  { "floor",    1, 1, lux_floor, "*" }, // symbols.c
-  { "fltarr",   1, MAX_DIMS, fltarr, 0 }, // symbols.c
-  { "fltfarr",  3, MAX_DIMS + 1, fltfarr, /* filemap.c */ "%1%offset:1readonly:2swap" },
-  { "fmap",     1, 1, lux_fmap, 0 }, // subsc.c
-  { "fratio",   3, 3, lux_f_ratio, "*1complement:2log" }, // fun1.c
-  { "freadf",   2, MAX_ARG, lux_freadf_f, "|1|1eof" }, // files.c
-  { "freads",   3, MAX_ARG, lux_freads_f, "1countspaces" }, // files.c
-  { "fstring",  1, MAX_ARG, lux_fstring, "1skip_undefined" }, // fun2.c
-  { "fsum",     1, 4, lux_total, "::power:weights:1double:2keepdims" }, // fun1.c
-  { "fzarr",    1, 1, lux_fzarr, "1readonly" }, // filemap.c
-  { "fzh",      1, 2, lux_fzhead_f, 0 }, // files.c
-  { "fzhead",   1, 2, lux_fzhead_f, 0 }, // files.c
-  { "fzr",      2, 3, lux_fzread_f, "|1|1printheader" }, // files.c
-  { "fzread",   2, 3, lux_fzread_f, "|1|1printheader" }, // files.c
-  { "fzw",      2, 3, lux_fzwrite_f, 0 }, // files.c
-  { "fzwrite",  2, 3, lux_fzwrite_f, 0 }, // files.c
-  { "gamma",    1, 1, lux_gamma, "*1log" }, // fun1.c
+  { "fits_header", 1, 4, lux_fits_header_f, 0 }, // files.cc
+  { "fits_key", 2, 2, lux_fitskey, "1comment" }, // strous3.cc
+  { "fits_read", 2, 7, lux_fits_read_f,          // files.cc
+    "|1|1translate:2rawvalues::::::blank" },
+  { "fits_xread", 2, 6, lux_fits_xread_f, 0 }, // files.cc
+  { "fix",      1, 1, lux_long, "*" },         // symbols.cc
+  { "float",    1, 1, lux_float, "*" },        // symbols.cc
+  { "floor",    1, 1, lux_floor, "*" },        // symbols.cc
+  { "fltarr",   1, MAX_DIMS, fltarr, 0 },      // symbols.cc
+  { "fltfarr",  3, MAX_DIMS + 1, fltfarr,      // filemap.cc
+    "%1%offset:1readonly:2swap" },
+  { "fmap",     1, 1, lux_fmap, 0 },                          // subsc.cc
+  { "fratio",   3, 3, lux_f_ratio, "*1complement:2log" },     // fun1.cc
+  { "freadf",   2, MAX_ARG, lux_freadf_f, "|1|1eof" },        // files.cc
+  { "freads",   3, MAX_ARG, lux_freads_f, "1countspaces" },   // files.cc
+  { "fstring",  1, MAX_ARG, lux_fstring, "1skip_undefined" }, // fun2.cc
+  { "fsum",     1, 4, lux_total,                              // fun1.cc
+    "::power:weights:1double:2keepdims" },
+  { "fzarr",    1, 1, lux_fzarr, "1readonly" },          // filemap.cc
+  { "fzh",      1, 2, lux_fzhead_f, 0 },                 // files.cc
+  { "fzhead",   1, 2, lux_fzhead_f, 0 },                 // files.cc
+  { "fzr",      2, 3, lux_fzread_f, "|1|1printheader" }, // files.cc
+  { "fzread",   2, 3, lux_fzread_f, "|1|1printheader" }, // files.cc
+  { "fzw",      2, 3, lux_fzwrite_f, 0 },                // files.cc
+  { "fzwrite",  2, 3, lux_fzwrite_f, 0 },                // files.cc
+  { "gamma",    1, 1, lux_gamma, "*1log" },              // fun1.cc
 #if HAVE_REGEX_H
-  { "getdirectories", 1, 2, lux_getdirectories, 0 }, // files.c
-  { "getdirects", 1, 2, lux_getdirectories, 0 }, // files.c
+  { "getdirectories", 1, 2, lux_getdirectories, 0 }, // files.cc
+  { "getdirects", 1, 2, lux_getdirectories, 0 },     // files.cc
 #endif
-  { "getenv",   1, 1, lux_getenv, 0 }, // files.c
+  { "getenv",   1, 1, lux_getenv, 0 }, // files.cc
 #if HAVE_REGEX_H
-  { "getfiles", 1, 2, lux_getfiles, 0 }, // files.c
-  { "getfiles_r", 1, 2, lux_getfiles_r, 0 }, // files.c
-  { "getmatchedfiles", 2, 3, lux_getmatchedfiles, 0 }, // files.c
-  { "getmatchedfiles_r", 2, 3, lux_getmatchedfiles_r, 0 }, // files.c
+  { "getfiles", 1, 2, lux_getfiles, 0 },                   // files.cc
+  { "getfiles_r", 1, 2, lux_getfiles_r, 0 },               // files.cc
+  { "getmatchedfiles", 2, 3, lux_getmatchedfiles, 0 },     // files.cc
+  { "getmatchedfiles_r", 2, 3, lux_getmatchedfiles_r, 0 }, // files.cc
 #endif
-  { "get_lun",  0, 0, lux_get_lun, 0 }, // files.c
-  { "gifread",  2, 3, lux_gifread_f, 0 }, // gifread_ana.c
-  { "gifwrite",         2, 3, lux_gifwrite_f, 0 }, // gifwrite_ana.c
-  { "gridmatch", 7, 8, lux_gridmatch, "1vocal" }, // fun4.c
-  { "gsmooth",  1, 4, lux_gsmooth, // fun2.c
+  { "get_lun",  0, 0, lux_get_lun, 0 },           // files.cc
+  { "gifread",  2, 3, lux_gifread_f, 0 },         // gifread_lux.cc
+  { "gifwrite", 2, 3, lux_gifwrite_f, 0 },        // gifwrite_lux.cc
+  { "gridmatch", 7, 8, lux_gridmatch, "1vocal" }, // fun4.cc
+  { "gsmooth",  1, 4, lux_gsmooth,                // fun2.cc
     ":::kernel:1normalize:2fullnorm:4balanced:8all" },
-  { "hamming",  1, 2, lux_hamming, 0 }, // strous3.c
-  { "hist",     1, 2, lux_hist, // fun3.c
+  { "hamming",  1, 2, lux_hamming, 0 }, // strous3.cc
+  { "hist",     1, 2, lux_hist,         // fun3.cc
     "1first:2ignorelimit:4increaselimit:8silent" },
-  { "histr",    1, 1, lux_histr, // fun3.c
+  { "histr",    1, 1, lux_histr, // fun3.cc
     "1first:2ignorelimit:4increaselimit:8silent" },
-  { "ibeta",    3, 3, lux_incomplete_beta, "*1complement:2log" }, // fun1.c
-  { "idlread",  2, 2, lux_idlread_f, 0 }, // strous3.c
-  { "igamma",   2, 2, lux_incomplete_gamma, "*1complement:2log" }, // fun1.c
-  { "imaginary", 1, 1, lux_imaginary, 0 }, // fun3.c
-  { "index",    1, 1, lux_index, "*1axis:2rank" }, // fun4.c
-  { "indgen",   1, 2, lux_indgen, "*" }, // fun1.c
-  { "inpolygon", 4, 4, lux_inpolygon, 0 }, // topology.c
-  { "int",      1, 1, lux_word, "*" }, // symbols.c
-  { "int64",    1, 1, lux_int64, "*" },     // symbols.c
-  { "int64arr", 1, MAX_DIMS, int64arr, 0 }, // symbols.c
-  { "int64farr", 3, MAX_DIMS+1, int64farr, // filemap.c
+  { "ibeta",    3, 3, lux_incomplete_beta, "*1complement:2log" },  // fun1.cc
+  { "idlread",  2, 2, lux_idlread_f, 0 },                          // strous3.cc
+  { "igamma",   2, 2, lux_incomplete_gamma, "*1complement:2log" }, // fun1.cc
+  { "imaginary", 1, 1, lux_imaginary, 0 },                         // fun3.cc
+  { "index",    1, 1, lux_index, "*1axis:2rank" },                 // fun4.cc
+  { "indgen",   1, 2, lux_indgen, "*" },                           // fun1.cc
+  { "inpolygon", 4, 4, lux_inpolygon, 0 },  // topology.cc
+  { "int",      1, 1, lux_word, "*" },      // symbols.cc
+  { "int64",    1, 1, lux_int64, "*" },     // symbols.cc
+  { "int64arr", 1, MAX_DIMS, int64arr, 0 }, // symbols.cc
+  { "int64farr", 3, MAX_DIMS+1, int64farr,  // filemap.cc
     "%1%offset:1readonly:2swap" },
-  { "int64map",         1, 1, lux_int64map, 0 }, // subsc.c
-  { "intarr",   1, MAX_DIMS, intarr, 0 }, // symbols.c
-  { "intfarr",  3, MAX_DIMS + 1, intfarr, // filemap.c
+  { "int64map", 1, 1, lux_int64map, 0 },  // subsc.cc
+  { "intarr",   1, MAX_DIMS, intarr, 0 }, // symbols.cc
+  { "intfarr",  3, MAX_DIMS + 1, intfarr, // filemap.cc
     "%1%offset:1readonly:2swap" },
-  { "isarray",  1, 1, lux_isarray, 0 }, // subsc.c
-  { "isnan",    1, 1, lux_isnan, 0 }, // fun1.c; needs IEEE isnan!
-  { "isscalar",         1, 1, lux_isscalar, 0 }, // subsc.c
-  { "isstring",         1, 1, lux_isstring, 0 }, // subsc.c
-  { "ist",      1, 3, lux_istring, 0 }, // fun2.c
-  { "istring",  1, 3, lux_istring, 0 }, // fun2.c
-  { "jpegread",         2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.c
-  { "jpegwrite", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.c
-  { "ksmooth",  2, 3, lux_ksmooth, "1balanced" }, // fun2.c
-  { "laplace2d",        1, 1, lux_laplace2d, 0 }, // poisson.c
-  { "legendre", 2, 2, lux_legendre, "1normalize" }, // strous3.c
-  { "llsq",     2, 9, lux_lsq2,         // strous2.c
+  { "isarray",  1, 1, lux_isarray, 0 },  // subsc.cc
+  { "isnan",    1, 1, lux_isnan, 0 },    // fun1.cc; needs IEEE isnan!
+  { "isscalar", 1, 1, lux_isscalar, 0 }, // subsc.cc
+  { "isstring", 1, 1, lux_isstring, 0 }, // subsc.cc
+  { "ist",      1, 3, lux_istring, 0 },  // fun2.cc
+  { "istring",  1, 3, lux_istring, 0 },  // fun2.cc
+  { "jpegread", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.cc
+  { "jpegwrite", 2, 4, lux_write_jpeg6b_f, 0 },                    // jpeg.cc
+  { "ksmooth",  2, 3, lux_ksmooth, "1balanced" },                  // fun2.cc
+  { "laplace2d", 1, 1, lux_laplace2d, 0 },                         // poisson.cc
+  { "legendre", 2, 2, lux_legendre, "1normalize" },                // strous3.cc
+  { "llsq",     2, 9, lux_lsq2,                                    // strous2.cc
     ":::fwhm:weights:cov:err:chisq:1formal:2reduce" },
-  { "lmap",     1, 1, lux_lmap, 0 }, // subsc.c
-  { "local_max", 2, 2, lux_local_maxf, // strous.c
+  { "lmap",     1, 1, lux_lmap, 0 },   // subsc.cc
+  { "local_max", 2, 2, lux_local_maxf, // strous.cc
     "3subgrid:2bound" },
-  { "local_maxloc", 2, 2, lux_local_maxloc, // strous.c
+  { "local_maxloc", 2, 2, lux_local_maxloc, // strous.cc
     "3subgrid:2bound:4relative" },
-  { "local_min", 2, 2, lux_local_minf, // strous.c
+  { "local_min", 2, 2, lux_local_minf, // strous.cc
     "3subgrid:2bound" },
-  { "local_minloc", 2, 2, lux_local_minloc, // strous.c
+  { "local_minloc", 2, 2, lux_local_minloc, // strous.cc
     "3subgrid:2bound:4relative" },
-  { "log",      1, 1, lux_log, "*" }, // fun1.c
-  { "log10",    1, 1, lux_log10, "*" }, // fun1.c
-  { "log1p",    1, 1, lux_log1p, "*" }, // fun1.c
-  { "lonarr",   1, MAX_DIMS, lonarr, 0 }, // symbols.c
-  { "lonfarr",  3, MAX_DIMS+1, lonfarr, // filemap.c
+  { "log",      1, 1, lux_log, "*" },     // fun1.cc
+  { "log10",    1, 1, lux_log10, "*" },   // fun1.cc
+  { "log1p",    1, 1, lux_log1p, "*" },   // fun1.cc
+  { "lonarr",   1, MAX_DIMS, lonarr, 0 }, // symbols.cc
+  { "lonfarr",  3, MAX_DIMS+1, lonfarr,   // filemap.cc
     "%1%offset:1readonly:2swap" },
-  { "long",     1, 1, lux_long, "*" }, // symbols.c
-  { "lowcase",  1, 1, lux_lower, 0 }, // fun2.c
-  { "lower",    1, 1, lux_lower, 0 }, // fun2.c
-  { "lsmooth",  3, 3, lux_dir_smooth2, // strous3.c
+  { "long",     1, 1, lux_long, "*" }, // symbols.cc
+  { "lowcase",  1, 1, lux_lower, 0 },  // fun2.cc
+  { "lower",    1, 1, lux_lower, 0 },  // fun2.cc
+  { "lsmooth",  3, 3, lux_dir_smooth2, // strous3.cc
     "0twosided:0boxcar:1onesided:2gaussian:4normalize:8straight" },
-  { "lsq",      2, 6, lux_lsq,  // strous2.c
+  { "lsq",      2, 6, lux_lsq,  // strous2.cc
     "::weights:cov:err:chisq:1formal:2reduce" },
-  { "match",    2, 2, lux_match, 0 }, // strous.c
-  { "max",      1, 2, lux_maxf, "1keepdims" }, // fun3.c
-  { "maxdir",   2, 3, lux_max_dir, 0 },         // topology.c
-  { "maxfilter", 1, 3, lux_maxfilter, 0 }, // strous2.c
-  { "maxloc",   1, 2, lux_maxloc, "1keepdims" }, // fun3.c
-  { "mean",     1, 4, lux_mean, "::power:weights:1double:2keepdims:4float:8omitnans" }, // fun1.c
-  { "medfilter", 1, 4, lux_medfilter, "%1%" }, // strous2.c
-  { "median",   1, 3, lux_median, "%1%" }, // strous2.c
-  { "memory",   0, 0, lux_memory, 0 }, // memck.c
-  { "min",      1, 2, lux_minf, "1keepdims" }, // fun3.c
-  { "minfilter", 1, 3, lux_minfilter, 0 }, // strous2.c
-  { "minloc",   1, 2, lux_minloc, "1keepdims" }, // fun3.c
-  { "ncchi2",   3, 3, lux_noncentral_chi_square, 0 }, // fun1.c
-  { "not",      1, 1, lux_not, "*" }, // strous.c
-  { "num_dim",  1, 1, lux_num_dimen, 0 }, // subsc.c
-  { "num_elem", 1, 2, lux_num_elem, 0 }, // subsc.c
-  { "one",      1, 1, lux_onef, 0 }, // fun1.c
-  { "openr",    2, 2, lux_openr_f, "1get_lun" }, // files.c
-  { "openu",    2, 2, lux_openu_f, "1get_lun" }, // files.c
-  { "openw",    2, 2, lux_openw_f, "1get_lun" }, // files.c
-  // { "orbitelem",     3, 3, lux_orbitalElement, 0,
-  { "ordfilter", 1, 4, lux_orderfilter, // strous2.c
+  { "match",    2, 2, lux_match, 0 },            // strous.cc
+  { "max",      1, 2, lux_maxf, "1keepdims" },   // fun3.cc
+  { "maxdir",   2, 3, lux_max_dir, 0 },          // topology.cc
+  { "maxfilter", 1, 3, lux_maxfilter, 0 },       // strous2.cc
+  { "maxloc",   1, 2, lux_maxloc, "1keepdims" }, // fun3.cc
+  { "mean",     1, 4, lux_mean,                  // fun1.cc
+    "::power:weights:1double:2keepdims:4float:8omitnans" },
+  { "medfilter", 1, 4, lux_medfilter, "%1%" },        // strous2.cc
+  { "median",   1, 3, lux_median, "%1%" },            // strous2.cc
+  { "memory",   0, 0, lux_memory, 0 },                // memck.cc
+  { "min",      1, 2, lux_minf, "1keepdims" },        // fun3.cc
+  { "minfilter", 1, 3, lux_minfilter, 0 },            // strous2.cc
+  { "minloc",   1, 2, lux_minloc, "1keepdims" },      // fun3.cc
+  { "ncchi2",   3, 3, lux_noncentral_chi_square, 0 }, // fun1.cc
+  { "not",      1, 1, lux_not, "*" },                 // strous.cc
+  { "num_dim",  1, 1, lux_num_dimen, 0 },             // subsc.cc
+  { "num_elem", 1, 2, lux_num_elem, 0 },              // subsc.cc
+  { "one",      1, 1, lux_onef, 0 },                  // fun1.cc
+  { "openr",    2, 2, lux_openr_f, "1get_lun" },      // files.cc
+  { "openu",    2, 2, lux_openu_f, "1get_lun" },      // files.cc
+  { "openw",    2, 2, lux_openw_f, "1get_lun" },      // files.cc
+  // { "orbitelem", 3, 3, lux_orbitalElement, 0,
+  { "ordfilter", 1, 4, lux_orderfilter, // strous2.cc
     "%1%order:1median:2minimum:3maximum" },
-  { "pit",      1, 3, lux_pit, 0 }, // fun2.c
-  { "polate",   3, 3, lux_table, 0 }, // strous.c
-  { "poly",     2, 2, lux_poly, "*" }, // fun2.c
-  { "power",    1, 2, lux_power, "1power:2shape:4onedim" }, // fun3.c
-  { "precess",  3, 3, lux_precess, "1julian:2besselian" }, // astron.c
-  { "printf",   1, MAX_ARG, lux_printf_f, 0 }, // files.c
+  { "pit",      1, 3, lux_pit, 0 },                         // fun2.cc
+  { "polate",   3, 3, lux_table, 0 },                       // strous.cc
+  { "poly",     2, 2, lux_poly, "*" },                      // fun2.cc
+  { "power",    1, 2, lux_power, "1power:2shape:4onedim" }, // fun3.cc
+  { "precess",  3, 3, lux_precess, "1julian:2besselian" },  // astron.cc
+  { "printf",   1, MAX_ARG, lux_printf_f, 0 },              // files.cc
 #if DEVELOP
-  { "project",  1, 1, lux_project, 0 }, // projection.c
-  { "projectmap", 2, 8, lux_projectmap, "::hdist:angle:mag:xmap:ymap:size" }, // projection.c
+  { "project",  1, 1, lux_project, 0 }, // projection.cc
+  { "projectmap", 2, 8, lux_projectmap, // projection.cc
+    "::hdist:angle:mag:xmap:ymap:size" },
 #endif
-  { "psum",     2, 4, lux_psum, // strous2.c
+  { "psum",     2, 4, lux_psum, // strous2.cc
     "1onedim:2vnormalize:4cnormalize:8single" },
-  { "ptoc",     1, 5, lux_polar_to_cartesian, 0 }, // fun4.c
-  { "quantile",         2, 3, lux_quantile, 0 }, // strous2.c
-  { "random",   1, MAX_DIMS, lux_random, // random.c
+  { "ptoc",     1, 5, lux_polar_to_cartesian, 0 }, // fun4.cc
+  { "quantile", 2, 3, lux_quantile, 0 },           // strous2.cc
+  { "random",   1, MAX_DIMS, lux_random,           // random.cc
     "%2%seed:period:1uniform:2normal:3sample:4shuffle:5bits" },
-  { "randomb",  3, MAX_DIMS, lux_randomb, "%2%seed:1long" }, // random.c
-  { "randomd",  3, MAX_DIMS, lux_randomd, "%1%seed" }, // random.c
-  { "randoml",  3, MAX_DIMS, lux_randoml, "%2%seed:1double" }, // random.c
-  { "randomn",  3, MAX_DIMS, lux_randomn, "%2%seed" }, // random.c
-  { "randomu",  3, MAX_DIMS, lux_randomu, "%2%seed:period" }, // random.c
-  { "readf",    2, MAX_ARG, lux_readf_f, "1askmore:2word" }, // files.c
-  { "readu",    2, MAX_ARG, lux_readu_f, 0 }, // files.c
-  { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.c
-  { "real",     1, 1, lux_real, 0 }, // fun3.c
-  { "redim",    2, 9, lux_redim_f, 0 }, // subsc.c
+  { "randomb",  3, MAX_DIMS, lux_randomb, "%2%seed:1long" },        // random.cc
+  { "randomd",  3, MAX_DIMS, lux_randomd, "%1%seed" },              // random.cc
+  { "randoml",  3, MAX_DIMS, lux_randoml, "%2%seed:1double" },      // random.cc
+  { "randomn",  3, MAX_DIMS, lux_randomn, "%2%seed" },              // random.cc
+  { "randomu",  3, MAX_DIMS, lux_randomu, "%2%seed:period" },       // random.cc
+  { "readf",    2, MAX_ARG, lux_readf_f, "1askmore:2word" },        // files.cc
+  { "readu",    2, MAX_ARG, lux_readu_f, 0 },                       // files.cc
+  { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.cc
+  { "real",     1, 1, lux_real, 0 },                                // fun3.cc
+  { "redim",    2, 9, lux_redim_f, 0 },                             // subsc.cc
 #if HAVE_REGEX_H
-  { "regex",    1, 2, lux_regex, "1case" }, // regex.c
+  { "regex",    1, 2, lux_regex, "1case" }, // regex.cc
 #endif
-  { "regrid",   5, 5, lux_regrid, 0 }, // fun4.c
-  { "regrid3",  5, 5, lux_regrid3, 0 }, // fun4.c
-  { "regrid3ns", 5, 5, lux_regrid3ns, 0 }, // fun4.c
+  { "regrid",   5, 5, lux_regrid, 0 },     // fun4.cc
+  { "regrid3",  5, 5, lux_regrid3, 0 },    // fun4.cc
+  { "regrid3ns", 5, 5, lux_regrid3ns, 0 }, // fun4.cc
 #if DEVELOP
-  { "regridls", 5, 5, lux_regridls, 0 }, // fun4.c
+  { "regridls", 5, 5, lux_regridls, 0 }, // fun4.cc
 #endif
-  { "reorder",  2, 2, lux_reorder, 0 },         // fun6.c
-  { "restore",  2, 3, lux_fzread_f, "1printheader" }, // files.c
-  { "reverse",  1, MAX_ARG, lux_reverse, "1zero" }, // subsc.c
-  { "rfix",     1, 1, lux_rfix, "*" }, // symbols.c
-  { "roll",     2, 2, lux_roll, 0 }, // subsc.c
-  { "root3",    3, 3, lux_root3, 0 }, // orientation.c
-  { "runcum",   1, 3, lux_runcum, "*1partial_width:2varsum" }, // strous.c
-  { "runprod",  1, 2, lux_runprod, "*" }, // strous2.c
-  { "runsum",   1, 3, lux_runsum, "*" }, // fun2.c
-  { "scale",    1, 3, lux_scale, "*1fullrange:2zoom" }, // fun3.c
-  { "scalerange", 3, 5, lux_scalerange, "*1fullrange:2zoom" }, // fun3.c
-  { "scanf",    2, MAX_ARG, lux_freadf_f, "|1|1eof" }, // files.c
-  { "sdev",     1, 3, lux_sdev, // fun2.c
+  { "reorder",  2, 2, lux_reorder, 0 },                        // fun6.cc
+  { "restore",  2, 3, lux_fzread_f, "1printheader" },          // files.cc
+  { "reverse",  1, MAX_ARG, lux_reverse, "1zero" },            // subsc.cc
+  { "rfix",     1, 1, lux_rfix, "*" },                         // symbols.cc
+  { "roll",     2, 2, lux_roll, 0 },                           // subsc.cc
+  { "root3",    3, 3, lux_root3, 0 },                          // orientation.cc
+  { "runcum",   1, 3, lux_runcum, "*1partial_width:2varsum" }, // strous.cc
+  { "runprod",  1, 2, lux_runprod, "*" },                      // strous2.cc
+  { "runsum",   1, 3, lux_runsum, "*" },                       // fun2.cc
+  { "scale",    1, 3, lux_scale, "*1fullrange:2zoom" },        // fun3.cc
+  { "scalerange", 3, 5, lux_scalerange, "*1fullrange:2zoom" }, // fun3.cc
+  { "scanf",    2, MAX_ARG, lux_freadf_f, "|1|1eof" },         // files.cc
+  { "sdev",     1, 3, lux_sdev,                                // fun2.cc
     "::weights:*0sample:1population:2keepdims:4double:8omitnans" },
-  { "segment",  1, 3, lux_segment, ":sign:diagonal:1degree" }, // topology.c
-  { "segmentdir", 2, 3, lux_segment_dir, "::sign" }, // topology.c
-  { "sgn",      1, 1, lux_sgn, "*" }, // fun1.c
-  { "shift",    1, 4, lux_shift_f, ":::blank:1translate" }, // strous2.c
-  { "shift3",   2, 3, lux_shift3, 0 }, // fun4.c
-  { "siderealtime", 1, 1, lux_siderealtime, "1atzerotime" }, // astron.c
-  { "sieve",    1, 2, lux_sieve, 0 }, // fun3.c
-  { "sin",      1, 1, lux_sin, "*" }, // fun1.c
-  { "sinh",     1, 1, lux_sinh, "*" }, // fun1.c
-  { "skipc",    2, 2, lux_skipc, 0 }, // fun2.c
-  { "smap",     1, 1, lux_smap, "1truncate:2array" }, // subsc.c
-  { "smooth",   1, 3, lux_smooth, "1partial_width:4all" }, // strous.c
-  { "solar_b",  1, 1, lux_solar_b, "*2modern" }, // ephem2.c
-  { "solar_l",  1, 1, lux_solar_l, "*1full:2modern" }, // ephem2.c
-  { "solar_p",  1, 1, lux_solar_p, "*2modern" }, // ephem2.c
-  { "solar_r",  1, 1, lux_solar_r, "*" }, // ephem2.c
-  { "sort",     1, 1, lux_sort, "*1heap:2shell:4axis" }, // fun4.c
-  { "spawn",    1, 1, lux_spawn_f, 0 }, // files.c
-  { "sprintf",  1, MAX_ARG, lux_fstring, "1skip_undefined" }, // fun2.c
-  { "sqrt",     1, 1, lux_sqrt, "*" }, // fun1.c
-  { "sscanf",   3, MAX_ARG, lux_freads_f, "1countspaces" }, // files.c
-  { "store",    2, 3, lux_fzwrite_f, "1safe" }, // files.c
-  { "str",      1, MAX_ARG, lux_string, 0 }, // fun2.c
-  { "strarr",   2, 1 + MAX_DIMS, strarr, "%1%size" }, // symbols.c
-  { "strcount",         2, 2, lux_strcount, 0 }, // fun2.c
-  { "stretch",  2, 2, lux_stretch, 0 }, // fun4.c
-  { "string",   1, MAX_ARG, lux_string, 0 }, // fun2.c
-  { "strlen",   1, 1, lux_strlen, 0 }, // fun2.c
-  { "strloc",   2, 2, lux_strloc, 0 }, // fun2.c
-  { "strpbrk",  2, 2, lux_strpbrk, 0 },         // fun2.c
-  { "strpos",   2, 3, lux_strpos, 0 }, // fun2.c
-  { "strr",     3, 4, lux_strreplace, 0 }, // fun2.c
-  { "strreplace", 3, 4, lux_strreplace, 0 }, // fun2.c
-  { "strskp",   2, 2, lux_strskp, 0 }, // fun2.c
-  { "strsub",   3, 3, lux_strsub, 0 }, // fun2.c
-  { "strtok",   1, 2, lux_strtok, "1skip_final_delim" }, // fun2.c
-  { "strtol",   1, 2, lux_strtol, 0 }, // fun3.c
-  { "strtrim",  1, 1, lux_strtrim, 0 }, // fun2.c
+  { "segment",  1, 3, lux_segment, ":sign:diagonal:1degree" }, // topology.cc
+  { "segmentdir", 2, 3, lux_segment_dir, "::sign" },           // topology.cc
+  { "sgn",      1, 1, lux_sgn, "*" },                          // fun1.cc
+  { "shift",    1, 4, lux_shift_f, ":::blank:1translate" },    // strous2.cc
+  { "shift3",   2, 3, lux_shift3, 0 },                         // fun4.cc
+  { "siderealtime", 1, 1, lux_siderealtime, "1atzerotime" },   // astron.cc
+  { "sieve",    1, 2, lux_sieve, 0 },                          // fun3.cc
+  { "sin",      1, 1, lux_sin, "*" },                          // fun1.cc
+  { "sinh",     1, 1, lux_sinh, "*" },                         // fun1.cc
+  { "skipc",    2, 2, lux_skipc, 0 },                          // fun2.cc
+  { "smap",     1, 1, lux_smap, "1truncate:2array" },          // subsc.cc
+  { "smooth",   1, 3, lux_smooth, "1partial_width:4all" },     // strous.cc
+  { "solar_b",  1, 1, lux_solar_b, "*2modern" },               // ephem2.cc
+  { "solar_l",  1, 1, lux_solar_l, "*1full:2modern" },         // ephem2.cc
+  { "solar_p",  1, 1, lux_solar_p, "*2modern" },               // ephem2.cc
+  { "solar_r",  1, 1, lux_solar_r, "*" },                      // ephem2.cc
+  { "sort",     1, 1, lux_sort, "*1heap:2shell:4axis" },       // fun4.cc
+  { "spawn",    1, 1, lux_spawn_f, 0 },                        // files.cc
+  { "sprintf",  1, MAX_ARG, lux_fstring, "1skip_undefined" },  // fun2.cc
+  { "sqrt",     1, 1, lux_sqrt, "*" },                         // fun1.cc
+  { "sscanf",   3, MAX_ARG, lux_freads_f, "1countspaces" },    // files.cc
+  { "store",    2, 3, lux_fzwrite_f, "1safe" },                // files.cc
+  { "str",      1, MAX_ARG, lux_string, 0 },                   // fun2.cc
+  { "strarr",   2, 1 + MAX_DIMS, strarr, "%1%size" },          // symbols.cc
+  { "strcount", 2, 2, lux_strcount, 0 },                       // fun2.cc
+  { "stretch",  2, 2, lux_stretch, 0 },                        // fun4.cc
+  { "string",   1, MAX_ARG, lux_string, 0 },                   // fun2.cc
+  { "strlen",   1, 1, lux_strlen, 0 },                         // fun2.cc
+  { "strloc",   2, 2, lux_strloc, 0 },                         // fun2.cc
+  { "strpbrk",  2, 2, lux_strpbrk, 0 },                        // fun2.cc
+  { "strpos",   2, 3, lux_strpos, 0 },                         // fun2.cc
+  { "strr",     3, 4, lux_strreplace, 0 },                     // fun2.cc
+  { "strreplace", 3, 4, lux_strreplace, 0 },                   // fun2.cc
+  { "strskp",   2, 2, lux_strskp, 0 },                         // fun2.cc
+  { "strsub",   3, 3, lux_strsub, 0 },                         // fun2.cc
+  { "strtok",   1, 2, lux_strtok, "1skip_final_delim" },       // fun2.cc
+  { "strtol",   1, 2, lux_strtol, 0 },                         // fun3.cc
+  { "strtrim",  1, 1, lux_strtrim, 0 },                        // fun2.cc
 #if DEVELOP
-  { "struct",   2, MAX_ARG, lux_struct, 0 }, // install.c
+  { "struct",   2, MAX_ARG, lux_struct, 0 }, // install.cc
 #endif
-  { "student",  2, 2, lux_student, "*1complement:2log" }, // fun1.c
-  { "sun_b",    2, 2, lux_sun_b, 0 }, // ephem.c
-  { "sun_d",    2, 2, lux_sun_d, 0 }, // ephem.c
-  { "sun_p",    2, 2, lux_sun_p, 0 }, // ephem.c
-  { "sun_r",    2, 2, lux_sun_r, 0 }, // ephem.c
-  { "symbol",   1, 1, lux_symbol, "1main" }, // symbols.c
-  { "symclass",         1, 1, lux_symclass, "+|1|1follow:2number" }, // subsc.c
-  { "symdtype",         1, 1, lux_symdtype, 0 }, // subsc.c
-  { "symmem",   0, 0, lux_symbol_memory, 0 }, // install.c
-  { "symnum",   1, 1, lux_symbol_number, 0 }, // install.c
-  { "table",    3, 4, lux_table, "|2|1all:2middle" }, // strous.c
-  { "tai_from_date", 5, 5, lux_tai_from_date, 0 }, // ephem.c
-  { "tan",      1, 1, lux_tan, "*" }, // fun1.c
-  { "tanh",     1, 1, lux_tanh, "*" }, // fun1.c
-  { "temporary", 1, 1, lux_temp, 0 }, // strous2.c
-  { "tense",    3, 6, lux_tense, 0 }, // fun3.c
-  { "tense_curve", 3, 6, lux_tense_curve, 0 }, // fun3.c
-  { "tense_loop", 3, 4, lux_tense_loop, 0 }, // fun3.c
+  { "student",  2, 2, lux_student, "*1complement:2log" }, // fun1.cc
+  { "sun_b",    2, 2, lux_sun_b, 0 },                     // ephem.cc
+  { "sun_d",    2, 2, lux_sun_d, 0 },                     // ephem.cc
+  { "sun_p",    2, 2, lux_sun_p, 0 },                     // ephem.cc
+  { "sun_r",    2, 2, lux_sun_r, 0 },                     // ephem.cc
+  { "symbol",   1, 1, lux_symbol, "1main" },              // symbols.cc
+  { "symclass", 1, 1, lux_symclass, "+|1|1follow:2number" }, // subsc.cc
+  { "symdtype", 1, 1, lux_symdtype, 0 },                     // subsc.cc
+  { "symmem",   0, 0, lux_symbol_memory, 0 },                // install.cc
+  { "symnum",   1, 1, lux_symbol_number, 0 },                // install.cc
+  { "table",    3, 4, lux_table, "|2|1all:2middle" },        // strous.cc
+  { "tai_from_date", 5, 5, lux_tai_from_date, 0 },           // ephem.cc
+  { "tan",      1, 1, lux_tan, "*" },                        // fun1.cc
+  { "tanh",     1, 1, lux_tanh, "*" },                       // fun1.cc
+  { "temporary", 1, 1, lux_temp, 0 },                        // strous2.cc
+  { "tense",    3, 6, lux_tense, 0 },                        // fun3.cc
+  { "tense_curve", 3, 6, lux_tense_curve, 0 },               // fun3.cc
+  { "tense_loop", 3, 4, lux_tense_loop, 0 },                 // fun3.cc
 #if DEVELOP
-  { "test",     2, 3, lux_test, 0 }, // execute.c
+  { "test",     2, 3, lux_test, 0 }, // execute.cc
 #endif
-  { "total",    1, 4, lux_total, "::power:weights:1double:2keepdims:4float:8omitnans" }, // fun1.c
-  { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, // trace_decoder_ana.c
-  { "trend",    1, 2, lux_trend, "*" }, // fun2.c
-  { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, // ephem.c
-  { "tvread",   1, 5, lux_xtvread, "1greyscale" }, // xport.c
-  { "typename",         1, 1, lux_typeName, 0 }, // install.c
-  { "upcase",   1, 1, lux_upper, 0 }, // fun2.c
-  { "upper",    1, 1, lux_upper, 0 }, // fun2.c
-  { "variance", 1, 3, lux_variance, // fun2.c
+  { "total",    1, 4, lux_total, // fun1.cc
+    "::power:weights:1double:2keepdims:4float:8omitnans" },
+  { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, // trace_decoder_ana.cc
+  { "trend",    1, 2, lux_trend, "*" },            // fun2.cc
+  { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, // ephem.cc
+  { "tvread",   1, 5, lux_xtvread, "1greyscale" },         // xport.cc
+  { "typename", 1, 1, lux_typeName, 0 },                   // install.cc
+  { "upcase",   1, 1, lux_upper, 0 },                      // fun2.cc
+  { "upper",    1, 1, lux_upper, 0 },                      // fun2.cc
+  { "variance", 1, 3, lux_variance,                        // fun2.cc
     "::weights:*0sample:1population:2keepdims:4double" },
-  { "varname",  1, 1, lux_varname, 0 }, // symbols.c
-  { "voigt",    2, 2, lux_voigt, "*" }, // fun1.c
-  { "wmap",     1, 1, lux_wmap, 0 }, // subsc.c
-  { "word",     1, 1, lux_word, "*" }, // symbols.c
-  { "writeu",   2, MAX_ARG, lux_writeu, 0 }, // files.c
-  { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.c
-  { "xexist",   1, 1, lux_xexist, 0 }, // xport.c
-  { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 }, // xport.c
+  { "varname",  1, 1, lux_varname, 0 },          // symbols.cc
+  { "voigt",    2, 2, lux_voigt, "*" },          // fun1.cc
+  { "wmap",     1, 1, lux_wmap, 0 },             // subsc.cc
+  { "word",     1, 1, lux_word, "*" },           // symbols.cc
+  { "writeu",   2, MAX_ARG, lux_writeu, 0 },     // files.cc
+  { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.cc
+  { "xexist",   1, 1, lux_xexist, 0 },           // xport.cc
+  { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 },   // xport.cc
 #if MOTIF
-  { "xmaddfiletolist", 2, 2, lux_xmaddfiletolist, 0 }, // motif.c
-  { "xmarrow",  3, 4, lux_xmarrow, 0 }, // motif.c
-  { "xmboard",  1, 5, lux_xmboard, 0 }, // motif.c
-  { "xmbutton",         3, 5, lux_xmbutton, 0 }, // motif.c
-  { "xmcheckbox", 5, 32, lux_xmcheckbox, 0 }, // motif.c
-  { "xmcolumns", 3, 5, lux_xmcolumns, 0 }, // motif.c
-  { "xmcommand", 3, 7, lux_xmcommand, 0 }, // motif.c
-  { "xmdialog_board", 4, 9, lux_xmdialog_board, 0 }, // motif.c
-  { "xmdialog_form", 4, 8, lux_xmdialog_form, 0 }, // motif.c
-  { "xmdrawingarea", 2, 7, lux_xmdrawingarea, 0 }, // motif.c
-  { "xmfilegetlist",    1, 1, lux_xmfilegetlist, 0 }, // motif.c
-  { "xmfileselect", 3, 12, lux_xmfileselect, 0 }, // motif.c
-  { "xmform",   1, 7, lux_xmform, 0 }, // motif.c
-  { "xmframe",  1, 5, lux_xmframe, 0 }, // motif.c
-  { "xmgetoptionselection", 1, 1, lux_xmgetoptionselection, 0 }, // motif.c
-  { "xmgetwidgetaddress", 1, 1, lux_xmgetwidgetaddress, 0 }, // motif.c
-  { "xmhscale",         5, 8, lux_xmhscale, 0 }, // motif.c
-  { "xmhscrollbar",     5, 6, lux_xmhscrollbar, 0 }, // motif.c
-  { "xmlabel",  2, 5, lux_xmlabel, 0 }, // motif.c
-  { "xmlist",   3, 6, lux_xmlist, 0 }, // motif.c
-  { "xmlistcount", 1, 1, lux_xmlistcount, 0 }, // motif.c
-  { "xmlistfromfile", 4, 6, lux_xmlistfromfile, 0 }, // motif.c
-  { "xmmenubar", 4, 32, lux_xmmenubar, 0 }, // motif.c
-  { "xmoptionmenu", 6, 50, lux_xmoptionmenu, 0 }, // motif.c
-  { "xmpixmapbutton", 3, 3, lux_xmpixmapbutton, 0 }, // motif.c
-  { "xmpixmapoptionmenu", 6, 32, lux_xmpixmapoptionmenu, 0 }, // motif.c
-  { "xmpulldownmenu", 6, 32, lux_xmpulldownmenu, 0 }, // motif.c
-  { "xmradiobox", 5, 32, lux_xmradiobox, 0 }, // motif.c
-  { "xmrows",   3, 5, lux_xmrows, 0 }, // motif.c
-  { "xmscalegetvalue", 1, 1, lux_xmscalegetvalue, 0 }, // motif.c
-  { "xmscrolledwindow", 3, 3, lux_xmscrolledwindow, 0 }, // motif.c
-  { "xmscrolledwindowapp", 1, 4, lux_xmscrolledwindowapp, 0 }, // motif.c
-  { "xmseparator", 1, 4, lux_xmseparator, 0 }, // motif.c
-  { "xmtext",   1, 5, lux_xmtext, 0 }, // motif.c
-  { "xmtextbox", 1, 5, lux_xmtextbox, 0 }, // motif.c
-  { "xmtextfield", 4, 8, lux_xmtextfield, 0 }, // motif.c
-  { "xmtextfieldarray", 9, 40, lux_xmtextfieldarray, 0 }, // motif.c
-  { "xmtextfieldgetstring", 1, 1, lux_xmtextfieldgetstring, 0 }, // motif.c
-  { "xmtextfromfile", 2, 6, lux_xmtextfromfile, 0 }, // motif.c
-  { "xmtextgetinsertposition", 1, 1, lux_xmtextgetinsertposition, 0 }, // motif.c
-  { "xmtextgetlastposition",    1, 1, lux_xmtextgetlastposition, 0 }, // motif.c
-  { "xmtextgetselection",       1, 3, lux_xmtextgetselection, 0 }, // motif.c
-  { "xmtextgetstring", 1, 1, lux_xmtextgetstring, 0 }, // motif.c
-  { "xmtogglegetstate", 1, 1, lux_xmtogglegetstate, 0 }, // motif.c
-  { "xmtoplevel_board", 3, 5, lux_xmtoplevel_board, 0 }, // motif.c
-  { "xmtoplevel_form", 3, 7, lux_xmtoplevel_form, 0 }, // motif.c
-  { "xmvscale",         5, 8, lux_xmvscale, 0 }, // motif.c
-  { "xmvscrollbar",     5, 6, lux_xmvscrollbar, 0 }, // motif.c
+  { "xmaddfiletolist", 2, 2, lux_xmaddfiletolist, 0 },           // motif.cc
+  { "xmarrow",  3, 4, lux_xmarrow, 0 },                          // motif.cc
+  { "xmboard",  1, 5, lux_xmboard, 0 },                          // motif.cc
+  { "xmbutton", 3, 5, lux_xmbutton, 0 },                         // motif.cc
+  { "xmcheckbox", 5, 32, lux_xmcheckbox, 0 },                    // motif.cc
+  { "xmcolumns", 3, 5, lux_xmcolumns, 0 },                       // motif.cc
+  { "xmcommand", 3, 7, lux_xmcommand, 0 },                       // motif.cc
+  { "xmdialog_board", 4, 9, lux_xmdialog_board, 0 },             // motif.cc
+  { "xmdialog_form", 4, 8, lux_xmdialog_form, 0 },               // motif.cc
+  { "xmdrawingarea", 2, 7, lux_xmdrawingarea, 0 },               // motif.cc
+  { "xmfilegetlist",    1, 1, lux_xmfilegetlist, 0 },            // motif.cc
+  { "xmfileselect", 3, 12, lux_xmfileselect, 0 },                // motif.cc
+  { "xmform",   1, 7, lux_xmform, 0 },                           // motif.cc
+  { "xmframe",  1, 5, lux_xmframe, 0 },                          // motif.cc
+  { "xmgetoptionselection", 1, 1, lux_xmgetoptionselection, 0 }, // motif.cc
+  { "xmgetwidgetaddress", 1, 1, lux_xmgetwidgetaddress, 0 },     // motif.cc
+  { "xmhscale", 5, 8, lux_xmhscale, 0 },                         // motif.cc
+  { "xmhscrollbar", 5, 6, lux_xmhscrollbar, 0 },                 // motif.cc
+  { "xmlabel",  2, 5, lux_xmlabel, 0 },                          // motif.cc
+  { "xmlist",   3, 6, lux_xmlist, 0 },                           // motif.cc
+  { "xmlistcount", 1, 1, lux_xmlistcount, 0 },                   // motif.cc
+  { "xmlistfromfile", 4, 6, lux_xmlistfromfile, 0 },             // motif.cc
+  { "xmmenubar", 4, 32, lux_xmmenubar, 0 },                      // motif.cc
+  { "xmoptionmenu", 6, 50, lux_xmoptionmenu, 0 },                // motif.cc
+  { "xmpixmapbutton", 3, 3, lux_xmpixmapbutton, 0 },             // motif.cc
+  { "xmpixmapoptionmenu", 6, 32, lux_xmpixmapoptionmenu, 0 },    // motif.cc
+  { "xmpulldownmenu", 6, 32, lux_xmpulldownmenu, 0 },            // motif.cc
+  { "xmradiobox", 5, 32, lux_xmradiobox, 0 },                    // motif.cc
+  { "xmrows",   3, 5, lux_xmrows, 0 },                           // motif.cc
+  { "xmscalegetvalue", 1, 1, lux_xmscalegetvalue, 0 },           // motif.cc
+  { "xmscrolledwindow", 3, 3, lux_xmscrolledwindow, 0 },         // motif.cc
+  { "xmscrolledwindowapp", 1, 4, lux_xmscrolledwindowapp, 0 },   // motif.cc
+  { "xmseparator", 1, 4, lux_xmseparator, 0 },                   // motif.cc
+  { "xmtext",   1, 5, lux_xmtext, 0 },                           // motif.cc
+  { "xmtextbox", 1, 5, lux_xmtextbox, 0 },                       // motif.cc
+  { "xmtextfield", 4, 8, lux_xmtextfield, 0 },                   // motif.cc
+  { "xmtextfieldarray", 9, 40, lux_xmtextfieldarray, 0 },        // motif.cc
+  { "xmtextfieldgetstring", 1, 1, lux_xmtextfieldgetstring, 0 }, // motif.cc
+  { "xmtextfromfile", 2, 6, lux_xmtextfromfile, 0 },             // motif.cc
+  { "xmtextgetinsertposition", 1, 1, lux_xmtextgetinsertposition, // motif.cc
+    0 },
+  { "xmtextgetlastposition", 1, 1, lux_xmtextgetlastposition, 0 }, // motif.cc
+  { "xmtextgetselection", 1, 3, lux_xmtextgetselection, 0 },       // motif.cc
+  { "xmtextgetstring", 1, 1, lux_xmtextgetstring, 0 },             // motif.cc
+  { "xmtogglegetstate", 1, 1, lux_xmtogglegetstate, 0 },           // motif.cc
+  { "xmtoplevel_board", 3, 5, lux_xmtoplevel_board, 0 },           // motif.cc
+  { "xmtoplevel_form", 3, 7, lux_xmtoplevel_form, 0 },             // motif.cc
+  { "xmvscale", 5, 8, lux_xmvscale, 0 },                           // motif.cc
+  { "xmvscrollbar", 5, 6, lux_xmvscrollbar, 0 },                   // motif.cc
 #endif
-  { "xquery",   0, 1, lux_xquery_f, 0 }, // xport.c
+  { "xquery",   0, 1, lux_xquery_f, 0 }, // xport.cc
 #if MOTIF
-  { "xtparent",         1, 1, lux_xtparent, 0 }, // motif.c
+  { "xtparent", 1, 1, lux_xtparent, 0 }, // motif.cc
 #endif
-  { "xtvread",  1, 5, lux_xtvread, "1greyscale" }, // xport.c
+  { "xtvread",  1, 5, lux_xtvread, "1greyscale" }, // xport.cc
 #if MOTIF
-  { "xtwindow",         1, 1, lux_xtwindow, 0 }, // motif.c
+  { "xtwindow", 1, 1, lux_xtwindow, 0 }, // motif.cc
 #endif
-  { "zero",     1, 2, lux_zerof, "*" }, // fun1.c
-  { "zeronans",         1, 2, lux_zapnan_f, "*%1%value" }, // fun1.c
-  { "zinv",     1, 1, lux_zinv, "*" }, // strous.c
+  { "zero",     1, 2, lux_zerof, "*" },            // fun1.cc
+  { "zeronans", 1, 2, lux_zapnan_f, "*%1%value" }, // fun1.cc
+  { "zinv",     1, 1, lux_zinv, "*" },             // strous.cc
 };
 int32_t nFunction = sizeof(function_table)/sizeof(internalRoutine);
 //----------------------------------------------------------------
@@ -4404,9 +4471,9 @@ void symbolInitialization(void)
  symbol_class(projectSym) = LUX_ARRAY;
  array_type(projectSym) = LUX_FLOAT;
  symbol_memory(projectSym) =
-   sizeof(array) + 16*sizeof(float);
+   sizeof(Array) + 16*sizeof(float);
  eallocate(p, i, char);
- array_header(projectSym) = (array *) p;
+ array_header(projectSym) = (Array *) p;
  array_num_dims(projectSym) = 2;
  array_dims(projectSym)[0] = array_dims(projectSym)[1] = 4;
  memcpy((float*) array_data(projectSym), defaultProjection, 16*sizeof(float));
@@ -4758,7 +4825,7 @@ int32_t strcasecmp_p(char *s1, char *s2)
 }
 //----------------------------------------------------------------
 int32_t         nBreakpoint = 0;
-breakpointInfo  breakpoint[NBREAKPOINTS];
+Breakpoint  breakpoint[NBREAKPOINTS];
 int32_t lux_breakpoint(int32_t narg, int32_t ps[])
 // BREAKPOINT,string[,/SET,/VARIABLE]
 // BREAKPOINT,n[,/DISABLE,/ENABLE,/DELETE]

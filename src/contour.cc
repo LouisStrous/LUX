@@ -44,7 +44,7 @@ int32_t        tkplot(float, float, int32_t, int32_t);
 int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */                
 // call is CONTOUR, image, nlev, xa, xb, ya, yb
 {
-  array        *h;
+  Array        *h;
   int32_t        iq, i, nc, lineStyle, symStyle;
   float        *pf, *cl, xmax, xmin, *pp, yq, xspace, xq;
   int32_t        anacon(float *, int32_t, int32_t, float *, int32_t, int32_t, float, float, float,
@@ -57,9 +57,9 @@ int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */
   iq = ps[0];
   CK_ARR(iq, 1);
   iq = lux_float(1, &iq);
-  h = (array *) sym[iq].spec.array.ptr;
+  h = (Array *) sym[iq].spec.array.ptr;
   ny = 1; nx = h->dims[0]; if (h->ndim != 1) ny = h->dims[1];
-  pf = (float *) ((char *) h + sizeof( array ));
+  pf = (float *) ((char *) h + sizeof( Array ));
   // check if $contours array exists yet
   if (contour_sym == 0) {
     i = installString("$CONTOURS");
@@ -93,8 +93,8 @@ int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */
                                                 // check for auto mode
   if (!gotLevels && ((internalMode & 1) || (!internalMode && autocon)))
   { redef_array(contour_sym, LUX_FLOAT, 1, &contour_nlev);
-    h = (array *) sym[contour_sym].spec.array.ptr;
-    cl = (float *) ((char *) h + sizeof( array ));
+    h = (Array *) sym[contour_sym].spec.array.ptr;
+    cl = (float *) ((char *) h + sizeof( Array ));
     pp = pf;        nc = nx * ny - 1;        xmin = xmax = *pp++;
     while (nc--) {        if (*pp > xmax)  xmax = *pp;
                         if (*pp < xmin)  xmin = *pp;        pp++; }
@@ -121,9 +121,9 @@ int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */
     if ( symbol_class(contour_sym) != 4 )
       return cerror(BAD_CONTOURS, contour_sym);
     iq = lux_float(1, &contour_sym);
-    h = (array *) sym[iq].spec.array.ptr;
+    h = (Array *) sym[iq].spec.array.ptr;
     if (h->ndim != 1) return cerror(BAD_CONTOURS, contour_sym);
-    cl = (float *) ((char *) h + sizeof( array ));
+    cl = (float *) ((char *) h + sizeof( Array ));
     contour_nlev = MIN(contour_nlev, h->dims[0]);  // min of these used
   }
   xsc = (xb - xa)/nx;        ysc = (yb - ya)/ny;

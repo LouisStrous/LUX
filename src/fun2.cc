@@ -62,7 +62,7 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
  register Pointer q1,q2,p;
  int32_t        result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
  int32_t        xdims[8], order, size;
- array  *h;
+ Array  *h;
 
  if (narg > 2) order = int_arg(ps[2]); else order = -1;
  if (narg > 1) axis = int_arg(ps[1]); else axis = -1;
@@ -2496,7 +2496,7 @@ int32_t lux_swab(int32_t narg, int32_t ps[])
 {
   int32_t       iq, n, nd, j;
   Pointer q1;
-  array         *h;
+  Array         *h;
   int32_t       swapb(char *, int32_t);
 
   while (narg--)
@@ -2515,8 +2515,8 @@ int32_t lux_swab(int32_t narg, int32_t ps[])
         break;
       case 4:                                           //array case
         n = lux_type_size[type];
-        h = (array *) sym[iq].spec.array.ptr;
-        q1.i32 = (int32_t *) ((char *)h + sizeof(array));
+        h = (Array *) sym[iq].spec.array.ptr;
+        q1.i32 = (int32_t *) ((char *)h + sizeof(Array));
         nd = h->ndim;
         for (j=0;j<nd;j++) n *= h->dims[j];             //# of elements
         break;
@@ -2551,7 +2551,7 @@ int32_t lux_esmooth(int32_t narg, int32_t ps[])
         i, tally[8], n, step[8], done;
   Symboltype type, outtype;
   float         damping, width;
-  array         *h;
+  Array         *h;
   Pointer       src, trgt;
   Scalar        sum, weight;
   extern float  float_arg(int32_t);
@@ -4091,7 +4091,7 @@ int32_t lux_decomp(int32_t narg, int32_t ps[])//decomp routine
                 //replaces a square matrix with it's lu decomposition
 {
   int32_t       iq, nd, nx;
-  array         *h;
+  Array         *h;
   Pointer q1;
   int32_t       lux_replace(int32_t, int32_t);
 
@@ -4099,15 +4099,15 @@ if ( narg != 1 ) return cerror(WRNG_N_ARG, 0);
 iq = ps[0];
 if (isFreeTemp(iq)) return cerror(RET_ARG_NO_ATOM, iq);
 CK_ARR(iq, -1);
-h = (array *) sym[iq].spec.array.ptr;
+h = (Array *) sym[iq].spec.array.ptr;
 nd = h->ndim;   nx = h->dims[0];
 if ( nd != 2 || nx != h->dims[1] ) return cerror(NEED_2D_SQ_ARR, iq);
                                                 //must be 2-D and square
 if  (sym[iq].type < 4 )  iq = lux_float(1, &iq);
 if (iq != ps[0] ) lux_replace(ps[0], iq);
 iq = ps[0];
-h = (array *) sym[iq].spec.array.ptr;
-q1.f = (float *) ((char *)h + sizeof(array));
+h = (Array *) sym[iq].spec.array.ptr;
+q1.f = (float *) ((char *)h + sizeof(Array));
                 //could be either float or double, support both
 switch ( sym[iq].type ) {
 case 3:
@@ -4122,13 +4122,13 @@ int32_t lux_dsolve(int32_t narg, int32_t ps[]) //decomp routine
                 //solves a linear system given lu decomp and rhs
 {
 int32_t         iq, jq, nd, nx, toptype, j, outer;
-array   *h;
+Array   *h;
 Pointer q1, q2;
 if ( narg != 2 ) return cerror(WRNG_N_ARG, 0);
 iq = ps[0];                             //the lu decomp matrix
 CK_ARR(iq, 1);
 toptype = sym[iq].type;
-h = (array *) sym[iq].spec.array.ptr;
+h = (Array *) sym[iq].spec.array.ptr;
 nd = h->ndim;   nx = h->dims[0];
 if ( nd != 2 || nx != h->dims[1] ) return cerror(NEED_2D_SQ_ARR, iq);
                                         //must be 2-D and square
@@ -4136,7 +4136,7 @@ jq = ps[1];                             //rhs side (may be more than one)
 if (isFreeTemp(jq)) return cerror(RET_ARG_NO_ATOM, jq);
 toptype = toptype > (int32_t) sym[jq].type ? toptype :  sym[iq].type;
 if (toptype < 3) toptype = 3;
-h = (array *) sym[jq].spec.array.ptr;
+h = (Array *) sym[jq].spec.array.ptr;
 nd = h->ndim;   if ( h->dims[0] != nx) return cerror(INCMP_LU_RHS, iq);
 outer = 1;
 if (nd > 1) for(j=1;j<nd;j++) outer *= h->dims[j];
@@ -4148,10 +4148,10 @@ case 4:
  iq = lux_double( 1, &iq); jq = lux_double( 1, &jq); break;
 }
 if (jq != ps[1] ) lux_replace(ps[1], jq);       jq = ps[1];
-h = (array *) sym[iq].spec.array.ptr;
-q1.i32 = (int32_t *) ((char *)h + sizeof(array));
-h = (array *) sym[jq].spec.array.ptr;
-q2.i32 = (int32_t *) ((char *)h + sizeof(array));
+h = (Array *) sym[iq].spec.array.ptr;
+q1.i32 = (int32_t *) ((char *)h + sizeof(Array));
+h = (Array *) sym[jq].spec.array.ptr;
+q2.i32 = (int32_t *) ((char *)h + sizeof(Array));
 while (outer--) {
                 //could be either float or double, support both
 switch ( toptype ) {
@@ -4172,7 +4172,7 @@ int32_t lux_pit(int32_t narg, int32_t ps[])     //pit function
   int32_t       npow, symx, symy, nd, nxq, outer, outerx, dim[2], cfsym;
   int32_t       j;
   Symboltype toptype;
-  array         *h;
+  Array         *h;
   int32_t       setxpit(Symboltype, int32_t),
     clux_pit(Pointer *, Pointer *, int32_t, int32_t, double *, double *, double *,
              int32_t, int32_t);
@@ -4198,14 +4198,14 @@ if (npow < 1 || npow >10 ) return cerror(ILL_POWER, 0);         //check power
 CK_ARR(symy, -1);
         // if either y or x (if x specified) is double, do a double calc.
 toptype = sym[symy].type < LUX_FLOAT ? LUX_FLOAT : sym[symy].type;
-h = (array *) sym[symy].spec.array.ptr;
+h = (Array *) sym[symy].spec.array.ptr;
         //array may be upgraded but y dimensions will be same, get now
 nd = h->ndim;   nxq = h->dims[0];       outer = 1;
 if (nd > 1) for(j=1;j<nd;j++) outer *= h->dims[j];
                                         // check x if specified
 if (symx > 0) { CK_ARR(symx, -1);
  toptype = (int32_t) sym[symx].type > toptype ? sym[symx].type : toptype;
- h = (array *) sym[symx].spec.array.ptr;
+ h = (Array *) sym[symx].spec.array.ptr;
                         // a specified x must match y in some regards
  nd = h->ndim;  if (h->dims[0] != nxq) return cerror(INCMP_DIMS, symy);
  outerx = 1;
@@ -4221,16 +4221,16 @@ case 3:
 case 4:
  symy = lux_double( 1, &symy); symx = lux_double( 1, &symx); break;
 }
-h = (array *) sym[symy].spec.array.ptr;
-qybase.i32 = (int32_t *) ((char *)h + sizeof(array));
-h = (array *) sym[symx].spec.array.ptr;
-qxbase.i32 = (int32_t *) ((char *)h + sizeof(array));
+h = (Array *) sym[symy].spec.array.ptr;
+qybase.i32 = (int32_t *) ((char *)h + sizeof(Array));
+h = (Array *) sym[symx].spec.array.ptr;
+qxbase.i32 = (int32_t *) ((char *)h + sizeof(Array));
                         // get the various matrices and vectors needed
 dim[0] = npow + 1;      dim[1] = outer;
 if (outer > 1) cfsym = array_scratch(LUX_DOUBLE, 2, dim); //always double
         else cfsym = array_scratch(LUX_DOUBLE, 1, dim);
-h = (array *) sym[cfsym].spec.array.ptr;
-cfbase = (double*) ((char *)h + sizeof(array));
+h = (Array *) sym[cfsym].spec.array.ptr;
+cfbase = (double*) ((char *)h + sizeof(Array));
                                                         //scratch array
 ALLOCATE(fbase, nxq, double);
 ALLOCATE(a, (npow + 1)*(npow + 1), double);
@@ -4313,18 +4313,18 @@ int32_t setxpit(Symboltype type, int32_t n) /* used by several routines to set u
   register float        del;
   register double       ddel;
   int32_t       nsym, nx;
-  array         *h;
+  Array         *h;
   nx = n;
   nsym = array_scratch(type, 1, &nx );
-  h = (array *) sym[nsym].spec.array.ptr;
-  qx.d = (double *) ((char *)h + sizeof(array));
+  h = (Array *) sym[nsym].spec.array.ptr;
+  qx.d = (double *) ((char *)h + sizeof(Array));
   switch (type) {
   case 3:
     del = 1.0 / nx;  *qx.f = 0.0;  while (--nx) *(qx.f+1) = *qx.f++ + del; break;
   case 4:
     ddel = 1.0/ nx;  *qx.d = 0.0;  while (--nx) *(qx.d+1) = *qx.d++ + ddel; break;
   }
-  qx.i32 = (int32_t *) ((char *)h + sizeof(array));
+  qx.i32 = (int32_t *) ((char *)h + sizeof(Array));
   return nsym;
 }
 //-------------------------------------------------------------------------

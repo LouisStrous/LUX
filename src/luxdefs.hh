@@ -462,18 +462,19 @@ union wideScalar {
   char **sp;
 };
 
+/// A union of pointers to all data types that LUX arrays can hold.
 union Pointer {
-  uint8_t* ui8;
-  int16_t *i16;
-  int32_t *i32;
-  int64_t *i64;
-  float *f;
-  double *d;
-  char *s;
-  char **sp;
-  void *v;
-  floatComplex *cf;
-  doubleComplex *cd;
+  uint8_t* ui8;             //!< Pointer to 8-bit unsigned array
+  int16_t *i16;             //!< Pointer to 16-bit signed array
+  int32_t *i32;             //!< Pointer to 32-bit signed array
+  int64_t *i64;             //!< Pointer to 64-bit signed array
+  float *f;                 //!< Pointer to single precision float array
+  double *d;                //!< Pointer to double precision float array
+  char *s;                  //!< Pointer to text string
+  char **sp;                //!< Pointer to array of text strings
+  void *v;                  //!< Generic pointer
+  floatComplex *cf;         //!< Pointer to single precision float complex array
+  doubleComplex *cd;        //!< Pointer to double precision float complex array
 };
 
 struct listElem {
@@ -490,70 +491,15 @@ typedef struct {
   int32_t defaultMode; uint8_t offset; char **keys;
 } keyList;
 
-// kinds of facts
-enum {
-  LUX_NO_FACT, LUX_STAT_FACTS
+/// A struct representing the dimensions of a LUX array.
+struct Array {
+  uint8_t ndim, c1, c2; int32_t dims[MAX_DIMS];
 };
 
-#define LUX_ANY_FACT            (0xffffffff)
-
-#define LUX_STAT_FACTS_MINMAX   (1<<0)
-#define LUX_STAT_FACTS_TOTAL    (1<<1)
-#define LUX_STAT_FACTS_SDEV     (1<<2)
-
-typedef struct {
-  int32_t min; int32_t max; int32_t minloc; int32_t maxloc; double total; double sdev;
-} statFacts_b;
-
-typedef struct {
-  int16_t min; int16_t max; int32_t minloc; int32_t maxloc; double total; double sdev;
-} statFacts_w;
-
-typedef struct {
-  int32_t min; int32_t max; int32_t minloc; int32_t maxloc; double total; double sdev;
-} statFacts_l;
-
-typedef struct {
-  float min; float max; int32_t minloc; int32_t maxloc; double total; double sdev;
-} statFacts_f;
-
-typedef struct {
-  double min; double max; int32_t minloc; int32_t maxloc; double total; double sdev;
-} statFacts_d;
-
-typedef struct {
-  floatComplex min; floatComplex max; int32_t minloc; int32_t maxloc;
-  doubleComplex total; double sdev;
-} statFacts_cf;
-
-typedef struct {
-  doubleComplex min; doubleComplex max; int32_t minloc; int32_t maxloc;
-  doubleComplex total; double sdev;
-} statFacts_cd;
-
-typedef union {
-  statFacts_b   *b;
-  statFacts_w   *w;
-  statFacts_l   *l;
-  statFacts_f   *f;
-  statFacts_d   *d;
-  statFacts_cf  *cf;
-  statFacts_cd  *cd;
-  void  *any;
-} allFacts;
-
-typedef struct {
-  uint8_t  type;
-  uint8_t  flags;
-  uint8_t  pad[2];
-  allFacts      fact;
-} arrayFacts;
-
-typedef struct arrayStruct {
-  uint8_t ndim, c1, c2, nfacts; int32_t dims[MAX_DIMS]; arrayFacts *facts;
-} array;
-
+/// A struct that represents the least and greatest values that the LUX
+/// numerical data types can hold.
 struct boundsStruct {
+  /// A struct with a member for each of the LUX numerical data types.
   struct T {
     uint8_t ui8;
     int16_t i16;
@@ -562,8 +508,8 @@ struct boundsStruct {
     float f;
     double d;
   };
-  T min;
-  T max;
+  T min;     //!< the least values that the LUX numerical data types can hold
+  T max;     //!< the greatest values that the LUX numerical data types can hold
 };
 
 typedef struct structElemStruct {
@@ -626,7 +572,7 @@ typedef struct symTableEntryStruct {
   int32_t exec;
   union specUnion
   { Scalar scalar;
-    struct { array      *ptr; int32_t bstore; } array;
+    struct { Array      *ptr; int32_t bstore; } array;
     struct { int16_t       *ptr; int32_t bstore; } wlist;
     struct { uint16_t      *ptr; int32_t bstore; } uwlist;
     struct { enumElem   *ptr; int32_t bstore; } enumElem;
@@ -664,17 +610,16 @@ typedef struct {
  char   txt[256];
 } fzHead;
 
-typedef struct {
-  int32_t symbol;  char kind; char mode;
-} debugItem;
-
-typedef struct {
+/// A struct that captures at what depth in an assignment the left hand side can
+/// be used for storing an intermediate result.
+struct BranchInfo {
   int32_t depth, symbol, size;  char containLHS;
-} branchInfo;
+};
 
-typedef struct {
+/// A struct that holds data for cubic spline calculations.
+struct csplineInfo {
   gsl_spline *spline; gsl_interp_accel *acc; double *x; double *y;
-} csplineInfo;
+};
 
 
 /// for nextCompileLevel
@@ -716,12 +661,12 @@ typedef struct {
   char only_whitespace;         //!< whitespace only?
 } formatInfo;
 
-// for breakpoints:
-typedef struct {
+/// A LUX breakpoint
+struct Breakpoint {
   int32_t   line;
   char  *name;
   char  status;
-} breakpointInfo;
+};
 #define BP_DEFINED      1
 #define BP_ENABLED      2
 #define BP_VARIABLE     4
@@ -729,7 +674,7 @@ typedef struct {
 
 // for Dick's stuff
 #define types_ptr       Pointer
-#define ahead           arrayStruct
+#define ahead           Array
 #define sym_desc        symTableEntryStruct
 #define class8_to_1(x)  dereferenceScalPointer(x)
 
@@ -789,8 +734,8 @@ extern char const* symbolStack[];
 #define MAX(A,B)                ((A > B)? A: B)
 #undef ABS
 #define ABS(A)                  (((A) >= 0)? (A): -(A))
-#define HEAD(SYM)               ((array *) sym[SYM].spec.array.ptr)
-#define LPTR(HEAD)              ((int32_t *)((char *) HEAD + sizeof(array)))
+#define HEAD(SYM)               ((Array *) sym[SYM].spec.array.ptr)
+#define LPTR(HEAD)              ((int32_t *)((char *) HEAD + sizeof(Array)))
 #define CK_ARR(SYM, ARGN)       if (symbol_class(SYM) != LUX_ARRAY)\
                                 return cerror(NEED_ARR, SYM)
 #define CK_SGN(ARR, N, ARGN, SYM)\
@@ -801,7 +746,7 @@ extern char const* symbolStack[];
     if (ARR[i] >= MAG) return cerror(ILL_DIM, ARGN, SYM)
 #define GET_SIZE(SIZ, ARR, N) SIZ = 1; for (i = 0; i < (int32_t) N; i++)\
                          SIZ *= ARR[i]
-#define N_ELEM(N) ((sym[N].spec.array.bstore - sizeof(array))\
+#define N_ELEM(N) ((sym[N].spec.array.bstore - sizeof(Array))\
                    /anaTypeSize[sym[N].type])
 
 #define ALLOCATE(arg, size, type)\

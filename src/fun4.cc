@@ -968,13 +968,13 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
   Symboltype type;
   float         zc1, zc2, z00, z01, z10, z11, xq;
   float         stepx, stepy, yrun, xrun, xbase, q, p, fn;
-  array         *h;
+  Array *h;
   Pointer base, jbase, out, jout, nlast;
                                 // first argument must be a 2-D array
   CK_ARR(iq, 1);
   type = sym[iq].type;
-  h = (array *) sym[iq].spec.array.ptr;
-  base.i32 = (int32_t *) ((char *)h + sizeof(array));
+  h = (Array *) sym[iq].spec.array.ptr;
+  base.i32 = (int32_t *) ((char *)h + sizeof(Array));
                                         // we want a 1 or 2-D array only
   if ( h->ndim > 2 )
     return cerror(NEED_1D_2D_ARR, iq);
@@ -1001,8 +1001,8 @@ int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand funct
   dim[0] = ns;
   dim[1] = ms;
   result_sym = array_scratch(type, h->ndim, dim);
-  h = (array *) sym[result_sym].spec.array.ptr;
-  out.i32 = jout.i32 = (int32_t *) ((char *)h + sizeof(array));
+  h = (Array *) sym[result_sym].spec.array.ptr;
+  out.i32 = jout.i32 = (int32_t *) ((char *)h + sizeof(Array));
                                                         // setup the steps
   stepx = 1.0 / sx;
   stepy = 1.0 /sy;
@@ -2060,14 +2060,14 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) // compress function
   Symboltype type;
   float         xq, fac;
   double        dq, dfac;
-  array         *h;
+  Array *h;
   Pointer q1, q2, p, base;
 
   iq = ps[0];
   CK_ARR(iq, 1);
   type = sym[iq].type;
-  h = (array *) sym[iq].spec.array.ptr;
-  q1.i32 = (int32_t *) ((char *)h + sizeof(array));
+  h = (Array *) sym[iq].spec.array.ptr;
+  q1.i32 = (int32_t *) ((char *)h + sizeof(Array));
   nd = h->ndim;
   // we want a 1 or 2-D array only
   if ( nd > 2 ) return cerror(NEED_1D_2D_ARR, iq);
@@ -2080,8 +2080,8 @@ int32_t lux_oldcompress(int32_t narg, int32_t ps[]) // compress function
   ny = ny / cy;  if (ny < 1) { cy = h->dims[1];  ny = 1; }
   dim[0] = nx;  dim[1] = ny;    nxx = h->dims[0];
   result_sym = array_scratch(type, nd, dim);
-  h = (array *) sym[result_sym].spec.array.ptr;
-  q2.i32 = (int32_t *) ((char *)h + sizeof(array));
+  h = (Array *) sym[result_sym].spec.array.ptr;
+  q2.i32 = (int32_t *) ((char *)h + sizeof(Array));
   fac = 1.0 / ( (float) cx * (float) cy );
   n = nxx - cx;                                         // step bewteen lines
   switch (type)

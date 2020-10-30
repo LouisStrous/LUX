@@ -53,9 +53,9 @@ int32_t filemap(Symboltype type, int32_t narg, int32_t ps[])
  symbol_context(iq) = -1;        // ?
  symbol_line(iq) = curLineNumber;
                                         // memory requirement
- mq = sizeof(array) + sizeof(int32_t)*(*ps != 0) + strlen(p) + 1;
+ mq = sizeof(Array) + sizeof(int32_t)*(*ps != 0) + strlen(p) + 1;
  symbol_memory(iq) = mq;
- file_map_header(iq) = (array*) malloc(mq);
+ file_map_header(iq) = (Array*) malloc(mq);
  if (!file_map_header(iq))
    return luxerror("Memory allocation error\n", 0);
  if (internalMode & 1)
@@ -112,7 +112,7 @@ int32_t lux_i_file_output(FILE *fp, Pointer q, int32_t assoctype,
  index array as a guide to the positions where to write */
 {
   int32_t        *qi, error = 0, size, dindx, i;
-  array        *h;
+  Array        *h;
 
   if (sym[offsym].type != LUX_INT32)
     offsym = lux_long(1, &offsym);
@@ -333,9 +333,9 @@ int32_t lux_fzarr(int32_t narg, int32_t ps[])
   symbol_context(iq) = -1;        // ?
   symbol_line(iq) = curLineNumber;
                                         // memory requirement
-  mq = sizeof(array) + sizeof(int32_t) + strlen(name) + 1;
+  mq = sizeof(Array) + sizeof(int32_t) + strlen(name) + 1;
   symbol_memory(iq) = mq;
-  file_map_header(iq) = (array*) malloc(mq);
+  file_map_header(iq) = (Array*) malloc(mq);
   if (!file_map_header(iq))
     return luxerror("Memory allocation error\n", 0);
   if (internalMode & 1)

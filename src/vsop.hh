@@ -23,6 +23,9 @@ struct planetIndex {
   uint16_t index;
   uint16_t nTerms;
 };
+
+/// Attributes of a segment of data for calculating planetary positions
+/// according to the VSOP theory.
 struct VSOPdata {
   struct planetIndex indices[6*3*8];
   uint16_t nTerms;

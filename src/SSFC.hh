@@ -4,6 +4,8 @@
 #include <valarray>
 #include <cstdint>
 
+/// A class for Sierpiński Surface Filling Coordinates.  See
+/// https://www.ssfc.quae.nl/en/index.html.
 class SSFC
 {
 public:

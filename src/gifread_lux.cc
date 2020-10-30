@@ -1,4 +1,4 @@
-/* This is file gifread_ana.cc.
+/* This is file gifread_lux.cc.
 
 Copyright 2013 Louis Strous, Richard Shine
 Copyright 2014 Louis Strous
@@ -26,36 +26,41 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include "lux_structures.hh"
  extern struct sym_desc sym[];
- struct GIFScreen {
-        char id[6];
-        unsigned char width_lsb;
-        unsigned char width_msb;
-        unsigned char height_lsb;
-        unsigned char height_msb;
-        unsigned char mask;
-        unsigned char background;
-        unsigned char extra;
- } ;
- struct GIFImage {
-        char sep;
-        unsigned char left_lsb;
-        unsigned char left_msb;
-        unsigned char top_lsb;
-        unsigned char top_msb;
-        unsigned char width_lsb;
-        unsigned char width_msb;
-        unsigned char height_lsb;
-        unsigned char height_msb;
-        unsigned char mask;
- } ;
+
+/// Attributes of a GIF screen
+struct GIFScreen {
+  char id[6];
+  unsigned char width_lsb;
+  unsigned char width_msb;
+  unsigned char height_lsb;
+  unsigned char height_msb;
+  unsigned char mask;
+  unsigned char background;
+  unsigned char extra;
+};
+
+/// Attributes of a GIF image
+struct GIFImage {
+  char sep;
+  unsigned char left_lsb;
+  unsigned char left_msb;
+  unsigned char top_lsb;
+  unsigned char top_msb;
+  unsigned char width_lsb;
+  unsigned char width_msb;
+  unsigned char height_lsb;
+  unsigned char height_msb;
+  unsigned char mask;
+} ;
 #define min(x,y) ((x) < (y) ? (x) : (y))
 #define FALSE 0
 #define TRUE 1
 
- typedef struct codestruct {
-            struct codestruct *prefix;
-            unsigned char first,suffix;
-        } codetype;
+/// LZW compression code element
+struct codetype {
+  codetype *prefix;
+  unsigned char first,suffix;
+};
  codetype *codetable;                // LZW compression code data
  int32_t datasize,codesize,codemask;     // Decoder working variables
  int32_t clear,eoi;                      // Special code values

@@ -203,10 +203,10 @@ int32_t copyToSym(int32_t target, int32_t source)
       break;
     case LUX_ARRAY:
       size = symbol_memory(source);
-      if (!(array_header(target) = (array *) malloc(size)))
+      if (!(array_header(target) = (Array *) malloc(size)))
         return cerror(ALLOC_ERR, target);
       symbol_memory(target) = size;
-      memcpy(array_header(target), array_header(source), sizeof(array));
+      memcpy(array_header(target), array_header(source), sizeof(Array));
       size = array_size(source);
       if (array_type(source) == LUX_STRING_ARRAY) {
         ptr.sp = (char **) array_data(target);
@@ -391,13 +391,13 @@ int32_t lux_replace(int32_t lhs, int32_t rhs)
   char  takeOver = 0;
   char const* name;
   extern int32_t        trace, step, nBreakpoint;
-  extern breakpointInfo         breakpoint[];
-  branchInfo    checkTree(int32_t, int32_t);
+  extern Breakpoint         breakpoint[];
+  BranchInfo    checkTree(int32_t, int32_t);
   int32_t       oldPipeExec, oldPipeSym;
   extern int32_t        pipeExec, pipeSym, tempVariableIndex, nTempVariable,
     fformat, iformat, sformat, cformat;
   extern char   *fmt_float, *fmt_integer, *fmt_complex, *fmt_string;
-  branchInfo    tree;
+  BranchInfo    tree;
   int32_t       evalLhs(int32_t), einsert(int32_t, int32_t);
   void  updateIndices(void);
 
@@ -1748,7 +1748,7 @@ int32_t execute(int32_t symbol)
                 tempVariableIndex, nBreakpoint;
   extern char   reportBody, ignoreSymbols, debugLine, evalScalPtr;
   extern char   *currentInputFile;
-  extern breakpointInfo         breakpoint[];
+  extern Breakpoint         breakpoint[];
   extern uint8_t        disableNewline;
   extern int16_t        watchVars[];
   uint8_t       oldNL;

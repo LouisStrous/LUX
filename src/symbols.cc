@@ -260,7 +260,7 @@ int32_t to_scratch_array(int32_t n, Symboltype type, int32_t ndim, int32_t dims[
 {
  size_t        size, i;
  float        fsize;
- array        *h;
+ Array *h;
  Pointer        ptr;
 
  if (isStringType(type))
@@ -283,8 +283,8 @@ int32_t to_scratch_array(int32_t n, Symboltype type, int32_t ndim, int32_t dims[
    fsize *= dims[i];
    size *= dims[i];
  }
- size += sizeof(array);
- fsize += sizeof(array);
+ size += sizeof(Array);
+ fsize += sizeof(Array);
  if (fabs(((float) size)/fsize - 1) > 1e-3 || size > INT32_MAX)
    return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  undefine(n);
@@ -295,12 +295,11 @@ int32_t to_scratch_array(int32_t n, Symboltype type, int32_t ndim, int32_t dims[
    printf("requested %1d bytes in array_scratch\n", size);
    return cerror(ALLOC_ERR, 0);
  }
- array_header(n) = h = (array *) ptr.v;
+ array_header(n) = h = (Array *) ptr.v;
  symbol_memory(n) = size;
  array_num_dims(n) = ndim;
  memcpy(array_dims(n), dims, ndim*sizeof(int32_t));
- h->c1 = h->c2 = h->nfacts = 0;
- h->facts = NULL;
+ h->c1 = h->c2 = 0;
  zerobytes(array_data(n), array_size(n)*lux_type_size[type]);
  return n;
 }
@@ -335,17 +334,17 @@ int32_t array_clone(int32_t symbol, Symboltype type)
 {
  int32_t        n, size;
  float        fsize;
- array        *h, *hOld;
+ Array *h, *hOld;
  void        *ptr;
  extern int32_t        pipeSym, pipeExec;
 
- size = ((symbol_memory(symbol) - sizeof(array))
+ size = ((symbol_memory(symbol) - sizeof(Array))
          / lux_type_size[array_type(symbol)]) * lux_type_size[type]
-   + sizeof(array);
+   + sizeof(Array);
  if (lux_type_size[type] > lux_type_size[array_type(symbol)]) {
-   fsize = ((float) (symbol_memory(symbol) - sizeof(array))
+   fsize = ((float) (symbol_memory(symbol) - sizeof(Array))
             / lux_type_size[array_type(symbol)]) * lux_type_size[type]
-     + sizeof(array);
+     + sizeof(Array);
    if (fsize != (float) size)
      return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
  }
@@ -354,7 +353,7 @@ int32_t array_clone(int32_t symbol, Symboltype type)
      && symbol_memory(pipeSym) == size) {
    n = pipeSym;
    pipeSym = 0;
-   memcpy(array_header(n), array_header(symbol), sizeof(array));
+   memcpy(array_header(n), array_header(symbol), sizeof(Array));
  } else {
    getFreeTempVariable(n);
    symbol_class(n) = ((isRealType(type) || isStringType(type))?
@@ -364,14 +363,13 @@ int32_t array_clone(int32_t symbol, Symboltype type)
      printf("requested %1d bytes in array_clone\n", size);
      return cerror(ALLOC_ERR, 0);
    }
-   array_header(n) = (array*) ptr;
+   array_header(n) = (Array *) ptr;
    symbol_memory(n) = size;
-   h = (array *) ptr;
+   h = (Array *) ptr;
    hOld = HEAD(symbol);
    h->ndim = hOld->ndim;
    memcpy(h->dims, hOld->dims, h->ndim*sizeof(int32_t));
-   h->c1 = h->c2 = h->nfacts = 0;
-   h->facts = NULL;
+   h->c1 = h->c2 = 0;
  }
  array_type(n) = type;
  return n;
@@ -792,8 +790,8 @@ int32_t lux_floor(int32_t narg, int32_t ps[])
  if (temp                        // we used input symbol to store results
      && symbol_class(iq) == LUX_ARRAY // it's an array
      && array_type(iq) > LUX_INT32) { // and bigger than we needed
-   symbol_memory(iq) = sizeof(array) + size*sizeof(int32_t);
-   symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
+   symbol_memory(iq) = sizeof(Array) + size*sizeof(int32_t);
+   symbol_data(iq) = (Array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))        // reallocation failed
      return luxerror("Realloc() failed in lux_floor", 0);
  }
@@ -910,8 +908,8 @@ int32_t lux_ceil(int32_t narg, int32_t ps[])
  if (temp                        // we used input symbol to store results
      && symbol_class(iq) == LUX_ARRAY // it's an array
      && array_type(iq) > LUX_INT32) { // and bigger than we needed
-   symbol_memory(iq) = sizeof(array) + size*sizeof(int32_t);
-   symbol_data(iq) = (array *) realloc(symbol_data(iq), symbol_memory(iq));
+   symbol_memory(iq) = sizeof(Array) + size*sizeof(int32_t);
+   symbol_data(iq) = (Array *) realloc(symbol_data(iq), symbol_memory(iq));
    if (!symbol_data(iq))        // reallocation failed
      return luxerror("Realloc() failed in lux_floor", 0);
  }
@@ -1199,7 +1197,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         break;
       case LUX_ARRAY: case LUX_CARRAY:
         n = array_size(iq);
-        size = n*trgtstep + sizeof(array); // new size requirement
+        size = n*trgtstep + sizeof(Array); // new size requirement
         // if the new size is greater than the old one, then we must
         // reallocate before we store the new numbers.  If the new size is
         // smaller than the old one, then we must reallocate after we store
@@ -1210,13 +1208,13 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           if (size <= symbol_memory(iq))
             do_realloc = 1;                // need to reallocate afterwards
           else
-            array_header(result) = (array*) realloc(array_header(result), size);
+            array_header(result) = (Array *) realloc(array_header(result), size);
         } else
-          array_header(result) = (array*) malloc(size);
+          array_header(result) = (Array *) malloc(size);
         if (!do_realloc && !array_header(result))
           return cerror(ALLOC_ERR, 0);
         if (iq != result)        // copy dimensions &c
-          memcpy(array_header(result), array_header(iq), sizeof(array));
+          memcpy(array_header(result), array_header(iq), sizeof(Array));
         symbol_memory(result) = size;
         src.v = array_data(iq);
         trgt.v = array_data(result);
@@ -1884,7 +1882,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
 
     switch (do_realloc) {
       case 1:
-        array_header(result) = (array*) realloc(array_header(result), size);
+        array_header(result) = (Array *) realloc(array_header(result), size);
         if (!array_header(result))
           return cerror(ALLOC_ERR, 0);
         symbol_memory(result) = size;
@@ -2066,7 +2064,7 @@ int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t *dims)
   dimensions, and dimensions; or a scalar if <ndim> == 0 */
 {                                //redefine a symbol i to an array
   int32_t   mq, j;
-  array        *h;
+  Array *h;
   Pointer        p;
 
   if (ndim > MAX_DIMS)
@@ -2082,7 +2080,7 @@ int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t *dims)
   mq = lux_type_size[ntype];
   for (j = 0; j < ndim; j++)
     mq *= dims[j];
-  mq += sizeof(array); //total memory required including header
+  mq += sizeof(Array); //total memory required including header
   /* before deleting, check the current size and use it if it matches,
   this avoids a lot of mallocing in loops */
   if (symbol_class(nsym) != LUX_ARRAY
@@ -2095,9 +2093,8 @@ int32_t redef_array(int32_t nsym, Symboltype ntype, int32_t ndim, int32_t *dims)
   array_type(nsym) = ntype;
   h = array_header(nsym);
   h->ndim = ndim;
-  h->c1 = 0; h->c2 = 0; h->nfacts = 0;
+  h->c1 = 0; h->c2 = 0;
   memcpy(h->dims, dims, ndim*sizeof(int32_t));
-  h->facts = NULL;                      // no known facts
   if (ntype == LUX_STRING_ARRAY) {
     // a string array: set all elements to NULL
     mq = array_size(nsym);
@@ -2359,7 +2356,7 @@ int32_t lux_assoc(int32_t narg, int32_t ps[])
   syntax: assoc(lun, array [, offset]) */
 {
  int32_t        lun, result, iq, size;
- array        *h;
+ Array *h;
 
  lun = int_arg(*ps);
  iq = ps[1];
@@ -2369,18 +2366,16 @@ int32_t lux_assoc(int32_t narg, int32_t ps[])
  sym[result].type = sym[iq].type;
  sym[result].line = curLineNumber;
  h = HEAD(iq);
- size = sizeof(array);
+ size = sizeof(Array);
  if (narg >= 3) size += sizeof(int32_t);
- if (!(sym[result].spec.array.ptr = (array *) Malloc(size)))
+ if (!(sym[result].spec.array.ptr = (Array *) Malloc(size)))
    return cerror(ALLOC_ERR, iq);
  sym[result].spec.array.bstore = size;
- memcpy(sym[result].spec.array.ptr, h, sizeof(array));
+ memcpy(sym[result].spec.array.ptr, h, sizeof(Array));
  h = HEAD(result);
  h->c1 = lun;
- if (size != sizeof(array))
+ if (size != sizeof(Array))
    set_assoc_has_offset(result);
- h->nfacts = 0;
- h->facts = NULL;
  if (assoc_has_offset(result))
    assoc_offset(result) = int_arg(ps[2]);
  return result;
@@ -2393,7 +2388,7 @@ int32_t lux_rfix(int32_t narg, int32_t ps[])
  int32_t        nsym, type, size, *trgt, i, result;
  Pointer        src;
  double        temp;
- array        *h;
+ Array *h;
 
  nsym = *ps;
  if ((type = sym[nsym].type) == LUX_INT32) return nsym; // already of proper type
@@ -3547,96 +3542,6 @@ void read_a_number_fp(FILE *fp, Scalar *value, Symboltype *type)
   if (type)
     *type = thetype;
 }
-//-------------------------------------------------------------------------
-#ifdef FACTS
-void *seekFacts(int32_t symbol, int32_t type, int32_t flag)
-// seeks facts of the indicated <type> and <flag> associated with the
-// <symbol>.
-// Returns a pointer to the facts, if found, or else returns NULL.
-// LS 6apr99
-{
-  uint8_t        n;
-  arrayFacts        *facts;
-
-  if (!symbolIsNumericalArray(symbol) // not a numerical symbol
-      || !array_facts(symbol))        // no associated facts
-    return NULL;
-
-  n = array_num_facts(symbol);
-  facts = array_facts(symbol);
-  while (n--) {
-    if (facts->type == type)
-      return (facts->flags & flag)? facts: NULL;
-    facts++;
-  }
-  return NULL;
-}
-//-------------------------------------------------------------------------
-void *setFacts(int32_t symbol, int32_t type, int32_t flag)
-// seeks facts of the indicated <type> associated with the <symbol>.
-// Returns a pointer to the facts, if found.  Otherwise, allocates a
-// new slot for the facts and returns a pointer to it.
-// sets the appropriate <flag>.
-// Returns NULL if unsucessful.  LS 6apr99
-{
-  arrayFacts        *facts;
-  int32_t        n;
-
-  if (!symbolIsNumericalArray(symbol)) // not a numerical symbol
-    return NULL;
-
-  if (array_facts(symbol)) {
-    facts = seekFacts(symbol, type, LUX_ANY_FACT);
-    if (facts) {                // it exists already
-      facts->type |= flag;
-      return facts;
-    }
-    // it doesn't exist yet, but we have some other facts already
-  }
-
-  n = array_num_facts(symbol);
-  if (n == 255)                        // no room for more
-    return NULL;
-  array_num_facts(symbol) = ++n;
-
-  facts = realloc(array_facts(symbol), n*sizeof(arrayFacts));
-  if (!facts)
-    return NULL;
-  array_facts(symbol) = facts;
-  facts += n - 1;                // the new one
-  facts->type = type;                // set defaults
-  facts->flags = flag;
-  facts->fact.any = NULL;        // no data yet
-  return facts;                        // pointer to the last one
-}
-//-------------------------------------------------------------------------
-void deleteFacts(int32_t symbol, int32_t type)
-{
-  int32_t        n, nf;
-  arrayFacts        *facts;
-
-  if (!symbolIsNumericalArray(symbol))
-    return;
-
-  if (array_facts(symbol)) {
-    facts = seekFacts(symbol, type, LUX_ANY_FACT);
-    if (facts) {
-      nf = array_num_facts(symbol);
-      n = nf + (array_facts(symbol) - facts) - 1;
-      if (n)
-        memcpy(facts, facts + 1, n*sizeof(arrayFacts));
-      array_num_facts(symbol) = --nf;
-      if (nf)
-        facts = realloc(facts, nf*sizeof(arrayFacts));
-      else {
-        free(facts);
-        facts = NULL;
-      }
-      array_facts(symbol) = facts;
-    }
-  }
-}
-#endif
 //-------------------------------------------------------------------------
 #undef malloc
 char *strsave_system(char *str)

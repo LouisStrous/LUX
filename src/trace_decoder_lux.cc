@@ -1182,7 +1182,6 @@ int32_t lux_trace_decoder(int32_t narg, int32_t ps[]) // initial TRACE decompres
  h->c1 = 0; h->c2 = 0;
  h->dims[0] = 64;
  h->dims[1] = nblocks;
- h->facts = NULL;                        //no known facts
 
  sym[i].spec.array.bstore = 128*nblocks + sizeof( struct ahead );
  stat = rdct(image, nx, ny, nblocks, qt, dct);

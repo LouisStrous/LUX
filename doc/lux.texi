@@ -11958,6 +11958,7 @@ arguments.
 * colorcomponents::             Derive RGB values
 * colorpixel::
 * colorstogrey::                Get greyscale values
+* commonfactors::               Lowest common factors
 * compile::                     Compile a string as LUX code
 * compile_file::
 * complex::                     Convert to a complex data type
@@ -15658,7 +15659,7 @@ raw pixel values, according to the current color map.
 See also: @ref{tvraw}, @ref{Color}
 
 @c -------------------------------------
-@node colorstogrey, compile, colorpixel, Internal Routines
+@node colorstogrey, commonfactors, colorpixel, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection colorstogrey
 @findex colorstogrey
@@ -15671,7 +15672,26 @@ the corresponding grey scale values (between 0 and 255).
 See also: @ref{colorcomponents}, @ref{Color}
 
 @c -------------------------------------
-@node compile, compile_file, colorstogrey, Internal Routines
+@node commonfactors, compile, colorstogrey, Internal Routines
+@subsection commonfactors
+@findex commonfactors
+
+@code{commonfactors, x, factors, categories [, tolerance]}
+
+Returns the lowest common factors among the numbers in @var{x}.
+@var{factors} receives the lowest common factors found within @var{x}.
+@var{categories} receives indexes into @var{factors} that point at the
+lowest common factor for each element of @var{x}.  @var{tolerance}
+says what the tolerance for detecting a common factor should be.  It
+should be 0 for integer @var{x}.
+
+For example, @code{x = [2, 12, 17, 4] commonfactors, x, f, c} yields
+@code{f = [2, 17]} and @code{c = [0, 0, 1, 0]}.  The lowest common
+factors for the elements of @var{x} are @code{f(c)} which yields
+@code{[2, 2, 17, 2]}.
+
+@c -------------------------------------
+@node compile, compile_file, commonfactors, Internal Routines
 @subsection compile
 @findex compile
 

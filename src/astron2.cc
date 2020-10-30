@@ -15,7 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
-/// \file LUX routines for calculating various astronomical ephemerides and for
+/// \file
+/// LUX routines for calculating various astronomical ephemerides and for
 /// transforming dates between various calendars.
 ///
 /// The calculations are based on the NASA JPL DE431 ephemeris, and use the

@@ -81,7 +81,7 @@ int32_t lux_crunch_f(int32_t narg, int32_t ps[])
 }
 //--------------------------------------------------------------------------
 int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)// crunch subroutine
- /* compress an array */                
+ /* compress an array */
  //  lux call is: crunch, IN, b ,OUT
  /* note that OUT must be predefined and limit is used to make certain we
     don't run out of space */
@@ -158,7 +158,7 @@ int32_t docrunch(int32_t narg, int32_t ps[], int32_t showerror)// crunch subrout
 }
  //--------------------------------------------------------------------------
 int32_t lux_decrunch(int32_t narg, int32_t ps[])                // decrunch subroutine
- /* decompress an array */                
+ /* decompress an array */
  //  decrunch, IN, OUT
 {
   // works only for I*2 and I*1 arrays

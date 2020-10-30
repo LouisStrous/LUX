@@ -25,14 +25,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 #include <string.h>             // for memcpy
 
-typedef struct {
+/// A data pyramid for the anti Laplace transformation
+struct Pyramid {
   int32_t num_levels;
   int32_t *nx;
   int32_t *ny;
   int32_t type;
   Pointer data;
   Pointer *levels;
-} *Pyramid;
+};
 
 int32_t lux_laplace2d(int32_t narg, int32_t ps[])
 // LAPLACE(img) calculates the Laplacian of 2D <img>
@@ -442,7 +443,7 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
   int32_t img, result = LUX_ERROR, nx, ny, nx2, ny2, nlevel, i, nelem;
   Symboltype type;
   Pointer src, tgt;
-  Pyramid pyramid;
+  Pyramid* pyramid;
 
   img = ps[0];
   if (!symbolIsRealArray(img))
@@ -465,7 +466,7 @@ int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
     ny2 /= 2;
     nlevel++;
   }
-  pyramid = (Pyramid) calloc(1, sizeof(*pyramid));
+  pyramid = (Pyramid*) calloc(1, sizeof(*pyramid));
   if (!pyramid)
     return cerror(ALLOC_ERR, 0);
   pyramid->nx = (int32_t*) calloc(nlevel, sizeof(*pyramid->nx));

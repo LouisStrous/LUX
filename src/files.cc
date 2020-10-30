@@ -2932,7 +2932,7 @@ int32_t lux_assoc_input(int32_t narg, int32_t ps[])
   int32_t        len, nsym, baseOffset;
   Symboltype type;
   Pointer        q;
-  array        *h;
+  Array        *h;
   FILE        *fp;
   char        warn = 0;
   extern int32_t        range_warn_flag;
@@ -3070,7 +3070,7 @@ int32_t lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
  int32_t        i, dattype, assoctype, ystep[8], rstep[8], tally[8], done;
  int32_t        efile, n, *step, baseOffset;
  Pointer        q;
- array        *h;
+ Array        *h;
  FILE        *fp;
 
  step = rstep;
@@ -4005,7 +4005,7 @@ int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
  int32_t        lun, n, iq, i;
  FILE        *fp;
  Pointer        p;
- array        *h;
+ Array        *h;
  char        str, *q;
 
  lun = int_arg(*ps++);
@@ -4061,7 +4061,7 @@ int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
  int32_t        lun, n, iq, i;
  FILE        *fp;
  Pointer        p;
- array        *h;
+ Array        *h;
  char        str, *q;
 
  lun = int_arg(*ps++);
@@ -4261,7 +4261,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
       endian(&symbol_memory(iq), sizeof(int32_t), LUX_INT32);
     n = symbol_memory(iq);
     ALLOCATE(p.v, n, char);
-    array_header(iq) = (array *) p.v;
+    array_header(iq) = (Array *) p.v;
     if (!fread(p.ui8, n, 1, fp))
       return 1;
     n = array_num_dims(iq);
@@ -4306,7 +4306,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
     if (reverseOrder)
       endian(&n, sizeof(int32_t), LUX_INT32);
     ALLOCATE(p.s, n, char);
-    file_map_header(iq) = (array *) p.s;
+    file_map_header(iq) = (Array *) p.s;
     if (!fread(p.ui8, n, 1, fp))
       return 1;
     n = file_map_num_dims(iq);

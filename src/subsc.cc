@@ -2218,12 +2218,12 @@ int32_t lux_num_dimen(int32_t narg, int32_t ps[])
 {
   int32_t       nsym, nd, result_sym;
 
-  array         *h;
+  Array *h;
   nsym = ps[0];                                 //the target symbol is the first
   result_sym = scalar_scratch(LUX_INT32);
   switch (symbol_class(nsym))   {                       //switch on class
     case LUX_ARRAY: case LUX_FILEMAP:
-        h = (array *) sym[nsym].spec.array.ptr;
+        h = (Array *) sym[nsym].spec.array.ptr;
         nd = h->ndim;
         break;
       case LUX_STRING:
@@ -2333,7 +2333,7 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
 {
   extern int32_t        redim_warn_flag;
   int32_t       oldSize, newSize, ndim, dims[MAX_DIMS], i, iq, nsym;
-  array         *data;
+  Array *data;
 
   nsym = ps[0];                         // the target symbol is the first
   if (symbol_class(nsym) != LUX_ARRAY) // not an array
@@ -2369,8 +2369,8 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
     printf("WARNING: result from REDIM is smaller than original\n");
   memcpy(array_dims(nsym), dims, ndim*sizeof(int32_t));
   array_num_dims(nsym) = ndim;
-  newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(array);
-  data = (array*) Realloc(array_header(nsym), newSize);
+  newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(Array);
+  data = (Array *) Realloc(array_header(nsym), newSize);
   if (!data)
     return luxerror("Resizing of array memory failed", nsym);
   array_header(nsym) = data;
@@ -2569,7 +2569,7 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
           return nsym;
         }
         // if we get here it is a numerical array
-        mq = symbol_memory(iq) - sizeof(array);// actual data memory
+        mq = symbol_memory(iq) - sizeof(Array);// actual data memory
         memcpy((char*) array_data(nsym), (char*) array_data(iq), mq);
         return nsym;
       default:

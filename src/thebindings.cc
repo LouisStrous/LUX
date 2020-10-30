@@ -1734,6 +1734,9 @@ void register_the_bindings()
   int32_t lux_findspans(int32_t, int32_t []);
   register_lux_f(lux_findspans, "findspans", 1, 1, "1cycle");
 
+  int32_t lux_commonfactors(int32_t, int32_t []);
+  register_lux_s(lux_commonfactors, "commonfactors", 3, 4, NULL);
+
   int32_t lux_permutationnumber(int32_t, int32_t []);
   register_lux_f(lux_permutationnumber, "permutationnumber", 1, 1, "1circular");
 

@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 extern        int32_t        lastmin_sym, lastmax_sym;
 extern        float        callig_xb, callig_yb;
                  // some common variables
-array        *h;
+Array *h;
 Pointer q1, q2, q3, q4;
 int32_t        tkplot(float x, float y, int32_t lineStyle, int32_t symStyle),
         tkplot_clip(float x, float y, int32_t lineStyle, int32_t symStyle),
@@ -2211,7 +2211,7 @@ int32_t lux_postimage(int32_t narg, int32_t ps[])                        // post
   float        x0, x1, y0, y1;
   int32_t        iq, nd, nx, ny, s1, s2;
   char        *ptr;
-  array        *h;
+  Array *h;
 
   x0 = wxb;
   x1 = wxt;
@@ -2228,14 +2228,14 @@ int32_t lux_postimage(int32_t narg, int32_t ps[])                        // post
     iq = lux_scale(1, &ps[0]);
     scalemin = s1;
     scalemax = s2;        }
-  h = (array *) sym[iq].spec.array.ptr;
+  h = (Array *) sym[iq].spec.array.ptr;
   nd = h->ndim;
   if (nd != 2)
   { printf("xtv - array must be 2-D\n");
     return -1; }
   nx = h->dims[0];
   ny = h->dims[1];
-  ptr = (char *) ((char *) h + sizeof(array));
+  ptr = (char *) ((char *) h + sizeof(Array));
   if (narg > 1)
     x0 = float_arg(ps[1]);
   if (narg > 2)

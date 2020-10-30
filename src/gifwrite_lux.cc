@@ -1,4 +1,4 @@
-/* This is file gifwrite_ana.cc.
+/* This is file gifwrite_lux.cc.
 
 Copyright 2013 Louis Strous, Richard Shine
 Copyright 2014 Louis Strous

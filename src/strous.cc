@@ -53,7 +53,7 @@ int32_t lux_distr(int32_t narg, int32_t ps[])
 {
  int32_t        iq, ntarget, i, n, *bin, nout = 0;
  Symboltype targettype;
- array  *h, *h2;
+ Array *h, *h2;
  Pointer        target, value;
 
  iq = *ps++;                            // target
@@ -502,10 +502,10 @@ int32_t lux_readarr(int32_t narg, int32_t ps[])
    if (redef_array(iq, maxtype, 1, &arrs) != 1)                 // target
    { printf("(redef_array): "); fclose(tp); return cerror(ALLOC_ERR, iq); }
    if (maxtype == LUX_FLOAT)
-   { fptr = (float *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
+   { fptr = (float *) ((char *) sym[iq].spec.array.ptr + sizeof(Array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%f", fptr++); }
    else
-   { iptr = (int32_t *) ((char *) sym[iq].spec.array.ptr + sizeof(array));
+   { iptr = (int32_t *) ((char *) sym[iq].spec.array.ptr + sizeof(Array));
      for (i = arrs; i > 0; i--) fscanf(tp, "%d", iptr++); }
  }
  fclose(tp);
@@ -526,7 +526,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
    <offset> is a scalar, or an array of the same size as <key>.
    LS 1apr94 */
 {
-  array         *h, *har;
+  Array *h, *har;
   Pointer       ar, base, key, off, indx, theKey, theOff;
   char  repeat = 0;
   int32_t       mode = 0, result, i, index = 0, offset, nRepeat;
@@ -2553,7 +2553,7 @@ int32_t lux_not(int32_t narg, int32_t ps[])
    LS 25feb93 */
 {
  int32_t        iq, i, type;
- array  *h;
+ Array *h;
  register Pointer       arg, result;
 
  iq = ps[0];
@@ -2592,7 +2592,7 @@ int32_t lux_table(int32_t narg, int32_t ps[])
 {
  int32_t        symx, symy, symf, nTable, nOut, nRepeat, ix, n1,
         symr, i, nsymx, nsymy, nsymf, nLoop, n2;
- array  *hx, *hy, *hf, *hMax, *hr;
+ Array *hx, *hy, *hf, *hMax, *hr;
  Pointer        x, y, xf, r, ox, oy, of, nx, ny;
  Symboltype topType;
  Scalar         grad;
@@ -2672,8 +2672,8 @@ int32_t lux_table(int32_t narg, int32_t ps[])
  ox.i32 = x.i32 = LPTR(hx);
  oy.i32 = y.i32 = LPTR(hy);
  of.i32 = LPTR(hf);
- nx.ui8 = ox.ui8 + sym[symx].spec.array.bstore - sizeof(array);
- ny.ui8 = oy.ui8 + sym[symy].spec.array.bstore - sizeof(array);
+ nx.ui8 = ox.ui8 + sym[symx].spec.array.bstore - sizeof(Array);
+ ny.ui8 = oy.ui8 + sym[symy].spec.array.bstore - sizeof(Array);
  r.i32 = LPTR(hr);
         // now the real work
         /* Search strategy:  hope that the next xnew value is near
@@ -2762,7 +2762,7 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
 {
  int32_t        symx, symy, symf, symi, nTable, nIndex, nRepeat, ix,
         symr, i, nsymx, nsymy, nsymf, nsymi, nx, ny, iTable;
- array  *hx, *hy, *hf, *hi;
+ Array *hx, *hy, *hf, *hi;
  Pointer        x, y, xf, xi, r, ox, oy, of, nf, oi, ni;
  Symboltype topType;
  Scalar         grad, table;
@@ -2858,19 +2858,19 @@ int32_t lux_table2d(int32_t narg, int32_t ps[])
  oy.i32 = LPTR(hy);
  if (symbol_class(nsymf) == LUX_ARRAY)
  { of.i32 = xf.i32 = LPTR(hf);
-   nf.ui8 = of.ui8 + sym[symf].spec.array.bstore - sizeof(array); }
+   nf.ui8 = of.ui8 + sym[symf].spec.array.bstore - sizeof(Array); }
  else
  { of.i32 = xf.i32 = &sym[nsymf].spec.scalar.i32;
    nf.ui8 = of.ui8 + lux_type_size[topType]; }
  if (symbol_class(nsymi) == LUX_ARRAY)
  { oi.i32 = xi.i32 = LPTR(hi);
-   ni.ui8 = oi.ui8 + sym[symi].spec.array.bstore - sizeof(array); }
+   ni.ui8 = oi.ui8 + sym[symi].spec.array.bstore - sizeof(Array); }
  else
  { oi.i32 = xi.i32 = &sym[nsymi].spec.scalar.i32;
    ni.ui8 = oi.ui8 + lux_type_size[topType]; }
- nx = (sym[symx].spec.array.bstore - sizeof(array))
+ nx = (sym[symx].spec.array.bstore - sizeof(Array))
    / lux_type_size[topType];
- ny = (sym[symy].spec.array.bstore - sizeof(array))
+ ny = (sym[symy].spec.array.bstore - sizeof(Array))
    / lux_type_size[topType];
         // now the real work
         /* Search strategy:  hope that the next xnew value is near

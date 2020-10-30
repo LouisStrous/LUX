@@ -138,7 +138,7 @@ sort_rank(size_t* p, const T* data, size_t stride, size_t n)
 {
   // 1. Determine the indexes
   std::vector<size_t> index(n);
-  gsl_sort_index(index, data, stride, n);
+  gsl_sort_index(index.data(), data, stride, n);
 
   // 2. Calculate the ranks
   for (size_t i = 0; i < n; ++i) {

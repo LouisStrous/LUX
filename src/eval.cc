@@ -23176,11 +23176,11 @@ int32_t evals(int32_t nsym)
 //----------------------------------------------------------
 #define UNKNOWN -1
 #define NEXT -2
-branchInfo checkBranch(int32_t lhs, int32_t rhs)
+BranchInfo checkBranch(int32_t lhs, int32_t rhs)
      // determines at what level in the assignment <lhs> = <rhs> the <lhs> can
      // be used for storage of intermediate results
 {
-  branchInfo    result = { 0, 0, 0, 0}, branch1, branch2;
+  BranchInfo    result = { 0, 0, 0, 0}, branch1, branch2;
   static int32_t    depth, lhsSize;
   int16_t  *args;
   int32_t   n;
@@ -23320,9 +23320,9 @@ branchInfo checkBranch(int32_t lhs, int32_t rhs)
 }
 //----------------------------------------------------------
 int32_t     pipeExec = 0, pipeSym = 0;
-branchInfo checkTree(int32_t lhs, int32_t rhs)
+BranchInfo checkTree(int32_t lhs, int32_t rhs)
 {
-  branchInfo    result;
+  BranchInfo    result;
 
   checkBranch(lhs, 0);          // initialize
   result = checkBranch(lhs, rhs);

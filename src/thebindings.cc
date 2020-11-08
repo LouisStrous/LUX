@@ -1737,15 +1737,17 @@ void register_the_bindings()
   int32_t lux_commonfactors(int32_t, int32_t []);
   register_lux_s(lux_commonfactors, "commonfactors", 3, 4, NULL);
 
+#if HAVE_LIBGSL
   int32_t lux_permutationnumber(int32_t, int32_t []);
-  register_lux_f(lux_permutationnumber, "permutationnumber", 1, 1, "1circular");
+  register_lux_f(lux_permutationnumber, "permutationnumber", 1, 1, "~1irank:1iindex:2prank:6pindex");
+#endif
 
   int32_t lux_permutation(int32_t, int32_t []);
   register_lux_f(lux_permutation, "permutation", 2, 2, "1circular");
 
 #if HAVE_LIBGSL
   int32_t lux_permutationdistance(int32_t, int32_t []);
-  register_lux_f(lux_permutationdistance, "permutationdistance", 2, 2, "1circular");
+  register_lux_f(lux_permutationdistance, "permutationdistance", 2, 2, "1prank:3pindex");
 #endif
 
 #if HAVE_LIBGSL

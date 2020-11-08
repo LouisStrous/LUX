@@ -18,6 +18,23 @@
 /// GSL functions are available under the name `gsl_sort_index`, which is the
 /// GSL function name when `T` = `double`.
 
+/// C++ convenience version of gsl_sort_char_index().  Returns the indexes into
+/// an array that produce the elements in ascending order.
+///
+/// \param[in,out] p points at the array where the indexes get stored.
+///
+/// \param[in] data points at the data elements to sort.
+///
+/// \param[in] stride is the number of data elements to advance to get the next
+/// element to include in the sort.
+///
+/// \param[in] n is the number of data elements to sort.
+void
+gsl_sort_index(size_t* p, const char* data, size_t stride, size_t n)
+{
+  return gsl_sort_char_index(p, data, stride, n);
+}
+
 /// C++ convenience version of gsl_sort_uchar_index().  Returns the indexes into
 /// an array that produce the elements in ascending order.
 ///
@@ -52,6 +69,23 @@ gsl_sort_index(size_t* p, const short* data, size_t stride, size_t n)
   return gsl_sort_short_index(p, data, stride, n);
 }
 
+/// C++ convenience version of gsl_sort_ushort_index().  Returns the indexes
+/// into an array that produce the elements in ascending order.
+///
+/// \param[in,out] p points at the array where the indexes get stored.
+///
+/// \param[in] data points at the data elements to sort.
+///
+/// \param[in] stride is the number of data elements to advance to get the next
+/// element to include in the sort.
+///
+/// \param[in] n is the number of data elements to sort.
+void
+gsl_sort_index(size_t* p, const unsigned short* data, size_t stride, size_t n)
+{
+  return gsl_sort_ushort_index(p, data, stride, n);
+}
+
 /// C++ convenience version of gsl_sort_int_index().  Returns the indexes into
 /// an array that produce the elements in ascending order.
 ///
@@ -69,6 +103,23 @@ gsl_sort_index(size_t* p, const int* data, size_t stride, size_t n)
   return gsl_sort_int_index(p, data, stride, n);
 }
 
+/// C++ convenience version of gsl_sort_uint_index().  Returns the indexes into
+/// an array that produce the elements in ascending order.
+///
+/// \param[in,out] p points at the array where the indexes get stored.
+///
+/// \param[in] data points at the data elements to sort.
+///
+/// \param[in] stride is the number of data elements to advance to get the next
+/// element to include in the sort.
+///
+/// \param[in] n is the number of data elements to sort.
+void
+gsl_sort_index(size_t* p, const unsigned int* data, size_t stride, size_t n)
+{
+  return gsl_sort_uint_index(p, data, stride, n);
+}
+
 /// C++ convenience version of gsl_sort_long_index().  Returns the indexes into
 /// an array that produce the elements in ascending order.
 ///
@@ -84,6 +135,23 @@ void
 gsl_sort_index(size_t* p, const long* data, size_t stride, size_t n)
 {
   return gsl_sort_long_index(p, data, stride, n);
+}
+
+/// C++ convenience version of gsl_sort_ulong_index().  Returns the indexes into
+/// an array that produce the elements in ascending order.
+///
+/// \param[in,out] p points at the array where the indexes get stored.
+///
+/// \param[in] data points at the data elements to sort.
+///
+/// \param[in] stride is the number of data elements to advance to get the next
+/// element to include in the sort.
+///
+/// \param[in] n is the number of data elements to sort.
+void
+gsl_sort_index(size_t* p, const unsigned long* data, size_t stride, size_t n)
+{
+  return gsl_sort_ulong_index(p, data, stride, n);
 }
 
 /// C++ convenience version of gsl_sort_float_index().  Returns the indexes into

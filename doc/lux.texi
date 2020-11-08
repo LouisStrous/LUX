@@ -22911,7 +22911,7 @@ See also: @ref{Incidental Colors}, @ref{!pdev}, @ref{pdev}, @ref{xopen},
 @subsection permutation
 @findex permutation
 
-@code{p = permutation(@var{pn}, @var{count} [, /circular]}
+@code{p = permutation(@var{pn}, @var{count} [, /prank, /pindex]}
 
 Calculates the linear or circular permutation that corresponds to
 permutation number @code{@var{pn}} for @code{@var{count}} element and
@@ -22923,6 +22923,13 @@ nonnegative and less than the possible number of permutations of
 for linear permutations, and @code{factorial(@var{count - 1})} for
 circular permutations.
 
+If @code{/prank} or @code{/pindex} are specified then the permutation
+is circular, and otherwise linear.
+
+If @code{/prank} is specified, then the permutation is circular based
+on rank.  If @code{/pindex} is specified, then the permutation is
+circular based on index.  See @ref{permutationnumber}.
+
 See also: @ref{factorial}, @ref{permutationnumber},
 @ref{permutationdistance}
 
@@ -22931,7 +22938,7 @@ See also: @ref{factorial}, @ref{permutationnumber},
 @subsection permutationdistance
 @findex permutationdistance
 
-@code{d = permutationdistance(@var{x1}, @var{x2} [, /circular])}
+@code{d = permutationdistance(@var{x1}, @var{x2} [, /prank, /pindex])}
 
 [GSL]
 
@@ -22943,13 +22950,22 @@ The Kendall tau distance is the count of swaps of adjacent elements
 that are needed to make the relative order of the permutations
 identical.
 
+if @code{/prank} or @code{/pindex} are specified, then the permutation
+is circular, and otherwise it is linear.
+
+If @code{/prank} is specified, then the permutation is circular based
+on rank.  If @code{/pindex} is specified, then the permutation is
+circular based on index.  See @ref{permutationnumber}.
+
 For example, @samp{permutationdistance([7, 2, 5, 8], [7, 8, 2, 5])}
 returns @samp{2}, because first swapping elements @samp{5} and
 @samp{8}, and then swapping elements @samp{2} and @samp{8} turns the
 first permutation into the second one, so 2 adjacent swaps suffice.
 
 If the number of elements is @var{n} then the distance is at most
-@code{n*(n - 1)/2 - 1}.
+@code{n*(n - 1)/2 - 1} for linear permutations, and @code{(n - 1)*(n -
+2)/2 - 1} for circular permutations, unless that is less than 0 in
+which case 0 is returned.
 
 Only the relative order of the elements is taken into account, so if
 we change the elements without changing their relative order then the
@@ -22968,47 +22984,111 @@ See also: @ref{permutation}, @ref{permutationnumber}
 @subsection permutationnumber
 @findex permutationnumber
 
-@code{permutationnumber(@var{values} [, /circular])}
+@code{permutationnumber(@var{x} [, /irank, /iindex] [, /prank, /pindex])}
 
-Calculates a nonnegative integer number (the Lehmer code) that
-uniquely identifies the permutation (the relative order) of numerical
-data @code{@var{values}}.  If @code{/circular} is specified, then the
-last element is assumed to be followed by the first element again,
-thus closing the circle.  If the permutation is not circular, then we
-refer to it here as @emph{linear}.
+Calculates a nonnegative integer number that uniquely identifies the
+permutation (the relative order) of the elements of @code{@var{x}}.
+Only the relative order is important, not the exact numerical values.
 
-If you rearrange the elements in a different order, then the
-permutation number changes.
+There are assumed to be no duplicate values in @code{@var{x}}.
 
-If the data elements are in ascending order, then the permutation
-number is 0.  The greatest permutation number is returned if the data
-elements are in descending order.  That number is equal to
-@code{factorial(n) − 1} for linear permutations, or @code{factorial(n
-- 1) - 1} for circular permutations.
+By default or if @code{/irank} is specified, then the @code{@var{x}}
+are assumed to be data values, and the permutation is defined by the
+ranks of the values.  If each value is replaced by its rank (0 for the
+least element, 1 for the next greater element, and so on), then the
+permutation number remains the same.
 
-The following table lists all permutations of 3 elements, with the
+If @code{/iindex} is specified, then the @code{@var{x}} are assumed to
+be indexes of data values.  Indexes say in what order the elements
+should be taken to get ascending order.  If the data values are stored
+in @code{@var{data}}, then @code{@var{data}(@var{x})} produce values
+in ascending order.
+
+By default, the permutation is assumed to be linear.  If @code{/prank}
+or @code{/pindex} are specified, then the permutation is instead
+assumed to be @emph{circular}.  If @code{/prank} is specified, then
+the permutation is assumed circular based on rank, which means that
+the greatest element is also adjacent to the least element.  If
+@code{/pindex} is specified, then the permutation is assumed circular
+based on index, which means that the last element is also adjacent to
+the first element.
+
+An example for circular permutations based on rank: Some objects were
+measured to be in directions given by angles of @code{[210, 355, 140,
+12]} degrees.  The corresponding 0-based ranks are @code{[2, 3, 1,
+0]}.  As a measure of direction, an angle of 360 degrees is equivalent
+to an angle of 0 degrees, and angles just below 360 degrees are
+adjacent to angles just above 0 degrees, so the object at angle 12
+degrees is adjacent to the object at angle 355 degrees, even though
+the difference between their angles is greatest of all.
+
+Suppose that we shift the zero point of the angle upward by 40
+degrees, so that the new angle is related to the old angle by
+@code{new = (old - 40) mod 360}.  Then relative to the new zero point
+the objects are at angles @code{[170, 315, 100, 332]} degrees, with
+corresponding ranks @code{[1, 2, 0, 3]}.  The new ranks are related to
+the old ones by @code{new = (old - 1) mod 4}, i.e., circularly shifted
+by 1.  If we keep shifting the ranks circularly by 1 then we find
+@code{[0, 1, 3, 2]}, @code{[3, 0, 2, 1]}, and then the original
+@code{[2, 3, 1, 0]} again.  All of those arrays of ranks (or their
+corresponding angles) produce the same circular permutation number by
+rank.
+
+An example for circular permutations based on index: We observe a
+rotating arrangement of four objects A through D, and note the order
+in which the objects pass by a fixed point, and find B, C, A, D.
+After object D object B shows up again, and so on.  If we number the
+objects A through D with 0 through 3 (these might be the indexes that
+arrange some aspect of the objects into ascending order, as returned
+by the @ref{index} function), then the order is @code{[1, 2, 0, 3]}.
+But the object that we noted first was arbitrary: If we had waited a
+little bit longer, then one of the other objects might have been the
+first one noted.  Then we might have found @code{[2, 0, 3, 1]} or
+@code{[0, 3, 1, 2]} or @code{[3, 1, 2, 0]}.  All of these arrangements
+produce the same circular permutation number by index.
+
+Note that the examples for circular permutations based on rank and on
+index started with the same arrangement (@code{[1, 2, 0, 3]}) but the
+other arrangements that produce the same circular permutation number
+based on rank or index are not the same, so it is important to choose
+the right one.
+
+If the elements of @code{@var{x}} are in ascending order, then the
+returned permutation number is 0.  The greatest permutation number is
+returned if the data elements are in descending order.  That number is
+equal to @code{factorial(n) − 1} for linear permutations, or
+@code{factorial(n - 1) - 1} for circular permutations.
+
+The following table lists all permutations of 4 elements, with the
 corresponding linear and circular permutation numbers.
 
-@multitable {Permutation} {Linear} {Circular}
-@headitem Permutation @tab Linear @tab Circular
-@item [0, 1, 2] @tab 0 @tab 0
-@item [0, 2, 1] @tab 1 @tab 1
-@item [1, 0, 2] @tab 2 @tab 1
-@item [1, 2, 0] @tab 3 @tab 0
-@item [2, 0, 1] @tab 4 @tab 0
-@item [2, 1, 0] @tab 5 @tab 1
+@multitable {Permutation} {Linear} {Circular Rank} {Circular Index}
+@headitem Permutation @tab Linear @tab Circular Rank @tab Circular Index
+@item [0,1,2,3] @tab  0 @tab 0 @tab 0
+@item [0,1,3,2] @tab  1 @tab 3 @tab 4
+@item [0,2,1,3] @tab  2 @tab 1 @tab 1
+@item [0,2,3,1] @tab  3 @tab 4 @tab 2
+@item [0,3,1,2] @tab  4 @tab 2 @tab 3
+@item [0,3,2,1] @tab  5 @tab 5 @tab 5
+@item [1,0,2,3] @tab  6 @tab 2 @tab 2
+@item [1,0,3,2] @tab  7 @tab 5 @tab 5
+@item [1,2,0,3] @tab  8 @tab 3 @tab 3
+@item [1,2,3,0] @tab  9 @tab 0 @tab 0
+@item [1,3,0,2] @tab 10 @tab 4 @tab 1
+@item [1,3,2,0] @tab 11 @tab 1 @tab 4
+@item [2,0,1,3] @tab 12 @tab 4 @tab 4
+@item [2,0,3,1] @tab 13 @tab 1 @tab 3
+@item [2,1,0,3] @tab 14 @tab 5 @tab 5
+@item [2,1,3,0] @tab 15 @tab 2 @tab 1
+@item [2,3,0,1] @tab 16 @tab 0 @tab 0
+@item [2,3,1,0] @tab 17 @tab 3 @tab 2
+@item [3,0,1,2] @tab 18 @tab 0 @tab 0
+@item [3,0,2,1] @tab 19 @tab 3 @tab 1
+@item [3,1,0,2] @tab 20 @tab 1 @tab 2
+@item [3,1,2,0] @tab 21 @tab 4 @tab 3
+@item [3,2,0,1] @tab 22 @tab 2 @tab 4
+@item [3,2,1,0] @tab 23 @tab 5 @tab 5
 @end multitable
-
-The circular permutation @samp{[1, 2, 0]} is equivalent to the
-circular permutation @samp{[0, 1, 2]} because in both permutations 2
-follows 1 and 0 follows 2 and 1 follows 0.
-
-So, @samp{permutationnumber([1, 0, 2])} yields @samp{2}, and that same
-permutation number is returned for any array of 3 elements with that
-same relative order (i.e., with the second element the least, the last
-element the greatest, and the first element in between in value).  For
-example, @samp{permutationnumber([-325.3, -1000, 22.3])} also yields
-@samp{2}.
 
 See also: @ref{factorial}, @ref{permutation}, @ref{permutationdistance}
 

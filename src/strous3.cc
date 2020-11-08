@@ -52,7 +52,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <functional>
 #include "MonotoneInterpolation.hh"
 
-//---------------------------------------------------------------------
+/// \ingroup luxroutines
+///
+/// Implements the `bisect` function in LUX.
+///
+///     y = bisect([x,] y, values [, axis=axis, pos=pos, width=width])
+///
+/// Depends on the Gnu Scientific Library.
+///
+/// \param[in] narg is the number of arguments.
+///
+/// \param[in,out] points at the LUX symbol number of the first argument.
+///
+/// \returns the LUX symbol number of the result.
 int32_t lux_bisect(int32_t narg, int32_t ps[])
 // y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width])
 // calculates bisector positions
@@ -448,6 +460,19 @@ static int32_t cmp0(const void *a, const void *b)
   return 0;
 }
 //---------------------------------------------------------------------
+/// \ingroup luxroutines
+///
+/// Implements the `cspline_find` function in LUX.
+///
+///     y = cspline_find([x,] y, values [, axis=axis, pos=pos, width=width])
+///
+/// Depends on the Gnu Scientific Library.
+///
+/// \param[in] narg is the number of arguments.
+///
+/// \param[in,out] points at the LUX symbol number of the first argument.
+///
+/// \returns the LUX symbol number of the result.
 int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 // z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index])
 /* locates positions where a certain value gets attained, using cubic
@@ -674,7 +699,17 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 #endif
 }
 //----------------------------------------------------------------
-// MONOTONEINTERPOLATE(x,y,xnew[,/NONE,/CIRCLE,/SQUARE,/WIDE])
+/// \ingroup luxroutines
+///
+/// Implements the `monotoneinterpolate` function in LUX.
+///
+///     yi = monotoneinterpolate(x,y,xnew[,/none,/circle,/square,/wide])
+///
+/// \param[in] narg is the number of arguments.
+///
+/// \param[in,out] points at the LUX symbol number of the first argument.
+///
+/// \returns the LUX symbol number of the result.
 int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
 {
   Pointer *ptrs;
@@ -3240,11 +3275,15 @@ int32_t lux_commonfactors(int32_t narg, int32_t ps[]) {
 }
 REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 
-/// Returns a number that uniquely identifies a permutation.  A permutation is
-/// determined by the ranks of the values, so every three-element array with the
-/// first element the largest, the second element the smallest, and the third
-/// element the middle value is associated with the same permutation number,
-/// which is 4.
+/// Returns a number that uniquely identifies the permutation of data values.
+/// The permutation is determined by the ranks of the values, so every
+/// three-element array with the first element the largest, the second element
+/// the smallest, and the third element the middle value is associated with the
+/// same permutation number, which is 4.  Any transformation of the values that
+/// leaves their ranks intact also leaves the permutation number unchanged.
+///
+/// Any change in the order of the data elements yields a change in the
+/// associated permutation number.
 ///
 /// \tparam Ret is the type of the produced permutation number.  For the
 /// greatest range, it should be an unsigned integer type.  The type should be
@@ -3264,14 +3303,16 @@ REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 ///
 /// \tparam D is the type of the data values that describe the permutation.
 ///
-/// \param[in] data points at the beginning of the array of data values.
+/// \param[in] data points at the beginning of the array of data values.  There
+/// are assumed to be no duplicate data values.
 ///
 /// \param[in] n counts the number of data values.
 ///
 /// \returns the permutation number, which is a number between 0 and \f$n! -
 /// 1\f$ inclusive.
 ///
-/// \sa permutation_number_circular(), permutation(), permutation_distance().
+/// \sa permutation_number_circular_rank(), permutation(),
+/// permutation_distance().
 template<typename Ret, typename D>
 Ret
 permutation_number(const D* data, size_t n)
@@ -3286,19 +3327,90 @@ permutation_number(const D* data, size_t n)
   return result;
 }
 
-/// Returns a number that uniquely identifies a circular permutation.  A
-/// circular permutation is one in which the first element is adjacent not only
-/// to the second element but also to the last element, so that (for example)
-/// `[1, 17, 5]` and `[17, 5, 1]` and `[5, 1, 17]` are all equivalent.  A
-/// permutation is determined by the ranks of the values, so every three-element
-/// array with the first element the largest, the second element the smallest,
-/// and the third element the middle value is associated with the same circular
-/// permutation number, as are all arrays that follow that pattern when the
-/// elements are rotated suitably.
+/// Returns a number that uniquely identifies a circular permutation based on
+/// rank.
 ///
-/// For example,
-/// - `permutation_number({0,1,2})` yields 0.
-/// - `permutation_number({1,0,2})` yields 1.
+/// A circular permutation based on rank is one in which the greatest element is
+/// adjacent not only to the second greatest element but also to the least
+/// element.  This is suitable for data values that are only known modulo some
+/// period.
+///
+/// For example, for indicating positions along a circle, angles just above 0
+/// degrees are adjacent to angles just below 360 degrees, because a circle has
+/// no beginning and no end.  If a different zero point of angular position is
+/// chosen, then the ranks of the angular positions may change but the circular
+/// permutation number remains the same.
+///
+/// Suppose that the values are known modulo \f$P\f$, so that they are between 0
+/// (inclusive) and \f$P\f$ (exclusive).  Then a shift of the zero point by
+/// \f$Δx\f$ corresponds to a change of data value \f$x\f$ to \f$(x-∆x) \mod
+/// P\f$.  The rank \f$r\f$ likewise changes to \f$(r-∆r) \mod n\f$ where
+/// \f$n\f$ is the number of elements.
+///
+/// If the original ranks of the elements are `{2 3 1 0}`, then subsequent rank
+/// shifts of 1 yield ranks `{1 2 0 3}`, `{0 1 3 2}`, `{3 0 2 1}`, and then
+/// again `{2 3 1 0}`.  All of these permutations yield the same permutation
+/// number.
+///
+/// \tparam Ret is the type of the produced permutation number.  For the
+/// greatest range, it should be an unsigned integer type.  The type should be
+/// big enough to store factorial-of-one-less-than-\f$n\f$ (\f$(n - 1)!\f$)
+/// different values.  `int32_t` and `uint32_t` are suitable for \f$n\f$ not
+/// exceeding 12, `int64_t` and `uint64_t` go up to 20, `int128_t` goes up to
+/// 33, and `uint128_t` is suitable for \f$n\f$ not exceeding 34.
+///
+/// \tparam T is the type of the data values that describe the permutation.
+///
+/// \param[in] data points at the beginning of the array of data values.  The
+/// range (difference between greatest and least) of the data values is assumed
+/// less than the period \f$P\f$.  There are assumed not to be duplicate data
+/// values.
+///
+/// \param[in] n counts the number of data values.
+///
+/// \returns the circular permutation number based on rank, which is a number
+/// between 0 and \f$(n - 1)!  - 1\f$ inclusive.
+///
+/// \sa permutation_number_circular_index(), permutation_number(),
+/// permutation(), permutation_distance().
+template<typename Ret, typename T>
+Ret
+permutation_number_circular_rank(const T* data, size_t n)
+{
+  // First get the ranks
+  std::vector<size_t> r(n);
+  sort_rank(r.data(), data, 1, n);
+
+  // For calculatingg the circular permutation number, we want the last element
+  // to have the greatest rank, which is n - 1.
+  auto d = n - 1 - r.back();
+  if (d) {
+    // The last element doesn't have the greatest rank; shift ranks so it does.
+    // We don't need to calculate the new rank of the last element explicitly,
+    // because we don't use it anymore.
+    for (int i = 0; i < n - 1; ++i) {
+      // effectively, we calculate (r[i] + d) mod n
+      r[i] += d;
+      if (r[i] >= n)
+        r[i] -= n;
+    }
+  }
+  // Now the last element has the greatest rank.  We can now calculate the
+  // linear permutation number based on all but the last element, and return
+  // that as the circular permutation number of the whole permutation.
+  return permutation_number<Ret>(r.data(), n - 1);
+}
+
+/// Returns a number that uniquely identifies a circular permutation based on
+/// index.
+///
+/// A circular permutation based on index is one in which the last element is
+/// adjacent not only to the second to last element but also to the first
+/// element.
+///
+/// If the original elements are `{2 3 1 0}`, then subsequent circular shifts of
+/// 1 yield `{3 1 0 2}`, `{1 0 2 3}`, `{0 2 3 1}`, and then again `{2 3 1 0}`.
+/// All of these permutations yield the same permutation number.
 ///
 /// \tparam Ret is the type of the produced permutation number.  For the
 /// greatest range, it should be an unsigned integer type.  The type should be
@@ -3309,17 +3421,19 @@ permutation_number(const D* data, size_t n)
 ///
 /// \tparam D is the type of the data values that describe the permutation.
 ///
-/// \param[in] data points at the beginning of the array of data values.
+/// \param[in] data points at the beginning of the array of data values.  There
+/// are assumed not to be duplicate data values.
 ///
 /// \param[in] n counts the number of data values.
 ///
-/// \returns the permutation number, which is a number between 0 and \f$(n - 1)!
-/// - 1\f$ inclusive.
+/// \returns the circular permutation number based on index, which is a number
+/// between 0 and \f$(n - 1)!  - 1\f$ inclusive.
 ///
-/// \sa permutation_number(), permutation(), permutation_distance().
+/// \sa permutation_number_circular_rank(), permutation_number(), permutation(),
+/// permutation_distance().
 template<typename Ret, typename D>
 Ret
-permutation_number_circular(const D* data, size_t n)
+permutation_number_circular_index(const D* data, size_t n)
 {
   // For a circular permutation, the element at the end should be the one with
   // the greatest value.  Which element is the greatest?
@@ -3343,9 +3457,10 @@ permutation_number_circular(const D* data, size_t n)
   return permutation_number<D>(data, n - 1);
 }
 
+#if HAVE_LIBGSL
 /// Implements the LUX `permutationnumber` function.
 ///
-///     value = permutationnumber(data [,/circular])
+///     value = permutationnumber(data [, /irank, /iindex, /prank, /pindex])
 ///
 /// \param[in] narg is the argument count.
 ///
@@ -3364,41 +3479,73 @@ lux_permutationnumber(int32_t narg, int32_t ps[])
   // We first determine the ranks of the values (0 = least, 1 = next higher,
   // etc.)
   std::vector<size_t> r(count);
-  switch (symbol_type(ps[0])) {
-  case LUX_INT8:
-    sort_rank(r.data(), src.ui8, 1, count);
-    break;
-  case LUX_INT16:
-    sort_rank(r.data(), src.i16, 1, count);
-    break;
-  case LUX_INT32:
-    sort_rank(r.data(), src.i32, 1, count);
-    break;
-  case LUX_FLOAT:
-    sort_rank(r.data(), src.f, 1, count);
-    break;
-  case LUX_DOUBLE:
-    sort_rank(r.data(), src.d, 1, count);
-    break;
+  if (internalMode & 1) {       // /iindex
+    // the input values are equivalent to indexes, that produce an ascending
+    // order.  Calling gsl_sort_index() on them produces ranks.
+    switch (symbol_type(ps[0])) {
+    case LUX_INT8:
+      gsl_sort_index(r.data(), src.ui8, 1, count);
+      break;
+    case LUX_INT16:
+      gsl_sort_index(r.data(), src.i16, 1, count);
+      break;
+    case LUX_INT32:
+      gsl_sort_index(r.data(), src.i32, 1, count);
+      break;
+    case LUX_FLOAT:
+      gsl_sort_index(r.data(), src.f, 1, count);
+      break;
+    case LUX_DOUBLE:
+      gsl_sort_index(r.data(), src.d, 1, count);
+      break;
+    }
+  } else {                      // /irank
+    // the data values are equivalent to ranks.
+    switch (symbol_type(ps[0])) {
+    case LUX_INT8:
+      sort_rank(r.data(), src.ui8, 1, count);
+      break;
+    case LUX_INT16:
+      sort_rank(r.data(), src.i16, 1, count);
+      break;
+    case LUX_INT32:
+      sort_rank(r.data(), src.i32, 1, count);
+      break;
+    case LUX_FLOAT:
+      sort_rank(r.data(), src.f, 1, count);
+      break;
+    case LUX_DOUBLE:
+      sort_rank(r.data(), src.d, 1, count);
+      break;
+    }
   }
 
   // Now we can calculate the permutation numbers from the ranks, which always
-  // have the same data type.
+  // have the same data type (size_t).
 
   // For n elements, there are n! different (linear) permutations.  If we are to
   // assign a unique permutation number to each permutation, then we must use a
   // data type for the permutation numbers that can distinguish between at least
   // n! values.
 
-  // Permutations can also be circular, which means that the first element is
-  // adjacent to the last element as well as to the second element.  In that
-  // case, [1, 2, 3, 4] is equivalent to [2, 3, 4, 1] and should get the same
-  // permutation number.  Then there are only (n − 1)! unique permutations.
+  // Permutations can also be circular, based on rank or on index.
+  //
+  // If based on rank, then the greatest element is adjacent to the least
+  // element as well as to the second-greatest element.  If based on index, then
+  // the last element is adjacent to the first element as well as to the second
+  // to last element.
+  //
+  // If the original ranks of the elements are {2 3 1 0}, then shifting by 1
+  // based on rank yields {1 2 0 3}, {0 1 3 2}, {3 0 2 1}, and {2 3 1 0} again.
+  // Shifting by 1 based on index yields {3 1 0 2}, {1 0 2 3}, {0 2 3 1}, and {2
+  // 3 1 0} again.
+  //
+  // There are (n − 1)! unique circular permutations.
 
   // int32_t and uint32_t are suitable for (linear) n not exceeding 12, and
   // int64_t and uint64_t go up to 20.
 
-  int permutation_is_circular = (internalMode & 1);
+  int permutation_is_circular = (internalMode & 2);
 
   int32_t result;
   if (count <= 12 + permutation_is_circular) {
@@ -3416,16 +3563,31 @@ lux_permutationnumber(int32_t narg, int32_t ps[])
   Pointer tgt;
   tgt.i32 = &scalar_value(result).i32;
 
-  if (permutation_is_circular) {
-    switch (scalar_type(result)) {
-    case LUX_INT32:
-      *tgt.i32 = permutation_number_circular<int32_t, size_t>(r.data(), count);
-      break;
-    case LUX_INT64:
-      *tgt.i64 = permutation_number_circular<int64_t, size_t>(r.data(), count);
-      break;
+  if (permutation_is_circular) { // circular permutation
+    if (internalMode & 4) {     // /pindex
+      switch (scalar_type(result)) {
+      case LUX_INT32:
+        *tgt.i32 = permutation_number_circular_index<int32_t, size_t>
+          (r.data(), count);
+        break;
+      case LUX_INT64:
+        *tgt.i64 = permutation_number_circular_index<int64_t, size_t>
+          (r.data(), count);
+        break;
+      }
+    } else {                    // prank
+      switch (scalar_type(result)) {
+      case LUX_INT32:
+        *tgt.i32 = permutation_number_circular_rank<int32_t, size_t>
+          (r.data(), count);
+        break;
+      case LUX_INT64:
+        *tgt.i64 = permutation_number_circular_rank<int64_t, size_t>
+          (r.data(), count);
+        break;
+      }
     }
-  } else {
+  } else {                      // linear permutation
     switch (scalar_type(result)) {
     case LUX_INT32:
       *tgt.i32 = permutation_number<int32_t, size_t>(r.data(), count);
@@ -3437,7 +3599,8 @@ lux_permutationnumber(int32_t narg, int32_t ps[])
   }
   return result;
 }
-REGISTER(permutationnumber, f, permutationnumber, 1, 1, "1circular");
+REGISTER(permutationnumber, f, permutationnumber, 1, 1, "~1irank:1iindex:2prank:6pindex", HAVE_LIBGSL);
+#endif
 
 /// Return the "standard" permutation corresponding to a permutation number.
 /// The "standard" permutation is the one that consists of the smallest possible
@@ -3495,7 +3658,8 @@ permutation(size_t permutationnumber, size_t n)
 /// possible non-negative integer numbers.  The permutation with number 0 is the
 /// one consisting of ascending numbers from 0 through \f$n - 1\f$.
 ///
-/// The opposite function is permutation_number_circular().
+/// The opposite functions are permutation_number_circular_index() and
+/// permutation_number_circular_rank().
 ///
 /// For example,
 /// - `permutation_circular(0,3)` yields `{0,1,2}`.
@@ -3513,14 +3677,14 @@ permutation(size_t permutationnumber, size_t n)
 /// \returns a vector of \f$n\f$ nonnegative integers that correspond to the
 /// given permutation number.
 ///
-/// \sa permutation(), permutation_number_circular().
+/// \sa permutation(), permutation_number_circular_index().
 std::vector<size_t>
 permutation_circular(size_t permutationnumber, size_t n)
 {
   if (n) {
-    // the standard circular permutation of <n> elements for permutation
-    // number <p> is equal to the standard linear permutation of <n> - 1
-    // elements, with the next higher number (which is <n> - 1) appended.
+    // the standard circular permutation of <n> elements for permutation number
+    // <p> is equal to the standard linear permutation of <n> - 1 elements, with
+    // the next higher number (which is <n> - 1) appended.
     auto p = permutation(permutationnumber, n - 1);
     if (p.empty()) {
       // the permutation number was too great for the element count
@@ -3536,7 +3700,7 @@ permutation_circular(size_t permutationnumber, size_t n)
 
 /// Implements the `permutation` function in LUX.
 ///
-/// `    p = permutation(pn, n [, /circular])`
+/// `    p = permutation(pn, n [, /prank, /pindex])`
 ///
 /// \param[in] narg is the number of arguments.
 ///
@@ -3556,8 +3720,12 @@ lux_permutation(int32_t narg, int32_t ps[])
   int32_t result = array_scratch(LUX_INT32, 1, &icount);
   int32_t* tgt = (int32_t*) array_data(result);
 
-  auto p = (internalMode & 1)? permutation_circular(ipn, icount):
-    permutation(ipn, icount);
+  std::vector<size_t> p;
+  if (internalMode & 1) {       // circular permutation
+    p = permutation_circular(ipn, icount);
+  } else {
+    p = permutation(ipn, icount);
+  }
   if (p.empty())
     return luxerror("Permutation number is too large for the element count",
                     ps[0]);
@@ -3569,9 +3737,50 @@ lux_permutation(int32_t narg, int32_t ps[])
 REGISTER(permutation, f, permutation, 2, 2, "1circular");
 
 #if HAVE_LIBGSL
+/// Returns the Kendall tau distance between two permutations.  That distance is
+/// the number of inversions of adjacent elements that are needed to make the
+/// second permutation have the same relative order of elements as the first
+/// one.
+///
+/// Only elements within each permutation are compared with each other, so it is
+/// not necessary that both permutations contain the exact same elements.  For
+/// example, if the elements of one of the permutations are multiplied by a
+/// positive factor then the distance remains the same.
+///
+/// It is assumed that neither permutation contains duplicate values.
+///
+/// \param[in] r1 contains the elements of the first permutation.
+///
+/// \param[in] r2 contains the elements of the second permutation.  It is
+/// assumed to have the same number of elements as the first permutation.
+///
+/// \returns the nonnegative distance, which is less than \f$n(n - 1)/2\f$ for
+/// permutations of \f$n\f$ elements.
+size_t
+permutation_distance(const std::vector<size_t>& r1,
+                     const std::vector<size_t>& r2)
+{
+  assert(r1.size() == r2.size());
+
+  size_t n = r1.size();
+
+  // Calculate the number of inversions between r1 and r2
+  size_t d = 0;
+  for (int i1 = 0; i1 < n - 1; ++i1) {
+    for (int i2 = i1 + 1; i2 < n; ++i2) {
+      d += (   ((r1[i1] > r1[i2]) && (r2[i1] < r2[i2]))
+               || ((r1[i1] < r1[i2]) && (r2[i1] > r2[i2])));
+    }
+  }
+  return d;
+}
+#endif
+
+#if HAVE_LIBGSL
 /// Returns the Kendall tau distance between two permutations of the same
 /// elements.  That distance is the number of inversions of adjacent elements
-/// that are needed to turn the first permutation into the second one.
+/// that are needed to make the second permutation have the same relative order
+/// of elements as the first one.
 ///
 /// Only the relative order of the elements in the two permutations is taken
 /// into account.  For example, the result remains the same if all elements of
@@ -3601,20 +3810,69 @@ permutation_distance(size_t n, const T* p1, const T* p2)
   // now r2[i] are the ranks (0 = least, n − 1 = greatest) of p2
 
   // 2. calculate the number of inversions between r1 and r2
-  size_t d = 0;
-  for (int i1 = 0; i1 < n - 1; ++i1) {
-    for (int i2 = i1 + 1; i2 < n; ++i2) {
-      d += (   ((r1[i1] > r1[i2]) && (r2[i1] < r2[i2]))
-            || ((r1[i1] < r1[i2]) && (r2[i1] > r2[i2])));
-    }
-  }
-  return d;
+  return permutation_distance(r1, r2);
 }
 
-/// Returns the Kendall tau distance between two circular permutations of the
-/// same elements.  That distance is the number of inversions of adjacent
-/// elements that are needed to turn the first circular permutation into the
-/// second one.
+#if HAVE_LIBGSL
+/// Returns the Kendall tau distance between two circular permutations based on
+/// rank.  That distance is the number of inversions of adjacent elements that
+/// are needed to make the second permutation have the same relative order of
+/// elements as the first one, when the circularity based on rank is also raken
+/// into account.
+///
+/// Only elements within each permutation are compared with each other, so it is
+/// not necessary that both permutations contain the exact same elements.  For
+/// example, if the elements of one of the permutations are multiplied by a
+/// positive factor then the distance remains the same.
+///
+/// It is assumed that neither permutation contains duplicate values.
+///
+/// \param[in] r1 contains the elements of the first permutation.
+///
+/// \param[in] r2 contains the elements of the second permutation.  It is
+/// assumed to have the same number of elements as the first permutation.
+///
+/// \returns the nonnegative distance, which is less than \f$(n - 1)(n - 2)/2\f$
+/// for permutations of \f$n\f$ elements if \f$n\f$ is 2 or greater, and is 0
+/// otherwise.
+size_t
+permutation_distance_circular_rank(const std::vector<size_t>& r1,
+                                   const std::vector<size_t>& r2)
+{
+  assert(r1.size() == r2.size());
+
+  size_t n = r1.size();
+
+  if (n < 2)
+    return 0;
+
+  size_t d_min = std::numeric_limits<size_t>::max();
+  std::vector<size_t> rr(r2);   // Copy that we can modify
+  for (size_t s = 0; s < n; ++s) {
+    size_t d = permutation_distance(r1, rr);
+    if (d < d_min)
+      d_min = d;
+
+    if (s < n - 1) {
+      // Adjust the rr ranks for the next circular candidate; calculate (r + 1)
+      // mod n
+      for (int i = 0; i < n; ++i) {
+        if (rr[i] == n - 1)
+          rr[i] = 0;
+        else
+          ++rr[i];
+      }
+    }
+  }
+  return d_min;
+}
+#endif
+
+/// Returns the Kendall tau distance between two circular permutations (based on
+/// rank) of the same elements.  That distance is the number of inversions of
+/// adjacent elements that are needed to make the second permutation have the
+/// same relative order of elements as the first one, when the circularity based
+/// on rank is also raken into account.
 ///
 /// Only the relative order of the elements in the two permutations is taken
 /// into account.  For example, the result remains the same if all elements of
@@ -3633,7 +3891,7 @@ permutation_distance(size_t n, const T* p1, const T* p2)
 /// \returns the nonnegative distance, which is less than \f$n(n - 1)/2\f$.
 template<typename T>
 size_t
-permutation_distance_circular(size_t n, const T* p1, const T* p2)
+permutation_distance_circular_rank(size_t n, const T* p1, const T* p2)
 {
   // 1. determine the ranks (0 .. n − 1) of the elements in both arrays
   std::vector<size_t> r1(n);
@@ -3645,38 +3903,51 @@ permutation_distance_circular(size_t n, const T* p1, const T* p2)
   // now r1[i] are the ranks (0 = least, n − 1 = greatest) of p1
   // and likewise r2 for p2
 
-  size_t d_min = std::numeric_limits<size_t>::max();
-
-  for (size_t s = 0; s < n; ++s) {
-    // 2. calculate the number of inversions between r1 and r2
-    size_t d = 0;
-    for (int i1 = 0; i1 < n - 1; ++i1) {
-      for (int i2 = i1 + 1; i2 < n; ++i2) {
-        d += (   ((r1[i1] > r1[i2]) && (r2[i1] < r2[i2]))
-              || ((r1[i1] < r1[i2]) && (r2[i1] > r2[i2])));
-      }
-    }
-    if (d < d_min)
-      d_min = d;
-
-    if (s < n - 1) {
-      // 5. adjust the p2 ranks for the next circular candidate
-      for (int i = 0; i < n; ++i) {
-        if (r2[i] == n - 1)
-          r2[i] = 0;
-        else
-          ++r2[i];
-      }
-    }
-  }
-  return d_min;
+  return permutation_distance_circular_rank(r1, r2);
 }
+
+#if HAVE_LIBGSL
+/// Returns the Kendall tau distance between two circular permutations (based on
+/// index) of the same elements.  That distance is the number of inversions of
+/// adjacent elements that are needed to make the second permutation have the
+/// same relative order of elements as the first one, when the circularity based
+/// on index is also raken into account.
+///
+/// Only the relative order of the elements in the two permutations is taken
+/// into account.  For example, the result remains the same if all elements of
+/// one of the permutations are multiplied by the same positive factor or get
+/// the same number added to them.  So, it isn't necessary that both
+/// permutations contain the exact same values (in different orders).
+///
+/// \tparam T is the data type of both permutations.
+///
+/// \param[in] n is the number of elements in each permutation.
+///
+/// \param[in] p1 points at the start of the first permutation.
+///
+/// \param[in] p2 points at the start of the second permutation.
+///
+/// \returns the nonnegative distance, which is less than \f$n(n - 1)/2\f$.
+template<typename T>
+size_t
+permutation_distance_circular_index(size_t n, const T* p1, const T* p2)
+{
+  // 1. determine the index (0 .. n − 1) of the elements in both arrays
+  std::vector<size_t> r1(n);
+  gsl_sort_index(r1.data(), p1, 1, n);
+
+  std::vector<size_t> r2(n);
+  gsl_sort_index(r2.data(), p2, 1, n);
+
+  return permutation_distance(r1, r2);
+}
+#endif
 
 /// \ingroup luxroutines
 ///
 /// Implements the `permutationdistance` function in LUX.
 ///
-///     d = permutationdistance(p1, p2 [, /circular])
+///     d = permutationdistance(p1, p2 [, /prank, /pindex])
 ///
 /// \param[in] narg is the number of arguments.
 ///
@@ -3710,27 +3981,52 @@ lux_permutationdistance(int32_t narg, int32_t ps[])
   }
   int32_t iq = scalar_scratch(LUX_INT32);
   if (internalMode & 1) {       // circular permutations
-    switch (ct) {
-    case LUX_INT8:
-      scalar_value(iq).i32 = permutation_distance_circular(count1, src1.ui8,
-                                                           src2.ui8);
-      break;
-    case LUX_INT16:
-      scalar_value(iq).i32 = permutation_distance_circular(count1, src1.i16,
-                                                           src2.i16);
-      break;
-    case LUX_INT32:
-      scalar_value(iq).i32 = permutation_distance_circular(count1, src1.i32,
-                                                           src2.i32);
-      break;
-    case LUX_FLOAT:
-      scalar_value(iq).i32 = permutation_distance_circular(count1, src1.f,
-                                                           src2.f);
-      break;
-    case LUX_DOUBLE:
-      scalar_value(iq).i32 = permutation_distance_circular(count1, src1.d,
-                                                           src2.d);
-      break;
+    if (internalMode & 2) {     // based on index
+      switch (ct) {
+      case LUX_INT8:
+        scalar_value(iq).i32
+          = permutation_distance_circular_index(count1, src1.ui8, src2.ui8);
+        break;
+      case LUX_INT16:
+        scalar_value(iq).i32
+          = permutation_distance_circular_index(count1, src1.i16, src2.i16);
+        break;
+      case LUX_INT32:
+        scalar_value(iq).i32
+          = permutation_distance_circular_index(count1, src1.i32, src2.i32);
+        break;
+      case LUX_FLOAT:
+        scalar_value(iq).i32
+          = permutation_distance_circular_index(count1, src1.f, src2.f);
+        break;
+      case LUX_DOUBLE:
+        scalar_value(iq).i32
+          = permutation_distance_circular_index(count1, src1.d, src2.d);
+        break;
+      }
+    } else {                    // based on rank
+      switch (ct) {
+      case LUX_INT8:
+        scalar_value(iq).i32
+          = permutation_distance_circular_rank(count1, src1.ui8, src2.ui8);
+        break;
+      case LUX_INT16:
+        scalar_value(iq).i32
+          = permutation_distance_circular_rank(count1, src1.i16, src2.i16);
+        break;
+      case LUX_INT32:
+        scalar_value(iq).i32
+          = permutation_distance_circular_rank(count1, src1.i32, src2.i32);
+        break;
+      case LUX_FLOAT:
+        scalar_value(iq).i32
+          = permutation_distance_circular_rank(count1, src1.f, src2.f);
+        break;
+      case LUX_DOUBLE:
+        scalar_value(iq).i32
+          = permutation_distance_circular_rank(count1, src1.d, src2.d);
+        break;
+      }
     }
   } else {                      // linear permutations
     switch (ct) {
@@ -3753,7 +4049,7 @@ lux_permutationdistance(int32_t narg, int32_t ps[])
   }
   return iq;
 }
-REGISTER(permutationdistance, f, permutationdistance, 2, 2, "1circular", HAVE_LIBGSL);
+REGISTER(permutationdistance, f, permutationdistance, 2, 2, "1prank:3pindex", HAVE_LIBGSL);
 #endif
 
 #if HAVE_LIBGSL
@@ -3769,7 +4065,7 @@ REGISTER(permutationdistance, f, permutationdistance, 2, 2, "1circular", HAVE_LI
 ///
 /// \param[in,out] points at the LUX symbol number of the first argument.
 ///
-/// \returns the LUX symbol number of the result.
+/// \returns the LUX symbol number of the result.i
 int32_t
 lux_factorial(int32_t narg, int32_t ps[])
 {
@@ -3780,8 +4076,15 @@ lux_factorial(int32_t narg, int32_t ps[])
   if (numerical(ps[0], &dims, &ndim, &count, &src) < 0)
     return LUX_ERROR;
 
-  int32_t iq = array_scratch(LUX_DOUBLE, ndim, dims);
-  double* tgt = (double*) array_data(iq);
+  int32_t iq;
+  double* tgt;
+  if (count == 1) {
+    iq = scalar_scratch(LUX_DOUBLE);
+    tgt = &scalar_value(iq).d;
+  } else {
+    iq = array_scratch(LUX_DOUBLE, ndim, dims);
+    tgt = (double*) array_data(iq);
+  }
   switch (symbol_type(ps[0])) {
   case LUX_INT8:
     for (int i = 0; i < count; ++i) {

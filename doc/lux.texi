@@ -22915,7 +22915,8 @@ See also: @ref{Incidental Colors}, @ref{!pdev}, @ref{pdev}, @ref{xopen},
 
 Calculates the linear or circular permutation that corresponds to
 permutation number @code{@var{pn}} for @code{@var{count}} element and
-that is made up of the smallest possible non-negative integers.
+that is made up of the smallest possible non-negative integers.  For
+circular permutations, the greatest element is at the end.
 
 @code{@var{count}} must be nonnegative.  @code{@var{pn}} must be
 nonnegative and less than the possible number of permutations of
@@ -22940,8 +22941,6 @@ See also: @ref{factorial}, @ref{permutationnumber},
 
 @code{d = permutationdistance(@var{x1}, @var{x2} [, /prank, /pindex])}
 
-[GSL]
-
 Calculates the nonnegative Kendall tau distance between two
 permutations @code{@var{x1}} and @code{@var{x2}}.  The permutations
 must have the same number of elements.
@@ -22964,8 +22963,8 @@ first permutation into the second one, so 2 adjacent swaps suffice.
 
 If the number of elements is @var{n} then the distance is at most
 @code{n*(n - 1)/2 - 1} for linear permutations, and @code{(n - 1)*(n -
-2)/2 - 1} for circular permutations, unless that is less than 0 in
-which case 0 is returned.
+2)/2 - 1} for circular permutations.  If that maximum is less than 0
+then 0 is returned.
 
 Only the relative order of the elements is taken into account, so if
 we change the elements without changing their relative order then the
@@ -22984,7 +22983,7 @@ See also: @ref{permutation}, @ref{permutationnumber}
 @subsection permutationnumber
 @findex permutationnumber
 
-@code{permutationnumber(@var{x} [, /irank, /iindex] [, /prank, /pindex])}
+@code{permutationnumber(@var{x} [, /irank, /iindex, /prank, /pindex])}
 
 Calculates a nonnegative integer number that uniquely identifies the
 permutation (the relative order) of the elements of @code{@var{x}}.
@@ -22993,16 +22992,18 @@ Only the relative order is important, not the exact numerical values.
 There are assumed to be no duplicate values in @code{@var{x}}.
 
 By default or if @code{/irank} is specified, then the @code{@var{x}}
-are assumed to be data values, and the permutation is defined by the
+are assumed to be data values associated with objects identified by
+their position in the array, and the permutation is defined by the
 ranks of the values.  If each value is replaced by its rank (0 for the
 least element, 1 for the next greater element, and so on), then the
 permutation number remains the same.
 
 If @code{/iindex} is specified, then the @code{@var{x}} are assumed to
-be indexes of data values.  Indexes say in what order the elements
-should be taken to get ascending order.  If the data values are stored
-in @code{@var{data}}, then @code{@var{data}(@var{x})} produce values
-in ascending order.
+be labels that identify the objects at those positions in the array,
+and the permutation is defined by the indexes of the values.  Indexes
+say in what order the elements should be taken to get ascending order.
+If the data values are stored in @code{@var{data}}, then
+@code{@var{data}(@var{x})} produce values in ascending order.
 
 By default, the permutation is assumed to be linear.  If @code{/prank}
 or @code{/pindex} are specified, then the permutation is instead

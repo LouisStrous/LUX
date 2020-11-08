@@ -3275,8 +3275,8 @@ int32_t lux_commonfactors(int32_t narg, int32_t ps[]) {
 }
 REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 
-/// Returns a number that uniquely identifies the permutation of data values.
-/// The permutation is determined by the ranks of the values, so every
+/// Returns a number that uniquely identifies the linear permutation of data
+/// values.  The permutation is determined by the ranks of the values, so every
 /// three-element array with the first element the largest, the second element
 /// the smallest, and the third element the middle value is associated with the
 /// same permutation number, which is 4.  Any transformation of the values that
@@ -3602,10 +3602,10 @@ lux_permutationnumber(int32_t narg, int32_t ps[])
 REGISTER(permutationnumber, f, permutationnumber, 1, 1, "~1irank:1iindex:2prank:6pindex", HAVE_LIBGSL);
 #endif
 
-/// Return the "standard" permutation corresponding to a permutation number.
-/// The "standard" permutation is the one that consists of the smallest possible
-/// non-negative integer numbers.  The permutation with number 0 is the one
-/// consisting of ascending numbers from 0 through \f$n - 1\f$.
+/// Return the "standard" linear permutation corresponding to a permutation
+/// number.  The "standard" permutation is the one that consists of the smallest
+/// possible non-negative integer numbers.  The permutation with number 0 is the
+/// one consisting of ascending numbers from 0 through \f$n - 1\f$.
 ///
 /// The opposite function is permutation_number().
 ///
@@ -3655,8 +3655,9 @@ permutation(size_t permutationnumber, size_t n)
 
 /// Return the "standard" circular permutation corresponding to a permutation
 /// number.  The "standard" permutation is the one that consists of the smallest
-/// possible non-negative integer numbers.  The permutation with number 0 is the
-/// one consisting of ascending numbers from 0 through \f$n - 1\f$.
+/// possible non-negative integer numbers and that has the greatest element at
+/// the end.  The permutation with number 0 is the one consisting of ascending
+/// numbers from 0 through \f$n - 1\f$.
 ///
 /// The opposite functions are permutation_number_circular_index() and
 /// permutation_number_circular_rank().
@@ -3737,10 +3738,10 @@ lux_permutation(int32_t narg, int32_t ps[])
 REGISTER(permutation, f, permutation, 2, 2, "1circular");
 
 #if HAVE_LIBGSL
-/// Returns the Kendall tau distance between two permutations.  That distance is
-/// the number of inversions of adjacent elements that are needed to make the
-/// second permutation have the same relative order of elements as the first
-/// one.
+/// Returns the Kendall tau distance between two linear permutations.  That
+/// distance is the number of inversions of adjacent elements that are needed to
+/// make the second permutation have the same relative order of elements as the
+/// first one.
 ///
 /// Only elements within each permutation are compared with each other, so it is
 /// not necessary that both permutations contain the exact same elements.  For
@@ -3777,10 +3778,10 @@ permutation_distance(const std::vector<size_t>& r1,
 #endif
 
 #if HAVE_LIBGSL
-/// Returns the Kendall tau distance between two permutations of the same
-/// elements.  That distance is the number of inversions of adjacent elements
-/// that are needed to make the second permutation have the same relative order
-/// of elements as the first one.
+/// Returns the Kendall tau distance between two linear permutations.  That
+/// distance is the number of inversions of adjacent elements that are needed to
+/// make the second permutation have the same relative order of elements as the
+/// first one.
 ///
 /// Only the relative order of the elements in the two permutations is taken
 /// into account.  For example, the result remains the same if all elements of
@@ -3812,6 +3813,7 @@ permutation_distance(size_t n, const T* p1, const T* p2)
   // 2. calculate the number of inversions between r1 and r2
   return permutation_distance(r1, r2);
 }
+#endif
 
 #if HAVE_LIBGSL
 /// Returns the Kendall tau distance between two circular permutations based on
@@ -3868,11 +3870,12 @@ permutation_distance_circular_rank(const std::vector<size_t>& r1,
 }
 #endif
 
-/// Returns the Kendall tau distance between two circular permutations (based on
-/// rank) of the same elements.  That distance is the number of inversions of
-/// adjacent elements that are needed to make the second permutation have the
-/// same relative order of elements as the first one, when the circularity based
-/// on rank is also raken into account.
+#if HAVE_LIBGSL
+/// Returns the Kendall tau distance between two circular permutations based on
+/// rank.  That distance is the number of inversions of adjacent elements that
+/// are needed to make the second permutation have the same relative order of
+/// elements as the first one, when the circularity based on rank is also raken
+/// into account.
 ///
 /// Only the relative order of the elements in the two permutations is taken
 /// into account.  For example, the result remains the same if all elements of
@@ -3905,13 +3908,14 @@ permutation_distance_circular_rank(size_t n, const T* p1, const T* p2)
 
   return permutation_distance_circular_rank(r1, r2);
 }
+#endif
 
 #if HAVE_LIBGSL
-/// Returns the Kendall tau distance between two circular permutations (based on
-/// index) of the same elements.  That distance is the number of inversions of
-/// adjacent elements that are needed to make the second permutation have the
-/// same relative order of elements as the first one, when the circularity based
-/// on index is also raken into account.
+/// Returns the Kendall tau distance between two circular permutations based on
+/// index.  That distance is the number of inversions of adjacent elements that
+/// are needed to make the second permutation have the same relative order of
+/// elements as the first one, when the circularity based on index is also raken
+/// into account.
 ///
 /// Only the relative order of the elements in the two permutations is taken
 /// into account.  For example, the result remains the same if all elements of
@@ -3943,6 +3947,7 @@ permutation_distance_circular_index(size_t n, const T* p1, const T* p2)
 }
 #endif
 
+#if HAVE_LIBGSL
 /// \ingroup luxroutines
 ///
 /// Implements the `permutationdistance` function in LUX.

@@ -22911,7 +22911,7 @@ See also: @ref{Incidental Colors}, @ref{!pdev}, @ref{pdev}, @ref{xopen},
 @subsection permutation
 @findex permutation
 
-@code{p = permutation(@var{pn}, @var{count} [, /prank, /pindex]}
+@code{p = permutation(@var{pn}, @var{count} [, /circular]}
 
 Calculates the linear or circular permutation that corresponds to
 permutation number @code{@var{pn}} for @code{@var{count}} element and
@@ -22924,12 +22924,8 @@ nonnegative and less than the possible number of permutations of
 for linear permutations, and @code{factorial(@var{count - 1})} for
 circular permutations.
 
-If @code{/prank} or @code{/pindex} are specified then the permutation
-is circular, and otherwise linear.
-
-If @code{/prank} is specified, then the permutation is circular based
-on rank.  If @code{/pindex} is specified, then the permutation is
-circular based on index.  See @ref{permutationnumber}.
+If @code{/circular} is specified then the permutation is circular, and
+otherwise linear.
 
 See also: @ref{factorial}, @ref{permutationnumber},
 @ref{permutationdistance}
@@ -22939,7 +22935,8 @@ See also: @ref{factorial}, @ref{permutationnumber},
 @subsection permutationdistance
 @findex permutationdistance
 
-@code{d = permutationdistance(@var{x1}, @var{x2} [, /prank, /pindex])}
+@code{d = permutationdistance(@var{x1}, @var{x2} [, /rank_circular,
+        /index_circular])}
 
 Calculates the nonnegative Kendall tau distance between two
 permutations @code{@var{x1}} and @code{@var{x2}}.  The permutations
@@ -22949,12 +22946,13 @@ The Kendall tau distance is the count of swaps of adjacent elements
 that are needed to make the relative order of the permutations
 identical.
 
-if @code{/prank} or @code{/pindex} are specified, then the permutation
-is circular, and otherwise it is linear.
+if @code{/rank_circular} or @code{/index_circular} are specified, then
+the permutation is circular, and otherwise it is linear.
 
-If @code{/prank} is specified, then the permutation is circular based
-on rank.  If @code{/pindex} is specified, then the permutation is
-circular based on index.  See @ref{permutationnumber}.
+If @code{/rank_circular} is specified, then the permutation is
+circular based on rank.  If @code{/index_circular} is specified, then
+the permutation is circular based on index.  See
+@ref{permutationnumber}.
 
 For example, @samp{permutationdistance([7, 2, 5, 8], [7, 8, 2, 5])}
 returns @samp{2}, because first swapping elements @samp{5} and
@@ -22983,7 +22981,7 @@ See also: @ref{permutation}, @ref{permutationnumber}
 @subsection permutationnumber
 @findex permutationnumber
 
-@code{permutationnumber(@var{x} [, /irank, /iindex, /prank, /pindex])}
+@code{permutationnumber(@var{x} [, /rank_circular, /index_circular])}
 
 Calculates a nonnegative integer number that uniquely identifies the
 permutation (the relative order) of the elements of @code{@var{x}}.
@@ -22991,28 +22989,15 @@ Only the relative order is important, not the exact numerical values.
 
 There are assumed to be no duplicate values in @code{@var{x}}.
 
-By default or if @code{/irank} is specified, then the @code{@var{x}}
-are assumed to be data values associated with objects identified by
-their position in the array, and the permutation is defined by the
-ranks of the values.  If each value is replaced by its rank (0 for the
-least element, 1 for the next greater element, and so on), then the
-permutation number remains the same.
-
-If @code{/iindex} is specified, then the @code{@var{x}} are assumed to
-be labels that identify the objects at those positions in the array,
-and the permutation is defined by the indexes of the values.  Indexes
-say in what order the elements should be taken to get ascending order.
-If the data values are stored in @code{@var{data}}, then
-@code{@var{data}(@var{x})} produce values in ascending order.
-
-By default, the permutation is assumed to be linear.  If @code{/prank}
-or @code{/pindex} are specified, then the permutation is instead
-assumed to be @emph{circular}.  If @code{/prank} is specified, then
-the permutation is assumed circular based on rank, which means that
-the greatest element is also adjacent to the least element.  If
-@code{/pindex} is specified, then the permutation is assumed circular
-based on index, which means that the last element is also adjacent to
-the first element.
+By default, the permutation is assumed to be linear.  If
+@code{/rank_circular} or @code{/index_circular} are specified, then
+the permutation is instead assumed to be @emph{circular}.  If
+@code{/rank_circular} is specified, then the permutation is assumed
+circular based on rank, which means that the greatest element is also
+adjacent to the least element.  If @code{/index_circular} is
+specified, then the permutation is assumed circular based on index,
+which means that the last element is also adjacent to the first
+element.
 
 An example for circular permutations based on rank: Some objects were
 measured to be in directions given by angles of @code{[210, 355, 140,

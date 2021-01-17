@@ -1,3 +1,5 @@
+#ifndef INCLUDED_GSLPP_SORT_VECTOR_HH
+#define INCLUDED_GSLPP_SORT_VECTOR_HH
 #include "config.h"
 #if HAVE_LIBGSL
 # include <gsl/gsl_sort_vector.h>
@@ -13,7 +15,7 @@
 /// related functions the same name.  This file provides such definitions, so
 /// that you can use the GSL function name without a type indication also for
 /// data types other than `double`.
-
+///
 /// All `void gsl_sort_vector2_T(gsl_vector_T* v1, gsl_vector_T* v2)` GSL
 /// functions are available under the name `gsl_sort_vector2`, which is the GSL
 /// function name when `T` = `double`.
@@ -78,4 +80,5 @@ gsl_sort_vector2(gsl_vector_long_double* v1, gsl_vector_long_double* v2)
   return gsl_sort_vector2_long_double(v1, v2);
 }
 
+#endif
 #endif

@@ -31,7 +31,7 @@ EXTRA_DIST += Doxyfile
 
 all-local: doxyfile.stamp
 
-doxyfile.stamp: Doxyfile $(top_builddir)/src/liblux.a
+doxyfile.stamp: Doxyfile $(top_builddir)/src/liblux.a Doxyfile.in
 	$(DOXYGEN) Doxyfile
 	touch doxyfile.stamp
 

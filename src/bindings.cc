@@ -1626,7 +1626,7 @@ lux_i_idpdp_iarp2q_011_f_(int32_t narg, int32_t ps[],
 
 // The LUX subroutine arguments are:
 
-// 1. an `double` input/output scalar or array of arbitrary
+// 1. a `double` input/output scalar or array of arbitrary
 // dimensions.  It must be a named variable.
 
 // 2. optionally, an input scalar or array of arbitrary dimensions,

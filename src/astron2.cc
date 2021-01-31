@@ -22,20 +22,29 @@
 /// The calculations are based on the NASA JPL DE431 ephemeris, and use the
 /// IMCCE CALCEPH and IAU SOFA libraries.
 
-#include <calceph.h>
+// standard includes
+
 #include <cmath>                // for std::nan
 #include <vector>
 
+// feature configuration include
+
 #include "config.h"
 
-#include "action.hh"
+// libraries
+
+#include <calceph.h>
 #if HAVE_LIBSOFA_C
 # include "sofa.h"
 #endif
 
+// own includes
+
+#include "AstronomicalConstants.hh"
+#include "action.hh"
+
 const double DEGREE_PER_RAD = 180/M_PI;
 const double RAD_PER_DEGREE = M_PI/180;
-const double J2000 = 2451545.0; // Julian Day Number of J2000.0
 
 /// Translate a LUX celestial object number to a CALCEPH/NAIF celestial object
 /// number.
@@ -86,7 +95,6 @@ astropos(double JD, int target_object, int observer_object, double xyz[3])
 {
   // got de431t.bsp from ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp
 #if HAVE_LIBCALCEPH
-  const double AU_m = 149'597'870'700; // 1 AU in meters
   static t_calcephbin* de431 = NULL;
   if (!de431)                   // TODO: make filename configurable
     de431 = calceph_open(expand_name("~/data/de431t.bsp", NULL));
@@ -107,7 +115,7 @@ astropos(double JD, int target_object, int observer_object, double xyz[3])
                              CALCEPH_UNIT_KM + CALCEPH_UNIT_SEC, posvel)) {
       // got km, convert to AU
       for (int i = 0; i < 3; ++i)
-        xyz[i] = posvel[i]*1e3/AU_m;
+        xyz[i] = posvel[i]*1e3/AstronomicalConstants::AU_m;
     }
   } else {
     // retrieval failed.  Return NaNs.
@@ -201,7 +209,7 @@ lux_astron2(int32_t narg, int32_t ps[])
         return cerror(NEED_SCAL, ps[3]);
       JD_equinox = *ptr.d;
     } else {
-      JD_equinox = J2000;
+      JD_equinox = AstronomicalConstants::J2000;
     }
   }
 

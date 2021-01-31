@@ -28,13 +28,16 @@
 /// A namespace containing astronomical constants.
 namespace AstronomicalConstants {
   /// The Astronomical Unit measured in meters.
-  const double AU_m = 149597870700.;
+  const double AU_m = 149'597'870'700;
 
   /// The equatorial radius of the Earth measured in meters.
-  const double Earth_equatorial_radius_m = 6378137;
+  const double Earth_equatorial_radius_m = 6'378'137;
 
   /// The dimensionless flattening of the Earth.
   const double Earth_flattening = 1/298.257223563;
+
+  /// The Julian Day corresponding to the J2000.0 epoch.
+  const double J2000 = 2'451'545;
 };
 
 #endif

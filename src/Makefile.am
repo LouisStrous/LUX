@@ -138,6 +138,8 @@ nonbind_sources = \
 	replacements.h\
 	sincos.cc\
 	site.cc\
+	SolarSystemEphemerides.cc\
+	SolarSystemEphemerides.hh\
 	sort.cc\
 	strous.cc\
 	strous2.cc\

@@ -1738,6 +1738,11 @@ void register_the_bindings()
   register_lux_s(lux_commonfactors, "commonfactors", 3, 4, NULL);
 
 #if HAVE_LIBGSL
+  int32_t lux_planetpermutationchanges(int32_t, int32_t []);
+  register_lux_f(lux_planetpermutationchanges, "planetpermutationchanges", 3, 3, NULL);
+#endif
+
+#if HAVE_LIBGSL
   int32_t lux_permutationnumber(int32_t, int32_t []);
   register_lux_f(lux_permutationnumber, "permutationnumber", 1, 1, "0rank:1index:0linear:2circular");
 #endif

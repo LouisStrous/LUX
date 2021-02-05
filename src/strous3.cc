@@ -43,6 +43,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>              // for errno
 #include <float.h>
 #include <functional>
+#include <list>
 #include <math.h>
 #include <numeric>
 #include <stdio.h>
@@ -63,6 +64,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <gslpp_sort_vector.hh> // for gsl_sort_vector
 #include <gslpp_vector.hh>
 #include "permutations.hh"
+#include "SolarSystemEphemerides.hh"
 
 /// \ingroup luxroutines
 ///
@@ -3287,6 +3289,353 @@ int32_t lux_commonfactors(int32_t narg, int32_t ps[]) {
 }
 REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 
+
+#if HAVE_LIBGSL
+struct PermutationChangeInterval
+{
+  double tmin;
+  double tmax;
+  size_t change_count;
+  int object1;
+  int object2;
+};
+
+/// Returns the absolute difference between two values of the same type, even if
+/// that type is unsigned.
+///
+/// \tparam T is the data type.  It must support `operator-()` and
+/// `operator<()`.
+///
+/// \param x1 is one value to compare.
+///
+/// \param x2 is the other value to compare.
+///
+/// \returns the absolute difference.
+template<typename T>
+T abs_diff(T x1, T x2)
+{
+  return x1 < x2? x2 - x1: x1 - x2;
+}
+
+struct PermutationChange {
+  PermutationChange(double a_t, double a_object1, double a_object2,
+                    size_t a_final_permutation)
+    : t(a_t), object1(a_object1), object2(a_object2),
+      final_permutation(a_final_permutation)
+  { }
+
+  double t;
+  int object1;
+  int object2;
+  size_t final_permutation;
+};
+
+/// Locate values of the independent coordinate (here denoted `t`) at which the
+/// circular rank permutation of objects changes.
+///
+/// The used algorithm may fail to locate some relevant values of `t` if some of
+/// the objects pass each other more than once during the searched interval.
+///
+/// \param f is a function object or a pointer to a function of `t` that
+/// produces the positions ("angles") that define the permutation, one position
+/// for each object.
+///
+/// \param period is the maximum value at which the positions wrap around.  The
+/// positions must be between 0 (inclusive) and \a period (exclusive).
+///
+/// \param tmin is the beginning of the interval of `t` to search.
+///
+/// \param tmax is the end of the interval of `t` to search.
+///
+/// \returns a vector of PermutationChange that reports the values of `t` at
+/// which the permutation changes, and the 0-based indexes (in ascending order)
+/// of the two objects that switch places at that time.
+template<typename FuncType>
+std::vector<PermutationChange>
+find_permutation_changes(FuncType f, double period, double tmin, double tmax)
+{
+  std::vector<PermutationChange> ts;
+
+  std::vector<double> vmin = f(tmin);
+
+  if (vmin.size() < 2)          // cannot detect changes
+    return ts;
+
+  std::vector<double> vmax = f(tmax);
+  size_t dtot = permutation_distance_circular_rank(vmin, vmax);
+  if (!dtot) {
+    return ts;                  // no permutation changes
+  }
+  if (dtot > 0) {
+    // locate intervals with a single permutation change
+
+    std::list<PermutationChangeInterval> intervals;
+    PermutationChangeInterval pci;
+    pci.tmin         = tmin;
+    pci.tmax         = tmax;
+    pci.change_count = dtot;
+    intervals.push_back(pci);
+
+    while (1) {
+      bool bad = false;
+      for (auto it = intervals.begin(); it != intervals.end(); ) {
+        switch (it->change_count) {
+        case 0:                 // no permutation change: remove
+          it = intervals.erase(it);
+          break;
+        case 1:                 // single permutation change: ok
+          ++it;
+          break;
+        default:                // too many permutation changes: split
+          pci.tmin = it->tmin;
+          pci.tmax = (it->tmin + it->tmax)/2;
+          it->tmin = pci.tmax;
+          vmin = f(pci.tmin);
+          vmax = f(pci.tmax);
+          pci.change_count = permutation_distance_circular_rank(vmin, vmax);
+          if (pci.change_count > 0) {
+            intervals.insert(it, pci);
+            if (pci.change_count != 1)
+              bad = true;
+            std::swap(vmin, vmax);
+            vmax = f(it->tmax);
+            it->change_count = permutation_distance_circular_rank(vmin, vmax);
+            if (it->change_count == 0) {
+              it = intervals.erase(it);
+            } else if (it->change_count != 1) {
+              bad = true;
+              ++it;
+            }
+          } else {
+            bad = true;
+            ++it;
+          }
+          break;
+        }
+      }
+      if (!bad)
+        break;
+    }
+    // Now intervals is a list in which every element has .change_count == 1.
+    // Figure out which two objects switch places during each interval
+    for (auto it = intervals.begin(); it != intervals.end(); ++it) {
+      vmin = f(it->tmin);
+      std::vector<size_t> rmin = sort_rank(vmin);
+      rotate_ranks_greatest_at_end(rmin);
+
+      vmax = f(it->tmax);
+      std::vector<size_t> rmax = sort_rank(vmax);
+      rotate_ranks_greatest_at_end(rmax);
+
+      // with three elements there are only two distinct circular permutations,
+      // so it is impossible to say which two elements switched places.
+
+      // with four or more elements, if the switching pair does not include the
+      // last element (case A):
+
+      // (Note that all but the last of the elements may be shuffled randomly
+      // compared to the example.)
+
+      // 0 - 1 - 2 - 3
+      // 1 - 0 - 2 - 3
+      // only two items differ; they differ by 1
+
+      // if the switching pair consists of the largest two ranks (case B):
+
+      // 0 - 1 - 2 - 3
+      // 0 - 1 - 3 - 2 gets rotated to
+      // 1 - 2 - 0 - 3
+      // the last item is the same, one item differs by n − 1, the rest differs
+      // by 1
+
+      // if the switching pair consists of the greatest and smallest ranks (case
+      // C):
+
+      // 0 - 1 - 2 - 3
+      // 3 - 1 - 2 - 0 gets rotated to
+      // 2 - 0 - 1 - 3
+      // the last item is the same, one item differs by n − 1, the rest differs
+      // by 1
+
+      if (rmin.size() > 2) {
+        size_t ix;
+        for (ix = 0; ix != rmin.size(); ++ix) {
+          if (abs_diff(rmin[ix], rmax[ix]) > 1) {
+            break;
+          }
+        }
+        if (ix == rmin.size()) { // case A
+          for (ix = 0; ix != rmin.size(); ++ix) {
+            if (abs_diff(rmin[ix], rmax[ix]) == 1) {
+              it->object1 = ix;
+              break;
+            }
+          }
+          for (++ix; ix != rmin.size(); ++ix) {
+            if (abs_diff(rmin[ix], rmax[ix]) == 1) {
+              it->object2 = ix;
+              break;
+            }
+          }
+        } else {                // case B or C
+          it->object1 = ix;
+          it->object2 = rmin.size() - 1;
+        }
+      } else {                  // 2 items
+        // TODO: can we handle this case better?
+        return ts;
+      } // end if (rmin.size() > 2)
+
+      // Now we know which two items switched places.  We locate the time of
+      // conjunction based on the difference in their positions.
+
+      auto getd = [&](double t) -> double {
+        auto v = f(t);
+        return fasmod(v[it->object1] - v[it->object2], period);
+      };
+
+      // determine the final permutation number
+      size_t pmax = permutation_number_circular_rank(vmax);
+
+      auto dmin = getd(it->tmin);
+      auto dmax = getd(it->tmax);
+      size_t count = 0;
+      while (1) {
+        // the switch occurs sometime between tmin and tmax
+        auto test = (dmax*it->tmin - dmin*it->tmax)
+                   /(dmax          - dmin         );
+        if (test < it->tmin || test > it->tmax) {
+          // the estimate is outside the bracket; bisect instead
+          test = (it->tmin + it->tmax)/2;
+        }
+        if (++count > 20) {
+          // we're likely in some kind of loop; abort
+          ts.push_back(PermutationChange(test, it->object1, it->object2, pmax));
+          break;
+        }
+        auto dest = getd(test);
+        if (dmin*dest < 0) {
+          // the target time is between tmin and test
+          if (test == it->tmax) {
+            // we cannot improve anymore
+            ts.push_back(PermutationChange(test, it->object1, it->object2,
+                                           pmax));
+            break;
+          }
+          // see if we can tighten tmin, too
+          auto test2 = 2*test - it->tmax;
+          if (test2 > it->tmin) {
+            auto dest2 = getd(test2);
+            if (dest2*dmin > 0) {
+              it->tmin = test2;
+              dmin = dest2;
+            }
+          }
+          it->tmax = test;
+          dmax = dest;
+        } else if (dest*dmax < 0) {
+          // the target time is between test and tmax
+          if (test == it->tmin) {
+            // we cannot improve anymore
+            ts.push_back(PermutationChange(test, it->object1, it->object2,
+                                           pmax));
+            break;
+          }
+          // see if we can tighten tmax, too
+          auto test2 = 2*test - it->tmin;
+          if (test2 < it->tmax) {
+            auto dest2 = getd(test2);
+            if (dest2*dmax > 0) {
+              it->tmax = test2;
+              dmax = dest2;
+            }
+          }
+          it->tmin = test;
+          dmin = dest;
+        } else {
+          // we cannot improve anymore
+          ts.push_back(PermutationChange(test, it->object1, it->object2, pmax));
+          break;
+        }
+        if ((it->tmax - it->tmin) < std::max(it->tmax, it->tmin)
+            * 2*std::numeric_limits<double>::epsilon()) {
+          // we likely cannot improve anymore
+          ts.push_back(PermutationChange(test, it->object1, it->object2, pmax));
+          break;
+        }
+      }
+    } // end for (auto it = intervals.begin(); it != intervals.end(); ++it)
+  } // end if (dtot > 0)
+  return ts;
+}
+
+/// Implements the LUX function
+///
+///     jds = planetpermutationchanges(jd1, jd2, planets)
+///
+/// which calculates Julian Day numbers at which any two of the planets
+/// (specified as for LUX function `astron`) have the same ICRS ecliptic
+/// longitude.
+///
+/// \param narg is the number of LUX arguments
+///
+/// \param ps points at the sequence of LUX arguments
+///
+/// \returns the LUX symbol representing the result.
+int32_t
+lux_planetpermutationchanges(int32_t narg, int32_t ps[])
+{
+  double t1 = double_arg(ps[0]);
+  double t2 = double_arg(ps[1]);
+  int32_t nelem;
+  Pointer src;
+  if (numerical(ps[2], NULL, NULL, &nelem, &src) < 0) {
+    return LUX_ERROR;
+  }
+
+  SolarSystemEphemerides sse;
+  sse
+    .set_coordinate_system(SolarSystemEphemerides::CoordinateSystem::Ecliptic);
+
+  auto gl = [&](double JD){
+    std::vector<double> l(nelem);
+    std::transform(src.i32, src.i32 + nelem, l.begin(),
+                   [&](int32_t o){
+                     auto sso = static_cast<SolarSystemObject>(o);
+                     auto polar = sse.polar_geocentric(JD, sso);
+                     return polar[0];
+                   });
+    return l;
+  };
+
+  std::vector<PermutationChange> pc
+    = find_permutation_changes(gl, 2*M_PI, t1, t2);
+
+  int32_t size = pc.size();
+  int32_t iq;
+  if (size > 0) {
+    int32_t dims[2];
+    dims[0] = 4;
+    dims[1] = size;
+    iq = array_scratch(LUX_DOUBLE, 2, dims);
+    Pointer tgt;
+    tgt.v = array_data(iq);
+    for (auto it = pc.begin(); it != pc.end(); ++it) {
+      *tgt.d++ = it->t;
+      *tgt.d++ = it->object1;
+      *tgt.d++ = it->object2;
+      *tgt.d++ = it->final_permutation;
+    }
+  } else {
+    iq = LUX_MINUS_ONE;
+  }
+  return iq;
+}
+REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, NULL, HAVE_LIBGSL);
+#endif
+
+// iD;iL*?;rL{1} → iiarx
+// lux_i_sd_iiarx_<ptrspec>_f_
 #if HAVE_LIBGSL
 /// Implements the LUX `permutationnumber` function.
 ///

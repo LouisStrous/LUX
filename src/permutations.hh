@@ -529,11 +529,11 @@ permutation_distance_circular_rank(size_t n, const T* v1, const T* v2)
     return 0;
 
   size_t d_min = std::numeric_limits<size_t>::max();
-  std::vector<T> r1(v1, v1 + n);  // copy that we can modify
-  std::vector<T> r2(v2, v2 + n);
+  std::vector<size_t> r1 = sort_rank(v1, 1, n); // get the ranks
+  std::vector<size_t> r2 = sort_rank(v2, 1, n);
   for (size_t i1 = 0; i1 < n; ++i1) {
     for (size_t i2 = 0; i2 < n; ++i2) {
-      size_t d = permutation_distance_linear_rank<T>(r1, r2);
+      size_t d = permutation_distance_linear_rank(r1, r2);
       if (d < d_min)
         d_min = d;
 

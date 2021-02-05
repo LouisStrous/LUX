@@ -11,20 +11,21 @@
 /// \file
 /// C++ GSL bindings for gsl_sort.h.
 ///
-/// Many GSL functions are available for different data types (`unsigned char`,
-/// `short`, `int`, `long`, `float`, `double`, sometimes `long double`).
-/// Because GSL is implemented in C, each of those related functions has a
-/// different name which includes an indication of the data type, except that
-/// that indication is omitted if the data type is `double`.  In C++ it is
-/// possible to give those related functions the same name.  This file provides
-/// such definitions, so that you can use the GSL function name without a type
-/// indication also for data types other than `double`.
+/// Many [GNU Scientific Library](https://www.gnu.org/software/gsl/) (GSL)
+/// functions are available for different data types (`unsigned char`, `short`,
+/// `int`, `long`, `float`, `double`, sometimes `long double`).  Because GSL is
+/// implemented in C, each of those related functions has a different name which
+/// includes an indication of the data type, except that that indication is
+/// omitted if the data type is `double`.  In C++ it is possible to give those
+/// related functions the same name.  This file provides such definitions, so
+/// that you can use the GSL function name without a type indication also for
+/// data types other than `double`.
 ///
 /// All `void gsl_sort_T_index(size_t* p, const T* data, size_t stride, size_t
 /// n)` GSL functions are made available here under the name `gsl_sort_index`,
 /// which is the original GSL function name when `T` = `double`.  Additionally,
 /// `std::vector<size_t> sort_index(const T* data, size_t stride, size_t n)` and
-/// `std::vector<size_t> sort_index(const std::vector<T> data)` are made
+/// `std::vector<size_t> sort_index(const std::vector<T>& data)` are made
 /// available, which do the same as `gsl_sort_index()` but based on
 /// `std::vector`.
 

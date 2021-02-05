@@ -123,6 +123,8 @@ nonbind_sources = \
 	output.cc\
 	output.hh\
 	paerror.cc\
+	permutations.cc\
+	permutations.hh\
 	plots.cc\
 	poisson.cc\
 	post.cc\

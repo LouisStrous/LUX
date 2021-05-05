@@ -1425,6 +1425,10 @@ int32_t lux_for(int32_t nsym)
      break;
  }
  temp = for_body(nsym);                 // body
+ // The for-loop may have many iterations.  To avoid loss of precision if the
+ // counter is of a floating point type, we then treat the counter using Kahan
+ // summation.
+ Scalar compensation;
  // initialize counter with start value
  switch (hiType) {
    case LUX_INT8:
@@ -1441,9 +1445,11 @@ int32_t lux_for(int32_t nsym)
      break;
    case LUX_FLOAT:
      *counter.f = start.f;
+     compensation.f = 0;
      break;
    case LUX_DOUBLE:
      *counter.d = start.d;
+     compensation.d = 0;
      break;
  }
  // check if the end criterion is already met (n = 0) or not (n = 1)
@@ -1668,7 +1674,13 @@ int32_t lux_for(int32_t nsym)
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.f += inc.f;
+         // increase counter using Kahan summation
+         {
+           float c = inc.f - compensation.f;
+           float t = *counter.f + c;
+           compensation.f = (t - *counter.f) - c;
+           *counter.f = t;
+         }
          n = forward? (*counter.f > end.f? 0: 1): (*counter.f < end.f? 0: 1);
        }
      else
@@ -1685,7 +1697,13 @@ int32_t lux_for(int32_t nsym)
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.f += inc.f;
+         // increase counter using Kahan summation
+         {
+           float c = inc.f - compensation.f;
+           float t = *counter.f + c;
+           compensation.f = (t - *counter.f) - c;
+           *counter.f = t;
+         }
          n = forward? (*counter.f > end.f? 0: 1): (*counter.f < end.f? 0: 1);
        }
      break;
@@ -1707,7 +1725,13 @@ int32_t lux_for(int32_t nsym)
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.d += inc.d;
+         // increase counter using Kahan summation
+         {
+           double c = inc.d - compensation.d;
+           double t = *counter.d + c;
+           compensation.d = (t - *counter.d) - c;
+           *counter.d = t;
+         }
          n = forward? (*counter.d > end.d? 0: 1): (*counter.d < end.d? 0: 1);
        }
      else
@@ -1724,7 +1748,13 @@ int32_t lux_for(int32_t nsym)
            case LOOP_RETALL: case LOOP_RETURN:
              return n;
          }
-         *counter.d += inc.d;
+         // increase counter using Kahan summation
+         {
+           double c = inc.d - compensation.d;
+           double t = *counter.d + c;
+           compensation.d = (t - *counter.d) - c;
+           *counter.d = t;
+         }
          n = forward? (*counter.d > end.d? 0: 1): (*counter.d < end.d? 0: 1);
        }
      break;

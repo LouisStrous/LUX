@@ -239,12 +239,12 @@ LoopInfo::advanceLoop(Pointer *ptr)
 {
   int32_t       i, done;
 
-  // advance pointer
-  ptr->ui8 += this->step[this->advanceaxis]*this->stride;
-
   if (this->advanceaxis >= this->rndim)         // already done
     done = this->rndim;
   else {
+    // advance pointer
+    ptr->ui8 += this->step[this->advanceaxis]*this->stride;
+
     done = this->advanceaxis;   // default: not done yet
 
     // update coordinates
@@ -601,12 +601,8 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
         for (i = 0; i < j; i++)
           newvalues[i] = axes[newIndexToOld[i]];
         memcpy(axes, newvalues, j*sizeof(*axes));
-        naxes = j;
-      } else {
-        // there are no axes left; add an axis equal to 0
-        axes[0] = 0;
-        naxes = 1;
       }
+      naxes = j;
     }
   }
 

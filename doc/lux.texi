@@ -5634,6 +5634,11 @@ LUX>FOR i = 1,5 T,i*i
 LUX>
 @end example
 
+Only numerical, non-complex, scalar loop variables are allowed.  If
+the loop variable is of a floating-point type, then it gets
+incremented using Kahan summation, which guards against loss of
+precision when repeatedly adding small increments to a large value.
+
 @c ------------------------------------------------------------------
 @node REPEAT Statement, WHILE-DO Statement, FOR Statement, Statements
 @comment  node-name,  next,  previous,  up

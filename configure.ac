@@ -42,6 +42,27 @@ AC_CHECK_LIB([X11], [XOpenDisplay])
 AC_CHECK_LIB([readline], [readline])
 AC_CHECK_LIB([sofa_c], [iauBi00])
 AC_CHECK_LIB([calceph], [calceph_open])
+
+# Check for a C++ library that doesn't export any function with C binding.
+# Complicated!
+AC_MSG_CHECKING([for OIIO::TypeDesc in -lOpenImageIO])
+AC_LANG_PUSH([C++])
+SAVED_LDFLAGS=$LDFLAGS
+LDFLAGS="$LDFLAGS -lOpenImageIO"
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <OpenImageIO/imageio.h>],
+                   [OIIO::TypeDesc x])],
+  [TEST_LIBS="$TEST_LIBS -lOpenImageIO"]
+  [AC_DEFINE(
+    [HAVE_LIBOPENIMAGEIO],
+    [1],
+    [Define to 1 if you have the 'OpenImageIO' library (-lOpenImageIO).]
+  )]
+  [AC_MSG_RESULT([yes])],
+  [AC_MSG_RESULT([no])]
+  LDFLAGS=$SAVED_LDFLAGS)
+AC_LANG_POP([C++])
+
 AC_CHECK_LIB([CppUTest], [cpputest_malloc],
   [AC_DEFINE(
     [HAVE_LIBCPPUTEST],
@@ -83,7 +104,6 @@ AC_REPLACE_FUNCS([sincos])
 AC_SUBST([CPPUTESTLIBS])
 
 AC_CONFIG_FILES([Makefile
-                 historicephemerides/Makefile
                  src/Makefile
                  src/fonts/Makefile
                  doc/Makefile

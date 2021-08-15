@@ -438,7 +438,7 @@ static int32_t rdct(int16_t* image, int32_t nx, int32_t ny, int32_t nblocks,
  float z5, z11, z13, z10, z12;
 
  // first de-zag and de-quantize
- { register float *wsptr;
+ { float *wsptr;
   short         *dctptr;
   wsptr = ws;        dctptr = dctstart;
   for (i=0; i < 64; i++) {
@@ -449,8 +449,8 @@ static int32_t rdct(int16_t* image, int32_t nx, int32_t ny, int32_t nblocks,
   /* we don't check for columns of zeroes since this usually uses full
   precision */
   {
-  register float *wsptr = ws;
-  // register float *fqtptr = fqtbl;
+  float *wsptr = ws;
+  // float *fqtptr = fqtbl;
   int32_t        nq = 8;
   while (nq--) {
     tmp0 = wsptr[0];
@@ -507,8 +507,8 @@ static int32_t rdct(int16_t* image, int32_t nx, int32_t ny, int32_t nblocks,
 
   // Pass 2: process rows.
   {
-  register float *wsptr;
-  register short *elemptr;
+  float *wsptr;
+  short *elemptr;
   int32_t        nq = 8;
   wsptr = ws;        elemptr = start;
   while (nq--) {

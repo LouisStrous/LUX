@@ -413,7 +413,7 @@ int32_t ephem_setup(int32_t narg, int32_t ps[])
  int32_t        nsym, result_sym, j, nd, n, iy;
  float        day;
  struct        ahead        *h;
- register union        types_ptr q1,q3;
+ union        types_ptr q1,q3;
 
  // first arg is the day, can be scalar or array
  nsym= ps[0];

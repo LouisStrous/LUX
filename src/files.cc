@@ -2631,7 +2631,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
           if (type == LUX_TEMP_STRING) {
             undefine(*ps);
             symbol_class(*ps) = LUX_STRING;
-            string_type(*ps) = LUX_TEMP_STRING;
+            sym_string_type(*ps) = LUX_TEMP_STRING;
             symbol_memory(*ps) = 1;
             string_value(*ps) = (char*) malloc(1);
             trgt.s = string_value(*ps);
@@ -5426,9 +5426,9 @@ int32_t lux_hex(int32_t narg, int32_t ps[])
  */
 {
   FILE        *fp;
-  register int32_t        nelem;
-  register union types_ptr p1;
-  register int32_t        j;
+  int32_t        nelem;
+  union types_ptr p1;
+  int32_t        j;
   int32_t i,k,iq,jq,flag=0;
   char        *ptr;
 

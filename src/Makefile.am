@@ -19,8 +19,9 @@
 
 SUBDIRS = fonts
 
-AM_CPPFLAGS = -Werror -include everywhere.hh \
-  -I$(top_srcdir)/historicephemerides
+#AM_CPPFLAGS = -Werror -include everywhere.hh \
+#  -I$(top_srcdir)/historicephemerides
+AM_CPPFLAGS = -Werror
 
 AM_YFLAGS = -d
 ACLOCAL_AMFLAGS = -I m4
@@ -31,6 +32,7 @@ nonbind_sources = \
 	Bytestack.hh\
 	Ellipsoid.cc\
 	Ellipsoid.hh\
+	FloatingPointAccumulator.hh\
 	GnuPlot.cc\
 	GnuPlot.hh\
 	MonotoneInterpolation.cc\
@@ -111,13 +113,13 @@ nonbind_sources = \
 	lux_structures.hh\
 	luxcon.cc\
 	luxdefs.hh\
-	luxhistoricephemerides.cc\
 	luxparser.hh\
 	luxparser.yy\
 	luxsofa.cc\
 	matrix.cc\
 	memck.cc\
 	menu.cc\
+	oiio.cc\
 	once.hh\
 	orientation.cc\
 	output.cc\
@@ -166,9 +168,7 @@ nonbind_sources = \
 
 bin_PROGRAMS = lux
 lux_SOURCES = lux.cc
-lux_LDADD = \
-	liblux.a\
-	$(top_builddir)/historicephemerides/libhistoricephemerides_c.a
+lux_LDADD = liblux.a
 
 #lux$(EXEEXT): $(top_builddir)/historicephemerides/libhistoricephemerides_c.a
 

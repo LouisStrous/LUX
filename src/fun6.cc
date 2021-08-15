@@ -36,7 +36,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
   /* we don't check for columns of zeroes since this usually uses full
      precision */
 {
-  register float *wsptr = ws;
+  float *wsptr = ws;
   int32_t        nq = 8;
 
   while (nq--) {
@@ -95,8 +95,8 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
 
   // Pass 2: process rows.
 {
-  register float *wsptr;
-  register short *elemptr;
+  float *wsptr;
+  short *elemptr;
   int32_t        nq = 8;
 
   wsptr = ws;
@@ -449,7 +449,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
     nc = 8;        // the 8 rows
     while (nc--) {
     // get a point to left of cell if available
-    if (ix) { p--;        
+    if (ix) { p--;
             a2 = (int32_t)*p++;
             a1 = (int32_t)*p++;
             a2 = a2 + a1;
@@ -552,8 +552,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
     switch (type) {
       case LUX_INT8:
         if (iorder < 4) {
-          register  uint8_t *pp, *qq;
-          register  int32_t  nn, mm, nxx, inc;
+          uint8_t *pp, *qq;
+          int32_t  nn, mm, nxx, inc;
 
           nxx = nx;
           mm = ny;
@@ -596,8 +596,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
               break;
           }
         } else {
-          register  uint8_t *pp, *qq;
-          register  int32_t  nn, mm, nyy, inc;
+          uint8_t *pp, *qq;
+          int32_t  nn, mm, nyy, inc;
 
           mm = ny;
           qq = q;
@@ -636,8 +636,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
         break;
       case LUX_INT16:
         if (iorder < 4) {
-          register  short *pp, *qq;
-          register  int32_t  nn, mm, nxx, inc;
+          short *pp, *qq;
+          int32_t  nn, mm, nxx, inc;
 
           nxx = nx;
           mm = ny;
@@ -680,8 +680,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
               break;
           }
         } else {
-          register  short *pp, *qq;
-          register  int32_t  nyy, nn, mm;
+          short *pp, *qq;
+          int32_t  nyy, nn, mm;
 
           switch (iorder) {
             case 4:                // transpose in x and y
@@ -713,15 +713,15 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
               *qq++ = *pp;
               pp += nyy;
               nn--;
-            }        
+            }
             pp += inc;
           }
         }
         break;
       case LUX_INT32:
         if (iorder < 4) {
-          register  int32_t *pp, *qq;
-          register  int32_t  nn, mm, nxx;
+           int32_t *pp, *qq;
+           int32_t  nn, mm, nxx;
 
           nxx = nx;
           mm = ny;
@@ -730,8 +730,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
           switch (iorder) {
             case 1:                // reverse in x
             {
-              register  int32_t *pp = (int32_t *) p + nx;
-              register  int32_t inc = 2*nx;
+               int32_t *pp = (int32_t *) p + nx;
+               int32_t inc = 2*nx;
 
               while (mm--) {
                 nn = nxx;
@@ -767,9 +767,9 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
               break;
           }
         } else {
-          register  int32_t *pp, *qq;
-          register  int32_t  nn, mm, nyy;
-        
+           int32_t *pp, *qq;
+           int32_t  nn, mm, nyy;
+
           mm = ny;
           qq = (int32_t *) q;
           switch (iorder) {
@@ -807,8 +807,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
         break;
       case LUX_INT64:
         if (iorder < 4) {
-          register  int64_t *pp, *qq;
-          register  int32_t  nn, mm, nxx;
+           int64_t *pp, *qq;
+           int32_t  nn, mm, nxx;
 
           nxx = nx;
           mm = ny;
@@ -854,8 +854,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
               break;
           }
         } else {
-          register  int64_t *pp, *qq;
-          register  int32_t  nn, mm, nyy;
+           int64_t *pp, *qq;
+           int32_t  nn, mm, nyy;
 
           mm = ny;
           qq = (int64_t *) q;
@@ -894,8 +894,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
         break;
       case LUX_FLOAT:
         if (iorder < 4) {
-          register  float *pp, *qq;
-          register  int32_t  nn, mm, nxx;
+           float *pp, *qq;
+           int32_t  nn, mm, nxx;
 
           nxx = nx;
           mm = ny;
@@ -938,9 +938,9 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
               break;
           }
         } else {
-          register  float *pp, *qq;
-          register  int32_t  nn, mm, nyy;
-        
+           float *pp, *qq;
+           int32_t  nn, mm, nyy;
+
           mm = ny;
           qq = (float *) q;
           switch (iorder) {
@@ -978,8 +978,8 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
         break;
       case LUX_DOUBLE:
         if (iorder < 4) {
-          register  double *pp, *qq;
-          register  int32_t  nn, mm, nxx;
+           double *pp, *qq;
+           int32_t  nn, mm, nxx;
 
           nxx = nx;
           mm = ny;
@@ -1022,9 +1022,9 @@ int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
               break;
           }
         } else {
-          register  double *pp, *qq;
-          register  int32_t  nn, mm, nyy;
-        
+          double *pp, *qq;
+          int32_t  nn, mm, nyy;
+
           mm = ny;
           qq = (double *) q;
           switch (iorder) {

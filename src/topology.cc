@@ -2575,10 +2575,10 @@ int32_t lux_basin(int32_t narg, int32_t ps[])
 {
  int32_t        iq, result_sym, nx, ny, col, row, *wsh, nx0;
  int32_t        mode, i, n, nsinks, *code, n0;
- register uint8_t       loc;
+ uint8_t       loc;
  uint8_t        end, locs[3];
  Array *h;
- register float         *alt, min0, min1 = 0.0, min2 = 0.0, min;
+ float         *alt, min0, min1 = 0.0, min2 = 0.0, min;
 
  iq = ps[0];                            // altitude map
  CK_ARR(iq,1);

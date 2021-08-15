@@ -34,11 +34,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits.h>
 #include <stdarg.h>
 #include <time.h>               // for difftime
+
 #include "action.hh"
 #include "install.hh"
 #include "format.hh"
 #include "editor.hh"            // for BUFSIZE
 #include "readline.h"
+#include "KahanSummation.hh"
 
 int16_t         stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
 extern int32_t  stackSym;
@@ -1811,28 +1813,6 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
   return result;
 }
 //-------------------------------------------------------------------------
-/*
-  It is tricky to avoid round-off error when calculating running sums.
-  Even using Kahan summation it is possible to get small residual
-  round-off errors, and to get negative running sums for all-zero data
-  in the running-sum window at the end of a sequence containing
-  non-zero values.
-
-  ACP 4.2.2 says:
-
-  Let u′ = (u f+ v) f- w
-      v′ = (u f+ v) f- u
-      u″ = (u f+ v) f- v′
-      v″ = (u f+ v) f- u′
-
-  where f+ is properly rounded floating-point addition and f- is
-  properly rounded floating-point subtraction.
-
-  Then u + v = (u f+ v) + ((u f- u′) f+ (v f- v″))
- */
-
-#define kahan_sum_f(value,sum,compensation) { float y = (value) - (compensation); float t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
-#define kahan_sum_d(value,sum,compensation) { double y = (value) - (compensation); double t = (sum) + y; (compensation) = (t - (sum)) - y; (sum) = t; }
 
 int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
 /* return smoothed version syntax: y = smooth/runcum(x [,axis,width]

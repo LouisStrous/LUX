@@ -392,10 +392,10 @@ float resid(int32_t *m1, int32_t *m2, int32_t idx, int32_t idy, int32_t nxa, int
             float bs)
 {
   int32_t     nxc, nxd, nyc, nyd, nx, ny;
-  register      Pointer   m1p, m2p;
-  register        float   *p1, *p2, *ps;
-  register        float   sum, sumx, t, ndmx2;
-  register        int32_t     i, j;
+  Pointer   m1p, m2p;
+  float   *p1, *p2, *ps;
+  float   sum, sumx, t, ndmx2;
+  int32_t     i, j;
   float   sumg;
   static  int32_t     mxc, mxd, myc, myd;
   static  float   gsum;

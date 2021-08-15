@@ -2808,7 +2808,7 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
   float         ffac, foff;
   Pointer       trgt;
 #if HAVE_LIBX11
-  extern int32_t        colorIndexType;
+  extern Symboltype colorIndexType;
 #else
   int32_t       colorIndexType = LUX_INT8;
 #endif
@@ -3132,7 +3132,7 @@ int32_t lux_scale(int32_t narg, int32_t ps[])
 {
   int32_t       iq, type, result_sym, n, oldScalemin, oldScalemax;
   Scalar        min, max;
-  register      Pointer q1, q2;
+  Pointer q1, q2;
   double        sd, qd;
 #if HAVE_LIBX11
   extern double         zoom_clo, zoom_chi;
@@ -3230,7 +3230,7 @@ int32_t lux_scalerange(int32_t narg, int32_t ps[])
 {
   int32_t       iq, type, result_sym, n, oldScalemin, oldScalemax;
   Scalar        min, max;
-  register      Pointer q1, q2;
+  Pointer q1, q2;
   double        sd, qd, logrey, higrey;
 #if HAVE_LIBX11
   extern double         zoom_clo, zoom_chi;
@@ -3445,15 +3445,16 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
 // this means we don't need to check for over and under flow
 // assumes <p2> is of type <colorIndexType>.  LS 23mar99
 {
-  register      Pointer q1, q2;
-  register      Scalar  range, min;
-  register      int32_t         xq;
-  register      float   fq;
-  register      double  dq;
+  Pointer q1, q2;
+  Scalar  range, min;
+  int32_t         xq;
+  float   fq;
+  double  dq;
 #if HAVE_LIBX11
-  extern int32_t        connect_flag, colorIndexType;
+  extern Symboltype colorIndexType;
+  extern int32_t connect_flag;
 #else
-  int32_t       colorIndexType = LUX_INT8;
+  Symboltype colorIndexType = LUX_INT8;
 #endif
 
 #if HAVE_LIBX11
@@ -3625,9 +3626,9 @@ int32_t neutral(void *p, int32_t n)
   int32_t       xq;
   Pointer       pp;
 #if HAVE_LIBX11
-  extern int32_t        colorIndexType;
+  extern Symboltype colorIndexType;
 #else
-  int32_t       colorIndexType = LUX_INT8;
+  Symboltype colorIndexType = LUX_INT8;
 #endif
 
   pp.ui8 = (uint8_t*) p;

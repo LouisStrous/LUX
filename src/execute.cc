@@ -143,7 +143,7 @@ int32_t copyToSym(int32_t target, int32_t source)
       memcpy((char*) symbol_data(target), (char*) symbol_data(source), size);
       symbol_memory(target) = size;
       if (symbol_class(source) == LUX_STRING)
-        string_type(target) = LUX_TEMP_STRING;
+        sym_string_type(target) = LUX_TEMP_STRING;
       break;
     case LUX_RANGE:
       range_start(target) = (range_start(source) >= 0)?
@@ -2440,7 +2440,7 @@ int32_t insert(int32_t narg, int32_t ps[])
       nelem = string_size(target);
       dims = &nelem;
       trgt.s = string_value(target);
-      type = string_type(target);
+      type = sym_string_type(target);
       break;
     case LUX_ASSOC:
       ndim = assoc_num_dims(target);
@@ -3862,7 +3862,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
       nelem = string_size(target);
       dims = &nelem;
       trgt.s = string_value(target);
-      type = string_type(target);
+      type = sym_string_type(target);
       break;
     case LUX_ASSOC:
       ndim = assoc_num_dims(target);

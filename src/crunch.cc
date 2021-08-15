@@ -253,7 +253,7 @@ int32_t anacrunch32(uint8_t *x, int32_t array[], int32_t slice, int32_t nx, int3
     int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   uint32_t nb,ixa,ixb,big=0;
-  unsigned register i,j,r1,in;
+  unsigned i,j,r1,in;
   int32_t r0;
   long long        r3, mask, y64;
   int32_t i2,k,iy;
@@ -391,7 +391,7 @@ int32_t anacrunch(uint8_t *x, short array[], int32_t slice, int32_t nx, int32_t 
     int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
-  unsigned register i,j,r1,in;
+  unsigned i,j,r1,in;
   int32_t r0,r3,mask;
   int32_t i2,k,iy;
   union { int32_t i; short w; unsigned char b[4]; } y;
@@ -505,7 +505,7 @@ int32_t anacrunch8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, int32
     int32_t     tsize,nblocks,bsize;
     uint8_t    slice_size,type; } *ch;
   unsigned nb,ixa,ixb;
-  unsigned register i,j,r1,in;
+  unsigned i,j,r1,in;
   int32_t r0,r3,mask;
   int32_t i2,k,iy;
   union { int32_t i; short w; unsigned char b[4]; } y;
@@ -1028,7 +1028,7 @@ int32_t anacrunchrun(uint8_t *x, short array[], int32_t slice, int32_t nx, int32
     uint8_t    slice_size,type; } *ch;
   short        *p;
   unsigned nb;
-  unsigned register i,j,r1;
+  unsigned i,j,r1;
   int32_t        r0,r3,mask, nrun, lrun, ic;
   int32_t        *dif, *d, nc, zq, yq, *dd;
   // enum        state { RUN, LITERAL };
@@ -1204,7 +1204,7 @@ int32_t anacrunchrun8(uint8_t *x, uint8_t array[], int32_t slice, int32_t nx, in
     uint8_t    slice_size,type; } *ch;
   uint8_t        *p;
   unsigned nb;
-  unsigned register i,j,r1;
+  unsigned i,j,r1;
   int32_t        r0,r3,mask, nrun, lrun, ic;
   int32_t        *dif, *d, nc, zq, yq, *dd;
   int32_t        i2,k,iy;

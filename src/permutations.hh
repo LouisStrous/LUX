@@ -188,6 +188,7 @@
 // standard includes
 
 # include <algorithm>            // for std::max_element
+# include <limits>               // for std::numeric_limits
 
 // library includes
 

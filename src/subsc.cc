@@ -286,8 +286,8 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
 int32_t lux_smap(int32_t narg, int32_t ps[])
  // convert type (and class) to a string
 {
-  register int32_t n;
-  register Pointer q1,q3;
+  int32_t n;
+  Pointer q1,q3;
   int32_t       nsym, nd, j, n1;
   int32_t       result_sym, size;
 
@@ -390,7 +390,7 @@ int32_t lux_cdmap(int32_t narg, int32_t ps[])
 int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
                 // general part for map routines
 {
-  register Pointer q1,q3;
+  Pointer q1,q3;
   int32_t       nsym, nd, n, nn;
   int32_t       result_sym;
   Symboltype type;

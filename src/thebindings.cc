@@ -8,7 +8,6 @@
 #if HAVE_LIBSOFA_C
 # include "sofa.h"
 #endif
-#include "historicephemerides.h"
 
 int32_t luxerror(char const*, int32_t, ...);
 
@@ -65,30 +64,6 @@ int32_t lux_hypot_stride_f(int32_t narg, int32_t ps[]) {
   int32_t result = lux_d_sd_iaiarxq_000_2_f_(narg, ps, hypot_stride);
   if (result < 0)
     luxerror("Error in hypot", 0);
-  return result;
-}
-
-int32_t lux_prutenic_longitude_sol_f(int32_t narg, int32_t ps[]) {
-  double prutenic_longitude_sol(double);
-  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_longitude_sol);
-  if (result < 0)
-    luxerror("Error in pruteniclongsol", 0);
-  return result;
-}
-
-int32_t lux_prutenic_longitude_luna_f(int32_t narg, int32_t ps[]) {
-  double prutenic_longitude_luna(double);
-  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_longitude_luna);
-  if (result < 0)
-    luxerror("Error in pruteniclongluna", 0);
-  return result;
-}
-
-int32_t lux_prutenic_nearest_new_moon_f(int32_t narg, int32_t ps[]) {
-  double prutenic_nearest_new_moon(double);
-  int32_t result = lux_d_d_iarq_0_1_f_(narg, ps, prutenic_nearest_new_moon);
-  if (result < 0)
-    luxerror("Error in prutenicnewmoon", 0);
   return result;
 }
 
@@ -1762,6 +1737,9 @@ void register_the_bindings()
   register_lux_f(lux_factorial, "factorial", 1, 1, NULL);
 #endif
 
+  int32_t lux_read_image_oiio(int32_t, int32_t []);
+  register_lux_f(lux_read_image_oiio, "readimage", 1, 1, NULL);
+
   int32_t lux_gcommand(int32_t, int32_t []);
   register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
 
@@ -1785,12 +1763,6 @@ void register_the_bindings()
 
   int32_t lux_gnucontour(int32_t, int32_t []);
   register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
-
-  register_lux_f(lux_prutenic_longitude_sol_f, "pruteniclongsol", 1, 1, 0);
-
-  register_lux_f(lux_prutenic_longitude_luna_f, "pruteniclongluna", 1, 1, 0);
-
-  register_lux_f(lux_prutenic_nearest_new_moon_f, "prutenicnewmoon", 1, 1, 0);
 
 #if HAVE_LIBSOFA_C
   register_lux_f(lux_iauBi00_f, "bi00", 0, 0, 0);

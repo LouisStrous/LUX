@@ -41,9 +41,10 @@ int32_t        xerr(Display *, XErrorEvent *), selectVisual(void);
 Status        anaAllocNamedColor(char const*, XColor **);
 #endif
 
+Symboltype colorIndexType;
 int32_t                screen_num, connect_flag = 0, private_colormap = 0,
   threeColors = 0, foreground_pixel, colormin, colormax, nColors,
-  select_visual = 0, bits_per_rgb, bits_per_pixel, colorIndexType,
+  select_visual = 0, bits_per_rgb, bits_per_pixel,
   visualClass;
 uint32_t        display_cells, depth, display_width, display_height,
   nColorCells, colorIndex;

@@ -157,7 +157,7 @@ int32_t file_map_size(int32_t symbol);
 #define scalar_type(symbol) /* uint8_t */(sym[symbol].type)
 #define scalar_value(symbol) /* Scalar */(sym[symbol].spec.scalar)
 #define string_size(symbol) /* int32_t */(sym[symbol].spec.name.bstore - (int32_t) 1)
-#define string_type(symbol) /* uint8_t */(sym[symbol].type)
+#define sym_string_type(symbol) /* uint8_t */(sym[symbol].type)
 #define string_value(symbol) /* char * */(sym[symbol].spec.name.ptr)
 #define list_ptr_tag_number(symbol) /* int32_t */(sym[symbol].spec.scalar.i32)
 #define list_ptr_tag_string(symbol) /* char * */(sym[symbol].spec.name.ptr)

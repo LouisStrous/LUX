@@ -265,7 +265,7 @@ void fatal(char const* s)
  //-------------------------------------------------------------------------
  // Output the bytes associated with a code to the raster array
 
-void outcode(register codetype *p, register unsigned char **fill)
+void outcode(codetype *p, unsigned char **fill)
  {
         if (p->prefix) outcode(p->prefix,fill);
         *(*fill)++ = p->suffix;
@@ -279,7 +279,7 @@ void outcode(register codetype *p, register unsigned char **fill)
 void process(int32_t code, unsigned char **fill)
  {
         static int32_t avail,oldcode;
-        register codetype *p;
+        codetype *p;
 
         if (code == clear) {
             codesize = datasize + 1;
@@ -319,10 +319,10 @@ void readraster(int32_t nsize, FILE *fin, unsigned char *raster)
  {
         unsigned char *fill;
         unsigned char buf[255];
-        register int32_t bits=0;
-        register unsigned count,datum=0;
-        register unsigned char *ch;
-        register int32_t code;
+        int32_t bits=0;
+        unsigned count,datum=0;
+        unsigned char *ch;
+        int32_t code;
 
         fill = raster;
         datasize = getc(fin);

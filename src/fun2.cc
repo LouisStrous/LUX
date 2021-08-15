@@ -59,7 +59,7 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
   the result has the same type as <x>.  axis & order extension by LS 26nov92
   implementation of 1D double-precision case LS 11feb2007 */
 {
- register Pointer q1,q2,p;
+ Pointer q1,q2,p;
  int32_t        result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
  int32_t        xdims[8], order, size;
  Array  *h;
@@ -3657,8 +3657,8 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
 int32_t lux_lower(int32_t narg, int32_t ps[]) //lower function
 // convert all letters in a string to lower case
 {
-register  uint8_t *p1, *p2;
-register  int32_t  mq;
+  uint8_t *p1, *p2;
+  int32_t  mq;
 int32_t         result_sym;
 if ( symbol_class( ps[0] ) != LUX_STRING ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
@@ -3674,8 +3674,8 @@ return result_sym;
 int32_t lux_upper(int32_t narg, int32_t ps[]) //upper function
 // convert all letters in a string to upper case
 {
-register  uint8_t *p1, *p2;
-register  int32_t  mq;
+  uint8_t *p1, *p2;
+  int32_t  mq;
 int32_t         result_sym;
 if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, *ps);
 mq = sym[ps[0]].spec.array.bstore - 1;
@@ -3692,7 +3692,7 @@ int32_t lux_strpos(int32_t narg, int32_t ps[]) //STRPOS function
 // returns index of sub string if found
      // added index - LS 11jun97
 {
-  register char *p1, *p2, *p3;
+  char *p1, *p2, *p3;
   int32_t       result_sym, index;
 
   if (symbol_class(ps[0]) != LUX_STRING)
@@ -3721,7 +3721,7 @@ int32_t lux_strpos(int32_t narg, int32_t ps[]) //STRPOS function
 int32_t lux_strcount(int32_t narg, int32_t ps[]) //STRCOUNT function
 //  count # of occurences of a substring
 {
-register char *p1, *p2, *p3;
+  char *p1, *p2, *p3;
 int32_t         result_sym, n;
 if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
 if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
@@ -3738,7 +3738,7 @@ return result_sym;
 int32_t lux_strreplace(int32_t narg, int32_t ps[]) //STRREPLACE function
 // replace a substring nc times
 {
-register char *p1, *p2, *p3, *p4;
+  char *p1, *p2, *p3, *p4;
 char    *pq;
 int32_t         result_sym, n, nc, nr, mq, ns;
 if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
@@ -3805,8 +3805,8 @@ int32_t lux_strloc(int32_t narg, int32_t ps[]) //STRLOC function
 /* returns rest of source starting at object string
  */
 {
-register char *p1, *p2, *p3;
-register  int32_t  mq, off;
+  char *p1, *p2, *p3;
+  int32_t  mq, off;
 int32_t         result_sym;
 if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
 if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
@@ -3826,8 +3826,8 @@ int32_t lux_strskp(int32_t narg, int32_t ps[]) //STRSKP function
 /*  returns rest of source starting AFTER object string
  */
 {
-register char *p1, *p2, *p3;
-register  int32_t  mq, off;
+  char *p1, *p2, *p3;
+  int32_t  mq, off;
 int32_t         result_sym;
 if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
 if ( symbol_class( ps[1] ) != 2 ) return cerror(NEED_STR, ps[1]);
@@ -3848,7 +3848,7 @@ return result_sym;
 int32_t lux_skipc(int32_t narg, int32_t ps[]) //SKIPC function
 // skip over characters
 {
-register char *p1, *p2, *p3;
+  char *p1, *p2, *p3;
 int32_t  mq, off;
 int32_t         result_sym;
 if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
@@ -3868,7 +3868,7 @@ return result_sym;
 int32_t lux_strsub(int32_t narg, int32_t ps[]) //STRSUB function
 // return a substring
 {
-register char *p1, *p3;
+  char *p1, *p3;
 int32_t  mq, off, len;
 int32_t         result_sym;
 if ( symbol_class( ps[0] ) != 2 ) return cerror(NEED_STR, ps[0]);
@@ -3889,7 +3889,7 @@ int32_t lux_strtrim(int32_t narg, int32_t ps[]) //STRTRIM function
 // trim trailing blanks and tabs and any control chars
      // older version took off last OK char, too - fixed.  LS 7may97
 {
-  register char *p1, *p2, *p3;
+  char *p1, *p2, *p3;
   int32_t  mq;
   int32_t       result_sym;
 
@@ -4309,9 +4309,9 @@ int32_t setxpit(Symboltype type, int32_t n) /* used by several routines to set u
                         //consisting of {0,1/n,2/n,...,(n-1)/n}
                         // type must be 3 or 4
 {
-  register Pointer qx;
-  register float        del;
-  register double       ddel;
+  Pointer qx;
+  float        del;
+  double       ddel;
   int32_t       nsym, nx;
   Array         *h;
   nx = n;
@@ -4340,7 +4340,7 @@ int32_t lux_detrend(int32_t narg, int32_t ps[])//detrend function
 int32_t lux_trend(int32_t narg, int32_t ps[]) //trend function
         // trend using a polynomial fit, CALL IS T=trend(Y,[NPOW])
 {
-  register double       *a;
+  double       *a;
   double        *fbase, *cfbase;
   Pointer qxbase,qybase,qzbase;
   int32_t       npow, symx, symy, nd, nxq, outer;

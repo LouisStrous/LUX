@@ -36,9 +36,6 @@ int32_t curv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
     // System generated locals
     int32_t ret_val, i_1, i_2;
 
-    // Builtin functions
-    int32_t s_wsle(), do_lio(), e_wsle();
-
     // Local variables
     static int32_t ibak;
     static double deln, dels, exps, diag1, diag2, delx1, delx2, slpp1,
@@ -226,9 +223,6 @@ int32_t kurv1_(int32_t *n, double *x, double *y, double *slp1, double *slpn,
     // System generated locals
     int32_t ret_val, i_1, i_2;
     double d_1, d_2;
-
-    // Builtin functions
-    int32_t s_wsle(), do_lio(), e_wsle();
 
     // Local variables
     static double deln, dels, delx, dely, exps, diag1, diag2, dels1,
@@ -452,9 +446,6 @@ int32_t kurvp1_(int32_t *n, double *x, double *y, double *xp, double *yp,
     // System generated locals
     int32_t ret_val, i_1, i_2;
     double d_1;
-
-    // Builtin functions
-    int32_t s_wsle(), do_lio(), e_wsle();
 
     // Local variables
     static int32_t ibak;

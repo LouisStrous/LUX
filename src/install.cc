@@ -2157,7 +2157,7 @@ int32_t newSymbol(Symbolclass kind, ...)
       case LUX_FIXED_STRING:
         // a literal string
         symbol_class(n) = LUX_STRING;
-        string_type(n) = LUX_LSTRING;
+        sym_string_type(n) = LUX_LSTRING;
         string_value(n) = (char*) symbolStack[i = va_arg(ap, int32_t)];
         symbol_memory(n) = strlen(symbolStack[i]) + 1; // count \0
         unlinkString(i);                // free position in stack
@@ -3351,7 +3351,7 @@ int32_t lux_classname(int32_t narg, int32_t ps[])
   class_id = int_arg(*ps);
   getFreeTempVariable(result);
   symbol_class(result) = LUX_STRING;
-  string_type(result) = LUX_TEMP_STRING;
+  sym_string_type(result) = LUX_TEMP_STRING;
   name = string_value(result) = strsave(className(class_id));
   symbol_memory(result) = strlen(name) + 1;
   return result;
@@ -3366,7 +3366,7 @@ int32_t lux_typeName(int32_t narg, int32_t ps[])
   if ((type = int_arg(*ps)) < 0) return -1;
   getFreeTempVariable(result);
   symbol_class(result) = LUX_STRING;
-  string_type(result) = LUX_TEMP_STRING;
+  sym_string_type(result) = LUX_TEMP_STRING;
   name = string_value(result) = strsave(typeName(type));
   symbol_memory(result) = strlen(name) + 1;
   return result;
@@ -3428,7 +3428,7 @@ void fixedValue(char const* name, Symboltype type, ...)
  switch (type) {
  case LUX_LSTRING:
    symbol_class(n) = LUX_STRING;
-   string_type(n) = LUX_LSTRING;
+   sym_string_type(n) = LUX_LSTRING;
    string_value(n) = va_arg(ap, char *);
    symbol_memory(n) = strlen(string_value(n)) + 1;
    break;

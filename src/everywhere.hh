@@ -32,8 +32,8 @@ void* checked_memcpy(T* dest, const U* src, std::size_t count)
 {
   if (std::is_standard_layout<T>::value
       && std::is_standard_layout<U>::value) {
-    return memcpy(reinterpret_cast<void*>(dest),
-                  reinterpret_cast<const void*>(src), count);
+    return std::memcpy(reinterpret_cast<void*>(dest),
+                       reinterpret_cast<const void*>(src), count);
   }
   // no else branch, so a compiler error is generated if T or U are
   // not standard-layout types.

@@ -1591,7 +1591,7 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   // need min and max of indices so we can create result array of
   // proper size
   indices2 = lux_long(1, &ps[1]); // force LUX_INT32
-  indx = (int32_t*) array_data(indices2);       // assumed of same size as <source>!
+  indx = (int32_t*) array_data(indices2); // assumed of same size as <source>!
   minmax(indx, nElem, LUX_INT32);
   size = lastmax.i32 + 1;
   offset = 0;

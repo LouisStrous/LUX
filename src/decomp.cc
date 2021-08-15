@@ -32,7 +32,7 @@ int32_t d_decomp(double* x, int32_t n, int32_t nd)
         it uses subscripts rather than the pointers used here */
 //no pivoting in this version !, so diagonals must be != 0
 {
-register        double        sum1, sum2, *p1, *p2, *p3, *p4;
+  double        sum1, sum2, *p1, *p2, *p3, *p4;
 double        *qd, *q2, *q1, div;
 int32_t        nq, mq, lq, k;
 p1 = x;
@@ -60,7 +60,7 @@ int32_t f_decomp(float *x, int32_t n, int32_t nd)
         it uses subscripts rather than the pointers used here */
 //no pivoting in this version !, so diagonals must be != 0
 {
-  register        float        sum1, sum2, *p1, *p2, *p3, *p4;
+         float        sum1, sum2, *p1, *p2, *p3, *p4;
   float                *qd, * q2, *q1, div;
   int32_t                nq, mq, lq, k;
 
@@ -91,7 +91,7 @@ return 1;                        // added LS 5feb97
 //--------------------------------------------------------------------------
 int32_t f_solve(float *a, float *b, int32_t n, int32_t nd)
 {
-  register        float        sum, *p1, *p2;
+         float        sum, *p1, *p2;
   float                *qd, *q1;
   int32_t                nq, mq, k;
 
@@ -117,7 +117,7 @@ return 1;                        // added LS 5feb97
 //--------------------------------------------------------------------------
 int32_t d_solve(double* a, double* b, int32_t n, int32_t nd)
 {
-register        double        sum, *p1, *p2;
+  double        sum, *p1, *p2;
 double        *qd, *q1;
 int32_t        nq, mq, k;
 //printf("in d_solve\n");

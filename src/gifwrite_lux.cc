@@ -52,7 +52,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
         unsigned char mask;
  } ;
  static void compress(int32_t, FILE *, uint8_t *, int32_t), output(int32_t),
-   cl_block(void), cl_hash(register int32_t) /*, char_init()*/;
+   cl_block(void), cl_hash(int32_t) /*, char_init()*/;
  static void char_out(int32_t), flush_char(void);
 
  //-------------------------------------------------------------------------
@@ -215,13 +215,13 @@ static int32_t free_ent = 0;       // first unused entry
  //******************************************************
 static void compress(int32_t init_bits, FILE *outfile, uint8_t *data, int32_t len)
  {
-  register long fcode;
-  register int32_t i = 0;
-  register int32_t c;
-  register int32_t ent;
-  register int32_t disp;
-  register int32_t hsize_reg;
-  register int32_t hshift;
+  long fcode;
+  int32_t i = 0;
+  int32_t c;
+  int32_t ent;
+  int32_t disp;
+  int32_t hsize_reg;
+  int32_t hshift;
 
   /*
    * Set up the globals:  g_init_bits - initial number of bits
@@ -406,11 +406,11 @@ static void cl_block(void)        // table clear for block compress
   output(ClearCode);
  }
  //******************************
-static void cl_hash(register int32_t hsize)          // reset code table
+static void cl_hash(int32_t hsize)          // reset code table
  {
-  register int32_t *htab_p = htab+hsize;
-  register long i;
-  register long m1 = -1;
+  int32_t *htab_p = htab+hsize;
+  long i;
+  long m1 = -1;
 
   i = hsize - 16;
   do {                            // might use Sys V memset(3) here

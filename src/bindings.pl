@@ -31,7 +31,6 @@ print $ofh <<EOD;
 #if HAVE_LIBSOFA_C
 # include "sofa.h"
 #endif
-#include "historicephemerides.h"
 
 int32_t luxerror(char const*, int32_t, ...);
 

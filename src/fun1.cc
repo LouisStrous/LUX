@@ -866,9 +866,9 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
       } else {
         memcpy(&data[2].ui8[0], &data[0].ui8[0], info[2].stride);
       }
-    } while (info[0].advanceLoop(&data[0]),
-             info[1].advanceLoop( &data[1]),
-             info[2].advanceLoop(&data[2]) < info[0].rndim);
+    } while (info[0].advanceLoop(&data[0].ui8),
+             info[1].advanceLoop(&data[1].ui8),
+             info[2].advanceLoop(&data[2].ui8) < info[0].rndim);
   }
   return sa.result();
 }
@@ -975,44 +975,44 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
     case LUX_INT8:
       do
         *trgt.ui8 = (uint8_t) trgtinfo.coords[0];
-      while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
     case LUX_INT16:
       do
         *trgt.i16 = (int16_t) trgtinfo.coords[0];
-      while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
     case LUX_INT32:
       do
         *trgt.i32 = (int32_t) trgtinfo.coords[0];
-      while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
     case LUX_INT64:
       do
         *trgt.i64 = (int32_t) trgtinfo.coords[0];
-      while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
     case LUX_FLOAT:
       do
         *trgt.f = (float) trgtinfo.coords[0];
-      while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
     case LUX_DOUBLE:
       do
         *trgt.d = (double) trgtinfo.coords[0];
-      while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
     case LUX_CFLOAT:
       do {
         trgt.cf->real = trgtinfo.coords[0];
         trgt.cf->imaginary = 0.0;
-      } while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
     case LUX_CDOUBLE:
       do {
         trgt.cd->real = trgtinfo.coords[0];
         trgt.cd->imaginary = 0.0;
-      } while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
       break;
   }
   return result;
@@ -3645,8 +3645,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.i32 += *src.i16 * *weights.i16;
                   w.i32 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
               } while (done < srcinfo.rndim);
@@ -3658,8 +3658,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.i32 += *src.i32 * *weights.i32;
                   w.i32 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
               } while (done < srcinfo.rndim);
@@ -3675,8 +3675,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.i64 += *src.ui8 * *weights.ui8;
                   w.i64 += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -3688,8 +3688,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.i64 += *src.i16 * *weights.i16;
                   w.i64 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -3701,8 +3701,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.i64 += *src.i32 * *weights.i32;
                   w.i64 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -3714,8 +3714,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.i64 += *src.i64 * *weights.i64;
                   w.i64 += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -3731,8 +3731,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.f += *src.ui8 * *weights.ui8;
                   w.f += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
               } while (done < srcinfo.rndim);
@@ -3744,8 +3744,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.f += *src.i16 * *weights.i16;
                   w.f += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
               } while (done < srcinfo.rndim);
@@ -3757,8 +3757,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.f += *src.i32 * *weights.i32;
                   w.f += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
               } while (done < srcinfo.rndim);
@@ -3770,8 +3770,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.f += *src.i64 * *weights.i64;
                   w.f += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
               } while (done < srcinfo.rndim);
@@ -3786,8 +3786,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.f += *src.f * *weights.f;
                       w.f += *weights.f;
                     }
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
                 } while (done < srcinfo.rndim);
@@ -3798,8 +3798,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   do {
                     sum.f += *src.f * *weights.f;
                     w.f += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
                 } while (done < srcinfo.rndim);
@@ -3818,8 +3818,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d += (double) *src.ui8 * *weights.ui8;
                   w.d += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
               } while (done < srcinfo.rndim);
@@ -3831,8 +3831,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d += (double) *src.i16 * *weights.i16;
                   w.d += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
               } while (done < srcinfo.rndim);
@@ -3844,8 +3844,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d += (double) *src.i32 * *weights.i32;
                   w.d += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
               } while (done < srcinfo.rndim);
@@ -3857,8 +3857,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sum.d += (double) *src.i64 * *weights.i64;
                   w.d += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
               } while (done < srcinfo.rndim);
@@ -3873,8 +3873,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.d += (double) *src.f * *weights.f;
                       w.d += *weights.f;
                     }
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -3885,8 +3885,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   do {
                     sum.d += (double) *src.f * *weights.f;
                     w.d += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -3902,8 +3902,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.d += *src.d * *weights.d;
                       w.d += *weights.d;
                     }
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -3914,8 +3914,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   do {
                     sum.d += *src.d * *weights.d;
                     w.d += *weights.d;
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -3934,8 +3934,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               sumcf.real += src.cf->real * *weights.f;
               sumcf.imaginary += src.cf->imaginary * *weights.f;
               w.f += *weights.f;
-            } while ((done = (winfo.advanceLoop(&weights),
-                              srcinfo.advanceLoop(&src)))
+            } while ((done = (winfo.advanceLoop(&weights.ui8),
+                              srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
             if (mean) {
               if (w.f) {
@@ -3961,8 +3961,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sumcd.real += (double) src.cf->real * *weights.f;
                   sumcd.imaginary += (double) src.cf->imaginary * *weights.f;
                   w.d += *weights.d;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 if (mean) {
                   if (w.d) {
@@ -3985,8 +3985,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sumcd.real += src.cd->real * *weights.d;
                   sumcd.imaginary += src.cd->imaginary * *weights.d;
                   w.d += *weights.d;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 if (mean) {
                   if (w.d) {
@@ -4016,7 +4016,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.i32 = 0.0;
                 do
                   sum.i32 += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
@@ -4025,7 +4025,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.i32 = 0.0;
                 do
                   sum.i32 += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
@@ -4034,7 +4034,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.i32 = 0.0;
                 do
                   sum.i32 += *src.i32;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
@@ -4047,7 +4047,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.i64 = 0.0;
                 do
                   sum.i64 += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -4056,7 +4056,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.i64 = 0.0;
                 do
                   sum.i64 += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -4065,7 +4065,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.i64 = 0.0;
                 do
                   sum.i64 += *src.i64;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -4074,7 +4074,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.i64 = 0.0;
                 do
                   sum.i64 += *src.i64;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -4087,7 +4087,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.f = 0.0;
                 do
                   sum.f += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -4096,7 +4096,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.f = 0.0;
                 do
                   sum.f += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -4105,7 +4105,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.f = 0.0;
                 do
                   sum.f += *src.i32;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -4114,7 +4114,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.f = 0.0;
                 do
                   sum.f += *src.i64;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -4128,7 +4128,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.f += *src.f;
                       ++w;
                     }
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.f++ = mean? (w? sum.f/w: 0): sum.f;
                 } while (done < srcinfo.rndim);
               } else {
@@ -4136,7 +4136,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sum.f = 0.0;
                   do
                     sum.f += *src.f;
-                  while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.f++ = mean? sum.f/n: sum.f;
                 } while (done < srcinfo.rndim);
               }
@@ -4151,7 +4151,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.d = 0.0;
                 do
                   sum.d += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
               } while (done < srcinfo.rndim);
               break;
@@ -4160,7 +4160,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 sum.d = 0.0;
                 do
                   sum.d += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
               } while (done < srcinfo.rndim);
               break;
@@ -4171,6 +4171,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sum.d += *src.i32;
                 while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
+                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
               } while (done < srcinfo.rndim);
               break;
             case LUX_INT64:
@@ -4237,7 +4238,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
             do {
               sumcf.real += src.cf->real;
               sumcf.imaginary += src.cf->imaginary;
-            } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+            } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
             if (mean) {
               trgt.cf->real = sumcf.real/n;
               trgt.cf++->imaginary = sumcf.imaginary/n;
@@ -4255,7 +4256,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sumcd.real += src.cf->real;
                   sumcd.imaginary += src.cf->imaginary;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 if (mean) {
                   trgt.cd->real = sumcd.real/n;
                   trgt.cd++->imaginary = sumcd.imaginary/n;
@@ -4271,7 +4272,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 do {
                   sumcd.real += src.cd->real;
                   sumcd.imaginary += src.cd->imaginary;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 if (mean) {
                   trgt.cd->real = sumcd.real/n;
                   trgt.cd++->imaginary = sumcd.imaginary/n;
@@ -4325,8 +4326,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.i32 *= *weights.ui8;
                   sum.i32 += value.i32;
                   w.i32 += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
               } while (done < srcinfo.rndim);
@@ -4350,8 +4351,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.i32 *= *weights.i16;
                   sum.i32 += value.i32;
                   w.i32 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
               } while (done < srcinfo.rndim);
@@ -4375,8 +4376,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.i32 *= *weights.i32;
                   sum.i32 += value.i32;
                   w.i32 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
               } while (done < srcinfo.rndim);
@@ -4404,8 +4405,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.i64 *= *weights.ui8;
                   sum.i64 += value.i64;
                   w.i64 += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -4429,8 +4430,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.i64 *= *weights.i16;
                   sum.i64 += value.i64;
                   w.i64 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -4454,8 +4455,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.i64 *= *weights.i32;
                   sum.i64 += value.i64;
                   w.i64 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -4479,8 +4480,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.i64 *= *weights.i64;
                   sum.i64 += value.i64;
                   w.i64 += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
               } while (done < srcinfo.rndim);
@@ -4508,8 +4509,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.f *= *weights.ui8;
                   sum.f += value.f;
                   w.f += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
               } while (done < srcinfo.rndim);
@@ -4533,8 +4534,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.f *= *weights.i16;
                   sum.f += value.f;
                   w.f += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
               } while (done < srcinfo.rndim);
@@ -4558,8 +4559,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.f *= *weights.i32;
                   sum.f += value.f;
                   w.f += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
               } while (done < srcinfo.rndim);
@@ -4583,8 +4584,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.f *= *weights.i64;
                   sum.f += value.f;
                   w.f += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
               } while (done < srcinfo.rndim);
@@ -4612,8 +4613,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.f += value.f;
                       w.f += *weights.f;
                     }
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
                 } while (done < srcinfo.rndim);
@@ -4636,8 +4637,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       value.f *= *weights.f;
                     sum.f += value.f;
                     w.f += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
                 } while (done < srcinfo.rndim);
@@ -4666,8 +4667,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.d *= *weights.ui8;
                   sum.d += value.d;
                   w.d += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
               } while (done < srcinfo.rndim);
@@ -4691,8 +4692,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.d *= *weights.i16;
                   sum.d += value.d;
                   w.d += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
               } while (done < srcinfo.rndim);
@@ -4716,8 +4717,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.d *= *weights.i32;
                   sum.d += value.d;
                   w.d += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
               } while (done < srcinfo.rndim);
@@ -4741,8 +4742,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     value.d *= *weights.i64;
                   sum.d += value.d;
                   w.d += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
               } while (done < srcinfo.rndim);
@@ -4770,8 +4771,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.d += value.d;
                       w.d += *weights.f;
                     }
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -4795,8 +4796,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       value.d *= *weights.f;
                     sum.d += value.d;
                     w.d += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -4824,8 +4825,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.d += value.d;
                       w.d += *weights.d;
                     }
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -4848,8 +4849,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       value.d *= *weights.d;
                     sum.d += value.d;
                     w.d += *weights.d;
-                  } while ((done = (winfo.advanceLoop(&weights),
-                                    srcinfo.advanceLoop(&src)))
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
                            < srcinfo.naxes);
                   *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
                 } while (done < srcinfo.rndim);
@@ -4894,8 +4895,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               sumcf.real += valuecf.real;
               sumcf.imaginary *= valuecf.imaginary;
               w.f += *weights.f;
-            } while ((done = (winfo.advanceLoop(&weights),
-                              srcinfo.advanceLoop(&src)))
+            } while ((done = (winfo.advanceLoop(&weights.ui8),
+                              srcinfo.advanceLoop(&src.ui8)))
                      < srcinfo.naxes);
             if (mean) {
               if (w.f) {
@@ -4949,8 +4950,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sumcd.real += valuecd.real;
                   sumcd.imaginary *= valuecd.imaginary;
                   w.d += *weights.f;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 if (mean) {
                   if (w.d) {
@@ -5002,8 +5003,8 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   sumcd.real += valuecd.real;
                   sumcd.imaginary *= valuecd.imaginary;
                   w.d += *weights.d;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
                          < srcinfo.naxes);
                 if (mean) {
                   if (w.d) {
@@ -5044,7 +5045,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.i32 = value.i32? 1.0/value.i32: 0.0;
                   sum.i32 += value.i32;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
@@ -5064,7 +5065,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.i32 = value.i32? 1.0/value.i32: 0.0;
                   sum.i32 += value.i32;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
@@ -5084,7 +5085,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.i32 = value.i32? 1.0/value.i32: 0.0;
                   sum.i32 += value.i32;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i32++ = mean? sum.i32/n: sum.i32;
               } while (done < srcinfo.rndim);
               break;
@@ -5108,7 +5109,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.i64 = value.i64? 1.0/value.i64: 0.0;
                   sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -5128,7 +5129,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.i64 = value.i64? 1.0/value.i64: 0.0;
                   sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -5148,7 +5149,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.i64 = value.i64? 1.0/value.i64: 0.0;
                   sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -5168,7 +5169,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.i64 = value.i64? 1.0/value.i64: 0.0;
                   sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.i64++ = mean? sum.i64/n: sum.i64;
               } while (done < srcinfo.rndim);
               break;
@@ -5192,7 +5193,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -5212,7 +5213,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -5232,7 +5233,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -5252,7 +5253,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.f = value.f? 1.0/value.f: 0.0;
                   sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.f++ = mean? sum.f/n: sum.f;
               } while (done < srcinfo.rndim);
               break;
@@ -5278,7 +5279,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.f += value.f;
                       ++w;
                     }
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.f++ = mean? (w? sum.f/w: 0): sum.f;
                 } while (done < srcinfo.rndim);
               } else {
@@ -5297,7 +5298,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     if (psign == -1) // negative exponent: must divide
                       value.f = value.f? 1.0/value.f: 0.0;
                     sum.f += value.f;
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.f++ = mean? sum.f/n: sum.f;
                 } while (done < srcinfo.rndim);
               }
@@ -5322,7 +5323,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
               } while (done < srcinfo.rndim);
               break;
@@ -5342,7 +5343,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
               } while (done < srcinfo.rndim);
               break;
@@ -5362,7 +5363,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
               } while (done < srcinfo.rndim);
               break;
@@ -5382,7 +5383,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   if (psign == -1) // negative exponent: must divide
                     value.d = value.d? 1.0/value.d: 0.0;
                   sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 *trgt.d++ = mean? sum.d/n: sum.d;
               } while (done < srcinfo.rndim);
               break;
@@ -5407,7 +5408,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.d += value.d;
                       ++w;
                     }
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.d++ = mean? (w? sum.d/w: 0): sum.d;
                 } while (done < srcinfo.rndim);
               } else {
@@ -5426,7 +5427,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     if (psign == -1) // negative exponent: must divide
                       value.d = value.d? 1.0/value.d: 0.0;
                     sum.d += value.d;
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.d++ = mean? sum.d/n: sum.d;
                 } while (done < srcinfo.rndim);
               }
@@ -5452,7 +5453,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                       sum.d += value.d;
                       ++w;
                     }
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.d++ = mean? (w? sum.d/n: 0): sum.d;
                 } while (done < srcinfo.rndim);
               } else {
@@ -5471,7 +5472,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     if (psign == -1) // negative exponent: must divide
                       value.d = value.d? 1.0/value.d: 0.0;
                     sum.d += value.d;
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                   *trgt.d++ = mean? sum.d/n: sum.d;
                 } while (done < srcinfo.rndim);
               }
@@ -5511,7 +5512,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               }
               sumcf.real += valuecf.real;
               sumcf.imaginary *= valuecf.imaginary;
-            } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+            } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
             if (mean) {
               trgt.cf->real = sumcf.real/n;
               trgt.cf->imaginary = sumcf.imaginary/n;
@@ -5557,7 +5558,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   }
                   sumcd.real += valuecd.real;
                   sumcd.imaginary *= valuecd.imaginary;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 if (mean) {
                   trgt.cd->real = sumcd.real/n;
                   trgt.cd->imaginary = sumcd.imaginary/n;
@@ -5601,7 +5602,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                   }
                   sumcd.real += valuecd.real;
                   sumcd.imaginary *= valuecd.imaginary;
-                } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
+                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
                 if (mean) {
                   trgt.cd->real = sumcd.real/n;
                   trgt.cd->imaginary = sumcd.imaginary/n;

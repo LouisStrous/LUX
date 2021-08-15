@@ -233,7 +233,7 @@ LoopInfo::setupDimensionLoop(int32_t ndim, int32_t const *dims,
     (3,0,0) yields 1, (3,4,0) yields 2, and (3,4,5) yields 3.
  */
 int32_t
-LoopInfo::advanceLoop(Pointer *ptr)
+LoopInfo::advanceLoop(void* ptr)
 /* advance coordinates; return index of first encountered incomplete
  axis.   */
 {
@@ -243,7 +243,8 @@ LoopInfo::advanceLoop(Pointer *ptr)
     done = this->rndim;
   else {
     // advance pointer
-    ptr->ui8 += this->step[this->advanceaxis]*this->stride;
+    auto p = static_cast<char**>(ptr);
+    *p += this->step[this->advanceaxis]*this->stride;
 
     done = this->advanceaxis;   // default: not done yet
 
@@ -255,7 +256,7 @@ LoopInfo::advanceLoop(Pointer *ptr)
       this->coords[i] = 0;      // back to start
       done = i + 1;             // keep track of last advanced dimension
       if (done < this->rndim)
-        ptr->ui8 += this->step[i + 1]*this->stride;
+        *p += this->step[i + 1]*this->stride;
     }
   }
   return done;

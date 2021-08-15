@@ -312,7 +312,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
       trgtinfo.rearrangeEdgeLoop(NULL, i);
       do
         *trgt.i32 = 0;
-      while (trgtinfo.advanceLoop(&trgt) < trgtinfo.ndim - 1);
+      while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.ndim - 1);
     }
   }
 
@@ -339,8 +339,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               break;
           }
           *trgt.i32 = (j == n);
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_INT16:
         do {
@@ -353,8 +353,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               break;
           }
           *trgt.i32 = (j == n);
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_INT32:
         do {
@@ -367,8 +367,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               break;
           }
           *trgt.i32 = (j == n);
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_INT64:
         do {
@@ -381,8 +381,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               break;
           }
           *trgt.i32 = (j == n);
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_FLOAT:
         do {
@@ -395,8 +395,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               break;
           }
           *trgt.i32 = (j == n);
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_DOUBLE:
         do {
@@ -409,8 +409,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               break;
           }
           *trgt.i32 = (j == n);
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
     } else                              // general case - a bit slower
       switch (array_type(ps[0])) {
@@ -432,8 +432,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               }
             }
             *trgt.i32 = nok;
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_INT16:
           do {
@@ -453,8 +453,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               }
             }
             *trgt.i32 = nok;
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_INT32:
           do {
@@ -474,8 +474,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               }
             }
             *trgt.i32 = nok;
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_INT64:
           do {
@@ -495,8 +495,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               }
             }
             *trgt.i32 = nok;
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_FLOAT:
           do {
@@ -516,8 +516,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               }
             }
             *trgt.i32 = nok;
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_DOUBLE:
           do {
@@ -537,8 +537,8 @@ int32_t segment_general(int32_t narg, int32_t ps[])
               }
             }
             *trgt.i32 = nok;
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
       }
 
@@ -1452,7 +1452,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
       do
         if (*src.i32 == 1)
           *src.i32 = EDGE;
-      while (srcinfo.advanceLoop(&src) < srcinfo.ndim - 1);
+      while (srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim - 1);
     }
   }
   free(edge);
@@ -2171,7 +2171,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
     do {
       if (*src.i32 == 1)
         *src.i32 = EDGE;
-    } while (srcinfo.advanceLoop(&src) < srcinfo.rndim - 1);
+    } while (srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim - 1);
   }
   free(edge);
 
@@ -2941,8 +2941,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now min[mini].ui8 is the lowest value
         *trgt.i32 = -loc[mini] - n*mini;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_INT16:
       min[0].i16 = min[1].i16 = bounds.max.i16;
@@ -3056,8 +3056,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now min[mini].i16 is the lowest value
         *trgt.i32 = -loc[mini] - n*mini;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_INT32:
       min[0].i32 = min[1].i32 = bounds.max.i32;
@@ -3171,8 +3171,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now min[mini].i32 is the lowest value
         *trgt.i32 = -loc[mini] - n*mini;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_INT64:
       min[0].i64 = min[1].i64 = bounds.max.i64;
@@ -3286,8 +3286,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now min[mini].i64 is the lowest value
         *trgt.i32 = -loc[mini] - n*mini;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_FLOAT:
       min[0].f = min[1].f = bounds.max.f;
@@ -3401,8 +3401,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now min[mini].f is the lowest value
         *trgt.i32 = -loc[mini] - n*mini;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_DOUBLE:
       min[0].d = min[1].d = bounds.max.d;
@@ -3516,8 +3516,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now min[mini].d is the lowest value
         *trgt.i32 = -loc[mini] - n*mini;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
 
     case LUX_INT8 | 0x20:
@@ -3632,8 +3632,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now max[maxi].ui8 is the highest value
         *trgt.i32 = -loc[maxi] - n*maxi;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_INT16 | 0x20:
       max[0].i16 = max[1].i16 = bounds.min.i16;
@@ -3747,8 +3747,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now max[maxi].i16 is the highest value
         *trgt.i32 = -loc[maxi] - n*maxi;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_INT32 | 0x20:
       max[0].i32 = max[1].i32 = bounds.min.i32;
@@ -3862,8 +3862,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now max[maxi].i32 is the highest value
         *trgt.i32 = -loc[maxi] - n*maxi;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_INT64 | 0x20:
       max[0].i64 = max[1].i64 = bounds.min.i64;
@@ -3977,8 +3977,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now max[maxi].i64 is the highest value
         *trgt.i32 = -loc[maxi] - n*maxi;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_FLOAT | 0x20:
       max[0].f = max[1].f = bounds.min.f;
@@ -4092,8 +4092,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now max[maxi].f is the highest value
         *trgt.i32 = -loc[maxi] - n*maxi;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_DOUBLE | 0x20:
       max[0].d = max[1].d = bounds.min.d;
@@ -4207,8 +4207,8 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
         }
         // now max[maxi].d is the highest value
         *trgt.i32 = -loc[maxi] - n*maxi;
-      } while (trgtinfo.advanceLoop(&trgt),
-               srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (trgtinfo.advanceLoop(&trgt.ui8),
+               srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
   }
 
@@ -4426,8 +4426,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
             *trgt.ui8++ = 0;              // right edge
             src.ui8++;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_INT16:
         do {
@@ -4456,8 +4456,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
             *trgt.ui8++ = 0;              // right edge
             src.i16++;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_INT32:
         do {
@@ -4486,8 +4486,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
             *trgt.ui8++ = 0;              // right edge
             src.i32++;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_INT64:
         do {
@@ -4516,8 +4516,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
             *trgt.ui8++ = 0;              // right edge
             src.i64++;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_FLOAT:
         do {
@@ -4546,8 +4546,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
             *trgt.ui8++ = 0;              // right edge
             src.f++;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
       case LUX_DOUBLE:
         do {
@@ -4576,8 +4576,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
             *trgt.ui8++ = 0;              // right edge
             src.d++;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.ndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
         break;
     } else                              // general case - a bit slower
       switch (array_type(ps[0])) {
@@ -4616,8 +4616,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 src.ui8++;
               }
             }
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_INT16:
           do {
@@ -4654,8 +4654,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 src.i16++;
               }
             }
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_INT32:
           do {
@@ -4692,8 +4692,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 src.i32++;
               }
             }
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_INT64:
           do {
@@ -4730,8 +4730,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 src.i64++;
               }
             }
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_FLOAT:
           do {
@@ -4768,8 +4768,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 src.f++;
               }
             }
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
         case LUX_DOUBLE:
           do {
@@ -4806,8 +4806,8 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
                 src.d++;
               }
             }
-          } while (trgtinfo.advanceLoop(&trgt),
-                   srcinfo.advanceLoop(&src) < srcinfo.ndim);
+          } while (trgtinfo.advanceLoop(&trgt.ui8),
+                   srcinfo.advanceLoop(&src.ui8) < srcinfo.ndim);
           break;
       }
 

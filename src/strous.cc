@@ -40,7 +40,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "format.hh"
 #include "editor.hh"            // for BUFSIZE
 #include "readline.h"
-#include "KahanSummation.hh"
+#include "FloatingPointAccumulator.hh"
 
 int16_t         stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];
 extern int32_t  stackSym;
@@ -1001,8 +1001,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             *trgt.ui8 = 0;        // zeros
             trgt.ui8 += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_INT16:
         do {
@@ -1034,8 +1034,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             *trgt.i16 = 0;        // zeros
             trgt.i16 += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_INT32:
         do {
@@ -1067,8 +1067,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             *trgt.i32 = 0;        // zeros
             trgt.i32 += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_INT64:
         do {
@@ -1100,8 +1100,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             *trgt.i64 = 0;        // zeros
             trgt.i64 += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_FLOAT:
         do {
@@ -1133,8 +1133,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             *trgt.f = 0;        // zeros
             trgt.f += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_DOUBLE:
         do {
@@ -1166,8 +1166,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             *trgt.d = 0;        // zeros
             trgt.d += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_CFLOAT:
         do {
@@ -1202,8 +1202,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             trgt.cf->real = trgt.cf->imaginary = 0;     // zeros
             trgt.cf += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
     case LUX_CDOUBLE:
         do {
@@ -1238,8 +1238,8 @@ int32_t lux_differ(int32_t narg, int32_t ps[])
             trgt.cd->real = trgt.cd->imaginary = 0;     // zeros
             trgt.cd += stride;
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
     }
     if (loop < srcinfo.naxes - 1)
@@ -1340,8 +1340,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.i32 += (int32_t) src.ui8[i];
             *trgt.i32 = sum.i32;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1366,8 +1366,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.i32 += (int32_t) src.i16[i];
             *trgt.i32 = sum.i32;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1392,8 +1392,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.i32 += src.i32[i];
             *trgt.i32 = sum.i32;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1421,8 +1421,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.i64 += src.ui8[i];
             *trgt.i64 = sum.i64;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1447,8 +1447,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.i64 += src.i16[i];
             *trgt.i64 = sum.i64;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1473,8 +1473,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.i64 += src.i32[i];
             *trgt.i64 = sum.i64;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1499,8 +1499,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.i64 += src.i64[i];
             *trgt.i64 = sum.i64;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1529,8 +1529,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.f += (float) src.ui8[i];
             *trgt.f = sum.f/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1556,8 +1556,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.f += (float) src.i16[i];
             *trgt.f = sum.f/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1583,8 +1583,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.f += (float) src.i32[i];
             *trgt.f = sum.f/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1610,8 +1610,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.f += (float) src.i64[i];
             *trgt.f = sum.f/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1637,8 +1637,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.f += src.f[i];
             *trgt.f = sum.f/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim) // done with indicated axes
               width.i32 = width0.i32;
@@ -1667,8 +1667,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.d += (double) src.ui8[i];
             *trgt.d = sum.d/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1694,8 +1694,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.d += (double) src.i16[i];
             *trgt.d = sum.d/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1721,8 +1721,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.d += (double) src.i32[i];
             *trgt.d = sum.d/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1748,8 +1748,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.d += (double) src.i64[i];
             *trgt.d = sum.d/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1775,8 +1775,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.d += (double) src.f[i];
             *trgt.d = sum.d/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1802,8 +1802,8 @@ int32_t varsmooth(int32_t narg, int32_t ps[], int32_t cumul)
             for (i = i1; i < i2; i += step)
               sum.d += src.d[i];
             *trgt.d = sum.d/weight;
-            done = trgtinfo.advanceLoop(&trgt),
-              srcinfo.advanceLoop(&src);
+            done = trgtinfo.advanceLoop(&trgt.ui8),
+              srcinfo.advanceLoop(&src.ui8);
             width.i32++;
             if (done == widthNDim)      // done with indicated axis
               width.i32 = width0.i32;
@@ -1990,8 +1990,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.ui8 += stride;
             }
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_INT16:
         do {
@@ -2064,8 +2064,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.i16 += stride;
             }
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_INT32:
         do {
@@ -2138,8 +2138,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.i32 += stride;
             }
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_INT64:
         do {
@@ -2212,8 +2212,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.i64 += stride;
             }
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_FLOAT:
         // we use the Kahan algorithm to limit roundoff error
@@ -2224,7 +2224,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
           if (internalMode & 1) { // /PARTIAL_WIDTH
             norm = cumul? ww: 0;
             if (ww%2) {                 // odd width
-              kahan_sum_f(*src.f, value.f, c);
+              kahan_sum(*src.f, value.f, c);
               src.f += stride;
               if (!cumul)
                 ++norm;
@@ -2234,9 +2234,9 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
             } else
               i = 0;
             for ( ; i < w1; i++) {
-              kahan_sum_f(*src.f, value.f, c);
+              kahan_sum(*src.f, value.f, c);
               src.f += stride;
-              kahan_sum_f(*src.f, value.f, c);
+              kahan_sum(*src.f, value.f, c);
               src.f += stride;
               if (!cumul)
                 norm += 2;
@@ -2245,7 +2245,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
             }
           } else {              // full width
             for (i = 0; i < ww; i++) { // do the left edge
-              kahan_sum_f(*src.f, value.f, c);
+              kahan_sum(*src.f, value.f, c);
               src.f += stride;
             }
             double v = value.f/norm;
@@ -2256,7 +2256,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
           }
           // middle part
           for ( ; i < w2; i++) {
-            kahan_sum_f(*src.f - src.f[offset], value.f, c);
+            kahan_sum(*src.f - src.f[offset], value.f, c);
             src.f += stride;
             *trgt.f = value.f/norm;
             trgt.f += stride;
@@ -2264,9 +2264,9 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
           // right-hand edge
           if (internalMode & 1) { // /PARTIAL_WIDTH
             for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
-              kahan_sum_f(-src.f[offset], value.f, c);
+              kahan_sum(-src.f[offset], value.f, c);
               offset += stride;
-              kahan_sum_f(-src.f[offset], value.f, c);
+              kahan_sum(-src.f[offset], value.f, c);
               offset += stride;
               if (!cumul)
                 norm -= 2;
@@ -2274,7 +2274,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.f += stride;
             }
             if (!(ww%2)) {
-              kahan_sum_f(-src.f[offset], value.f, c);
+              kahan_sum(-src.f[offset], value.f, c);
               offset += stride;
               if (!cumul)
                 --norm;
@@ -2288,8 +2288,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.f += stride;
             }
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
       case LUX_DOUBLE:
         // we use the Kahan algorithm to limit roundoff error
@@ -2300,7 +2300,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
           if (internalMode & 1) { // /PARTIAL_WIDTH
             norm = cumul? ww: 0;
             if (ww%2) {                 // odd width
-              kahan_sum_d(*src.d, value.d, c);
+              kahan_sum(*src.d, value.d, c);
               src.d += stride;
               if (!cumul)
                 ++norm;
@@ -2310,9 +2310,9 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
             } else
               i = 0;
             for ( ; i < w1; i++) {
-              kahan_sum_d(*src.d, value.d, c);
+              kahan_sum(*src.d, value.d, c);
               src.d += stride;
-              kahan_sum_d(*src.d, value.d, c);
+              kahan_sum(*src.d, value.d, c);
               src.d += stride;
               if (!cumul)
                 norm += 2;
@@ -2321,7 +2321,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
             }
           } else {              // full width
             for (i = 0; i < ww; i++) { // do the left edge
-              kahan_sum_d(*src.d, value.d, c);
+              kahan_sum(*src.d, value.d, c);
               src.d += stride;
             }
             double v = value.d/norm;
@@ -2332,7 +2332,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
           }
           // middle part
           for ( ; i < w2; i++) {
-            kahan_sum_d(*src.d - src.d[offset], value.d, c);
+            kahan_sum(*src.d - src.d[offset], value.d, c);
             src.d += stride;
             *trgt.d = value.d/norm;
             trgt.d += stride;
@@ -2340,9 +2340,9 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
           // right-hand edge
           if (internalMode & 1) { // /PARTIAL_WIDTH
             for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
-              kahan_sum_d(-src.d[offset], value.d, c);
+              kahan_sum(-src.d[offset], value.d, c);
               offset += stride;
-              kahan_sum_d(-src.d[offset], value.d, c);
+              kahan_sum(-src.d[offset], value.d, c);
               offset += stride;
               if (!cumul)
                 norm -= 2;
@@ -2350,7 +2350,7 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.d += stride;
             }
             if (!(ww%2)) {
-              kahan_sum_d(-src.d[offset], value.d, c);
+              kahan_sum(-src.d[offset], value.d, c);
               offset += stride;
               if (!cumul)
                 --norm;
@@ -2364,8 +2364,8 @@ int32_t smooth(int32_t narg, int32_t ps[], int32_t cumul)
               trgt.d += stride;
             }
           }
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
         break;
     }
     if (loop < srcinfo.naxes - 1) {
@@ -2534,7 +2534,7 @@ int32_t lux_not(int32_t narg, int32_t ps[])
 {
  int32_t        iq, i, type;
  Array *h;
- register Pointer       arg, result;
+ Pointer       arg, result;
 
  iq = ps[0];
  GET_NUMERICAL(arg, narg);

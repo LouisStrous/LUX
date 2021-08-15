@@ -5271,7 +5271,7 @@ int32_t lux_test(int32_t narg, int32_t ps[])
       info.rearrangeEdgeLoop(NULL, i);
       do
         *src.i32 = value;
-      while (info.advanceLoop(&src) < info.ndim - 1);
+      while (info.advanceLoop(&src.ui8) < info.ndim - 1);
     }
   }
 

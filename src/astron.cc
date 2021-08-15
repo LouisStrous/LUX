@@ -1205,8 +1205,8 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
     default:
       break;
     }
-  } while (tgtinfo.advanceLoop(&tgt),
-           srcinfo.advanceLoop(&src) < srcinfo.rndim);
+  } while (tgtinfo.advanceLoop(&tgt.ui8),
+           srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
   if (!tgtinfo.loopIsAtStart())
     return luxerror("Source loop is finished but target loop is not!", ps[0]);
 
@@ -2313,15 +2313,15 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   case LUX_INT8:
     do {
       alpha = *src.ui8*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.ui8*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
       *tgt.f = delta*RAD;
       do {
-        done = srcinfo.advanceLoop(&src);
-        tgtinfo.advanceLoop(&tgt);
+        done = srcinfo.advanceLoop(&src.ui8);
+        tgtinfo.advanceLoop(&tgt.ui8);
         if (!done)
           *tgt.f = *src.ui8;
       } while (!done);
@@ -2330,15 +2330,15 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   case LUX_INT16:
     do {
       alpha = *src.i16*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.i16*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
       *tgt.f = delta*RAD;
       do {
-        done = srcinfo.advanceLoop(&src);
-        tgtinfo.advanceLoop(&tgt);
+        done = srcinfo.advanceLoop(&src.ui8);
+        tgtinfo.advanceLoop(&tgt.ui8);
         if (!done)
           *tgt.f = *src.i16;
       } while (!done);
@@ -2347,15 +2347,15 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   case LUX_INT32:
     do {
       alpha = *src.i32*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.i32*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
       *tgt.f = delta*RAD;
       do {
-        done = srcinfo.advanceLoop(&src);
-        tgtinfo.advanceLoop(&tgt);
+        done = srcinfo.advanceLoop(&src.ui8);
+        tgtinfo.advanceLoop(&tgt.ui8);
         if (!done)
           *tgt.f = *src.i32;
       } while (!done);
@@ -2364,15 +2364,15 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   case LUX_FLOAT:
     do {
       alpha = *src.f*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.f*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.f = alpha*RAD;
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
       *tgt.f = delta*RAD;
       do {
-        done = srcinfo.advanceLoop(&src);
-        tgtinfo.advanceLoop(&tgt);
+        done = srcinfo.advanceLoop(&src.ui8);
+        tgtinfo.advanceLoop(&tgt.ui8);
         if (!done)
           *tgt.f = *src.f;
       } while (!done);
@@ -2381,15 +2381,15 @@ int32_t lux_precess(int32_t narg, int32_t ps[])
   case LUX_DOUBLE:
     do {
       alpha = *src.d*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.d*DEG;
       precessEquatorial(&alpha, &delta, JDfrom, JDto);
       *tgt.d = alpha*RAD;
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
       *tgt.d = delta*RAD;
       do {
-        done = srcinfo.advanceLoop(&src);
-        tgtinfo.advanceLoop(&tgt);
+        done = srcinfo.advanceLoop(&src.ui8);
+        tgtinfo.advanceLoop(&tgt.ui8);
         if (!done)
           *tgt.d = *src.d;
       } while (!done);
@@ -2470,10 +2470,10 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
   case LUX_INT8:
     do {
       alpha = *src.ui8*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.ui8*DEG;
       do
-        done = srcinfo.advanceLoop(&src);
+        done = srcinfo.advanceLoop(&src.ui8);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2487,16 +2487,16 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
     } while (done < srcinfo.rndim);
     break;
   case LUX_INT16:
     do {
       alpha = *src.i16*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.i16*DEG;
       do
-        done = srcinfo.advanceLoop(&src);
+        done = srcinfo.advanceLoop(&src.ui8);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2510,16 +2510,16 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
     } while (done < srcinfo.rndim);
     break;
   case LUX_INT32:
     do {
       alpha = *src.i32*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.i32*DEG;
       do
-        done = srcinfo.advanceLoop(&src);
+        done = srcinfo.advanceLoop(&src.ui8);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2533,16 +2533,16 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
     } while (done < srcinfo.rndim);
     break;
   case LUX_FLOAT:
     do {
       alpha = *src.f*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.f*DEG;
       do
-        done = srcinfo.advanceLoop(&src);
+        done = srcinfo.advanceLoop(&src.ui8);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2556,16 +2556,16 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
     } while (done < srcinfo.rndim);
     break;
   case LUX_DOUBLE:
     do {
       alpha = *src.d*DEG;
-      srcinfo.advanceLoop(&src);
+      srcinfo.advanceLoop(&src.ui8);
       delta = *src.d*DEG;
       do
-        done = srcinfo.advanceLoop(&src);
+        done = srcinfo.advanceLoop(&src.ui8);
       while (!done);
       if (vocal) {
         printf("CONSTELLATION (equinox %.10g)\n", equinox);
@@ -2579,7 +2579,7 @@ int32_t lux_constellation(int32_t narg, int32_t ps[])
         showraddms(" delta = ", delta);
       }
       *tgt.ui8 = constellation(alpha*RAD, delta*RAD);
-      tgtinfo.advanceLoop(&tgt);
+      tgtinfo.advanceLoop(&tgt.ui8);
     } while (done < srcinfo.rndim);
     break;
   }
@@ -4117,7 +4117,7 @@ int32_t lux_astrf(int32_t narg, int32_t ps[]) {
     }
     src.ui8 += srcinfo.rdims[0]*srcinfo.stride;
     tgt.ui8 += tgtinfo.rdims[0]*tgtinfo.stride;
-  } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
+  } while (srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
   return result;
 }
 //--------------------------------------------------------------------------

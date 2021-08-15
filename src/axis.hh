@@ -69,7 +69,7 @@ struct LoopInfo {
   int setupDimensionLoop(int32_t ndim, int32_t const *dims,
                          Symboltype type, int32_t naxes, int32_t const *axes,
                          Pointer *data, int32_t mode);
-  int32_t advanceLoop(Pointer *ptr);
+  int32_t advanceLoop(void* ptr);
   int32_t loopIsAtStart() const;
   void rearrangeDimensionLoop();
   void setAxisMode(int32_t mode);

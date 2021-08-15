@@ -320,7 +320,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
           } // end of if (*ptr.f > level.f[lev]) else
         } // end of for (lev = 0; ...)
         src.f += step*srcinfo.rdims[0];
-      } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
     case LUX_DOUBLE:
       do {
@@ -441,7 +441,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
           } // end of if (*ptr.d > level.d[lev]) else
         } // end of for (lev = 0; ...)
         src.d += step*srcinfo.rdims[0];
-      } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
+      } while (srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       break;
   default:
     break;
@@ -599,7 +599,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
               Bytestack_push_data(b, c, (uint8_t *) c + csize);
             }
           }
-        } while ((i = srcinfo.advanceLoop(&src)) == 0);
+        } while ((i = srcinfo.advanceLoop(&src.ui8)) == 0);
       } while (i < srcinfo.rndim);
       break;
   case LUX_DOUBLE:
@@ -643,7 +643,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
               Bytestack_push_data(b, c, (uint8_t *) c + csize);
             }
           }
-        } while ((i = srcinfo.advanceLoop(&src)) == 0);
+        } while ((i = srcinfo.advanceLoop(&src.ui8)) == 0);
       } while (i < srcinfo.rndim);
     break;
   default:
@@ -1292,8 +1292,8 @@ LS 9nov98 */
           value *= 0.5;
       }
       *trgt.f = value;
-    } while (trgtinfo.advanceLoop(&trgt),
-             srcinfo.advanceLoop(&src) < srcinfo.rndim);
+    } while (trgtinfo.advanceLoop(&trgt.ui8),
+             srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
   else                          // gaussian smoothing
     do {
       count = twosided + 1;
@@ -1432,8 +1432,8 @@ LS 9nov98 */
       if (!total)
         value /= ws;
       *trgt.f = value;
-    } while (trgtinfo.advanceLoop(&trgt),
-             srcinfo.advanceLoop(&src) < srcinfo.rndim);
+    } while (trgtinfo.advanceLoop(&trgt.ui8),
+             srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
   return iq;
 }
 //--------------------------------------------------------------------
@@ -1609,8 +1609,8 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
           }
         } // end of while (s < s0)
       } // end of while (count--)
-    } while (trgtinfo.advanceLoop(&trgt),
-             srcinfo.advanceLoop(&src) < srcinfo.rndim);
+    } while (trgtinfo.advanceLoop(&trgt.ui8),
+             srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
   } else {                      // gaussian smoothing
     norm = 0.5*M_2_SQRTPI;
     do {
@@ -1749,8 +1749,8 @@ int32_t lux_dir_smooth2(int32_t narg, int32_t ps[])
           }
         } // end of while (d < DONE)
       } // end of while (count--)
-    } while (trgtinfo.advanceLoop(&trgt),
-             srcinfo.advanceLoop(&src) < srcinfo.rndim);
+    } while (trgtinfo.advanceLoop(&trgt.ui8),
+             srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
   }
   return iq;
 }

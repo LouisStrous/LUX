@@ -115,11 +115,11 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
           }
         ptrs[0].d += infos[0].singlestep[2];
         ptrs[2].d += infos[2].singlestep[2];
-      } while (infos[0].advanceLoop(&ptrs[0]),
-               infos[2].advanceLoop(&ptrs[2]) < 2);
+      } while (infos[0].advanceLoop(&ptrs[0].ui8),
+               infos[2].advanceLoop(&ptrs[2].ui8) < 2);
       ptrs[0].d -= infos[0].ndim > 3? infos[0].singlestep[3]: infos[0].nelem;
       ptrs[1].d += infos[1].singlestep[2];
-    } while (infos[1].advanceLoop(&ptrs[1]) < infos[1].ndim);
+    } while (infos[1].advanceLoop(&ptrs[1].ui8) < infos[1].ndim);
   } else {                      // /INNER
     do {
       for (i = 0; i < dims1[1]; i++) // rows of #1
@@ -132,9 +132,9 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
       ptrs[0].d += infos[0].singlestep[2];
       ptrs[1].d += infos[1].singlestep[2];
       ptrs[2].d += infos[2].singlestep[2];
-    } while (infos[0].advanceLoop(&ptrs[0]),
-             infos[1].advanceLoop(&ptrs[1]),
-             infos[2].advanceLoop(&ptrs[2]) < infos[2].ndim);
+    } while (infos[0].advanceLoop(&ptrs[0].ui8),
+             infos[1].advanceLoop(&ptrs[1].ui8),
+             infos[2].advanceLoop(&ptrs[2].ui8) < infos[2].ndim);
   }
   return iq;
 
@@ -292,10 +292,10 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
     ptrs[1].d += infos[1].singlestep[2];
     ptrs[2].d += infos[2].singlestep[1];
     ptrs[3].d += infos[3].singlestep[2];
-  } while (infos[0].advanceLoop(&ptrs[0]),
-           infos[1].advanceLoop(&ptrs[1]),
-           infos[2].advanceLoop(&ptrs[2]),
-           infos[3].advanceLoop(&ptrs[3]) < infos[3].ndim);
+  } while (infos[0].advanceLoop(&ptrs[0].ui8),
+           infos[1].advanceLoop(&ptrs[1].ui8),
+           infos[2].advanceLoop(&ptrs[2].ui8),
+           infos[3].advanceLoop(&ptrs[3].ui8) < infos[3].ndim);
   iq = LUX_OK;
   return iq;
 #else
@@ -348,8 +348,8 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
     matrix_transpose(ptrs[0].d, ptrs[1].d, infos[0].dims[0], infos[0].dims[1]);
     ptrs[0].d += n;
     ptrs[1].d += n;
-  } while (infos[0].advanceLoop(&ptrs[0]),
-           infos[1].advanceLoop(&ptrs[1]) < infos[1].rndim);
+  } while (infos[0].advanceLoop(&ptrs[0].ui8),
+           infos[1].advanceLoop(&ptrs[1].ui8) < infos[1].rndim);
   return iq;
 }
 REGISTER(transpose_matrix, f, transpose, 1, 1, NULL);

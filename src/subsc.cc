@@ -279,7 +279,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
       default:
         return cerror(ILL_TYPE, ps[0]);
     }
-  } while (trgtinfo.advanceLoop(&trgt) < trgtinfo.rndim);
+  } while (trgtinfo.advanceLoop(&trgt.ui8) < trgtinfo.rndim);
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
@@ -603,8 +603,8 @@ int32_t lux_reverse(int32_t narg, int32_t ps[])
             } // end of while (i--)
           src.ui8 = src2.ui8 + stride*srcinfo.rdims[0];
           trgt.ui8 = trgt2.ui8 + stride*srcinfo.rdims[0];
-        } while (trgtinfo.advanceLoop(&trgt),
-                 srcinfo.advanceLoop(&src) < srcinfo.rndim);
+        } while (trgtinfo.advanceLoop(&trgt.ui8),
+                 srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
       else {                    // center is out of bounds
         if (internalMode & 1) {         // /ZERO
           zerobytes(trgt.ui8, trgtinfo.nelem*trgtinfo.stride);
@@ -3183,7 +3183,7 @@ int32_t extractNumerical(Pointer src, Pointer trgt, Symboltype type,
   do {
     memcpy(trgt.ui8, src.ui8, info.stride);
     src.ui8 += info.stride;
-  } while (info.advanceLoop(&trgt) < info.rndim);
+  } while (info.advanceLoop(&trgt.ui8) < info.rndim);
   return 1;
 }
 //-------------------------------------------------------------------------
@@ -3245,7 +3245,7 @@ int32_t lux_roll(int32_t narg, int32_t ps[])
   do {
     memcpy(trgt.ui8, src.ui8, srcinfo.stride);
     trgt.ui8 += srcinfo.stride;
-  } while (srcinfo.advanceLoop(&src) < srcinfo.rndim);
+  } while (srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
 
   return result;
 }

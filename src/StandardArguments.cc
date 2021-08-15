@@ -1723,8 +1723,7 @@ StandardArguments::result() const
 int
 StandardArguments::advanceLoop(size_t index)
 {
-  int32_t advanceLoop(LoopInfo*, Pointer*);
-  return m_loop_infos[index].advanceLoop(&m_pointers[index]);
+  return m_loop_infos[index].advanceLoop(m_pointers[index].ui8);
 }
 
 /// Creates an object to which the instances of Pointer and LoopInfo

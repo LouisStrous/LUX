@@ -258,7 +258,7 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
     do {
       f(ptrs[iret].d, infos[iret].rdims[0], infos[iret].rsinglestep[0]);
       ptrs[iret].d += infos[iret].rsinglestep[0]*infos[iret].rdims[0];
-    } while (infos[iret].advanceLoop(&ptrs[iret]) < infos[iret].rndim);
+    } while (infos[iret].advanceLoop(&ptrs[iret].ui8) < infos[iret].rndim);
   }
   if (allaxes)
     free(axes);
@@ -901,8 +901,8 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
     do {
       *ptrs[iret].d = f(ptrs[0].d, infos[0].rdims[0], infos[0].rsinglestep[0]);
       ptrs[0].d += infos[0].rsinglestep[1];
-    } while (infos[iret].advanceLoop(&ptrs[iret]),
-             infos[0].advanceLoop(&ptrs[0]) < infos[0].rndim);
+    } while (infos[iret].advanceLoop(&ptrs[iret].ui8),
+             infos[0].advanceLoop(&ptrs[0].ui8) < infos[0].rndim);
   }
   if (allaxes)
     free(axes);
@@ -1759,8 +1759,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
       ptrs[iret].d, infos[0].rdims[0], infos[iret].rsinglestep[0]);
     ptrs[0].d += infos[0].rsinglestep[1];
     ptrs[iret].d += infos[iret].rsinglestep[1];
-  } while (infos[0].advanceLoop(&ptrs[0]),
-           infos[iret].advanceLoop(&ptrs[iret])
+  } while (infos[0].advanceLoop(&ptrs[0].ui8),
+           infos[iret].advanceLoop(&ptrs[iret].ui8)
            < infos[iret].rndim);
   return iq;
 }
@@ -1806,10 +1806,10 @@ lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(int32_t narg, int32_t ps[],
     return LUX_ERROR;
   do {
     f(*ptrs[0].d, *ptrs[1].d, *ptrs[2].d, (double (*)[3]) ptrs[3].d);
-  } while (infos[0].advanceLoop(&ptrs[3]),
-           infos[1].advanceLoop(&ptrs[2]),
-           infos[2].advanceLoop(&ptrs[1]),
-           infos[3].advanceLoop(&ptrs[0]) < infos[0].rndim);
+  } while (infos[0].advanceLoop(&ptrs[3].ui8),
+           infos[1].advanceLoop(&ptrs[2].ui8),
+           infos[2].advanceLoop(&ptrs[1].ui8),
+           infos[3].advanceLoop(&ptrs[0].ui8) < infos[0].rndim);
   return sa.result();
 }
 //-----------------------------------------------------------------------

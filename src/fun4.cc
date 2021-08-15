@@ -1969,10 +1969,10 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
         sum.i32 = 0;
         do
           sum.i32 += (int32_t) src.ui8[offset];
-        while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
+        while (tmpinfo.advanceLoop(&src.ui8) < tmpinfo.rndim);
         *trgt.ui8 = sum.i32/nel;
         src.ui8 = (uint8_t *) tmpinfo.data0;
-        n = trgtinfo.advanceLoop(&trgt);
+        n = trgtinfo.advanceLoop(&trgt.ui8);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
           offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -1983,10 +1983,10 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
         sum.i32 = 0;
         do
           sum.i32 += (int32_t) src.i16[offset];
-        while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
+        while (tmpinfo.advanceLoop(&src.ui8) < tmpinfo.rndim);
         *trgt.i16 = sum.i32/nel;
         src.i16 = (int16_t *) tmpinfo.data0;
-        n = trgtinfo.advanceLoop(&trgt);
+        n = trgtinfo.advanceLoop(&trgt.ui8);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
           offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -1997,10 +1997,10 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
         sum.i32 = 0;
         do
           sum.i32 += src.i32[offset];
-        while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
+        while (tmpinfo.advanceLoop(&src.ui8) < tmpinfo.rndim);
         *trgt.i32 = sum.i32/nel;
         src.i32 = (int32_t *) tmpinfo.data0;
-        n = trgtinfo.advanceLoop(&trgt);
+        n = trgtinfo.advanceLoop(&trgt.ui8);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
           offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -2011,10 +2011,10 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
         sum.i64 = 0;
         do
           sum.i64 += src.i64[offset];
-        while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
+        while (tmpinfo.advanceLoop(&src.ui8) < tmpinfo.rndim);
         *trgt.i64 = sum.i64/nel;
         src.i64 = (int64_t*) tmpinfo.data0;
-        n = trgtinfo.advanceLoop(&trgt);
+        n = trgtinfo.advanceLoop(&trgt.ui8);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
           offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -2025,10 +2025,10 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
         sum.d = 0;
         do
           sum.d += (double) src.f[offset];
-        while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
+        while (tmpinfo.advanceLoop(&src.ui8) < tmpinfo.rndim);
         *trgt.f = sum.d/nel;
         src.f = (float *) tmpinfo.data0;
-        n = trgtinfo.advanceLoop(&trgt);
+        n = trgtinfo.advanceLoop(&trgt.ui8);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
           offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];
@@ -2039,10 +2039,10 @@ int32_t lux_compress(int32_t narg, int32_t ps[])
         sum.d = 0;
         do
           sum.d += src.d[offset];
-        while (tmpinfo.advanceLoop(&src) < tmpinfo.rndim);
+        while (tmpinfo.advanceLoop(&src.ui8) < tmpinfo.rndim);
         *trgt.d = sum.d/nel;
         src.d = (double *) tmpinfo.data0;
-        n = trgtinfo.advanceLoop(&trgt);
+        n = trgtinfo.advanceLoop(&trgt.ui8);
         offset = 0;
         for (i = 0; i < trgtinfo.ndim; i++)
           offset += srcinfo.rsinglestep[i]*trgtinfo.coords[i]*div[srcinfo.raxes[i]];

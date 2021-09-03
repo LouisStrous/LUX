@@ -35,6 +35,7 @@ nonbind_sources = \
 	FloatingPointAccumulator.hh\
 	GnuPlot.cc\
 	GnuPlot.hh\
+	InstanceID.hh\
 	MonotoneInterpolation.cc\
 	MonotoneInterpolation.hh\
 	NumericDataDescriptor.cc\

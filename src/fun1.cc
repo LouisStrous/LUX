@@ -24,6 +24,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <limits>
+#include "InstanceID.hh"
 #include <time.h>
 #include <sys/time.h>
 #include <string.h>
@@ -35,6 +37,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.hh"
 #include "action.hh"
 #include "calendar.hh"
+
+size_t InstanceID::s_instance_id = 0; // define static member
 
 void    Quit(int32_t);
 
@@ -3455,7 +3459,526 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   return result;
 }
 //-----------------------------------------------------------------------
-int32_t total(int32_t narg, int32_t ps[], int32_t mean)
+
+/// An interface template that demands a function operator that transforms a
+/// scalar.
+///
+/// \tparam T is the type of the scalar to transform and is also the return type
+/// of the function operator.
+template<typename T>
+class ScalarTransform
+  : virtual public InstanceID
+{
+public:
+  /// An abstract function operator that takes and returns a value of the same
+  /// type.
+  ///
+  /// \param x is the value to transform.
+  ///
+  /// \returns the transformed value.
+  virtual T
+  operator()(T x) const
+  = 0;
+};
+
+/// A template class that provides a function operator that returns its argument
+/// unchanged.  This can be used in situations where a ScalarTransform is
+/// expected but no scalar transformation is desired.
+///
+/// \tparam T is the type of the scalar to tranform.
+template<typename T>
+class NullTransform
+  : public ScalarTransform<T>,
+    virtual public InstanceID
+{
+public:
+  /// A function operator that leaves its argument unchanged.
+  ///
+  /// \param x is the value to transform.
+  ///
+  /// \returns \a x
+  virtual T
+  operator()(T x) const
+  {
+    return x;
+  }
+};
+
+/// A template class that provides a function operator that raises its argument
+/// to an integer power.
+///
+/// \tparam T is the type of the scalar to transform.
+template<typename T>
+class IntegerPower
+  : public ScalarTransform<T>,
+    virtual public InstanceID
+{
+public:
+  // constructors, destructor
+
+  /// Regular constructor.
+  ///
+  /// \param power is the power to which to raise the arguments of the function
+  /// operator.  It may be positive, zero, or negative.
+  IntegerPower(int power)
+    : m_power(power)
+  {
+    int p = std::abs(m_power);
+    while (p) {
+      m_present.push_back(p & 1);
+      p >>= 1;
+    }
+  }
+
+  /// Copy constructor.
+  ///
+  /// \param other is the instance to copy.
+  IntegerPower(const IntegerPower& other)
+    : m_power(other.m_power),
+      m_present(other.m_present)
+  { }
+
+  // no move constructor
+  IntegerPower(IntegerPower&& other) = delete;
+
+  /// Default destructor.
+  ~IntegerPower() = default;
+
+  // operators
+
+  /// Copy-assignment operator.
+  ///
+  /// \param other is the instance to assign from.
+  ///
+  /// \returns a reference to the current instance.
+  IntegerPower&
+  operator=(const IntegerPower& other)
+  {
+    if (this != &other) {
+      m_power = other.m_power;
+      m_present = other.m_present;
+    }
+    return *this;
+  }
+
+  // no move-assignment operator
+  IntegerPower&
+  operator=(IntegerPower&& other) = delete;
+
+  /// The function operator that calculates the configured integer power of the
+  /// argument.  No checking for overflow is done.
+  ///
+  /// \param x is the value to transform
+  ///
+  /// \returns the configured integer power of the argument.
+  T
+  operator()(T x) const
+  {
+    T result = 1;
+    for (auto it = m_present.begin(); it != m_present.end(); ++it) {
+      if (*it)
+        result *= x;
+      x *= x;
+    }
+    if (m_power >= 0)
+      return result;
+    else if (result != 0 || std::numeric_limits<T>::has_infinity)
+      return 1/result;
+    else
+      return 0;                 // instead of 1/0
+  }
+
+private:
+  int m_power;                  //!< the power to raise to.
+  std::vector<bool> m_present;
+};
+
+/// A template class that represents the algorithm to calculate the unweighted
+/// total or average of a collections of data values.
+///
+/// \tparam InType is the type of the data values to process.
+///
+/// \tparam OutType is the type of the resulting total or average.
+///
+/// \tparam IntermediateType is the type of the partial sum.  By default it is
+/// equal to \a OutType.  For a floating-point input type, the effects of
+/// round-off errors in summing a large number of input values with a large
+/// dynamic range is sharply reduced if the partial sum is tracked in a
+/// floating-point data type that is wider than \a InType.  And for an integer
+/// input type, using a wider intermediate type can avoid overflow problems.
+///
+/// \sa AlgorithmTotalWithWeight
+template<typename InType, typename OutType,
+         typename IntermediateType = OutType>
+class AlgorithmTotal
+  : virtual public InstanceID
+{
+public:
+  // constructors, destructor
+
+  /// Constructor.
+  ///
+  /// \param[in,out] src_loop defines how to iterate over the input values.  It
+  /// has the purpose of an iterator but does not have the interface of a C++
+  /// iterator.
+  ///
+  /// \param[in] src_data points at the beginning of the block of input values.
+  ///
+  /// \param[in,out] tgt_data points at the beginning of the memory where the
+  /// output values get stored.
+  ///
+  /// \param want_mean says whether or not the average of the input values
+  /// should be returned instead of the total.
+  ///
+  /// \param omit_NaNs says whether or not to omit NaN values from the
+  /// calculations.  It is only relevant for floating-point values and defaults
+  /// to \c false.
+  AlgorithmTotal(LoopInfo& src_loop,
+                 const InType* src_data,
+                 OutType* tgt_data,
+                 bool want_mean,
+                 bool omit_NaNs = false)
+    : m_src_loop(src_loop),
+      m_src_data(src_data),
+      m_tgt_data(tgt_data),
+      m_nulltransform(),
+      m_transform(m_nulltransform),
+      m_want_mean(want_mean),
+      m_omit_NaNs(omit_NaNs)
+  { }
+
+  /// Constructor.
+  ///
+  /// \param[in,out] src_loop defines how to iterate over the input values.  It
+  /// has the purpose of an iterator but does not have the interface of a C++
+  /// iterator.
+  ///
+  /// \param[in,out] src_data points at the beginning of the block of input
+  /// values.
+  ///
+  /// \param[in,out] tgt_data points at the beginning of the memory where the
+  /// output values get stored.
+  ///
+  /// \param[in] transform defines how each input value should be transformed
+  /// before being counted.
+  ///
+  /// \param want_mean says whether or not the average of the input values
+  /// should be returned instead of the total.
+  ///
+  /// \param omit_NaNs says whether or not to omit NaN values from the
+  /// calculations.  It is only relevant for floating-point values and defaults
+  /// to \c false.
+  AlgorithmTotal(LoopInfo& src_loop,
+                 const InType* src_data,
+                 OutType* tgt_data,
+                 const ScalarTransform<IntermediateType>& transform,
+                 bool want_mean,
+                 bool omit_NaNs = false)
+    : m_src_loop(src_loop),
+      m_src_data(src_data),
+      m_tgt_data(tgt_data),
+      m_transform(transform),
+      m_want_mean(want_mean),
+      m_omit_NaNs(omit_NaNs)
+  { }
+
+  ~AlgorithmTotal() = default;
+
+  /// Copy constructor.
+  ///
+  /// \param[in] other is the instance to copy.
+  AlgorithmTotal(const AlgorithmTotal& other)
+    : m_src_loop(other.m_src_loop),
+      m_src_data(other.m_src_data),
+      m_tgt_data(other.m_tgt_data),
+      m_nulltransform(),
+      m_transform(other.m_transform),
+      m_transform(m_transform),
+      m_want_mean(other.m_want_mean),
+      m_omit_NaNs(other.m_omit_NaNs)
+  { }
+
+  // no move constructor
+  AlgorithmTotal(AlgorithmTotal&& other) = delete;
+
+  // non-const methods
+
+  /// Copy assignment.
+  ///
+  /// \param[in] other is the instance to assign from.
+  ///
+  /// \returns a reference to the current instance.
+  AlgorithmTotal&
+  operator=(const AlgorithmTotal& other)
+  {
+    m_src_loop = other.m_src_loop;
+    m_src_data = other.m_src_data;
+    m_tgt_data = other.m_tgt_data;
+    m_transform = other.m_transform;
+    m_want_mean = other.m_want_mean;
+    m_omit_NaNs = other.m_omit_NaNs;
+    return *this;
+  }
+
+  // no move assignment
+  AlgorithmTotal&
+  operator=(AlgorithmTotal&& other) = delete;
+
+  /// Evaluate the instance.  This processes input values and produces output
+  /// values as configured during construction.
+  void
+  operator()()
+  {
+    int done = 0;
+    if (m_omit_NaNs) {
+      do {
+        IntermediateType sum = 0;
+        size_t m_element_count = 0;
+        do {
+          if (!isnan(*m_src_data)) {
+            sum += m_transform(*m_src_data);
+            ++m_element_count;
+          }
+        } while ((done = m_src_loop.advanceLoop(&m_src_data))
+                 < m_src_loop.naxes);
+        *m_tgt_data++ = m_want_mean?
+          sum/std::max(m_element_count, (size_t) 1): sum;
+      } while (done < m_src_loop.rndim);
+    } else {
+      do {
+        IntermediateType sum = 0;
+        size_t m_element_count = 0;
+        do {
+          sum += m_transform(*m_src_data);
+          ++m_element_count;
+        } while ((done = m_src_loop.advanceLoop(&m_src_data))
+                 < m_src_loop.naxes);
+        *m_tgt_data++ = m_want_mean?
+          sum/std::max(m_element_count, (size_t) 1): sum;
+      } while (done < m_src_loop.rndim);
+    }
+  }
+
+private:
+  LoopInfo& m_src_loop;         //!< The input dimensions and "iterator".
+  const InType* m_src_data;     //!< Pointer to the input values.
+  OutType* m_tgt_data;          //!< Pointer to the output values.
+  size_t m_element_count;       //!< Counter of processed input values.
+  bool m_want_mean;             //!< Do we want the mean instead of the total?
+  bool m_omit_NaNs;             //!< Do we want to omit NaNs?
+
+  /// A ScalarTransform that does nothing.  Needed as a target for #m_transform
+  /// if no specific transform is requested.
+  NullTransform<IntermediateType> m_nulltransform;
+
+  /// Defines a transformation of the input values.
+  const ScalarTransform<IntermediateType>& m_transform;
+};
+
+/// A template class that represents the algorithm to calculate the weighted
+/// total or average of a collections of data values.
+///
+/// \tparam InType is the type of the data values to process.
+///
+/// \tparam OutType is the type of the resulting total or average.
+///
+/// \tparam IntermediateType is the type of the partial sum.  By default it is
+/// equal to \a OutType.  For a floating-point input type, the effects of
+/// round-off errors in summing a large number of input values with a large
+/// dynamic range is sharply reduced if the partial sum is tracked in a
+/// floating-point data type that is wider than \a InType.  And for an integer
+/// input type, using a wider intermediate type can avoid overflow problems.
+///
+/// \sa AlgorithmTotal
+template<typename InType, typename OutType,
+         typename IntermediateType = OutType>
+class AlgorithmTotalWithWeight
+  : virtual public InstanceID
+{
+public:
+  // constructors, destructor
+
+  /// Constructor.
+  ///
+  /// \param[in,out] src_loop defines how to iterate over the input values.  It
+  /// has the purpose of an iterator but does not have the interface of a C++
+  /// iterator.
+  ///
+  /// \param[in] src_data points at the beginning of the block of input values.
+  ///
+  /// \param[in,out] weight_loop defines how to iterate over the weights.
+  ///
+  /// \param[in] weight_data points at the beginning of the block of weights.
+  ///
+  /// \param[in,out] tgt_data points at the beginning of the memory where the
+  /// output values get stored.
+  ///
+  /// \param want_mean says whether or not the average of the input values
+  /// should be returned instead of the total.
+  ///
+  /// \param omit_NaNs says whether or not to omit NaN values from the
+  /// calculations.  It is only relevant for floating-point values and defaults
+  /// to \c false.
+  AlgorithmTotalWithWeight(LoopInfo& src_loop,
+                           const InType* src_data,
+                           LoopInfo& weight_loop,
+                           const InType* weight_data,
+                           OutType* tgt_data,
+                           bool want_mean,
+                           bool omit_NaNs = false)
+    : m_src_loop(src_loop),
+      m_src_data(src_data),
+      m_weight_loop(weight_loop),
+      m_weight_data(weight_data),
+      m_tgt_data(tgt_data),
+      m_want_mean(want_mean),
+      m_omit_NaNs(omit_NaNs),
+      m_nulltransform(),
+      m_transform(m_nulltransform)
+  { }
+
+  /// Constructor.
+  ///
+  /// \param[in,out] src_loop defines how to iterate over the input values.  It
+  /// has the purpose of an iterator but does not have the interface of a C++
+  /// iterator.
+  ///
+  /// \param[in] src_data points at the beginning of the block of input values.
+  ///
+  /// \param[in,out] weight_loop defines how to iterate over the weights.
+  ///
+  /// \param[in] weight_data points at the beginning of the block of weights.
+  ///
+  /// \param[in,out] tgt_data points at the beginning of the memory where the
+  /// output values get stored.
+  ///
+  /// \param[in] transform defines how each input value should be transformed
+  /// before being counted.
+  ///
+  /// \param want_mean says whether or not the average of the input values
+  /// should be returned instead of the total.
+  ///
+  /// \param omit_NaNs says whether or not to omit NaN values from the
+  /// calculations.  It is only relevant for floating-point values and defaults
+  /// to \c false.
+  AlgorithmTotalWithWeight(LoopInfo& src_loop,
+                           const InType* src_data,
+                           LoopInfo& weight_loop,
+                           const InType* weight_data,
+                           OutType* tgt_data,
+                           ScalarTransform<IntermediateType>& transform,
+                           bool want_mean,
+                           bool omit_NaNs = false)
+    : m_src_loop(src_loop),
+      m_src_data(src_data),
+      m_weight_loop(weight_loop),
+      m_weight_data(weight_data),
+      m_tgt_data(tgt_data),
+      m_transform(transform),
+      m_want_mean(want_mean),
+      m_omit_NaNs(omit_NaNs)
+  { }
+
+  ~AlgorithmTotalWithWeight() = default;
+
+  /// Copy constructor.
+  ///
+  /// \param[in] other is the instance to copy.
+  AlgorithmTotalWithWeight(const AlgorithmTotalWithWeight& other)
+    : m_src_loop(other.m_src_loop),
+      m_src_data(other.m_src_data),
+      m_weight_loop(other.m_weight_loop),
+      m_weight_data(other.m_weight_data),
+      m_tgt_data(other.m_tgt_data),
+      m_nulltransform(),
+      m_transform(other.m_transform),
+      m_transform(m_transform),
+      m_want_mean(other.m_want_mean),
+      m_omit_NaNs(other.m_omit_NaNs)
+  { }
+
+  // no move constructor
+  AlgorithmTotalWithWeight(AlgorithmTotalWithWeight&& other) = delete;
+
+  // non-const methods
+
+  /// Copy assignment.
+  ///
+  /// \param[in] other is the instance to assign from.
+  ///
+  /// \returns a reference to the current instance.
+  AlgorithmTotalWithWeight&
+  operator=(const AlgorithmTotalWithWeight& other)
+  {
+    m_src_loop = other.m_src_loop;
+    m_src_data = other.m_src_data;
+    m_weight_loop = other.m_weight_loop;
+    m_weight_data = other.m_weight_data;
+    m_tgt_data = other.m_tgt_data;
+    m_transform = other.m_transform;
+    m_want_mean = other.m_want_mean;
+    m_omit_NaNs = other.m_omit_NaNs;
+    return *this;
+  }
+
+  // no move assignment
+  AlgorithmTotalWithWeight&
+  operator=(AlgorithmTotalWithWeight&& other) = delete;
+
+  /// Evaluate the instance.  This processes input values and produces output
+  /// values as configured during construction.
+  void
+  operator()()
+  {
+    int done = 0;
+    if (m_omit_NaNs) {
+      do {
+        IntermediateType sum = 0;
+        IntermediateType weight = 0;
+        do {
+          if (!isnan(*m_src_data)) {
+            sum += m_transform(*m_src_data) * *m_weight_data;
+            weight += *m_weight_data;
+          }
+        } while ((done = (m_weight_loop.advanceLoop(&m_weight_data),
+                          m_src_loop.advanceLoop(&m_src_data)))
+                 < m_src_loop.naxes);
+        *m_tgt_data++ = m_want_mean? (weight? sum/weight: 0): sum;
+      } while (done < m_src_loop.rndim);
+    } else {
+      do {
+        IntermediateType sum = 0;
+        IntermediateType weight = 0;
+        do {
+          sum += m_transform(*m_src_data) * *m_weight_data;
+          weight += *m_weight_data;
+        } while ((done = (m_weight_loop.advanceLoop(&m_weight_data),
+                          m_src_loop.advanceLoop(&m_src_data)))
+                 < m_src_loop.naxes);
+        *m_tgt_data++ = m_want_mean? (weight? sum/weight: 0): sum;
+      } while (done < m_src_loop.rndim);
+    }
+  }
+
+private:
+  LoopInfo& m_src_loop;         //!< The input dimensions and "iterator".
+  const InType* m_src_data;     //!< Pointer to the input values.
+  LoopInfo& m_weight_loop;      //!< The weight dimensions and "iterator".
+  const InType* m_weight_data;  //!< Pointer to the weight values.
+  OutType* m_tgt_data;          //!< Pointer to the output values.
+  size_t m_element_count;       //!< Counter of processed input values.
+  bool m_want_mean;             //!< Do we want the mean instead of the total?
+  bool m_omit_NaNs;             //!< Do we want the mean instead of the total?
+
+  /// A ScalarTransform that does nothing.  Needed as a target for #m_transform
+  /// if no specific transform is requested.
+  NullTransform<IntermediateType> m_nulltransform;
+
+  /// Defines a transformation of the input values.
+  ScalarTransform<IntermediateType>& m_transform;
+};
+
+int32_t total(int32_t narg, int32_t ps[], bool mean)
 // TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /FLOAT, /DOUBLE])
 
 // TOTAL(array) sums all elements of <array> and returns a LUX_SCALAR.
@@ -3626,183 +4149,95 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
         case LUX_INT32:
           switch (type) {
             case LUX_INT8:
-              do {
-                sum.i32 = 0.0;
-                w.i32 = 0.0;
-                do {
-                  sum.i32 += *src.ui8 * *weights.ui8;
-                  w.i32 += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights),
-                                  srcinfo.advanceLoop(&src)))
-                         < srcinfo.naxes);
-                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.i32, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i32 = 0.0;
-                w.i32 = 0.0;
-                do {
-                  sum.i32 += *src.i16 * *weights.i16;
-                  w.i32 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.i32, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i32 = 0.0;
-                w.i32 = 0.0;
-                do {
-                  sum.i32 += *src.i32 * *weights.i32;
-                  w.i32 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0): sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.i32, mean);
+                a();
+              }
               break;
           } // end of switch (type)
           break;
         case LUX_INT64:
           switch (type) {
             case LUX_INT8:
-              do {
-                sum.i64 = 0.0;
-                w.i64 = 0.0;
-                do {
-                  sum.i64 += *src.ui8 * *weights.ui8;
-                  w.i64 += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.i64, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i64 = 0.0;
-                w.i64 = 0.0;
-                do {
-                  sum.i64 += *src.i16 * *weights.i16;
-                  w.i64 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.i64, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i64 = 0.0;
-                w.i64 = 0.0;
-                do {
-                  sum.i64 += *src.i32 * *weights.i32;
-                  w.i64 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.i64, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.i64 = 0.0;
-                w.i64 = 0.0;
-                do {
-                  sum.i64 += *src.i64 * *weights.i64;
-                  w.i64 += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i64, winfo, weights.i64, trgt.i64, mean);
+                a();
+              }
               break;
           } // end of switch (type)
           break;
         case LUX_FLOAT:
           switch (type) {
             case LUX_INT8:
-              do {
-                sum.f = 0.0;
-                w.f = 0.0;
-                do {
-                  sum.f += *src.ui8 * *weights.ui8;
-                  w.f += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.f, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.f = 0.0;
-                w.f = 0.0;
-                do {
-                  sum.f += *src.i16 * *weights.i16;
-                  w.f += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.f, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.f = 0.0;
-                w.f = 0.0;
-                do {
-                  sum.f += *src.i32 * *weights.i32;
-                  w.f += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.f, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.f = 0.0;
-                w.f = 0.0;
-                do {
-                  sum.f += *src.i64 * *weights.i64;
-                  w.f += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i64, winfo, weights.i64, trgt.f, mean);
+                a();
+              }
               break;
             case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.f = 0.0;
-                  w.f = 0.0;
-                  do {
-                    if (!isnan(*src.f) && !isnan(*weights.f)) {
-                      sum.f += *src.f * *weights.f;
-                      w.f += *weights.f;
-                    }
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.f = 0.0;
-                  w.f = 0.0;
-                  do {
-                    sum.f += *src.f * *weights.f;
-                    w.f += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0): sum.f;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight<float, float, double>
+                  a(srcinfo, src.f, winfo, weights.f, trgt.f, mean, omitNaNs);
+                a();
               }
               break;
             // no cases LUX_DOUBLE, LUX_CFLOAT, or LUX_CDOUBLE: if <x>
@@ -3812,113 +4247,45 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
         case LUX_DOUBLE:
           switch (type) {
             case LUX_INT8:
-              do {
-                sum.d = 0.0;
-                w.d = 0.0;
-                do {
-                  sum.d += (double) *src.ui8 * *weights.ui8;
-                  w.d += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.d, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.d = 0.0;
-                w.d = 0.0;
-                do {
-                  sum.d += (double) *src.i16 * *weights.i16;
-                  w.d += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.d, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.d = 0.0;
-                w.d = 0.0;
-                do {
-                  sum.d += (double) *src.i32 * *weights.i32;
-                  w.d += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.d, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.d = 0.0;
-                w.d = 0.0;
-                do {
-                  sum.d += (double) *src.i64 * *weights.i64;
-                  w.d += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i64, winfo, weights.i64, trgt.d, mean);
+                a();
+              }
               break;
             case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.d = 0.0;
-                  w.d = 0.0;
-                  do {
-                    if (!isnan(*src.f) && !isnan(*weights.f)) {
-                      sum.d += (double) *src.f * *weights.f;
-                      w.d += *weights.f;
-                    }
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = 0.0;
-                  w.d = 0.0;
-                  do {
-                    sum.d += (double) *src.f * *weights.f;
-                    w.d += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.f, winfo, weights.f, trgt.d, mean, omitNaNs);
+                a();
               }
               break;
             case LUX_DOUBLE:
-              if (omitNaNs) {
-                do {
-                  sum.d = 0.0;
-                  w.d = 0.0;
-                  do {
-                    if (!isnan(*src.d) && !isnan(*weights.d)) {
-                      sum.d += *src.d * *weights.d;
-                      w.d += *weights.d;
-                    }
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = 0.0;
-                  w.d = 0.0;
-                  do {
-                    sum.d += *src.d * *weights.d;
-                    w.d += *weights.d;
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0): sum.d;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.d, winfo, weights.d, trgt.d, mean, omitNaNs);
+                a();
               }
               break;
             // no cases LUX_CFLOAT, or LUX_CDOUBLE: if <x>
@@ -4012,226 +4379,130 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
         case LUX_INT32:
           switch (type) {
             case LUX_INT8:
-              do {
-                sum.i32 = 0.0;
-                do
-                  sum.i32 += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i32++ = mean? sum.i32/n: sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.ui8, trgt.i32, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i32 = 0.0;
-                do
-                  sum.i32 += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i32++ = mean? sum.i32/n: sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.i16, trgt.i32, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i32 = 0.0;
-                do
-                  sum.i32 += *src.i32;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i32++ = mean? sum.i32/n: sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.i32, trgt.i32, mean);
+                a();
+              }
               break;
           } // end of switch (type)
           break;
         case LUX_INT64:
           switch (type) {
             case LUX_INT8:
-              do {
-                sum.i64 = 0.0;
-                do
-                  sum.i64 += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.ui8, trgt.i64, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i64 = 0.0;
-                do
-                  sum.i64 += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.i16, trgt.i64, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i64 = 0.0;
-                do
-                  sum.i64 += *src.i64;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.i32, trgt.i64, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.i64 = 0.0;
-                do
-                  sum.i64 += *src.i64;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.i64, trgt.i64, mean);
+                a();
+              }
               break;
           } // end of switch (type)
           break;
         case LUX_FLOAT:
           switch (type) {
             case LUX_INT8:
-              do {
-                sum.f = 0.0;
-                do
-                  sum.f += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT16:
-              do {
-                sum.f = 0.0;
-                do
-                  sum.f += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT32:
-              do {
-                sum.f = 0.0;
-                do
-                  sum.f += *src.i32;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT64:
-              do {
-                sum.f = 0.0;
-                do
-                  sum.f += *src.i64;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.f = 0.0;
-                  size_t w = 0;
-                  do {
-                    if (!isnan(*src.f)) {
-                      sum.f += *src.f;
-                      ++w;
-                    }
-                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.f++ = mean? (w? sum.f/w: 0): sum.f;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.f = 0.0;
-                  do
-                    sum.f += *src.f;
-                  while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.f++ = mean? sum.f/n: sum.f;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal a(srcinfo, src.ui8, trgt.f, mean);
+                a();
               }
               break;
-           // no cases DOUBLE, CFLOAT, or CDOUBLE
+            case LUX_INT16:
+              {
+                AlgorithmTotal a(srcinfo, src.i16, trgt.f, mean);
+                a();
+              }
+              break;
+            case LUX_INT32:
+              {
+                AlgorithmTotal a(srcinfo, src.i32, trgt.f, mean);
+                a();
+              }
+              break;
+            case LUX_INT64:
+              {
+                AlgorithmTotal<int64_t, float, double>
+                  a(srcinfo, src.i64, trgt.f, mean);
+                a();
+              }
+              break;
+            case LUX_FLOAT:
+              {
+                AlgorithmTotal<float, float, double>
+                  a(srcinfo, src.f, trgt.f, mean, omitNaNs);
+                a();
+              }
+              break;
+              // no cases DOUBLE, CFLOAT, or CDOUBLE
           } // end of switch (type)
+          break;
+      case LUX_DOUBLE:
+        switch (type) {
+        case LUX_INT8:
+          {
+            AlgorithmTotal a(srcinfo, src.ui8, trgt.d, mean);
+            a();
+          }
+          break;
+        case LUX_INT16:
+          {
+            AlgorithmTotal a(srcinfo, src.i16, trgt.d, mean);
+            a();
+          }
+          break;
+        case LUX_INT32:
+          {
+            AlgorithmTotal a(srcinfo, src.i32, trgt.d, mean);
+            a();
+          }
+          break;
+        case LUX_INT64:
+          {
+            AlgorithmTotal a(srcinfo, src.i64, trgt.d, mean);
+            a();
+          }
+          break;
+        case LUX_FLOAT:
+          {
+            AlgorithmTotal a(srcinfo, src.f, trgt.d, mean, omitNaNs);
+            a();
+          }
           break;
         case LUX_DOUBLE:
-          switch (type) {
-            case LUX_INT8:
-              do {
-                sum.d = 0.0;
-                do
-                  sum.d += *src.ui8;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT16:
-              do {
-                sum.d = 0.0;
-                do
-                  sum.d += *src.i16;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT32:
-              do {
-                sum.d = 0.0;
-                do
-                  sum.d += *src.i32;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-                while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT64:
-              do {
-                sum.d = 0.0;
-                do
-                  sum.d += *src.i64;
-                while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.d = 0.0;
-                  size_t w = 0;
-                  do {
-                    if (!isnan(*src.f)) {
-                      sum.d += *src.f;
-                      ++w;
-                    }
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                  *trgt.d++ = mean? (w? sum.d/w: 0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = 0.0;
-                  do
-                    sum.d += *src.f;
-                  while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                  *trgt.d++ = mean? sum.d/n: sum.d;
-                } while (done < srcinfo.rndim);
-              }
-              break;
-            case LUX_DOUBLE:
-              if (omitNaNs) {
-                do {
-                  sum.d = 0.0;
-                  size_t w = 0;
-                  do {
-                    if (!isnan(*src.d)) {
-                      sum.d += *src.d;
-                      ++w;
-                    }
-                  } while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                  *trgt.d++ = mean? (w? sum.d/w: 0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = 0.0;
-                  do
-                    sum.d += *src.d;
-                  while ((done = srcinfo.advanceLoop(&src)) < srcinfo.naxes);
-                  *trgt.d++ = mean? sum.d/n: sum.d;
-                } while (done < srcinfo.rndim);
-              }
-              break;
-           // no cases CFLOAT, CDOUBLE
-          } // end of switch (type)
-          break;
+          {                     // TODO: kahan summation
+            AlgorithmTotal a(srcinfo, src.d, trgt.d, mean, omitNaNs);
+            a();
+          }
+          // no cases CFLOAT, CDOUBLE
+        } // end of switch (type)
+        break;
         case LUX_CFLOAT:
           do {
             sumcf.real = sumcf.imaginary = 0.0;
@@ -4306,557 +4577,163 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 #endif
       switch (outtype) {
         case LUX_INT32:
-          switch (type) {
+          {
+            IntegerPower<int32_t> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.i32 = w.i32 = 0.0;
-                do {
-                  temp.i32 = *src.ui8; // data value
-                  value.i32 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i32 *= temp.i32;
-                    temp.i32 *= temp.i32;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i32 = value.i32? *weights.ui8/value.i32: 0.0;
-                  else
-                    value.i32 *= *weights.ui8;
-                  sum.i32 += value.i32;
-                  w.i32 += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.i32, ip, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i32 = w.i32 = 0.0;
-                do {
-                  temp.i32 = *src.i16; // data value
-                  value.i32 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i32 *= temp.i32;
-                    temp.i32 *= temp.i32;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i32 = value.i32? *weights.i16/value.i32: 0.0;
-                  else
-                    value.i32 *= *weights.i16;
-                  sum.i32 += value.i32;
-                  w.i32 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.i32, ip, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i32 = w.i32 = 0.0;
-                do {
-                  temp.i32 = *src.i32; // data value
-                  value.i32 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i32 *= temp.i32;
-                    temp.i32 *= temp.i32;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i32 = value.i32? *weights.i32/value.i32: 0.0;
-                  else
-                    value.i32 *= *weights.i32;
-                  sum.i32 += value.i32;
-                  w.i32 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i32++ = mean? (w.i32? sum.i32/w.i32: 0.0): sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.i32, ip, mean);
+                a();
+              }
               break;
-          } // end of switch (type)
+            } // end of switch (type)
+          }
           break;
         case LUX_INT64:
-          switch (type) {
+          {
+            IntegerPower<int64_t> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.i64 = w.i64 = 0.0;
-                do {
-                  temp.i64 = *src.ui8; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? *weights.ui8/value.i64: 0.0;
-                  else
-                    value.i64 *= *weights.ui8;
-                  sum.i64 += value.i64;
-                  w.i64 += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.i64, ip, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i64 = w.i64 = 0.0;
-                do {
-                  temp.i64 = *src.i16; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? *weights.i16/value.i64: 0.0;
-                  else
-                    value.i64 *= *weights.i16;
-                  sum.i64 += value.i64;
-                  w.i64 += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                IntegerPower<int64_t> ip(p*psign);
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.i64, ip, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i64 = w.i64 = 0.0;
-                do {
-                  temp.i64 = *src.i32; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? *weights.i32/value.i64: 0.0;
-                  else
-                    value.i64 *= *weights.i32;
-                  sum.i64 += value.i64;
-                  w.i64 += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                IntegerPower<int64_t> ip(p*psign);
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.i64, ip, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.i64 = w.i64 = 0.0;
-                do {
-                  temp.i64 = *src.i64; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? *weights.i64/value.i64: 0.0;
-                  else
-                    value.i64 *= *weights.i64;
-                  sum.i64 += value.i64;
-                  w.i64 += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.i64++ = mean? (w.i64? sum.i64/w.i64: 0.0): sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                IntegerPower<int64_t> ip(p*psign);
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i64, winfo, weights.i64, trgt.i64, ip, mean);
+                a();
+              }
               break;
-          } // end of switch (type)
+            } // end of switch (type)
+          }
           break;
         case LUX_FLOAT:
-          switch (type) {
+          {
+            IntegerPower<double> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.f = w.f = 0.0;
-                do {
-                  temp.f = *src.ui8; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? *weights.ui8/value.f: 0.0;
-                  else
-                    value.f *= *weights.ui8;
-                  sum.f += value.f;
-                  w.f += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT16:
-              do {
-                sum.f = w.f = 0.0;
-                do {
-                  temp.f = *src.i16; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? *weights.i16/value.f: 0.0;
-                  else
-                    value.f *= *weights.i16;
-                  sum.f += value.f;
-                  w.f += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT32:
-              do {
-                sum.f = w.f = 0.0;
-                do {
-                  temp.f = *src.i32; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? *weights.i32/value.f: 0.0;
-                  else
-                    value.f *= *weights.i32;
-                  sum.f += value.f;
-                  w.f += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT64:
-              do {
-                sum.f = w.f = 0.0;
-                do {
-                  temp.f = *src.i64; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? *weights.i64/value.f: 0.0;
-                  else
-                    value.f *= *weights.i64;
-                  sum.f += value.f;
-                  w.f += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.f = w.f = 0.0;
-                  do {
-                    if (!isnan(*src.f) && !isnan(*weights.f)) {
-                      temp.f = *src.f; // data value
-                      value.f = 1.0;
-                      for (i = 0; i < nbase; i++) {
-                        if (present[i])
-                          value.f *= temp.f;
-                        temp.f *= temp.f;
-                      }
-                      // we now have the data value to the given
-                      // unsigned power. add in the exponent sign and
-                      // the weight
-                      if (psign == -1) // negative exponent: must divide
-                        value.f = value.f? *weights.f/value.f: 0.0;
-                      else
-                        value.f *= *weights.f;
-                      sum.f += value.f;
-                      w.f += *weights.f;
-                    }
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.f = w.f = 0.0;
-                  do {
-                    temp.f = *src.f; // data value
-                    value.f = 1.0;
-                    for (i = 0; i < nbase; i++) {
-                      if (present[i])
-                        value.f *= temp.f;
-                      temp.f *= temp.f;
-                    }
-                    // we now have the data value to the given unsigned power
-                    // add in the exponent sign and the weight
-                    if (psign == -1) // negative exponent: must divide
-                      value.f = value.f? *weights.f/value.f: 0.0;
-                    else
-                      value.f *= *weights.f;
-                    sum.f += value.f;
-                    w.f += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.f++ = mean? (w.f? sum.f/w.f: 0.0): sum.f;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight<uint8_t, float, double>
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.f, ip, mean);
+                a();
               }
               break;
-          } // end of switch (type)
+            case LUX_INT16:
+              {
+                AlgorithmTotalWithWeight<int16_t, float, double>
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.f, ip, mean);
+                a();
+              }
+              break;
+            case LUX_INT32:
+              {
+                AlgorithmTotalWithWeight<int32_t, float, double>
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.f, ip, mean);
+                a();
+              }
+              break;
+            case LUX_INT64:
+              {
+                AlgorithmTotalWithWeight<int64_t, float, double>
+                  a(srcinfo, src.i64, winfo, weights.i64, trgt.f, ip, mean);
+                a();
+              }
+              break;
+            case LUX_FLOAT:
+              {
+                AlgorithmTotalWithWeight<float, float, double>
+                  a(srcinfo, src.f, winfo, weights.f, trgt.f, ip, mean,
+                    omitNaNs);
+                a();
+              }
+              break;
+            } // end of switch (type)
+          }
           break;
         case LUX_DOUBLE:
-          switch (type) {
+          {
+            IntegerPower<double> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.d = w.d = 0.0;
-                do {
-                  temp.d = *src.ui8; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? *weights.ui8/value.d: 0.0;
-                  else
-                    value.d *= *weights.ui8;
-                  sum.d += value.d;
-                  w.d += *weights.ui8;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.ui8, winfo, weights.ui8, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.d = w.d = 0.0;
-                do {
-                  temp.d = *src.i16; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? *weights.i16/value.d: 0.0;
-                  else
-                    value.d *= *weights.i16;
-                  sum.d += value.d;
-                  w.d += *weights.i16;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i16, winfo, weights.i16, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.d = w.d = 0.0;
-                do {
-                  temp.d = *src.i32; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? *weights.i32/value.d: 0.0;
-                  else
-                    value.d *= *weights.i32;
-                  sum.d += value.d;
-                  w.d += *weights.i32;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i32, winfo, weights.i32, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.d = w.d = 0.0;
-                do {
-                  temp.d = *src.i64; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? *weights.i64/value.d: 0.0;
-                  else
-                    value.d *= *weights.i64;
-                  sum.d += value.d;
-                  w.d += *weights.i64;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
-                *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.i64, winfo, weights.i64, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.d = w.d = 0.0;
-                  do {
-                    if (!isnan(*src.f) && !isnan(*weights.f)) {
-                      temp.d = *src.f; // data value
-                      value.d = 1.0;
-                      for (i = 0; i < nbase; i++) {
-                        if (present[i])
-                          value.d *= temp.d;
-                        temp.d *= temp.d;
-                      }
-                      // we now have the data value to the given
-                      // unsigned power.  add in the exponent sign and
-                      // the weight
-                      if (psign == -1) // negative exponent: must divide
-                        value.d = value.d? *weights.f/value.d: 0.0;
-                      else
-                        value.d *= *weights.f;
-                      sum.d += value.d;
-                      w.d += *weights.f;
-                    }
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = w.d = 0.0;
-                  do {
-                    temp.d = *src.f; // data value
-                    value.d = 1.0;
-                    for (i = 0; i < nbase; i++) {
-                      if (present[i])
-                        value.d *= temp.d;
-                      temp.d *= temp.d;
-                    }
-                    // we now have the data value to the given
-                    // unsigned power.  add in the exponent sign and
-                    // the weight
-                    if (psign == -1) // negative exponent: must divide
-                      value.d = value.d? *weights.f/value.d: 0.0;
-                    else
-                      value.d *= *weights.f;
-                    sum.d += value.d;
-                    w.d += *weights.f;
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.f, winfo, weights.f, trgt.d, ip, mean,
+                    omitNaNs);
+                a();
               }
-              break;
             case LUX_DOUBLE:
-              if (omitNaNs) {
-                do {
-                  sum.d = w.d = 0.0;
-                  do {
-                    if (!isnan(*src.d) && !isnan(*weights.d)) {
-                      temp.d = *src.d; // data value
-                      value.d = 1.0;
-                      for (i = 0; i < nbase; i++) {
-                        if (present[i])
-                          value.d *= temp.d;
-                        temp.d *= temp.d;
-                      }
-                      // we now have the data value to the given unsigned power
-                      // add in the exponent sign and the weight
-                      if (psign == -1) // negative exponent: must divide
-                        value.d = value.d? *weights.d/value.d: 0.0;
-                      else
-                        value.d *= *weights.d;
-                      sum.d += value.d;
-                      w.d += *weights.d;
-                    }
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = w.d = 0.0;
-                  do {
-                    temp.d = *src.d; // data value
-                    value.d = 1.0;
-                    for (i = 0; i < nbase; i++) {
-                      if (present[i])
-                        value.d *= temp.d;
-                      temp.d *= temp.d;
-                    }
-                    // we now have the data value to the given unsigned power
-                    // add in the exponent sign and the weight
-                    if (psign == -1) // negative exponent: must divide
-                      value.d = value.d? *weights.d/value.d: 0.0;
-                    else
-                      value.d *= *weights.d;
-                    sum.d += value.d;
-                    w.d += *weights.d;
-                  } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                    srcinfo.advanceLoop(&src.ui8)))
-                           < srcinfo.naxes);
-                  *trgt.d++ = mean? (w.d? sum.d/w.d: 0.0): sum.d;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotalWithWeight
+                  a(srcinfo, src.d, winfo, weights.d, trgt.d, ip, mean,
+                    omitNaNs);
+                a();
               }
               break;
-          } // end of switch (type)
+            } // end of switch (type)
+          }
           break;
         case LUX_CFLOAT:
           do {
@@ -5028,460 +4905,161 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
 #endif
       switch (outtype) {
         case LUX_INT32:
-          switch (type) {
+          {
+            IntegerPower<int32_t> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.i32 = 0.0;
-                do {
-                  temp.i32 = *src.ui8; // data value
-                  value.i32 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i32 *= temp.i32;
-                    temp.i32 *= temp.i32;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i32 = value.i32? 1.0/value.i32: 0.0;
-                  sum.i32 += value.i32;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i32++ = mean? sum.i32/n: sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.ui8, trgt.i32, ip, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i32 = 0.0;
-                do {
-                  temp.i32 = *src.i16; // data value
-                  value.i32 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i32 *= temp.i32;
-                    temp.i32 *= temp.i32;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i32 = value.i32? 1.0/value.i32: 0.0;
-                  sum.i32 += value.i32;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i32++ = mean? sum.i32/n: sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i16, trgt.i32, ip, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i32 = 0.0;
-                do {
-                  temp.i32 = *src.i32; // data value
-                  value.i32 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i32 *= temp.i32;
-                    temp.i32 *= temp.i32;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i32 = value.i32? 1.0/value.i32: 0.0;
-                  sum.i32 += value.i32;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i32++ = mean? sum.i32/n: sum.i32;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i32, trgt.i32, ip, mean);
+                a();
+              }
               break;
-          } // end of switch (type)
+            } // end of switch (type)
+          }
           break;
         case LUX_INT64:
-          switch (type) {
+          {
+            IntegerPower<int64_t> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.i64 = 0.0;
-                do {
-                  temp.i64 = *src.ui8; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? 1.0/value.i64: 0.0;
-                  sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.ui8, trgt.i64, ip, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.i64 = 0.0;
-                do {
-                  temp.i64 = *src.i16; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? 1.0/value.i64: 0.0;
-                  sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i16, trgt.i64, ip, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.i64 = 0.0;
-                do {
-                  temp.i64 = *src.i32; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? 1.0/value.i64: 0.0;
-                  sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i32, trgt.i64, ip, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.i64 = 0.0;
-                do {
-                  temp.i64 = *src.i64; // data value
-                  value.i64 = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.i64 *= temp.i64;
-                    temp.i64 *= temp.i64;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.i64 = value.i64? 1.0/value.i64: 0.0;
-                  sum.i64 += value.i64;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.i64++ = mean? sum.i64/n: sum.i64;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i64, trgt.i64, ip, mean);
+                a();
+              }
               break;
-          } // end of switch (type)
+            } // end of switch (type)
+          }
           break;
         case LUX_FLOAT:
-          switch (type) {
+          {
+            IntegerPower<double> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.f = 0.0;
-                do {
-                  temp.f = *src.ui8; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? 1.0/value.f: 0.0;
-                  sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT16:
-              do {
-                sum.f = 0.0;
-                do {
-                  temp.f = *src.i16; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? 1.0/value.f: 0.0;
-                  sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT32:
-              do {
-                sum.f = 0.0;
-                do {
-                  temp.f = *src.i32; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? 1.0/value.f: 0.0;
-                  sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_INT64:
-              do {
-                sum.f = 0.0;
-                do {
-                  temp.f = *src.i64; // data value
-                  value.f = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.f *= temp.f;
-                    temp.f *= temp.f;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.f = value.f? 1.0/value.f: 0.0;
-                  sum.f += value.f;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.f++ = mean? sum.f/n: sum.f;
-              } while (done < srcinfo.rndim);
-              break;
-            case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.f = 0.0;
-                  size_t w = 0;
-                  do {
-                    if (!isnan(*src.f)) {
-                      temp.f = *src.f; // data value
-                      value.f = 1.0;
-                      for (i = 0; i < nbase; i++) {
-                        if (present[i])
-                          value.f *= temp.f;
-                        temp.f *= temp.f;
-                      }
-                      // we now have the data value to the given
-                      // unsigned power.  add in the exponent sign and
-                      // the weight
-                      if (psign == -1) // negative exponent: must divide
-                        value.f = value.f? 1.0/value.f: 0.0;
-                      sum.f += value.f;
-                      ++w;
-                    }
-                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.f++ = mean? (w? sum.f/w: 0): sum.f;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.f = 0.0;
-                  do {
-                    temp.f = *src.f; // data value
-                    value.f = 1.0;
-                    for (i = 0; i < nbase; i++) {
-                      if (present[i])
-                        value.f *= temp.f;
-                      temp.f *= temp.f;
-                    }
-                    // we now have the data value to the given unsigned power
-                    // add in the exponent sign and the weight
-                    if (psign == -1) // negative exponent: must divide
-                      value.f = value.f? 1.0/value.f: 0.0;
-                    sum.f += value.f;
-                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.f++ = mean? sum.f/n: sum.f;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal<uint8_t, float, double>
+                  a(srcinfo, src.ui8, trgt.f, ip, mean);
+                a();
               }
               break;
-          } // end of switch (type)
+            case LUX_INT16:
+              {
+                AlgorithmTotal<int16_t, float, double>
+                  a(srcinfo, src.i16, trgt.f, ip, mean);
+                a();
+              }
+              break;
+            case LUX_INT32:
+              {
+                AlgorithmTotal<int32_t, float, double>
+                  a(srcinfo, src.i32, trgt.f, ip, mean);
+                a();
+              }
+              break;
+            case LUX_INT64:
+              {
+                AlgorithmTotal<int64_t, float, double>
+                  a(srcinfo, src.i64, trgt.f, ip, mean);
+                a();
+              }
+              break;
+            case LUX_FLOAT:
+              {
+                AlgorithmTotal<float, float, double>
+                  a(srcinfo, src.f, trgt.f, ip, mean, omitNaNs);
+                a();
+              }
+              break;
+            } // end of switch (type)
+          }
           break;
         case LUX_DOUBLE:
-          switch (type) {
+          {
+            IntegerPower<double> ip(p*psign);
+            switch (type) {
             case LUX_INT8:
-              do {
-                sum.d = 0.0;
-                do {
-                  temp.d = *src.ui8; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? 1.0/value.d: 0.0;
-                  sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.ui8, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_INT16:
-              do {
-                sum.d = 0.0;
-                do {
-                  temp.d = *src.i16; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? 1.0/value.d: 0.0;
-                  sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i16, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_INT32:
-              do {
-                sum.d = 0.0;
-                do {
-                  temp.d = *src.i32; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? 1.0/value.d: 0.0;
-                  sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i32, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_INT64:
-              do {
-                sum.d = 0.0;
-                do {
-                  temp.d = *src.i64; // data value
-                  value.d = 1.0;
-                  for (i = 0; i < nbase; i++) {
-                    if (present[i])
-                      value.d *= temp.d;
-                    temp.d *= temp.d;
-                  }
-                  // we now have the data value to the given unsigned power
-                  // add in the exponent sign and the weight
-                  if (psign == -1) // negative exponent: must divide
-                    value.d = value.d? 1.0/value.d: 0.0;
-                  sum.d += value.d;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                *trgt.d++ = mean? sum.d/n: sum.d;
-              } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.i64, trgt.d, ip, mean);
+                a();
+              }
               break;
             case LUX_FLOAT:
-              if (omitNaNs) {
-                do {
-                  sum.d = 0.0;
-                  size_t w = 0;
-                  do {
-                    if (!isnan(*src.f)) {
-                      temp.d = *src.f; // data value
-                      value.d = 1.0;
-                      for (i = 0; i < nbase; i++) {
-                        if (present[i])
-                          value.d *= temp.d;
-                        temp.d *= temp.d;
-                      }
-                      // we now have the data value to the given unsigned power
-                      // add in the exponent sign and the weight
-                      if (psign == -1) // negative exponent: must divide
-                        value.d = value.d? 1.0/value.d: 0.0;
-                      sum.d += value.d;
-                      ++w;
-                    }
-                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.d++ = mean? (w? sum.d/w: 0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = 0.0;
-                  do {
-                    temp.d = *src.f; // data value
-                    value.d = 1.0;
-                    for (i = 0; i < nbase; i++) {
-                      if (present[i])
-                        value.d *= temp.d;
-                      temp.d *= temp.d;
-                    }
-                    // we now have the data value to the given unsigned power
-                    // add in the exponent sign and the weight
-                    if (psign == -1) // negative exponent: must divide
-                      value.d = value.d? 1.0/value.d: 0.0;
-                    sum.d += value.d;
-                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.d++ = mean? sum.d/n: sum.d;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.f, trgt.d, ip, mean, omitNaNs);
+                a();
               }
-              break;
             case LUX_DOUBLE:
-              if (omitNaNs) {
-                do {
-                  sum.d = 0.0;
-                  size_t w = 0;
-                  do {
-                    if (!isnan(*src.d)) {
-                      temp.d = *src.d; // data value
-                      value.d = 1.0;
-                      for (i = 0; i < nbase; i++) {
-                        if (present[i])
-                          value.d *= temp.d;
-                        temp.d *= temp.d;
-                      }
-                      // we now have the data value to the given unsigned power
-                      // add in the exponent sign and the weight
-                      if (psign == -1) // negative exponent: must divide
-                        value.d = value.d? 1.0/value.d: 0.0;
-                      sum.d += value.d;
-                      ++w;
-                    }
-                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.d++ = mean? (w? sum.d/n: 0): sum.d;
-                } while (done < srcinfo.rndim);
-              } else {
-                do {
-                  sum.d = 0.0;
-                  do {
-                    temp.d = *src.d; // data value
-                    value.d = 1.0;
-                    for (i = 0; i < nbase; i++) {
-                      if (present[i])
-                        value.d *= temp.d;
-                      temp.d *= temp.d;
-                    }
-                    // we now have the data value to the given unsigned power
-                    // add in the exponent sign and the weight
-                    if (psign == -1) // negative exponent: must divide
-                      value.d = value.d? 1.0/value.d: 0.0;
-                    sum.d += value.d;
-                  } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
-                  *trgt.d++ = mean? sum.d/n: sum.d;
-                } while (done < srcinfo.rndim);
+              {
+                AlgorithmTotal
+                  a(srcinfo, src.d, trgt.d, ip, mean, omitNaNs);
+                a();
               }
               break;
-          } // end of switch (type)
+            } // end of switch (type)
+          }
           break;
         case LUX_CFLOAT:
           do {
-            sumcf.real = sumcf.imaginary = 0.0;
+            sumcf.real = sumcf.imaginary = w.f = 0.0;
             do {
               tempcf.real = src.cf->real;
               tempcf.imaginary = src.cf->imaginary;
@@ -5505,17 +5083,26 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                 temp2f = valuecf.real*valuecf.real
                   + valuecf.imaginary*valuecf.imaginary;
                 if (temp2f) {
-                  temp2f = 1.0/temp2f;
+                  temp2f = *weights.f/temp2f;
                   valuecf.real *= temp2f;
                   valuecf.imaginary *= -temp2f;
                 }
+              } else {
+                valuecf.real *= *weights.f;
+                valuecf.imaginary *= *weights.f;
               }
               sumcf.real += valuecf.real;
               sumcf.imaginary *= valuecf.imaginary;
-            } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+              w.f += *weights.f;
+            } while ((done = (winfo.advanceLoop(&weights.ui8),
+                              srcinfo.advanceLoop(&src.ui8)))
+                     < srcinfo.naxes);
             if (mean) {
-              trgt.cf->real = sumcf.real/n;
-              trgt.cf->imaginary = sumcf.imaginary/n;
+              if (w.f) {
+                trgt.cf->real = sumcf.real/w.f;
+                trgt.cf->imaginary = sumcf.imaginary/w.f;
+              } else
+                trgt.cf->real = trgt.cf->imaginary = 0.0;
             } else {
               trgt.cf->real = sumcf.real;
               trgt.cf->imaginary = sumcf.imaginary;
@@ -5527,7 +5114,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
           switch (type) {
             case LUX_CFLOAT:
               do {
-                sumcd.real = sumcd.imaginary = 0.0;
+                sumcd.real = sumcd.imaginary = w.d = 0.0;
                 do {
                   tempcd.real = src.cf->real;
                   tempcd.imaginary = src.cf->imaginary;
@@ -5551,17 +5138,26 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     temp2d = valuecd.real*valuecd.real
                       + valuecd.imaginary*valuecd.imaginary;
                     if (temp2d) {
-                      temp2d = 1.0/temp2d;
+                      temp2d = *weights.f/temp2d;
                       valuecd.real *= temp2d;
                       valuecd.imaginary *= -temp2d;
                     }
+                  } else {
+                    valuecd.real *= *weights.f;
+                    valuecd.imaginary *= *weights.f;
                   }
                   sumcd.real += valuecd.real;
                   sumcd.imaginary *= valuecd.imaginary;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                  w.d += *weights.f;
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
+                         < srcinfo.naxes);
                 if (mean) {
-                  trgt.cd->real = sumcd.real/n;
-                  trgt.cd->imaginary = sumcd.imaginary/n;
+                  if (w.d) {
+                    trgt.cd->real = sumcd.real/w.d;
+                    trgt.cd->imaginary = sumcd.imaginary/w.d;
+                  } else
+                    trgt.cd->real = trgt.cd->imaginary = 0.0;
                 } else {
                   trgt.cd->real = sumcd.real;
                   trgt.cd->imaginary = sumcd.imaginary;
@@ -5571,7 +5167,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               break;
             case LUX_CDOUBLE:
               do {
-                sumcd.real = sumcd.imaginary = 0.0;
+                sumcd.real = sumcd.imaginary = w.d = 0.0;
                 do {
                   tempcd.real = src.cd->real;
                   tempcd.imaginary = src.cd->imaginary;
@@ -5595,17 +5191,26 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
                     temp2d = valuecd.real*valuecd.real
                       + valuecd.imaginary*valuecd.imaginary;
                     if (temp2d) {
-                      temp2d = 1.0/temp2d;
+                      temp2d = *weights.d/temp2d;
                       valuecd.real *= temp2d;
                       valuecd.imaginary *= -temp2d;
                     }
+                  } else {
+                    valuecd.real *= *weights.d;
+                    valuecd.imaginary *= *weights.d;
                   }
                   sumcd.real += valuecd.real;
                   sumcd.imaginary *= valuecd.imaginary;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                  w.d += *weights.d;
+                } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                  srcinfo.advanceLoop(&src.ui8)))
+                         < srcinfo.naxes);
                 if (mean) {
-                  trgt.cd->real = sumcd.real/n;
-                  trgt.cd->imaginary = sumcd.imaginary/n;
+                  if (w.d) {
+                    trgt.cd->real = sumcd.real/w.d;
+                    trgt.cd->imaginary = sumcd.imaginary/w.d;
+                  } else
+                    trgt.cd->real = trgt.cd->imaginary = 0.0;
                 } else {
                   trgt.cd->real = sumcd.real;
                   trgt.cd->imaginary = sumcd.imaginary;
@@ -5615,7 +5220,7 @@ int32_t total(int32_t narg, int32_t ps[], int32_t mean)
               break;
           } // end of switch (type)
           break;
-      }         // end of switch (outtype)
+      }
     } // end of if (haveWeights) else
   } // end of if (p == 1) else
 

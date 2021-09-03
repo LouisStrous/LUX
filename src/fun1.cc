@@ -4207,28 +4207,28 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
           switch (type) {
             case LUX_INT8:
               {
-                AlgorithmTotalWithWeight
+                AlgorithmTotalWithWeight<uint8_t, float, double>
                   a(srcinfo, src.ui8, winfo, weights.ui8, trgt.f, mean);
                 a();
               }
               break;
             case LUX_INT16:
               {
-                AlgorithmTotalWithWeight
+                AlgorithmTotalWithWeight<int16_t, float, double>
                   a(srcinfo, src.i16, winfo, weights.i16, trgt.f, mean);
                 a();
               }
               break;
             case LUX_INT32:
               {
-                AlgorithmTotalWithWeight
+                AlgorithmTotalWithWeight<int32_t, float, double>
                   a(srcinfo, src.i32, winfo, weights.i32, trgt.f, mean);
                 a();
               }
               break;
             case LUX_INT64:
               {
-                AlgorithmTotalWithWeight
+                AlgorithmTotalWithWeight<int64_t, float, double>
                   a(srcinfo, src.i64, winfo, weights.i64, trgt.f, mean);
                 a();
               }
@@ -4430,19 +4430,22 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
           switch (type) {
             case LUX_INT8:
               {
-                AlgorithmTotal a(srcinfo, src.ui8, trgt.f, mean);
+                AlgorithmTotal<uint8_t, float, double>
+                  a(srcinfo, src.ui8, trgt.f, mean);
                 a();
               }
               break;
             case LUX_INT16:
               {
-                AlgorithmTotal a(srcinfo, src.i16, trgt.f, mean);
+                AlgorithmTotal<int16_t, float, double>
+                  a(srcinfo, src.i16, trgt.f, mean);
                 a();
               }
               break;
             case LUX_INT32:
               {
-                AlgorithmTotal a(srcinfo, src.i32, trgt.f, mean);
+                AlgorithmTotal<int32_t, float, double>
+                  a(srcinfo, src.i32, trgt.f, mean);
                 a();
               }
               break;

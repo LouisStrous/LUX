@@ -12352,6 +12352,7 @@ arguments.
 * read::                        Read a value from the keyboard
 * readarr::                     Read values from the keyboard into an array
 * readf::                       Read values from a file in ASCII format
+* readimage::                   Read an image
 * readorbits::                  Read orbital da
 * readu::                       Read values from a file in machine format
 * read_jpeg::                   Read from a JPEG-compressed file
@@ -24553,12 +24554,12 @@ See also: @ref{readarr}, @ref{readf}, @ref{print}, @ref{openr},
 
 Reads one line of array elements from the keyboard and returns the read
 elements in @code{@var{x}}.  So, the number of array elements need not be
-specified in advance. 
+specified in advance.
 
 See also: @ref{read}, @ref{print}
 
 @c -------------------------------------
-@node readf, readorbits, readarr, Internal Routines
+@node readf, readimage, readarr, Internal Routines
 @subsection readf
 @findex readf
 
@@ -24585,7 +24586,19 @@ Upon exit, @code{!read_count} contains the number of read elements.
 See also: @ref{printf}, @ref{read}, @ref{readu}, @ref{!read_count}
 
 @c -------------------------------------
-@node readorbits, readu, readf, Internal Routines
+@node readimage, readorbits, readf, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection readimage
+@findex readimage
+
+@code{x = readimage(path)}
+
+[OIIO] Reads and returns the image located at the indicated
+@code{@var{path}}, or @code{-1} if the image cannot be read.  Requires
+the OpenImageIO library, which can read images in very many formats.
+
+@c -------------------------------------
+@node readorbits, readu, readimage, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection readorbits
 @findex readorbits

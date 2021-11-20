@@ -16,40 +16,47 @@ lux_read_image_oiio(int32_t narg, int32_t ps[])
 
   auto in = OIIO::ImageInput::open(filename);
   if (!in)
-    return luxerror("Cannot open image file '%s' via OIIO", ps[0], filename);
-  const OIIO::ImageSpec& spec = in->spec();
+    return LUX_MINUS_ONE;
+  const auto& spec = in->spec();
   uint32_t result;
   auto oiiotype = spec.format;
+  Symboltype luxtype;
   {
     int dims[3];
     dims[0] = spec.nchannels;
     dims[1] = spec.width;
     dims[2] = spec.height;
-    Symboltype luxtype = LUX_INT16;
-    switch (oiiotype.basetype) {
-    case OIIO::TypeDesc::UINT8:
-    case OIIO::TypeDesc::INT8:
-      luxtype = LUX_INT8;
-      oiiotype = OIIO::TypeDesc::UINT8;
+    if (!oiiotype.is_floating_point()) {
+      switch (oiiotype.elementsize()) {
+      case 1:
+        luxtype = LUX_INT8;
+        oiiotype = OIIO::TypeDesc::UINT8;
       break;
-    case OIIO::TypeDesc::UINT16:
-    case OIIO::TypeDesc::INT16:
-      luxtype = LUX_INT16;
-      oiiotype = OIIO::TypeDesc::INT16;
-      break;
-    case OIIO::TypeDesc::UINT32:
-    case OIIO::TypeDesc::INT32:
-      luxtype = LUX_INT32;
-      oiiotype = OIIO::TypeDesc::INT32;
-      break;
-    default:
-      luxtype = LUX_FLOAT;;
+      case 2:
+        luxtype = LUX_INT16;
+        oiiotype = OIIO::TypeDesc::INT16;
+        break;
+      case 4:
+        luxtype = LUX_INT32;
+        oiiotype = OIIO::TypeDesc::INT32;
+        break;
+      default:
+        luxtype = LUX_FLOAT;
+        oiiotype = OIIO::TypeDesc::FLOAT;
+        break;
+      }
+    } else {
+      luxtype = LUX_FLOAT;
       oiiotype = OIIO::TypeDesc::FLOAT;
-      break;
     }
     result = array_scratch(luxtype, sizeof(dims)/sizeof(*dims), dims);
   }
-  in->read_image(oiiotype, array_data(result));
+  auto scanlinesize = spec.width*spec.nchannels*lux_type_size[luxtype];
+  in->read_image(oiiotype, ((char*) array_data(result))
+                 + (spec.height - 1)*scanlinesize,
+                 OIIO::AutoStride,  // default x stride
+                 -scanlinesize,     // special y stride
+                 OIIO::AutoStride); // default z stride
   in->close();
   return result;
 }

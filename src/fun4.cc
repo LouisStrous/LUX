@@ -21,6 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // File fun4.c
 // Various LUX functions.
 #include "config.h"
+#include <cassert>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -961,194 +962,239 @@ int32_t getmin2(float *p, float *x0, float *y0)
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t expandImage(int32_t iq, float sx, float sy, int32_t smt) // expand function
-// magnify (or even demagnify) an array
+template<typename T>
+void
+rescale_image_nearest_neighbor_action(const void* vin, int32_t dimsin[2],
+                                      void* vout, int32_t dimsout[2])
 {
-  int32_t       n, m, ns, ms, dim[2], j, i, inc, nc, result_sym, oldi, ns2;
-  Symboltype type;
-  float         zc1, zc2, z00, z01, z10, z11, xq;
-  float         stepx, stepy, yrun, xrun, xbase, q, p, fn;
-  Array *h;
-  Pointer base, jbase, out, jout, nlast;
-                                // first argument must be a 2-D array
-  CK_ARR(iq, 1);
-  type = sym[iq].type;
-  h = (Array *) sym[iq].spec.array.ptr;
-  base.i32 = (int32_t *) ((char *)h + sizeof(Array));
-                                        // we want a 1 or 2-D array only
-  if ( h->ndim > 2 )
-    return cerror(NEED_1D_2D_ARR, iq);
-  n = h->dims[0];
-  if ( h->ndim > 1 )
-    m = h->dims[1];
-  else
-    m = 1;
-  fn = (float) n;
-                                        // get the magnification(s)
-                                // make sure they're positive  LS 1jul94
-  if (sx < 0)
-    sx = -sx;
-  if (sy < 0)
-    sy = -sy;
-  if (sx == 1.0 && sy == 1.0)   // no magnifaction, return original
-    return iq;
+  const T* in = static_cast<const T*>(vin);
+  T* out = static_cast<T*>(vout);
 
-                                // compute new ns and ms
-  ns = n * sx;
-  ms = m * sy;
-  ms = MAX(ms, 1);
-  ns = MAX(ns, 1);
-  dim[0] = ns;
-  dim[1] = ms;
-  result_sym = array_scratch(type, h->ndim, dim);
-  h = (Array *) sym[result_sym].spec.array.ptr;
-  out.i32 = jout.i32 = (int32_t *) ((char *)h + sizeof(Array));
-                                                        // setup the steps
-  stepx = 1.0 / sx;
-  stepy = 1.0 /sy;
-  xbase = 0.5 + 0.5 * stepx;
-  yrun = 0.5 + 0.5 * stepy;
-  inc = lux_type_size[type];
-  nlast.ui8 = base.ui8 + inc * (m-2) * n;
-  jbase.ui8 = base.ui8;
-  // use nearest neighbor if smt = 0 and bilinear otherwise
-  if ( smt != 0 ) {
-    while (ms--) {                              // column loop
-      j = yrun;
-      q = yrun - j;
-      if ( j < 1 ) {                            //bottom border region
-        jbase.ui8 = base.ui8;
-        q = 0.0;
-      } else {
-        if ( j >= m ) {                                 // upper border
-          q = 1.0;
-          jbase.ui8 = nlast.ui8;
-        }
-        else                                    // normal case
-          jbase.ui8 = base.ui8 + (j - 1) * n * inc;
+  // i = ⌊o*f/g⌋
+  // o*f = i*g + t
+  //
+  // f = n*g + m
+  //
+  // o ← o + 1 ⇒ i ← i + n, t ← t + m
+  // t ≥ g → i ← i + 1, t ← t − g
+
+  auto cx = div(dimsin[0], dimsout[0]);
+  auto cy = div(dimsin[1], dimsout[1]);
+
+  int32_t ii = 0, tx = 0, ty = 0;
+  for (int32_t oy = 0; oy < dimsout[1]; ++oy) {
+    for (int32_t ox = 0; ox < dimsout[0]; ++ox) {
+      *out++ = in[ii];
+      ii += cx.quot;
+      tx += cx.rem;
+      if (tx >= dimsout[0]) {
+        ++ii;
+        tx -= dimsout[0];
       }
-      oldi = 0;                                 // for all cases
-      switch (type) {
-      case 0:
-        z00 = *(jbase.ui8);
-        z01 = *(jbase.ui8 + n); break;
-      case 1:
-        z00 = *(jbase.i16);
-        z01 = *(jbase.i16 + n); break;
-      case 2:
-        z00 = *(jbase.i32);
-        z01 = *(jbase.i32 + n); break;
-      case 3:
-        z00 = *(jbase.f);
-        z01 = *(jbase.f + n); break;
-      case 4:
-        z00 = *(jbase.d);
-        z01 = *(jbase.d + n); break;
-      }
-      z10 = z00;
-      z11 = z01;
-      zc1 = (z01 - z00) * q + z00;
-      zc2 = 0.0;
-      xrun = xbase;
-      out.ui8 = jout.ui8;
-      while (1) {                               // row loop
-        i = xrun;
-        p = xrun - i;
-        if ( i != oldi) {                       // need new corners
-          z00 = z10;
-          z01 = z11;
-          oldi = i;
-          switch (type) {
-          case 0:
-            z10 = *(jbase.ui8 + i);
-            z11 = *(jbase.ui8 + i + n); break;
-          case 1:
-            z10 = *(jbase.i16 + i);
-            z11 = *(jbase.i16 + i + n); break;
-          case 2:
-            z10 = *(jbase.i32 + i);
-            z11 = *(jbase.i32 + i + n); break;
-          case 3:
-            z10 = *(jbase.f + i);
-            z11 = *(jbase.f + i + n); break;
-          case 4:
-            z10 = *(jbase.d + i);
-            z11 = *(jbase.d + i + n); break;
-          }
-          zc1 = z10 - z00;
-          zc2 = (z11 - z01 - zc1) * q + zc1;
-          zc1 = (z01 - z00) * q + z00;
-        }
-        xq = p * zc2 + zc1;
-        switch (type) {
-        case 0: *out.ui8++ = xq; break;
-        case 1: *out.i16++ = xq; break;
-        case 2: *out.i32++ = xq; break;
-        case 3: *out.f++ = xq; break;
-        case 4: *out.d++ = xq; break;
-        }
-        xrun = xrun + stepx;
-        if (xrun >= fn) break;
-      }
-      // rest of row
-      xq = zc1 + zc2;
-      jout.ui8 += ns * inc;
-      nc = (jout.ui8 - out.ui8) / inc;
-      while (nc > 0 )
-      { nc--;
-        switch (type) {
-        case 0: *out.ui8++ = xq; break;
-        case 1: *out.i16++ = xq; break;
-        case 2: *out.i32++ = xq; break;
-        case 3: *out.f++ = xq; break;
-        case 4: *out.d++ = xq; break;
-        }
-      }
-      yrun += stepy;
     }
-  } else {                              // nearest neighbor case
-    while (ms--) {                              // column loop
-      j = yrun - 0.5;
-      //printf("j, yrun = %d %f\n",j, yrun);
-      if ( j < 1 ) {                            //bottom border region
-        jbase.ui8 = base.ui8;
-      } else {
-        if ( j >= m ) {                                 // upper border
-          jbase.ui8 = base.ui8 + inc * (m-1) * n;
-        }
-        // normal case
-        jbase.ui8 = base.ui8 + j * n * inc;
-        //printf("normal, jbase.ui8 = %d\n",jbase.ui8);
-      }
-      xrun = xbase - 0.5;       out.ui8 = jout.ui8;
-      ns2 = ns;
-      while (ns2--) {                           // row loop
-        i = xrun;
-        switch (type) {
-        case 0: *out.ui8++ = *(jbase.ui8 + i); break;
-        case 1: *out.i16++ = *(jbase.i16 + i); break;
-        case 2: *out.i32++ = *(jbase.i32 + i); break;
-        case 3: *out.f++ = *(jbase.f + i); break;
-        case 4: *out.d++ = *(jbase.d + i); break;
-        }
-        xrun = xrun + stepx;
-      }
-      // rest of row (if any)
-      i = n - 1;        jout.ui8 += ns * inc;     nc = (jout.ui8 - out.ui8) / inc;
-      //printf("nc = %d\n",nc);
-      while (nc > 0 ) { nc--;
-                        switch (type) {
-                        case 0: *out.ui8++ = *(jbase.ui8 + i); break;
-                        case 1: *out.i16++ = *(jbase.i16 + i); break;
-                        case 2: *out.i32++ = *(jbase.i32 + i); break;
-                        case 3: *out.f++ = *(jbase.f + i); break;
-                        case 4: *out.d++ = *(jbase.d + i); break;
-                        }
-                      }
-      yrun += stepy;
+    ii += cy.quot*dimsin[0];
+    ty += cy.rem;
+    if (ty >= dimsout[1]) {
+      ty -= dimsout[1];
+    } else {
+      ii -= dimsin[0];
     }
   }
-  return result_sym;
+}
+
+template<typename T>
+void
+rescale_image_bilinear_action(const void* vin, int32_t dimsin[2],
+                              void* vout, int32_t dimsout[2])
+{
+  const T* in = static_cast<const T*>(vin);
+  T* out = static_cast<T*>(vout);
+
+  // i = ⌊o*f/g⌋
+  // o*f = i*g + t
+  //
+  // f = n*g + m
+  //
+  // o ← o + 1 ⇒ i ← i + n, t ← t + m
+  // t ≥ g → i ← i + 1, t ← t − g
+
+  int32_t nix = dimsin[0];
+  int32_t niy = dimsin[1];
+  int32_t nox = dimsout[0];
+  int32_t noy = dimsout[1];
+
+  auto cx = div(nix, nox);
+  auto cy = div(niy, noy);
+
+  int32_t ix = 0, iy = 0, tx = 0, ty = 0;
+  int32_t ix_prev = -1, iy_prev = -1;
+  T z1, z2, z3, z4;
+  int32_t ax = 1;
+  int32_t ay = nix;
+  int32_t no = nox*noy;
+  for (int32_t oy = 0; oy < noy; ++oy) {
+    for (int32_t ox = 0; ox < nox; ++ox) {
+      // Now the indexes of the nearest neighbors are:
+      //
+      // | Index        | x    | y    | label |
+      // |--------------+------+------+-------|
+      // | ii           | low  | low  | z1    |
+      // | ii + 1       | high | low  | z2    |
+      // | ii + nix     | low  | high | z3    |
+      // | ii + nix + 1 | high | high | z4    |
+      //
+      // but the cells with "high" x or y coordinates might not exist (if we're
+      // near an edge).
+      //
+      // The desired value is
+      //
+      //  ((z1*(nox-tx) + z2*tx)/nox*(noy-ty)
+      // + (z3*(nox-tx) + z4*tx)/nox*ty  )/noy
+      if (ix != ix_prev) {
+        ix_prev = ix;
+        if (ix == nix - 1)      // avoid going beyond the far x edge
+          ax = 0;
+        if (iy != iy_prev) {
+          ax = 1;
+          iy_prev = iy;
+          if (iy == (niy - 1)*nix)
+            ay = 0;             // avoid going beyond the far y edge
+        }
+        auto ii = ix + iy;
+        z1 = in[ii];
+        z2 = in[ii + ax];
+        z3 = in[ii + ay];
+        z4 = in[ii + ax + ay];
+      }
+      auto ux = nox - tx;
+      auto uy = noy - ty;
+      auto v = ((z1*ux + z2*tx)*uy + (z3*ux + z4*tx)*ty);
+      *out++ = v/no;
+      ix += cx.quot;
+      tx += cx.rem;
+      if (tx >= nox) {
+        ++ix;
+        tx -= nox;
+      }
+    }
+    iy += cy.quot*nix;
+    ty += cy.rem;
+    if (ty >= noy) {
+      iy += nix;
+      ty -= noy;
+    }
+    ix -= nix;
+    ax = 1;
+  }
+}
+
+int32_t expandImage(int32_t source, float factor_x, float factor_y,
+                    int32_t method)
+{
+  assert(factor_x > 0);
+  assert(factor_y > 0);
+  if (!symbolIsNumericalArray(source)
+      || array_num_dims(source) != 2)
+    return cerror(NEED_2D_ARR, source);
+
+  int32_t* dimsin = array_dims(source);
+  int32_t dimsout[2];
+  dimsout[0] = dimsin[0]*factor_x;
+  if (dimsout[0] < 1)
+    dimsout[0] = 1;
+  dimsout[1] = dimsin[1]*factor_y;
+  if (dimsout[1] < 1)
+    dimsout[1] = 1;
+
+  int32_t out = array_scratch(array_type(source), 2, dimsout);
+
+  switch (method) {
+  case 1:                       // nearest neighbor
+    switch (array_type(source)) {
+    case LUX_INT8:
+      rescale_image_nearest_neighbor_action<uint8_t>(array_data(source),
+                                                     array_dims(source),
+                                                     array_data(out),
+                                                     array_dims(out));
+      break;
+    case LUX_INT16:
+      rescale_image_nearest_neighbor_action<int16_t>(array_data(source),
+                                                     array_dims(source),
+                                                     array_data(out),
+                                                     array_dims(out));
+      break;
+    case LUX_INT32:
+      rescale_image_nearest_neighbor_action<int32_t>(array_data(source),
+                                                     array_dims(source),
+                                                     array_data(out),
+                                                     array_dims(out));
+      break;
+    case LUX_INT64:
+      rescale_image_nearest_neighbor_action<int64_t>(array_data(source),
+                                                     array_dims(source),
+                                                     array_data(out),
+                                                     array_dims(out));
+      break;
+    case LUX_FLOAT:
+      rescale_image_nearest_neighbor_action<float>(array_data(source),
+                                                   array_dims(source),
+                                                   array_data(out),
+                                                   array_dims(out));
+      break;
+    case LUX_DOUBLE:
+      rescale_image_nearest_neighbor_action<double>(array_data(source),
+                                                    array_dims(source),
+                                                    array_data(out),
+                                                    array_dims(out));
+      break;
+    default:
+      return cerror(ILL_TYPE, source);
+    }
+    break;
+  default:                      // bilinear
+    switch (array_type(source)) {
+    case LUX_INT8:
+      rescale_image_bilinear_action<uint8_t>(array_data(source),
+                                             array_dims(source),
+                                             array_data(out),
+                                             array_dims(out));
+      break;
+    case LUX_INT16:
+      rescale_image_bilinear_action<int16_t>(array_data(source),
+                                             array_dims(source),
+                                             array_data(out),
+                                             array_dims(out));
+      break;
+    case LUX_INT32:
+      rescale_image_bilinear_action<int32_t>(array_data(source),
+                                             array_dims(source),
+                                             array_data(out),
+                                             array_dims(out));
+      break;
+    case LUX_INT64:
+      rescale_image_bilinear_action<int64_t>(array_data(source),
+                                             array_dims(source),
+                                             array_data(out),
+                                             array_dims(out));
+      break;
+    case LUX_FLOAT:
+      rescale_image_bilinear_action<float>(array_data(source),
+                                           array_dims(source),
+                                           array_data(out),
+                                           array_dims(out));
+      break;
+    case LUX_DOUBLE:
+      rescale_image_bilinear_action<double>(array_data(source),
+                                            array_dims(source),
+                                            array_data(out),
+                                            array_dims(out));
+      break;
+    default:
+      return cerror(ILL_TYPE, source);
+    }
+    break;
+  }
+  return out;
 }
 //-------------------------------------------------------------------------
 int32_t lux_expand(int32_t narg, int32_t ps[])
@@ -1157,10 +1203,14 @@ int32_t lux_expand(int32_t narg, int32_t ps[])
   int32_t       smt;
 
   sx = float_arg(ps[1]);
+  if (sx <= 0)
+    return luxerror("Magnification factor %f should be positive", ps[1]);
   if (narg > 2)
     sy = float_arg(ps[2]);
   else
     sy = sx;
+  if (sy <= 0)
+    return luxerror("Magnification factor %f should be positive", ps[2]);
   if (sx == 1 && sy == 1)       // nothing to do
     return ps[0];
   if (narg > 3)

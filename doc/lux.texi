@@ -11967,6 +11967,7 @@ arguments.
 * compile::                     Compile a string as LUX code
 * compile_file::
 * complex::                     Convert to a complex data type
+* compose2d::
 * compress::                    Reduce the number of elements of an array
 * concat::                      Concatenate scalars and/or arrays
 * conjugate::                   Complex conjugate
@@ -11991,6 +11992,7 @@ arguments.
 * dblarr::                      Create a @code{double} array
 * dblfarr::                     Create a @code{double} file array
 * decomp::                      LU matrix decomposition
+* decompose2dmedian3::
 * decrunch::                    Data decompression
 * default::                     Specify a default value for a variable
 * defined::                     Does the variable have a defined value?
@@ -15723,7 +15725,7 @@ See also: @ref{eval}, @ref{execute}, @ref{Running}
 See also: @ref{Running}
 
 @c -------------------------------------
-@node complex, compress, compile_file, Internal Routines
+@node complex, compose2d, compile_file, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection complex
 @findex complex
@@ -15738,11 +15740,36 @@ See also: @ref{abs}, @ref{arg}, @ref{imaginary}, @ref{real},
 @ref{Complex Numbers}, @ref{Number Conversion}, @ref{Complex Functions}
 
 @c -------------------------------------
-@node compress, concat, complex, Internal Routines
+@node compose2d, compress, complex, Internal Routines
+@subsection compose2d
+@findex compose2d
+
+@code{compose2d,out,in1,in2}
+
+Composes input images @code{@var{in1}} and @code{@var{in2}} into
+output image @code{@var{out}}.  This is the opposite of
+@code{decompose2dmedian3}.
+
+@code{@var{in1}} and @code{@var{in2}} must have the same data type.
+The dimensions of @code{@var{in1}} and @code{@var{in2}} must be as if
+they were produced by a single call of
+@code{@var{decompose2dmedian3}}, so the dimensions of @code{@var{in2}}
+must be about a third as large as those of @code{@var{in1}}.
+
+@code{@var{in2}} is expanded by a factor 3 in both dimensions, gets it
+right-hand and bottom edges chopped off as needed to make the result
+have the same dimensions as @code{@var{in1}}, and then gets
+@code{@var{in1}} added to it to produce output image @code{@var{out}}
+with the same data type and dimensions as @code{@var{in1}}.
+
+Reverse: @ref{decompose2dmedian3}
+
+@c -------------------------------------
+@node compress, concat, compose2d, Internal Routines
 @subsection compress
 @findex compress
 
-@code{compress(@var{data} [, @var{dimensions}], @var{factors})} 
+@code{compress(@var{data} [, @var{dimensions}], @var{factors})}
 
 Returns a compressed copy of array @code{@var{data}}, which may have an
 arbitrary number of dimensions.  The positive integer compression
@@ -16368,7 +16395,7 @@ byte-swapped after reading (for input only).
 See also: @ref{array}, @ref{File Arrays}, @ref{#max_dims}
 
 @c -------------------------------------
-@node decomp, decrunch, dblfarr, Internal Routines
+@node decomp, decompose2dmedian3, dblfarr, Internal Routines
 @subsection decomp
 @findex decomp
 
@@ -16379,7 +16406,31 @@ Replaces square matrix @code{@var{matrix}} with its lu decomposition.
 See also: @ref{dsolve}
 
 @c -------------------------------------
-@node decrunch, default, decomp, Internal Routines
+@node decompose2dmedian3, decrunch, decomp, Internal Routines
+@subsection decompose2dmedian3
+@findex decompose2dmedian3
+
+@code{decompose2dmedian3,in,out1,out2}
+
+Decomposes input image @code{@var{in}} into image @code{@var{out1}}
+that shows small-scale details, and image @code{@var{out2}} that shows
+large-scale details.  @code{@var{out1}} gets the same data type and
+dimensions as @code{@var{in}}.  @code{@var{out2}} gets the same data
+type as well, but is only a third the size of @code{@var{in}} in both
+dimensions.
+
+The input image is divided into tiles of 3 by 3 elements.  (The tiles
+at the right-hand and bottom (large-index) edges may be smaller if the
+dimensions of the input image are not multiples of 3.)  Each element
+of @code{@var{out2}} contains the median value of the corresponding
+tile of @code{@var{in}}.  Each element of @code{@var{out1}} contains
+the difference between the corresponding element of @code{@var{in}}
+and the median of its tile.
+
+Reverse: @ref{compose2d}
+
+@c -------------------------------------
+@node decrunch, default, decompose2dmedian3, Internal Routines
 @subsection decrunch
 @findex decrunch
 

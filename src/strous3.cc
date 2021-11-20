@@ -3984,3 +3984,386 @@ lux_factorial(int32_t narg, int32_t ps[])
 }
 REGISTER(factorial, f, factorial, 1, 1, NULL, HAVE_LIBGSL);
 #endif
+
+/// This template function provides the main action for function
+/// lux_decompose_2d_median3().  It decomposes a source image into an image of
+/// the same dimensions that shows only the small scale details (referred to
+/// below as the first output image) and a smaller image that shows only the
+/// large scale details (the second output image).
+///
+/// The source image is divided into tiles of 3 by 3 elements, except that the
+/// tiles at the right-hand and bottom edges can be smaller if the dimensions of
+/// the source image aren't divisible by 3.  The second output image is composed
+/// of the median value of all tiles.  The first output image contains the
+/// difference between source image tiles and the median value of those tiles.
+///
+/// \tparam T is the numerical data type of the data values.
+///
+/// \param[in] vin points at the start of the source image values.
+///
+/// \param[in] dims holds the dimensions of the source image, which are also
+/// the dimensions of the first output image.
+///
+/// \param[out] vout1 points at the start of the memory area where the values of
+/// the first output image get written.  The memory area must be large enough to
+/// hold `dims[0]*dims[1]` data values.
+///
+/// \param[out] vout2 points at the start of the memory area where the values of
+/// the second output image get written.  The memory area must be large enough
+/// to hold `ceil(dims[0]/3.0)*ceil(dims[1]/3.0)` elements.
+template<typename T>
+void
+lux_decompose_2d_median3_action(const void* vin, int32_t dims[2], void* vout1,
+                                void* vout2)
+{
+  const T* in = static_cast<const T*>(vin);
+  T* out1 = static_cast<T*>(vout1);
+  T* out2 = static_cast<T*>(vout2);
+  const int side = 3;
+  T data[side*side];
+
+  int rightedge = dims[0]%side;
+  int bottomedge = dims[1]%side;
+
+  // We process the input tile by tile, where each tile has side*side elements
+  // -- except perhaps at the right-hand and lower edges.  First we handle the
+  // rows of tiles for which we have the full height.
+  for (int y = 0; y < dims[1] - dims[1]%side; y += side) {
+    // in each row, we first handle the tiles that are complete (have side*side
+    // elements).
+    for (int x = 0; x < dims[0] - dims[0]%side; x += side) {
+      // copy input values from the current tile into the temporary array
+      for (int doff = 0, inoff = 0;
+           doff < side*side;
+           doff += side, inoff += dims[0]) {
+        memcpy(data + doff, in + inoff, side*sizeof(*in));
+      }
+
+      // determine the median: sort, then take the middle element
+      std::sort(&data[0], &data[9]);
+      auto v = data[(side*side)/2];
+
+      // fill out1 with the input values minus the median
+      for (int y2 = 0, inoff = 0; y2 < side; ++y2, inoff += dims[0]) {
+        for (int x2 = 0; x2 < side; ++x2) {
+          out1[inoff + x2] = in[inoff + x2] - v;
+        }
+      }
+      in += side;
+      out1 += side;
+
+      // store the median in out2
+      *out2++ = v;
+    }
+    if (rightedge) {
+      // We have less than a full tile (only rightedge elements wide) at the
+      // right-hand edge.  Copy input values from the current tile into the
+      // temporary array.
+      for (int doff = 0, inoff = 0;
+           doff < side*rightedge;
+           doff += rightedge, inoff += dims[0]) {
+        memcpy(data + doff, in + inoff, rightedge*sizeof(*in));
+      }
+
+      // Determine the median: sort, then take the middle element.  If the
+      // number of elements is even then we take one of the elements that are
+      // closest to the middle.
+      std::sort(&data[0], &data[side*rightedge]);
+      T v = data[(side*rightedge)/2]; // (near) median
+
+      // fill out1 with the input values minus the median
+      for (int y2 = 0, inoff = 0; y2 < side; ++y2, inoff += dims[0]) {
+        for (int x2 = 0; x2 < rightedge; ++x2) {
+          out1[inoff + x2] = in[inoff + x2] - v;
+        }
+      }
+      in += rightedge;
+      out1 += rightedge;
+
+      // store the median in out2
+      *out2++ = v;
+    }
+    in += 2*dims[0];
+    out1 += 2*dims[0];
+  }
+  if (bottomedge) {
+    // We have less than full tiles (only bottomedge elements tall) in the
+    // bottom row.  We first handle the tiles that have full width.
+    for (int x = 0; x < dims[0] - dims[0]%side; x += side) {
+      // copy input values from the current tile into the temporary array
+      for (int doff = 0, inoff = 0;
+           doff < side*bottomedge;
+           doff += side, inoff += dims[0]) {
+        memcpy(data + doff, in + inoff, side*sizeof(*in));
+      }
+
+      // determine the median: sort, then take the middle element
+      std::sort(&data[0], &data[9]);
+      auto v = data[(side*bottomedge)/2];
+
+      // fill out1 with the input values minus the median
+      for (int y2 = 0, inoff = 0; y2 < bottomedge; ++y2, inoff += dims[0]) {
+        for (int x2 = 0; x2 < side; ++x2) {
+          out1[inoff + x2] = in[inoff + x2] - v;
+        }
+      }
+      in += side;
+      out1 += side;
+
+      // store the median in out2
+      *out2++ = v;
+    }
+    if (rightedge) {
+      // The very last tile is both shorter and narrower (only rightedge
+      // elements wide, only bottomedge elements tall).  Copy input values from
+      // the current tile into the temporary array.
+      for (int doff = 0, inoff = 0;
+           doff < bottomedge*rightedge;
+           doff += rightedge, inoff += dims[0]) {
+        memcpy(data + doff, in + inoff, rightedge*sizeof(*in));
+      }
+
+      // Determine the median: sort, then take the middle element.  If the
+      // number of elements is even then we take one of the elements that are
+      // closest to the middle.
+      std::sort(&data[0], &data[bottomedge*rightedge]);
+      T v = data[(bottomedge*rightedge)/2]; // (near) median
+
+      // fill out1 with the input values minus the median
+      for (int y2 = 0, inoff = 0; y2 < bottomedge; ++y2, inoff += dims[0]) {
+        for (int x2 = 0; x2 < rightedge; ++x2) {
+          out1[inoff + x2] = in[inoff + x2] - v;
+        }
+      }
+      // store the median in out2
+      *out2 = v;
+    }
+  }
+}
+
+int32_t
+lux_decompose_2d_median3(int32_t narg, int32_t ps[])
+{
+  int32_t in = ps[0];
+  if (!symbolIsNumericalArray(in)
+      || array_num_dims(in) != 2)
+    return cerror(NEED_2D_ARR, in);
+
+  int32_t dims[2];
+  memcpy(dims, array_dims(in), sizeof(dims)); // copy 2 int32_t
+
+  int32_t out1 = ps[1];
+  to_scratch_array(out1, symbol_type(in), sizeof(dims)/sizeof(dims[0]), dims);
+
+  int32_t out2 = ps[2];
+  // out2's dimension is ceil(n/3) where n is in's corresponding dimension
+  for (int i = 0; i < sizeof(dims)/sizeof(dims[0]); ++i)
+    dims[i] = dims[i]/3 + (dims[i]%3 != 0);
+  to_scratch_array(out2, symbol_type(in), sizeof(dims)/sizeof(dims[0]), dims);
+
+  switch (array_type(in)) {
+  case LUX_INT8:
+    lux_decompose_2d_median3_action<uint8_t>(array_data(in),
+                                             array_dims(in),
+                                             array_data(out1),
+                                             array_data(out2));
+    break;
+  case LUX_INT16:
+    lux_decompose_2d_median3_action<int16_t>(array_data(in),
+                                             array_dims(in),
+                                             array_data(out1),
+                                             array_data(out2));
+    break;
+  case LUX_INT32:
+    lux_decompose_2d_median3_action<int32_t>(array_data(in),
+                                             array_dims(in),
+                                             array_data(out1),
+                                             array_data(out2));
+    break;
+  case LUX_INT64:
+    lux_decompose_2d_median3_action<int64_t>(array_data(in),
+                                             array_dims(in),
+                                             array_data(out1),
+                                             array_data(out2));
+  case LUX_FLOAT:
+    lux_decompose_2d_median3_action<float>(array_data(in),
+                                           array_dims(in),
+                                           array_data(out1),
+                                           array_data(out2));
+    break;
+  case LUX_DOUBLE:
+    lux_decompose_2d_median3_action<double>(array_data(in),
+                                            array_dims(in),
+                                            array_data(out1),
+                                            array_data(out2));
+    break;
+  default:
+    return cerror(ILL_TYPE, 0);
+  }
+  return LUX_OK;
+}
+REGISTER(decompose_2d_median3, s, decompose2dmedian3, 3, 3, NULL);
+
+/// This template function provides the main action for function
+/// lux_compose_2d(), which does the opposite of lux_decompose_2d_median3().
+/// Conceptually, it expands the second source image by a factor of 3 in both
+/// dimensions, chops off the right-hand and bottom edges as neeeded to make it
+/// have the same size as the first source image, and then adds it to the first
+/// source image to produce the target image.
+///
+/// \tparam T is the numerical data type of the data values.
+///
+/// \param[in] vout points at the start of the memory area where the values of
+/// the output image get written.  The memory area must be large enough to hold
+/// `dims[0]*dims[1]` data values.
+///
+/// \param[in] dims holds the dimensions of the first source image, which are
+/// also the dimensions of the output image.
+///
+/// \param[out] vin1 points at the start of the data values of the first input
+/// image.
+///
+/// \param[out] vin2 points at the start of the data values of the second input
+/// image.  It must hold `ceil(dims[0]/3.0)` by `ceil(dims[1]/3.0)` elements.
+template<typename T>
+void
+lux_compose_2d_action(void* vout, int32_t dimsout[2], const void* vin1,
+                      const void* vin2)
+{
+  T* out = static_cast<T*>(vout);
+  const T* in1 = static_cast<const T*>(vin1);
+  const T* in2 = static_cast<const T*>(vin2);
+  const int side = 3;
+  T data[side*side];
+
+  int rightedge = dimsout[0]%side;
+  int bottomedge = dimsout[1]%side;
+
+  // We process the output tile by tile, where each tile has side*side elements
+  // -- except perhaps at the right-hand and lower edges.  First we handle the
+  // rows of tiles for which we have the full height.
+  for (int y = 0; y < dimsout[1] - dimsout[1]%side; y += side) {
+    // in each row, we first handle the tiles that are complete (have side*side
+    // elements).
+    for (int x = 0; x < dimsout[0] - dimsout[0]%side; x += side) {
+      // fill out with the sum of the relevant input values
+      for (int y2 = 0, inoff = 0; y2 < side; ++y2, inoff += dimsout[0]) {
+        for (int x2 = 0; x2 < side; ++x2) {
+          out[inoff + x2] = in1[inoff + x2] + *in2;
+        }
+      }
+      out += side;
+      in1 += side;
+      ++in2;
+    }
+    if (rightedge) {
+      // We have less than a full tile (only rightedge elements wide) at the
+      // right-hand edge.
+      for (int y2 = 0, inoff = 0; y2 < side; ++y2, inoff += dimsout[0]) {
+        for (int x2 = 0; x2 < rightedge; ++x2) {
+          out[inoff + x2] = in1[inoff + x2] + *in2;
+        }
+      }
+      out+= rightedge;
+      in1 += rightedge;
+      ++in2;
+    }
+    out+= 2*dimsout[0];
+    in1 += 2*dimsout[0];
+  }
+  if (bottomedge) {
+    // We have less than full tiles (only bottomedge elements tall) in the
+    // bottom row.  We first handle the tiles that have full width.
+    for (int x = 0; x < dimsout[0] - dimsout[0]%side; x += side) {
+      for (int y2 = 0, inoff = 0; y2 < bottomedge; ++y2, inoff += dimsout[0]) {
+        for (int x2 = 0; x2 < side; ++x2) {
+          out[inoff + x2] = in1[inoff + x2] + *in2;
+        }
+      }
+      out += side;
+      in1+= side;
+      ++in2;
+    }
+    if (rightedge) {
+      // The very last tile is both shorter and narrower (only rightedge
+      // elements wide, only bottomedge elements tall).
+      for (int y2 = 0, inoff = 0; y2 < bottomedge; ++y2, inoff += dimsout[0]) {
+        for (int x2 = 0; x2 < rightedge; ++x2) {
+          out[inoff + x2] = in1[inoff + x2] + *in2;
+        }
+      }
+    }
+  }
+}
+
+int32_t
+lux_compose_2d(int32_t narg, int32_t ps[])
+{
+  int32_t in1 = ps[1];
+  if (!symbolIsNumericalArray(in1)
+      || array_num_dims(in1) != 2)
+    return cerror(NEED_2D_ARR, in1);
+
+  int32_t dims[2];
+  memcpy(dims, array_dims(in1), sizeof(dims));
+
+  int32_t in2 = ps[2];
+  if (!symbolIsNumericalArray(in2)
+      || array_num_dims(in2) != 2)
+    return cerror(NEED_2D_ARR, in2);
+
+  // in1 and in2 must have the same data type
+  if (symbol_type(ps[2]) != symbol_type(ps[1]))
+    return cerror(INCMP_ARG, in2);
+
+  // in2's dimension must be ceil(n/3) where n is in1's corresponding dimension
+  int32_t* dims2 = array_dims(in2);
+  for (int i = 0; i < sizeof(dims)/sizeof(dims[0]); ++i)
+    if (dims2[i] != dims[i]/3 + (dims[i]%3 != 0))
+      return cerror(INCMP_DIMS, in2, in1);
+
+  int32_t out = ps[0];
+  to_scratch_array(out, symbol_type(in1), sizeof(dims)/sizeof(dims[0]), dims);
+
+  switch (array_type(in1)) {
+  case LUX_INT8:
+    lux_compose_2d_action<uint8_t>(array_data(out),
+                                   array_dims(in1),
+                                   array_data(in1),
+                                   array_data(in2));
+    break;
+  case LUX_INT16:
+    lux_compose_2d_action<int16_t>(array_data(out),
+                                   array_dims(in1),
+                                   array_data(in1),
+                                   array_data(in2));
+    break;
+  case LUX_INT32:
+    lux_compose_2d_action<int32_t>(array_data(out),
+                                   array_dims(in1),
+                                   array_data(in1),
+                                   array_data(in2));
+    break;
+  case LUX_INT64:
+    lux_compose_2d_action<int64_t>(array_data(out),
+                                   array_dims(in1),
+                                   array_data(in1),
+                                   array_data(in2));
+  case LUX_FLOAT:
+    lux_compose_2d_action<float>(array_data(out),
+                                 array_dims(in1),
+                                 array_data(in1),
+                                 array_data(in1));
+    break;
+  case LUX_DOUBLE:
+    lux_compose_2d_action<double>(array_data(out),
+                                  array_dims(in1),
+                                  array_data(in1),
+                                  array_data(in2));
+    break;
+  default:
+    return cerror(ILL_TYPE, 0);
+  }
+  return LUX_OK;
+}
+REGISTER(compose_2d, s, compose2d, 3, 3, NULL);

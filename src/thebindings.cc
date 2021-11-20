@@ -1737,6 +1737,12 @@ void register_the_bindings()
   register_lux_f(lux_factorial, "factorial", 1, 1, NULL);
 #endif
 
+  int32_t lux_decompose_2d_median3(int32_t, int32_t []);
+  register_lux_s(lux_decompose_2d_median3, "decompose2dmedian3", 3, 3, NULL);
+
+  int32_t lux_compose_2d(int32_t, int32_t []);
+  register_lux_s(lux_compose_2d, "compose2d", 3, 3, NULL);
+
   int32_t lux_read_image_oiio(int32_t, int32_t []);
   register_lux_f(lux_read_image_oiio, "readimage", 1, 1, NULL);
 

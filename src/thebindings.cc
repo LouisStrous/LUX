@@ -2402,7 +2402,7 @@ void register_the_bindings()
   register_lux_f(lux_generalfit2, "fit3", 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 
   int32_t lux_setnan(int32_t, int32_t []);
-  register_lux_f(lux_setnan, "setnan", 2, 2, NULL);
+  register_lux_f(lux_setnan, "setnan", 1, 2, NULL);
 
   int32_t lux_indgen_s(int32_t, int32_t []);
   register_lux_s(lux_indgen_s, "indgen", 1, 2, "*");

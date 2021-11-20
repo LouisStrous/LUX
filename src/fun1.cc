@@ -877,7 +877,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
   return sa.result();
 }
 //-------------------------------------------------------------------------
-// <y> = setnan(<x>, <mask>)
+// <y> = setnan(<x>[, <mask>])
 //
 // returns a copy of <x> with all elements for which the <mask> is
 // non-zero set equal to NaN.  If <x> is of an integer type, then the
@@ -888,33 +888,35 @@ int32_t lux_setnan(int32_t narg, int32_t ps[])
   Pointer* data;
   LoopInfo* info;
 
-  StandardArguments_RAII sa(narg, ps, "i^*;i&;r>F^&", &data, &info);
+  StandardArguments_RAII sa(narg, ps, "i^*;i&?;r>F^&", &data, &info);
   iq = sa.result();
   if (iq < 0)
     return iq;
 
   size_t nelem = info[0].nelem;
   while (nelem--) {
-    bool mask;
-    switch (info[1].type) {
-    case LUX_INT8:
-      mask = *data[1].ui8 != 0;
-      break;
-    case LUX_INT16:
-      mask = *data[1].i16 != 0;
-      break;
-    case LUX_INT32:
-      mask = *data[1].i32 != 0;
-      break;
-    case LUX_INT64:
-      mask = *data[1].i64 != 0;
-      break;
-    case LUX_FLOAT:
-      mask = *data[1].f != 0;
-      break;
-    case LUX_DOUBLE:
-      mask = *data[1].d != 0;
-      break;
+    bool mask = true;
+    if (narg > 1) {
+      switch (info[1].type) {
+      case LUX_INT8:
+        mask = *data[1].ui8 != 0;
+        break;
+      case LUX_INT16:
+        mask = *data[1].i16 != 0;
+        break;
+      case LUX_INT32:
+        mask = *data[1].i32 != 0;
+        break;
+      case LUX_INT64:
+        mask = *data[1].i64 != 0;
+        break;
+      case LUX_FLOAT:
+        mask = *data[1].f != 0;
+        break;
+      case LUX_DOUBLE:
+        mask = *data[1].d != 0;
+        break;
+      }
     }
     data[1].ui8 += info[1].stride;
     Scalar value;
@@ -949,7 +951,7 @@ int32_t lux_setnan(int32_t narg, int32_t ps[])
   }
   return iq;
 }
-REGISTER(setnan, f, setnan, 2, 2, NULL);
+REGISTER(setnan, f, setnan, 1, 2, NULL);
 //-------------------------------------------------------------------------
 int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
 /* fills array elements with their element index or with the value of

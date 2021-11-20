@@ -26054,10 +26054,12 @@ See also: @ref{setbackground}, @ref{Incidental Colors}
 @subsection setnan
 @findex setnan
 
-@code{setnan(@var{x}, @var{mask})}
+@code{setnan(@var{x} [, @var{mask}])}
 
-Returns a copy of @code{@var{x}} in which those elements are set equal
-to NaN (not a number) for which @code{@var{mask}} is not zero.
+Returns a copy of @code{@var{x}} in which all elements are equal to
+NaN (not a number), or, if @code{@var{mask}} is specified, those
+elements are set equal to NaN (not a number) for which
+@code{@var{mask}} is not zero.
 
 @c -------------------------------------
 @node sgn, shift, setnan, Internal Routines

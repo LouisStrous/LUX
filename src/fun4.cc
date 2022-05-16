@@ -20,6 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File fun4.c
 // Various LUX functions.
+/// \file
 #include "config.h"
 #include <cassert>
 #include <stdio.h>
@@ -961,135 +962,277 @@ int32_t getmin2(float *p, float *x0, float *y0)
   *y0 = (2*a*e - c*d)*det;
   return 1;
 }
-//-------------------------------------------------------------------------
+//------------------------------------------------------------------------- / A
+
+/// A template type representing a function that acts as a backend to
+/// interpolate_2d().  The function should produce an interpolated value based
+/// on the provided arguments.
+///
+/// The input has \a nix by \a niy elements.  The location of the point at which
+/// the interpolated value is desired has coordinates (\a ix + \a tx/(2*\a nox),
+/// \a iy + \a ty/(2*\a noy)).
+///
+/// \tparam T is the type of the data to interpolate.
+///
+/// \param[in] in points at the input value nearest the desired location.
+///
+/// \param ix is the 0-based x index of the input value pointed at by \a in.
+///
+/// \param tx is the x coordinate of the desired location, relative to the
+/// center of the element pointed at by \a in.
+///
+/// \param iy is the 0-based y index of the input value pointed at by \a in.
+///
+/// \param ty is the y coordinate of the desired location, relative to the
+/// center of the input value.
+///
+/// \param nix is the input element count in the x direction.
+///
+/// \param niy is the input element count in the y direction.
+///
+/// \param nox is the output element count in the x direction.
+///
+/// \param noy is the output element count in the y direction.
 template<typename T>
-void
-rescale_image_nearest_neighbor_action(const void* vin, int32_t dimsin[2],
-                                      void* vout, int32_t dimsout[2])
-{
-  const T* in = static_cast<const T*>(vin);
-  T* out = static_cast<T*>(vout);
+using Interpolation2DBackend
+= T (*)(const T* in, int ix, int tx, int iy, int ty, int nix, int niy,
+        int nox, int noy);
 
-  // i = ⌊o*f/g⌋
-  // o*f = i*g + t
-  //
-  // f = n*g + m
-  //
-  // o ← o + 1 ⇒ i ← i + n, t ← t + m
-  // t ≥ g → i ← i + 1, t ← t − g
-
-  auto cx = div(dimsin[0], dimsout[0]);
-  auto cy = div(dimsin[1], dimsout[1]);
-
-  int32_t ii = 0, tx = 0, ty = 0;
-  for (int32_t oy = 0; oy < dimsout[1]; ++oy) {
-    for (int32_t ox = 0; ox < dimsout[0]; ++ox) {
-      *out++ = in[ii];
-      ii += cx.quot;
-      tx += cx.rem;
-      if (tx >= dimsout[0]) {
-        ++ii;
-        tx -= dimsout[0];
-      }
-    }
-    ii += cy.quot*dimsin[0];
-    ty += cy.rem;
-    if (ty >= dimsout[1]) {
-      ty -= dimsout[1];
-    } else {
-      ii -= dimsin[0];
-    }
-  }
+/// A 2D interpolation backend that does nearest-neighbor interpolation.
+///
+/// The input has \a nix by \a niy elements.  The location of the point at which
+/// the interpolated value is desired has coordinates (\a ix + \a tx/(2*\a nox),
+/// \a iy + \a ty/(2*\a noy)).
+///
+/// \tparam T is the type of the data to interpolate.
+///
+/// \param[in] in points at the input value nearest the desired location.
+///
+/// \param ix is the 0-based x index of the input value pointed at by \a in.
+///
+/// \param tx is the x coordinate of the desired location, relative to the
+/// center of the element pointed at by \a in.
+///
+/// \param iy is the 0-based y index of the input value pointed at by \a in.
+///
+/// \param ty is the y coordinate of the desired location, relative to the
+/// center of the input value.
+///
+/// \param nix is the input element count in the x direction.
+///
+/// \param niy is the input element count in the y direction.
+///
+/// \param nox is the output element count in the x direction.
+///
+/// \param noy is the output element count in the y direction.
+///
+/// \returns the value pointed at by \a in, which is the input value
+/// interpolated (in nearest-neighbor fashion) at the indicated position.
+template<typename T>
+inline T
+nearest_neighbor_2d_interpolation_backend
+(const T* in, int ix, int tx, int iy, int ty, int nix, int niy, int nox,
+ int noy) {
+  return *in;
 }
 
+/// A 2D interpolation backend that does bilinear interpolation.
+///
+/// The input has \a nix by \a niy elements.  The location of the point at which
+/// the interpolated value is desired has coordinates (\a ix + \a tx/(2*\a nox),
+/// \a iy + \a ty/(2*\a noy)).
+///
+/// \tparam T is the type of the data to interpolate.
+///
+/// \param[in] in points at the input value nearest the desired location.
+///
+/// \param ix is the 0-based x index of the input value pointed at by \a in.
+///
+/// \param tx is the x coordinate of the desired location, relative to the
+/// center of the element pointed at by \a in.
+///
+/// \param iy is the 0-based y index of the input value pointed at by \a in.
+///
+/// \param ty is the y coordinate of the desired location, relative to the
+/// center of the input value.
+///
+/// \param nix is the input element count in the x direction.
+///
+/// \param niy is the input element count in the y direction.
+///
+/// \param nox is the output element count in the x direction.
+///
+/// \param noy is the output element count in the y direction.
+///
+/// \returns the value pointed at by \a in, which is the input value
+/// interpolated (in nearest-neighbor fashion) at the indicated position.
 template<typename T>
+T
+bilinear_2d_interpolation_backend(const T* in, int ix, int tx, int iy, int ty,
+                                  int nix, int niy, int nox, int noy) {
+  auto nix2 = 2*nix;
+  auto niy2 = 2*niy;
+  auto nox2 = 2*nox;
+  auto noy2 = 2*noy;
+
+  // x = ix + tx/nox2
+  // y = iy + ty/noy2
+
+  if (ix == nix - 1) {          // beyond the high x edge
+    --in;                       // start at the previous x
+    tx += nox2;                 // shift target forward one x element
+  }
+  if (iy == niy - 1) {          // beyond the high y edge
+    in -= nix;                  // start at the previous y
+    ty += noy2;                 // shift the target forward one y element
+  }
+  if (tx < 0 && ix > 0) {
+    --in;
+    tx += nox2;
+  }
+  if (ty < 0 && iy > 0) {
+    in -= nix;
+    ty += noy2;
+  }
+
+  auto ux = nox2 - tx;
+  auto uy = noy2 - ty;
+
+  // The bilinear result is((in[0]*ux + in[1]*tx)*uy + (in[nix]*ux + in[nix +
+  // 1]*tx)*ty)/(nox2*noy2) of which both the numerator and denominator can
+  // easily overflow if T is an integer type.  We rewrite in terms of
+  // differences with the base value:
+  //
+  // T v00 = in[0]
+  // T d10 = in[1] - in[0];
+  // T d01 = in[nix] - in[0];
+  // T d11 = in[nix + 1] - in[0];
+  // T v = (((v00*ux + (v00 + d10)*tx)*uy
+  //        + ((v00 + d01)*ux + (v00 + d11)*tx)*ty))
+  //       /(nox2*noy2)
+  //   = v00 + (d10*tx*uy + d01*ux*ty + d11*tx*ty)/(nox2*noy2)
+  //
+  // This is already better, but if T is an unsigned type then d10, d01, d11
+  // cannot express negative differences, and the numerator and denominator of
+  // the ratio can still both overflow.  We'll keep it simple and calculate the
+  // bit that gets added to v00 in a floating-point type.
+
+  auto d10 = static_cast<typename std::common_type<T, float>::type>
+    (in[1]) - in[0];
+  auto d01 = static_cast<typename std::common_type<T, float>::type>
+    (in[nix]) - in[0];
+  auto d11 = static_cast<typename std::common_type<T, float>::type>
+    (in[nix + 1]) - in[0];
+
+  return in[0] + static_cast<T>((d10*tx*uy + ty*(d01*ux + d11*tx))/(nox2*noy2));
+}
+
+/// Does two-dimensional interpolation.
+///
+/// \tparam T is the type of the data values to interpolate.
+///
+/// \tparam interpolate points at the backend interpolation function which
+/// produces the interpolated value at the desired location.
+///
+/// \param[in] vin points at the beginning of the input data.  The input data
+/// values are expected to be of type \a T, but for convenience this pointer is
+/// a pointer to void.
+///
+/// \param[out] vout points at the beginning of the output data.  The
+/// interpolated values are written there.  The output data values are of type
+/// \a T, but for convenience this pointer is a pointer to void.  The memory
+/// area is assumed to have been allocated already and to be large enough to
+/// hold the results.
+///
+/// \param[in] indims points at the 2 dimensions of the input data.  The
+/// dimensions are expected to be positive.
+///
+/// \param[in] outdims points at the 2 dimensions of the output data.  The
+/// dimensions are expected to be positive.
+template<typename T, Interpolation2DBackend<T> interpolate>
 void
-rescale_image_bilinear_action(const void* vin, int32_t dimsin[2],
-                              void* vout, int32_t dimsout[2])
-{
-  const T* in = static_cast<const T*>(vin);
-  T* out = static_cast<T*>(vout);
+interpolate_2d(const void* vin, void* vout, const int* indims,
+               const int* outdims) {
+  auto in = static_cast<const T*>(vin);
+  auto out = static_cast<T*>(vout);
+  auto& nix = indims[0];
+  auto& niy = indims[1];
+  auto& nox = outdims[0];
+  auto& noy = outdims[1];
 
-  // i = ⌊o*f/g⌋
-  // o*f = i*g + t
-  //
-  // f = n*g + m
-  //
-  // o ← o + 1 ⇒ i ← i + n, t ← t + m
-  // t ≥ g → i ← i + 1, t ← t − g
+  auto qrx = std::div(nix, 2*nox);
+  auto qry = std::div(niy, 2*noy);
 
-  int32_t nix = dimsin[0];
-  int32_t niy = dimsin[1];
-  int32_t nox = dimsout[0];
-  int32_t noy = dimsout[1];
+  auto qx2 = 2*qrx.quot;
+  auto qy2 = 2*qry.quot;
 
-  auto cx = div(nix, nox);
-  auto cy = div(niy, noy);
+  auto rx2 = 2*qrx.rem;
+  auto ry2 = 2*qry.rem;
 
-  int32_t ix = 0, iy = 0, tx = 0, ty = 0;
-  int32_t ix_prev = -1, iy_prev = -1;
-  T z1, z2, z3, z4;
-  int32_t ax = 1;
-  int32_t ay = nix;
-  int32_t no = nox*noy;
-  for (int32_t oy = 0; oy < noy; ++oy) {
-    for (int32_t ox = 0; ox < nox; ++ox) {
-      // Now the indexes of the nearest neighbors are:
-      //
-      // | Index        | x    | y    | label |
-      // |--------------+------+------+-------|
-      // | ii           | low  | low  | z1    |
-      // | ii + 1       | high | low  | z2    |
-      // | ii + nix     | low  | high | z3    |
-      // | ii + nix + 1 | high | high | z4    |
-      //
-      // but the cells with "high" x or y coordinates might not exist (if we're
-      // near an edge).
-      //
-      // The desired value is
-      //
-      //  ((z1*(nox-tx) + z2*tx)/nox*(noy-ty)
-      // + (z3*(nox-tx) + z4*tx)/nox*ty  )/noy
-      if (ix != ix_prev) {
-        ix_prev = ix;
-        if (ix == nix - 1)      // avoid going beyond the far x edge
-          ax = 0;
-        if (iy != iy_prev) {
-          ax = 1;
-          iy_prev = iy;
-          if (iy == (niy - 1)*nix)
-            ay = 0;             // avoid going beyond the far y edge
-        }
-        auto ii = ix + iy;
-        z1 = in[ii];
-        z2 = in[ii + ax];
-        z3 = in[ii + ay];
-        z4 = in[ii + ax + ay];
-      }
-      auto ux = nox - tx;
-      auto uy = noy - ty;
-      auto v = ((z1*ux + z2*tx)*uy + (z3*ux + z4*tx)*ty);
-      *out++ = v/no;
-      ix += cx.quot;
-      tx += cx.rem;
+  auto nox2 = 2*nox;
+  auto noy2 = 2*noy;
+
+  auto ix = qrx.quot;
+  auto ix0 = ix;
+  auto iy = qry.quot;
+
+  int tx = qrx.rem - nox;
+  int ty = qry.rem - noy;
+
+  auto ip = &in[ix + iy*nix];
+  auto op = &out[0];
+
+  auto opendx = op + nox;
+  auto opendy = op + nox*noy;
+
+  auto cy = qy2*nix;
+  while (op < opendy) {
+    while (op < opendx) {
+      *op = interpolate(ip, ix, tx, iy, ty, nix, niy, nox, noy);
+      ix += qx2;
+      ip += qx2;
+      tx += rx2;
       if (tx >= nox) {
+        ++ip;
         ++ix;
-        tx -= nox;
+        tx -= nox2;
       }
+      ++op;
     }
-    iy += cy.quot*nix;
-    ty += cy.rem;
+    ip += cy;
+    ix = ix0;
+    ty += ry2;
     if (ty >= noy) {
-      iy += nix;
-      ty -= noy;
+      ++iy;
+      ty -= noy2;
+    } else {
+      ip -= nix;
     }
-    ix -= nix;
-    ax = 1;
+    opendx += nox;
   }
 }
 
-int32_t expandImage(int32_t source, float factor_x, float factor_y,
-                    int32_t method)
+/// Does two-dimensional image expansion by an arbitrary positive factor for
+/// each dimension.
+///
+/// \param source is the number of the LUX symbol that holds the image to be
+/// expanded.
+///
+/// \param factor_x is the factor by which to expand the image in the x
+/// direction (the first dimension).  The expanded image's x dimension is the
+/// rounded-down product of the source image's x dimension and \a factor_x.  The
+/// expansion factor passed to the interpolation backend is the ratio of the
+/// output image's to the input image's x dimension.
+///
+/// \param factor_y is the factor by which to expand the image in the y
+/// direction (the second dimension).  It gets treated similarly to \a factor_x.
+///
+/// \param method indicates which interpolation method to use.  Supported values
+/// are 0 for nearest-neighbor interpolation, or 1 for bilinear interpolation.
+///
+/// \returns the LUX symbol number of the expanded image.
+int32_t
+expandImage(int32_t source, float factor_x, float factor_y, int32_t method)
 {
   assert(factor_x > 0);
   assert(factor_y > 0);
@@ -1109,85 +1252,85 @@ int32_t expandImage(int32_t source, float factor_x, float factor_y,
   int32_t out = array_scratch(array_type(source), 2, dimsout);
 
   switch (method) {
-  case 1:                       // nearest neighbor
+  default:                       // nearest neighbor
     switch (array_type(source)) {
     case LUX_INT8:
-      rescale_image_nearest_neighbor_action<uint8_t>(array_data(source),
-                                                     array_dims(source),
-                                                     array_data(out),
-                                                     array_dims(out));
+      interpolate_2d<uint8_t,
+                     nearest_neighbor_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_INT16:
-      rescale_image_nearest_neighbor_action<int16_t>(array_data(source),
-                                                     array_dims(source),
-                                                     array_data(out),
-                                                     array_dims(out));
+      interpolate_2d<int16_t,
+                     nearest_neighbor_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_INT32:
-      rescale_image_nearest_neighbor_action<int32_t>(array_data(source),
-                                                     array_dims(source),
-                                                     array_data(out),
-                                                     array_dims(out));
+      interpolate_2d<int32_t,
+                     nearest_neighbor_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_INT64:
-      rescale_image_nearest_neighbor_action<int64_t>(array_data(source),
-                                                     array_dims(source),
-                                                     array_data(out),
-                                                     array_dims(out));
+      interpolate_2d<int64_t,
+                     nearest_neighbor_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_FLOAT:
-      rescale_image_nearest_neighbor_action<float>(array_data(source),
-                                                   array_dims(source),
-                                                   array_data(out),
-                                                   array_dims(out));
+      interpolate_2d<float,
+                     nearest_neighbor_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_DOUBLE:
-      rescale_image_nearest_neighbor_action<double>(array_data(source),
-                                                    array_dims(source),
-                                                    array_data(out),
-                                                    array_dims(out));
+      interpolate_2d<double,
+                     nearest_neighbor_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     default:
       return cerror(ILL_TYPE, source);
     }
     break;
-  default:                      // bilinear
+  case 1:                      // bilinear
     switch (array_type(source)) {
     case LUX_INT8:
-      rescale_image_bilinear_action<uint8_t>(array_data(source),
-                                             array_dims(source),
-                                             array_data(out),
-                                             array_dims(out));
+      interpolate_2d<uint8_t,
+                     bilinear_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_INT16:
-      rescale_image_bilinear_action<int16_t>(array_data(source),
-                                             array_dims(source),
-                                             array_data(out),
-                                             array_dims(out));
+      interpolate_2d<int16_t,
+                     bilinear_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_INT32:
-      rescale_image_bilinear_action<int32_t>(array_data(source),
-                                             array_dims(source),
-                                             array_data(out),
-                                             array_dims(out));
+      interpolate_2d<int32_t,
+                     bilinear_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_INT64:
-      rescale_image_bilinear_action<int64_t>(array_data(source),
-                                             array_dims(source),
-                                             array_data(out),
-                                             array_dims(out));
+      interpolate_2d<int64_t,
+                     bilinear_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_FLOAT:
-      rescale_image_bilinear_action<float>(array_data(source),
-                                           array_dims(source),
-                                           array_data(out),
-                                           array_dims(out));
+      interpolate_2d<float,
+                     bilinear_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     case LUX_DOUBLE:
-      rescale_image_bilinear_action<double>(array_data(source),
-                                            array_dims(source),
-                                            array_data(out),
-                                            array_dims(out));
+      interpolate_2d<double,
+                     bilinear_2d_interpolation_backend>
+        (array_data(source), array_data(out), array_dims(source),
+         array_dims(out));
       break;
     default:
       return cerror(ILL_TYPE, source);

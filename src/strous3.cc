@@ -4353,7 +4353,7 @@ lux_compose_2d(int32_t narg, int32_t ps[])
     lux_compose_2d_action<float>(array_data(out),
                                  array_dims(in1),
                                  array_data(in1),
-                                 array_data(in1));
+                                 array_data(in2));
     break;
   case LUX_DOUBLE:
     lux_compose_2d_action<double>(array_data(out),

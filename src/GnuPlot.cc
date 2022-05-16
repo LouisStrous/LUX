@@ -281,7 +281,7 @@ GnuPlot::discard_datablocks()
 {
   if (m_pipe) {
     while (m_datablock_count > 0) {
-      sendf("undefine %d;\n", m_datablock_count--);
+      sendf("undefine $LUX%d;\n", m_datablock_count--);
     }
   }
   m_datablock_plot_elements = DatablockBackendCollection();

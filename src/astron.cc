@@ -72,6 +72,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
    since 0 UT on 1 January 1970.
 */
 
+#include <algorithm>
 #include <limits>
 
 #include <assert.h>
@@ -860,14 +861,17 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
   // 2 : TT
   // 3 : LT
 
-  numerical_or_string(ps[0], &dims, &ndim, NULL, NULL);
+  if (narg == 1) {
+    numerical_or_string(ps[0], &dims, &ndim, NULL, NULL);
+  }
 
   /* If no specific "from" calendar is specified, then assume the Common
-     calendar if the input is a string or string array, or if the input
-     has 3 elements in its first dimension.  Otherwise, assume CJD. */
+     calendar if the input is a string or string array, or if there are 3 input
+     symbols or if there is 1 input symbol and it has 3 elements in its first
+     dimension.  Otherwise, assume CJD. */
   if (fromcalendar == CAL_DEFAULT) {
     if (symbolIsString(ps[0])
-        || dims[0] == 3)
+        || narg == 3 || (narg == 1 && dims[0] == 3))
       fromcalendar = CAL_COMMON;
     else
       fromcalendar = CAL_CJD;
@@ -878,337 +882,401 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
   void (*CaltoCJD)(double const *date, double *CJDN)
     = cal_data[fromcalendar].CaltoCJD;
   /*
-  void (*CalStoCJDN)(char * const *date, int32_t *CJDN)
+    void (*CalStoCJDN)(char * const *date, int32_t *CJDN)
     = cal_data[fromcalendar].CalStoCJDN;
   */
   void (*CalStoCJD)(char * const *date, double *CJD)
     = cal_data[fromcalendar].CalStoCJD;
 
-  iq = ps[0];
-  {
-    Symboltype type;
+  if (narg == 1) {
+    iq = ps[0];
+    {
+      Symboltype type;
 
-    /* if the input type is integer, then promote to LONG.  If the
-       input type is floating point, then promote to DOUBLE. */
-    type = symbol_type(iq);
-    if (isIntegerType(type)) {
-      iq = lux_long(1, &iq);
-      inputtype = LUX_INT32;
-    } else if (isFloatType(type)) {
-      iq = lux_double(1, &iq);
-      inputtype = LUX_DOUBLE;
-    } else                        // must be text type
-      inputtype = LUX_STRING_ARRAY;
-  }
-
-  // number of input elements expected per calendar date
-  input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
-  if (isStringType(inputtype))
-    input_elem_per_date = 1; // strings have all elements of a date in a single string
-
-  if (dims[0] % input_elem_per_date)
-    return luxerror("Incompatible first dimension: expected a multiple "
-                    "of %d but found %d", ps[0], input_elem_per_date,
-                    dims[0]);
-
-  /* If no specific "to" calendar is specified, then assume the Common
-     calendar if the (effective) "from" calendar is a
-     one-element-per-date calendar, and otherwise CJD */
-  if (tocalendar == CAL_DEFAULT) {
-    if (input_elem_per_date == 1)
-      tocalendar = CAL_COMMON;
-    else
-      tocalendar = CAL_CJD;
-  }
-
-  if (fromcalendar == tocalendar
-      && fromtime == totime)    // no conversion
-    return *ps;
-
-  void (*CJDNtoCal)(int32_t const *CJDN, int32_t *date)
-    = cal_data[tocalendar].CJDNtoCal;
-  void (*CJDtoCal)(double const *CJD, double *date)
-    = cal_data[tocalendar].CJDtoCal;
-  void (*CJDNtoCalS)(int32_t const *CJDN, char **date)
-    = cal_data[tocalendar].CJDNtoCalS;
-  void (*CJDtoCalS)(double const *CJD, char **date)
-    = cal_data[tocalendar].CJDtoCalS;
-
-  assert(CaltoCJDN || CaltoCJD);
-  assert(CJDNtoCal || CJDtoCal);
-
-  // number of output elements per calendar date
-  output_elem_per_date = cal_data[tocalendar].to_elements_per_date;
-
-  /* if the (promoted) input type is LONG, then the internal type is
-     LONG if CaltoCJDN is not NULL, or DOUBLE if CaltoCJDN is NULL.
-     If CaltoCJDN is NULL and the number of input elements per date
-     is not equal to 1, then work with a DOUBLE copy of the input
-     symbol. */
-  if (inputtype == LUX_INT32) {
-    if (CaltoCJDN && fromtime == totime)
-      internaltype = LUX_INT32;
-    else {
-      internaltype = LUX_DOUBLE;
-      if (input_elem_per_date != 1) {
+      /* if the input type is integer, then promote to LONG.  If the input type
+         is floating point, then promote to DOUBLE. */
+      type = symbol_type(iq);
+      if (isIntegerType(type)) {
+        iq = lux_long(1, &iq);
+        inputtype = LUX_INT32;
+      } else if (isFloatType(type)) {
         iq = lux_double(1, &iq);
         inputtype = LUX_DOUBLE;
+      } else                        // must be text type
+        inputtype = LUX_STRING_ARRAY;
+    }
+
+    // number of input elements expected per calendar date
+    input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
+    if (isStringType(inputtype))
+      input_elem_per_date = 1; // strings have all elements of a date in a
+                               // single string
+
+    if (dims[0] % input_elem_per_date)
+      return luxerror("Incompatible first dimension: expected a multiple "
+                      "of %d but found %d", ps[0], input_elem_per_date,
+                      dims[0]);
+
+    /* If no specific "to" calendar is specified, then assume the Common
+       calendar if the (effective) "from" calendar is a one-element-per-date
+       calendar, and otherwise CJD */
+    if (tocalendar == CAL_DEFAULT) {
+      if (input_elem_per_date == 1)
+        tocalendar = CAL_COMMON;
+      else
+        tocalendar = CAL_CJD;
+    }
+
+    if (fromcalendar == tocalendar
+        && fromtime == totime)    // no conversion
+      return *ps;
+
+    void (*CJDNtoCal)(int32_t const *CJDN, int32_t *date)
+      = cal_data[tocalendar].CJDNtoCal;
+    void (*CJDtoCal)(double const *CJD, double *date)
+      = cal_data[tocalendar].CJDtoCal;
+    void (*CJDNtoCalS)(int32_t const *CJDN, char **date)
+      = cal_data[tocalendar].CJDNtoCalS;
+    void (*CJDtoCalS)(double const *CJD, char **date)
+      = cal_data[tocalendar].CJDtoCalS;
+
+    assert(CaltoCJDN || CaltoCJD);
+    assert(CJDNtoCal || CJDtoCal);
+
+    // number of output elements per calendar date
+    output_elem_per_date = cal_data[tocalendar].to_elements_per_date;
+
+    /* if the (promoted) input type is LONG, then the internal type is LONG if
+       CaltoCJDN is not NULL, or DOUBLE if CaltoCJDN is NULL.  If CaltoCJDN is
+       NULL and the number of input elements per date is not equal to 1, then
+       work with a DOUBLE copy of the input symbol. */
+    if (inputtype == LUX_INT32) {
+      if (CaltoCJDN && fromtime == totime)
+        internaltype = LUX_INT32;
+      else {
+        internaltype = LUX_DOUBLE;
+        if (input_elem_per_date != 1) {
+          iq = lux_double(1, &iq);
+          inputtype = LUX_DOUBLE;
+        }
       }
     }
-  }
 
-  /* if the (promoted) input type is DOUBLE, then the internal type
-     is DOUBLE if CaltoCJD is not NULL, or LONG if CaltoCJD is NULL.
-     If CaltoCJD is NULL and the number of input elements per date
-     is not equal to 1, then work with a LONG ("floor") copy of the
-     input symbol. */
+    /* if the (promoted) input type is DOUBLE, then the internal type is DOUBLE
+       if CaltoCJD is not NULL, or LONG if CaltoCJD is NULL.  If CaltoCJD is
+       NULL and the number of input elements per date is not equal to 1, then
+       work with a LONG ("floor") copy of the input symbol. */
 
-  else if (inputtype == LUX_DOUBLE) {
-    if (CaltoCJD || fromtime != totime)
-      internaltype = LUX_DOUBLE;
+    else if (inputtype == LUX_DOUBLE) {
+      if (CaltoCJD || fromtime != totime)
+        internaltype = LUX_DOUBLE;
+      else {
+        internaltype = LUX_INT32;
+        if (input_elem_per_date != 1) {
+          int32_t lux_floor(int32_t, int32_t *);
+          iq = lux_floor(1, &iq);
+          inputtype = LUX_INT32;
+        }
+      }
+    }
+
+    /* if the input type is a string type, then the internal type depends on the
+       output kind. */
     else {
-      internaltype = LUX_INT32;
-      if (input_elem_per_date != 1) {
-        int32_t lux_floor(int32_t, int32_t *);
-        iq = lux_floor(1, &iq);
-        inputtype = LUX_INT32;
+      if (outputkind == CAL_DOUBLE)
+        internaltype = LUX_DOUBLE;
+      else
+        internaltype = LUX_INT32;
+      input_elem_per_date = 1; // all input elements in a single text value
+    }
+
+    /* for numeric output, the output type is DOUBLE if CJDNtoCal is NULL (i.e.,
+       a conversion routine to LONG is not available), or LONG if CJDtoCal is
+       NULL (i.e., a conversion routine to DOUBLE is not available), or else is
+       equal to the internal type.  For non-numerical (i.e., text) output, then
+       output type indicates text.
+    */
+    if (outputkind == CAL_TEXT) {
+      outputtype = LUX_STRING_ARRAY;
+      output_elem_per_date = 1; // all date components in a single text value
+    } else if (outputkind == CAL_LONG || internaltype == LUX_INT32)
+      outputtype = CJDNtoCal? LUX_INT32: LUX_DOUBLE;
+    else if (outputkind == CAL_DOUBLE || internaltype == LUX_DOUBLE)
+      outputtype = CJDtoCal? LUX_DOUBLE: LUX_INT32;
+    else                          // should not happen
+      outputtype = internaltype;
+
+    {
+      int32_t more[1], less[1], nMore, nLess;
+
+      // does the output need more elements than the input?
+      nMore = nLess = 0;
+      if (output_elem_per_date != input_elem_per_date) { // yes, different
+        if (output_elem_per_date > 1) { // output needs more elements
+          nMore = 1;                    // prefix one dimension
+          more[0] = output_elem_per_date;
+        }
+        if (input_elem_per_date > 1) { // output needs fewer elements
+          nLess = 1;
+          less[0] = input_elem_per_date; // reduce 1st dimension
+        }
       }
+
+      if (standardLoopX(iq, LUX_ZERO,
+                        SL_AXISCOORD
+                        | SL_EACHROW,
+                        &srcinfo, &src,
+                        nMore, more,
+                        nLess, less,
+                        outputtype,
+                        SL_AXISCOORD
+                        | SL_EACHROW,
+                        &result,
+                        &tgtinfo, &tgt) < 0)
+        return LUX_ERROR;
     }
-  }
 
-  /* if the input type is a string type, then the internal type
-     depends on the output kind. */
-  else {
-    if (outputkind == CAL_DOUBLE)
-      internaltype = LUX_DOUBLE;
-    else
-      internaltype = LUX_INT32;
-    input_elem_per_date = 1; // all input elements in a single text value
-  }
+    if (srcinfo.rdims[0] != input_elem_per_date) {
+      /* we have a multiple of the expected number of input elements per date,
+         but the first dimension must be exactly equal to the expected number
+         else the standard loop ignores the excess elements.  We shift the
+         excess to the second dimension. */
+      int32_t dims[MAX_DIMS];
+      size_t ndim = 0;
 
-  /* for numeric output, the output type is DOUBLE if CJDNtoCal is
-     NULL (i.e., a conversion routine to LONG is not available), or
-     LONG if CJDtoCal is NULL (i.e., a conversion routine to DOUBLE is
-     not available), or else is equal to the internal type.  For
-     non-numerical (i.e., text) output, then output type indicates
-     text.
-  */
-  if (outputkind == CAL_TEXT) {
-    outputtype = LUX_STRING_ARRAY;
-    output_elem_per_date = 1;   // all date components in a single text value
-  } else if (outputkind == CAL_LONG || internaltype == LUX_INT32)
-    outputtype = CJDNtoCal? LUX_INT32: LUX_DOUBLE;
-  else if (outputkind == CAL_DOUBLE || internaltype == LUX_DOUBLE)
-    outputtype = CJDtoCal? LUX_DOUBLE: LUX_INT32;
-  else                          // should not happen
-    outputtype = internaltype;
-
-  {
-    int32_t more[1], less[1], nMore, nLess;
-
-    // does the output need more elements than the input?
-    nMore = nLess = 0;
-    if (output_elem_per_date != input_elem_per_date) { // yes, different
-      if (output_elem_per_date > 1) { // output needs more elements
-        nMore = 1;                    // prefix one dimension
-        more[0] = output_elem_per_date;
+      assert(srcinfo.dims[0] % input_elem_per_date == 0);
+      memcpy(dims, &srcinfo.dims[0], srcinfo.ndim*sizeof(*dims));
+      if (srcinfo.ndim == 1) {    // there is only one dimension
+        dims[1] = 1;              // add a 2nd dimension
+        srcinfo.ndim = 2;
       }
-      if (input_elem_per_date > 1) { // output needs fewer elements
-        nLess = 1;
-        less[0] = input_elem_per_date; // reduce 1st dimension
-      }
+      int32_t d = srcinfo.dims[0]/input_elem_per_date;
+      dims[1] *= d;
+      dims[0] /= d;
+      srcinfo.setupDimensionLoop(srcinfo.ndim, dims, srcinfo.type,
+                                 srcinfo.naxes, srcinfo.axes, srcinfo.data,
+                                 srcinfo.mode);
     }
 
-    if (standardLoopX(iq, LUX_ZERO,
-                      SL_AXISCOORD
-                      | SL_EACHROW,
-                      &srcinfo, &src,
-                      nMore, more,
-                      nLess, less,
-                      outputtype,
-                      SL_AXISCOORD
-                      | SL_EACHROW,
-                      &result,
-                      &tgtinfo, &tgt) < 0)
-      return LUX_ERROR;
-  }
+    /* complain if the desired type of translation is not available.  We don't
+       need to check for numerical types, because we demand that at least one of
+       the translations (to LONG/DOUBLE) is available, and are prepared to
+       handle the case where only one is available. */
+    if (inputtype == LUX_STRING_ARRAY && !CalStoCJD)
+      return luxerror("Translating from STRING is not supported for"
+                      " this calendar", ps[0]);
 
-  if (srcinfo.rdims[0] != input_elem_per_date) {
-    /* we have a multiple of the expected number of input elements per
-       date, but the first dimension must be exactly equal to the
-       expected number else the standard loop ignores the excess
-       elements.  We shift the excess to the second dimension. */
-    int32_t dims[MAX_DIMS];
-    size_t ndim = 0;
-
-    assert(srcinfo.dims[0] % input_elem_per_date == 0);
-    memcpy(dims, &srcinfo.dims[0], srcinfo.ndim*sizeof(*dims));
-    if (srcinfo.ndim == 1) {    // there is only one dimension
-      dims[1] = 1;              // add a 2nd dimension
-      srcinfo.ndim = 2;
-    }
-    int32_t d = srcinfo.dims[0]/input_elem_per_date;
-    dims[1] *= d;
-    dims[0] /= d;
-    srcinfo.setupDimensionLoop(srcinfo.ndim, dims, srcinfo.type,
-                               srcinfo.naxes, srcinfo.axes, srcinfo.data,
-                               srcinfo.mode);
-  }
-
-  /* complain if the desired type of translation is not available.  We
-     don't need to check for numerical types, because we demand that
-     at least one of the translations (to LONG/DOUBLE) is available,
-     and are prepared to handle the case where only one is
-     available. */
-  if (inputtype == LUX_STRING_ARRAY && !CalStoCJD)
-    return luxerror("Translating from STRING is not supported for"
-                    " this calendar", ps[0]);
-
-  /* complain if the desired type of translation is not available.  We
-     don't need to check for numerical types, because we demand that
-     at least one of the translations (from LONG/DOUBLE) is available,
-     and are prepared to handle the case where only one is
-     available. */
-  if (outputtype == LUX_STRING_ARRAY)
-    switch (internaltype) {
-    case LUX_INT32:
-      if (!CJDNtoCalS)
-        return luxerror("Translating CJDN to STRING is not supported"
-                        " for this calendar", ps[0]);
-      break;
-    case LUX_DOUBLE:
-      if (!CJDtoCalS)
-        return luxerror("Translating CJD to STRING is not supported"
-                        " for this calendar", ps[0]);
-      break;
-    default:
-      break;
-    }
-
-  // now loop over all dates to translate
-  do {
-    Scalar timestamp, temp;
-
-    // translate input to CJD or CJDN
-    switch (internaltype) {
-    case LUX_INT32:              // translate to CJDN
-      switch (inputtype) {
+    /* complain if the desired type of translation is not available.  We
+       don't need to check for numerical types, because we demand that
+       at least one of the translations (from LONG/DOUBLE) is available,
+       and are prepared to handle the case where only one is
+       available. */
+    if (outputtype == LUX_STRING_ARRAY)
+      switch (internaltype) {
       case LUX_INT32:
-        CaltoCJDN(src.i32, &timestamp.i32);
-        src.i32 += input_elem_per_date;
+        if (!CJDNtoCalS)
+          return luxerror("Translating CJDN to STRING is not supported"
+                          " for this calendar", ps[0]);
         break;
-      case LUX_DOUBLE: // only cases with one element per date reach here
-        assert(input_elem_per_date == 1);
-        temp.i32 = (int32_t) floor(*src.d); // translate from DOUBLE to LONG
-        CaltoCJDN(&temp.i32, &timestamp.i32); // use LONG translation
-        src.d += input_elem_per_date;
+      case LUX_DOUBLE:
+        if (!CJDtoCalS)
+          return luxerror("Translating CJD to STRING is not supported"
+                          " for this calendar", ps[0]);
         break;
       default:
         break;
       }
-      break;
-    case LUX_DOUBLE:            // translate to CJD
-      switch (inputtype) {
-      case LUX_INT32: // only cases with one element per date reach here
-        assert(input_elem_per_date == 1);
-        temp.d = (double) *src.i32; // translate from LONG to DOUBLE
-        CaltoCJD(&temp.d, &timestamp.d); // use DOUBLE translation
-        src.i32 += input_elem_per_date;
+
+    // now loop over all dates to translate
+    do {
+      Scalar timestamp, temp;
+
+      // translate input to CJD or CJDN
+      switch (internaltype) {
+      case LUX_INT32:              // translate to CJDN
+        switch (inputtype) {
+        case LUX_INT32:
+          CaltoCJDN(src.i32, &timestamp.i32);
+          src.i32 += input_elem_per_date;
+          break;
+        case LUX_DOUBLE: // only cases with one element per date reach here
+          assert(input_elem_per_date == 1);
+          temp.i32 = (int32_t) floor(*src.d); // translate from DOUBLE to LONG
+          CaltoCJDN(&temp.i32, &timestamp.i32); // use LONG translation
+          src.d += input_elem_per_date;
+          break;
+        default:
+          break;
+        }
         break;
-      case LUX_DOUBLE:
-        CaltoCJD(src.d, &timestamp.d);
-        src.d += input_elem_per_date;
-        break;
-      case LUX_STRING_ARRAY: case LUX_LSTRING:
-        CalStoCJD(src.sp, &timestamp.d);
-        src.sp += input_elem_per_date;
+      case LUX_DOUBLE:            // translate to CJD
+        switch (inputtype) {
+        case LUX_INT32: // only cases with one element per date reach here
+          assert(input_elem_per_date == 1);
+          temp.d = (double) *src.i32; // translate from LONG to DOUBLE
+          CaltoCJD(&temp.d, &timestamp.d); // use DOUBLE translation
+          src.i32 += input_elem_per_date;
+          break;
+        case LUX_DOUBLE:
+          CaltoCJD(src.d, &timestamp.d);
+          src.d += input_elem_per_date;
+          break;
+        case LUX_STRING_ARRAY: case LUX_LSTRING:
+          CalStoCJD(src.sp, &timestamp.d);
+          src.sp += input_elem_per_date;
+          break;
+        default:
+          return cerror(ILL_TYPE, ps[0]);
+        }
         break;
       default:
         return cerror(ILL_TYPE, ps[0]);
       }
-      break;
-    default:
-      return cerror(ILL_TYPE, ps[0]);
-    }
 
-    if (fromtime != totime) {
-      switch (fromtime) {
-      case CAL_UTC:
-        UTC_to_TAI(&timestamp.d);
-        break;
-      case CAL_TAI:
-        break;
-      case CAL_TT:
-        TT_to_TAI(&timestamp.d);
-        break;
-      case CAL_LT:
-        CJDLT_to_TAI(&timestamp.d);
-        break;
+      if (fromtime != totime) {
+        switch (fromtime) {
+        case CAL_UTC:
+          UTC_to_TAI(&timestamp.d);
+          break;
+        case CAL_TAI:
+          break;
+        case CAL_TT:
+          TT_to_TAI(&timestamp.d);
+          break;
+        case CAL_LT:
+          CJDLT_to_TAI(&timestamp.d);
+          break;
+        }
+
+        switch (totime) {
+        case CAL_UTC:
+          TAI_to_UTC(&timestamp.d);
+          break;
+        case CAL_TAI:
+          break;
+        case CAL_TT:
+          TAI_to_TT(&timestamp.d);
+          break;
+        case CAL_LT:
+          TAI_to_CJDLT(&timestamp.d);
+          break;
+        }
       }
 
-      switch (totime) {
-      case CAL_UTC:
-        TAI_to_UTC(&timestamp.d);
-        break;
-      case CAL_TAI:
-        break;
-      case CAL_TT:
-        TAI_to_TT(&timestamp.d);
-        break;
-      case CAL_LT:
-        TAI_to_CJDLT(&timestamp.d);
-        break;
-      }
-    }
-
-    // translate CJD or CJDN to output
-    switch (internaltype) {
-    case LUX_INT32:
-      switch (outputtype) {
+      // translate CJD or CJDN to output
+      switch (internaltype) {
       case LUX_INT32:
-        CJDNtoCal(&timestamp.i32, tgt.i32);
-        tgt.i32 += output_elem_per_date;
-        break;
-      case LUX_DOUBLE: // only cases with one element per date reach here
-        assert(output_elem_per_date == 1);
-        temp.d = (double) timestamp.i32; // translate from LONG to DOUBLE
-        CJDtoCal(&temp.d, tgt.d);      // use DOUBLE translation
-        tgt.d += output_elem_per_date;
-        break;
-      case LUX_STRING_ARRAY:
-        CJDNtoCalS(&timestamp.i32, tgt.sp);
-        tgt.sp += output_elem_per_date;
-        break;
-      default:
-        break;
-      }
-      break;
-    case LUX_DOUBLE:
-      switch (outputtype) {
-      case LUX_INT32:
-        temp.i32 = (int32_t) floor(timestamp.d); // translate from DOUBLE to LONG
-        CJDNtoCal(&temp.i32, tgt.i32);         // use LONG translation
-        tgt.i32 += output_elem_per_date;
+        switch (outputtype) {
+        case LUX_INT32:
+          CJDNtoCal(&timestamp.i32, tgt.i32);
+          tgt.i32 += output_elem_per_date;
+          break;
+        case LUX_DOUBLE: // only cases with one element per date reach here
+          assert(output_elem_per_date == 1);
+          temp.d = (double) timestamp.i32; // translate from LONG to DOUBLE
+          CJDtoCal(&temp.d, tgt.d);      // use DOUBLE translation
+          tgt.d += output_elem_per_date;
+          break;
+        case LUX_STRING_ARRAY:
+          CJDNtoCalS(&timestamp.i32, tgt.sp);
+          tgt.sp += output_elem_per_date;
+          break;
+        default:
+          break;
+        }
         break;
       case LUX_DOUBLE:
-        CJDtoCal(&timestamp.d, tgt.d);
-        tgt.d += output_elem_per_date;
-        break;
-      case LUX_STRING_ARRAY:
-        CJDtoCalS(&timestamp.d, tgt.sp);
-        tgt.sp += output_elem_per_date;
+        switch (outputtype) {
+        case LUX_INT32:
+          temp.i32 = (int32_t) floor(timestamp.d); // translate from DOUBLE to
+                                                   // LONG
+          CJDNtoCal(&temp.i32, tgt.i32);         // use LONG translation
+          tgt.i32 += output_elem_per_date;
+          break;
+        case LUX_DOUBLE:
+          CJDtoCal(&timestamp.d, tgt.d);
+          tgt.d += output_elem_per_date;
+          break;
+        case LUX_STRING_ARRAY:
+          CJDtoCalS(&timestamp.d, tgt.sp);
+          tgt.sp += output_elem_per_date;
+          break;
+        default:
+          break;
+        }
         break;
       default:
         break;
       }
-      break;
-    default:
-      break;
+    } while (tgtinfo.advanceLoop(&tgt.ui8),
+             srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
+    if (!tgtinfo.loopIsAtStart())
+      return luxerror("Source loop is finished but target loop is not!", ps[0]);
+  } else if (narg == 3) {
+    if (!symbolIsNumerical(ps[0]))
+      return cerror(ONLY_A_S, ps[0]);
+    if (!symbolIsNumerical(ps[1]))
+      return cerror(ONLY_A_S, ps[1]);
+    if (!symbolIsNumerical(ps[2]))
+      return cerror(ONLY_A_S, ps[2]);
+    input_elem_per_date = cal_data[fromcalendar].from_elements_per_date;
+    if (input_elem_per_date != 3)
+      return luxerror("Input calendar does not have 3 elements per date", 0);
+    int32_t *dims_year;
+    int32_t *dims_month;
+    int32_t *dims_day;
+    int32_t ndim_year;
+    int32_t ndim_month;
+    int32_t ndim_day;
+    int32_t n_year;
+    int32_t n_month;
+    int32_t n_day;
+    Pointer year;
+    Pointer month;
+    Pointer day;
+    numerical(lux_long(1, &ps[0]), &dims_year, &ndim_year, &n_year, &year);
+    numerical(lux_long(1, &ps[1]), &dims_month, &ndim_month, &n_month, &month);
+    numerical(lux_long(1, &ps[2]), &dims_day, &ndim_day, &n_day, &day);
+    int32_t n = std::max({n_year, n_month, n_day});
+    int32_t *dims;
+    int32_t ndim;
+    if (n == n_year) {
+      dims = dims_year;
+      ndim = ndim_year;
+    } else if (n == n_month) {
+      dims = dims_month;
+      ndim = ndim_month;
+    } else if (n == n_day) {
+      dims = dims_day;
+      ndim = ndim_day;
+    } else {
+      dims = &n;
+      ndim = 1;
     }
-  } while (tgtinfo.advanceLoop(&tgt.ui8),
-           srcinfo.advanceLoop(&src.ui8) < srcinfo.rndim);
-  if (!tgtinfo.loopIsAtStart())
-    return luxerror("Source loop is finished but target loop is not!", ps[0]);
+    // TODO: how many output elements per date are expected?
+    result = array_scratch(LUX_INT32, ndim, dims);
+    Pointer cjdn;
+    cjdn.i32 = static_cast<int32_t*>(array_data(result));
+    int32_t ix_year = 0;
+    int32_t ix_month = 0;
+    int32_t ix_day = 0;
+    int32_t date[3];
+    while (n--) {
+      date[0] = year.i32[ix_year];
+      if (++ix_year == n_year)
+        ix_year = 0;
+      date[1] = month.i32[ix_month];
+      if (++ix_month == n_month)
+        ix_month = 0;
+      date[2] = day.i32[ix_day];
+      if (++ix_day == n_day)
+        ix_day = 0;
+      CaltoCJDN(date, cjdn.i32);
+      ++cjdn.i32;
+    }
+  } else {
+    return cerror(WRNG_N_ARG, 0);
+  }
 
   return result;
 }

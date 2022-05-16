@@ -14414,11 +14414,29 @@ See also: @ref{Running}
 /fromtai, /fromtt, /fromlt] [, /toutc, /totai, /tott, /tolt] [,
 /fromymd, /fromdmy] [, /toymd, /todmy])}
 
-Transforms date @code{@var{date}} from one calendar system into
-another.  The @code{/from@dots{}} keywords specify the source calendar
-system, and the @code{/to@dots{}} keywords the target calendar system.
-The input data may be numerical or in the form of text, and likewise
-for the output.
+@code{calendar(@var{year}, @var{month}, @var{day} [, /fromcommon,
+/fromgregorian, /fromislamic, /fromjulian, /fromhebrew, /fromegyptian]
+[, /tocommon, /tocjd])}
+
+The first form transforms date @code{@var{date}} from one calendar
+system into another.  The @code{/from@dots{}} keywords specify the
+source calendar system, and the @code{/to@dots{}} keywords the target
+calendar system.  The input data may be numerical or in the form of
+text, and likewise for the output.
+
+The second form transforms dates @code{@var{year}, @var{month},
+@var{day}} from one calendar system into another.  Only the
+@code{/from@dots{}} keywords that imply three numbers (year, month,
+day) per calendar date are allowed, and only the @code{/to@dots{}}
+keywords that imply the Chronological Julian Day Number are allowed.
+The time related keywords (such as @code{/toutc}) are ignored.  If
+@code{@var{year}}, @code{@var{month}}, and @code{@var{day}} do not
+have the same number of elements, then the shorter ones are repeated
+as needed to provide as many elements as the longest one.  The result
+gets the same dimensions as the longest of the arguments.
+
+The remainder of this text presumes the first form, but generally
+applies to the second form, too.
 
 Through keywords, one can specify calendars, time systems, date
 component orders, and the data output type.
@@ -24771,14 +24789,17 @@ See also: @ref{diagnostic}, @ref{Diagnostic Output}
 @subsection redim
 @findex redim
 
-@code{redim, @var{array}, @var{dimensions}}
+@code{redim, @var{array}[, @var{dimensions}]}
 
-@code{redim( @var{array}, @var{dimensions})}
+@code{redim( @var{array}[, @var{dimensions}])}
 
-Changes the dimensions of @code{@var{array}} to the indicated
-@code{@var{dimension}}.  Up to @code{#max_dims} dimensions may be
-specified in any number of scalars or arrays.  The function form returns
-the modified @code{@var{array}}.
+The subroutine form changes the dimensions of @code{@var{array}} to
+the indicated @code{@var{dimension}}.  Up to @code{#max_dims}
+dimensions may be specified in any number of scalars or arrays.  If no
+dimensions are specified then the result is a one-dimensional array
+with the same number of elements.  The function form returns the
+modified form of @code{@var{array}} but leaves @code{@var{array}}
+unchanged.
 
 See also: @ref{dimen}, @ref{num_dim}, @ref{#max_dims}
 
@@ -27753,18 +27774,19 @@ See also: @ref{tv3}, @ref{tvlct}, @ref{zoom}
 @subsection tolookup
 @findex tolookup
 
-@code{tolookup, @var{src}, @var{list}, @var{index}}
+@code{tolookup, @var{src}, @var{list}, @var{index} [, /one]}
 
 Determines a lookup table for @code{@var{src}} in @code{@var{list}} such
 that @code{@var{list}} contains no duplicate members, and
 @code{@var{index}} contains an index to the member of @code{@var{list}}
 that corresponds to each member of @code{@var{src}}.
 
-If @code{@var{src}} has only one dimension, then @code{@var{index}} has
-the same number of elements as @code{@var{src}}, and @code{@var{list}}
-has the number of elements equal to the number of unique members of
-@code{@var{src}}.  In that case, @code{@var{list}(@var{index})} is an
-exact copy of @code{@var{src}}.
+If @code{@var{src}} has only one dimension or if @code{/one} is
+specified, then @code{@var{index}} has the same number of elements as
+@code{@var{src}}, and @code{@var{list}} has the number of elements
+equal to the number of unique members of @code{@var{src}}.  In that
+case, @code{@var{list}(@var{index})} is an exact copy of
+@code{@var{src}}.
 
 If @code{@var{src}} has more than one dimension, then its last dimension
 is taken to contain the numbers that define each member, and the

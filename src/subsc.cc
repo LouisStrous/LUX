@@ -2341,8 +2341,9 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
   // get old size
   oldSize = array_size(nsym);
   ndim = 0;
-  for (i = 1; i < narg; i++)
-    switch (symbol_class(ps[i])) {
+  if (narg > 1) {
+    for (i = 1; i < narg; i++)
+      switch (symbol_class(ps[i])) {
       case LUX_SCALAR:
         if (ndim + 1> MAX_DIMS)
           return luxerror("Too many dimensions specified", ps[i]);
@@ -2359,7 +2360,10 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
         break;
       default:
         return cerror(ILL_CLASS, ps[1]);
-    }
+      }
+  } else {
+    dims[ndim++] = oldSize;
+  }
   newSize = 1;                  // calculate new size
   for (i = 0; i < ndim; i++)
     newSize *= dims[i];

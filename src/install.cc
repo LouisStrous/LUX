@@ -870,7 +870,7 @@ internalRoutine function_table[] = {
   { "byte",     1, 1, lux_byte, "*" },    // symbols.cc
   { "bytfarr",  3, MAX_DIMS + 1, bytfarr, // filemap.cc
     "%1%offset:1readonly:2swap" },
-  { "calendar", 1, 1, lux_calendar, // astron.cc
+  { "calendar", 1, 3, lux_calendar, // astron.cc
     "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew"
     ":6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan"
     ":11fromlongcount:12fromlatin:16tocommon:32togregorian"
@@ -1132,7 +1132,7 @@ internalRoutine function_table[] = {
   { "readu",    2, MAX_ARG, lux_readu_f, 0 },                       // files.cc
   { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.cc
   { "real",     1, 1, lux_real, 0 },                                // fun3.cc
-  { "redim",    2, 9, lux_redim_f, 0 },                             // subsc.cc
+  { "redim",    1, 9, lux_redim_f, 0 },                             // subsc.cc
 #if HAVE_REGEX_H
   { "regex",    1, 2, lux_regex, "1case" }, // regex.cc
 #endif

@@ -328,7 +328,7 @@ SSFC::calculate_polar() const
     assert(m_level >= 3);
     assert(sizeof(m_bits) == 8);
 
-    const uint64_t highest_bit = ((unsigned int64_t) 1 << (8*sizeof(m_bits) - 1));
+    const uint64_t highest_bit = ((uint64_t) 1) << (8*sizeof(m_bits) - 1);
 
     uint64_t bits = m_bits;
 

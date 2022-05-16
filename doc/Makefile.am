@@ -29,9 +29,15 @@ if HAVE_DOXYGEN
 
 EXTRA_DIST += Doxyfile
 
+.PHONY: force
+
 all-local: doxyfile.stamp
 
 doxyfile.stamp: Doxyfile $(top_builddir)/src/liblux.a Doxyfile.in
+	$(DOXYGEN) Doxyfile
+	touch doxyfile.stamp
+
+force:
 	$(DOXYGEN) Doxyfile
 	touch doxyfile.stamp
 

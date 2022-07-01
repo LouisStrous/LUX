@@ -48,11 +48,11 @@ AC_CHECK_LIB([calceph], [calceph_open])
 AC_MSG_CHECKING([for OIIO::TypeDesc in -lOpenImageIO])
 AC_LANG_PUSH([C++])
 SAVED_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS -lOpenImageIO"
+LIBS="-lOpenImageIO -lOpenImageIO_Util $LIBS"
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([#include <OpenImageIO/imageio.h>],
                    [OIIO::TypeDesc x])],
-  [TEST_LIBS="$TEST_LIBS -lOpenImageIO"]
+  [TEST_LIBS="$TEST_LIBS -lOpenImageIO -lOpenImageIO_Util"]
   [AC_DEFINE(
     [HAVE_LIBOPENIMAGEIO],
     [1],

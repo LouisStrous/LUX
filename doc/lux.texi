@@ -12094,6 +12094,7 @@ arguments.
 * filetypename::                Returns the name of the file type
 * filewrite::                   Unformatted writing to a file
 * find::                        Find the first occurrence of particular values
+* find2::
 * findfile::                    Find a particular file
 * findspans::                   Find spans of elements meeting a condition
 * find_max::                    Find the values of local maxima
@@ -18378,7 +18379,7 @@ data is written at the current file position.
 See also: @ref{fileread}, @ref{openw}
 
 @c -------------------------------------
-@node find, findfile, filewrite, Internal Routines
+@node find, find2, filewrite, Internal Routines
 @subsection find
 @findex find
 
@@ -18414,7 +18415,25 @@ be a scalar or an array of the same size as @code{@var{key}}.
 See also: @ref{find_maxloc}
 
 @c -------------------------------------
-@node findfile, findspans, find, Internal Routines
+@node find2, findfile, find, Internal Routines
+@subsection find
+@findex find2
+
+@code{find2(@var{data}, @var{key} [, /reverse])}
+
+Finds the first occurrence of each element of @code{@var{key}} in
+@code{@var{data}}, starting at the end (if @code{/reverse} is
+specified) or at the beginning of @code{@var{data}}.  Returns the
+zero-based index of each found key, or @code{-1} for a key that wasn't
+found.
+
+This function is intended to eventually replace @ref{find}, when it is
+more complete.
+
+See also: @ref{find}
+
+@c -------------------------------------
+@node findfile, findspans, find2, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection findfile
 @findex findfile

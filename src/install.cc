@@ -961,9 +961,6 @@ internalRoutine function_table[] = {
   { "filesize", 1, 1, lux_filesize, 0 },                       // files.cc
   { "filetype", 1, 1, lux_identify_file, 0 },                  // files.cc
   { "filetypename", 1, 1, lux_filetype_name, 0 },              // install.cc
-  { "find",     2, 4, lux_find,                                // strous.cc
-    "0exact:1index_ge:2value_ge:4first" },
-  { "find2",    2, 2, lux_find2, "0exact" },     // strous.cc
   { "findfile", 2, 2, lux_findfile, 0 },         // files.cc
   { "find_max", 1, 3, lux_find_max,              // strous2.cc
     "::diagonal:1degree:2subgrid" },

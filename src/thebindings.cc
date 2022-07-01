@@ -1663,6 +1663,9 @@ int32_t lux_kepler_v_f(int32_t narg, int32_t ps[]) {
 
 void register_the_bindings()
 {
+  int32_t lux_find2(int32_t, int32_t []);
+  register_lux_f(lux_find2, "find2", 2, 2, "1reverse" );
+
   int32_t lux_matrix_product(int32_t, int32_t []);
   register_lux_f(lux_matrix_product, "mproduct", 2, 2, "0inner:1outer");
 

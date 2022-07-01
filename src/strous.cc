@@ -670,6 +670,32 @@ int32_t lux_find(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
+template<typename T>
+void
+find2_action(T* keys, int keys_count, T* data, int data_count,
+                  int32_t* target, bool reverse)
+{
+  if (reverse) {
+    for (int i = 0; i < keys_count; ++i) {
+      int j;
+      for (j = data_count - 1; j; --j)
+        if (*keys == data[j])
+          break;
+      *target++ = j;
+      ++keys;
+    }
+  } else {
+    for (int i = 0; i < keys_count; i++) {
+      int j;
+      for (j = 0; j < data_count; j++)
+        if (*keys == data[j])
+          break;
+      *target++ = (j == data_count? -1: j);
+      keys++;
+    }
+  }
+}
+
 int32_t lux_find2(int32_t narg, int32_t ps[])
 // FIND2(array, key)
 {
@@ -703,75 +729,38 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
   default:
     return cerror(ILL_CLASS, ps[1]);
   }
+  bool reverse = (internalMode & 1);
   switch (type) {
   case LUX_INT8:
-    for (i = 0; i < keys_count; i++) {
-      for (j = 0; j < data_count; j++)
-        if (*keys.ui8 == data.ui8[j])
-          break;
-      *target.i32++ = (j == data_count? -1: j);
-      keys.ui8++;
-    }
+    find2_action(keys.ui8, keys_count, data.ui8, data_count, target.i32,
+                 reverse);
     break;
   case LUX_INT16:
-    for (i = 0; i < keys_count; i++) {
-      for (j = 0; j < data_count; j++)
-        if (*keys.i16 == data.i16[j])
-          break;
-      *target.i16++ = (j == data_count? -1: j);
-      keys.i16++;
-    }
+    find2_action(keys.i16, keys_count, data.i16, data_count, target.i32,
+                 reverse);
     break;
   case LUX_INT32:
-    for (i = 0; i < keys_count; i++) {
-      for (j = 0; j < data_count; j++)
-        if (*keys.i32 == data.i32[j])
-          break;
-      *target.i32++ = (j == data_count? -1: j);
-      keys.i32++;
-    }
+    find2_action(keys.i32, keys_count, data.i32, data_count, target.i32,
+                 reverse);
     break;
   case LUX_INT64:
-    for (i = 0; i < keys_count; i++) {
-      for (j = 0; j < data_count; j++)
-        if (*keys.i64 == data.i64[j])
-          break;
-      *target.i64++ = (j == data_count? -1: j);
-      keys.i64++;
-    }
+    find2_action(keys.i64, keys_count, data.i64, data_count, target.i32,
+                 reverse);
     break;
   case LUX_FLOAT:
-    for (i = 0; i < keys_count; i++) {
-      for (j = 0; j < data_count; j++)
-        if (*keys.f == data.f[j])
-          break;
-      *target.i32++ = (j == data_count? -1: j);
-      keys.f++;
-    }
+    find2_action(keys.f, keys_count, data.f, data_count, target.i32,
+                 reverse);
     break;
   case LUX_DOUBLE:
-    for (i = 0; i < keys_count; i++) {
-      for (j = 0; j < data_count; j++)
-        if (*keys.d == data.d[j])
-          break;
-      *target.i32++ = (j == data_count? -1: j);
-      keys.d++;
-    }
-    break;
-  case LUX_STRING_ARRAY:
-    for (i = 0; i < keys_count; i++) {
-      for (j = 0; j < data_count; j++)
-        if (!strcmp(*keys.sp, data.sp[j]))
-          break;
-      *target.i32++ = (j == data_count? -1: j);
-      keys.sp++;
-    }
+    find2_action(keys.d, keys_count, data.d, data_count, target.i32,
+                 reverse);
     break;
   default:
     return luxerror("Illegal type in arguments to FIND2 function", 0);
   }
   return result;
 }
+REGISTER(find2, f, find2, 2, 2, "1reverse" );
 //-------------------------------------------------------------------------
 int timespec_diff(struct timespec* two, struct timespec* one)
 {

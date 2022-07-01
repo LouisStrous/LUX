@@ -4346,8 +4346,9 @@ int32_t lux_astropos(int32_t narg, int32_t ps[])
       iq = lux_long(1, &iq);
       object = (int32_t *) array_data(iq);
       nObjects = array_size(iq);
-      if ((internalMode & S_KEEPDIMS) // always include objects dimensions
-          || nObjects > 1) {
+      if (((internalMode & S_KEEPDIMS) // always include objects dimensions
+          || nObjects > 1)
+          && (internalMode & S_CONJSPREAD) == 0) { // not /conjspread
         outDims.insert(outDims.end(), array_dims(iq),
                        array_dims(iq) + array_num_dims(iq));
       }

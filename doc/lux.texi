@@ -11881,7 +11881,8 @@ arguments.
 * assoc::                       Create an associated variable
 * astore::                      Store complete variables on disk
 * astrf::                       Astronomical coordinate transformations
-* astron::                      Calculate planetary positions
+* astron::                      Calculate planetary positions (VSOP87)
+* astron2::                     Calculate planetary positions (DE431)
 * atan::                        Arc tangent (mod 180 degrees)
 * atan2::                       Arc tangent (mod 360 degrees)
 * atanh::                       Inverse hyperbolic tangent
@@ -13224,7 +13225,7 @@ structure as @code{@var{coords}}.  By default, @code{/fromequatorial,
 See also: @ref{astron}, @ref{precess}
 
 @c -------------------------------------
-@node astron, atan, astrf, Internal Routines
+@node astron, astron2, astrf, Internal Routines
 @subsection astron
 @findex astron
 
@@ -13234,6 +13235,11 @@ elements=@var{elements}] [, /xyz, /equatorial, /ecliptical,
 /horizontal, /elongation, /date, /tdt, /lighttime, /aberration,
 /nutation, /apparent, /qelements, /fk5, /conjspread, /planetocentric,
 /keepdimensions, /vocal, /vsop87a, /vsop87c])}
+
+NOTE: This function may be replaced by, or incorporate, function
+@ref{astron2}.  Function @code{astron2} is based on a more modern and
+more accurate ephemeris than the current function is, but the current
+function offers more functionality..
 
 Returns the positions of a set of heavenly bodies at a specific set of
 times.  Unless the user specifies otherwise, the times are taken to be
@@ -13339,14 +13345,14 @@ specified, then the coordinates are referred to the mean dynamical
 ecliptic defined by the VSOP system.
 @item /conjspread
 return the average position (ecliptical longitude and latitude) and
-the the conjunction spread of all indicated objects, measured in
-degrees.  The conjunction spread is a measure for how close together
-all indicated objects are in the sky.  For two close objects, the
+the conjunction spread of all indicated objects, measured in degrees.
+The conjunction spread is a measure for how close together all
+indicated objects are in the sky.  For two close objects, the
 conjunction spread is practically equal to their mutual distance.  For
 many objects on a great circle (e.g., planets on the ecliptic), the
 conjunction spread is equal to twice the standard deviation of their
 positions along the great circle.
-@item /keepdimensions
+@item /keepdims
 returns dimensions for the number of objects and number of dates even
 if these are equal to 1.
 @item /vocal
@@ -13371,10 +13377,93 @@ in time to the desired time are used.  Otherwise, linear interpolation
 between the two orbits that are closest in time on either side to the
 desired time is performed.
 
-See also: @ref{calendar}, @ref{readorbits}, @ref{Astronomy and Calendars}
+See also: @ref{astron2}, @ref{calendar}, @ref{readorbits},
+@ref{Astronomy and Calendars}
 
 @c -------------------------------------
-@node atan, atan2, astron, Internal Routines
+@node astron2, atan, astron, Internal Routines
+@subsection astron2
+@findex astron2
+
+@code{astron2(@var{jds}, @var{objects} [, @var{object0},
+equinox=@var{equinox}] [, /keepdims, /ecliptical, /equatorial, /bare,
+/polar, /xyz, /date, /conjspread])}
+
+NOTE: This function may be merged into, or replace, function
+@ref{astron}.  The current function is based on a more modern and more
+accurate ephemeris than function @code{astron} is.
+
+Returns the positions of a set of heavenly bodies at a specific set of
+times.  The times are taken to be in Barycentric Dynamical Time (TDB).
+By default, the observer is assumed to be at the center of the Earth,
+ecliptical coordinates (longitude and latitude in degrees, distance in
+AU) relative to the International Celestial Reference System (ICRS)
+are returned.
+
+The calculations are based on the NASA JPL DE431 ephemeris.
+
+If @code{/keepdims} and not @code{/conjspread} is specified, then the
+result has a dimension 3, followed by the dimensions of
+@code{@var{objects}} (or 1 if @code{@var{objects}} is a scalar),
+followed by the dimensions of @code{@var{jds}} (or 1 if
+@code{@var{jds}} is a scalar).  Neither @code{/keepdims} nor
+@code{/conjspread} are specified, then dimensions equal to 1 are
+omitted.
+
+@table @var
+@item jds
+Julian days (JD) for which results are desired, relative to TBD.
+Beware!  By default, @ref{calendar} returns Chronological Julian days
+(CJD), not Julian days (JD).  Use @code{calendar(..., /tojd)} to get
+JD.
+@item objects
+scalar or array of numbers of objects for which info is to be returned.
+Currently supported: 0 for the Sun, 1 for Mercury, 2 for Venus, 3 for
+the Earth, 4 for Mars, 5 for Jupiter, 6 for Saturn, 7 for Uranus, 8 for
+Neptune, 10 for the Moon.
+@item object0
+number of the object relative to which the other coordinates are
+requested.  By default, 3 (Earth) is assumed.
+@item equinox
+The year of the equinox relative to which the results are returned.
+If a scalar, then the unit is Julian years, with (J) 2000.0 equivalent
+to JDE 2451545.0.  If a string, then the first character must be
+either a j or J (indicating Julian years), or a b or B (indicating
+Besselian years).  The equinox of the date can be requested through
+the /date keyword.
+@end table
+
+@table @code
+@item /date
+selects the equinox of the date.
+@item /xyz
+selects return of cartesian (x y z) coordinates in AU.
+@item /polar
+selects return of polar coordinates (right ascension/longitude in
+degrees, declination/latitude in degrees, and distance in AU).
+@item /equatorial
+return equatorial coordinates (based on the celestial equator).
+@item /ecliptical
+return ecliptical coordinates (based on the ecliptic).
+@item /conjspread
+return the average position (ecliptical longitude and latitude) and
+the conjunction spread of all indicated objects, measured in degrees.
+The conjunction spread is a measure for how close together all
+indicated objects are in the sky.  For two close objects, the
+conjunction spread is practically equal to their mutual distance.  For
+many objects on a great circle (e.g., planets on the ecliptic), the
+conjunction spread is equal to twice the standard deviation of their
+positions along the great circle.
+@item /keepdims
+returns dimensions for the number of objects and number of dates even
+if these are equal to 1.
+@end table
+
+See also: @ref{astron}, @ref{calendar}, @ref{readorbits},
+@ref{Astronomy and Calendars}
+
+@c -------------------------------------
+@node atan, atan2, astron2, Internal Routines
 @subsection atan
 @findex atan
 

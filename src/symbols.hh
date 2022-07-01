@@ -20,6 +20,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // File symbols.h
 // Macro definitions that specify various parts of LUX symbols
 
+#ifndef INCLUDE_SYMBOLS_HH
+#define INCLUDE_SYMBOLS_HH
+
 #include <cstdint>              // for int32_t
 
 #define array_data(symbol) /* void * */ ((void *) (array_header(symbol) + 1))
@@ -234,3 +237,5 @@ int32_t file_map_size(int32_t symbol);
 #define complexMag2(x) ((x).real*(x).real + (x).imaginary*(x).imaginary)
 
 #define INFTY (1.0/0.0)
+
+#endif

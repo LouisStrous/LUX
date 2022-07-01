@@ -32,6 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include "install.hh"
 #include "action.hh"
+#include "cdiv.hh"
 #include "editor.hh"                // for BUFSIZE
 extern "C" {
 #include "visualclass.h"
@@ -681,241 +682,427 @@ int32_t lux_int64(int32_t narg, int32_t ps[])
   return lux_convert(narg, ps, LUX_INT64, 1);
 }
 //-----------------------------------------------------
-int32_t lux_floor(int32_t narg, int32_t ps[])
-// returns a LUX_INT32 version of the argument
-// each float number is transformed into the next lower integer
-// compare lux_long(), where each float number is transformed into the
-// next integer closer to zero, and lux_rfix(), where each float is
-// transformed into the closest integer.  LS 24may96
-{
- int32_t        iq, result, n, temp, size, type;
- int32_t        value;
- Pointer        src, trgt;
 
- iq = *ps;
- if (!symbolIsNumerical(iq)        // not numerical
-     && !symbolIsStringScalar(iq))        // and not a string either
-   return cerror(ILL_CLASS, iq); // reject
- if (isIntegerType(symbol_type(iq))) // if it's already integer then we're done
-   return iq;
- temp = (isFreeTemp(iq))? 1: 0;
- type = symbol_type(iq);        // gotta store now because "result" may
-                                // be same symbol as "iq"
- switch (symbol_class(iq)) {
-   case LUX_SCAL_PTR:                // transform to scalar
-     iq = dereferenceScalPointer(iq);
-     temp = (isFreeTemp(iq))? 1: 0;
-   case LUX_SCALAR:
-     if (temp)                        // can use iq to store the result
-       result = iq;
-     else                        // need new scalar
-       result = scalar_scratch(LUX_INT32);
-     trgt.ui8 = &scalar_value(result).ui8;
-     src.ui8 = &scalar_value(iq).ui8;
-     n = 1;
-     break;
-   case LUX_STRING:
-     if (temp)
-       result = iq;
-     else
-       result = scalar_scratch(LUX_INT32);
-     value = (int32_t) floor(atof((char *) string_value(iq))); // convert
-     if (temp) {
-       free(string_value(iq));        // change string to scalar: free up memory
-       symbol_class(result) = LUX_SCALAR;
-       scalar_type(result) = LUX_INT32;
-     }
-     scalar_value(result).i32 = value;
-     return result;
-   case LUX_CSCALAR:
-     result = scalar_scratch(LUX_INT32);
-     temp = 0;
-     n = 1;
-     trgt.ui8 = &scalar_value(result).ui8;
-     src.cf = complex_scalar_data(iq).cf;
-     break;
-   case LUX_ARRAY:
-     /* we can use the input symbol if it is free and if
-        it has at least as much memory as we need */
-     if (temp
-         && (int32_t) array_type(iq) >= LUX_INT32)
-       result = iq;
-     else {
-       result = array_clone(iq, LUX_INT32);
-       temp = 0;
-     }
-     n = array_size(result);
-     trgt.v = array_data(result);
-     src.v = array_data(iq);
-     break;
-   default:
-     return cerror(ILL_CLASS, iq);
- }
-        // convert
- size = n;
- switch (type) {
-   case LUX_INT8:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.ui8++;
-     break;
-   case LUX_INT16:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.i16++;
-     break;
-   case LUX_INT32:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.i32++;
-     break;
-   case LUX_INT64:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.i64++;
-     break;
-   case LUX_FLOAT:
-     while (n--)
-       *trgt.i32++ = (int32_t) floor(*src.f++);
-     break;
-   case LUX_DOUBLE:
-     while (n--)
-       *trgt.i32++ = (int32_t) floor(*src.d++);
-     break;
-   case LUX_CFLOAT:
-     while (n--)
-       *trgt.i32++ = (int32_t) floor(src.cf++->real);
-     break;
-   case LUX_CDOUBLE:
-     while (n--)
-       *trgt.i32++ = (int32_t) floor(src.cd++->real);
-     break;
- }
- if (temp                        // we used input symbol to store results
-     && symbol_class(iq) == LUX_ARRAY // it's an array
-     && array_type(iq) > LUX_INT32) { // and bigger than we needed
-   symbol_memory(iq) = sizeof(Array) + size*sizeof(int32_t);
-   symbol_data(iq) = (Array *) realloc(symbol_data(iq), symbol_memory(iq));
-   if (!symbol_data(iq))        // reallocation failed
-     return luxerror("Realloc() failed in lux_floor", 0);
- }
- symbol_type(result) = LUX_INT32;
- return result;
-}
-//-----------------------------------------------------
-int32_t lux_ceil(int32_t narg, int32_t ps[])
-// returns a LUX_INT32 version of the argument
-// each float number is transformed into the next higher integer
-// compare lux_long(), where each float number is transformed into the
-// next integer closer to zero, and lux_rfix(), where each float is
-// transformed into the closest integer.  LS 24may96
+/// A template function to round floating-point values down (toward minus
+/// infinity) using std::floor(), iterating over the data values based on
+/// LoopInfo.
+///
+/// \tparam Float is the type of the values to process, and must be a
+/// floating-point type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] src points at the values to process.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Float,
+         std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
+void
+lux_floor_action(LoopInfo* infos, Float* src, Float* tgt)
 {
- int32_t        iq, result, n, temp, size, type;
- int32_t        value;
- Pointer        src, trgt;
-
- iq = *ps;
- if (!symbolIsNumerical(iq)        // not numerical
-     && !symbolIsStringScalar(iq))        // and not a string either
-   return cerror(ILL_CLASS, iq); // reject
- if (isIntegerType(symbol_type(iq))) // if it's already integer then we're done
-   return iq;
- temp = (isFreeTemp(iq))? 1: 0;
- type = symbol_type(iq);        // gotta store now because "result" may
-                                // be same symbol as "iq"
- switch (symbol_class(iq)) {
-   case LUX_SCAL_PTR:                // transform to scalar
-     iq = dereferenceScalPointer(iq);
-     temp = (isFreeTemp(iq))? 1: 0;
-   case LUX_SCALAR:
-     if (temp)                        // can use iq to store the result
-       result = iq;
-     else                        // need new scalar
-       result = scalar_scratch(LUX_INT32);
-     trgt.ui8 = &scalar_value(result).ui8;
-     src.ui8 = &scalar_value(iq).ui8;
-     n = 1;
-     break;
-   case LUX_STRING:
-     if (temp)
-       result = iq;
-     else
-       result = scalar_scratch(LUX_INT32);
-     value = (int32_t) ceil(atof((char *) string_value(iq))); // convert
-     if (temp) {
-       free(string_value(iq));        // change string to scalar: free up memory
-       symbol_class(result) = LUX_SCALAR;
-       scalar_type(result) = LUX_INT32;
-     }
-     scalar_value(result).i32 = value;
-     return result;
-   case LUX_CSCALAR:
-     result = scalar_scratch(LUX_INT32);
-     temp = 0;
-     n = 1;
-     trgt.ui8 = &scalar_value(result).ui8;
-     src.cf = complex_scalar_data(iq).cf;
-     break;
-   case LUX_ARRAY:
-     /* we can use the input symbol if it is free and if
-        it has at least as much memory as we need */
-     if (temp
-         && (int32_t) array_type(iq) >= LUX_INT32)
-       result = iq;
-     else {
-       result = array_clone(iq, LUX_INT32);
-       temp = 0;
-     }
-     n = array_size(result);
-     trgt.v = array_data(result);
-     src.v = array_data(iq);
-     break;
-   default:
-     return cerror(ILL_CLASS, iq);
- }
-        // convert
- size = n;
- switch (type) {
-   case LUX_INT8:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.ui8++;
-     break;
-   case LUX_INT16:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.i16++;
-     break;
-   case LUX_INT32:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.i32++;
-     break;
-   case LUX_INT64:
-     while (n--)
-       *trgt.i32++ = (int32_t) *src.i64++;
-     break;
-   case LUX_FLOAT:
-     while (n--)
-       *trgt.i32++ = (int32_t) ceil(*src.f++);
-     break;
-   case LUX_DOUBLE:
-     while (n--)
-       *trgt.i32++ = (int32_t) ceil(*src.d++);
-     break;
-   case LUX_CFLOAT:
-     while (n--)
-       *trgt.i32++ = (int32_t) ceil(src.cf++->real);
-     break;
-   case LUX_CDOUBLE:
-     while (n--)
-       *trgt.i32++ = (int32_t) ceil(src.cd++->real);
-     break;
- }
- if (temp                        // we used input symbol to store results
-     && symbol_class(iq) == LUX_ARRAY // it's an array
-     && array_type(iq) > LUX_INT32) { // and bigger than we needed
-   symbol_memory(iq) = sizeof(Array) + size*sizeof(int32_t);
-   symbol_data(iq) = (Array *) realloc(symbol_data(iq), symbol_memory(iq));
-   if (!symbol_data(iq))        // reallocation failed
-     return luxerror("Realloc() failed in lux_floor", 0);
- }
- symbol_type(result) = LUX_INT32;
- return result;
+  do {
+    *tgt++ = std::floor(*src);
+  } while (infos[0].advanceLoop(&src) < infos[0].rndim);
 }
+
+/// A template function to round the result of a floating-point division down
+/// (toward minus infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Float is the type of the values to process.  It must be a
+/// floating-point type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom is the denominator of the division.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Float,
+         std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
+void
+lux_floor_action(LoopInfo* infos, Float* num, Float denom, Float* tgt)
+{
+  do {
+    *tgt++ = std::floor(*num/denom);
+  } while (infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// A template function to round the results of an integer division down (toward
+/// minus infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Int is the type of the values to process.  It must be an integer
+/// type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom is the denominator of the division.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Int,
+         std::enable_if_t<std::is_integral<Int>::value, bool> = true>
+void
+lux_floor_action(LoopInfo* infos, Int* num, Int denom, Int* tgt)
+{
+  do {
+    auto qr = cdiv(*num, denom);
+    *tgt++ = qr.quot;
+  } while (infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// A template function to round the result of a floating-point division down
+/// (toward minus infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Float is the type of the values to process.  It must be a
+/// floating-point type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom points at the denominators of the division.  It is assumed
+/// to have as many elements as \a num.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Float,
+         std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
+void
+lux_floor_action(LoopInfo* infos, Float* num, Float* denom, Float* tgt)
+{
+  do {
+    *tgt++ = std::floor(*num/ *denom);
+  } while (infos[1].advanceLoop(&denom),
+           infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// A template function to round the results of an integer division down (toward
+/// minus infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Int is the type of the values to process.  It must be an integer
+/// type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom points at the denominators of the division.  It must have
+/// as many elements as \a num.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Int,
+         std::enable_if_t<std::is_integral<Int>::value, bool> = true>
+void
+lux_floor_action(LoopInfo* infos, Int* num, Int* denom, Int* tgt)
+{
+  do {
+    auto qr = cdiv(*num, *denom);
+    *tgt++ = qr.quot;
+  } while (infos[1].advanceLoop(&denom),
+           infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// Implements the LUX `floor` function
+int32_t
+lux_floor(int32_t narg, int32_t ps[])
+{
+  StandardArguments_RAII sa;
+  Pointer* ptrs;
+  LoopInfo* infos;
+  int32_t iq = LUX_ERROR;
+  if (narg == 1) {
+    // floor(x).  For integer data types this is effectively a copy.
+    if ((iq = sa.set(narg, ps, "i*;r&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+    switch (infos[0].type) {
+    case LUX_INT8: case LUX_INT16: case LUX_INT32: case LUX_INT64:
+      // integer type: just copy the input to the output
+      memcpy(ptrs[1].ui8, ptrs[0].ui8, infos[0].nelem*infos[0].stride);
+      break;
+    case LUX_FLOAT:
+      lux_floor_action(infos, ptrs[0].f, ptrs[1].f);
+      break;
+    case LUX_DOUBLE:
+      lux_floor_action(infos, ptrs[0].d, ptrs[1].d);
+      break;
+    default:
+      return cerror(ILL_TYPE, ps[0]);
+      break;
+    }
+  } else if (narg == 2) {
+    // floor(numerator,denominator)
+    if ((iq = sa.set(narg, ps, "i^*;i^#;r&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+    if (infos[1].nelem == 1) {
+      switch (infos[0].type) {
+      case LUX_INT8:
+        lux_floor_action(infos, ptrs[0].ui8, *ptrs[1].ui8, ptrs[2].ui8);
+        break;
+      case LUX_INT16:
+        lux_floor_action(infos, ptrs[0].i16, *ptrs[1].i16, ptrs[2].i16);
+        break;
+      case LUX_INT32:
+        lux_floor_action(infos, ptrs[0].i32, *ptrs[1].i32, ptrs[2].i32);
+        break;
+      case LUX_INT64:
+        lux_floor_action(infos, ptrs[0].i64, *ptrs[1].i64, ptrs[2].i64);
+        break;
+      case LUX_FLOAT:
+        lux_floor_action(infos, ptrs[0].f, *ptrs[1].f, ptrs[2].f);
+        break;
+      case LUX_DOUBLE:
+        lux_floor_action(infos, ptrs[0].d, *ptrs[1].d, ptrs[2].d);
+        break;
+      default:
+        return cerror(ILL_TYPE, ps[0]);
+        break;
+      }
+    } else {
+      switch (infos[0].type) {
+      case LUX_INT8:
+        lux_floor_action(infos, ptrs[0].ui8, ptrs[1].ui8, ptrs[2].ui8);
+        break;
+      case LUX_INT16:
+        lux_floor_action(infos, ptrs[0].i16, ptrs[1].i16, ptrs[2].i16);
+        break;
+      case LUX_INT32:
+        lux_floor_action(infos, ptrs[0].i32, ptrs[1].i32, ptrs[2].i32);
+        break;
+      case LUX_INT64:
+        lux_floor_action(infos, ptrs[0].i64, ptrs[1].i64, ptrs[2].i64);
+        break;
+      case LUX_FLOAT:
+        lux_floor_action(infos, ptrs[0].f, ptrs[1].f, ptrs[2].f);
+        break;
+      case LUX_DOUBLE:
+        lux_floor_action(infos, ptrs[0].d, ptrs[1].d, ptrs[2].d);
+        break;
+      default:
+        return cerror(ILL_TYPE, ps[0]);
+        break;
+      }
+    }
+  }
+  return iq;
+}
+REGISTER(floor, f, floor, 1, 2, nullptr);
+
+//------------------------
+
+/// A template function to round floating-point values up (toward infinity)
+/// using std::ceil(), iterating over the data values based on LoopInfo.
+///
+/// \tparam Float is the type of the values to process, and must be a
+/// floating-point type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] src points at the values to process.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Float,
+         std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
+void
+lux_ceil_action(LoopInfo* infos, Float* src, Float* tgt)
+{
+  do {
+    *tgt++ = std::ceil(*src);
+  } while (infos[0].advanceLoop(&src) < infos[0].rndim);
+}
+
+/// A template function to round the result of a floating-point division up
+/// (toward infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Float is the type of the values to process.  It must be a
+/// floating-point type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom is the denominator of the division.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Float,
+         std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
+void
+lux_ceil_action(LoopInfo* infos, Float* num, Float denom, Float* tgt)
+{
+  do {
+    *tgt++ = std::ceil(*num/denom);
+  } while (infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// A template function to round the results of an integer division up (toward
+/// infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Int is the type of the values to process.  It must be an integer
+/// type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom is the denominator of the division.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Int,
+         std::enable_if_t<std::is_integral<Int>::value, bool> = true>
+void
+lux_ceil_action(LoopInfo* infos, Int* num, Int denom, Int* tgt)
+{
+  do {
+    auto qr = cdiv(*num, denom);
+    *tgt++ = qr.quot + (qr.rem != 0);
+  } while (infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// A template function to round the result of a floating-point division up
+/// (toward infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Float is the type of the values to process.  It must be a
+/// floating-point type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom points at the denominators of the division.  It is assumed
+/// to have as many elements as \a num.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Float,
+         std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
+void
+lux_ceil_action(LoopInfo* infos, Float* num, Float* denom, Float* tgt)
+{
+  do {
+    *tgt++ = std::ceil(*num/ *denom);
+  } while (infos[1].advanceLoop(&denom),
+           infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// A template function to round the results of an integer division up (toward
+/// minus infinity), iterating over the data values based on LoopInfo.
+///
+/// \tparam Int is the type of the values to process.  It must be an integer
+/// type.
+///
+/// \param infos points at the LoopInfo instances corresponding to the remaining
+/// parameters.
+///
+/// \param[in] num points at the numerators to divide.
+///
+/// \param[in] denom points at the denominators of the division.  It must have
+/// as many elements as \a num.
+///
+/// \param[out] tgt points at the memory where to store the results.
+template<typename Int,
+         std::enable_if_t<std::is_integral<Int>::value, bool> = true>
+void
+lux_ceil_action(LoopInfo* infos, Int* num, Int* denom, Int* tgt)
+{
+  do {
+    auto qr = cdiv(*num, *denom);
+    *tgt++ = qr.quot + (qr.rem != 0);
+  } while (infos[1].advanceLoop(&denom),
+           infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// Implements the LUX `ceil` function
+int32_t
+lux_ceil(int32_t narg, int32_t ps[])
+{
+  StandardArguments_RAII sa;
+  Pointer* ptrs;
+  LoopInfo* infos;
+  int32_t iq = LUX_ERROR;
+  if (narg == 1) {
+    // ceil(x).  For integer data types this is effectively a copy.
+    if ((iq = sa.set(narg, ps, "i*;r&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+    switch (infos[0].type) {
+    case LUX_INT8: case LUX_INT16: case LUX_INT32: case LUX_INT64:
+      // integer type: just copy the input to the output
+      memcpy(ptrs[1].ui8, ptrs[0].ui8, infos[0].nelem*infos[0].stride);
+      break;
+    case LUX_FLOAT:
+      lux_ceil_action(infos, ptrs[0].f, ptrs[1].f);
+      break;
+    case LUX_DOUBLE:
+      lux_ceil_action(infos, ptrs[0].d, ptrs[1].d);
+      break;
+    default:
+      return cerror(ILL_TYPE, ps[0]);
+      break;
+    }
+  } else if (narg == 2) {
+    // ceil(numerator,denominator)
+    if ((iq = sa.set(narg, ps, "i^*;i^#;r&", &ptrs, &infos)) < 0)
+      return LUX_ERROR;
+    if (infos[1].nelem == 1) {
+      switch (infos[0].type) {
+      case LUX_INT8:
+        lux_ceil_action(infos, ptrs[0].ui8, *ptrs[1].ui8, ptrs[2].ui8);
+        break;
+      case LUX_INT16:
+        lux_ceil_action(infos, ptrs[0].i16, *ptrs[1].i16, ptrs[2].i16);
+        break;
+      case LUX_INT32:
+        lux_ceil_action(infos, ptrs[0].i32, *ptrs[1].i32, ptrs[2].i32);
+        break;
+      case LUX_INT64:
+        lux_ceil_action(infos, ptrs[0].i64, *ptrs[1].i64, ptrs[2].i64);
+        break;
+      case LUX_FLOAT:
+        lux_ceil_action(infos, ptrs[0].f, *ptrs[1].f, ptrs[2].f);
+        break;
+      case LUX_DOUBLE:
+        lux_ceil_action(infos, ptrs[0].d, *ptrs[1].d, ptrs[2].d);
+        break;
+      default:
+        return cerror(ILL_TYPE, ps[0]);
+        break;
+      }
+    } else {
+      switch (infos[0].type) {
+      case LUX_INT8:
+        lux_ceil_action(infos, ptrs[0].ui8, ptrs[1].ui8, ptrs[2].ui8);
+        break;
+      case LUX_INT16:
+        lux_ceil_action(infos, ptrs[0].i16, ptrs[1].i16, ptrs[2].i16);
+        break;
+      case LUX_INT32:
+        lux_ceil_action(infos, ptrs[0].i32, ptrs[1].i32, ptrs[2].i32);
+        break;
+      case LUX_INT64:
+        lux_ceil_action(infos, ptrs[0].i64, ptrs[1].i64, ptrs[2].i64);
+        break;
+      case LUX_FLOAT:
+        lux_ceil_action(infos, ptrs[0].f, ptrs[1].f, ptrs[2].f);
+        break;
+      case LUX_DOUBLE:
+        lux_ceil_action(infos, ptrs[0].d, ptrs[1].d, ptrs[2].d);
+        break;
+      default:
+        return cerror(ILL_TYPE, ps[0]);
+        break;
+      }
+    }
+  }
+  return iq;
+}
+REGISTER(ceil, f, ceil, 1, 2, nullptr);
 //-----------------------------------------------------
 int32_t lux_float(int32_t narg, int32_t ps[])
 // returns a LUX_FLOAT version of the argument

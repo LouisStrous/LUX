@@ -58,6 +58,7 @@ nonbind_sources = \
 	bindings.hh\
 	calendar.cc\
 	calendar.hh\
+	cdiv.hh\
 	cluster.cc\
 	color.cc\
 	constellations.hh\

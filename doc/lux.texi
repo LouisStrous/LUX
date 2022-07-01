@@ -12007,6 +12007,7 @@ arguments.
 * disablenewline::              Tell LUX to ignore newlines
 * distarr::                     Distance array
 * distr::                       Distribute data to array elements
+* div::                         Full division returning quotient and remainder
 * dmap::                        Convert to @code{double} byte by byte
 * doub::                        Convert to @code{double} value by value
 * double::                      Convert to @code{double} value by value
@@ -14473,7 +14474,7 @@ similar to the Julian Day number system except that the day begins at
 midnight (00:00).  Chronological Julian Day 0 (CJD 0) corresponds to 1
 January @minus{}4712 in the Julian calendar.  JD = CJD @minus{} 0.5.
 @item /...lunar
-indicates a (fractionalf) count of New Moons since thef first New Moon
+indicates a (fractional) count of New Moons since the first New Moon
 after Julian Day number 0.  The count is based on the mean motion of
 the Moon, disregarding short-term perturbations.
 @item /...mayan
@@ -15366,14 +15367,25 @@ Conversion}
 @subsection ceil
 @findex ceil
 
-@code{ceil(@var{arg})}
+@code{ceil(@var{x})}
 
-Returns the next higher (i.e., closer to positive infinity) integer
-number for each value in @code{@var{arg}}.  For complex arguments, the
-result is based on the real part only.
+@code{ceil(@var{num}, @var{denom})}
 
-See also: @ref{floor}, @ref{rfix}, @ref{long}, @ref{Complex Functions},
-@ref{Math Routines}
+The first form returns the integer at or next above each element of
+@code{@var{x}} (i.e., closer to positive infinity).  Examples:
+@code{ceil(5.3)} yields @code{6}, and @code{ceil(-5.3)} yields
+@code{-5}.
+
+The second form returns the division of @code{@var{num}} by
+@code{@var{denom}} rounded up to the next higher integer.
+@code{@var{denom}} must either have a single element (as a scalar or
+in an array) or else must have the same number of elements as
+@code{@var{num}}.  If both @code{@var{num}} and @code{@var{denom}} are
+of integer type, then @code{@var{denom}} must not contain any elements
+equal to 0.  Examples: @code{ceil(7, 3)} yields @code{3}, and
+@code{ceil(-7, 3)} yields @code{-2}.
+
+See also: @ref{floor}, @ref{rfix}, @ref{long}, @ref{Math Routines}
 
 @c -------------------------------------
 @node cfloat, cfltarr, ceil, Internal Routines
@@ -16686,7 +16698,7 @@ in that dimensions must be multiplied.
 
 
 @c -------------------------------------
-@node distr, dmap, distarr, Internal Routines
+@node distr, div, distarr, Internal Routines
 @subsection distr
 @findex distr
 
@@ -16713,7 +16725,30 @@ range of values.
 See also: @ref{hist}, @ref{!maxhistsize}
 
 @c -------------------------------------
-@node dmap, doub, distr, Internal Routines
+@node div, dmap, distr, Internal Routines
+@subsection div
+@findex div
+
+@code{div(@var{numerator}, @var{denominator})}
+
+Returns the quotient and remainder of dividing the
+@code{@var{numerator}} by the @code{@var{denominator}}.  The
+@code{@var{denominator}} must contain either 1 element or else the
+same number of elements as the @code{@var{numerator}}.  The result has
+the same dimensions as the @code{@var{numerator}} but with a dimension
+equal to 2 prefixed.  If the result is @code{@var{qr}}, then
+@code{@var{qr(0,/all)}} are the quotients and @code{@var{qr(1,/all)}}
+are the remainders.
+
+The remainders are always nonnegative, even if the
+@code{@var{numerator}} or @code{@var{denominator}} (but not both) are
+negative.
+
+The @code{@var{denominator}} must not be zero, otherwise you may get a
+division-by-zero exception.
+
+@c -------------------------------------
+@node dmap, doub, div, Internal Routines
 @subsection dmap
 @findex dmap
 
@@ -19198,10 +19233,23 @@ See also: @ref{Number Conversion}
 
 @code{floor(@var{x})}
 
-Returns the integer at or next below @code{@var{x}} (i.e., closer to
-minus infinity).
+@code{floor(@var{num}, @var{denom})}
 
-See also: @ref{ceil}, @ref{fix}, @ref{rfix}
+The first form returns the integer at or next below each element of
+@code{@var{x}} (i.e., closer to minus infinity).  Examples:
+@code{floor(5.3)} yields @code{5}, and @code{floor(-5.3)} yields
+@code{-6}.
+
+The second form returns the division of @code{@var{num}} by
+@code{@var{denom}} rounded down to the next lower integer.
+@code{@var{denom}} must either have a single element (as a scalar or
+in an array) or else must have the same number of elements as
+@code{@var{num}}.  If both @code{@var{num}} and @code{@var{denom}} are
+of integer type, then @code{@var{denom}} must not contain any elements
+equal to 0.  Examples: @code{floor(7, 3)} yields @code{2}, and
+@code{floor(-7, 3)} yields @code{-3}.
+
+See also: @ref{ceil}, @ref{rfix}, @ref{Math Routines}
 
 @c -------------------------------------
 @node fltarr, fltfarr, floor, Internal Routines

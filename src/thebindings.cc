@@ -1677,7 +1677,7 @@ void register_the_bindings()
 
 #if HAVE_LIBCALCEPH
   int32_t lux_astron2(int32_t, int32_t []);
-  register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdimensions:~6ecliptic:2equatorial:4bare:~8polar:8xyz:16date:32conjspread");
+  register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdims:~6ecliptical:2equatorial:4bare:~8polar:8xyz:16date:32conjspread");
 #endif
 
   register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
@@ -1686,6 +1686,12 @@ void register_the_bindings()
 
   int32_t lux_randome(int32_t, int32_t []);
   register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
+
+  int32_t lux_floor(int32_t, int32_t []);
+  register_lux_f(lux_floor, "floor", 1, 2, nullptr);
+
+  int32_t lux_ceil(int32_t, int32_t []);
+  register_lux_f(lux_ceil, "ceil", 1, 2, nullptr);
 
   int32_t lux_monotone_interpolation(int32_t, int32_t []);
   register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");
@@ -1742,6 +1748,9 @@ void register_the_bindings()
 
   int32_t lux_compose_2d(int32_t, int32_t []);
   register_lux_s(lux_compose_2d, "compose2d", 3, 3, NULL);
+
+  int32_t lux_div(int32_t, int32_t []);
+  register_lux_f(lux_div, "div", 2, 2, NULL);
 
   int32_t lux_read_image_oiio(int32_t, int32_t []);
   register_lux_f(lux_read_image_oiio, "readimage", 1, 1, NULL);

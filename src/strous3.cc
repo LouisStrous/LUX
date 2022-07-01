@@ -60,6 +60,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "MonotoneInterpolation.hh"
 #include "SSFC.hh"
 #include "action.hh"
+#include "cdiv.hh"
 #include <gslpp_sort.hh>        // for gsl_sort_index
 #include <gslpp_sort_vector.hh> // for gsl_sort_vector
 #include <gslpp_vector.hh>
@@ -2995,7 +2996,7 @@ convert_vector_to_lux_array(const std::vector<T>& data, int32_t lux_symbol)
 }
 
 template<typename Integer,
-         std::enable_if_t<std::is_integral<Integer>::value, int> = 0>
+         std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
 Integer
 nn_mod(Integer a, Integer b)
 {
@@ -3006,7 +3007,7 @@ nn_mod(Integer a, Integer b)
 }
 
 template<typename Float,
-  std::enable_if_t<std::is_floating_point<Float>::value, int> = 0>
+         std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 Float
 nn_mod(Float a, Float b)
 {
@@ -4367,3 +4368,108 @@ lux_compose_2d(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 REGISTER(compose_2d, s, compose2d, 3, 3, NULL);
+
+/// A template function to divide data using cdiv(), iterating over the data via
+/// LoopInfo functionality.  The division produces the quotient and nonnegative
+/// remainder of dividing the numerator by the denominator.
+///
+/// \tparam T is the type of the data values
+///
+/// \param infos points at the 3 relevant LoopInfo instances corresponding to \a
+/// num, \a denom, and \a tgt.
+///
+/// \param[in] num points at the numerators.
+///
+/// \param[in] denom is the denominator.
+///
+/// \param[out] tgt points at the memory where to write the results.  There must
+/// be enough memory available there.
+template<typename T>
+void
+lux_div_action(LoopInfo* infos, T* num, T denom, T* tgt)
+{
+  do {
+    auto result = cdiv(*num, denom);
+    *tgt++ = result.quot;
+    *tgt++ = result.rem;
+  } while (infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// A template function to divide data using cdiv(), iterating over the data via
+/// LoopInfo functionality.  The division produces the quotient and nonnegative
+/// remainder of dividing the numerator by the denominator.
+///
+/// \tparam T is the type of the data values
+///
+/// \param infos points at the 3 relevant LoopInfo instances corresponding to \a
+/// num, \a denom, and \a tgt.
+///
+/// \param[in] num points at the numerators.
+///
+/// \param[in] denom points at the the denominators.  There must be as many of
+/// them as there are numerators.
+///
+/// \param[out] tgt points at the memory where to write the results.  There must
+/// be enough memory available there.
+template<typename T>
+void
+lux_div_action(LoopInfo* infos, T* num, T* denom, T* tgt)
+{
+  do {
+    auto result = cdiv(*num, *denom);
+    *tgt++ = result.quot;
+    *tgt++ = result.rem;
+  } while (infos[1].advanceLoop(&denom),
+           infos[0].advanceLoop(&num) < infos[0].rndim);
+}
+
+/// Implements LUX function `div`.
+int32_t
+lux_div(int32_t narg, int32_t ps[])
+{
+  StandardArguments_RAII sa;
+  int32_t iq;
+  Pointer* ptrs;
+  LoopInfo* infos;
+  if ((iq = sa.set(narg, ps, "i^*;i^#;r^+2&", &ptrs, &infos)) < 0)
+    return LUX_ERROR;
+
+  if (infos[1].nelem == 1) {
+    switch (infos[0].type) {
+    case LUX_INT8:
+      lux_div_action(infos, ptrs[0].ui8, *ptrs[1].ui8, ptrs[2].ui8);
+      break;
+    case LUX_INT16:
+      lux_div_action(infos, ptrs[0].i16, *ptrs[1].i16, ptrs[2].i16);
+      break;
+    case LUX_INT32:
+      lux_div_action(infos, ptrs[0].i32, *ptrs[1].i32, ptrs[2].i32);
+      break;
+    case LUX_INT64:
+      lux_div_action(infos, ptrs[0].i64, *ptrs[1].i64, ptrs[2].i64);
+      break;
+    default:
+      return cerror(ILL_TYPE, ps[0]);
+    }
+  } else {
+    switch (infos[0].type) {
+    case LUX_INT8:
+      lux_div_action(infos, ptrs[0].ui8, ptrs[1].ui8, ptrs[2].ui8);
+      break;
+    case LUX_INT16:
+      lux_div_action(infos, ptrs[0].i16, ptrs[1].i16, ptrs[2].i16);
+      break;
+    case LUX_INT32:
+      lux_div_action(infos, ptrs[0].i32, ptrs[1].i32, ptrs[2].i32);
+      break;
+    case LUX_INT64:
+      lux_div_action(infos, ptrs[0].i64, ptrs[1].i64, ptrs[2].i64);
+      break;
+    default:
+      return cerror(ILL_TYPE, ps[0]);
+    }
+  }
+
+  return iq;
+}
+REGISTER(div, f, div, 2, 2, NULL);

@@ -885,7 +885,6 @@ internalRoutine function_table[] = {
     "%1%offset:1readonly:2swap" },
   { "cdmap",    1, 1, lux_cdmap, 0 },     // subsc.cc
   { "cdouble",  1, 1, lux_cdouble, "*" }, // fun1.cc
-  { "ceil",     1, 1, lux_ceil, "*" },    // symbols.cc
   { "cfloat",   1, 1, lux_cfloat, "*" },  // fun1.cc
   { "cfltarr",  1, MAX_ARG, cfltarr, 0 }, // symbols.cc
   { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, // filemap.cc
@@ -990,7 +989,6 @@ internalRoutine function_table[] = {
   { "fits_xread", 2, 6, lux_fits_xread_f, 0 }, // files.cc
   { "fix",      1, 1, lux_long, "*" },         // symbols.cc
   { "float",    1, 1, lux_float, "*" },        // symbols.cc
-  { "floor",    1, 1, lux_floor, "*" },        // symbols.cc
   { "fltarr",   1, MAX_DIMS, fltarr, 0 },      // symbols.cc
   { "fltfarr",  3, MAX_DIMS + 1, fltfarr,      // filemap.cc
     "%1%offset:1readonly:2swap" },

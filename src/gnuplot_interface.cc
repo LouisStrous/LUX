@@ -324,6 +324,22 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
       gp.send(oss.str());
     }
 
+    {
+      std::ostringstream oss;
+      oss << "set zrange [";
+      if (plims[2])
+        oss << plims[2];
+      else
+        oss << "*";
+      oss << ":";
+      if (plims[3])
+        oss << plims[3];
+      else
+        oss << "*";
+      oss << "]\n";
+      gp.send(oss.str());
+    }
+
     if (internalMode & 2)         // logarithmic x axis
       gp.send("set logscale x\n");
     else
@@ -465,9 +481,12 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     gp.remember_for_current_datablock(using_oss.str());
   }
 
-  if (status != GplotStatus::gaplot
-      || !narg)
-    gp.sendn(gp.construct_plot_command());
+  if (status != GplotStatus::gaplot || !narg) {
+    if (ndata == 3)
+      gp.sendn(gp.construct_splot_command());
+    else
+      gp.sendn(gp.construct_plot_command());
+  }
 
   gp.flush();
 

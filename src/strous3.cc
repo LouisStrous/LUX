@@ -53,19 +53,19 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // library includes
 
 #include <gsl/gsl_sf_gamma.h>
+#include <gslpp_sort.hh>        // for gsl_sort_index
+#include <gslpp_sort_vector.hh> // for gsl_sort_vector
+#include <gslpp_vector.hh>
 
 // own includes
 
 #include "Bytestack.hh"
 #include "MonotoneInterpolation.hh"
 #include "SSFC.hh"
+#include "SolarSystemEphemerides.hh"
 #include "action.hh"
 #include "cdiv.hh"
-#include <gslpp_sort.hh>        // for gsl_sort_index
-#include <gslpp_sort_vector.hh> // for gsl_sort_vector
-#include <gslpp_vector.hh>
 #include "permutations.hh"
-#include "SolarSystemEphemerides.hh"
 
 /// \ingroup luxroutines
 ///

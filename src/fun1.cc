@@ -828,7 +828,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
   Pointer *data;
   LoopInfo *info;
 
-  StandardArguments_RAII sa(narg, ps, "i*;i&?;r&", &data, &info);
+  StandardArguments sa(narg, ps, "i*;i&?;r&", &data, &info);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -888,7 +888,7 @@ int32_t lux_setnan(int32_t narg, int32_t ps[])
   Pointer* data;
   LoopInfo* info;
 
-  StandardArguments_RAII sa(narg, ps, "i^*;i&?;r>F^&", &data, &info);
+  StandardArguments sa(narg, ps, "i^*;i&?;r>F^&", &data, &info);
   iq = sa.result();
   if (iq < 0)
     return iq;

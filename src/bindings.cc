@@ -71,8 +71,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
     \par stdargspec
 
-    \c <stdargspec> is an encoding of the arguments type specification
-    in the most elaborate call to standard_args() for this binding.
+    \c <stdargspec> is an encoding of the arguments type specification in the
+    most elaborate call to the StandardArguments constructor for this binding.
     The encoding is obtained from the arguments type specification by:
 
     - removing `;`, `?`, and all data type specifications (including
@@ -91,8 +91,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     indicated by appending `T` and the repeat count.  For example,
     `iqiqiqiq` gets abbreviated to `iqT4`.
 
-    Multiple standard_args() format specifications can lead to the
-    same \c <stdargspec>.
+    Multiple StandardArguments format specifications can lead to the same \c
+    <stdargspec>.
 
     So,
 
@@ -196,7 +196,7 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
   int32_t iq, iret;
   int32_t *axes, naxes, oneaxis[1] = { 0 }, allaxes;
 
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   switch (narg) {
   case 1:                       // source
     if ((iq = sa.set(narg, ps, isfunction? "iD*;rD&": "iD*",
@@ -307,7 +307,7 @@ lux_d_dT3_iaiqiqrq_012_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>L*;iD&;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>L*;iD&;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   switch (infos[0].type) {
@@ -364,7 +364,7 @@ lux_d_dT4_iaiqT3rq_0T3_4_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
@@ -402,7 +402,7 @@ lux_d_dT4_iaiqrq_01_2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -451,7 +451,7 @@ lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD+3,+3&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;iD+3,+3&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   double (*rnpb)[3] = (double (*)[3]) ptrs[2].d;
@@ -498,7 +498,7 @@ lux_d_dT6_iaiT4rq_0z1T4_5_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>L*;iD;iD;iD;iD;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>L*;iD;iD;iD;iD;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -555,7 +555,7 @@ lux_d_d_iarq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -594,7 +594,7 @@ lux_d_dd_iaibrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD#;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD#;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   if (infos[1].nelem > 1) {
@@ -638,7 +638,7 @@ lux_d_dd_iaiqrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -673,7 +673,7 @@ lux_d_dd_iarq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>L*;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>L*;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -732,7 +732,7 @@ lux_d_dp33d_i33aimmqrcq_01_2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;iD-,-&;rD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;iD-,-&;rD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   double (*rnpb)[3] = (double (*)[3]) ptrs[0].d;
@@ -770,7 +770,7 @@ lux_d_dp3_i3arm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double [3]))
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;rD-3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;rD-3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   int32_t nelem = infos[0].nelem/3;
@@ -813,7 +813,7 @@ lux_d_dp3dp3_i3aiqrm3q_01_2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;iD&;rD-3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;iD&;rD-3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[2].nelem--) {
@@ -861,7 +861,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
   int32_t iq, iret;
   int32_t *axes, naxes, oneaxis[1] = { 0 }, allaxes;
 
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   switch (narg) {
   case 1:                       // source
     if ((iq = sa.set(narg, ps, "iD*;rD-&", &ptrs, &infos)) < 0)
@@ -946,7 +946,7 @@ lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;iD&;iD&;oD&"
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;iD&;iD&;oD&"
                             ";oD&;oD&;oD&;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -989,7 +989,7 @@ lux_i_dT3dpdp_iaiqrq_0z122_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -1034,7 +1034,7 @@ lux_i_dT5dp3_i3aiirq_120003_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;iD;iD;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;iD;iD;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
@@ -1081,7 +1081,7 @@ lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&",
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -1126,7 +1126,7 @@ lux_i_dddp23T2_iaop2p3qocq_0z12_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>L*;oD+2,+3&;oD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>L*;oD+2,+3&;oD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   double (*pvh)[3] = (double (*)[3]) ptrs[1].d;
@@ -1195,7 +1195,7 @@ lux_i_dddpdp_iarq_0z11_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -1238,7 +1238,7 @@ lux_i_ddidp23_iairp3p2q_0z12_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iL;rD+3,+2&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iL;rD+3,+2&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -1288,7 +1288,7 @@ lux_i_ddipT3dp_iarp3q_0z1111_f_(int32_t narg, int32_t ps[],
   int32_t y, m, d;
   double fd;
 
-  StandardArguments_RAII sa(narg, ps, "i>L*;rD+3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>L*;rD+3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -1391,7 +1391,7 @@ lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps,
+  StandardArguments sa(narg, ps,
                             "iD2,3*;oD-2-3&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&",
                             &ptrs, &infos);
   if (sa.result() < 0)
@@ -1439,7 +1439,7 @@ lux_i_dpiT3dp_iaiirq_00T3_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iL;iL;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iL;iL;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
@@ -1482,7 +1482,7 @@ lux_i_dpiidp_iairq_00T2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iL;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iL;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nrepeat = infos[0].nelem/infos[0].rdims[0];
@@ -1526,7 +1526,7 @@ lux_i_idT3dp3_i3airq_10002_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;iL;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;iL;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
@@ -1570,7 +1570,7 @@ lux_i_idp3dpT3_ii3arcq_0T222_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iL;iD3*;rD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iL;iD3*;rD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[1].nelem/3;
@@ -1611,7 +1611,7 @@ lux_i_idpdp_iarp2q_011_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iL*;rD+2&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iL*;rD+2&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -1723,7 +1723,7 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
   LoopInfo *infos;
   int32_t iq, ipar1, ipar2, iret;
 
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   switch (narg) {
   case 2:                       // source, param1; (param2 = 0)
     if ((iq = sa.set(narg, ps, "iD*;iD;rD&", &ptrs, &infos)) < 0)
@@ -1801,7 +1801,7 @@ lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;rD+3,+3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;rD+3,+3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   do {
@@ -1848,7 +1848,7 @@ lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;rD+3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;rD+3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -1898,7 +1898,7 @@ lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;rD+3,+3&",
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;rD+3,+3&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -1947,7 +1947,7 @@ lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;rD+3,+3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;rD+3,+3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   tgt = (double (*)[3]) ptrs[3].d;
@@ -1995,7 +1995,7 @@ lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;oD&;oD&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;oD&;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
@@ -2037,7 +2037,7 @@ lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;oD&;oD&;oD&;oD&",
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;oD&;oD&;oD&;oD&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -2093,7 +2093,7 @@ lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;oD&;oD+3,+3&;oD[-]&;"
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;oD&;oD+3,+3&;oD[-]&;"
                             "oD[-]&;oD[-]&;oD[-]&",
                             &ptrs, &infos);
   if (sa.result() < 0)
@@ -2144,7 +2144,7 @@ lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;oD&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
@@ -2185,7 +2185,7 @@ lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;oD&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
@@ -2227,7 +2227,7 @@ lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&",
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;iD&;oD+2,+3&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -2275,7 +2275,7 @@ lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo* infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;rD+3,+3&",
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;rD+3,+3&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -2325,7 +2325,7 @@ lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps,
+  StandardArguments sa(narg, ps,
                             "iD*;iD&;iD&;iD&;iD&;iD&;oD&;oD&;oD&;oD&;oD&;oD&",
                             &ptrs, &infos);
   if (sa.result() < 0)
@@ -2372,7 +2372,7 @@ lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;rD+3,+3&",
+  StandardArguments sa(narg, ps, "iD*;iD&;iD&;iD&;iD&;rD+3,+3&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -2424,7 +2424,7 @@ lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD+3,+3&;rD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD+3,+3&;rD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -2474,7 +2474,7 @@ lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>L*;oD3,3;oD+3,+3&;oD[-]&",
+  StandardArguments sa(narg, ps, "i>L*;oD3,3;oD+3,+3&;oD[-]&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -2547,7 +2547,7 @@ lux_v_dddp33_iarp3p3q_0z1_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;rD+3,+3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;rD+3,+3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   double (*r)[3] = (double (*)[3]) ptrs[1].d;
@@ -2591,7 +2591,7 @@ lux_v_dddp3_iaiqrp3q_0T2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD&;rD+3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD&;rD+3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -2636,7 +2636,7 @@ lux_v_dddp3dpT3_i3aiirq_120333_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;iD;iD;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;iD;iD;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
@@ -2683,7 +2683,7 @@ lux_v_dddpT16_iaoqT16_0z1T16_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;"
+  StandardArguments sa(narg, ps, "iD*;oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&;"
                             "oD&;oD&;oD&;oD&;oD&;oD&;oD&;oD&",
                             &ptrs, &infos);
   if (sa.result() < 0)
@@ -2724,7 +2724,7 @@ lux_v_dddpT3_iaoqT3_0z1T3_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;oD&;oD&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;oD&;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
@@ -2775,7 +2775,7 @@ lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;oD&;oD&;oD&;oD+3,+3&;oD[-1]&;"
+  StandardArguments sa(narg, ps, "iD*;oD&;oD&;oD&;oD+3,+3&;oD[-1]&;"
                             "oD[-]&;oD[-]&;oD[-]&",
                             &ptrs, &infos);
   if (sa.result() < 0)
@@ -2823,7 +2823,7 @@ lux_v_dddpT4_iaoqT4_0z1T4_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;oD&;oD&;oD&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;oD&;oD&;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
@@ -2858,7 +2858,7 @@ lux_v_dddpdp_iaoqoq_0z12_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;oD&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--)
@@ -2895,7 +2895,7 @@ lux_v_ddp33_iao33q_01_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;oD3,3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;oD3,3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -2932,7 +2932,7 @@ lux_v_ddpdp_iaoqoq_012_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;oD&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;oD&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -2977,7 +2977,7 @@ lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD2,3*;iD&;rD=,-&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD2,3*;iD&;rD=,-&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
@@ -3026,7 +3026,7 @@ lux_v_dp23T3_i23aiqrq_0T2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD2,3*;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD2,3*;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
@@ -3073,7 +3073,7 @@ lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps,
+  StandardArguments sa(narg, ps,
                             "iD2,3*;oD-,-&;oD[-]&;oD[-]&;oD[-]&;oD[-]&;oD[-]&",
                             &ptrs, &infos);
   if (sa.result() < 0)
@@ -3118,7 +3118,7 @@ lux_v_dp23dpdp_i23aommqocq_0T2_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD2,3*;oD-,-&;oD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD2,3*;oD-,-&;oD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/6;
@@ -3158,7 +3158,7 @@ lux_v_dp33T2_i33arq_01_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -3206,7 +3206,7 @@ lux_v_dp33T3_i33aiqrq_0T2_f_(int32_t narg, int32_t ps[],
   LoopInfo *infos;
   size_t nelem;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   double (*r1)[3] = (double (*)[3]) ptrs[0].d;
@@ -3244,7 +3244,7 @@ lux_v_dp33_r33_0_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3]))
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "rD3,3", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "rD3,3", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   f((double (*)[3]) ptrs[0].d);
@@ -3291,7 +3291,7 @@ lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(int32_t narg, int32_t ps[],
   LoopInfo *infos;
   size_t nelem;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;iD-,-&;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;iD-,-&;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   era = ptrs[1];
@@ -3342,7 +3342,7 @@ lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;iD-3+2&;rD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;iD-3+2&;rD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/9;
@@ -3392,7 +3392,7 @@ lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(int32_t narg, int32_t ps[],
   LoopInfo *infos;
   int32_t step;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;iD-&;rD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;iD-&;rD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return sa.result();
   size_t nelem = infos[1].nelem/3;
@@ -3436,7 +3436,7 @@ lux_v_dp33dp3_i33armq_01_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;rD-&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;rD-&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -3479,7 +3479,7 @@ lux_v_dp33dpdp_i33aommqocq_0T2_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3,3*;oD-,-&;oD[-]&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3,3*;oD-,-&;oD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -3525,7 +3525,7 @@ lux_v_dp3T3_i3aiqrq_0T2_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;iD&;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;iD&;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
@@ -3568,7 +3568,7 @@ lux_v_dp3dp33_i3arp3q_01_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;rD+3&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;rD+3&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -3608,7 +3608,7 @@ lux_v_dp3dpT3_i3arq_0111_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   int32_t nelem = infos[0].nelem/3;
@@ -3647,7 +3647,7 @@ lux_v_dp3dp_o33o3_01_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "oD3,3;oD3", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "oD3,3;oD3", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   f((double (*)[3]) ptrs[0].d, (double *) ptrs[1].d);
@@ -3687,7 +3687,7 @@ lux_v_dp3dpdp3_i3aomqoq_0T2_s_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;oD-&;oD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;oD-&;oD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   size_t nelem = infos[0].nelem/3;
@@ -3729,7 +3729,7 @@ lux_v_dp3dpdp_i3arm3p2q_011_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD3*;rD-3+2&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD3*;rD-3+2&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -3764,7 +3764,7 @@ lux_v_dpT3_r3_000_f_(int32_t narg, int32_t ps[],
 {
   Pointer *tgts;
 
-  StandardArguments_RAII sa(narg, ps, "rD3", &tgts, NULL);
+  StandardArguments sa(narg, ps, "rD3", &tgts, NULL);
   if (sa.result() < 0)
     return LUX_ERROR;
   f(&tgts[0].d[0], &tgts[0].d[1], &tgts[0].d[2]);
@@ -3802,7 +3802,7 @@ lux_v_sddsd_iairq_012_f_(int32_t narg, int32_t ps[],
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "iD*;iD?;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "iD*;iD?;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   double width = ptrs[1].d? ptrs[1].d[0]: 3;

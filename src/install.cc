@@ -5353,7 +5353,7 @@ int32_t translateEscapes(char *p)
         c = *p2;                // temporary storage
         *p2 = '\0';             /* temporary end to force strtol not to
                                    read beyond the first three octal digits */
-        i = strtol(p + 1, NULL, 8);
+        i = strtol(p + 1, 8);
         *p2 = c;
         *p = i;
         memmove(p + 1, p2, strlen(p2) + 1);

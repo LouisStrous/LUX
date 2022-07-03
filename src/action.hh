@@ -17,6 +17,8 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+/// \file
+
 #ifndef _GNU_SOURCE
 #  define _GNU_SOURCE
 #endif
@@ -211,9 +213,6 @@ void zapMarked(void);
 void zapTemp(int32_t);
 void zerobytes(void*, int32_t);
 
-void* seekFacts(int32_t symbol, int32_t type, int32_t flag);
-void* setFacts(int32_t symbol, int32_t type, int32_t flag);
-
 // It is tricky to avoid round-off error when calculating running sums.
 // Even using Kahan summation it is possible to get small residual
 // round-off errors, and to get negative running sums for all-zero data
@@ -266,6 +265,31 @@ kahan_sum(T value, T& sum, T& compensation)
   auto t = sum + y;
   compensation = (t - sum) - y;
   sum = t;
+}
+
+/// A variant of strtol() that accepts a const 2nd argument.  Read a number from
+/// text.
+///
+/// \param[in] str is the text to parse.
+///
+/// \param[in,out] endptr points to the address where, if the address is not
+/// null, the pointer to just after the parsed text gets stored.
+///
+/// \param base is the number base to assume for the parsing.
+inline int
+strtol(const char* str, const char** endptr, int base) {
+  return std::strtol(str, const_cast<char**>(endptr), base);
+}
+
+/// A variant of strtol() that doesn't return a pointer to just after the parsed
+/// text.  Read a number from text.
+///
+/// \param[in] str is the text to parse.
+///
+/// \param base is the number base to assume for the parsing.
+inline int
+strtol(const char* str, int base) {
+  return std::strtol(str, nullptr, base);
 }
 
 #define axisAxes(i)     (axisAxis? axisAxis[i]: (i))

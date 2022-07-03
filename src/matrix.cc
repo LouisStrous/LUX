@@ -33,7 +33,7 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>D*;i>D*;rD1", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>D*;i>D*;rD1", &ptrs, &infos);
   int32_t iq = sa.result();
   if (iq < 0)
     return LUX_ERROR;
@@ -253,7 +253,7 @@ int32_t lux_svd(int32_t narg, int32_t ps[])
   LoopInfo *infos;
   int32_t iq;
 
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   if ((iq = sa.set(narg, ps, "i>D*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   if (infos[0].ndim < 2) {
@@ -326,7 +326,7 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
   int32_t n;
   int32_t *dims;
 
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   if ((iq = sa.set(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   if (infos[0].ndim < 2) {
@@ -360,7 +360,7 @@ int32_t lux_diagonal_matrix(int32_t narg, int32_t ps[])
   LoopInfo *infos;
   int32_t iq;
 
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   if ((iq = sa.set(narg, ps, "i>D*;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   int32_t dims[2];

@@ -142,7 +142,7 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t
 ///
 /// \param fsspec is the specification of the options and named
 /// parameters of the LUX function or subroutine, like the \a fmt
-/// parameter of standard_args().
+/// parameter of StandardArguments.
 ///
 /// The name of the binding function is schematically \c lux_type_fs_
 /// where \c type stands for the value of parameter \a type, and \c fs
@@ -174,7 +174,7 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name, int32_t
 ///
 /// \param fsspec is the specification of the options and named
 /// parameters of the LUX function or subroutine, like the \a fmt
-/// parameter of standard_args().
+/// parameter of StandardArguments.
 ///
 /// The name of the binding function is schematically \c lux_type_fs_
 /// where \c type stands for the value of parameter \a type, and \c fs

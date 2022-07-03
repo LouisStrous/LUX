@@ -730,7 +730,7 @@ int32_t lux_monotone_interpolation(int32_t narg, int32_t ps[])
   Pointer *ptrs;
   LoopInfo* infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>D*;i>D&;i>D*;rD[2]&",
+  StandardArguments sa(narg, ps, "i>D*;i>D&;i>D*;rD[2]&",
                             &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
@@ -2679,7 +2679,7 @@ int32_t lux_ssfc_to_polar(int32_t narg, int32_t ps[]) {
   Pointer* ptrs;
   LoopInfo* infos;
   int32_t iq;
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   if (symbolIsInteger(ps[0])) {
     if ((iq = sa.set(narg, ps, "iL*;iL*?;rD+3&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
@@ -2770,7 +2770,7 @@ int32_t lux_polar_to_ssfc(int32_t narg, int32_t ps[]) {
   LoopInfo* infos;
   int32_t iq;
   int32_t level;
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   if (narg > 1) {
     if ((iq = sa.set(narg, ps, "iD>2,*;iL;rL-,&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
@@ -4427,7 +4427,7 @@ lux_div_action(LoopInfo* infos, T* num, T* denom, T* tgt)
 int32_t
 lux_div(int32_t narg, int32_t ps[])
 {
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   int32_t iq;
   Pointer* ptrs;
   LoopInfo* infos;

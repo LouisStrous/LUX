@@ -374,7 +374,7 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     Pointer *data;
     LoopInfo *info;
 
-    StandardArguments_RAII sa(ndata, myps, "iD*;iD&?;iD&?", &data, &info);
+    StandardArguments sa(ndata, myps, "iD*;iD&?;iD&?", &data, &info);
     if (sa.result() < 0)
       return LUX_ERROR;
 
@@ -575,7 +575,7 @@ int32_t lux_gnuplot_with_image(int32_t narg, int32_t ps[],
   Pointer *data;
   LoopInfo *info;
 
-  StandardArguments_RAII sa(narg, ps, "i>B>1,>1", &data, &info);
+  StandardArguments sa(narg, ps, "i>B>1,>1", &data, &info);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -831,7 +831,7 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
       for (int i = 0; i < ndata; ++i)
         myps[i] = lux_float(1, &ps[i]);
 
-      StandardArguments_RAII sa(ndata, myps, "iF*;iF*;iF>1,*", &data, &info);
+      StandardArguments sa(ndata, myps, "iF*;iF*;iF>1,*", &data, &info);
       if (sa.result()< 0)
         return LUX_ERROR;
 

@@ -812,7 +812,7 @@ lux_floor_action(LoopInfo* infos, Int* num, Int* denom, Int* tgt)
 int32_t
 lux_floor(int32_t narg, int32_t ps[])
 {
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   Pointer* ptrs;
   LoopInfo* infos;
   int32_t iq = LUX_ERROR;
@@ -1023,7 +1023,7 @@ lux_ceil_action(LoopInfo* infos, Int* num, Int* denom, Int* tgt)
 int32_t
 lux_ceil(int32_t narg, int32_t ps[])
 {
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   Pointer* ptrs;
   LoopInfo* infos;
   int32_t iq = LUX_ERROR;

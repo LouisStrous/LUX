@@ -203,7 +203,7 @@ int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>L3*;r>L-3*", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
 
@@ -299,7 +299,7 @@ int32_t lux_iauDat(int32_t narg, int32_t ps[])
   } else {
     if (narg < 1)
       return luxerror("Need 1 argument", 0);
-    StandardArguments_RAII sa;
+    StandardArguments sa;
     if ((iq = sa.set(narg, ps, "i>L3*;rD-3", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     switch (infos[0].type) {
@@ -420,7 +420,7 @@ int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>D*;rD&", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>D*;rD&", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {
@@ -447,7 +447,7 @@ int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
   Pointer *ptrs;
   LoopInfo *infos;
 
-  StandardArguments_RAII sa(narg, ps, "i>D*;rD*", &ptrs, &infos);
+  StandardArguments sa(narg, ps, "i>D*;rD*", &ptrs, &infos);
   if (sa.result() < 0)
     return LUX_ERROR;
   while (infos[0].nelem--) {

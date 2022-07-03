@@ -657,7 +657,7 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   LoopInfo *infos;
 
   int32_t iq;
-  StandardArguments_RAII sa;
+  StandardArguments sa;
   if ((iq = sa.set(narg, ps, "i>D*;i>D1;rD1", &ptrs, &infos)) < 0)
     return LUX_ERROR;
   double factor = *ptrs[1].d;
@@ -4557,7 +4557,7 @@ int32_t lux_strtol(int32_t narg, int32_t ps[])
     base = int_arg(ps[1]);
   } else
     base = 10;
-  number = strtol(string, NULL, base);
+  number = strtol(string, base);
   result = scalar_scratch(LUX_INT32);
   scalar_value(result).i32 = number;
   return result;

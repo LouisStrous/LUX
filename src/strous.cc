@@ -669,6 +669,7 @@ int32_t lux_find(int32_t narg, int32_t ps[])
   } // end of while (nRepeat--)
   return result;
 }
+REGISTER(find, f, find, 2, 4, "0exact:1index_ge:2value_ge:4first");
 //-------------------------------------------------------------------------
 template<typename T>
 void
@@ -703,7 +704,8 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
   Pointer data, keys, target;
   int32_t i, j;
 
-  if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count, &data) < 0)
+  if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count,
+                          &data) < 0)
     return LUX_ERROR;
   if (numerical_or_string(ps[1], NULL, NULL, &keys_count, &keys) < 0)
     return LUX_ERROR;
@@ -760,7 +762,7 @@ int32_t lux_find2(int32_t narg, int32_t ps[])
   }
   return result;
 }
-REGISTER(find2, f, find2, 2, 2, "1reverse" );
+REGISTER(find2, f, find2, 2, 2, "1reverse");
 //-------------------------------------------------------------------------
 int timespec_diff(struct timespec* two, struct timespec* one)
 {

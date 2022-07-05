@@ -9,6 +9,6 @@
 typedef int32_t DimensionSize_tp;
 
 /// The data type of a symbol number.
-typedef int32_t SymbolProxy_tp;
+typedef int32_t Symbol;
 
 #endif

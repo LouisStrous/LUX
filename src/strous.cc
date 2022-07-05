@@ -697,70 +697,51 @@ find2_action(T* keys, int keys_count, T* data, int data_count,
   }
 }
 
-int32_t lux_find2(int32_t narg, int32_t ps[])
-// FIND2(array, key)
+Symbol
+lux_find2(int32_t narg, Symbol ps[])
+// FIND2(array, key [, offset] [, /reverse])
 {
-  int32_t *data_dims, data_dim_count, data_count, keys_count, result, type;
-  Pointer data, keys, target;
-  int32_t i, j;
+  StandardArguments sa(narg, ps, "i*;i*;r[1]L&");;
+  if (sa.result() < 0) {
+    return sa.result();
+  }
 
-  if (numerical_or_string(ps[0], &data_dims, &data_dim_count, &data_count,
-                          &data) < 0)
-    return LUX_ERROR;
-  if (numerical_or_string(ps[1], NULL, NULL, &keys_count, &keys) < 0)
-    return LUX_ERROR;
-  if (symbol_type(ps[1]) != symbol_type(ps[0])) {
-    if (symbol_type(ps[1]) > symbol_type(ps[0])) {
-      int32_t iq = lux_converts[symbol_type(ps[1])](1, &ps[0]);
-      numerical_or_string(iq, NULL, NULL, NULL, &data);
-      type = symbol_type(ps[1]);
-    } else {
-      int32_t iq = lux_converts[symbol_type(ps[0])](1, &ps[1]);
-      numerical_or_string(iq, NULL, NULL, NULL, &keys);
-      type = symbol_type(ps[0]);
-    }
-  }
-  switch (symbol_class(ps[1])) {
-  case LUX_SCALAR: case LUX_STRING:
-    result = scalar_scratch(LUX_INT32);
-    target.ui8 = &scalar_value(result).ui8;
-    break;
-  case LUX_ARRAY:
-    result = array_clone(ps[1], LUX_INT32);
-    target.v = array_data(result);
-  default:
-    return cerror(ILL_CLASS, ps[1]);
-  }
   bool reverse = (internalMode & 1);
-  switch (type) {
+  switch (sa.datainfo(0).type) {
   case LUX_INT8:
-    find2_action(keys.ui8, keys_count, data.ui8, data_count, target.i32,
-                 reverse);
+    find2_action(sa.datapointer(1).ui8, sa.datainfo(1).nelem,
+                 sa.datapointer(0).ui8, sa.datainfo(0).nelem,
+                 sa.datapointer(2).i32, reverse);
     break;
   case LUX_INT16:
-    find2_action(keys.i16, keys_count, data.i16, data_count, target.i32,
-                 reverse);
+    find2_action(sa.datapointer(1).i16, sa.datainfo(1).nelem,
+                 sa.datapointer(0).i16, sa.datainfo(0).nelem,
+                 sa.datapointer(2).i32, reverse);
     break;
   case LUX_INT32:
-    find2_action(keys.i32, keys_count, data.i32, data_count, target.i32,
-                 reverse);
+    find2_action(sa.datapointer(1).i32, sa.datainfo(1).nelem,
+                 sa.datapointer(0).i32, sa.datainfo(0).nelem,
+                 sa.datapointer(2).i32, reverse);
     break;
   case LUX_INT64:
-    find2_action(keys.i64, keys_count, data.i64, data_count, target.i32,
-                 reverse);
+    find2_action(sa.datapointer(1).i64, sa.datainfo(1).nelem,
+                 sa.datapointer(0).i64, sa.datainfo(0).nelem,
+                 sa.datapointer(2).i32, reverse);
     break;
   case LUX_FLOAT:
-    find2_action(keys.f, keys_count, data.f, data_count, target.i32,
-                 reverse);
+    find2_action(sa.datapointer(1).f, sa.datainfo(1).nelem,
+                 sa.datapointer(0).f, sa.datainfo(0).nelem,
+                 sa.datapointer(2).i32, reverse);
     break;
   case LUX_DOUBLE:
-    find2_action(keys.d, keys_count, data.d, data_count, target.i32,
-                 reverse);
+    find2_action(sa.datapointer(1).d, sa.datainfo(1).nelem,
+                 sa.datapointer(0).d, sa.datainfo(0).nelem,
+                 sa.datapointer(2).i32, reverse);
     break;
   default:
     return luxerror("Illegal type in arguments to FIND2 function", 0);
   }
-  return result;
+  return sa.result();
 }
 REGISTER(find2, f, find2, 2, 2, "1reverse");
 //-------------------------------------------------------------------------

@@ -663,24 +663,31 @@ int32_t lux_byte(int32_t narg, int32_t ps[])
 {
   return lux_convert(narg, ps, LUX_INT8, 1);
 }
+REGISTER(byte, f, byte, 1, 1, "*");
+REGISTER(byte, f, uint8, 1, 1, "*");
 //-----------------------------------------------------
 int32_t lux_word(int32_t narg, int32_t ps[])
 // returns a LUX_INT16 version of the argument
 {
   return lux_convert(narg, ps, LUX_INT16, 1);
 }
+REGISTER(word, f, word, 1, 1, "*");
+REGISTER(word, f, int16, 1, 1, "*");
 //-----------------------------------------------------
 int32_t lux_long(int32_t narg, int32_t ps[])
 // returns a LUX_INT32 version of the argument
 {
   return lux_convert(narg, ps, LUX_INT32, 1);
 }
+REGISTER(long, f, long, 1, 1, "*");
+REGISTER(long, f, int32, 1, 1, "*");
 //-----------------------------------------------------
 int32_t lux_int64(int32_t narg, int32_t ps[])
 // returns a LUX_INT64 version of the argument
 {
   return lux_convert(narg, ps, LUX_INT64, 1);
 }
+REGISTER(int64, f, int64, 1, 1, "*");
 //-----------------------------------------------------
 
 /// A template function to round floating-point values down (toward minus
@@ -696,13 +703,13 @@ int32_t lux_int64(int32_t narg, int32_t ps[])
 /// \param[in] src points at the values to process.
 ///
 /// \param[out] tgt points at the memory where to store the results.
-template<typename Float,
+template<typename Float, typename Int,
          std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 void
-lux_floor_action(LoopInfo* infos, Float* src, Float* tgt)
+lux_floor_action(LoopInfo* infos, Float* src, Int* tgt)
 {
   do {
-    *tgt++ = std::floor(*src);
+    *tgt++ = static_cast<Int>(std::floor(*src));
   } while (infos[0].advanceLoop(&src) < infos[0].rndim);
 }
 
@@ -720,13 +727,13 @@ lux_floor_action(LoopInfo* infos, Float* src, Float* tgt)
 /// \param[in] denom is the denominator of the division.
 ///
 /// \param[out] tgt points at the memory where to store the results.
-template<typename Float,
+template<typename Float, typename Int,
          std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 void
-lux_floor_action(LoopInfo* infos, Float* num, Float denom, Float* tgt)
+lux_floor_action(LoopInfo* infos, Float* num, Float denom, Int* tgt)
 {
   do {
-    *tgt++ = std::floor(*num/denom);
+    *tgt++ = static_cast<Int>(std::floor(*num/denom));
   } while (infos[0].advanceLoop(&num) < infos[0].rndim);
 }
 
@@ -770,13 +777,13 @@ lux_floor_action(LoopInfo* infos, Int* num, Int denom, Int* tgt)
 /// to have as many elements as \a num.
 ///
 /// \param[out] tgt points at the memory where to store the results.
-template<typename Float,
+template<typename Float, typename Int,
          std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 void
-lux_floor_action(LoopInfo* infos, Float* num, Float* denom, Float* tgt)
+lux_floor_action(LoopInfo* infos, Float* num, Float* denom, Int* tgt)
 {
   do {
-    *tgt++ = std::floor(*num/ *denom);
+    *tgt++ = static_cast<Int>(std::floor(*num/ *denom));
   } while (infos[1].advanceLoop(&denom),
            infos[0].advanceLoop(&num) < infos[0].rndim);
 }
@@ -818,7 +825,7 @@ lux_floor(int32_t narg, int32_t ps[])
   int32_t iq = LUX_ERROR;
   if (narg == 1) {
     // floor(x).  For integer data types this is effectively a copy.
-    if ((iq = sa.set(narg, ps, "i*;r&", &ptrs, &infos)) < 0)
+    if ((iq = sa.set(narg, ps, "i*;r~@&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     switch (infos[0].type) {
     case LUX_INT8: case LUX_INT16: case LUX_INT32: case LUX_INT64:
@@ -826,10 +833,10 @@ lux_floor(int32_t narg, int32_t ps[])
       memcpy(ptrs[1].ui8, ptrs[0].ui8, infos[0].nelem*infos[0].stride);
       break;
     case LUX_FLOAT:
-      lux_floor_action(infos, ptrs[0].f, ptrs[1].f);
+      lux_floor_action(infos, ptrs[0].f, ptrs[1].i32);
       break;
     case LUX_DOUBLE:
-      lux_floor_action(infos, ptrs[0].d, ptrs[1].d);
+      lux_floor_action(infos, ptrs[0].d, ptrs[1].i64);
       break;
     default:
       return cerror(ILL_TYPE, ps[0]);
@@ -837,7 +844,7 @@ lux_floor(int32_t narg, int32_t ps[])
     }
   } else if (narg == 2) {
     // floor(numerator,denominator)
-    if ((iq = sa.set(narg, ps, "i^*;i^#;r&", &ptrs, &infos)) < 0)
+    if ((iq = sa.set(narg, ps, "i^*;i^#;r~@&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     if (infos[1].nelem == 1) {
       switch (infos[0].type) {
@@ -854,10 +861,10 @@ lux_floor(int32_t narg, int32_t ps[])
         lux_floor_action(infos, ptrs[0].i64, *ptrs[1].i64, ptrs[2].i64);
         break;
       case LUX_FLOAT:
-        lux_floor_action(infos, ptrs[0].f, *ptrs[1].f, ptrs[2].f);
+        lux_floor_action(infos, ptrs[0].f, *ptrs[1].f, ptrs[2].i32);
         break;
       case LUX_DOUBLE:
-        lux_floor_action(infos, ptrs[0].d, *ptrs[1].d, ptrs[2].d);
+        lux_floor_action(infos, ptrs[0].d, *ptrs[1].d, ptrs[2].i64);
         break;
       default:
         return cerror(ILL_TYPE, ps[0]);
@@ -878,10 +885,10 @@ lux_floor(int32_t narg, int32_t ps[])
         lux_floor_action(infos, ptrs[0].i64, ptrs[1].i64, ptrs[2].i64);
         break;
       case LUX_FLOAT:
-        lux_floor_action(infos, ptrs[0].f, ptrs[1].f, ptrs[2].f);
+        lux_floor_action(infos, ptrs[0].f, ptrs[1].f, ptrs[2].i32);
         break;
       case LUX_DOUBLE:
-        lux_floor_action(infos, ptrs[0].d, ptrs[1].d, ptrs[2].d);
+        lux_floor_action(infos, ptrs[0].d, ptrs[1].d, ptrs[2].i64);
         break;
       default:
         return cerror(ILL_TYPE, ps[0]);
@@ -907,13 +914,13 @@ REGISTER(floor, f, floor, 1, 2, nullptr);
 /// \param[in] src points at the values to process.
 ///
 /// \param[out] tgt points at the memory where to store the results.
-template<typename Float,
+template<typename Float, typename Int,
          std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 void
-lux_ceil_action(LoopInfo* infos, Float* src, Float* tgt)
+lux_ceil_action(LoopInfo* infos, Float* src, Int* tgt)
 {
   do {
-    *tgt++ = std::ceil(*src);
+    *tgt++ = static_cast<Int>(std::ceil(*src));
   } while (infos[0].advanceLoop(&src) < infos[0].rndim);
 }
 
@@ -931,13 +938,13 @@ lux_ceil_action(LoopInfo* infos, Float* src, Float* tgt)
 /// \param[in] denom is the denominator of the division.
 ///
 /// \param[out] tgt points at the memory where to store the results.
-template<typename Float,
+template<typename Float, typename Int,
          std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 void
-lux_ceil_action(LoopInfo* infos, Float* num, Float denom, Float* tgt)
+lux_ceil_action(LoopInfo* infos, Float* num, Float denom, Int* tgt)
 {
   do {
-    *tgt++ = std::ceil(*num/denom);
+    *tgt++ = static_cast<Int>(std::ceil(*num/denom));
   } while (infos[0].advanceLoop(&num) < infos[0].rndim);
 }
 
@@ -981,13 +988,13 @@ lux_ceil_action(LoopInfo* infos, Int* num, Int denom, Int* tgt)
 /// to have as many elements as \a num.
 ///
 /// \param[out] tgt points at the memory where to store the results.
-template<typename Float,
+template<typename Float, typename Int,
          std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 void
-lux_ceil_action(LoopInfo* infos, Float* num, Float* denom, Float* tgt)
+lux_ceil_action(LoopInfo* infos, Float* num, Float* denom, Int* tgt)
 {
   do {
-    *tgt++ = std::ceil(*num/ *denom);
+    *tgt++ = static_cast<Int>(std::ceil(*num/ *denom));
   } while (infos[1].advanceLoop(&denom),
            infos[0].advanceLoop(&num) < infos[0].rndim);
 }
@@ -1029,7 +1036,7 @@ lux_ceil(int32_t narg, int32_t ps[])
   int32_t iq = LUX_ERROR;
   if (narg == 1) {
     // ceil(x).  For integer data types this is effectively a copy.
-    if ((iq = sa.set(narg, ps, "i*;r&", &ptrs, &infos)) < 0)
+    if ((iq = sa.set(narg, ps, "i*;r~@&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     switch (infos[0].type) {
     case LUX_INT8: case LUX_INT16: case LUX_INT32: case LUX_INT64:
@@ -1037,10 +1044,10 @@ lux_ceil(int32_t narg, int32_t ps[])
       memcpy(ptrs[1].ui8, ptrs[0].ui8, infos[0].nelem*infos[0].stride);
       break;
     case LUX_FLOAT:
-      lux_ceil_action(infos, ptrs[0].f, ptrs[1].f);
+      lux_ceil_action(infos, ptrs[0].f, ptrs[1].i32);
       break;
     case LUX_DOUBLE:
-      lux_ceil_action(infos, ptrs[0].d, ptrs[1].d);
+      lux_ceil_action(infos, ptrs[0].d, ptrs[1].i64);
       break;
     default:
       return cerror(ILL_TYPE, ps[0]);
@@ -1048,7 +1055,7 @@ lux_ceil(int32_t narg, int32_t ps[])
     }
   } else if (narg == 2) {
     // ceil(numerator,denominator)
-    if ((iq = sa.set(narg, ps, "i^*;i^#;r&", &ptrs, &infos)) < 0)
+    if ((iq = sa.set(narg, ps, "i^*;i^#;r~@&", &ptrs, &infos)) < 0)
       return LUX_ERROR;
     if (infos[1].nelem == 1) {
       switch (infos[0].type) {
@@ -1065,10 +1072,10 @@ lux_ceil(int32_t narg, int32_t ps[])
         lux_ceil_action(infos, ptrs[0].i64, *ptrs[1].i64, ptrs[2].i64);
         break;
       case LUX_FLOAT:
-        lux_ceil_action(infos, ptrs[0].f, *ptrs[1].f, ptrs[2].f);
+        lux_ceil_action(infos, ptrs[0].f, *ptrs[1].f, ptrs[2].i32);
         break;
       case LUX_DOUBLE:
-        lux_ceil_action(infos, ptrs[0].d, *ptrs[1].d, ptrs[2].d);
+        lux_ceil_action(infos, ptrs[0].d, *ptrs[1].d, ptrs[2].i64);
         break;
       default:
         return cerror(ILL_TYPE, ps[0]);
@@ -1089,10 +1096,10 @@ lux_ceil(int32_t narg, int32_t ps[])
         lux_ceil_action(infos, ptrs[0].i64, ptrs[1].i64, ptrs[2].i64);
         break;
       case LUX_FLOAT:
-        lux_ceil_action(infos, ptrs[0].f, ptrs[1].f, ptrs[2].f);
+        lux_ceil_action(infos, ptrs[0].f, ptrs[1].f, ptrs[2].i32);
         break;
       case LUX_DOUBLE:
-        lux_ceil_action(infos, ptrs[0].d, ptrs[1].d, ptrs[2].d);
+        lux_ceil_action(infos, ptrs[0].d, ptrs[1].d, ptrs[2].i64);
         break;
       default:
         return cerror(ILL_TYPE, ps[0]);
@@ -2311,7 +2318,7 @@ int32_t redef_array_extra_dims(int32_t tgt, int32_t src, Symboltype type, int32_
   return redef_array(tgt, type, ndim, tgtdims);
 }
 //-----------------------------------------------------
-int32_t bytarr(int32_t narg, int32_t ps[])
+int32_t lux_bytarr(int32_t narg, int32_t ps[])
 // create an array of I*1 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2320,8 +2327,10 @@ int32_t bytarr(int32_t narg, int32_t ps[])
    return LUX_ERROR;
  return array_scratch(LUX_INT8, narg, dims);
 }
+REGISTER(bytarr, f, bytarr, 1, MAX_DIMS, nullptr);
+REGISTER(bytarr, f, uint8arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
-int32_t intarr(int32_t narg, int32_t ps[])
+int32_t lux_intarr(int32_t narg, int32_t ps[])
 // create an array of I*2 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2330,8 +2339,10 @@ int32_t intarr(int32_t narg, int32_t ps[])
    return LUX_ERROR;
  return array_scratch(LUX_INT16, narg, dims);
 }
+REGISTER(intarr, f, intarr, 1, MAX_DIMS, nullptr);
+REGISTER(intarr, f, int16arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
-int32_t lonarr(int32_t narg, int32_t ps[])
+int32_t lux_lonarr(int32_t narg, int32_t ps[])
 // create an array of I*4 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2340,8 +2351,10 @@ int32_t lonarr(int32_t narg, int32_t ps[])
    return LUX_ERROR;
  return array_scratch(LUX_INT32, narg, dims);
 }
+REGISTER(lonarr, f, lonarr, 1, MAX_DIMS, nullptr);
+REGISTER(lonarr, f, int32arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
-int32_t int64arr(int32_t narg, int32_t ps[])
+int32_t lux_int64arr(int32_t narg, int32_t ps[])
 // create an array of 64-bit elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2350,6 +2363,7 @@ int32_t int64arr(int32_t narg, int32_t ps[])
    return LUX_ERROR;
  return array_scratch(LUX_INT64, narg, dims);
 }
+REGISTER(int64arr, f, int64arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
 int32_t fltarr(int32_t narg, int32_t ps[])
 // create an array of F*4 elements

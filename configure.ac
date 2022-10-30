@@ -106,6 +106,7 @@ AC_SUBST([CPPUTESTLIBS])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/fonts/Makefile
+                 historicephemerides/Makefile
                  doc/Makefile
                  test/Makefile])
 

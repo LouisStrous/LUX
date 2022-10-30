@@ -673,26 +673,87 @@ REGISTER(find, f, find, 2, 4, "0exact:1index_ge:2value_ge:4first");
 //-------------------------------------------------------------------------
 template<typename T>
 void
-find2_action(T* keys, int keys_count, T* data, int data_count,
-                  int32_t* target, bool reverse)
+find2_action(StandardLoopIterator<T> datait,
+             StandardLoopIterator<T> keysit,
+             StandardLoopIterator<int32_t> indexit,
+             StandardLoopIterator<int32_t> targetit,
+             bool reverse)
 {
+  auto data = datait.pointer();
+  auto keys = keysit.pointer();
+  auto index = indexit.pointer();
+  auto target = targetit.pointer();
+  auto keys_count = keysit.element_count();
+  auto data_count = datait.element_count();
+  auto index_count = indexit.element_count();
+  // if (reverse) {
+  //   for (int i = 0; i < keys_count; ++i) {
+  //     if (index_count && (*index >= data_count || *index < 0)) {
+  //       *target++ = -1;
+  //       if (index_count > 1)
+  //         ++index;
+  //       continue;
+  //     }
+  //     int j;
+  //     for (j = index_count? *index: data_count - 1; j; --j)
+  //       if (*keys == data[j])
+  //         break;
+  //     *target++ = j;
+  //     ++keys;
+  //     if (index_count > 1)
+  //       ++index;
+  //   }
+  // } else {
+  //   for (int i = 0; i < keys_count; i++) {
+  //     if (index_count && (*index >= data_count || *index < 0)) {
+  //       *target++ = -1;
+  //       if (index_count > 1)
+  //         ++index;
+  //       continue;
+  //     }
+  //     int j;
+  //     for (j = index_count? *index: 0; j < data_count; j++)
+  //       if (*keys == data[j])
+  //         break;
+  //     *target++ = (j == data_count? -1: j);
+  //     keys++;
+  //     if (index_count > 1)
+  //       ++index;
+  //   }
+  // }
   if (reverse) {
-    for (int i = 0; i < keys_count; ++i) {
+    while (!keysit.done()) {
+      if (index_count && (*indexit >= data_count || *indexit < 0)) {
+        *targetit++ = -1;
+        if (index_count > 1)
+          ++indexit;
+        continue;
+      }
       int j;
-      for (j = data_count - 1; j; --j)
-        if (*keys == data[j])
+      for (j = index_count? *indexit: data_count - 1; j; --j)
+        if (*keysit == data[j])
           break;
-      *target++ = j;
-      ++keys;
+      *targetit++ = j;
+      ++keysit;
+      if (index_count > 1)
+        ++indexit;
     }
   } else {
-    for (int i = 0; i < keys_count; i++) {
+    while (!keysit.done()) {
+      if (index_count && (*indexit >= data_count || *indexit < 0)) {
+        *targetit++ = -1;
+        if (index_count > 1)
+          ++indexit;
+        continue;
+      }
       int j;
-      for (j = 0; j < data_count; j++)
-        if (*keys == data[j])
+      for (j = index_count? *indexit: 0; j < data_count; j++)
+        if (*keysit == data[j])
           break;
-      *target++ = (j == data_count? -1: j);
-      keys++;
+      *targetit++ = (j == data_count? -1: j);
+      ++keysit;
+      if (index_count > 1)
+        ++indexit;
     }
   }
 }
@@ -701,7 +762,7 @@ Symbol
 lux_find2(int32_t narg, Symbol ps[])
 // FIND2(array, key [, offset] [, /reverse])
 {
-  StandardArguments sa(narg, ps, "i*;i*;r[1]L&");;
+  StandardArguments sa(narg, ps, "i*;i*;iL[-]#?;rL[1]@&");;
   if (sa.result() < 0) {
     return sa.result();
   }
@@ -709,41 +770,53 @@ lux_find2(int32_t narg, Symbol ps[])
   bool reverse = (internalMode & 1);
   switch (sa.datainfo(0).type) {
   case LUX_INT8:
-    find2_action(sa.datapointer(1).ui8, sa.datainfo(1).nelem,
-                 sa.datapointer(0).ui8, sa.datainfo(0).nelem,
-                 sa.datapointer(2).i32, reverse);
+    find2_action(StandardLoopIterator<uint8_t>(sa, 0),
+                 StandardLoopIterator<uint8_t>(sa, 1),
+                 StandardLoopIterator<int32_t>(sa, 2),
+                 StandardLoopIterator<int32_t>(sa, 3),
+                 reverse);
     break;
   case LUX_INT16:
-    find2_action(sa.datapointer(1).i16, sa.datainfo(1).nelem,
-                 sa.datapointer(0).i16, sa.datainfo(0).nelem,
-                 sa.datapointer(2).i32, reverse);
+    find2_action(StandardLoopIterator<int16_t>(sa, 0),
+                 StandardLoopIterator<int16_t>(sa, 1),
+                 StandardLoopIterator<int32_t>(sa, 2),
+                 StandardLoopIterator<int32_t>(sa, 3),
+                 reverse);
     break;
   case LUX_INT32:
-    find2_action(sa.datapointer(1).i32, sa.datainfo(1).nelem,
-                 sa.datapointer(0).i32, sa.datainfo(0).nelem,
-                 sa.datapointer(2).i32, reverse);
+    find2_action(StandardLoopIterator<int32_t>(sa, 0),
+                 StandardLoopIterator<int32_t>(sa, 1),
+                 StandardLoopIterator<int32_t>(sa, 2),
+                 StandardLoopIterator<int32_t>(sa, 3),
+                 reverse);
     break;
   case LUX_INT64:
-    find2_action(sa.datapointer(1).i64, sa.datainfo(1).nelem,
-                 sa.datapointer(0).i64, sa.datainfo(0).nelem,
-                 sa.datapointer(2).i32, reverse);
+    find2_action(StandardLoopIterator<int64_t>(sa, 0),
+                 StandardLoopIterator<int64_t>(sa, 1),
+                 StandardLoopIterator<int32_t>(sa, 2),
+                 StandardLoopIterator<int32_t>(sa, 3),
+                 reverse);
     break;
   case LUX_FLOAT:
-    find2_action(sa.datapointer(1).f, sa.datainfo(1).nelem,
-                 sa.datapointer(0).f, sa.datainfo(0).nelem,
-                 sa.datapointer(2).i32, reverse);
+    find2_action(StandardLoopIterator<float>(sa, 0),
+                 StandardLoopIterator<float>(sa, 1),
+                 StandardLoopIterator<int32_t>(sa, 2),
+                 StandardLoopIterator<int32_t>(sa, 3),
+                 reverse);
     break;
   case LUX_DOUBLE:
-    find2_action(sa.datapointer(1).d, sa.datainfo(1).nelem,
-                 sa.datapointer(0).d, sa.datainfo(0).nelem,
-                 sa.datapointer(2).i32, reverse);
+    find2_action(StandardLoopIterator<double>(sa, 0),
+                 StandardLoopIterator<double>(sa, 1),
+                 StandardLoopIterator<int32_t>(sa, 2),
+                 StandardLoopIterator<int32_t>(sa, 3),
+                 reverse);
     break;
   default:
     return luxerror("Illegal type in arguments to FIND2 function", 0);
   }
   return sa.result();
 }
-REGISTER(find2, f, find2, 2, 2, "1reverse");
+REGISTER(find2, f, find2, 2, 3, "1reverse");
 //-------------------------------------------------------------------------
 int timespec_diff(struct timespec* two, struct timespec* one)
 {

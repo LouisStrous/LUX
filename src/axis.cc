@@ -215,31 +215,25 @@ LoopInfo::setupDimensionLoop(int32_t ndim, int32_t const *dims,
   return 0;
 }
 //-----------------------------------------------------------------------
-/** Advance along a loop.  The coordinates and the pointer to the data
-    are advanced, taking into account the dimensional structure of the
-    data and the configured axes.
 
-    \param[in,out] info points to the LoopInfo that describes the
-    dimensional structure and the way to traverse it.
-
-    \param[in,out] ptr points to a Pointer that indicates the current
-    data element.
-
-    \returns the index of the first loop axis that is not yet
-    completely traversed.
-
-    For example, if the array has 4 by 5 by 6 elements, then
-    advancement from element (2,0,0) (to element (3,0,0)) yields 0,
-    (3,0,0) yields 1, (3,4,0) yields 2, and (3,4,5) yields 3.
- */
+/// Advance along a loop.  The coordinates and the pointer to the data are
+/// advanced, taking into account the dimensional structure of the data and the
+/// configured axes.
+///
+/// \param[in,out] ptr points at the current data element.
+///
+/// \returns the index of the first loop axis that is not yet completely
+/// traversed.
+///
+/// For example, if the array has 4 by 5 by 6 elements, then advancement from
+/// element (2,0,0) (to element (3,0,0)) yields 0, (3,0,0) yields 1, (3,4,0)
+/// yields 2, and (3,4,5) yields 3.
 int32_t
 LoopInfo::advanceLoop(void* ptr)
-/* advance coordinates; return index of first encountered incomplete
- axis.   */
 {
-  int32_t       i, done;
+  int32_t i, done;
 
-  if (this->advanceaxis >= this->rndim)         // already done
+  if (this->advanceaxis >= this->rndim) // already done
     done = this->rndim;
   else {
     // advance pointer

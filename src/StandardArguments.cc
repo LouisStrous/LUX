@@ -99,7 +99,20 @@ namespace StandardArgs {
     /// lower than this, then a copy converted to this type is used instead.
     /// Corresponds to `>` in the data type part of a StandardArguments format
     /// specification.
-    PS_LOWER_LIMIT
+    PS_LOWER_LIMIT,
+
+    /// The data type is an upper limit: If an input argument has a data type
+    /// higher than this, then a copy converted to this type is used instead.
+    /// Corresponds to `<` in the data type part of a StandardArguments format
+    /// specification.
+    PS_UPPER_LIMIT,
+
+    /// The data type is integer.  If an input argument has a floating-point
+    /// data type, then a copy converted to the corresponding integer type
+    /// (`float` to `int32_t`, `double` to `int64_t`) is used instead.
+    /// Corresponds to `~` in the data type part of a StandardArguments format
+    /// specification.
+    PS_FORCE_INTEGER,
   };
 
   /// Represents how the remaining dimensions should be handled according to a
@@ -137,7 +150,7 @@ namespace StandardArgs {
     Type_spec_limit_type data_type_limit = PS_EXACT;
 
     /// The data type.
-    Symboltype data_type = LUX_INT32;
+    Symboltype data_type = LUX_NO_SYMBOLTYPE;
 
     /// The dimension specifications.
     std::vector<Dims_spec> dims_spec;
@@ -246,6 +259,14 @@ parse_standard_arg_fmt(const std::string& format, Param_spec_list& psl)
       switch (*fmt) {
       case '>':
         p_spec.data_type_limit = PS_LOWER_LIMIT;
+        ++fmt;
+        break;
+      case '<':
+        p_spec.data_type_limit = PS_UPPER_LIMIT;
+        ++fmt;
+        break;
+      case '~':
+        p_spec.data_type_limit = PS_FORCE_INTEGER;
         ++fmt;
         break;
       } // end of switch (*fmt)
@@ -502,7 +523,7 @@ parse_standard_arg_fmt(const std::string& format, Param_spec_list& psl)
   }
   if (!bad) {
     /* check that the reference parameter does not point outside the list */
-    int32_t n = psl.size() - (psl.has_return_param? 1: 0);
+    int32_t n = psl.num_in_out_parameters();
     if (n) {
       for (int i = 0; i < psl.size(); i++) {
         if (psl[i].ref_par >= n) {
@@ -517,6 +538,58 @@ parse_standard_arg_fmt(const std::string& format, Param_spec_list& psl)
     }
   }
   return !bad;
+}
+
+/// Determines the final symbol type.
+///
+/// \param[in] actual is the symbol type of the Symbol.
+///
+/// \param[in] limit is the limiting symbol type to compare with.
+///
+/// \param[in] limit_type identifies the nature of the limit.
+///
+/// \returns the symbol type that corresponds to the \a actual one with the
+/// limit applied.
+static Symboltype
+standard_args_final_symboltype(Symboltype actual, Symboltype limit,
+                               Type_spec_limit_type limit_type)
+{
+  switch (limit_type) {
+  case PS_EXACT:
+    if (limit != LUX_NO_SYMBOLTYPE
+        && actual != limit) {
+      actual = limit;
+    }
+    break;
+  case PS_LOWER_LIMIT:
+    if (actual == LUX_NO_SYMBOLTYPE
+        || (actual < limit && limit != LUX_NO_SYMBOLTYPE)) {
+      actual = limit;
+    }
+    break;
+  case PS_UPPER_LIMIT:
+    if (actual == LUX_NO_SYMBOLTYPE
+        || (actual > limit && limit != LUX_NO_SYMBOLTYPE)) {
+      actual = limit;
+    }
+    break;
+  case PS_FORCE_INTEGER:
+    switch (actual) {
+    case LUX_FLOAT: case LUX_CFLOAT: case LUX_NO_SYMBOLTYPE:
+      actual = LUX_INT32;
+      break;
+    case LUX_DOUBLE: case LUX_CDOUBLE:
+      actual = LUX_INT64;
+      break;
+    default:
+      if (actual < limit && limit != LUX_NO_SYMBOLTYPE) {
+        actual = limit;
+      }
+      break;
+    }
+    break;
+  }
+  return actual;
 }
 
 /// Determines the common symbol type for standard arguments.
@@ -544,12 +617,9 @@ standard_args_common_symboltype(const Param_spec_list& param_specs,
         type = symbol_type(iq);
       else
         type = LUX_NO_SYMBOLTYPE;
-      if ((pspec.data_type_limit == PS_LOWER_LIMIT
-           && (type == LUX_NO_SYMBOLTYPE || type < pspec.data_type))
-          || (pspec.data_type_limit == PS_EXACT
-              && pspec.data_type != LUX_NO_SYMBOLTYPE
-              && type != pspec.data_type))
-        type = pspec.data_type;
+
+      type = standard_args_final_symboltype(type, pspec.data_type,
+                                            pspec.data_type_limit);
       if (type != LUX_NO_SYMBOLTYPE
           && (common_type == LUX_NO_SYMBOLTYPE
               || type > common_type))
@@ -570,7 +640,29 @@ StandardArguments::StandardArguments(int32_t narg, int32_t ps[],
   set(narg, ps, fmt, ptrs, infos);
 }
 
-int32_t
+/// Configure symbols based on the passed symbols and a StandardArguments format
+/// string.  The configured symbols can be used to handle a call of a LUX
+/// function or subroutine.
+///
+/// \param[in] narg is the number of symbols passed in \a ps.
+///
+/// \param[in] ps points at the symbols passed into this call.
+///
+/// \param[in] fmt is the StandardArguments format string that says what input,
+/// output, and return symbols the LUX function or subroutine expects.
+///
+/// \param[in,out] ptrs points (if it is not null) at the address where to store
+/// a pointer to one Pointer per configured symbol, that points at the first
+/// data element of each symbol.
+///
+/// \param[in,out] infos points (if it is not null) at the address where to
+/// store a pointer to one LoopInfo per configured symbol, that holds
+/// information about the coordinates, dimensional structure, and way to
+/// traverse the elements.
+///
+/// \returns the configured return symbol.  For a LUX subroutine this is
+/// LUX_ONE.
+Symbol
 StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
                        Pointer** ptrs, LoopInfo** infos)
 {
@@ -604,7 +696,7 @@ StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
 
   // the final parameter values; they may be converted copies of the
   // original values.
-  auto final = std::vector<int32_t>(psl.size());
+  auto final = std::vector<Symbol>(psl.size());
 
   Symboltype common_type
     = standard_args_common_symboltype(psl, narg, ps);
@@ -895,12 +987,9 @@ StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
         type = symbol_type(iq);
         if (pspec.common_type)
           type = common_type;
-        else if ((pspec.data_type_limit == PS_LOWER_LIMIT
-                  && type < pspec.data_type)
-                 || (pspec.data_type_limit == PS_EXACT
-                     && type != pspec.data_type
-                     && pspec.data_type != LUX_NO_SYMBOLTYPE))
-          type = pspec.data_type;
+        else
+          type = standard_args_final_symboltype(type, pspec.data_type,
+                                                pspec.data_type_limit);
         iq = lux_convert(1, &iq, type, 1);
         break;
       case PS_OUTPUT: case PS_RETURN:
@@ -986,9 +1075,6 @@ StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
                                        tgt_dims.end(),
                                        1),
                            tgt_dims.end());
-            if (!tgt_dims.size()) {
-              tgt_dims.push_back(1);
-            }
           }
         }
         if (param_ix == num_in_out_params) {      /* a return parameter */
@@ -1000,12 +1086,9 @@ StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
           if (pspec.common_type
               && common_type != LUX_NO_SYMBOLTYPE) {
             type = common_type;
-          } else if (pspec.data_type_limit == PS_EXACT
-                     && pspec.data_type != LUX_NO_SYMBOLTYPE) {
-            type = pspec.data_type;
-          } else if (pspec.data_type_limit == PS_LOWER_LIMIT
-                     && type < pspec.data_type) {
-            type = pspec.data_type;
+          } else {
+            type = standard_args_final_symboltype(type, pspec.data_type,
+                                                  pspec.data_type_limit);
           }
           if (tgt_dims.size())
             iq = m_return_symbol = array_scratch(type, tgt_dims.size(),
@@ -1016,13 +1099,28 @@ StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
           // not a return parameter, so an output parameter
           iq = ps[param_ix];
           type = symbol_type(iq);
-          if (symbol_class(iq) == LUX_UNUSED
-              || ((pspec.data_type_limit == PS_LOWER_LIMIT
-                   && type < pspec.data_type)
-                  || (pspec.data_type_limit == PS_EXACT
-                      && pspec.data_type != LUX_NO_SYMBOLTYPE
-                      && type != pspec.data_type)))
+          if (symbol_class(iq) == LUX_UNUSED) {
             type = pspec.data_type;
+          } else {
+            switch (pspec.data_type_limit) {
+            case PS_LOWER_LIMIT:
+              if (type < pspec.data_type) {
+                type = pspec.data_type;
+              }
+              break;
+            case PS_UPPER_LIMIT:
+              if (type > pspec.data_type) {
+                type = pspec.data_type;
+              }
+              break;
+            case PS_EXACT:
+              if (pspec.data_type != LUX_NO_SYMBOLTYPE
+                  && type != pspec.data_type) {
+                type = pspec.data_type;
+              }
+              break;
+            }
+          }
           if (tgt_dims.size())
             redef_array(iq, type, tgt_dims.size(), tgt_dims.data());
           else

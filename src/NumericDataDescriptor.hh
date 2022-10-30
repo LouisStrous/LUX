@@ -24,28 +24,30 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "types.hh"
 
-/// A class that describes the dimensional structure and location of
-/// numeric data.
+/// A class that describes the dimensional structure and location of numeric
+/// data.
 class NumericDataDescriptor
 {
 public:
-  // typedef
+  // types
+
+  typedef std::vector<DimensionSize_tp> DimensionsCollection;
 
   // constructors
 
-  /// Default constructor.  Leaves is_valid() equal to `false`.
+  /// Default constructor.
   NumericDataDescriptor();
 
-  /// Constructor that fills the members based on the contents of the
-  /// symbol.
+  /// Constructor that fills the members based on the contents of the symbol.
   ///
   /// \param[in] symbol is the number of the symbol.
-  explicit NumericDataDescriptor(SymbolProxy_tp symbol);
+  explicit NumericDataDescriptor(Symbol symbol);
 
-  // accessors
+  // const methods
 
   /// Returns a Pointer to the data.
-  Pointer data() const;
+  Pointer
+  data() const;
 
   /// Returns the size of a dimension.
   ///
@@ -53,44 +55,52 @@ public:
   ///
   /// \returns the size of the requested dimension, or 0 if the
   /// dimension does not exist.
-  DimensionSize_tp dimension(int index) const;
+  DimensionSize_tp
+  dimension(int index) const;
 
-  /// Returns the number of dimensions.
-  size_t dimensions_count() const;
+  /// Returns the count of dimensions.
+  size_t
+  dimensions_count() const;
 
   /// Returns the collection of dimensions.
-  std::vector<DimensionSize_tp> dimensions() const;
+  const DimensionsCollection&
+  dimensions() const;
 
-  /// Returns the number of elements, obtained by multiplying all of
-  /// the dimensions together, or 0 if the instance wasn't
-  /// successfully set based on a symbol yet.
-  size_t element_count() const;
+  /// Returns the number of elements, obtained by multiplying all of the
+  /// dimensions together, or 0 if the instance wasn't successfully set based on
+  /// a symbol yet.
+  size_t
+  element_count() const;
 
   /// Returns `true` if the descriptor is valid, which means it was
   /// successfully set based on a symbol.
-  bool is_valid() const;
+  bool
+  is_valid() const;
 
-  // modifiers
+  // non-const methods
 
   /// Omits dimensions equal to 1.  If that removes all dimensions,
   /// then retain a single dimension equal to 1.
-  void omit_dimensions_equal_to_one();
+  void
+  omit_dimensions_equal_to_one();
 
   /// Resets the current instance so it is as if it were just
   /// constructed and wasn't successfully set based on a symbol yet.
-  void reset();
+  void
+  reset();
 
   /// (Re)sets the current instance based on the specified symbol.
   ///
   /// \param[in] symbols is the number of the symbol.
   ///
   /// \returns `true` for success, `false` for failure.
-  bool set_from(SymbolProxy_tp symbol);
+  bool
+  set_from(Symbol symbol);
 
 private:
 
   /// A vector of dimensions.
-  std::vector<DimensionSize_tp> m_dimensions;
+  DimensionsCollection m_dimensions;
 
   /// A Pointer to the beginning of the data.
   Pointer m_data;

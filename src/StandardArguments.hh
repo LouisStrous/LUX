@@ -24,11 +24,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef STANDARDARGUMENTS_HH_
 #define STANDARDARGUMENTS_HH_
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 /// A class to facilitate applying LUX functions.
-class StandardArguments {
+class StandardArguments
+{
 public:
   // public constructors
 
@@ -200,6 +202,13 @@ public:
   /// the input parameter type is at least `float`, then the return value gets
   /// the same type as the input parameter.
   ///
+  /// Similarly, a less-than sign (`<`) introduces a maximum data type.
+  ///
+  /// A tilde (`~`) is like greater-than (`>`) but with the additional condition
+  /// that the data type must be integer.  If the data type would be `float`
+  /// then instead it becomes `int32_t`, and if the data type would be `double`
+  /// then it instead becomes `int64_t`.
+  ///
   /// If the data type specifications for more than one numerical parameter are
   /// followed by a caret (`^`), then all of those parameters get the same data
   /// type, which is equal to the greatest data type among them that would have
@@ -354,7 +363,7 @@ public:
   /// \code
   ///   <format> = <param-spec>[;<param-spec>]*
   ///   <param-spec> = {'i'|'o'|'r'}[<type-spec>][<dims-spec>]['?']
-  ///   <type-spec> = {{['>']{'B'|'W'|'L'|'Q'|'F'|'D'}}|'S'}['^']
+  ///   <type-spec> = {{['>'|'<'|'~']{'B'|'W'|'L'|'Q'|'F'|'D'}}|'S'}['^']
   ///   <dims-spec> = ['@']['['<ref-par>']']['{'<axis-par>'}']
   ///                 <dim-spec>[,<dim-spec>]*['*'|'&'|'#']
   ///   <dim-spec> = [{['+'|'-'|'=']NUMBER|'-'|'='|':'}]*
@@ -367,8 +376,8 @@ public:
   ///   by a type specification and a dimensions specification, optionally
   ///   followed by a question mark `?`.
   /// - a type specification consists of an `S`, or else of an optional
-  ///   greater-than sign `>` followed by one of `B`, `W`, `L`, `Q`, `F`, or
-  ///   `D`.  Optionally, a `^` follows.
+  ///   greater-than sign `>` or less-than sign `<` or tilde `~` followed by one
+  ///   of `B`, `W`, `L`, `Q`, `F`, or `D`.  Optionally, a `^` follows.
   /// - a dimensions specification consists of an optional at sign `@`, an a
   ///   optional reference parameter number between square brackets `[]`,
   ///   followed by an optional axis parameter number between curly braces `{}`,
@@ -396,6 +405,9 @@ public:
   ///
   /// For the type specification \c type-spec:
   /// - `>` = the type should be at least equal to the indicated type.
+  /// - `<` = the type should be at most equal to the indicated type.
+  /// - '~' = the type should be at least equal to the indicated type but must
+  ///   be integer: float becomes `int32_t` and double becomes `int64_t`.
   /// - `B` = LUX_INT8
   /// - `W` = LUX_INT16
   /// - `L` = LUX_INT32
@@ -407,11 +419,19 @@ public:
   ///   which is the greatest numerical data type among them that would have
   ///   applied if no `^` had been specified.
   ///
-  /// For input parameters, a copy is created with the indicated (minimum) type
-  /// if the input parameter does not meet the condition, and further processing
-  /// is based on that copy.  For output parameters, an array is created with
-  /// the indicate type, unless `>` is specified and the reference parameter has
-  /// a greater type, in which case that type is used.  If no explicit type is
+  /// For input parameters, a copy is created with the indicated
+  /// (minimum/maximum) type if the input parameter does not meet the condition,
+  /// and further processing is based on that copy.  For output parameters, an
+  /// array is created with the indicate type, except that
+  /// - if `>` is specified and the reference parameter has a greater type, then
+  ///   that type is used.
+  /// - if `~` is specified and the reference parameter has a greater type, then
+  ///   that type is used, except that `float` becomes `int32_t` and `double`
+  ///   becomes `int64_t`.
+  /// - if `<` is specified and the reference parameter has a lesser type, then
+  ///   that type is used.
+  ///
+  /// If no explicit type is
   /// specified for an output parameter, then it gets the type of the reference
   /// parameter.
   ///
@@ -514,6 +534,127 @@ private:
   /// The return symbol -- the symbol representing the result of the
   /// call of the LUX subroutine or function.
   int32_t m_return_symbol;
+};
+
+/// An iterator-like object for iterating over data elements using
+/// StandardArguments.
+///
+/// \note This iterator-like object does not work exactly like standard
+/// iterators do.
+///
+/// \tparam T is the data type of the data elements.
+template<typename T>
+class StandardLoopIterator
+{
+public:
+  /// Constructs an instance for one standard argument.
+  ///
+  /// \param[in] as represents the relevant StandardArguments.
+  ///
+  /// \param[in] index is the 0-based index of the standard argument.  It must
+  /// be nonnegative and less than sa.size().  Throws a std::domain_error if the
+  /// index is out of range.
+  StandardLoopIterator(StandardArguments& sa, int index)
+    : m_status()
+  {
+    if (index < 0 || index >= sa.size()) {
+      throw std::domain_error("StandardArguments index out of range");
+    }
+    m_data = reinterpret_cast<T*>(sa.datapointer(index).v);
+    m_loop_info = sa.datainfo(index);
+  }
+
+  /// Prefix increment.
+  StandardLoopIterator&
+  operator++()
+  {
+    m_status = m_loop_info.advanceLoop(&m_data);
+    return *this;
+  }
+
+  /// postfix increment.
+  StandardLoopIterator
+  operator++(int)
+  {
+    auto old = *this;
+    m_status = m_loop_info.advanceLoop(&m_data);
+    return old;
+  }
+
+  /// Returns a reference to the data value currently pointed at.
+  ///
+  /// \returns the value.
+  ///
+  /// \todo what if we're past the end?
+  T&
+  operator*() const
+  {
+    return *m_data;
+  }
+
+  /// Returns a pointer to the address of the data value currently pointed at.
+  ///
+  /// \returns the pointer.
+  ///
+  /// \todo what if we're past the end?
+  T*
+  pointer() const
+  {
+    return m_data;
+  }
+
+  /// Returns the count of data elements.
+  ///
+  /// \returns the count.
+  size_t
+  element_count() const
+  {
+    return m_loop_info.nelem;
+  }
+
+  /// Returns the status of the iterator, expressed as the 1-based index of the
+  /// highest rearranged dimension whose coordinate was incremented just before
+  /// the current element.  The initial status, when the iterator points at the
+  /// very first element, is 0.
+  ///
+  /// For example, if the rearranged dimensions are 4 and 3, then the status is
+  /// as follows for each of the elements:
+  ///
+  ///      0 0 0 0
+  ///      1 0 0 0
+  ///      1 0 0 0
+  ///     (2)
+  ///
+  /// so if you need to detect when the first rearranged dimension has been
+  /// completed (and the 2nd coordinate is the highest one to have been
+  /// incremented) then look for status() == 1.  And if you need to detect when
+  /// the second rearranged dimension has been completed, then look for status()
+  /// == 2.
+  ///
+  /// If you're only interested in detecting when you've passed beyond the last
+  /// data element, then you can look at done() instead.
+  ///
+  /// \returns the status.
+  int32_t
+  status() const
+  {
+    return m_status;
+  }
+
+  /// Did the iterator just pass beyond the last element?
+  ///
+  /// \returns `true` if the iterator just passed beyond the last element,
+  /// `false` otherwise.
+  bool
+  done() const
+  {
+    return m_status == m_loop_info.rndim;
+  }
+
+private:
+  T* m_data;                    //!< points at the current data element
+  LoopInfo m_loop_info;         //!< the dimensional information
+  int32_t m_status;             //!< the status
 };
 
 #endif

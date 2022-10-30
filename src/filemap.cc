@@ -74,21 +74,28 @@ int32_t filemap(Symboltype type, int32_t narg, int32_t ps[])
  return iq;
 }
 //-------------------------------------------------------------------------
-int32_t bytfarr(int32_t narg, int32_t ps[])
+int32_t lux_bytfarr(int32_t narg, int32_t ps[])
 // Create a LUX_INT8 file array (file map)
 { return filemap(LUX_INT8, narg, ps); }
+REGISTER(bytfarr, f, bytfarr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+REGISTER(bytfarr, f, uint8farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
-int32_t intfarr(int32_t narg, int32_t ps[])
+int32_t lux_intfarr(int32_t narg, int32_t ps[])
 // Create a LUX_INT16 file array (file map)
 { return filemap(LUX_INT16, narg, ps); }
+REGISTER(intfarr, f, intfarr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+REGISTER(intfarr, f, int16farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
-int32_t lonfarr(int32_t narg, int32_t ps[])
+int32_t lux_lonfarr(int32_t narg, int32_t ps[])
 // Create a LUX_INT32 file array (file map)
 { return filemap(LUX_INT32, narg, ps); }
+REGISTER(lonfarr, f, lonfarr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+REGISTER(lonfarr, f, int32farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
-int32_t int64farr(int32_t narg, int32_t ps[])
+int32_t lux_int64farr(int32_t narg, int32_t ps[])
 // Create a LUX_INT64 file array (file map)
 { return filemap(LUX_INT64, narg, ps); }
+REGISTER(int64farr, f, int64farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
 int32_t fltfarr(int32_t narg, int32_t ps[])
 // Create a LUX_FLOAT file array (file map)

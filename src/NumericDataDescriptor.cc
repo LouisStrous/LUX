@@ -33,7 +33,7 @@ NumericDataDescriptor::NumericDataDescriptor()
   reset();
 }
 
-NumericDataDescriptor::NumericDataDescriptor(SymbolProxy_tp symbol)
+NumericDataDescriptor::NumericDataDescriptor(Symbol symbol)
 {
   set_from(symbol);
 }
@@ -48,7 +48,7 @@ NumericDataDescriptor::dimension(int index) const
   }
 }
 
-std::vector<DimensionSize_tp>
+const NumericDataDescriptor::DimensionsCollection&
 NumericDataDescriptor::dimensions() const
 {
   return m_dimensions;
@@ -61,8 +61,9 @@ NumericDataDescriptor::data() const
 }
 
 bool
-NumericDataDescriptor::set_from(SymbolProxy_tp symbol)
+NumericDataDescriptor::set_from(Symbol symbol)
 {
+  reset();
   switch (symbol_class(symbol)) {
   case LUX_SCALAR:
     m_dimensions.push_back(1);

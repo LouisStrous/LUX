@@ -276,16 +276,23 @@ char *verrorMessage(char const* message, int32_t symbol, va_list ap)
     sprintf(curScrat, "%1d", fileLevel);
   else
     sprintf(curScrat, "(main)");
-  curScrat += strlen(curScrat);        // NOTE: sprintf does not return the number
+  curScrat += strlen(curScrat); // NOTE: sprintf does not return the number
                                 // of printed characters on all platforms.
   sprintf(curScrat, ": ");
   curScrat += strlen(curScrat);
-  if (symbol)
+  if (symbol) {
     symbolIdent(symbol, I_LINE | I_TRUNCATE | I_LENGTH);
-  else
+    curScrat += strlen(curScrat);
+    strcpy(curScrat, " (");
+    curScrat += 2;
+    symbolIdent(symbol, I_VALUE | I_TRUNCATE | I_LENGTH);
+    curScrat += strlen(curScrat);
+    strcpy(curScrat, ")");
+    ++curScrat;
+  } else {
     sprintf(curScrat, "%d", curLineNumber);
-
-  curScrat += strlen(curScrat);
+    curScrat += strlen(curScrat);
+  }
 
   sprintf(curScrat, ": ");
   curScrat += 2;
@@ -394,4 +401,5 @@ int32_t lux_error(int32_t narg, int32_t ps[])
   }
   return 1;                        // or some compilers complain
 }
+REGISTER(error, s, error, 0, 2, "1store:2restore" );
 //---------------------------------------------------------

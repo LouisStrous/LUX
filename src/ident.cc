@@ -776,7 +776,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     switch (array_type(symbol)) {
     case LUX_INT8:
       while (j--) {
-        sprintf(curScrat, "%d", (int32_t) *ptr.ui8++);
+        sprintf(curScrat, "%db", (int32_t) *ptr.ui8++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -784,7 +784,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case LUX_INT16:
       while (j--) {
-        sprintf(curScrat, "%d", (int32_t) *ptr.i16++);
+        sprintf(curScrat, "%di", (int32_t) *ptr.i16++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -800,7 +800,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case LUX_INT64:
       while (j--) {
-        sprintf(curScrat, "%jd", (intmax_t) *ptr.i64++);
+        sprintf(curScrat, "%jdq", (intmax_t) *ptr.i64++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -808,7 +808,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case LUX_FLOAT:
       while (j--) {
-        sprintf(curScrat, "%g", (double) *ptr.f++);
+        sprintf(curScrat, "%#g", (double) *ptr.f++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");
@@ -816,7 +816,7 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       break;
     case LUX_DOUBLE:
       while (j--) {
-        sprintf(curScrat, "%g", *ptr.d++);
+        sprintf(curScrat, "%#g", *ptr.d++);
         curScrat += strlen(curScrat);
         if (j || i)
           strcpy(curScrat++, ",");

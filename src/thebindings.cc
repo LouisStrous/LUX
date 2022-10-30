@@ -1667,7 +1667,7 @@ void register_the_bindings()
   register_lux_f(lux_find, "find", 2, 4, "0exact:1index_ge:2value_ge:4first");
 
   int32_t lux_find2(int32_t, int32_t []);
-  register_lux_f(lux_find2, "find2", 2, 2, "1reverse");
+  register_lux_f(lux_find2, "find2", 2, 3, "1reverse");
 
   int32_t lux_matrix_product(int32_t, int32_t []);
   register_lux_f(lux_matrix_product, "mproduct", 2, 2, "0inner:1outer");
@@ -1693,11 +1693,74 @@ void register_the_bindings()
   int32_t lux_randome(int32_t, int32_t []);
   register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
 
+  int32_t lux_byte(int32_t, int32_t []);
+  register_lux_f(lux_byte, "byte", 1, 1, "*");
+
+  int32_t lux_byte(int32_t, int32_t []);
+  register_lux_f(lux_byte, "uint8", 1, 1, "*");
+
+  int32_t lux_word(int32_t, int32_t []);
+  register_lux_f(lux_word, "word", 1, 1, "*");
+
+  int32_t lux_word(int32_t, int32_t []);
+  register_lux_f(lux_word, "int16", 1, 1, "*");
+
+  int32_t lux_long(int32_t, int32_t []);
+  register_lux_f(lux_long, "long", 1, 1, "*");
+
+  int32_t lux_long(int32_t, int32_t []);
+  register_lux_f(lux_long, "int32", 1, 1, "*");
+
+  int32_t lux_int64(int32_t, int32_t []);
+  register_lux_f(lux_int64, "int64", 1, 1, "*");
+
   int32_t lux_floor(int32_t, int32_t []);
   register_lux_f(lux_floor, "floor", 1, 2, nullptr);
 
   int32_t lux_ceil(int32_t, int32_t []);
   register_lux_f(lux_ceil, "ceil", 1, 2, nullptr);
+
+  int32_t lux_bytarr(int32_t, int32_t []);
+  register_lux_f(lux_bytarr, "bytarr", 1, MAX_DIMS, nullptr);
+
+  int32_t lux_bytarr(int32_t, int32_t []);
+  register_lux_f(lux_bytarr, "uint8arr", 1, MAX_DIMS, nullptr);
+
+  int32_t lux_intarr(int32_t, int32_t []);
+  register_lux_f(lux_intarr, "intarr", 1, MAX_DIMS, nullptr);
+
+  int32_t lux_intarr(int32_t, int32_t []);
+  register_lux_f(lux_intarr, "int16arr", 1, MAX_DIMS, nullptr);
+
+  int32_t lux_lonarr(int32_t, int32_t []);
+  register_lux_f(lux_lonarr, "lonarr", 1, MAX_DIMS, nullptr);
+
+  int32_t lux_lonarr(int32_t, int32_t []);
+  register_lux_f(lux_lonarr, "int32arr", 1, MAX_DIMS, nullptr);
+
+  int32_t lux_int64arr(int32_t, int32_t []);
+  register_lux_f(lux_int64arr, "int64arr", 1, MAX_DIMS, nullptr);
+
+  int32_t lux_bytfarr(int32_t, int32_t []);
+  register_lux_f(lux_bytfarr, "bytfarr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+
+  int32_t lux_bytfarr(int32_t, int32_t []);
+  register_lux_f(lux_bytfarr, "uint8farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+
+  int32_t lux_intfarr(int32_t, int32_t []);
+  register_lux_f(lux_intfarr, "intfarr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+
+  int32_t lux_intfarr(int32_t, int32_t []);
+  register_lux_f(lux_intfarr, "int16farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+
+  int32_t lux_lonfarr(int32_t, int32_t []);
+  register_lux_f(lux_lonfarr, "lonfarr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+
+  int32_t lux_lonfarr(int32_t, int32_t []);
+  register_lux_f(lux_lonfarr, "int32farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
+
+  int32_t lux_int64farr(int32_t, int32_t []);
+  register_lux_f(lux_int64farr, "int64farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
   int32_t lux_monotone_interpolation(int32_t, int32_t []);
   register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");
@@ -2421,6 +2484,9 @@ void register_the_bindings()
 
   int32_t lux_generalfit2(int32_t, int32_t []);
   register_lux_f(lux_generalfit2, "fit3", 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
+
+  int32_t lux_error(int32_t, int32_t []);
+  register_lux_s(lux_error, "error", 0, 2, "1store:2restore" );
 
   int32_t lux_setnan(int32_t, int32_t []);
   register_lux_f(lux_setnan, "setnan", 1, 2, NULL);

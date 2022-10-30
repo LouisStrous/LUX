@@ -603,7 +603,8 @@ Internal Functions and Subroutines
 * assoc::                       Create an associated variable
 * astore::                      Store complete variables on disk
 * astrf::                       Astronomical coordinate transformations
-* astron::                      Calculate planetary positions
+* astron::                      Calculate planetary positions (VSOP87)
+* astron2::                     Calculate planetary positions (DE431)
 * atan::                        Arc tangent (mod 180 degrees)
 * atan2::                       Arc tangent (mod 360 degrees)
 * atanh::                       Inverse hyperbolic tangent
@@ -685,9 +686,11 @@ Internal Functions and Subroutines
 * colorcomponents::             Derive RGB values
 * colorpixel::
 * colorstogrey::                Get greyscale values
+* commonfactors::               Lowest common factors
 * compile::                     Compile a string as LUX code
 * compile_file::
 * complex::                     Convert to a complex data type
+* compose2d::
 * compress::                    Reduce the number of elements of an array
 * concat::                      Concatenate scalars and/or arrays
 * conjugate::                   Complex conjugate
@@ -712,6 +715,7 @@ Internal Functions and Subroutines
 * dblarr::                      Create a @code{double} array
 * dblfarr::                     Create a @code{double} file array
 * decomp::                      LU matrix decomposition
+* decompose2dmedian3::
 * decrunch::                    Data decompression
 * default::                     Specify a default value for a variable
 * defined::                     Does the variable have a defined value?
@@ -726,6 +730,7 @@ Internal Functions and Subroutines
 * disablenewline::              Tell LUX to ignore newlines
 * distarr::                     Distance array
 * distr::                       Distribute data to array elements
+* div::                         Full division returning quotient and remainder
 * dmap::                        Convert to @code{double} byte by byte
 * doub::                        Convert to @code{double} value by value
 * double::                      Convert to @code{double} value by value
@@ -779,6 +784,7 @@ Internal Functions and Subroutines
 * f0read::                      Retrieve data from an FZ file
 * f0w::                         Write data to an FZ file
 * f0write::                     Write data to an FZ file
+* factorial::
 * fad03::                       Mean elongation of Moon
 * fade::                        Fade between two images
 * fade_init::                   Initialize a fade between two images
@@ -811,7 +817,9 @@ Internal Functions and Subroutines
 * filetypename::                Returns the name of the file type
 * filewrite::                   Unformatted writing to a file
 * find::                        Find the first occurrence of particular values
+* find2::
 * findfile::                    Find a particular file
+* findspans::                   Find spans of elements meeting a condition
 * find_max::                    Find the values of local maxima
 * find_maxloc::                 Find the locations of local maxima
 * find_min::                    Find the values of local minima
@@ -909,6 +917,12 @@ Internal Functions and Subroutines
 * inpolygon::                   Determine if points are inside a polygon
 * insert::                      Insert data into an array
 * int::                         Convert to @code{word} value by value
+* int16::
+* int16arr::
+* int16farr::
+* int32::
+* int32arr::
+* int32farr::
 * int64::                       Convert to @code{int64} value by value
 * int64arr::                    Create an @code{int64} array
 * int64farr::                   Create an @code{int64} file array
@@ -1009,6 +1023,9 @@ Internal Functions and Subroutines
 * peek::                        Investigate memory locations
 * pen::                         Set pen width
 * pencolor::                    Set pen color
+* permutation::                 Permutation for permutation number
+* permutationdistance::         Kendall tau distance between permutations
+* permutationnumber::           Permutation number for permutation
 * pfw06::                       Fukushima-Williams precession angles, IAU 2006
 * pit::                         Polynomial fit
 * pixelsto8bit::                Convert pixel values to 8-bit values
@@ -1068,6 +1085,7 @@ Internal Functions and Subroutines
 * read::                        Read a value from the keyboard
 * readarr::                     Read values from the keyboard into an array
 * readf::                       Read values from a file in ASCII format
+* readimage::                   Read an image
 * readorbits::                  Read orbital da
 * readu::                       Read values from a file in machine format
 * read_jpeg::                   Read from a JPEG-compressed file
@@ -1248,6 +1266,9 @@ Internal Functions and Subroutines
 * ty::                          Print to screen
 * type::                        Print to screen
 * typename::                    Name of a data type
+* uint8::
+* uint8arr::
+* uint8farr::
 * ulib::                        User library
 * unload::                      Unload a tape
 * unmod::
@@ -12195,6 +12216,12 @@ arguments.
 * inpolygon::                   Determine if points are inside a polygon
 * insert::                      Insert data into an array
 * int::                         Convert to @code{word} value by value
+* int16::
+* int16arr::
+* int16farr::
+* int32::
+* int32arr::
+* int32farr::
 * int64::                       Convert to @code{int64} value by value
 * int64arr::                    Create an @code{int64} array
 * int64farr::                   Create an @code{int64} file array
@@ -12538,6 +12565,9 @@ arguments.
 * ty::                          Print to screen
 * type::                        Print to screen
 * typename::                    Name of a data type
+* uint8::
+* uint8arr::
+* uint8farr::
 * ulib::                        User library
 * unload::                      Unload a tape
 * unmod::
@@ -14101,6 +14131,9 @@ The latter may be an array containing the dimensions, or a number of
 scalar arguments.
 
 See also: @ref{array}, @ref{Default Arrays}
+
+Alias: @ref{uint8arr}
+
 @c -------------------------------------
 @node byte, bytfarr, bytarr, Internal Routines
 @subsection byte
@@ -14116,6 +14149,8 @@ byte.  The function returns a converted copy and leaves @code{@var{x}}
 itself alone.  The subroutine modifies @code{@var{x}} itself.
 
 See also: @ref{Number Conversion}
+
+Alias: @ref{uint8}
 
 @c -------------------------------------
 @node bytfarr, c, byte, Internal Routines
@@ -14135,7 +14170,10 @@ to zero.  Keyword @code{/readonly} disallows writing into the file
 through the file array.  Keyword @code{/swap} indicates that the data
 should be byte-swapped after reading (for input only).
 
-See also: @ref{File Arrays}, @ref{#max_dims}, @ref{File Array Creation}
+See also: @ref{File Arrays}, @ref{#max_dims}, @ref{File Array
+Creation}
+
+Alias: @ref{uint8farr}
 
 @c -------------------------------------
 @node c, c2i00a, bytfarr, Internal Routines
@@ -18508,13 +18546,19 @@ See also: @ref{find_maxloc}
 @subsection find
 @findex find2
 
-@code{find2(@var{data}, @var{key} [, /reverse])}
+@code{find2(@var{data}, @var{key} [, @var{start}] [, /reverse])}
 
 Finds the first occurrence of each element of @code{@var{key}} in
-@code{@var{data}}, starting at the end (if @code{/reverse} is
-specified) or at the beginning of @code{@var{data}}.  Returns the
-zero-based index of each found key, or @code{-1} for a key that wasn't
-found.
+@code{@var{data}}, treating @code{@var{data}} as a one-dimensional
+array, and starting the search at zero-based element index
+@code{@var{start}} and moving forward (if @code{/reverse} is not
+specified) or backward (if @code{/reverse} is specified).  If
+@code{@var{start}} is not specified, then starts at the beginning if
+@code{/reverse} is not specified, or at the end if @code{/reverse} is
+specified.
+
+Returns the zero-based index of each found key, or @code{-1} for a key
+that wasn't found.
 
 This function is intended to eventually replace @ref{find}, when it is
 more complete.
@@ -19751,7 +19795,7 @@ See also: @ref{fcwrite}, @ref{fzread}, @ref{fzhead}
 Alias: @ref{fzw}, @ref{f0w}, @ref{f0write}
 
 @c -------------------------------------
-@node gamma, gc2gd, fzwrite, Internal Routines
+@node gamma, gaplot, fzwrite, Internal Routines
 @subsection gamma
 @findex gamma
 
@@ -19764,7 +19808,7 @@ function is returned.
 See also: @ref{igamma}, @ref{beta}
 
 @c -------------------------------------
-@node gaplot
+@node gaplot, gc2gd, gamma, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gaplot
 @findex gaplot
@@ -19829,7 +19873,7 @@ parameters @code{/liii /loii /lioi /looi /liio /loio /lioo /looo}
 similarly specify for the x, y, and z axes.
 
 @c -------------------------------------
-@node gc2gd, gc2gde, gamma, Internal Routines
+@node gc2gd, gc2gde, gaplot, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection gc2gd
 @findex gc2gd
@@ -20936,7 +20980,7 @@ because it was written be fore insertion through subscripts became
 available and might still be used in ANA scripts converted to LUX.
 
 @c -------------------------------------
-@node int, int64, insert, Internal Routines
+@node int, int16, insert, Internal Routines
 @subsection int
 @findex int
 
@@ -20955,7 +20999,120 @@ Alias: @ref{word}
 See also: @ref{Number Conversion}
 
 @c -------------------------------------
-@node int64, int64arr, int, Internal Routines
+@node int16, int16arr, int, Internal Routines
+@subsection int16
+@findex int16
+
+@code{int16(@var{x})}
+
+@code{int16, @var{x}}
+
+Converts @code{@var{x}} to data type @code{word} by truncating at the
+decimal point (if any) and then discarding all but the two least
+significant bytes.  The function returns a converted copy and leaves
+@code{@var{x}} itself alone.  The subroutine modifies @code{@var{x}}
+itself.
+
+Alias: @ref{int}
+
+See also: @ref{Number Conversion}
+
+Alias: @ref{word}
+
+@c -------------------------------------
+@node int16arr, int16farr, int16, Internal Routines
+@subsection int16arr
+@findex int16arr
+
+@code{int16arr(@var{dimensions})}
+
+Returns a @code{word} (2-byte) array of the specified
+@code{@var{dimensions}}.  The latter may be an array containing the
+dimensions, or a list of up to @code{#max_dims} dimensions.
+
+See also: @ref{array}, @ref{bytarr}, @ref{int64arr}, @ref{lonarr},
+@ref{fltarr}, @ref{dblarr}, @ref{#max_dims}
+
+Alias: @ref{intarr}
+
+@c -------------------------------------
+@node int16farr, int32, int16arr, Internal Routines
+@subsection int16farr
+@findex int16farr
+
+@code{int16farr(@var{file}, @var{dimensions} [, offset = @var{offset},
+/readonly, /swap])}
+
+Links a @code{word} (2-byte) array structure with the specified
+@code{@var{dimensions}} to the specified @code{@var{file}}.
+@code{@var{dimensions}} may be an array, or a list of up to ten
+dimensions.  The file need not exist.  @code{@var{offset}} indicates the
+length in bytes of a header after which the array data is to be found.
+It defaults to zero.  Keyword @code{/readonly} disallows writing into
+the file through the file array.  Keyword @code{/swap} indicates that
+the data should be byte-swapped after reading (for input only).
+
+See also: @ref{File Arrays}, @ref{array}, @ref{intarr}
+
+Alias: @ref{intfarr}
+
+@c -------------------------------------
+@node int32, int32arr, int16farr, Internal Routines
+@subsection int32
+@findex int32
+
+@code{int32(@var{x})}
+
+@code{int32, @var{x} [, @dots{}]}
+
+Converts the arguments to data type @code{long} by truncating at the
+decimal point (if any).  The function returns a converted copy and
+leaves @code{@var{x}} itself alone.  The subroutine modifies
+@code{@var{x}} itself.
+
+Alias: @ref{fix}, @ref{long}
+
+See also: @ref{Number Conversion}
+
+@c -------------------------------------
+@node int32arr, int32farr, int32, Internal Routines
+@subsection int32arr
+@findex int32arr
+
+@code{int32arr(@var{dimensions})}
+
+Returns a @code{long} (4-byte) array of the specified
+@code{@var{dimensions}}.  The latter may be an array containing the
+dimensions, or a list of up to @code{#max_dims} dimensions.
+
+See also: @ref{array}, @ref{bytarr}, @ref{intarr}, @ref{int64arr},
+@ref{fltarr}, @ref{dblarr}, @ref{strarr}, @ref{#max_dims}
+
+Alias: @ref{lonarr}
+
+@c -------------------------------------
+@node int32farr, int64, int32arr, Internal Routines
+@subsection int32farr
+@findex int32farr
+
+@code{int32farr(@var{file}, @var{dimensions} [, offset=@var{offset},
+/readonly, /swap])}
+
+Links a @code{long} (4-byte) array structure with the specified
+@code{@var{dimensions}} to the specified @code{@var{file}}.
+@code{@var{dimensions}} may be an array, or a list of up to ten
+dimensions.  No file checks are made.  @code{@var{offset}} indicates the
+length in bytes of a header after which the array data is to be found.
+It defaults to zero.  Keyword @code{/readonly} disallows writing into
+the file through the file array.  Keyword @code{/swap} indicates that
+the data should be byte-swapped after reading (for input only).
+
+See also: @ref{File Arrays}, @ref{array}, @ref{lonarr}
+
+Alias: @ref{lonfarr}
+
+@c -------------------------------------
+@node int64, int64arr, int32farr, Internal Routines
 @subsection int64
 @findex int64
 
@@ -21029,6 +21186,8 @@ dimensions, or a list of up to @code{#max_dims} dimensions.
 See also: @ref{array}, @ref{bytarr}, @ref{int64arr}, @ref{lonarr},
 @ref{fltarr}, @ref{dblarr}, @ref{#max_dims}
 
+Alias: @ref{int16arr}
+
 @c -------------------------------------
 @node intfarr, ir, intarr, Internal Routines
 @subsection intfarr
@@ -21047,6 +21206,8 @@ the file through the file array.  Keyword @code{/swap} indicates that
 the data should be byte-swapped after reading (for input only).
 
 See also: @ref{File Arrays}, @ref{array}, @ref{intarr}
+
+Alias: @ref{int16farr}
 
 @c -------------------------------------
 @node ir, isarray, intfarr, Internal Routines
@@ -21591,6 +21752,8 @@ dimensions, or a list of up to @code{#max_dims} dimensions.
 See also: @ref{array}, @ref{bytarr}, @ref{intarr}, @ref{int64arr},
 @ref{fltarr}, @ref{dblarr}, @ref{strarr}, @ref{#max_dims}
 
+Alias: @ref{int32arr}
+
 @c -------------------------------------
 @node lonfarr, long, lonarr, Internal Routines
 @subsection lonfarr
@@ -21610,6 +21773,8 @@ the data should be byte-swapped after reading (for input only).
 
 See also: @ref{File Arrays}, @ref{array}, @ref{lonarr}
 
+Alias: @ref{int32farr}
+
 @c -------------------------------------
 @node long, lowcase, lonfarr, Internal Routines
 @subsection long
@@ -21624,7 +21789,7 @@ decimal point (if any).  The function returns a converted copy and
 leaves @code{@var{x}} itself alone.  The subroutine modifies
 @code{@var{x}} itself.
 
-Alias: @ref{fix}
+Alias: @ref{fix}, @ref{int32}
 
 See also: @ref{Number Conversion}
 
@@ -23142,21 +23307,38 @@ See also: @ref{Incidental Colors}, @ref{!pdev}, @ref{pdev}, @ref{xopen},
 @subsection permutation
 @findex permutation
 
-@code{p = permutation(@var{pn}, @var{count} [, /circular]}
+@code{p = permutation(@var{pn}, @var{count} [, /rank, /index, /linear,
+/circular]}
 
-Calculates the linear or circular permutation that corresponds to
-permutation number @code{@var{pn}} for @code{@var{count}} element and
-that is made up of the smallest possible non-negative integers.  For
-circular permutations, the greatest element is at the end.
+Calculates the permutation that corresponds to permutation number
+@code{@var{pn}} for @code{@var{count}} element and that is made up of
+the smallest possible non-negative integers.
+
+The permutation can be linear (@code{/linear}, the default) or
+circular (@code{/circular}).  In a circular permutation the 'first'
+and 'last' elements (defined below) are neighbors, but in a linear
+permutation they are not.  In a circular permutation all elements have
+two neighbors, but in a linear permutation the 'first' and 'last'
+elements have only a single neighbor.
+
+The permutation can be based on index (@code{/index}) or rank
+(@code{/rank}, the default).  For permutations based on index, the
+'first' element is the one with index 0 (i.e., the first element of
+the array), and the 'last' element is the one with the greatest index
+(the last element of the array), and elements are neighbors if their
+index differs by one.  For circular permutations only, the elements
+with the least and greatest index are neighbors, too.
+
+For permutations based on rank, it is the value rather than the index
+that is important.  The `first` element is the element with the
+smallest value (the smallest rank) and the 'last' element is the
+element with the greatest value (the greatest rank).
 
 @code{@var{count}} must be nonnegative.  @code{@var{pn}} must be
 nonnegative and less than the possible number of permutations of
 @code{@var{count}} elements, which is @code{factorial(@var{count})}
 for linear permutations, and @code{factorial(@var{count - 1})} for
 circular permutations.
-
-If @code{/circular} is specified then the permutation is circular, and
-otherwise linear.
 
 See also: @ref{factorial}, @ref{permutationnumber},
 @ref{permutationdistance}
@@ -23166,8 +23348,8 @@ See also: @ref{factorial}, @ref{permutationnumber},
 @subsection permutationdistance
 @findex permutationdistance
 
-@code{d = permutationdistance(@var{x1}, @var{x2} [, /rank_circular,
-        /index_circular])}
+@code{d = permutationdistance(@var{x1}, @var{x2} [, /rank, /index,
+      /linear, /circular])}
 
 Calculates the nonnegative Kendall tau distance between two
 permutations @code{@var{x1}} and @code{@var{x2}}.  The permutations
@@ -23177,18 +23359,31 @@ The Kendall tau distance is the count of swaps of adjacent elements
 that are needed to make the relative order of the permutations
 identical.
 
-if @code{/rank_circular} or @code{/index_circular} are specified, then
-the permutation is circular, and otherwise it is linear.
+The permutation can be linear (@code{/linear}, the default) or
+circular (@code{/circular}).  In a circular permutation the 'first'
+and 'last' elements (defined below) are neighbors, but in a linear
+permutation they are not.  In a circular permutation all elements have
+two neighbors, but in a linear permutation the 'first' and 'last'
+elements have only a single neighbor.
 
-If @code{/rank_circular} is specified, then the permutation is
-circular based on rank.  If @code{/index_circular} is specified, then
-the permutation is circular based on index.  See
-@ref{permutationnumber}.
+The permutation can be based on index (@code{/index}) or rank
+(@code{/rank}, the default).  For permutations based on index, the
+'first' element is the one with index 0 (i.e., the first element of
+the array), and the 'last' element is the one with the greatest index
+(the last element of the array), and elements are neighbors if their
+index differs by one.  For circular permutations only, the elements
+with the least and greatest index are neighbors, too.
 
-For example, @samp{permutationdistance([7, 2, 5, 8], [7, 8, 2, 5])}
-returns @samp{2}, because first swapping elements @samp{5} and
-@samp{8}, and then swapping elements @samp{2} and @samp{8} turns the
-first permutation into the second one, so 2 adjacent swaps suffice.
+For permutations based on rank, it is the value rather than the index
+that is important.  The `first` element is the element with the
+smallest value (the smallest rank) and the 'last' element is the
+element with the greatest value (the greatest rank).
+
+For example, @samp{permutationdistance([7, 2, 5, 8], [7, 8, 2, 5],
+/linear, /index)} returns @samp{2}, because first swapping elements
+@samp{5} and @samp{8} and then swapping elements @samp{2} and @samp{8}
+turns the first permutation into the second one, so 2 adjacent swaps
+suffice.
 
 If the number of elements is @var{n} then the distance is at most
 @code{n*(n - 1)/2 - 1} for linear permutations, and @code{(n - 1)*(n -
@@ -23198,12 +23393,12 @@ then 0 is returned.
 Only the relative order of the elements is taken into account, so if
 we change the elements without changing their relative order then the
 result remains the same.  For example, @samp{permutationdistance([7,
-2, 5, 8], [701, 801, 201, 501])} and @samp{permutationdistance([1142,
--100, 3.14, 2000.3], [3, 4, 1, 2])} also yield @samp{2}, because the
-elements of the second array are in the same relative order as before
-(the 3rd smallest element first, then the largest element, then the
-smallest, and finally the 2nd smallest), and likewise for the first
-array.
+2, 5, 8], [701, 801, 201, 501], /index, /linear)} and
+@samp{permutationdistance([1142, -100, 3.14, 2000.3], [3, 4, 1, 2],
+/linear, /index)} also yield @samp{2}, because the elements of the
+second array are in the same relative order as before (the 3rd
+smallest element first, then the largest element, then the smallest,
+and finally the 2nd smallest), and likewise for the first array.
 
 See also: @ref{permutation}, @ref{permutationnumber}
 
@@ -23212,7 +23407,7 @@ See also: @ref{permutation}, @ref{permutationnumber}
 @subsection permutationnumber
 @findex permutationnumber
 
-@code{permutationnumber(@var{x} [, /rank_circular, /index_circular])}
+@code{permutationnumber(@var{x} [, /rank, /index, /linear, /circular])}
 
 Calculates a nonnegative integer number that uniquely identifies the
 permutation (the relative order) of the elements of @code{@var{x}}.
@@ -23220,15 +23415,25 @@ Only the relative order is important, not the exact numerical values.
 
 There are assumed to be no duplicate values in @code{@var{x}}.
 
-By default, the permutation is assumed to be linear.  If
-@code{/rank_circular} or @code{/index_circular} are specified, then
-the permutation is instead assumed to be @emph{circular}.  If
-@code{/rank_circular} is specified, then the permutation is assumed
-circular based on rank, which means that the greatest element is also
-adjacent to the least element.  If @code{/index_circular} is
-specified, then the permutation is assumed circular based on index,
-which means that the last element is also adjacent to the first
-element.
+The permutation can be linear (@code{/linear}, the default) or
+circular (@code{/circular}).  In a circular permutation the 'first'
+and 'last' elements (defined below) are neighbors, but in a linear
+permutation they are not.  In a circular permutation all elements have
+two neighbors, but in a linear permutation the 'first' and 'last'
+elements have only a single neighbor.
+
+The permutation can be based on index (@code{/index}) or rank
+(@code{/rank}, the default).  For permutations based on index, the
+'first' element is the one with index 0 (i.e., the first element of
+the array), and the 'last' element is the one with the greatest index
+(the last element of the array), and elements are neighbors if their
+index differs by one.  For circular permutations only, the elements
+with the least and greatest index are neighbors, too.
+
+For permutations based on rank, it is the value rather than the index
+that is important.  The `first` element is the element with the
+smallest value (the smallest rank) and the 'last' element is the
+element with the greatest value (the greatest rank).
 
 An example for circular permutations based on rank: Some objects were
 measured to be in directions given by angles of @code{[210, 355, 140,
@@ -28493,7 +28698,7 @@ Alias: @ref{print}, @ref{t}, @ref{ty}
 See also: @ref{printf}, @ref{In-Line Print Formats}, @ref{#max_args}
 
 @c -------------------------------------
-@node typename, ulib, type, Internal Routines
+@node typename, uint8, type, Internal Routines
 @subsection typename
 @findex typename
 
@@ -28505,7 +28710,63 @@ Returns the name of the numerical data type with type number
 See also: @ref{symdtype}, @ref{classname}
 
 @c -------------------------------------
-@node ulib, unload, typename, Internal Routines
+@node uint8, uint8arr, typename, Internal Routines
+@subsection uint8
+@findex uint8
+
+@code{uint8(@var{x})}
+
+@code{uint8, @var{x} [, @dots{}]}
+
+Converts the arguments to data type @code{byte} by truncating at the
+decimal point (if any) and then discarding all but the least significant
+byte.  The function returns a converted copy and leaves @code{@var{x}}
+itself alone.  The subroutine modifies @code{@var{x}} itself.
+
+See also: @ref{Number Conversion}
+
+Alias: @ref{byte}
+
+@c -------------------------------------
+@node uint8arr, uint8farr, uint8, Internal Routines
+@subsection uint8arr
+@findex uint8arr
+
+@code{uint8arr(@var{dimensions})}
+
+Return a @code{byte} array of the specified @code{@var{dimensions}}.
+The latter may be an array containing the dimensions, or a number of
+scalar arguments.
+
+See also: @ref{array}, @ref{Default Arrays}
+
+Alias: @ref{bytarr}
+
+@c -------------------------------------
+@node uint8farr, ulib, uint8arr, Internal Routines
+@subsection uint8farr
+@findex uint8farr
+
+@code{uint8farr(@var{file}, @var{dimensions} [, offset=@var{offset},
+/readonly, /swap])}
+
+Returns a @code{file array} that links a @code{byte} array dimensional
+structure with the specified @code{@var{dimensions}} to the specified
+@code{@var{file}}.  @code{@var{dimensions}} may be an array, or up to
+@code{#max_dims} arguments each of which contains one dimension.  The
+file need not exist.  @code{@var{offset}} indicates the length in bytes
+of a file header after which the array data is to be found.  It defaults
+to zero.  Keyword @code{/readonly} disallows writing into the file
+through the file array.  Keyword @code{/swap} indicates that the data
+should be byte-swapped after reading (for input only).
+
+See also: @ref{File Arrays}, @ref{#max_dims}, @ref{File Array
+Creation}
+
+Alias: @ref{bytfarr}
+
+@c -------------------------------------
+@node ulib, unload, uint8farr, Internal Routines
 @subsection ulib
 @findex ulib
 
@@ -28804,7 +29065,7 @@ significant bytes.  The function returns a converted copy and leaves
 @code{@var{x}} itself alone.  The subroutine modifies @code{@var{x}}
 itself.
 
-Alias: @ref{int}
+Alias: @ref{int16}
 
 See also: @ref{Number Conversion}
 

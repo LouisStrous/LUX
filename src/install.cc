@@ -329,7 +329,6 @@ internalRoutine         subroutine_table[] = {
   { "endian",   1, 1, lux_endian, 0 },       // strous.c
   { "erase",    0, 5, lux_erase,             // plots.c
     "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev" },
-  { "error",    0, 2, lux_error, "1store:2restore" }, // error.c
   { "execute",  1, 1, lux_execute, "1main" },         // execute.c
   { "exit",     0, 1, lux_quit, 0 },                  // fun1.c
   { "extract_bits", 4, 4, lux_extract_bits, 0 },      // fun3.c
@@ -700,7 +699,7 @@ extern LuxRoutine lux_abs, lux_acos, lux_arestore_f, lux_arg,
   lux_ksmooth, lux_laplace2d, lux_lmap, lux_local_maxf,
   lux_local_maxloc, lux_int64map,
   lux_local_minf, lux_local_minloc, lux_log, lux_log10,
-  lux_log1p, lonarr, lonfarr, lux_long, lux_lower,
+  lux_log1p, lonfarr, lux_long, lux_lower,
   lux_lsq, lux_lsq2, lux_match, lux_max_dir,
   lux_maxf, lux_maxfilter, lux_maxloc, lux_mean,
   lux_medfilter, lux_median, lux_memory, lux_minf,
@@ -866,10 +865,6 @@ internalRoutine function_table[] = {
   { "by0",      1, 1, lux_y0, "*" },      // fun1.cc
   { "by1",      1, 1, lux_y1, "*" },      // fun1.cc
   { "byn",      2, 2, lux_yn, "*" },      // fun1.cc
-  { "bytarr",   1, MAX_DIMS, bytarr, 0 }, // symbols.cc
-  { "byte",     1, 1, lux_byte, "*" },    // symbols.cc
-  { "bytfarr",  3, MAX_DIMS + 1, bytfarr, // filemap.cc
-    "%1%offset:1readonly:2swap" },
   { "calendar", 1, 3, lux_calendar, // astron.cc
     "1fromcommon:2fromgregorian:3fromislamic:4fromjulian:5fromhebrew"
     ":6fromegyptian:7fromjd:8fromcjd:9fromlunar:10frommayan"
@@ -1034,14 +1029,7 @@ internalRoutine function_table[] = {
   { "indgen",   1, 2, lux_indgen, "*" },                           // fun1.cc
   { "inpolygon", 4, 4, lux_inpolygon, 0 },  // topology.cc
   { "int",      1, 1, lux_word, "*" },      // symbols.cc
-  { "int64",    1, 1, lux_int64, "*" },     // symbols.cc
-  { "int64arr", 1, MAX_DIMS, int64arr, 0 }, // symbols.cc
-  { "int64farr", 3, MAX_DIMS+1, int64farr,  // filemap.cc
-    "%1%offset:1readonly:2swap" },
   { "int64map", 1, 1, lux_int64map, 0 },  // subsc.cc
-  { "intarr",   1, MAX_DIMS, intarr, 0 }, // symbols.cc
-  { "intfarr",  3, MAX_DIMS + 1, intfarr, // filemap.cc
-    "%1%offset:1readonly:2swap" },
   { "isarray",  1, 1, lux_isarray, 0 },  // subsc.cc
   { "isnan",    1, 1, lux_isnan, 0 },    // fun1.cc; needs IEEE isnan!
   { "isscalar", 1, 1, lux_isscalar, 0 }, // subsc.cc
@@ -1067,10 +1055,6 @@ internalRoutine function_table[] = {
   { "log",      1, 1, lux_log, "*" },     // fun1.cc
   { "log10",    1, 1, lux_log10, "*" },   // fun1.cc
   { "log1p",    1, 1, lux_log1p, "*" },   // fun1.cc
-  { "lonarr",   1, MAX_DIMS, lonarr, 0 }, // symbols.cc
-  { "lonfarr",  3, MAX_DIMS+1, lonfarr,   // filemap.cc
-    "%1%offset:1readonly:2swap" },
-  { "long",     1, 1, lux_long, "*" }, // symbols.cc
   { "lowcase",  1, 1, lux_lower, 0 },  // fun2.cc
   { "lower",    1, 1, lux_lower, 0 },  // fun2.cc
   { "lsmooth",  3, 3, lux_dir_smooth2, // strous3.cc
@@ -1227,7 +1211,6 @@ internalRoutine function_table[] = {
   { "varname",  1, 1, lux_varname, 0 },          // symbols.cc
   { "voigt",    2, 2, lux_voigt, "*" },          // fun1.cc
   { "wmap",     1, 1, lux_wmap, 0 },             // subsc.cc
-  { "word",     1, 1, lux_word, "*" },           // symbols.cc
   { "writeu",   2, MAX_ARG, lux_writeu, 0 },     // files.cc
   { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.cc
   { "xexist",   1, 1, lux_xexist, 0 },           // xport.cc

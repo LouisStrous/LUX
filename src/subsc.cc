@@ -2367,16 +2367,16 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
   newSize = 1;                  // calculate new size
   for (i = 0; i < ndim; i++)
     newSize *= dims[i];
-  if (newSize > oldSize)
-    return cerror(ARR_SMALL, nsym);
-  else if (newSize < oldSize && redim_warn_flag)
-    printf("WARNING: result from REDIM is smaller than original\n");
+  if (newSize != oldSize && redim_warn_flag)
+    printf("WARNING: result from REDIM is different than original\n");
   memcpy(array_dims(nsym), dims, ndim*sizeof(int32_t));
   array_num_dims(nsym) = ndim;
   newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(Array);
   data = (Array *) Realloc(array_header(nsym), newSize);
   if (!data)
     return luxerror("Resizing of array memory failed", nsym);
+  if (newSize > oldSize)
+    memset(((char*) data) + oldSize, 0, newSize - oldSize);
   array_header(nsym) = data;
   symbol_memory(nsym) = newSize;
   return 1;

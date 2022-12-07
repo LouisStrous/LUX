@@ -104,6 +104,14 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
   //   'plot element' for the data block.  Send a plot command for all
   //   data blocks and plot elements to gnuplot.
   //
+  // For gaplot:
+  //
+  //   If there is data, then send it to an unused gnuplot data block, and
+  //   remember the 'plot element' for the data block, but do not plot anything.
+  //
+  //   If there is no data, then send a plot command for all data blocks and
+  //   plot elements to gnuplot.
+  //
   // All setting up of the plot (e.g., defining titles) is done for
   // gplot and does not need to be remembered for the data block.
 
@@ -197,6 +205,8 @@ int32_t lux_gplot_backend(GplotStatus status, int32_t narg, int32_t ps[])
     --enarg;
     ++eps;
   }
+
+  gp.sendf("set xtics; set ytics;\n");
 
   bool done = false;
   if (status == GplotStatus::gplot || first_gaplot) {

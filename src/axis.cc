@@ -579,9 +579,8 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
         memcpy(dims, newvalues, j*sizeof(*dims));
         ndim = j;
       } else {
-        // there are no dimensions left; add a dimension equal to 1
-        dims[0] = 1;
-        ndim = 1;
+        // there are no dimensions left; get a scalar
+        ndim = 0;
       }
       // update axes[] and naxes
       for (i = 0; i < naxes; i++)

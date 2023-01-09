@@ -3290,7 +3290,6 @@ int32_t lux_commonfactors(int32_t narg, int32_t ps[]) {
 }
 REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 
-
 #if HAVE_LIBGSL
 struct PermutationChangeInterval
 {
@@ -3319,12 +3318,6 @@ T abs_diff(T x1, T x2)
 }
 
 struct PermutationChange {
-  PermutationChange(double a_t, double a_object1, double a_object2,
-                    size_t a_final_permutation)
-    : t(a_t), object1(a_object1), object2(a_object2),
-      final_permutation(a_final_permutation)
-  { }
-
   double t;
   int object1;
   int object2;
@@ -3417,7 +3410,7 @@ find_permutation_changes(FuncType f, double period, double tmin, double tmax)
       if (!bad)
         break;
     }
-    // Now intervals is a list in which every element has .change_count == 1.
+    // Now intervals is a list in which every element has change_count == 1.
     // Figure out which two objects switch places during each interval
     for (auto it = intervals.begin(); it != intervals.end(); ++it) {
       vmin = f(it->tmin);
@@ -3482,8 +3475,9 @@ find_permutation_changes(FuncType f, double period, double tmin, double tmax)
           it->object1 = ix;
           it->object2 = rmin.size() - 1;
         }
-      } else {                  // 2 items
-        // TODO: can we handle this case better?
+      } else {
+        // 2 items
+        // \todo can we handle this case better?
         return ts;
       } // end if (rmin.size() > 2)
 
@@ -3511,7 +3505,7 @@ find_permutation_changes(FuncType f, double period, double tmin, double tmax)
         }
         if (++count > 20) {
           // we're likely in some kind of loop; abort
-          ts.push_back(PermutationChange(test, it->object1, it->object2, pmax));
+          ts.push_back({test, it->object1, it->object2, pmax});
           break;
         }
         auto dest = getd(test);
@@ -3519,8 +3513,7 @@ find_permutation_changes(FuncType f, double period, double tmin, double tmax)
           // the target time is between tmin and test
           if (test == it->tmax) {
             // we cannot improve anymore
-            ts.push_back(PermutationChange(test, it->object1, it->object2,
-                                           pmax));
+            ts.push_back({test, it->object1, it->object2, pmax});
             break;
           }
           // see if we can tighten tmin, too
@@ -3538,8 +3531,7 @@ find_permutation_changes(FuncType f, double period, double tmin, double tmax)
           // the target time is between test and tmax
           if (test == it->tmin) {
             // we cannot improve anymore
-            ts.push_back(PermutationChange(test, it->object1, it->object2,
-                                           pmax));
+            ts.push_back({test, it->object1, it->object2, pmax});
             break;
           }
           // see if we can tighten tmax, too
@@ -3555,13 +3547,13 @@ find_permutation_changes(FuncType f, double period, double tmin, double tmax)
           dmin = dest;
         } else {
           // we cannot improve anymore
-          ts.push_back(PermutationChange(test, it->object1, it->object2, pmax));
+          ts.push_back({test, it->object1, it->object2, pmax});
           break;
         }
         if ((it->tmax - it->tmin) < std::max(it->tmax, it->tmin)
             * 2*std::numeric_limits<double>::epsilon()) {
           // we likely cannot improve anymore
-          ts.push_back(PermutationChange(test, it->object1, it->object2, pmax));
+          ts.push_back({test, it->object1, it->object2, pmax});
           break;
         }
       }
@@ -3642,6 +3634,7 @@ REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, NULL, HAVE
 ///
 ///     value = permutationnumber(data [, /rank, /index]
 ///                               [, /linear, /circular])
+///     value = permutationnumber(data, period [, /rank, /index]) ; semicircular
 ///
 /// \param[in] narg is the argument count.
 ///
@@ -3657,42 +3650,11 @@ lux_permutationnumber(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   size_t count = (size_t) icount;
 
-  // We first determine the ranks of the values (0 = least, 1 = next higher,
-  // etc.).  If the input values are (equivalent to) indexes that sort the
-  // elements into ascending order, then sort_index() returns the corresponding
-  // 0-based ranks.  If the input values are values, then we need to call
-  // sort_index() once to find the indexes, and then once more to invert the
-  // indexes to find ranks.
-  std::vector<size_t> r(count);
-  switch (symbol_type(ps[0])) {
-  case LUX_INT8:
-    r = sort_index(src.ui8, 1, count);
-    break;
-  case LUX_INT16:
-    r = sort_index(src.i16, 1, count);
-    break;
-  case LUX_INT32:
-    r = sort_index(src.i32, 1, count);
-    break;
-  case LUX_FLOAT:
-    r = sort_index(src.f, 1, count);
-    break;
-  case LUX_DOUBLE:
-    r = sort_index(src.d, 1, count);
-    break;
-  }
-
-  if ((internalMode & 1) == 0) {
-    // the input values were ranks, not indexes.  r now contains indexes.
-    // Invert them to get ranks.
-    r = sort_index(r);
-  }
-
-  // Now we can calculate the permutation numbers from the ranks, which always
-  // have the same data type (size_t).
-
   // int32_t and uint32_t are suitable for (linear) n not exceeding 12, and
   // int64_t and uint64_t go up to 20.
+
+  if (narg >= 2)
+    internalMode = 0;
 
   int permutation_is_circular = ((internalMode & 2) != 0);
 
@@ -3705,35 +3667,159 @@ lux_permutationnumber(int32_t narg, int32_t ps[])
     result = scalar_scratch(LUX_INT64);
   } else {
     return luxerror("Cannot store permutation numbers for permutations "
-                    "of more than 20 (linear) or 21 (circular) elements.",
-                    ps[0]);
+                    "of more than 20 (linear, semicircular) or 21 (circular) "
+                    "elements.", ps[0]);
   }
 
   Pointer tgt;
   tgt.i32 = &scalar_value(result).i32;
 
-  if (permutation_is_circular) { // circular permutation
-    switch (scalar_type(result)) {
+  if (narg >= 2) {
+    // semicircular permutation
+    size_t pn;
+    switch (symbol_type(ps[0])) {
+    case LUX_INT8:
+      pn = permutation_number_semicircular_rank
+        (src.ui8, count, get_scalar_value<uint8_t>(ps[1]));
+      break;
+    case LUX_INT16:
+      pn = permutation_number_semicircular_rank
+        (src.i16, count, get_scalar_value<int16_t>(ps[1]));
+      break;
     case LUX_INT32:
-      *tgt.i32 = permutation_number_circular_rank(r);
+      pn = permutation_number_semicircular_rank
+        (src.i32, count, get_scalar_value<int32_t>(ps[1]));
       break;
     case LUX_INT64:
-      *tgt.i64 = permutation_number_circular_rank(r);
+      pn = permutation_number_semicircular_rank
+        (src.i64, count, get_scalar_value<int64_t>(ps[1]));
+      break;
+    case LUX_FLOAT:
+      pn = permutation_number_semicircular_rank
+        (src.f, count, get_scalar_value<float>(ps[1]));
+      break;
+    case LUX_DOUBLE:
+      pn = permutation_number_semicircular_rank
+        (src.d, count, get_scalar_value<double>(ps[1]));
       break;
     }
-  } else {                      // linear permutation
     switch (scalar_type(result)) {
     case LUX_INT32:
-      *tgt.i32 = permutation_number_linear_rank(r);
+      *tgt.i32 = pn;
       break;
     case LUX_INT64:
-      *tgt.i64 = permutation_number_linear_rank(r);
+      *tgt.i64 = pn;
+      break;
+    }
+  } else if (permutation_is_circular) {
+    // circular permutation
+
+    // We first determine the ranks of the values (0 = least, 1 = next higher,
+    // etc.).  If the input values are (equivalent to) indexes that sort the
+    // elements into ascending order, then sort_index() returns the
+    // corresponding 0-based ranks.  If the input values are values, then we
+    // need to call sort_index() once to find the indexes, and then once more to
+    // invert the indexes to find ranks.
+    std::vector<size_t> r;
+    switch (symbol_type(ps[0])) {
+    case LUX_INT8:
+      r = sort_index(src.ui8, 1, count);
+      break;
+    case LUX_INT16:
+      r = sort_index(src.i16, 1, count);
+      break;
+    case LUX_INT32:
+      r = sort_index(src.i32, 1, count);
+      break;
+    case LUX_FLOAT:
+      r = sort_index(src.f, 1, count);
+      break;
+    case LUX_DOUBLE:
+      r = sort_index(src.d, 1, count);
+      break;
+    }
+
+    if ((internalMode & 1) == 0) {
+      // the input values were ranks, not indexes.  r now contains indexes.
+      // Invert them to get ranks.
+      r = sort_index(r);
+    }
+
+    // Now we can calculate the permutation numbers from the ranks, which always
+    // have the same data type (size_t).
+
+    auto pn = permutation_number_circular_from_ranks(r);
+    switch (scalar_type(result)) {
+    case LUX_INT32:
+      *tgt.i32 = pn;
+      break;
+    case LUX_INT64:
+      *tgt.i64 = pn;
+      break;
+    }
+  } else {
+    // linear permutation
+
+    size_t pn;
+    if (internalMode & 1) {
+      // by index
+      switch (symbol_type(ps[0])) {
+      case LUX_INT8:
+        pn = permutation_number_linear_index(src.ui8, count);
+        break;
+      case LUX_INT16:
+        pn = permutation_number_linear_index(src.i16, count);
+        break;
+      case LUX_INT32:
+        pn = permutation_number_linear_index(src.i32, count);
+        break;
+      case LUX_INT64:
+        pn = permutation_number_linear_index(src.i64, count);
+        break;
+      case LUX_FLOAT:
+        pn = permutation_number_linear_index(src.f, count);
+        break;
+      case LUX_DOUBLE:
+        pn = permutation_number_linear_index(src.d, count);
+        break;
+      }
+    } else {
+      // by rank
+      switch (symbol_type(ps[0])) {
+      case LUX_INT8:
+        pn = permutation_number_linear_rank(src.ui8, count);
+        break;
+      case LUX_INT16:
+        pn = permutation_number_linear_rank(src.i16, count);
+        break;
+      case LUX_INT32:
+        pn = permutation_number_linear_rank(src.i32, count);
+        break;
+      case LUX_INT64:
+        pn = permutation_number_linear_rank(src.i64, count);
+        break;
+      case LUX_FLOAT:
+        pn = permutation_number_linear_rank(src.f, count);
+        break;
+      case LUX_DOUBLE:
+        pn = permutation_number_linear_rank(src.d, count);
+        break;
+      }
+    }
+
+    switch (scalar_type(result)) {
+    case LUX_INT32:
+      *tgt.i32 = pn;
+      break;
+    case LUX_INT64:
+      *tgt.i64 = pn;
       break;
     }
   }
+
   return result;
 }
-REGISTER(permutationnumber, f, permutationnumber, 1, 1, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
+REGISTER(permutationnumber, f, permutationnumber, 1, 2, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
 #endif
 
 /// Implements the `permutation` function in LUX.

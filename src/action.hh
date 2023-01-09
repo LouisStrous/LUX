@@ -297,4 +297,40 @@ strtol(const char* str, int base) {
 #define debugout(msg)   printf("DEBUG - %s [%s, line %d]\n", (msg), __FILE__, __LINE__)
 #define debugout1(fmt,arg)      printf("DEBUG - "); printf((fmt), (arg)); printf(" [%s, line %d]\n", __FILE__, __LINE__)
 
+/// Get the value from a scalar Lux symbol and convert it to the desired type.
+///
+/// \tparam is the desired data type
+///
+/// \par iq identifies the Lux symbol.
+///
+/// \returns the converted value, or 0 if the symbol wasn't a scalar.
+template<typename T>
+T
+get_scalar_value(int32_t iq)
+{
+ if (symbol_class(iq) == LUX_SCAL_PTR)
+    iq = dereferenceScalPointer(iq);
+  if (symbol_class(iq) != LUX_SCALAR) {
+    cerror(NO_SCAL, iq);
+    return 0;
+  }
+  switch (scalar_type(iq)) {
+  case LUX_INT8:
+    return (T) scalar_value(iq).ui8;
+  case LUX_INT16:
+    return (T) scalar_value(iq).i16;
+  case LUX_INT32:
+    return (T) scalar_value(iq).i32;
+  case LUX_INT64:
+    return (T) scalar_value(iq).i64;
+  case LUX_FLOAT:
+    return (T) scalar_value(iq).f;
+  case LUX_DOUBLE:
+    return (T) scalar_value(iq).d;
+  default:
+    cerror(ILL_TYPE, iq);
+    return 0;
+  }
+}
+
 #endif

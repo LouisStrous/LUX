@@ -11,7 +11,7 @@
 
 #include "permutations.hh"
 
-/// Ensure that the last rank is the greatest, by circular rotation of rank \a
+/// Ensure that the first rank is the least, by circular rotation of rank \a
 /// values.  All rank values get adjusted via \f$ (r + ∆r) \bmod n \f$ where \f$
 /// r \f$ is the original rank value, \f$ ∆r \f$ is the appropriate shift, and
 /// \f$ n \f$ is the number of elements.
@@ -19,9 +19,34 @@
 /// \param ranks contains the 0-based ranks.  If there are \f$ n \f$ elements,
 /// then all ranks from 0 through \f$ n - 1 \f$ must be present.
 void
-rotate_ranks_greatest_at_end(std::vector<size_t>& ranks) {
+rotate_ranks_least_at_start(std::vector<size_t>& ranks)
+{
   auto n = ranks.size();
-  // We want the last element to have the greatest rank, which is n - 1.
+  // We want the first element to have the least rank, which is 0.
+  auto d = ranks.front();
+  if (d) {
+    // The first element doesn't have the least rank; shift ranks so it does.
+    for (int i = 0; i < n; ++i) {
+      // effectively, we calculate (ranks[i] - d) mod n
+      if (ranks[i] < d)
+        ranks[i] += n;
+      ranks[i] -= d;
+    }
+  }
+}
+
+/// Ensure that the first rank is the least, by circular rotation of rank \a
+/// values.  All rank values get adjusted via \f$ (r + ∆r) \bmod n \f$ where \f$
+/// r \f$ is the original rank value, \f$ ∆r \f$ is the appropriate shift, and
+/// \f$ n \f$ is the number of elements.
+///
+/// \param ranks contains the 0-based ranks.  If there are \f$ n \f$ elements,
+/// then all ranks from 0 through \f$ n - 1 \f$ must be present.
+void
+rotate_ranks_greatest_at_end(std::vector<size_t>& ranks)
+{
+  auto n = ranks.size();
+  // We want the last element to have the least rank, which is n - 1.
   auto d = n - 1 - ranks.back();
   if (d) {
     // The last element doesn't have the greatest rank; shift ranks so it does.
@@ -109,13 +134,14 @@ permutation_circular_rank(size_t pn, size_t n)
   if (n) {
     // the standard circular permutation of <n> elements for permutation number
     // <p> is equal to the standard linear permutation of <n> - 1 elements, with
-    // the next higher number (which is <n> - 1) appended.
+    // 1 added to each element, and then getting 0 prefixed.
     auto p = permutation_linear_rank(pn, n - 1);
     if (p.empty()) {
       // the permutation number was too great for the element count
       return p;
     }
-    p.push_back(n - 1);
+    std::for_each(p.begin(), p.end(), [](size_t& x) { ++x; });
+    p.insert(p.begin(), 0);
     return p;
   } else {
     // no elements; return empty vector
@@ -142,4 +168,20 @@ permutation_circular_index(size_t pn, size_t n)
   p = sort_index(p);
 
   return p;
+}
+
+/// Return the circular permutation number from a sequence of ranks.
+///
+/// \param r contains the 0-based ranks.  If it has \f$n\f$ elements then it
+/// must contain every number from 0 through \f$n − 1\f$ exactly once.
+///
+/// \returns the permutation number.
+size_t
+permutation_number_circular_from_ranks(std::vector<size_t> r)
+{
+  // rotate until the first element has the least rank
+  rotate_ranks_least_at_start(r);
+
+  // return the rank-based linear permutation number of elements 2 and up
+  return permutation_number_linear_rank(&r[1], r.size() - 1);
 }

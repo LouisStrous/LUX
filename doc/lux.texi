@@ -31,7 +31,7 @@
 This text documents the LUX data processing language and program,
 version @value{VERSION}, and was last updated on @value{UPDATED}.
 
-@copyright{} 1995-2019 Louis Strous
+@copyright{} 1995-2023 Louis Strous
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
@@ -23314,6 +23314,9 @@ Calculates the permutation that corresponds to permutation number
 @code{@var{pn}} for @code{@var{count}} element and that is made up of
 the smallest possible non-negative integers.
 
+For a semicircular permutation (see @ref{permutationnumber}), call
+this function as if the permutation is linear instead.
+
 The permutation can be linear (@code{/linear}, the default) or
 circular (@code{/circular}).  In a circular permutation the 'first'
 and 'last' elements (defined below) are neighbors, but in a linear
@@ -23407,28 +23410,37 @@ See also: @ref{permutation}, @ref{permutationnumber}
 @subsection permutationnumber
 @findex permutationnumber
 
-@code{permutationnumber(@var{x} [, /rank, /index, /linear, /circular])}
+@code{pn = permutationnumber(@var{x} [, /rank, /index, /linear, /circular])}
+
+@code{pn = permutationnumber(@var{x}, @var{period})}
 
 Calculates a nonnegative integer number that uniquely identifies the
 permutation (the relative order) of the elements of @code{@var{x}}.
-Only the relative order is important, not the exact numerical values.
+For the first form (with one argument), only the relative order is
+important, not the exact numerical values.  For the second form (with
+the @code{@var{period}} argument, too) the exact numerical values are
+important, too.
 
 There are assumed to be no duplicate values in @code{@var{x}}.
 
-The permutation can be linear (@code{/linear}, the default) or
-circular (@code{/circular}).  In a circular permutation the 'first'
-and 'last' elements (defined below) are neighbors, but in a linear
-permutation they are not.  In a circular permutation all elements have
-two neighbors, but in a linear permutation the 'first' and 'last'
-elements have only a single neighbor.
+The permutation can be linear (first form with @code{/linear}, the
+default), circular (first form with @code{/circular}), or semicircular
+(second form, with @code{@var{period}}).  In a circular or
+semicircular permutation the 'first' and 'last' elements (defined
+below) are neighbors, but in a linear permutation they are not.  In a
+circular or semicircular permutation all elements have two neighbors,
+but in a linear permutation the 'first' and 'last' elements have only
+a single neighbor.
 
-The permutation can be based on index (@code{/index}) or rank
-(@code{/rank}, the default).  For permutations based on index, the
-'first' element is the one with index 0 (i.e., the first element of
-the array), and the 'last' element is the one with the greatest index
-(the last element of the array), and elements are neighbors if their
-index differs by one.  For circular permutations only, the elements
-with the least and greatest index are neighbors, too.
+A linear or circular permutation can be based on index (@code{/index})
+or rank (@code{/rank}, the default).  A semicircular permutation is
+based on rank.  For permutations based on index, the 'first' element
+is the one with index 0 (i.e., the first element of the array), and
+the 'last' element is the one with the greatest index (the last
+element of the array), and elements are neighbors if their index
+differs by one.  For circular and semicircular but not for linear
+permutations, the elements with the least and greatest index are
+neighbors, too.
 
 For permutations based on rank, it is the value rather than the index
 that is important.  The `first` element is the element with the
@@ -23442,7 +23454,7 @@ measured to be in directions given by angles of @code{[210, 355, 140,
 to an angle of 0 degrees, and angles just below 360 degrees are
 adjacent to angles just above 0 degrees, so the object at angle 12
 degrees is adjacent to the object at angle 355 degrees, even though
-the difference between their angles is greatest of all.
+the numerical difference between their angles is greatest of all.
 
 Suppose that we shift the zero point of the angle upward by 40
 degrees, so that the new angle is related to the old angle by
@@ -23478,8 +23490,60 @@ the right one.
 If the elements of @code{@var{x}} are in ascending order, then the
 returned permutation number is 0.  The greatest permutation number is
 returned if the data elements are in descending order.  That number is
-equal to @code{factorial(n) − 1} for linear permutations, or
-@code{factorial(n - 1) - 1} for circular permutations.
+equal to @code{factorial(n) − 1} for linear and semicircular
+permutations, or @code{factorial(n - 1) - 1} for circular
+permutations.
+
+Semicircular permutations are a non-standard extension.  A
+semicircular permutation is like a circular permutation in that every
+element has two neighbors, and is like a linear permutation in that
+all arrangements of the elements are unique.  Out of all arrangements
+of elements that are equivalent for a circular permutation, the
+semicircular permutation chooses the one in which the span of the
+values is least, or, equivalently, in which the circular distance from
+the greatest element past the period of the circle to the least
+element is greatest.  This is suitable for cases where the elements
+together often only cover a relatively small fraction of the entire
+circle (hence ``semicircular'').
+
+The semicircular permutation depends not just on the relative order of
+the original values but also on the original values themselves, and is
+only available for rank-based permutations.  To be able to tell how
+big the gap is between the greatest and the least value we need to
+know how big the period of the circle is, so a second argument is
+required.
+
+An example: Some objects were measured to be in directions given by
+angles of @code{[210, 355, 140, 12]} degrees, with the corresponding
+ranks @code{[2, 3, 1, 0]}.  (This is the same arrangement as for the
+example for circular permutations based on rank.)  Sorted into
+ascending order the angles are @code{[12, 140, 210, 355]}.  The
+greatest gap between two adjacent sorted angles is 145 degrees (from
+210 to 355), taking into account that the angles of 355 and 12 degrees
+are adjacent, too, but the gap between them is only 12 + 360 − 355 =
+17 degrees (because the period of angles is 360 degrees).
+
+For a circular permutation we saw earlier that the following sequences
+of ranks are all equivalent: @code{[2, 3, 1, 0]}, @code{[1, 2, 0, 3]},
+@code{[0, 1, 3, 2]}, @code{[3, 0, 2, 1]}.  The semicircular
+permutation is the one for which the greatest gap in the original data
+values lies before the first and after the last element of the
+sequence.  In this example that gap must lie before the angle of 355
+degrees, so the rank of the value 355 must be 0, so the appropriate
+semicircular permutation is @code{[3, 0, 2, 1]}.  The corresponding
+permutation number is the same as for the linear permutation with
+those elements, in this case 19.
+
+If we move the zero point of the angles backward by 5 degrees then the
+new angles are @code{[215, 0, 145, 17]}.  Then the elements span 215
+degrees (all values are between 0 and 215), leaving a gap of 145
+degrees (from angle 215 up to 360 which is equivalent to 0) to
+complete the circle.
+
+Some more examples: Angle sequences @code{[0, 1, 2, 3]} and
+@code{[359, 0, 1, 2]} both correspond to semicircular permutation 0.
+The first sequence corresponds to permutation 0 also when regarded as
+a linear permutation by rank, but the second sequence does not.
 
 The following table lists all permutations of 4 elements, with the
 corresponding linear and circular permutation numbers.
@@ -23487,28 +23551,28 @@ corresponding linear and circular permutation numbers.
 @multitable {Permutation} {Linear} {Circular Rank} {Circular Index}
 @headitem Permutation @tab Linear @tab Circular Rank @tab Circular Index
 @item [0,1,2,3] @tab  0 @tab 0 @tab 0
-@item [0,1,3,2] @tab  1 @tab 3 @tab 4
-@item [0,2,1,3] @tab  2 @tab 1 @tab 1
-@item [0,2,3,1] @tab  3 @tab 4 @tab 2
-@item [0,3,1,2] @tab  4 @tab 2 @tab 3
+@item [0,1,3,2] @tab  1 @tab 1 @tab 1
+@item [0,2,1,3] @tab  2 @tab 2 @tab 2
+@item [0,2,3,1] @tab  3 @tab 3 @tab 4
+@item [0,3,1,2] @tab  4 @tab 4 @tab 3
 @item [0,3,2,1] @tab  5 @tab 5 @tab 5
-@item [1,0,2,3] @tab  6 @tab 2 @tab 2
+@item [1,0,2,3] @tab  6 @tab 4 @tab 4
 @item [1,0,3,2] @tab  7 @tab 5 @tab 5
-@item [1,2,0,3] @tab  8 @tab 3 @tab 3
+@item [1,2,0,3] @tab  8 @tab 1 @tab 3
 @item [1,2,3,0] @tab  9 @tab 0 @tab 0
-@item [1,3,0,2] @tab 10 @tab 4 @tab 1
-@item [1,3,2,0] @tab 11 @tab 1 @tab 4
-@item [2,0,1,3] @tab 12 @tab 4 @tab 4
-@item [2,0,3,1] @tab 13 @tab 1 @tab 3
+@item [1,3,0,2] @tab 10 @tab 3 @tab 2
+@item [1,3,2,0] @tab 11 @tab 2 @tab 1
+@item [2,0,1,3] @tab 12 @tab 3 @tab 1
+@item [2,0,3,1] @tab 13 @tab 2 @tab 3
 @item [2,1,0,3] @tab 14 @tab 5 @tab 5
-@item [2,1,3,0] @tab 15 @tab 2 @tab 1
+@item [2,1,3,0] @tab 15 @tab 4 @tab 2
 @item [2,3,0,1] @tab 16 @tab 0 @tab 0
-@item [2,3,1,0] @tab 17 @tab 3 @tab 2
+@item [2,3,1,0] @tab 17 @tab 1 @tab 4
 @item [3,0,1,2] @tab 18 @tab 0 @tab 0
-@item [3,0,2,1] @tab 19 @tab 3 @tab 1
-@item [3,1,0,2] @tab 20 @tab 1 @tab 2
-@item [3,1,2,0] @tab 21 @tab 4 @tab 3
-@item [3,2,0,1] @tab 22 @tab 2 @tab 4
+@item [3,0,2,1] @tab 19 @tab 1 @tab 2
+@item [3,1,0,2] @tab 20 @tab 2 @tab 4
+@item [3,1,2,0] @tab 21 @tab 3 @tab 3
+@item [3,2,0,1] @tab 22 @tab 4 @tab 1
 @item [3,2,1,0] @tab 23 @tab 5 @tab 5
 @end multitable
 

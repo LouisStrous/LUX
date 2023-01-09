@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <malloc.h> // for free malloc
 #include <math.h> // for floor
 #include <stdio.h> // for asprintf sscanf
-#include <string.h> // for strcmp
+#include <string.h> // for strcmpo
 #include <time.h> // for localtime time gmtime
 #include <stdlib.h>             // for strtol
 // END HEADERS

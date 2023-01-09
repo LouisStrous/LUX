@@ -472,32 +472,7 @@ char *strsave(char const* str)
 int32_t int_arg(int32_t nsym)
 // returns the 32-bit integer value of a scalar symbol
 {
- if (nsym < 0 || nsym >= NSYM) {
-   cerror(ILL_SYM, 0, nsym, "int_arg");
-   return 0;
- }
- if (symbol_class(nsym) == LUX_SCAL_PTR)
-   nsym = dereferenceScalPointer(nsym);
- if (symbol_class(nsym) != LUX_SCALAR) {
-   cerror(NO_SCAL, nsym);
-   return 0;
- }
- switch (scalar_type(nsym)) {
-   case LUX_INT8:
-     return (int32_t) scalar_value(nsym).ui8;
-   case LUX_INT16:
-     return (int32_t) scalar_value(nsym).i16;
-   case LUX_INT32:
-     return (int32_t) scalar_value(nsym).i32;
-   case LUX_INT64:
-     return (int32_t) scalar_value(nsym).i64;
-   case LUX_FLOAT:
-     return (int32_t) scalar_value(nsym).f;
-   case LUX_DOUBLE:
-     return (int32_t) scalar_value(nsym).d;
-   default:
-     return cerror(ILL_TYPE, nsym);
- }
+  return get_scalar_value<int32_t>(nsym);
 }
 //-----------------------------------------------------
 int32_t int_arg_stat(int32_t nsym, int32_t *value)
@@ -535,27 +510,7 @@ int32_t int_arg_stat(int32_t nsym, int32_t *value)
 float float_arg(int32_t nsym)
 // returns the float value of a scalar symbol
 {
-  if (nsym < 0 || nsym >= NSYM)
-    { cerror(ILL_SYM, 0, nsym, "float_arg");
-      return 0; }
-  if (symbol_class(nsym) == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
-  if (symbol_class(nsym) != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
-  switch (scalar_type(nsym)) {
-  case LUX_INT8:
-    return (float) scalar_value(nsym).ui8;
-  case LUX_INT16:
-    return (float) scalar_value(nsym).i16;
-  case LUX_INT32:
-    return (float) scalar_value(nsym).i32;
-  case LUX_INT64:
-    return (float) scalar_value(nsym).i64;
-  case LUX_FLOAT:
-    return (float) scalar_value(nsym).f;
-  case LUX_DOUBLE:
-    return (float) scalar_value(nsym).d;
-  default:
-    return cerror(ILL_TYPE, nsym);
-  }
+  return get_scalar_value<float>(nsym);
 }
 //-----------------------------------------------------
 int32_t float_arg_stat(int32_t nsym, float *value)
@@ -593,26 +548,7 @@ int32_t float_arg_stat(int32_t nsym, float *value)
 double double_arg(int32_t nsym)
 // returns the double value of a LUX_DOUBLE scalar symbol
 {
- if (nsym < 0 || nsym >= NSYM)
- { cerror(ILL_SYM, 0, nsym, "double_arg");
-   return 0; }
- if (symbol_class(nsym) == LUX_SCAL_PTR) nsym = dereferenceScalPointer(nsym);
- if (symbol_class(nsym) != LUX_SCALAR) { cerror(NO_SCAL, nsym);  return 0.0; }
- switch (scalar_type(nsym))
- { case LUX_INT8:
-     return (double) scalar_value(nsym).ui8;
-   case LUX_INT16:
-     return (double) scalar_value(nsym).i16;
-   case LUX_INT32:
-     return (double) scalar_value(nsym).i32;
-   case LUX_INT64:
-     return (double) scalar_value(nsym).i64;
-   case LUX_FLOAT:
-     return (double) scalar_value(nsym).f;
-   case LUX_DOUBLE:
-     return (double) scalar_value(nsym).d;
-   default:
-     return cerror(ILL_TYPE, nsym); }
+  return get_scalar_value<double>(nsym);
 }
 //-----------------------------------------------------
 int32_t double_arg_stat(int32_t nsym, double *value)

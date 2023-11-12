@@ -1,6 +1,0 @@
-*.deps
-*.o
-.deps
-Makefile
-Makefile.in
-libhistoricephemerides_c.a

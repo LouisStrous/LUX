@@ -23,6 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#if HAVE_LIBX11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -1221,3 +1222,4 @@ int32_t lux_event_name(int32_t narg, int32_t ps[])
   return result;
 }
  //------------------------------------------------------------------------
+#endif

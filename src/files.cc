@@ -686,7 +686,7 @@ int32_t lux_format_set(int32_t narg, int32_t ps[])
 {
   char        *string, *fmt;
   int32_t        n, iq = 0;
-  extern formatInfo        theFormat;
+  extern FormatInfo        theFormat;
   Pointer        p;
 
   if (narg) {
@@ -793,12 +793,12 @@ void type_ascii_one(int32_t symbol, FILE *fp)
   uintmax_t intval;
   double fltval;
   extern char        *fmt_integer, *fmt_float, *fmt_complex, *fmt_string;
-  extern formatInfo        theFormat;
+  extern FormatInfo        theFormat;
   int32_t        i, n, j;
   int32_t        Sprintf_tok(char *, ...);
   char        *nextformat(char *, int32_t);
   Pointer        ptr;
-  listElem        *sptr;
+  ListElem* sptr;
 
   symbol = transfer(symbol);
 
@@ -1024,7 +1024,7 @@ void type_ascii_one(int32_t symbol, FILE *fp)
     }
     break;
   case LUX_CARRAY:
-    ptr.cf = (floatComplex*) array_data(symbol);
+    ptr.cf = (FloatComplex*) array_data(symbol);
     n = array_size(symbol);
     switch (array_type(symbol)) {
     case LUX_CFLOAT:
@@ -1063,7 +1063,7 @@ char *nextformat(char *fmt, int32_t mode)
 // of the modified !FMT_... variables.
 {
   static char        *saveI = NULL, *saveF = NULL, *saveC = NULL, *saveS = NULL;
-  extern formatInfo        theFormat;
+  extern FormatInfo        theFormat;
   extern char        *fmt_integer, *fmt_float, *fmt_complex, *fmt_string;
   char        install = 1;
 
@@ -1144,7 +1144,7 @@ int32_t type_ascii(int32_t narg, int32_t ps[], FILE *fp)
   int32_t        i, iq, fmtsym;
   char        *p = NULL;
   char        *fmttok(char *);
-  extern formatInfo        theFormat;
+  extern FormatInfo        theFormat;
 
   theFormat.type = (fmtType) 0;
   theFormat.start = theFormat.next = NULL;
@@ -1221,7 +1221,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
   char        *fmt, *thefmt, *save, haveTrailer, dofreefmt, *newfmt, *ptr;
   int32_t        iq, n, nn, iq0;
   Pointer        p;
-  extern formatInfo        theFormat;
+  extern FormatInfo        theFormat;
   int32_t        Sprintf(char *, char *, ...);
 
   iq = iq0 = ps[0];                // the format symbol
@@ -2537,7 +2537,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
   Pointer        trgt;
   void        **ptr2;
   static char        *keyboard = NULL;
-  extern formatInfo        theFormat;
+  extern FormatInfo        theFormat;
   int32_t        lux_replace(int32_t, int32_t);
 
   if (!isString) {
@@ -2640,7 +2640,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
             symbol_class(*ps) = LUX_CSCALAR;
             complex_scalar_type(*ps) = type;
             complex_scalar_memory(*ps) = lux_type_size[type];
-            complex_scalar_data(*ps).cf = (floatComplex*) malloc(complex_scalar_memory(*ps));
+            complex_scalar_data(*ps).cf = (FloatComplex*) malloc(complex_scalar_memory(*ps));
             trgt.cf = complex_scalar_data(*ps).cf;
           } else {
             undefine(*ps);
@@ -3211,7 +3211,7 @@ FILE *fopenr_sym(int32_t nsym)        // internal utility
 #define SYNCH_OK        0x5555aaaa
 #define SYNCH_REVERSE        0xaaaa5555
 #endif
-int32_t ck_synch_hd(FILE *fin, fzHead *fh, int32_t *wwflag)
+int32_t ck_synch_hd(FILE *fin, FzHead *fh, int32_t *wwflag)
 // internal utility
 /* reads the start of an fz file, checks for synch and a reasonable header,
    returns -1 if something amiss, used by several fz readers. */
@@ -3306,7 +3306,7 @@ int32_t lux_fzinspect(int32_t narg, int32_t ps[])                // fzinspect su
 {
   int32_t        wwflag=0, *q1, i;
   char        *name;
-  fzHead        *fh;
+  FzHead        *fh;
   FILE        *fin;
   struct stat statbuf;
 
@@ -3329,7 +3329,7 @@ int32_t lux_fzinspect(int32_t narg, int32_t ps[])                // fzinspect su
 
   // a few chores, check the synch and get a pointer to header
   // use scrat to read in header block
-  fh = (fzHead *) scrat;
+  fh = (FzHead *) scrat;
   if (ck_synch_hd(fin, fh, &wwflag) < 0 ) return 1;
 
                          // if a header requested, create and load
@@ -3362,7 +3362,7 @@ int32_t fzhead(int32_t narg, int32_t ps[], int32_t flag) // fzhead subroutine
 {
  int32_t        wwflag;
  char        *name;
- fzHead        *fh;
+ FzHead        *fh;
  FILE        *fin;
 
  flag = flag & !error_extra;
@@ -3379,7 +3379,7 @@ int32_t fzhead(int32_t narg, int32_t ps[], int32_t flag) // fzhead subroutine
    }
  }
                                  // use scrat to read in header block
- fh = (fzHead *) scrat;
+ fh = (FzHead *) scrat;
  if (ck_synch_hd(fin, fh, &wwflag) < 0)
    return LUX_ERROR;
 
@@ -3409,7 +3409,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) // fzread subroutine
   int32_t        iq, n, nb, i, mq, nq, sbit, nelem, wwflag=0;
   Symboltype type;
   char        *p, *name;
-  fzHead        *fh;
+  FzHead        *fh;
   Pointer q1;
   FILE        *fin;
   int32_t        anadecrunch(uint8_t *, int16_t [], int32_t, int32_t, int32_t),
@@ -3444,7 +3444,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) // fzread subroutine
   }
 
                                  // use scrat to read in header block
-  fh = (fzHead *) scrat;
+  fh = (FzHead *) scrat;
 
   if (ck_synch_hd(fin, fh, &wwflag) < 0)
     return LUX_ERROR;
@@ -3599,7 +3599,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) // fzwrite subroutine
   int32_t        iq, n, nd, j, type, mq, i, sz, safe;
   char const        *p, *name;
   char* safename;
-  fzHead        *fh;
+  FzHead        *fh;
   Pointer q1, q2;
   FILE        *fout;
   static char const* safeFile = "Safe_file";
@@ -3641,7 +3641,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) // fzwrite subroutine
     }
   }
                                          // use scrat to setup header
-  fh = (fzHead *) scrat;
+  fh = (FzHead *) scrat;
   zerobytes(fh, 512);                //zero it first
 #if WORDS_BIGENDIAN
   fh->synch_pattern = 0xaaaa5555;
@@ -3783,7 +3783,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
 {
  int32_t        iq, n, nd, j, type, i, mq, nx, ny, limit, sz;
  char        *name, *p;
- fzHead        *fh;
+ FzHead        *fh;
  Pointer q1, q2;
  union { int32_t i;  uint8_t b[4];} lmap;
  FILE        *fout;
@@ -3823,7 +3823,7 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
    }
  }
                                          // use scrat to setup header
- fh = (fzHead *) scrat;
+ fh = (FzHead *) scrat;
  zerobytes(fh, 512);                //zero it first
                          // these have to be readable by the Vax's
 #if WORDS_BIGENDIAN
@@ -4135,7 +4135,7 @@ void astore_one(FILE *fp, int32_t iq)
   int32_t n, sz, i;
   Pointer p;
 
-  fwrite(&sym[iq], sizeof(symTableEntry), 1, fp); // the symbol
+  fwrite(&sym[iq], sizeof(SymbolImpl), 1, fp); // the symbol
   switch (symbol_class(iq)) {
   case LUX_ARRAY:
     n = symbol_memory(iq);
@@ -4249,7 +4249,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
   line = sym[iq].line;
   context = symbol_context(iq);
   exec = sym[iq].exec;
-  if (!fread(&sym[iq], sizeof(symTableEntry), 1, fp))
+  if (!fread(&sym[iq], sizeof(SymbolImpl), 1, fp))
     return 1;                        // some problem: check errno for kind
   sym[iq].xx = hash;                // restore
   symbol_line(iq) = line;
@@ -4670,7 +4670,7 @@ int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
 {
   int32_t        i, nd, *dims, n, m, type, j;
   FILE        *fp;
-  fzHead        *fh;
+  FzHead        *fh;
 
   if (symbol_class(ps[0]) != LUX_STRING)
     return cerror(NEED_STR, ps[0]);
@@ -4708,7 +4708,7 @@ int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
   if (n < m)
     return luxerror("File too small for desired type and dimensions", 0);
 
-  fh = (fzHead *) scrat;
+  fh = (FzHead *) scrat;
   zerobytes(fh, 512);                //zero it first
   fh->synch_pattern = SYNCH_OK;
   fh->subf = MSBfirst << 7;        // no compression; indicate endian

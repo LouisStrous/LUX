@@ -1253,10 +1253,14 @@ int32_t lux_calendar(int32_t narg, int32_t ps[])
       dims = &n;
       ndim = 1;
     }
-    // TODO: how many output elements per date are expected?
-    result = array_scratch(LUX_INT32, ndim, dims);
     Pointer cjdn;
-    cjdn.i32 = static_cast<int32_t*>(array_data(result));
+    if (ndim == 1 && dims[0] == 1) {
+      result = scalar_scratch(LUX_INT32);
+      cjdn.i32 = &scalar_value(result).i32;
+    } else {
+      result = array_scratch(LUX_INT32, ndim, dims);
+      cjdn.i32 = static_cast<int32_t*>(array_data(result));
+    }
     int32_t ix_year = 0;
     int32_t ix_month = 0;
     int32_t ix_day = 0;

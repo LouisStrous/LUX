@@ -4,6 +4,7 @@
 AC_PREREQ([2.68])
 AC_INIT([lux], [1.3.0], [lux@quae.nl])
 AM_EXTRA_RECURSIVE_TARGETS([debug])
+AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/lux.cc])
 AC_CONFIG_MACRO_DIR([m4])
@@ -12,8 +13,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_LIBOBJ_DIR([lib])
 
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
-#AM_PATH_CPPUNIT()
 
 AC_CANONICAL_HOST
 AC_DEFINE_UNQUOTED([PLATFORM], "${host}", [The canonical host type])
@@ -31,6 +30,8 @@ else
    AC_MSG_ERROR([need bison])
 fi
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
+
+AM_PROG_AR
 
 # Checks for libraries.  The order is important!
 AC_CHECK_LIB([c], [printf])
@@ -63,30 +64,6 @@ AC_LINK_IFELSE(
   LDFLAGS=$SAVED_LDFLAGS)
 AC_LANG_POP([C++])
 
-AC_CHECK_LIB([CppUTest], [cpputest_malloc],
-  [AC_DEFINE(
-    [HAVE_LIBCPPUTEST],
-    [1],
-    [Define to 1 if you have the 'CppUTest' library (-lCppUTest).]
-   )
-   CPPUTESTLIBS="-lCppUTest $CPPUTESTLIBS"
-  ],
-  [echo "No CppUTest-based tests will be run."]
-)
-if test "x$ac_cv_lib_CppUTest_cpputest_malloc" = xyes; then
-  AC_CHECK_LIB([CppUTestExt], [mock_c],
-    [AC_DEFINE(
-      [HAVE_LIBCPPUTESTEXT],
-      [1],
-      [Define to 1 if you have the 'CppUTestExt' library (-lCppUTestExt).]
-     )
-     CPPUTESTLIBS="-lCppUTestExt $CPPUTESTLIBS"
-    ],
-    [echo "No CppUTestExt-based tests will be run."],
-    [-lCppUTest]
-  )
-fi
-
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -101,18 +78,12 @@ AC_CHECK_FUNCS([clock_gettime])
 # Checks for library functions, with replacements if needed.
 AC_REPLACE_FUNCS([sincos])
 
-AC_SUBST([CPPUTESTLIBS])
-
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/fonts/Makefile
-                 historicephemerides/Makefile
-                 doc/Makefile
-                 test/Makefile])
+                 doc/Makefile])
 
 AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
 AM_COND_IF([HAVE_DOXYGEN],[AC_CONFIG_FILES([doc/Doxyfile])])
-
-AM_CONDITIONAL([HAVE_CPPUTEST], [test -n "$CPPUTEST"])
 
 AC_OUTPUT

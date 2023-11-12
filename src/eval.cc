@@ -54,7 +54,7 @@ static Pointer  lp,             // Pointer to the LHS values
                 rp,             // Pointer to the RHS values
                 tp;             // Pointer to the result values
 
-int32_t     internal_routine(int32_t, internalRoutine *), // interal routine call
+int32_t     internal_routine(int32_t, InternalRoutine *), // interal routine call
         usr_routine(int32_t);       // user routine call
 char    evalScalPtr = 1;        // we need to evaluate scalar pointers, too
 
@@ -7172,14 +7172,14 @@ double fasmod(double x, double y)
   return v;
 }
 //----------------------------------------------------------
-doubleComplex zamod(doubleComplex x, doubleComplex y)
+DoubleComplex zamod(DoubleComplex x, DoubleComplex y)
 {
   /* we formally define the modulus z1 amod z2 as
      z1 - n*z2 where n is the greatest integer not smaller
      than the real number closest to z2 */
   double rx, ry, ax, ay, d;
   int32_t n;
-  doubleComplex z;
+  DoubleComplex z;
 
   ry = hypot(y.real, y.imaginary);
   if (!ry)
@@ -7199,9 +7199,9 @@ doubleComplex zamod(doubleComplex x, doubleComplex y)
   return z;
 }
 //----------------------------------------------------------
-doubleComplex zasmod(doubleComplex x, doubleComplex y)
+DoubleComplex zasmod(DoubleComplex x, DoubleComplex y)
 {
-  doubleComplex result = zamod(x, y);
+  DoubleComplex result = zamod(x, y);
   if (2*result.real > y.real) {
     result.real -= y.real;
     result.imaginary -= y.imaginary;
@@ -7212,7 +7212,7 @@ doubleComplex zasmod(doubleComplex x, doubleComplex y)
 void lux_smod(void)
      // remainder-taking with array operands
 {
-  doubleComplex l, r, t;
+  DoubleComplex l, r, t;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -7751,7 +7751,7 @@ void lux_smod(void)
 void lux_smod_as(void)
      // remainder-taking with array LHS and scalar RHS
 {
-  doubleComplex l, r, t;
+  DoubleComplex l, r, t;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -8290,7 +8290,7 @@ void lux_smod_as(void)
 void lux_smod_sa(void)
      // remainder-taking with scalar LHS and array RHS
 {
-  doubleComplex l, r, t;
+  DoubleComplex l, r, t;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -8829,7 +8829,7 @@ void lux_smod_sa(void)
 void lux_mod(void)
      // remainder-taking with array operands
 {
-  doubleComplex l, r, t;
+  DoubleComplex l, r, t;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -9368,7 +9368,7 @@ void lux_mod(void)
 void lux_mod_as(void)
 // remainder-taking with array LHS and scalar RHS
 {
-  doubleComplex l, r, t;
+  DoubleComplex l, r, t;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -9907,7 +9907,7 @@ void lux_mod_as(void)
 void lux_mod_sa(void)
      // remainder-taking with scalar LHS and array RHS
 {
-  doubleComplex l, r, t;
+  DoubleComplex l, r, t;
 
   switch (lhsType) {
   case LUX_INT8:
@@ -21892,7 +21892,8 @@ int32_t evalLhs(int32_t symbol)
    LS 7jan99 */
 {
   int32_t   target, kind, depth, nitem, class_id, modified, result, n, special, j;
-  extractSec    *eptr, *tptr;
+  ExtractSec* eptr;
+  ExtractSec*  tptr;
   char  **sptr, *name, *p;
   int32_t   findTarget(char *, int32_t *, int32_t);
   void  *v;
@@ -21948,7 +21949,7 @@ int32_t evalLhs(int32_t symbol)
           if (extract_num_sec(symbol) > 1) {
             // still have more sections
             symbol_memory(symbol) =
-              (extract_num_sec(symbol) - 1)*sizeof(extractSec);
+              (extract_num_sec(symbol) - 1)*sizeof(ExtractSec);
             memmove(eptr, eptr + 1, symbol_memory(symbol));
           } else {              // just the target: no more extraction
             symbol_class(symbol) = LUX_TRANSFER;
@@ -21969,9 +21970,9 @@ int32_t evalLhs(int32_t symbol)
         free(pre_extract_name(symbol));
         v = pre_extract_ptr(symbol);
         free(symbol_data(symbol));
-        extract_ptr(symbol) = (extractSec*) v;
+        extract_ptr(symbol) = (ExtractSec*) v;
         extract_num_sec(symbol) = pre_extract_num_sec(symbol);
-        symbol_memory(symbol) = extract_num_sec(symbol)*sizeof(extractSec);
+        symbol_memory(symbol) = extract_num_sec(symbol)*sizeof(ExtractSec);
         extract_target(symbol) = target;
 
       }
@@ -22044,8 +22045,8 @@ int32_t evalLhs(int32_t symbol)
                 symbol_class(result) = LUX_EXTRACT;
                 extract_target(result) = target;
                 extract_num_sec(result) = (Symboltype) (depth + 1);
-                symbol_memory(result) = (depth + 1)*sizeof(extractSec);
-                extract_ptr(result) = tptr = (extractSec*) malloc(symbol_memory(result));
+                symbol_memory(result) = (depth + 1)*sizeof(ExtractSec);
+                extract_ptr(result) = tptr = (ExtractSec*) malloc(symbol_memory(result));
                 if (!tptr)
                   return cerror(ALLOC_ERR, 0);
                 for (j = 0; j <= depth; j++) {
@@ -22114,13 +22115,13 @@ int32_t evalExtractRhs(int32_t symbol)
     j, k, *ip;
   int32_t   findTarget(char *, int32_t *, int32_t), getBody(int32_t);
   int16_t  *wptr;
-  extractSec    *eptr;
+  ExtractSec* eptr;
   char  **sptr;
   Pointer       p, q, r;
   extern int32_t    d_r_sym, r_d_sym;
-  structElem    *se;
-  structPtr     *spe;
-  structPtrMember       *spm;
+  StructElem* se;
+  StructPtr* spe;
+  StructPtrMember* spm;
 
   if (symbol_class(symbol) == LUX_PRE_EXTRACT) {
     /* #d.r and #r.d are widely used as "degrees-to-radians" and
@@ -22157,7 +22158,7 @@ int32_t evalExtractRhs(int32_t symbol)
         if (extract_num_sec(symbol) > 1) {
           // still have more sections
           symbol_memory(symbol) =
-            (extract_num_sec(symbol) - 1)*sizeof(extractSec);
+            (extract_num_sec(symbol) - 1)*sizeof(ExtractSec);
           memmove(eptr, eptr + 1, symbol_memory(symbol));
         } else {                // just the target: no more extraction
           undefine(symbol);
@@ -22188,7 +22189,7 @@ int32_t evalExtractRhs(int32_t symbol)
       free(pre_extract_name(symbol));
       p.v = pre_extract_ptr(symbol);
       free(pre_extract_data(symbol));
-      extract_ptr(symbol) = (extractSec*) p.v;
+      extract_ptr(symbol) = (ExtractSec*) p.v;
       extract_target(symbol) = target;
     }
   } else                        // we assume it's an LUX_EXTRACT symbol
@@ -22615,7 +22616,7 @@ int32_t evalExtractRhs(int32_t symbol)
                 return luxerror("No double subscripts allowed here!", symbol);
               }
               n = spe->n_subsc = eptr->number; // number of subscripts
-              spm = spe->member = (structPtrMember*) malloc(spe->n_subsc*sizeof(structPtrMember));
+              spm = spe->member = (StructPtrMember*) malloc(spe->n_subsc*sizeof(StructPtrMember));
               wptr = eptr->ptr.i16;
               while (n--) {     // treat all subscripts
                 i = *wptr++; // subscript symbol number
@@ -22689,8 +22690,8 @@ int32_t evalExtractRhs(int32_t symbol)
               }
               // add an entry to the STRUCT_PTR list
               n = struct_ptr_n_elements(target);
-              symbol_memory(target) += sizeof(structPtr);
-              struct_ptr_elements(target) = (structPtr*)
+              symbol_memory(target) += sizeof(StructPtr);
+              struct_ptr_elements(target) = (StructPtr*)
                 realloc(struct_ptr_elements(target), symbol_memory(target));
               spe = struct_ptr_elements(target) + n; // point at the new one
               spe->desc = i;
@@ -22794,7 +22795,7 @@ int32_t eval(int32_t symbol)
         break;
       symbol_class(result) = LUX_LIST; // generate LUX_LIST symbol
       n = pre_list_num_symbols(symbol); // number of elements
-      ALLOCATE(list_symbols(result), n, listElem); // get memory
+      ALLOCATE(list_symbols(result), n, ListElem); // get memory
       symbol_memory(result) = symbol_memory(symbol); // is same size
       for (i = 0; i < n; i++) { // all elements
         list_key(result,i) = pre_list_key(symbol,i)?
@@ -23226,10 +23227,10 @@ BranchInfo checkBranch(int32_t lhs, int32_t rhs)
     case LUX_INT_FUNC:
 
       /* functions that allow piping have:
-         a keyList structure with */
+         a KeyList structure with */
       // the pipe member unequal to zero
       if (!function[int_func_number(rhs)].keys
-          || !((keyList *) function[int_func_number(rhs)].keys)->pipe)
+          || !((KeyList *) function[int_func_number(rhs)].keys)->pipe)
         // no piping
       { result.depth = depth;
         result.symbol = rhs;

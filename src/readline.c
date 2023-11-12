@@ -6,6 +6,7 @@
 
 # include <stdio.h>
 # include <malloc.h>
+# include <string.h>            /* for strchr */
 
 void rl_initialize() { }
 

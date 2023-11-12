@@ -2756,7 +2756,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
     mini, loc[3], nel, label = 0, sign, maxi = 0;
   Pointer       src, trgt, trgt0;
   Scalar        min[3], max[3];
-  extern struct boundsStruct    bounds;
+  extern struct BoundsStruct    bounds;
   LoopInfo      srcinfo, trgtinfo;
 
   if (narg == 1 && symbolIsNumericalArray(ps[0]) && array_num_dims(ps[0]) == 2)

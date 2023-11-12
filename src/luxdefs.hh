@@ -42,69 +42,73 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // symbol classes
 
 /// LUX symbol classes.
-enum Symbolclass {
-  LUX_UNUSED = 0,               //!< (0) symbol with no assigned class
-  LUX_SCALAR,                   //!< (1) a real scalar, e.g. 17
-  LUX_STRING,                   //!< (2) a text string, e.g. 'x'
-  LUX_RANGE,                    //!< (3) a range, e.g. `(1:2)`
-  LUX_ARRAY,     //!< (4) a numerical real or string array, e.g. `[1,2]`
-  LUX_TRANSFER, //!< (5) a transfer symbol, a symbol that points at another symbol
-  LUX_ASSOC,    //!< (6) an associated variable (`ASSOC`)
-  LUX_FUNC_PTR, //!< (7) a function pointer, e.g.`&SIN`
-  LUX_SCAL_PTR, //!< (8) a scalar pointer, e.g. `!MXB`
-  LUX_SUBSC_PTR,       //!< (9) a subscript pointer, e.g. `(1:2)`
-  LUX_FILEMAP,         //!< (10) a file map (e.g., `FLTFARR`)
-  LUX_CLIST,           //!< (11) a compact list (e.g., `{}`)
-  LUX_LIST,            //!< (12) a list (e.g., `{}`)
-  LUX_STRUCT,          //!< (13) a structure (e.g., `{}`)
-  LUX_KEYWORD,         //!< (14) a keyword (e.g., `/FOO`)
-  LUX_LIST_PTR,        //!< (15) a list member pointer (e.g., `.TAG`)
-  LUX_PRE_RANGE,       //!< (16) a pre-range (e.g.,`(1:3)`)
-  LUX_PRE_CLIST,        //!< (17) a pre-compact-list (`{}`)
-  LUX_PRE_LIST,         //!< (18) a pre-list (`{}`)
-  LUX_ENUM,             //!< (19) an enumeration
-  LUX_META,             //!< (20) a meta (e.g., `SYMBOL('string')`)
-  LUX_CSCALAR,          //!< (21) a complex scalar
-  LUX_CARRAY,           //!< (22) a complex array
-  LUX_CPLIST,           //!< (23) a compact pointer list
-  LUX_POINTER,          //!< (24) a pointer (e.g., `&X`)
-  LUX_STRUCT_PTR,       //!< (25) a pointer to member(s) of a structure
-  LUX_SUBROUTINE = 32,  //!< (32) a subroutine definition
-  LUX_FUNCTION,         //!< (33) a function definition
-  LUX_BLOCKROUTINE,     //!< (34) a block routine definition
-  LUX_DEFERRED_SUBR,    //!< (35) a deferred subroutine definition
-  LUX_DEFERRED_FUNC,    //!< (36) a deferred function definition
-  LUX_DEFERRED_BLOCK,   //!< (37) a deferred block routine
-  LUX_BIN_OP = 192,     //!< (192) a binary operation
-  LUX_INT_FUNC,         //!< (193) an internal function call
-  LUX_USR_FUNC,         //!< (194) a user-defined function call
-  LUX_IF_OP,            //!< (195) a binary if-operation
-  LUX_EXTRACT,          //!< (196) an extraction operation
-  LUX_PRE_EXTRACT,      //!< (197) a pre-extraction operation
-  LUX_EVB = 200,        //!< (200) an executable
-  LUX_FIXED_NUMBER,     //!< (201) a fixed number
-  LUX_FIXED_STRING,     //!< (202) a fixed string
-  LUX_UNDEFINED = 255   //!< (255) an undefined symbol
-};
+enum Symbolclass
+  {
+    LUX_UNUSED = 0,      //!< (0) symbol with no assigned class
+    LUX_SCALAR,          //!< (1) a real scalar, e.g. 17
+    LUX_STRING,          //!< (2) a text string, e.g. 'x'
+    LUX_RANGE,           //!< (3) a range, e.g. `(1:2)`
+    LUX_ARRAY,           //!< (4) a numerical real or string array, e.g. `[1,2]`
+
+    /// (5) a transfer symbol, a symbol that points at another symbol
+    LUX_TRANSFER,
+    LUX_ASSOC,                  //!< (6) an associated variable (`ASSOC`)
+    LUX_FUNC_PTR,               //!< (7) a function pointer, e.g.`&SIN`
+    LUX_SCAL_PTR,               //!< (8) a scalar pointer, e.g. `!MXB`
+    LUX_SUBSC_PTR,              //!< (9) a subscript pointer, e.g. `(1:2)`
+    LUX_FILEMAP,                //!< (10) a file map (e.g., `FLTFARR`)
+    LUX_CLIST,                  //!< (11) a compact list (e.g., `{}`)
+    LUX_LIST,                   //!< (12) a list (e.g., `{}`)
+    LUX_STRUCT,                 //!< (13) a structure (e.g., `{}`)
+    LUX_KEYWORD,                //!< (14) a keyword (e.g., `/FOO`)
+    LUX_LIST_PTR,               //!< (15) a list member pointer (e.g., `.TAG`)
+    LUX_PRE_RANGE,              //!< (16) a pre-range (e.g.,`(1:3)`)
+    LUX_PRE_CLIST,              //!< (17) a pre-compact-list (`{}`)
+    LUX_PRE_LIST,               //!< (18) a pre-list (`{}`)
+    LUX_ENUM,                   //!< (19) an enumeration
+    LUX_META,                   //!< (20) a meta (e.g., `SYMBOL('string')`)
+    LUX_CSCALAR,                //!< (21) a complex scalar
+    LUX_CARRAY,                 //!< (22) a complex array
+    LUX_CPLIST,                 //!< (23) a compact pointer list
+    LUX_POINTER,                //!< (24) a pointer (e.g., `&X`)
+    LUX_STRUCT_PTR,             //!< (25) a pointer to member(s) of a structure
+    LUX_SUBROUTINE = 32,        //!< (32) a subroutine definition
+    LUX_FUNCTION,               //!< (33) a function definition
+    LUX_BLOCKROUTINE,           //!< (34) a block routine definition
+    LUX_DEFERRED_SUBR,          //!< (35) a deferred subroutine definition
+    LUX_DEFERRED_FUNC,          //!< (36) a deferred function definition
+    LUX_DEFERRED_BLOCK,         //!< (37) a deferred block routine
+    LUX_BIN_OP = 192,           //!< (192) a binary operation
+    LUX_INT_FUNC,               //!< (193) an internal function call
+    LUX_USR_FUNC,               //!< (194) a user-defined function call
+    LUX_IF_OP,                  //!< (195) a binary if-operation
+    LUX_EXTRACT,                //!< (196) an extraction operation
+    LUX_PRE_EXTRACT,            //!< (197) a pre-extraction operation
+    LUX_EVB = 200,              //!< (200) an executable
+    LUX_FIXED_NUMBER,           //!< (201) a fixed number
+    LUX_FIXED_STRING,           //!< (202) a fixed string
+    LUX_UNDEFINED = 255         //!< (255) an undefined symbol
+  };
 
 // note: do not change the relative order of these classes!  newSymbol
 // might not work properly if you do.
 
 /// LUX symbol types
-enum Symboltype {
-  LUX_INT8,                     //!< (0) 1-byte integers
-  LUX_INT16,                    //!< (1) 2-byte integers
-  LUX_INT32,                    //!< (2) 4-byte integers
-  LUX_INT64,                    //!< (3) 8-byte integers
-  LUX_FLOAT,                    //!< (4) 4-byte floats
-  LUX_DOUBLE,                   //!< (5) 8-byte floats
-  LUX_TEMP_STRING,              //!< (6) temporary strings
-  LUX_LSTRING,                  //!< (7) literal strings
-  LUX_STRING_ARRAY,             //!< (8) string arrays
-  LUX_CFLOAT,                   //!< (9) 8-byte complex floats
-  LUX_CDOUBLE,                  //!< (10) 16-byte complex floats
-  LUX_NO_SYMBOLTYPE,            //!< sentinel; not for use
-};
+enum Symboltype
+  {
+    LUX_INT8,                   //!< (0) 1-byte integers
+    LUX_INT16,                  //!< (1) 2-byte integers
+    LUX_INT32,                  //!< (2) 4-byte integers
+    LUX_INT64,                  //!< (3) 8-byte integers
+    LUX_FLOAT,                  //!< (4) 4-byte floats
+    LUX_DOUBLE,                 //!< (5) 8-byte floats
+    LUX_TEMP_STRING,            //!< (6) temporary strings
+    LUX_LSTRING,                //!< (7) literal strings
+    LUX_STRING_ARRAY,           //!< (8) string arrays
+    LUX_CFLOAT,                 //!< (9) 8-byte complex floats
+    LUX_CDOUBLE,                //!< (10) 16-byte complex floats
+    LUX_NO_SYMBOLTYPE,          //!< sentinel; not for use
+  };
 
 template<class T>
 constexpr Symboltype
@@ -135,29 +139,31 @@ constexpr Symboltype
 lux_symboltype_for_type<double> = LUX_DOUBLE;
 
 /// LUX EVB classes
-enum EVBclass {
-  EVB_BLOCK = 1,              //!< (1) statement block { }
-  EVB_REPLACE,                //!< (2) assignment statement =
-  EVB_INT_SUB,                //!< (3) call to internal subroutine
-  EVB_FOR,                    //!< (4) FOR statement
-  EVB_INSERT,                 //!< (5) insert statement
-  EVB_IF,                     //!< (6) IF statement
-  EVB_USR_SUB,                //!< (7) call to user-defined subroutine
-  EVB_WHILE_DO,               //!< (8) WHILE-DO statement
-  EVB_DO_WHILE,               //!< (9) DO-WHILE statement
-  EVB_RETURN,                 //!< (10) RETURN statement
-  EVB_CASE,                   //!< (11) CASE statement
-  EVB_NCASE,                  //!< (12) NCASE statement
-  EVB_REPEAT,                 //!< (13) REPEAT statement
-  EVB_USR_CODE,               //!< (14) RUN statement
-  EVB_FILE                    //!< (15) file inclusion @, @@
-};
+enum EVBclass
+  {
+    EVB_BLOCK = 1,              //!< (1) statement block { }
+    EVB_REPLACE,                //!< (2) assignment statement =
+    EVB_INT_SUB,                //!< (3) call to internal subroutine
+    EVB_FOR,                    //!< (4) FOR statement
+    EVB_INSERT,                 //!< (5) insert statement
+    EVB_IF,                     //!< (6) IF statement
+    EVB_USR_SUB,                //!< (7) call to user-defined subroutine
+    EVB_WHILE_DO,               //!< (8) WHILE-DO statement
+    EVB_DO_WHILE,               //!< (9) DO-WHILE statement
+    EVB_RETURN,                 //!< (10) RETURN statement
+    EVB_CASE,                   //!< (11) CASE statement
+    EVB_NCASE,                  //!< (12) NCASE statement
+    EVB_REPEAT,                 //!< (13) REPEAT statement
+    EVB_USR_CODE,               //!< (14) RUN statement
+    EVB_FILE                    //!< (15) file inclusion @, @@
+  };
 
 /// LUX File inclusion types
-enum includeType {
+enum includeType
+  {
   FILE_INCLUDE,                 //!< (0) @file
   FILE_REPORT                   //!< (1) @@file
-};
+  };
 
 // special execution codes
 #define LUX_ERROR       -1      //!< error state
@@ -181,17 +187,18 @@ enum includeType {
 #endif
 
 /// LUX format types
-enum fmtType {
-  FMT_ERROR,                    //!< (0) illegal format
-  FMT_PLAIN,                    //!< (1) plain text format
-  FMT_INTEGER,                  //!< (2) integer format
-  FMT_FLOAT,                    //!< (3) float format
-  FMT_TIME,                     //!< (4) time format
-  FMT_DATE,                     //!< (5) date format
-  FMT_STRING,                   //!< (6) string format
-  FMT_COMPLEX,                  //!< (7) complex float format
-  FMT_EMPTY                     //!< (8) empty format
-};
+enum fmtType
+  {
+    FMT_ERROR,                  //!< (0) illegal format
+    FMT_PLAIN,                  //!< (1) plain text format
+    FMT_INTEGER,                //!< (2) integer format
+    FMT_FLOAT,                  //!< (3) float format
+    FMT_TIME,                   //!< (4) time format
+    FMT_DATE,                   //!< (5) date format
+    FMT_STRING,                 //!< (6) string format
+    FMT_COMPLEX,                //!< (7) complex float format
+    FMT_EMPTY                   //!< (8) empty format
+  };
 
 // binary operation classes
 /* don't change the order of these constants!  this order must
@@ -202,29 +209,31 @@ enum fmtType {
    between LUX_OR and LUX_POW do not. */
 
 /// LUX binary operations
-enum binaryOp {
-  LUX_ADD,                      //!< (0) +
-  LUX_SUB,                      //!< (1) -
-  LUX_MUL,                      //!< (2) *
-  LUX_DIV,                      //!< (3) /
-  LUX_IDIV,                     //!< (4) \ .
-  LUX_MOD,                      //!< (5) %, MOD
-  LUX_SMOD,                     //!< (6) SMOD
-  LUX_MAX,                      //!< (7) >
-  LUX_MIN,                      //!< (8) <
-  LUX_EQ,                       //!< (9) EQ
-  LUX_GT,                       //!< (10) GT
-  LUX_GE,                       //!< (11) GE
-  LUX_LT,                       //!< (12) LT
-  LUX_LE,                       //!< (13) LE
-  LUX_NE,                       //!< (14) NE
-  LUX_OR,                       //!< (15) OR
-  LUX_AND,                      //!< (16) AND
-  LUX_XOR,                      //!< (17) XOR
-  LUX_POW,                      //!< (18) ^
-  LUX_ANDIF,                    //!< (19) ANDIF
-  LUX_ORIF                      //!< (20) ORIF
-};
+enum binaryOp
+  {
+    LUX_ADD,                    //!< (0) +
+    LUX_SUB,                    //!< (1) -
+    LUX_MUL,                    //!< (2) *
+    LUX_DIV,                    //!< (3) /
+    LUX_IDIV,                   //!< (4) \ .
+    LUX_MOD,                    //!< (5) %, MOD
+    LUX_SMOD,                   //!< (6) SMOD
+    LUX_MAX,                    //!< (7) >
+    LUX_MIN,                    //!< (8) <
+    LUX_EQ,                     //!< (9) EQ
+    LUX_GT,                     //!< (10) GT
+    LUX_GE,                     //!< (11) GE
+    LUX_LT,                     //!< (12) LT
+    LUX_LE,                     //!< (13) LE
+    LUX_NE,                     //!< (14) NE
+    LUX_OR,                     //!< (15) OR
+    LUX_AND,                    //!< (16) AND
+    LUX_XOR,                    //!< (17) XOR
+    LUX_POW,                    //!< (18) ^
+    LUX_ANDIF,                  //!< (19) ANDIF
+    LUX_ORIF                    //!< (20) ORIF
+  };
+
 #define NUM_BIN_OP      19      // note that this number does not
                                 // count LUX_ANDIF and LUX_ORIF
 
@@ -299,19 +308,20 @@ enum binaryOp {
 #define I_SINGLEEXEC    (~(I_PARENT | I_LINE | I_FILELEVEL | I_VALUE))
 
 /// Trace Mode bit flags
-enum TraceMode {
-  T_FILE = (1 << 0),            //!< Trace @files.
-  T_LOOP = (1 << 1),            //!< Trace any kind of loop.
-  T_BLOCK = (1 << 2),           //!< Trace {} blocks.
+enum TraceMode
+  {
+    T_FILE = (1 << 0),          //!< Trace @files.
+    T_LOOP = (1 << 1),          //!< Trace any kind of loop.
+    T_BLOCK = (1 << 2),         //!< Trace {} blocks.
 
-  /// Trace user-defined subroutines, functions, and block routines.
-  T_ROUTINE = (1 << 3),
+    /// Trace user-defined subroutines, functions, and block routines.
+    T_ROUTINE = (1 << 3),
 
-  T_SHOWSTATS = (1 << 4),       //!< Show execution statistics.
-  T_CPUTIME = (1 << 5),         //!< Show CPU time.
-  T_SHOWEXEC = (1 << 6),
-  T_ROUTINEIO = (1 << 7)
-};
+    T_SHOWSTATS = (1 << 4),       //!< Show execution statistics.
+    T_CPUTIME = (1 << 5),         //!< Show CPU time.
+    T_SHOWEXEC = (1 << 6),
+    T_ROUTINEIO = (1 << 7)
+  };
 
 // sprintf modes
 #define FMT_LEFT_JUSTIFY        (1 << 0) // - modifier
@@ -417,25 +427,22 @@ const double RAD = 180/PI;
 #define scratSize()     (NSCRAT*sizeof(int32_t) + (curScrat - (char *) scrat))
 
 /// a single-precision complex number */
-struct floatComplex {
+struct FloatComplex
+{
   float real;
   float imaginary;
 };
 
 /// a double-precision complex number */
-struct doubleComplex {
+struct DoubleComplex
+{
   double real;
   double imaginary;
 };
 
-/// a union of pointers to a complex number */
-union complexPointer {
-  floatComplex *f;
-  doubleComplex *d;
-};
-
 /// a union of scalar values */
-union Scalar {
+union Scalar
+{
   uint8_t ui8;
   int16_t i16;
   int32_t i32;
@@ -449,21 +456,23 @@ union Scalar {
 // wideScalar is equal to scalar plus the complex data types; we have
 // separate scalar and wideScalars because wideScalar is wider, which is
 // not always desirable.
-union wideScalar {
+union wideScalar
+{
   uint8_t ui8;
   int16_t i16;
   int32_t i32;
   int64_t i64;
   float f;
   double d;
-  floatComplex cf;
-  doubleComplex cd;
+  FloatComplex cf;
+  DoubleComplex cd;
   char *s;
   char **sp;
 };
 
 /// A union of pointers to all data types that LUX arrays can hold.
-union Pointer {
+union Pointer
+{
   uint8_t* ui8;             //!< Pointer to 8-bit unsigned array
   int16_t *i16;             //!< Pointer to 16-bit signed array
   int32_t *i32;             //!< Pointer to 32-bit signed array
@@ -473,32 +482,36 @@ union Pointer {
   char *s;                  //!< Pointer to text string
   char **sp;                //!< Pointer to array of text strings
   void *v;                  //!< Generic pointer
-  floatComplex *cf;         //!< Pointer to single precision float complex array
-  doubleComplex *cd;        //!< Pointer to double precision float complex array
+  FloatComplex *cf;         //!< Pointer to single precision float complex array
+  DoubleComplex *cd;        //!< Pointer to double precision float complex array
 };
 
-struct listElem {
+struct ListElem
+{
   char const* key;
  int16_t value;
 };
 
-struct enumElem {
+struct EnumElem
+{
   char const* key; int32_t value;
 };
 
-typedef struct {
+struct KeyList
+{
   char suppressEval; char pipe; char suppressUnused;
   int32_t defaultMode; uint8_t offset; char **keys;
-} keyList;
+};
 
 /// A struct representing the dimensions of a LUX array.
-struct Array {
+struct Array
+{
   uint8_t ndim, c1, c2; int32_t dims[MAX_DIMS];
 };
 
 /// A struct that represents the least and greatest values that the LUX
 /// numerical data types can hold.
-struct boundsStruct {
+struct BoundsStruct {
   /// A struct with a member for each of the LUX numerical data types.
   struct T {
     uint8_t ui8;
@@ -512,58 +525,81 @@ struct boundsStruct {
   T max;     //!< the greatest values that the LUX numerical data types can hold
 };
 
-typedef struct structElemStruct {
-  union {
-    struct {
-      int32_t nelem; int32_t size; int32_t *dims; uint8_t ndim;
+struct StructElem
+{
+  union
+  {
+    struct
+    {
+      int32_t nelem;
+      int32_t size;
+      int32_t* dims;
+      uint8_t ndim;
     } first;
-    struct {
-      char *tag; off_t offset; uint8_t type;
-      union {
-        struct {
-          int32_t *dims; uint8_t ndim;
+    struct
+    {
+      char *tag;
+      off_t offset;
+      uint8_t type;
+      union
+      {
+        struct
+        {
+          int32_t* dims;
+          uint8_t ndim;
         } singular;
         int32_t member;
       } spec;
     } regular;
   } u;
-} structElem;
+};
 
-typedef struct {
+struct ExtractSec {
   uint8_t type;
   uint16_t number;
-  union { int16_t* i16; char **sp; } ptr;
-} extractSec;
+  union
+  {
+    int16_t* i16;
+    char** sp;
+  } ptr;
+};
 
-typedef struct {
-  uint8_t  type;                   // subscript type: scalar, range, index
-  union {
-    struct {
-      int32_t       value;          // the single integer subscript
+struct StructPtrMember
+{
+  uint8_t type;                 //!< subscript type: scalar, range, index
+  union
+  {
+    struct
+    {
+      int32_t value;            //!< the single integer subscript
     } scalar;
-    struct {
-      int32_t       start;          // the integer range start
-      int32_t       end;            // the integer range end
+    struct
+    {
+      int32_t start;            //!< the integer range start
+      int32_t end;              //!< the integer range end
     } range;
-    struct {
-      int32_t       n_elem;         // the number of index array elements
-      int32_t       *ptr;           // pointer to the index array elements
+    struct
+    {
+      int32_t n_elem;           //!< the number of index array elements
+      int32_t* ptr;             //!< pointer to the index array elements
     } array;
   } data;
-} structPtrMember;
+};
 
-typedef struct structPtrStruct {
-  int32_t   desc;                   // index of structure descriptor
-  int32_t   n_subsc;                // number of subscripts
-  structPtrMember       *member;
-} structPtr;
+struct StructPtr
+{
+  int32_t desc;                 //!< index of structure descriptor
+  int32_t n_subsc;              //!< number of subscripts
+  StructPtrMember* member;
+};
 
-typedef struct {
-  char  *name;
-  extractSec    *extract;
-} preExtract;
+struct PreExtract {
+  char* name;
+  ExtractSec* extract;
+};
 
-typedef struct symTableEntryStruct {
+struct SymbolImpl
+{
   Symbolclass sclass;
   Symboltype type;
   int16_t xx;
@@ -571,75 +607,155 @@ typedef struct symTableEntryStruct {
   int16_t context;
   int32_t exec;
   union specUnion
-  { Scalar scalar;
-    struct { Array      *ptr; int32_t bstore; } array;
-    struct { int16_t       *ptr; int32_t bstore; } wlist;
-    struct { uint16_t      *ptr; int32_t bstore; } uwlist;
-    struct { enumElem   *ptr; int32_t bstore; } enumElem;
-    struct { char       *ptr; int32_t bstore; } name;
-    struct { listElem   *ptr; int32_t bstore; } listElem;
-    struct { int32_t        *ptr; int32_t bstore; } intList;
-    struct { extractSec *ptr; int32_t bstore; } extract;
-    struct { preExtract *ptr; int32_t bstore; } preExtract;
-    struct { void       *ptr; int32_t bstore; } general;
-    struct { structPtr  *ptr; int32_t bstore; } structPtr;
-    Pointer     dpointer;
-    struct { int16_t args[4]; } evb;
-    struct { uint16_t args[4]; } uevb;
-    struct { uint8_t narg; char **keys; uint8_t extend; uint16_t nstmnt;
-      int16_t *ptr; } routine;
+  {
+    Scalar scalar;
+    struct
+    {
+      Array* ptr;
+      int32_t bstore;
+    } array;
+    struct
+    {
+      int16_t* ptr;
+      int32_t bstore;
+    } wlist;
+    struct
+    {
+      uint16_t* ptr;
+      int32_t bstore;
+    } uwlist;
+    struct
+    {
+      EnumElem* ptr;
+      int32_t bstore;
+    } enumElem;
+    struct
+    {
+      char* ptr;
+      int32_t bstore;
+    } name;
+    struct
+    {
+      ListElem* ptr;
+      int32_t bstore;
+    } listElem;
+    struct
+    {
+      int32_t* ptr;
+      int32_t bstore;
+    } intList;
+    struct
+    {
+      ExtractSec* ptr;
+      int32_t bstore;
+    } extract;
+    struct
+    {
+      PreExtract* ptr;
+      int32_t bstore;
+    } preExtract;
+    struct
+    {
+      void* ptr;
+      int32_t bstore;
+    } general;
+    struct
+    {
+      StructPtr* ptr;
+      int32_t bstore;
+    } structPtr;
+    Pointer dpointer;
+    struct
+    {
+      int16_t args[4];
+    } evb;
+    struct
+    {
+      uint16_t args[4];
+    } uevb;
+    struct
+    {
+      uint8_t narg;
+      char** keys;
+      uint8_t extend;
+      uint16_t nstmnt;
+      int16_t* ptr;
+    } routine;
   } spec;
-} symTableEntry;
+};
 
-typedef struct hashTableEntryStruct {
-  char const* name; int32_t symNum; struct hashTableEntryStruct *next;
-} hashTableEntry;
+struct HashTableEntry
+{
+  char const* name;
+  int32_t symNum;
+  HashTableEntry *next;
+};
 
-typedef struct internalRoutineStruct {
+struct InternalRoutine
+{
   char const* name;
   int16_t minArg;
   int16_t maxArg;
   int32_t (*ptr)(int32_t, int32_t []);
   char const* keys;
-} internalRoutine;
+};
 
-typedef struct {
- int32_t    synch_pattern;
- uint8_t   subf, source, nhb, datyp, ndim, free1, cbytes[4], free[178];
- int32_t    dim[16];
- char   txt[256];
-} fzHead;
+struct FzHead
+{
+  int32_t synch_pattern;
+  uint8_t subf;
+  uint8_t source;
+  uint8_t nhb;
+  uint8_t datyp;
+  uint8_t ndim;
+  uint8_t free1;
+  uint8_t cbytes[4];
+  uint8_t free[178];
+  int32_t dim[16];
+  char txt[256];
+};
 
 /// A struct that captures at what depth in an assignment the left hand side can
 /// be used for storing an intermediate result.
-struct BranchInfo {
-  int32_t depth, symbol, size;  char containLHS;
+struct BranchInfo
+{
+  int32_t depth;
+  int32_t symbol;
+  int32_t size;
+  char containLHS;
 };
 
 /// A struct that holds data for cubic spline calculations.
-struct csplineInfo {
-  gsl_spline *spline; gsl_interp_accel *acc; double *x; double *y;
+struct CsplineInfo
+{
+  gsl_spline* spline;
+  gsl_interp_accel* acc;
+  double* x;
+  double* y;
 };
 
 
 /// for nextCompileLevel
-typedef struct compileInfoStruct {
-  char  *line;
+struct CompileInfo
+{
+  char* line;
   int32_t (*charfunc)(void);
-  char  *name;
-  FILE  *stream;
-  int32_t   line_number;
-  struct compileInfoStruct      *next;
-  struct compileInfoStruct      *prev;
-} compileInfo;
+  char* name;
+  FILE* stream;
+  int32_t line_number;
+  CompileInfo* next;
+  CompileInfo* prev;
+};
 
 /// for execution nesting info:
-typedef struct executionLevelInfoStruct {
-  int32_t   target;
-  int32_t   line;
-} executionLevelInfo;
+struct ExecutionLevelInfo
+{
+  int32_t target;
+  int32_t line;
+};
 
-typedef struct {
+struct FormatInfo
+{
   char* format;               //!< whole format string
   char* current;              //!< the currently selected format entry
   char* start;                //!< initial % of current format entry
@@ -659,13 +775,14 @@ typedef struct {
   char save1;                   //!< for temporary storage
   char save2;                   //!< for temporary storage
   char only_whitespace;         //!< whitespace only?
-} formatInfo;
+};
 
 /// A LUX breakpoint
-struct Breakpoint {
-  int32_t   line;
-  char  *name;
-  char  status;
+struct Breakpoint
+{
+  int32_t line;
+  char* name;
+  char status;
 };
 #define BP_DEFINED      1
 #define BP_ENABLED      2
@@ -675,16 +792,16 @@ struct Breakpoint {
 // for Dick's stuff
 #define types_ptr       Pointer
 #define ahead           Array
-#define sym_desc        symTableEntryStruct
+#define sym_desc        SymbolImpl
 #define class8_to_1(x)  dereferenceScalPointer(x)
 
 #define symbol_ident_single(x,y)        what(x,y)
 int32_t     nextFreeTempVariable(void), nextFreeNamedVariable(void),
         nextFreeExecutable(void), nextFreeTempExecutable(void),
-        dereferenceScalPointer(int32_t), findSym(int32_t, hashTableEntry *[], int32_t),
+        dereferenceScalPointer(int32_t), findSym(int32_t, HashTableEntry *[], int32_t),
         findInternalName(char const *, int32_t), luxerror(char const *, int32_t, ...),
-        lookForName(char const *, hashTableEntry *[], int32_t), execute(int32_t);
-char const* symName(int32_t, hashTableEntry *[]);
+        lookForName(char const *, HashTableEntry *[], int32_t), execute(int32_t);
+char const* symName(int32_t, HashTableEntry *[]);
 
 #define getFreeTempVariable(a)\
         { if ((a = nextFreeTempVariable()) < 0) return a; }

@@ -750,17 +750,17 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
   if (enarg) {
     if (*eps) {                 // contours
       bool done = false;
+      gp.send("set contour base; unset surface; set view map;\n");
       if (symbolIsRealScalar(*eps)) {
         if (symbolIsInteger(*eps)) {
           int32_t value = int_arg(*eps);
           if (value == 1) { // fully automatic contours
             // display automatically selected contours
-            gp.send("set contour surface; set cntrparam levels auto;\n");
+            gp.send("set cntrparam levels auto;\n");
             have_contour_labels = true;
             done = true;
           } else if (value > 1) { // desired contour count
-            gp.sendf("set contour surface; set cntrparam levels auto %d;\n",
-                     value);
+            gp.sendf("set cntrparam levels auto %d;\n", value);
             have_contour_labels = true;
             done = true;
           } else if (value == 0) { // no contours
@@ -777,11 +777,11 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
         int32_t iq = lux_double(1, eps);
         if (numerical(iq, NULL, NULL, &contours_count, &contours) < 0)
           return LUX_ERROR;
-        gp.send("set contour surface; set cntrparam levels discrete ");
+        gp.send("set cntrparam levels discrete ");
         for (int i = 0; i < contours_count; ++i) {
           if (i)
             gp.sendf(",");
-          gp.sendf("%f", *contours.f++);
+          gp.sendf("%g", *contours.d++);
         }
         gp.send("\n");
         have_contour_labels = true;
@@ -793,27 +793,29 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
   } else
     gp.send("unset contour;\n");
 
-  if (internalMode & 1)         // /flat
-    gp.send("set view map\n");
-  else {
-    gp.send("unset view\n");
-    gp.sendf("set view %f,%f\n", angle_x, angle_z);
-  }
+  if (!have_contour_labels) {
+    if (internalMode & 1)         // /flat
+      gp.send("set view map\n");
+    else {
+      gp.send("unset view\n");
+      gp.sendf("set view %f,%f\n", angle_x, angle_z);
+    }
 
-  if (internalMode & 2)         // logarithmic x axis
-    gp.send("set logscale x\n");
-  else
-    gp.send("unset logscale x\n");
+    if (internalMode & 2)         // logarithmic x axis
+      gp.send("set logscale x\n");
+    else
+      gp.send("unset logscale x\n");
 
-  if (internalMode & 4)         // logarithmic y axis
-    gp.send("set logscale y\n");
-  else
-    gp.send("unset logscale y;\n");
+    if (internalMode & 4)         // logarithmic y axis
+      gp.send("set logscale y\n");
+    else
+      gp.send("unset logscale y;\n");
 
-  if (internalMode & 8) {       // logarithmic z axis
-    gp.send("set logscale z; set logscale cb;\n");
-  } else {
-    gp.send("unset logscale z; unset logscale cb;\n");
+    if (internalMode & 8) {       // logarithmic z axis
+      gp.send("set logscale z; set logscale cb;\n");
+    } else {
+      gp.send("unset logscale z; unset logscale cb;\n");
+    }
   }
 
   // gp.send("set tics; set auto fix;\n");
@@ -905,7 +907,12 @@ int32_t lux_gnuplot3d(int32_t narg, int32_t ps[])
             }
             tmp.close();
 
-            gp.sendf("splot '%s' binary nonuniform matrix using 1:2:3 notitle with pm3d;\n",
+            if (have_contour_labels)
+              gp.sendf("splot '%s' binary nonuniform matrix using 1:2:3 notitle with lines;\n",
+                     gp.data_file_name().c_str())
+              .flush();
+            else
+              gp.sendf("splot '%s' binary nonuniform matrix using 1:2:3 notitle with pm3d;\n",
                      gp.data_file_name().c_str())
               .flush();
           } else

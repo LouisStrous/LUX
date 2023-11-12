@@ -65,11 +65,13 @@ struct LoopInfo {
   int32_t raxes[MAX_DIMS];          //!< from rearranged to old axes
   int32_t iraxes[MAX_DIMS];         //!< from old to rearranged axes
 
-  int32_t setAxes(int32_t nAxes, int32_t *axes, int32_t mode);
+  Symbol setAxes(int32_t nAxes, const int32_t* axes, int32_t mode);
+  Symbol setAxes(const std::vector<int32_t>& axes, int32_t mode);
+
   int setupDimensionLoop(int32_t ndim, int32_t const *dims,
                          Symboltype type, int32_t naxes, int32_t const *axes,
                          Pointer *data, int32_t mode);
-  int32_t advanceLoop(void* ptr);
+  int32_t advanceLoop(const void* ptr);
   int32_t loopIsAtStart() const;
   void rearrangeDimensionLoop();
   void setAxisMode(int32_t mode);

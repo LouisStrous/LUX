@@ -24,8 +24,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "types.hh"
 
-/// A class that describes the dimensional structure and location of numeric
-/// data.
+/// A class that describes the dimensional structure and location of
+/// numeric data.
 class NumericDataDescriptor
 {
 public:
@@ -35,10 +35,11 @@ public:
 
   // constructors
 
-  /// Default constructor.
+  /// Default constructor.  Leaves is_valid() equal to `false`.
   NumericDataDescriptor();
 
-  /// Constructor that fills the members based on the contents of the symbol.
+  /// Constructor that fills the members based on the contents of the
+  /// symbol.
   ///
   /// \param[in] symbol is the number of the symbol.
   explicit NumericDataDescriptor(Symbol symbol);

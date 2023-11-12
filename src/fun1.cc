@@ -92,13 +92,13 @@ double (*func_ddd[])(double, double, double) = {
   non_central_chi_square, incomplete_beta, F
 };
 
-doubleComplex c_sin(double, double), c_cos(double, double),
+DoubleComplex c_sin(double, double), c_cos(double, double),
   c_tan(double, double), c_arcsin(double, double), c_arccos(double,
   double), c_arctan(double, double), c_sinh(double, double),
   c_cosh(double, double), c_tanh(double, double), c_log(double,
   double), c_exp(double, double);
 
-doubleComplex (*func_c[])(double, double) = {
+DoubleComplex (*func_c[])(double, double) = {
   c_sin, c_cos, c_tan, c_arcsin, c_arccos, c_arctan, c_sinh, c_cosh,
   c_tanh, NULL, NULL, c_exp, NULL, c_log, NULL, NULL, NULL, NULL,
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -1094,7 +1094,6 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
 {
   int32_t       n, result, iq, *trgt;
   Pointer       src;
-  floatComplex  *trgtc;
 
   iq = *ps;
   switch (symbol_class(iq)) {
@@ -1102,7 +1101,7 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
       iq = dereferenceScalPointer(iq);
     case LUX_SCALAR:
       if (scalar_type(iq) < LUX_FLOAT) // integer type
-        return lux_zerof(narg, ps); // always OK
+        return LUX_ZERO; // always OK
       n = 1;
       src.f = &scalar_value(iq).f;
       result = scalar_scratch(LUX_INT32);
@@ -1111,12 +1110,12 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
     case LUX_CSCALAR:
       n = 1;
       src.cf = complex_scalar_data(iq).cf;
-      result = scalar_scratch(LUX_CFLOAT);
+      result = scalar_scratch(LUX_INT32);
       trgt = &scalar_value(result).i32;
       break;
     case LUX_ARRAY:
       if (array_type(iq) < LUX_FLOAT)
-        return lux_zerof(narg, ps); // always OK
+        return array_clone_zero(iq, LUX_INT32); // always OK
       if (isStringType(array_type(iq)))
         return cerror(ILL_TYPE, *ps); // no string arrays allowed here
       n = array_size(iq);
@@ -1127,8 +1126,8 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
     case LUX_CARRAY:
       n = array_size(iq);
       src.f = (float*) array_data(iq);
-      result = array_clone(iq, LUX_CFLOAT);
-      trgtc = (floatComplex*) array_data(result);
+      result = array_clone_zero(iq, LUX_INT32);
+      trgt = (int32_t*) array_data(result);
       break;
     default:
       return cerror(ILL_CLASS, *ps);
@@ -1145,14 +1144,14 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
       break;
     case LUX_CFLOAT:
       while (n--) {
-        trgtc->real = isnan(src.cf->real);
-        trgtc++->imaginary = isnan(src.cf++->imaginary);
+        *trgt++ = (isnan(src.cf->real) || isnan(src.cf->imaginary));
+        ++src.cf;
       }
       break;
     case LUX_CDOUBLE:
       while (n--) {
-        trgtc->real = isnan(src.cd->real);
-        trgtc++->imaginary = isnan(src.cd++->imaginary);
+        *trgt++ = (isnan(src.cd->real) || isnan(src.cd->imaginary));
+        ++src.cd;
       }
       break;
   }
@@ -1297,7 +1296,7 @@ int32_t lux_abs(int32_t narg, int32_t ps[])
       result = array_scratch((Symboltype) (array_type(iq)
                                            - LUX_CFLOAT + LUX_FLOAT),
                              array_num_dims(iq), array_dims(iq));
-      src.cf = (floatComplex*) array_data(iq);
+      src.cf = (FloatComplex*) array_data(iq);
       trgt.ui8 = (uint8_t*) array_data(result);
       n = array_size(iq);
       break;
@@ -1402,7 +1401,7 @@ int32_t lux_complexsquare(int32_t narg, int32_t ps[])
       result = array_scratch((Symboltype) (array_type(iq)
                                            - LUX_CFLOAT + LUX_FLOAT),
                              array_num_dims(iq), array_dims(iq));
-      src.cf = (floatComplex*) array_data(iq);
+      src.cf = (FloatComplex*) array_data(iq);
       trgt.ui8 = (uint8_t*) array_data(result);
       n = array_size(iq);
       break;
@@ -1509,12 +1508,12 @@ int32_t lux_conjugate(int32_t narg, int32_t ps[])
       n = 1;
       break;
     case LUX_CARRAY:
-      src.cf = (floatComplex*) array_data(*ps);
+      src.cf = (FloatComplex*) array_data(*ps);
       if (isFreeTemp(*ps))
         result = *ps;
       else
         result = array_clone(*ps, symbol_type(*ps));
-      trgt.cf = (floatComplex*) array_data(result);
+      trgt.cf = (FloatComplex*) array_data(result);
       n = array_size(*ps);
       break;
     default:
@@ -1546,8 +1545,8 @@ int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
   Symboltype outType;
   Pointer       src, trgt, sum, weights, hist;
   Scalar        temp, value;
-  floatComplex  tempcf, valuecf;
-  doubleComplex         tempcd, valuecd;
+  FloatComplex  tempcf, valuecf;
+  DoubleComplex         tempcd, valuecd;
   float         temp2f;
   double        temp2d;
   uint8_t       *present;
@@ -4002,8 +4001,8 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
   Symboltype type, outtype;
   uint8_t       *present;
   Scalar        sum, value, temp, w;
-  floatComplex  sumcf, tempcf, valuecf;
-  doubleComplex         sumcd, tempcd, valuecd;
+  FloatComplex  sumcf, tempcf, valuecf;
+  DoubleComplex         sumcd, tempcd, valuecd;
   float         temp2f;
   double        temp2d;
   Pointer       src, trgt, weights;
@@ -4142,14 +4141,16 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
 
   bool omitNaNs = (internalMode & 8) != 0;
 
-  if (p == 1) {                         // regular summation
+  if (p == 1) {                 // regular summation
     if (haveWeights) {          // have <weights>
 #if DEBUG_VOCAL
       debugout("Weighted regular summation");
 #endif
-      switch (outtype) {
+      switch (outtype)
+      {
         case LUX_INT32:
-          switch (type) {
+          switch (type)
+          {
             case LUX_INT8:
               {
                 AlgorithmTotalWithWeight
@@ -4299,13 +4300,31 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
           do {
             sumcf.real = sumcf.imaginary = 0.0;
             w.f = 0.0;
-            do {
-              sumcf.real += src.cf->real * *weights.f;
-              sumcf.imaginary += src.cf->imaginary * *weights.f;
-              w.f += *weights.f;
-            } while ((done = (winfo.advanceLoop(&weights.ui8),
-                              srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
+            if (omitNaNs)
+            {
+              do {
+                if (!isnan(src.cf->real)
+                    && !isnan(src.cf->imaginary)
+                    && !isnan(*weights.f))
+                {
+                  sumcf.real += src.cf->real * *weights.f;
+                  sumcf.imaginary += src.cf->imaginary * *weights.f;
+                  w.f += *weights.f;
+                }
+              } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                srcinfo.advanceLoop(&src.ui8)))
+                       < srcinfo.naxes);
+            }
+            else                // keep NaNs
+            {
+              do {
+                sumcf.real += src.cf->real * *weights.f;
+                sumcf.imaginary += src.cf->imaginary * *weights.f;
+                w.f += *weights.f;
+              } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                srcinfo.advanceLoop(&src.ui8)))
+                       < srcinfo.naxes);
+            }
             if (mean) {
               if (w.f) {
                 trgt.cf->real = sumcf.real/w.f;
@@ -4326,13 +4345,32 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
               do {
                 sumcd.real = sumcd.imaginary = 0.0;
                 w.d = 0.0;
-                do {
-                  sumcd.real += (double) src.cf->real * *weights.f;
-                  sumcd.imaginary += (double) src.cf->imaginary * *weights.f;
-                  w.d += *weights.d;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
+                if (omitNaNs)
+                {
+                  do {
+                    if (!isnan(src.cf->real)
+                        && !isnan(src.cf->imaginary)
+                        && !isnan(*weights.f))
+                      {
+                        sumcd.real += (double) src.cf->real * *weights.f;
+                        sumcd.imaginary
+                          += (double) src.cf->imaginary * *weights.f;
+                        w.d += *weights.d;
+                      }
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
+                           < srcinfo.naxes);
+                }
+                else            // accept NaNs
+                {
+                  do {
+                    sumcd.real += (double) src.cf->real * *weights.f;
+                    sumcd.imaginary += (double) src.cf->imaginary * *weights.f;
+                    w.d += *weights.d;
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
+                           < srcinfo.naxes);
+                }
                 if (mean) {
                   if (w.d) {
                     trgt.cd->real = sumcd.real/w.d;
@@ -4350,13 +4388,31 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
               do {
                 sumcd.real = sumcd.imaginary = 0.0;
                 w.d = 0.0;
-                do {
-                  sumcd.real += src.cd->real * *weights.d;
-                  sumcd.imaginary += src.cd->imaginary * *weights.d;
-                  w.d += *weights.d;
-                } while ((done = (winfo.advanceLoop(&weights.ui8),
-                                  srcinfo.advanceLoop(&src.ui8)))
-                         < srcinfo.naxes);
+                if (omitNaNs)
+                {
+                  do {
+                    if (!isnan(src.cd->real)
+                        && !isnan(src.cd->imaginary)
+                        && !isnan(*weights.d))
+                    {
+                      sumcd.real += src.cd->real * *weights.d;
+                      sumcd.imaginary += src.cd->imaginary * *weights.d;
+                      w.d += *weights.d;
+                    }
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
+                           < srcinfo.naxes);
+                }
+                else            // accept NaNs
+                {
+                  do {
+                    sumcd.real += src.cd->real * *weights.d;
+                    sumcd.imaginary += src.cd->imaginary * *weights.d;
+                    w.d += *weights.d;
+                  } while ((done = (winfo.advanceLoop(&weights.ui8),
+                                    srcinfo.advanceLoop(&src.ui8)))
+                           < srcinfo.naxes);
+                }
                 if (mean) {
                   if (w.d) {
                     trgt.cd->real = sumcd.real/w.d;
@@ -4373,13 +4429,16 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
           } // end of switch (type)
           break;
       }         // end of switch (outtype)
-    } else {                    // no <weights>: plain summation
+    }
+    else
+    {                           // no <weights>: plain summation
 #if DEBUG_VOCAL
       debugout("Regular unweighted summing");
 #endif
       switch (outtype) {
         case LUX_INT32:
-          switch (type) {
+          switch (type)
+          {
             case LUX_INT8:
               {
                 AlgorithmTotal a(srcinfo, src.ui8, trgt.i32, mean);
@@ -4401,7 +4460,8 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
           } // end of switch (type)
           break;
         case LUX_INT64:
-          switch (type) {
+          switch (type)
+          {
             case LUX_INT8:
               {
                 AlgorithmTotal a(srcinfo, src.ui8, trgt.i64, mean);
@@ -4429,7 +4489,8 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
           } // end of switch (type)
           break;
         case LUX_FLOAT:
-          switch (type) {
+          switch (type)
+          {
             case LUX_INT8:
               {
                 AlgorithmTotal<uint8_t, float, double>
@@ -4469,7 +4530,8 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
           } // end of switch (type)
           break;
       case LUX_DOUBLE:
-        switch (type) {
+        switch (type)
+        {
         case LUX_INT8:
           {
             AlgorithmTotal a(srcinfo, src.ui8, trgt.d, mean);
@@ -4511,13 +4573,29 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
         case LUX_CFLOAT:
           do {
             sumcf.real = sumcf.imaginary = 0.0;
-            do {
-              sumcf.real += src.cf->real;
-              sumcf.imaginary += src.cf->imaginary;
-            } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+            size_t count = 0;
+            if (omitNaNs)
+            {
+              do {
+                if (!isnan(src.cf->real)
+                    && !isnan(src.cf->imaginary))
+                {
+                  sumcf.real += src.cf->real;
+                  sumcf.imaginary += src.cf->imaginary;
+                  ++count;
+                }
+              } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+            }
+            else                // accept NaNs
+            {
+              do {
+                sumcf.real += src.cf->real;
+                sumcf.imaginary += src.cf->imaginary;
+              } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+            }
             if (mean) {
-              trgt.cf->real = sumcf.real/n;
-              trgt.cf++->imaginary = sumcf.imaginary/n;
+              trgt.cf->real = sumcf.real/(count? count: n);
+              trgt.cf++->imaginary = sumcf.imaginary/(count? count: n);
             } else {
               trgt.cf->real = sumcf.real;
               trgt.cf++->imaginary = sumcf.imaginary;
@@ -4529,13 +4607,31 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
             case LUX_CFLOAT:
               do {
                 sumcd.real = sumcd.imaginary = 0.0;
-                do {
-                  sumcd.real += src.cf->real;
-                  sumcd.imaginary += src.cf->imaginary;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                size_t count = 0;
+                if (omitNaNs)
+                {
+                  do {
+                    if (!isnan(src.cf->real)
+                        && !isnan(src.cf->imaginary))
+                    {
+                      sumcd.real += src.cf->real;
+                      sumcd.imaginary += src.cf->imaginary;
+                      ++count;
+                    }
+                  } while ((done
+                            = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                }
+                else            // accept NaNs
+                {
+                  do {
+                    sumcd.real += src.cf->real;
+                    sumcd.imaginary += src.cf->imaginary;
+                  } while ((done
+                            = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                }
                 if (mean) {
-                  trgt.cd->real = sumcd.real/n;
-                  trgt.cd++->imaginary = sumcd.imaginary/n;
+                  trgt.cd->real = sumcd.real/(count? count: n);
+                  trgt.cd++->imaginary = sumcd.imaginary/(count? count: n);
                 } else {
                   trgt.cd->real = sumcd.real;
                   trgt.cd++->imaginary = sumcd.imaginary;
@@ -4545,13 +4641,31 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
             case LUX_CDOUBLE:
               do {
                 sumcd.real = sumcd.imaginary = 0.0;
-                do {
-                  sumcd.real += src.cd->real;
-                  sumcd.imaginary += src.cd->imaginary;
-                } while ((done = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                size_t count = 0;
+                if (omitNaNs)
+                {
+                  do {
+                    if (!isnan(src.cd->real)
+                        && !isnan(src.cd->imaginary))
+                    {
+                      sumcd.real += src.cd->real;
+                      sumcd.imaginary += src.cd->imaginary;
+                      ++count;
+                    }
+                  } while ((done
+                            = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                }
+                else            // accept NaNs
+                {
+                  do {
+                    sumcd.real += src.cd->real;
+                    sumcd.imaginary += src.cd->imaginary;
+                  } while ((done
+                            = srcinfo.advanceLoop(&src.ui8)) < srcinfo.naxes);
+                }
                 if (mean) {
-                  trgt.cd->real = sumcd.real/n;
-                  trgt.cd++->imaginary = sumcd.imaginary/n;
+                  trgt.cd->real = sumcd.real/(count? count: n);
+                  trgt.cd++->imaginary = sumcd.imaginary/(count? count: n);
                 } else {
                   trgt.cd->real = sumcd.real;
                   trgt.cd++->imaginary = sumcd.imaginary;
@@ -5250,30 +5364,30 @@ int32_t lux_mean(int32_t narg, int32_t ps[])
    return total(narg, ps, 1);
  }
 //-------------------------------------------------------------------------
-doubleComplex c_sin(double real, double imaginary)
+DoubleComplex c_sin(double real, double imaginary)
 // complex sine
 {
-  doubleComplex         result;
+  DoubleComplex         result;
 
   result.real = sin(real)*cosh(imaginary);
   result.imaginary = cos(real)*sinh(imaginary);
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_cos(double real, double imaginary)
+DoubleComplex c_cos(double real, double imaginary)
 // complex cosine
 {
-  doubleComplex         result;
+  DoubleComplex         result;
 
   result.real = cos(real)*cosh(imaginary);
   result.imaginary = -sin(real)*sinh(imaginary);
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_tan(double real, double imaginary)
+DoubleComplex c_tan(double real, double imaginary)
 // complex tangent
 {
-  doubleComplex result;
+  DoubleComplex result;
   double        factor;
 
   factor = 1.0/(cos(2*real) + cosh(2*imaginary));
@@ -5282,11 +5396,11 @@ doubleComplex c_tan(double real, double imaginary)
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_arcsin(double real, double imaginary)
+DoubleComplex c_arcsin(double real, double imaginary)
 // complex arc sine
 {
   double        a, b, c, d;
-  doubleComplex         result;
+  DoubleComplex         result;
 
   imaginary *= imaginary;
   c = real + 1;
@@ -5300,11 +5414,11 @@ doubleComplex c_arcsin(double real, double imaginary)
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_arccos(double real, double imaginary)
+DoubleComplex c_arccos(double real, double imaginary)
 // complex arc cosine
 {
   double        a, b, c, d;
-  doubleComplex         result;
+  DoubleComplex         result;
 
   imaginary *= imaginary;
   c = real + 1;
@@ -5318,11 +5432,11 @@ doubleComplex c_arccos(double real, double imaginary)
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_arctan(double real, double imaginary)
+DoubleComplex c_arctan(double real, double imaginary)
 // complex arc tangent
 {
   double        a, b;
-  doubleComplex         result;
+  DoubleComplex         result;
 
   result.real = 0.5*atan(2*real/(1 - real*real - imaginary*imaginary));
   real *= real;
@@ -5334,31 +5448,31 @@ doubleComplex c_arctan(double real, double imaginary)
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_sinh(double real, double imaginary)
+DoubleComplex c_sinh(double real, double imaginary)
 // complex hyperbolic sine
 {
-  doubleComplex         result;
+  DoubleComplex         result;
 
   result.real = sinh(real)*cos(imaginary);
   result.imaginary = cosh(real)*sin(imaginary);
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_cosh(double real, double imaginary)
+DoubleComplex c_cosh(double real, double imaginary)
 // complex hyperbolic cosine
 {
-  doubleComplex         result;
+  DoubleComplex         result;
 
   result.real = cosh(real)*cos(imaginary);
   result.imaginary = sinh(real)*sin(imaginary);
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_tanh(double real, double imaginary)
+DoubleComplex c_tanh(double real, double imaginary)
 // complex hyperbolic tangent
 {
   double        factor;
-  doubleComplex         result;
+  DoubleComplex         result;
 
   factor = 1.0/(cosh(2*real) + cos(2*imaginary));
   result.real = sinh(2*real)*factor;
@@ -5366,21 +5480,21 @@ doubleComplex c_tanh(double real, double imaginary)
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_log(double real, double imaginary)
+DoubleComplex c_log(double real, double imaginary)
 // complex logarithm
 {
-  doubleComplex         result;
+  DoubleComplex         result;
 
   result.real = 0.5*log(real*real + imaginary*imaginary);
   result.imaginary = atan2(imaginary, real);
   return result;
 }
 //-------------------------------------------------------------------------
-doubleComplex c_exp(double real, double imaginary)
+DoubleComplex c_exp(double real, double imaginary)
 // complex exponential
 {
   double        r;
-  doubleComplex         result;
+  DoubleComplex         result;
 
   r = exp(real);
   result.real = r*cos(imaginary);
@@ -5639,7 +5753,7 @@ int32_t math_funcs(int32_t nsym, int32_t code)
 {
   int32_t       n, result, type, out_type;
   Pointer       trgt, src;
-  doubleComplex         value;
+  DoubleComplex         value;
 
   errno = 0;                    // or "old" errors might get reported
   type = symbol_type(nsym);

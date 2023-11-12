@@ -28,7 +28,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <strings.h>                // for bzero
 #include "lux_structures.hh"
- extern struct sym_desc sym[];
+ extern SymbolImpl sym[];
  struct GIFScreen {
         char id[7];
         unsigned char width_lsb;

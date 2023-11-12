@@ -52,7 +52,12 @@ lux_read_image_oiio(int32_t narg, int32_t ps[])
     result = array_scratch(luxtype, sizeof(dims)/sizeof(*dims), dims);
   }
   auto scanlinesize = spec.width*spec.nchannels*lux_type_size[luxtype];
-  in->read_image(0, 0, 0, -1, oiiotype, array_data(result)); // default z stride
+  in->read_image(0, 0, 0, -1,
+                 oiiotype, ((char*) array_data(result))
+                 + (spec.height - 1)*scanlinesize,
+                 OIIO::AutoStride,  // default x stride
+                 -scanlinesize,     // special y stride
+                 OIIO::AutoStride); // default z stride
   in->close();
   return result;
 }

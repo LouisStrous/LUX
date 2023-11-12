@@ -318,8 +318,8 @@ int32_t lux_fzarr(int32_t narg, int32_t ps[])
   char        *name, *p;
   int32_t        wwflag, iq, mq;
   FILE        *fp;
-  fzHead        *fh;
-  int32_t        ck_synch_hd(FILE *, fzHead *, int32_t *);
+  FzHead        *fh;
+  int32_t        ck_synch_hd(FILE *, FzHead *, int32_t *);
 
   if (symbol_class(*ps) != LUX_STRING)
     return cerror(NEED_STR, *ps);
@@ -327,7 +327,7 @@ int32_t lux_fzarr(int32_t narg, int32_t ps[])
   fp = Fopen(expand_name(name, NULL), "r");
   if (!fp)                        // could not open file for reading
     return cerror(ERR_OPEN, 0);
-  fh = (fzHead *) scrat;
+  fh = (FzHead *) scrat;
   if (ck_synch_hd(fp, fh, &wwflag) < 0)
     return LUX_ERROR;
   fclose(fp);

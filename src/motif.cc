@@ -68,7 +68,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  //following is icon bitmap, currently same as in xport but want to change
 #include "lux_bitmap.xbmh"
 
- extern        struct sym_desc sym[];
+ extern        SymbolImpl sym[];
 
 extern Colormap        colorMap;        // from color.c
 

@@ -45,23 +45,23 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
 extern char const* symbolStack[];
-extern symTableEntry    sym[];
-extern hashTableEntry   *varHashTable[], *subrHashTable[], *funcHashTable[],
+extern SymbolImpl    sym[];
+extern HashTableEntry   *varHashTable[], *subrHashTable[], *funcHashTable[],
                         *blockHashTable[];
 extern int16_t          listStack[];
 extern int32_t          keepEVB;
 extern char             *currentChar, line[];
 extern FILE             *inputStream, *outputStream;
 extern int32_t          nExecuted;
-// extern internalRoutine       subroutine[], function[];
-internalRoutine *subroutine, *function;
+// extern InternalRoutine       subroutine[], function[];
+InternalRoutine *subroutine, *function;
 
 int32_t         luxerror(char const*, int32_t, ...),
-  lookForName(char const*, hashTableEntry *[], int32_t),
+  lookForName(char const*, HashTableEntry *[], int32_t),
         newSymbol(Symbolclass, ...), lux_setup();
 void    installKeys(void *keys), zerobytes(void *, int32_t);
 char    *strsave(char const *);
-char const* symName(int32_t, hashTableEntry *[]), *className(int32_t),
+char const* symName(int32_t, HashTableEntry *[]), *className(int32_t),
         *typeName(int32_t);
 
 int32_t         nFixed = 0, noioctl = 0, trace = 0, curTEIndex;
@@ -82,7 +82,7 @@ int32_t         symbolStackIndex = 0, tempVariableIndex = TEMPS_START,
 
 int32_t         markStack[MSSIZE], markIndex = 0;
 
-executionLevelInfo      *exInfo = NULL;
+ExecutionLevelInfo      *exInfo = NULL;
 int32_t         nexInfo = 0;
 
 extern int32_t  compileLevel, curLineNumber;
@@ -267,7 +267,7 @@ int32_t         lux_zeroifnotdefined(), lux_compile_file();     // browser
   "%1%SPECIAL" -> FOO,3,2 yields (none),3,2
                   FOO,3,SPECIAL=1 yields 1,3 */
 
-internalRoutine         subroutine_table[] = {
+InternalRoutine         subroutine_table[] = {
   { "%insert",  3, MAX_ARG, insert, // execute.c
     "1inner:2outer:4onedim:8skipspace:16zero:32all:64separate" },
   { "area",     1, 4, lux_area, ":seed:numbers:diagonal" }, // topology.c
@@ -385,7 +385,7 @@ internalRoutine         subroutine_table[] = {
   { "int64",    1, MAX_ARG, lux_int64_inplace, 0 },              // symbols.c
   { "jpegread", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
   { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },                    // jpeg.c
-  { "limits",   0, 4, lux_limits, 0 },                           // plots.c
+  { "limits",   0, 6, lux_limits, 0 },                           // plots.c
   { "list",     1, 1, lux_list, 0 },                             // ident.c
   { "long",     1, MAX_ARG, lux_long_inplace, 0 },               // symbols.c
   { "menu",     1, MAX_ARG, lux_menu, 0 },                       // menu.c
@@ -662,7 +662,7 @@ internalRoutine         subroutine_table[] = {
   { "zeronans", 1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
   { "zoom",     1, 3, lux_zoom, "1oldcontrast" },      // zoom.c
 };
-int32_t nSubroutine = sizeof(subroutine_table)/sizeof(internalRoutine);
+int32_t nSubroutine = sizeof(subroutine_table)/sizeof(InternalRoutine);
 
 extern LuxRoutine lux_abs, lux_acos, lux_arestore_f, lux_arg,
   lux_array, lux_asin, lux_assoc, lux_astore_f, lux_atan,
@@ -785,7 +785,7 @@ extern LuxRoutine lux_read_jpeg6b_f, lux_write_jpeg6b_f;
 extern int32_t  vargsmooth;
 extern LuxRoutine lux_test;
 
-internalRoutine function_table[] = {
+InternalRoutine function_table[] = {
   { "%a_unary_negative", 1, 1, lux_neg_func, "*" }, // fun1.cc
   { "%b_subscript", 1, MAX_ARG, lux_subsc_func,     // subsc.cc
     "1inner:2outer:4zero:8subgrid:16keepdims:32all:64separate" },
@@ -1278,7 +1278,7 @@ internalRoutine function_table[] = {
   { "zeronans", 1, 2, lux_zapnan_f, "*%1%value" }, // fun1.cc
   { "zinv",     1, 1, lux_zinv, "*" },             // strous.cc
 };
-int32_t nFunction = sizeof(function_table)/sizeof(internalRoutine);
+int32_t nFunction = sizeof(function_table)/sizeof(InternalRoutine);
 //----------------------------------------------------------------
 void undefine(int32_t symbol)
 // free up memory allocated for <symbol> and make it undefined
@@ -1288,8 +1288,9 @@ void undefine(int32_t symbol)
   int32_t       n, k, oldZapContext, i;
   int16_t       *ptr;
   Pointer       p2;
-  listElem      *p;
-  extractSec    *eptr, *eptr0;
+  ListElem* p;
+  ExtractSec* eptr;
+  ExtractSec* eptr0;
   extern int32_t        tempSym;
   extern char   restart;
 
@@ -1528,7 +1529,7 @@ void zap(int32_t nsym)
 {
  char const *name, *noName = "[]";
  int32_t        context, hashValue;
- hashTableEntry         *hp, *oldHp, **hashTable;
+ HashTableEntry         *hp, *oldHp, **hashTable;
 #if DEBUG
  void   checkTemps(void);
 #endif
@@ -2069,7 +2070,7 @@ int32_t newSymbol(Symbolclass kind, ...)
 {
   int32_t               n, i, narg, isStruct, isScalarRange, j, target, depth;
   extern char   reportBody, ignoreSymbols, compileOnly;
-  extractSec    *eptr;
+  ExtractSec* eptr;
   int16_t       *ptr;
   Pointer       p;
 #if YYDEBUG
@@ -2142,8 +2143,8 @@ int32_t newSymbol(Symbolclass kind, ...)
         break;
       case LUX_STRUCT_PTR:
         symbol_class(n) = LUX_STRUCT_PTR;
-        symbol_memory(n) = sizeof(structPtr);
-        struct_ptr_elements(n) = (structPtr*) malloc(symbol_memory(n));
+        symbol_memory(n) = sizeof(StructPtr);
+        struct_ptr_elements(n) = (StructPtr*) malloc(symbol_memory(n));
         break;
       case LUX_EXTRACT:
         target = popList();
@@ -2151,19 +2152,19 @@ int32_t newSymbol(Symbolclass kind, ...)
           extract_target(n) = target;
           depth = popList();
           extract_num_sec(n) = (Symboltype) depth;
-          symbol_memory(n) = depth*sizeof(extractSec);
-          extract_ptr(n) = eptr = (extractSec*) malloc(symbol_memory(n));
+          symbol_memory(n) = depth*sizeof(ExtractSec);
+          extract_ptr(n) = eptr = (ExtractSec*) malloc(symbol_memory(n));
           embed(target, n);
         } else {
           i = -target;
           symbol_class(n) = LUX_PRE_EXTRACT;
-          symbol_memory(n) = sizeof(preExtract);
-          symbol_data(n) = malloc(sizeof(preExtract));
+          symbol_memory(n) = sizeof(PreExtract);
+          symbol_data(n) = malloc(sizeof(PreExtract));
           pre_extract_name(n) = (char*) symbolStack[i];
           unlinkString(i);      // so it does not get zapped
           depth = popList();
           pre_extract_num_sec(n) = (Symboltype) depth;
-          pre_extract_ptr(n) = eptr = (extractSec*) (depth? malloc(depth*sizeof(extractSec)): NULL);
+          pre_extract_ptr(n) = eptr = (ExtractSec*) (depth? malloc(depth*sizeof(ExtractSec)): NULL);
         }
         if (!eptr && depth)
           return cerror(ALLOC_ERR, 0);
@@ -2281,10 +2282,9 @@ int32_t newSymbol(Symbolclass kind, ...)
           arg -= 2;
         }
         if (isStruct) {
-          listElem      *p;
-        
-          i = narg*(sizeof(listElem));
-          if (!(list_symbols(n) = (listElem *) malloc(i))) {
+          ListElem* p;
+          i = narg*(sizeof(ListElem));
+          if (!(list_symbols(n) = (ListElem *) malloc(i))) {
             va_end(ap);
             return luxerror("Could not allocate memory for a struct", 0);
           }
@@ -2756,10 +2756,10 @@ int32_t hash(char const* string)
 //----------------------------------------------------------------
 int32_t ircmp(const void *a, const void *b)
 {
-  internalRoutine *ra, *rb;
+  InternalRoutine *ra, *rb;
 
-  ra = (internalRoutine *) a;
-  rb = (internalRoutine *) b;
+  ra = (InternalRoutine *) a;
+  rb = (InternalRoutine *) b;
   return strcmp(ra->name, rb->name);
 }
 //----------------------------------------------------------------
@@ -2768,7 +2768,7 @@ int32_t findInternalName(char const* name, int32_t isSubroutine)
   or function table.  if found, returns
   index, else returns -1 */
 {
-  internalRoutine       *table, *found, key;
+  InternalRoutine       *table, *found, key;
   size_t n;
 
   if (isSubroutine) {
@@ -2779,13 +2779,13 @@ int32_t findInternalName(char const* name, int32_t isSubroutine)
     n = nFunction;
   }
   key.name = name;
-  found = (internalRoutine*) bsearch(&key, table, n, sizeof(*table), ircmp);
+  found = (InternalRoutine*) bsearch(&key, table, n, sizeof(*table), ircmp);
   return found? found - table: -1;
 }
 //----------------------------------------------------------------
-static compileInfo      *c_info = NULL;
+static CompileInfo      *c_info = NULL;
 int32_t         cur_c_info = 0, n_c_info = 0;
-compileInfo     *curCompileInfo;
+CompileInfo     *curCompileInfo;
 
 int32_t nextCompileLevel(FILE *fp, char const* fileName)
 /* saves the rest of the current input line and starts reading
@@ -2799,7 +2799,7 @@ int32_t nextCompileLevel(FILE *fp, char const* fileName)
  extern uint8_t         disableNewline;
  int32_t        yyparse(void), getStreamChar(void), getStringChar(void);
  extern int32_t         (*getChar)(void);
- compileInfo    *nextFreeCompileInfo(void);
+ CompileInfo    *nextFreeCompileInfo(void);
  void   pegParse(void), removeParseMarker(void), releaseCompileInfo(void);
 
  curCompileInfo = nextFreeCompileInfo();
@@ -3025,12 +3025,12 @@ int32_t newSubrSymbol(int32_t index)
  return newSymbol(LUX_EVB, EVB_USR_SUB, n);
 }
 //----------------------------------------------------------------
-int32_t lookForName(char const* name, hashTableEntry *hashTable[], int32_t context)
+int32_t lookForName(char const* name, HashTableEntry *hashTable[], int32_t context)
      /* searches name in hashTable[] for context.  if found,
         returns symbol number, otherwise returns -1 */
 {
   int32_t               hashValue, n;
-  hashTableEntry        *hp;
+  HashTableEntry        *hp;
 
   hashValue = hash(name);
   if (*name == '$' || *name == '#' || *name == '!') context = 0;
@@ -3057,7 +3057,7 @@ int32_t lookForName(char const* name, hashTableEntry *hashTable[], int32_t conte
   return -1;
 }
 //----------------------------------------------------------------
-int32_t findSym(int32_t index, hashTableEntry *hashTable[], int32_t context)
+int32_t findSym(int32_t index, HashTableEntry *hashTable[], int32_t context)
 /* searches symbolStack[index] in hashTable[] for context.  if found,
    returns symbol number, otherwise installs the name in hashTable[]
    and sym[].  always removes the entry from the symbolStack. */
@@ -3076,12 +3076,12 @@ int32_t findSym(int32_t index, hashTableEntry *hashTable[], int32_t context)
  return n;
 }
 //----------------------------------------------------------------
-char const* symName(int32_t symNum, hashTableEntry *hashTable[])
+char const* symName(int32_t symNum, HashTableEntry *hashTable[])
 // returns the name of the symbol, if any, or "[symNum]"
 {
  static char    name[7];
  int32_t                hashValue;
- hashTableEntry         *hp;
+ HashTableEntry         *hp;
 
  if (symNum < 0 || symNum >= NSYM)
  { printf("Illegal symbol number (symName): %d\n", symNum);
@@ -3101,7 +3101,7 @@ char const* symName(int32_t symNum, hashTableEntry *hashTable[])
 char const* symbolName(int32_t symbol)
 // returns the name of the symbol.
 {
-  hashTableEntry        **hashTable;
+  HashTableEntry        **hashTable;
 
   if (symbol < 0 || symbol >= NSYM) {
     cerror(ILL_SYM, 0, symbol, "symbolName");
@@ -3129,11 +3129,11 @@ int32_t suppressEvalRoutine(int32_t index)
 // symbolStack[index]
 {
   int32_t       n;
-  keyList       *keys;
+  KeyList       *keys;
 
   n = findInternalSym(index, 1); // >= 0 -> internal subroutine
   if (n < 0) return 0;
-  keys = (keyList *) subroutine[n].keys;
+  keys = (KeyList *) subroutine[n].keys;
   return keys->suppressEval;
 }
 //----------------------------------------------------------------
@@ -3411,7 +3411,7 @@ void fixedValue(char const* name, Symboltype type, ...)
    symbol_memory(n) = strlen(string_value(n)) + 1;
    break;
  case LUX_CFLOAT: case LUX_CDOUBLE:
-   complex_scalar_data(n).cf = (floatComplex*) malloc(lux_type_size[type]);
+   complex_scalar_data(n).cf = (FloatComplex*) malloc(lux_type_size[type]);
    if (!complex_scalar_data(n).cf)
      puts("WARNING - memory allocation error in symbol initialization");
    complex_scalar_memory(n) = lux_type_size[type];
@@ -3545,9 +3545,13 @@ int32_t convertRange(int32_t range)
 void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
 // converts value in target from inType to outType
 {
-  switch (outType) {
+  switch (outType)
+  {
   case LUX_INT8:
-    switch (inType) {
+    switch (inType)
+    {
+    case LUX_INT8:
+      break;
     case LUX_INT16:
       (*target).ui8 = (uint8_t) (*target).i16;
       break;
@@ -3563,12 +3567,22 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
     case LUX_DOUBLE:
       (*target).ui8 = (uint8_t) (*target).d;
       break;
+#if 0
+    case LUX_CFLOAT:
+      (*target).ui8 = (uint8_t) (*target).cf.real;
+      break;
+    case LUX_CDOUBLE:
+      (*target).ui8 = (uint8_t) (*target).cd.real;
+      break;
+#endif
     }
-    break;
   case LUX_INT16:
-    switch (inType) {
+    switch (inType)
+    {
     case LUX_INT8:
       (*target).i16 = (int16_t) (*target).ui8;
+      break;
+    case LUX_INT16:
       break;
     case LUX_INT32:
       (*target).i16 = (int16_t) (*target).i32;
@@ -3582,15 +3596,26 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
     case LUX_DOUBLE:
       (*target).i16 = (int16_t) (*target).d;
       break;
+#if 0
+    case LUX_CFLOAT:
+      (*target).i16 = (int16_t) (*target).cf.real;
+      break;
+    case LUX_CDOUBLE:
+      (*target).i16 = (int16_t) (*target).cd.real;
+      break;
+#endif
     }
     break;
   case LUX_INT32:
-    switch (inType) {
+    switch (inType)
+    {
     case LUX_INT8:
       (*target).i32 = (int32_t) (*target).ui8;
       break;
     case LUX_INT16:
       (*target).i32 = (int32_t) (*target).i16;
+      break;
+    case LUX_INT32:
       break;
     case LUX_INT64:
       (*target).i32 = (int32_t) (*target).i64;
@@ -3601,10 +3626,19 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
     case LUX_DOUBLE:
       (*target).i32 = (int32_t) (*target).d;
       break;
+#if 0
+    case LUX_CFLOAT:
+      (*target).i32 = (int32_t) (*target).cf.real;
+      break;
+    case LUX_CDOUBLE:
+      (*target).i32 = (int32_t) (*target).cd.real;
+      break;
+#endif
     }
     break;
   case LUX_INT64:
-    switch (inType) {
+    switch (inType)
+    {
     case LUX_INT8:
       (*target).i64 = (int64_t) (*target).ui8;
       break;
@@ -3614,16 +3648,27 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
     case LUX_INT32:
       (*target).i64 = (int64_t) (*target).i32;
       break;
+    case LUX_INT64:
+      break;
     case LUX_FLOAT:
       (*target).i64 = (int64_t) (*target).f;
       break;
     case LUX_DOUBLE:
       (*target).i64 = (int64_t) (*target).d;
       break;
+#if 0
+    case LUX_CFLOAT:
+      (*target).i64 = (int64_t) (*target).cf.real;
+      break;
+    case LUX_CDOUBLE:
+      (*target).i64 = (int64_t) (*target).cd.real;
+      break;
+#endif
     }
     break;
   case LUX_FLOAT:
-    switch (inType) {
+    switch (inType)
+    {
     case LUX_INT8:
       (*target).f = (float) (*target).ui8;
       break;
@@ -3636,13 +3681,24 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
     case LUX_INT64:
       (*target).f = (float) (*target).i64;
       break;
+    case LUX_FLOAT:
+      break;
     case LUX_DOUBLE:
       (*target).f = (float) (*target).d;
       break;
+#if 0
+    case LUX_CFLOAT:
+      (*target).f = (float) (*target).cf.real;
+      break;
+    case LUX_CDOUBLE:
+      (*target).f = (float) (*target).cd.real;
+      break;
+#endif
     }
     break;
   case LUX_DOUBLE:
-    switch (inType) {
+    switch (inType)
+    {
     case LUX_INT8:
       (*target).d = (double) (*target).ui8;
       break;
@@ -3658,17 +3714,93 @@ void convertPointer(Scalar *target, Symboltype inType, Symboltype outType)
     case LUX_FLOAT:
       (*target).d = (double) (*target).f;
       break;
+    case LUX_DOUBLE:
+      break;
+#if 0
+    case LUX_CFLOAT:
+      (*target).d = (double) (*target).cf.real;
+      break;
+    case LUX_CDOUBLE:
+      (*target).d = (*target).cd.real;
+      break;
+#endif
     }
     break;
   }
+#if 0
+  case LUX_CFLOAT:
+    switch (inType)
+    {
+    case LUX_INT8:
+      (*target).cf.real = (float) (*target).ui8;
+      (*target).cf.imaginary = 0;
+      break;
+    case LUX_INT16:
+      (*target).cf.real = (float) (*target).i16;
+      (*target).cf.imaginary = 0;
+      break;
+    case LUX_INT32:
+      (*target).cf.real = (float) (*target).i32;
+      (*target).cf.imaginary = 0;
+      break;
+    case LUX_INT64:
+      (*target).cf.real = (float) (*target).i64;
+      (*target).cf.imaginary = 0;
+      break;
+    case LUX_DOUBLE:
+      (*target).cf.real = (float) (*target).d;
+      (*target).cf.imaginary = 0;
+      break;
+    case LUX_CFLOAT:
+      break;
+    case LUX_CDOUBLE:
+      (*target).cf.real = (float) (*target).cd.real;
+      (*target).cf.imaginary = 0;
+      break;
+    }
+    break;
+  case LUX_CDOUBLE:
+    switch (inType)
+    {
+    case LUX_INT8:
+      (*target).cd.real = (double) (*target).ui8;
+      (*target).cd.imaginary = 0;
+      break;
+    case LUX_INT16:
+      (*target).cd.real = (double) (*target).i16;
+      (*target).cd.imaginary = 0;
+      break;
+    case LUX_INT32:
+      (*target).cd.real = (double) (*target).i32;
+      (*target).cd.imaginary = 0;
+      break;
+    case LUX_INT64:
+      (*target).cd.real = (double) (*target).i64;
+      (*target).cd.imaginary = 0;
+      break;
+    case LUX_DOUBLE:
+      (*target).cd.real = (double) (*target).d;
+      (*target).cd.imaginary = 0;
+      break;
+    case LUX_CFLOAT:
+      (*target).cd.real = (double) (*target).cf.real;
+      (*target).cd.imaginary = (double) (*target).cf.imaginary;
+      break;
+    case LUX_CDOUBLE:
+      break;
+    }
+    break;
+#endif
 }
 //----------------------------------------------------------------
 void convertWidePointer(wideScalar *target, int32_t inType, int32_t outType)
 // converts value in <target> from <inType> to <outType>
 {
-  switch (inType) {
+  switch (inType)
+  {
   case LUX_INT8:
-    switch (outType) {
+    switch (outType)
+    {
     case LUX_INT8:
       break;
     case LUX_INT16:
@@ -4199,7 +4331,8 @@ extern int32_t  motif_flag;
 
 char    *firstbreak;            // for memck.c
 
-enumElem        classesStruct[] = {
+EnumElem classesStruct[]
+= {
   { "SCALAR", LUX_SCALAR },
   { "STRING", LUX_STRING },
   { "RANGE", LUX_RANGE },
@@ -4222,7 +4355,8 @@ enumElem        classesStruct[] = {
   { "UNDEFINED", LUX_UNDEFINED }
 };
 
-enumElem        typesStruct[] = {
+EnumElem typesStruct[]
+= {
   { "byte", LUX_INT8 },
   { "word", LUX_INT16 },
   { "long", LUX_INT32 },
@@ -4235,7 +4369,8 @@ enumElem        typesStruct[] = {
   { "undefined", LUX_UNDEFINED }
 };
 
-enumElem        eventStruct[] =         { // see lux_register_event in menu.c
+EnumElem eventStruct[]
+= { // see lux_register_event in menu.c
   { "KEYPRESS", 1 },
   { "BUTTONPRESS", 4 },
   { "BUTTONRELEASE", 8 },
@@ -4246,7 +4381,8 @@ enumElem        eventStruct[] =         { // see lux_register_event in menu.c
   { "MENU", 512 }
 };
 
-enumElem        coordSysStruct[] = {
+EnumElem coordSysStruct[]
+= {
   { "DEP", 0 },
   { "DVI", 1 },
   { "DEV", 2 },
@@ -4257,7 +4393,8 @@ enumElem        coordSysStruct[] = {
   { "X11", 7 },
 };
 
-enumElem        filetypeStruct[] = {
+EnumElem filetypeStruct[]
+= {
   { "FZ", FILE_TYPE_ANA_FZ },
   { "ASTORE", FILE_TYPE_ANA_ASTORE },
   { "IDL", FILE_TYPE_IDL_SAVE },
@@ -4276,7 +4413,7 @@ enumElem        filetypeStruct[] = {
   { "PM", FILE_TYPE_PM }
 };
 
-struct boundsStruct bounds = {
+struct BoundsStruct bounds = {
   { 0, INT16_MIN, INT32_MIN, INT64_MIN, -FLT_MAX, -DBL_MAX},
   { UINT8_MAX, INT16_MAX, INT32_MAX, INT64_MAX, FLT_MAX, DBL_MAX }
 };
@@ -4314,35 +4451,35 @@ void symbolInitialization(void)
  extern struct obstack *registered_subroutines;
  int32_t registered_subroutines_size
    = registered_subroutines? obstack_object_size(registered_subroutines): 0;
- subroutine = (internalRoutine*) malloc(registered_subroutines_size
-                     + nSubroutine*sizeof(internalRoutine));
+ subroutine = (InternalRoutine*) malloc(registered_subroutines_size
+                     + nSubroutine*sizeof(InternalRoutine));
  if (registered_subroutines)
    memcpy(subroutine,
-          (internalRoutineStruct*) obstack_finish(registered_subroutines),
+          (InternalRoutine*) obstack_finish(registered_subroutines),
           registered_subroutines_size);
  memcpy((char *) subroutine + registered_subroutines_size,
-        subroutine_table, nSubroutine*sizeof(internalRoutine));
- nSubroutine += registered_subroutines_size/sizeof(internalRoutine);
+        subroutine_table, nSubroutine*sizeof(InternalRoutine));
+ nSubroutine += registered_subroutines_size/sizeof(InternalRoutine);
  if (registered_subroutines)
    obstack_free(registered_subroutines, NULL);
 
  extern struct obstack *registered_functions;
  int32_t registered_functions_size
    = registered_functions? obstack_object_size(registered_functions): 0;
- function = (internalRoutine*) malloc(registered_functions_size
-                     + nFunction*sizeof(internalRoutine));
+ function = (InternalRoutine*) malloc(registered_functions_size
+                     + nFunction*sizeof(InternalRoutine));
  if (registered_functions)
    memcpy(function,
-          (internalRoutineStruct*) obstack_finish(registered_functions),
+          (InternalRoutine*) obstack_finish(registered_functions),
           registered_functions_size);
  memcpy((char *) function + registered_functions_size,
-        function_table, nFunction*sizeof(internalRoutine));
- nFunction += registered_functions_size/sizeof(internalRoutine);
+        function_table, nFunction*sizeof(InternalRoutine));
+ nFunction += registered_functions_size/sizeof(InternalRoutine);
  if (registered_functions)
    obstack_free(registered_functions, NULL);
 
- qsort(subroutine, nSubroutine, sizeof(internalRoutine), ircmp);
- qsort(function, nFunction, sizeof(internalRoutine), ircmp);
+ qsort(subroutine, nSubroutine, sizeof(InternalRoutine), ircmp);
+ qsort(function, nFunction, sizeof(InternalRoutine), ircmp);
  for (i = 0; i < nSubroutine; i++) {
    if (i && !strcmp(subroutine[i].name, subroutine[i - 1].name))
      luxerror("Internal subroutine name %s is used for multiple routines!",
@@ -4738,7 +4875,7 @@ void symbolInitialization(void)
  installing = 0;
 }
 //----------------------------------------------------------------
-int32_t matchInternalName(char *name, internalRoutine *table, int32_t size, int32_t hi)
+int32_t matchInternalName(char *name, InternalRoutine *table, int32_t size, int32_t hi)
 /* matches name against the initial parts of all names in the table.
    returns index of first match (i.e., closest to the start of the table),
    or -1 if none were found.  LS97 */
@@ -5083,7 +5220,7 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
 {
   int32_t       n, ns, nb;
   Pointer       p;
-  listElem      *l;
+  ListElem* l;
 
   switch (symbol_class(symbol)) {
     case LUX_SCALAR: case LUX_CSCALAR:
@@ -5132,13 +5269,13 @@ int32_t structSize(int32_t symbol, int32_t *nstruct, int32_t *nbyte)
   }
 }
 //----------------------------------------------------------------
-int32_t makeStruct(int32_t symbol, char const* tag, structElem **se,
+int32_t makeStruct(int32_t symbol, char const* tag, StructElem** se,
                    char *data, int32_t *offset, int32_t descend)
 {
   int32_t       size, offset0, ndim, n;
-  structElem    *se0;
+  StructElem* se0;
   int16_t       *arg;
-  listElem      *le;
+  ListElem* le;
 
   if (descend) {
     return LUX_OK;
@@ -5243,7 +5380,7 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
 {
   int32_t       result, size, nstruct, dims[MAX_DIMS], ndim, n, i, offset;
   Pointer       data;
-  structElem    *se;
+  StructElem* se;
 
   if (structSize(ps[0], &nstruct, &size) == LUX_ERROR) /* check
                                                           specification */
@@ -5262,7 +5399,7 @@ int32_t lux_struct(int32_t narg, int32_t ps[])
     return LUX_ERROR;
   symbol_class(result) = LUX_STRUCT;
   symbol_memory(result) = sizeof(int32_t) // to store the number of elements
-    + nstruct*sizeof(structElem) // to store the structure information
+    + nstruct*sizeof(StructElem) // to store the structure information
     + size*n;                   // to store the data values
   data.v = malloc(symbol_memory(result));
   if (!data.v)
@@ -5401,7 +5538,7 @@ void installKeys(void *keys)
    at position 2. */
 {
  char   *p, **result, *copy;
- keyList        *theKeyList;
+ KeyList        *theKeyList;
  int32_t        n = 1, i;
 
  if (!*(char **) keys)          // empty key
@@ -5420,7 +5557,7 @@ void installKeys(void *keys)
      n++;
    }
  if (!(result = (char **) malloc((n + 1)*sizeof(char *)))
-     || !(theKeyList = (keyList *) malloc(sizeof(keyList)))) {
+     || !(theKeyList = (KeyList *) malloc(sizeof(KeyList)))) {
    luxerror("Memory allocation error in installKeys [%s].", 0, (char *) keys);
    return;
  }
@@ -5459,16 +5596,16 @@ void installKeys(void *keys)
    *result++ = p;
  }
  *result = 0;
- *(keyList **) keys = theKeyList;
+ *(KeyList **) keys = theKeyList;
 }
 //----------------------------------------------------------------
-int32_t findName(char const* name, hashTableEntry *hashTable[], int32_t context)
+int32_t findName(char const* name, HashTableEntry *hashTable[], int32_t context)
 // searches for <name> in <hashTable[]> (with <context>).  if found,
 // returns symbol number, otherwise installs a copy of the name in
 // <hashTable[]> and sym[].  Returns -1 if an error occurs.  LS 6feb96
 {
  int32_t                hashValue, i;
- hashTableEntry         *hp, *oldHp;
+ HashTableEntry         *hp, *oldHp;
 #if YYDEBUG
  extern int32_t         yydebug;
 #endif
@@ -5494,7 +5631,7 @@ int32_t findName(char const* name, hashTableEntry *hashTable[], int32_t context)
                 // wasn't defined yet;  install if not !xxx
  if (*name == '!' && !installing)
    return luxerror("Non-existent system variable %s", 0, name);
- hp = (hashTableEntry *) malloc(sizeof(hashTableEntry));
+ hp = (HashTableEntry *) malloc(sizeof(HashTableEntry));
  if (!hp)
    return cerror(ALLOC_ERR, 0);
  if (oldHp)                     // current hash chain wasn't empty
@@ -5625,11 +5762,11 @@ int32_t lux_verify(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //----------------------------------------------------------------
-compileInfo *nextFreeCompileInfo(void)
+CompileInfo *nextFreeCompileInfo(void)
 {
   if (cur_c_info >= n_c_info) { // need more room
     n_c_info += 16;
-    c_info = (compileInfo*) realloc(c_info, n_c_info*sizeof(compileInfo));
+    c_info = (CompileInfo*) realloc(c_info, n_c_info*sizeof(CompileInfo));
     if (!c_info) {
       puts("pushCompileLevel:");
         cerror(ALLOC_ERR, 0);
@@ -5647,13 +5784,13 @@ void releaseCompileInfo(void)
     curCompileInfo = NULL;
 }
 //----------------------------------------------------------------
-static executionLevelInfo       *e_info;
+static ExecutionLevelInfo       *e_info;
 static int32_t  n_e_info = 0, cur_e_info = 0;
 void pushExecutionLevel(int32_t line, int32_t target)
 {
   if (cur_e_info + 1 >= n_e_info) { // need more room
     n_e_info += 16;
-    e_info = (executionLevelInfo*) realloc(e_info, n_e_info*sizeof(executionLevelInfo));
+    e_info = (ExecutionLevelInfo*) realloc(e_info, n_e_info*sizeof(ExecutionLevelInfo));
     if (!e_info) {
       puts("pushExecutionLevel:");
       cerror(ALLOC_ERR, 0);

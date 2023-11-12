@@ -52,10 +52,13 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 // library includes
 
+#if HAVE_LIBGSL
 #include <gsl/gsl_sf_gamma.h>
+#include <gslpp_roots.hh>
 #include <gslpp_sort.hh>        // for gsl_sort_index
 #include <gslpp_sort_vector.hh> // for gsl_sort_vector
 #include <gslpp_vector.hh>
+#endif
 
 // own includes
 
@@ -103,7 +106,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
     lev, xSym, ySym, vSym, il, ir;
   double        xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
   Pointer       src, trgt, level, ptr, rightedge, left, width, x;
-  csplineInfo   cspl;
+  CsplineInfo   cspl;
   LoopInfo      srcinfo;
 
   if (!symbolIsNumericalArray(ps[0]))
@@ -176,7 +179,7 @@ int32_t lux_bisect(int32_t narg, int32_t ps[])
         undefine(ps[5]);
         symbol_class(ps[5]) = LUX_SCALAR;
         scalar_type(ps[5]) = srcinfo.type;
-      }         
+      }
     }
   }
   if (result < 0)
@@ -507,7 +510,7 @@ int32_t lux_cspline_find(int32_t narg, int32_t ps[])
 #if HAVE_LIBGSL
   int32_t       result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   Pointer       src, level;
-  csplineInfo   cspl;
+  CsplineInfo   cspl;
   LoopInfo      srcinfo;
   Bytestack b;
   struct c { double v; int32_t l; int32_t c; } *c;
@@ -2604,7 +2607,7 @@ int32_t approximately_equal(double a, double b, double eps)
   return fabs(a - b) <= (fabs(a) < fabs(b)? fabs(b): fabs(a))*DBL_EPSILON*eps;
 }
 //--------------------------------------------------------------------
-int32_t approximately_equal_z(doubleComplex a, doubleComplex b, double eps)
+int32_t approximately_equal_z(DoubleComplex a, DoubleComplex b, double eps)
 {
   double md = hypot(a.real - b.real, a.imaginary - b.imaginary);
   double ma = hypot(a.real, a.imaginary);
@@ -2617,7 +2620,7 @@ int32_t essentially_equal(double a, double b, double eps)
   return fabs(a - b) <= (fabs(a) > fabs(b)? fabs(b): fabs(a))*DBL_EPSILON*eps;
 }
 //--------------------------------------------------------------------
-int32_t essentially_equal_z(doubleComplex a, doubleComplex b, double eps)
+int32_t essentially_equal_z(DoubleComplex a, DoubleComplex b, double eps)
 {
   double md = hypot(a.real - b.real, a.imaginary - b.imaginary);
   double ma = hypot(a.real, a.imaginary);
@@ -2630,7 +2633,7 @@ int32_t approximately_equal_f(float a, float b, float eps)
   return fabs(a - b) <= (fabs(a) < fabs(b)? fabs(b): fabs(a))*FLT_EPSILON*eps;
 }
 //--------------------------------------------------------------------
-int32_t approximately_equal_z_f(floatComplex a, floatComplex b, float eps)
+int32_t approximately_equal_z_f(FloatComplex a, FloatComplex b, float eps)
 {
   float md = hypot(a.real - b.real, a.imaginary - b.imaginary);
   float ma = hypot(a.real, a.imaginary);
@@ -2643,7 +2646,7 @@ int32_t essentially_equal_f(float a, float b, float eps)
   return fabs(a - b) <= (fabs(a) > fabs(b)? fabs(b): fabs(a))*FLT_EPSILON*eps;
 }
 //--------------------------------------------------------------------
-int32_t essentially_equal_z_f(floatComplex a, floatComplex b, float eps)
+int32_t essentially_equal_z_f(FloatComplex a, FloatComplex b, float eps)
 {
   float md = hypot(a.real - b.real, a.imaginary - b.imaginary);
   float ma = hypot(a.real, a.imaginary);
@@ -3341,12 +3344,18 @@ struct PermutationChange {
 ///
 /// \param tmax is the end of the interval of `t` to search.
 ///
+/// \param semicircular says whether to look for changes based on semicircular
+/// permutations rather than circular permutations.  See
+/// permutation_semicircular_rank() for information about semicircular
+/// permutations.
+///
 /// \returns a vector of PermutationChange that reports the values of `t` at
 /// which the permutation changes, and the 0-based indexes (in ascending order)
 /// of the two objects that switch places at that time.
 template<typename FuncType>
 std::vector<PermutationChange>
-find_permutation_changes(FuncType f, double period, double tmin, double tmax)
+find_permutation_changes(FuncType f, double period, double tmin, double tmax,
+                         bool semicircular)
 {
   std::vector<PermutationChange> ts;
 
@@ -3492,69 +3501,74 @@ find_permutation_changes(FuncType f, double period, double tmin, double tmax)
       // determine the final permutation number
       size_t pmax = permutation_number_circular_rank(vmax);
 
-      auto dmin = getd(it->tmin);
-      auto dmax = getd(it->tmax);
-      size_t count = 0;
-      while (1) {
-        // the switch occurs sometime between tmin and tmax
-        auto test = (dmax*it->tmin - dmin*it->tmax)
-                   /(dmax          - dmin         );
-        if (test < it->tmin || test > it->tmax) {
-          // the estimate is outside the bracket; bisect instead
-          test = (it->tmin + it->tmax)/2;
-        }
-        if (++count > 20) {
-          // we're likely in some kind of loop; abort
-          ts.push_back({test, it->object1, it->object2, pmax});
-          break;
-        }
-        auto dest = getd(test);
-        if (dmin*dest < 0) {
-          // the target time is between tmin and test
-          if (test == it->tmax) {
+      Gsl_root_fsolver grf(gsl_root_fsolver_brent, getd, it->tmin, it->tmax);
+      double t_test = grf.get_root();
+
+      if (0) {
+        auto dmin = getd(it->tmin);
+        auto dmax = getd(it->tmax);
+        size_t count = 0;
+        while (1) {
+          // the switch occurs sometime between tmin and tmax
+          auto test = (dmax*it->tmin - dmin*it->tmax)
+            /(dmax          - dmin         );
+          if (test < it->tmin || test > it->tmax) {
+            // the estimate is outside the bracket; bisect instead
+            test = (it->tmin + it->tmax)/2;
+          }
+          if (++count > 20) {
+            // we're likely in some kind of loop; abort
+            ts.push_back({test, it->object1, it->object2, pmax});
+            break;
+          }
+          auto dest = getd(test);
+          if (dmin*dest < 0) {
+            // the target time is between tmin and test
+            if (test == it->tmax) {
+              // we cannot improve anymore
+              ts.push_back({test, it->object1, it->object2, pmax});
+              break;
+            }
+            // see if we can tighten tmin, too
+            auto test2 = 2*test - it->tmax;
+            if (test2 > it->tmin) {
+              auto dest2 = getd(test2);
+              if (dest2*dmin > 0) {
+                it->tmin = test2;
+                dmin = dest2;
+              }
+            }
+            it->tmax = test;
+            dmax = dest;
+          } else if (dest*dmax < 0) {
+            // the target time is between test and tmax
+            if (test == it->tmin) {
+              // we cannot improve anymore
+              ts.push_back({test, it->object1, it->object2, pmax});
+              break;
+            }
+            // see if we can tighten tmax, too
+            auto test2 = 2*test - it->tmin;
+            if (test2 < it->tmax) {
+              auto dest2 = getd(test2);
+              if (dest2*dmax > 0) {
+                it->tmax = test2;
+                dmax = dest2;
+              }
+            }
+            it->tmin = test;
+            dmin = dest;
+          } else {
             // we cannot improve anymore
             ts.push_back({test, it->object1, it->object2, pmax});
             break;
           }
-          // see if we can tighten tmin, too
-          auto test2 = 2*test - it->tmax;
-          if (test2 > it->tmin) {
-            auto dest2 = getd(test2);
-            if (dest2*dmin > 0) {
-              it->tmin = test2;
-              dmin = dest2;
-            }
-          }
-          it->tmax = test;
-          dmax = dest;
-        } else if (dest*dmax < 0) {
-          // the target time is between test and tmax
-          if (test == it->tmin) {
-            // we cannot improve anymore
+          if ((it->tmax - it->tmin) < std::max(it->tmax, it->tmin)
+              * 2*std::numeric_limits<double>::epsilon()) {
+            // we likely cannot improve anymore
             ts.push_back({test, it->object1, it->object2, pmax});
             break;
           }
-          // see if we can tighten tmax, too
-          auto test2 = 2*test - it->tmin;
-          if (test2 < it->tmax) {
-            auto dest2 = getd(test2);
-            if (dest2*dmax > 0) {
-              it->tmax = test2;
-              dmax = dest2;
-            }
-          }
-          it->tmin = test;
-          dmin = dest;
-        } else {
-          // we cannot improve anymore
-          ts.push_back({test, it->object1, it->object2, pmax});
-          break;
-        }
-        if ((it->tmax - it->tmin) < std::max(it->tmax, it->tmin)
-            * 2*std::numeric_limits<double>::epsilon()) {
-          // we likely cannot improve anymore
-          ts.push_back({test, it->object1, it->object2, pmax});
-          break;
         }
       }
     } // end for (auto it = intervals.begin(); it != intervals.end(); ++it)
@@ -3602,7 +3616,7 @@ lux_planetpermutationchanges(int32_t narg, int32_t ps[])
   };
 
   std::vector<PermutationChange> pc
-    = find_permutation_changes(gl, 2*M_PI, t1, t2);
+    = find_permutation_changes(gl, 2*M_PI, t1, t2, (internalMode & 1) != 0);
 
   int32_t size = pc.size();
   int32_t iq;
@@ -3624,7 +3638,7 @@ lux_planetpermutationchanges(int32_t narg, int32_t ps[])
   }
   return iq;
 }
-REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, NULL, HAVE_LIBGSL);
+REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, "1semicircular", HAVE_LIBGSL);
 #endif
 
 // iD;iL*?;rL{1} → iiarx

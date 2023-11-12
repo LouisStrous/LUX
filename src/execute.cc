@@ -59,7 +59,7 @@ void fixContext(int32_t symbol, int32_t context)
 {
   int32_t       i, nElem;
   int16_t       *ptr;
-  listElem      *p;
+  ListElem* p;
 
   switch (symbol_class(symbol)) {
     case LUX_RANGE:
@@ -108,9 +108,11 @@ int32_t copyToSym(int32_t target, int32_t source)
   int32_t       size, i;
   Pointer       optr, ptr;
   char  zapIt = 0;
-  listElem      *eptr, *oeptr;
+  ListElem* eptr;
+  ListElem* oeptr;
   int32_t       copySym(int32_t);
-  extractSec    *etrgt, *esrc;
+  ExtractSec* etrgt;
+  ExtractSec* esrc;
   void  embed(int32_t target, int32_t context), zap(int32_t);
 
   if (source < 0)               // some error
@@ -183,7 +185,7 @@ int32_t copyToSym(int32_t target, int32_t source)
     case LUX_LIST:
       size = list_num_symbols(source);
       oeptr = list_symbols(source);
-      ALLOCATE(list_symbols(target), size, listElem);
+      ALLOCATE(list_symbols(target), size, ListElem);
       symbol_memory(target) = symbol_memory(source);
       eptr = list_symbols(target);
       while (size--) {
@@ -236,7 +238,7 @@ int32_t copyToSym(int32_t target, int32_t source)
     case LUX_EXTRACT:
       extract_target(target) = extract_target(source);
       symbol_memory(target) = symbol_memory(source);
-      etrgt = (extractSec*) malloc(symbol_memory(target));
+      etrgt = (ExtractSec*) malloc(symbol_memory(target));
       if (!etrgt)
         return cerror(ALLOC_ERR, target);
       extract_ptr(target) = etrgt;
@@ -676,15 +678,15 @@ int32_t matchUserKey(char *name, int32_t routineNum)
 }
 //------------------------------------------------------------------
 #define PRESERVE_KEY    1024
-int32_t internal_routine(int32_t symbol, internalRoutine *routine)
+int32_t internal_routine(int32_t symbol, InternalRoutine *routine)
 // execute an internal routine (subroutine or function)
 // keywords:  each internal function and routine has associated with it
 // a (possibly empty) list of keywords, associated with particular
 // arguments to the routine, or associated with an external variable
-// called internalRoutine.  The keyword lists can be found in file
+// called InternalRoutine.  The keyword lists can be found in file
 // install.c.  plain keywords (i.e. without a prefixed number)
 // connect a user-specified value with a particular argument to the
-// routine.  numbered keywords logically OR internalRoutine with the
+// routine.  numbered keywords logically OR InternalRoutine with the
 // number, if the keyword is recognized, or AND with the binary complement
 // of the number if the user-typed keyword is preceded by NO.  the special
 // keyword MODE is recognized by all routines and any associated value is
@@ -699,7 +701,7 @@ int32_t internal_routine(int32_t symbol, internalRoutine *routine)
  int32_t        nArg, nKeys = 0, i, maxArg, *evalArgs,
         routineNum, n, thisInternalMode = 0, ordinary = 0;
  uint8_t        isSubroutine;
- keyList        *theKeyList;
+ KeyList        *theKeyList;
  int16_t        *arg;
  char   *name, suppressEval = 0, suppressUnused = 0;
  extern char    evalScalPtr;
@@ -711,7 +713,7 @@ int32_t internal_routine(int32_t symbol, internalRoutine *routine)
  isSubroutine = (routine == subroutine); // 1->sub, 0->func
  arg = int_sub_arguments(symbol); // pointer to start of argument list
 
- theKeyList = (keyList *) routine[routineNum].keys; // keys of routine
+ theKeyList = (KeyList *) routine[routineNum].keys; // keys of routine
  maxArg = routine[routineNum].maxArg; // max allowed number of arguments
  if (theKeyList) {
    suppressEval = theKeyList->suppressEval; // suppress evaluation of args
@@ -1005,7 +1007,7 @@ int32_t usr_routine(int32_t symbol)
  int16_t        *arg, *par, *list = NULL;
  char   type, *name, msg, isError;
  char const* routineTypeNames[] = { "func", "subr", "block" };
- symTableEntry  *oldpars;
+ SymbolImpl  *oldpars;
  extern int32_t         returnSym, defined(int32_t, int32_t);
  extern char    evalScalPtr;
  void pushExecutionLevel(int32_t, int32_t), popExecutionLevel(void);
@@ -1236,7 +1238,7 @@ int32_t usr_routine(int32_t symbol)
       201 FOO.X     pointer, points at <0>
       201 FOO.X     pointer, points at <0> */
    if (nPar) {
-     oldpars = (symTableEntry *) malloc(nPar*sizeof(symTableEntry));
+     oldpars = (SymbolImpl *) malloc(nPar*sizeof(SymbolImpl));
      if (!oldpars) {
        cerror(ALLOC_ERR, 0);
        goto usr_routine_3;
@@ -1244,7 +1246,7 @@ int32_t usr_routine(int32_t symbol)
    } else
      oldpars = NULL;
    for (i = 0; i < nPar; i++)
-     memcpy(oldpars + i, &sym[par[i]], sizeof(symTableEntry));
+     memcpy(oldpars + i, &sym[par[i]], sizeof(SymbolImpl));
 
    for (i = 0; i < nPar; i++) {
      if (evalArg[i]) {          // have an argument
@@ -1310,7 +1312,7 @@ int32_t usr_routine(int32_t symbol)
  // restore old values
  par = routine_parameters(routineNum);
  for (n = 0; n < nPar; n++)
-   memcpy(&sym[par[n]], oldpars + n, sizeof(symTableEntry));
+   memcpy(&sym[par[n]], oldpars + n, sizeof(SymbolImpl));
  free(oldpars);
 
  if (evalArg)
@@ -3824,7 +3826,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
   for (i = 0; i < narg; i++) {
     if (symbol_class(ps[i]) == LUX_KEYWORD) {
       n = matchKey(keyword_name_symbol(ps[i]),
-                   ((keyList *) subroutine[insert_subr].keys)->keys, &iq);
+                   ((KeyList *) subroutine[insert_subr].keys)->keys, &iq);
       if (n != ORKEY) {
         internalMode = oldInternalMode;
         return luxerror("Illegal keyword %s", 0, keyword_name(ps[i]));

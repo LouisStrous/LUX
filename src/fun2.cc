@@ -1,7 +1,7 @@
 /* This is file fun2.cc.
 
 Copyright 2013 Louis Strous, Richard Shine
-Copyright 2014 Louis Strous
+Copyright 2014-2023 Louis Strous
 
 This file is part of LUX.
 
@@ -34,7 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <limits.h>
 #include <ctype.h>
-#include <assert.h>
+#include <cassert>
 #include "action.hh"
 #include "install.hh"
 
@@ -1675,6 +1675,78 @@ int32_t lux_covariance(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
+
+/// A template function to facilitate the calculation of the weighted standard
+/// deviation or variance.
+///
+/// \tparam T is the type of the data values and weights.
+///
+/// \tparam omitNaNs says whether NaN values should be omitted.  This is only
+/// relevant if T is a floating point type.
+///
+/// \param[in,out] srcinfo is a reference to information about the data values
+/// to process.
+///
+/// \param[in,out] winfo is a reference to information about the weights to
+/// process.  It is assumed that \a srcinfo and \a winfo are consistent.
+///
+/// \param[in] values points at the first of the data values to process.
+///
+/// \param[in] weights points at the first of the weights to process.
+///
+/// \param[out] M receives the weighted mean value of the data.
+///
+/// \param[out] S receives the weighted sum of squared deviations from the mean.
+///
+/// \param[out] N receives the incremental weighted effective sample size.
+///
+/// \returns a return value as from advanceLoop().
+template<typename T, bool omitNaNs>
+int32_t
+calculations_for_sdev(LoopInfo& srcinfo,
+                      LoopInfo& winfo,
+                      const T* values,
+                      const T* weights,
+                      double& M,
+                      double& S,
+                      double& N)
+{
+  // The below algorithm is based on
+  // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Weighted_incremental_algorithm
+  // attributed to West, D. H. D. (1979). "Updating Mean and Variance Estimates:
+  // An Improved Method". Communications of the ACM. 22 (9):
+  // 532–535. doi:10.1145/359146.359153. S2CID 30671293.  I (Louis Strous, 2023)
+  // changed the accumulation of the sum of squares of the weights to an
+  // incremental calculation of the effective sample size N, which remains much
+  // smaller.
+
+  M = 0;                  // incremental mean
+  S = 0;                  // incremental sum of squared deviations from the mean
+  N = 0;                  // incremental effective sample size
+  double W = 0;           // sum of weights
+
+  int32_t done = 0;
+  do {
+    if ((!omitNaNs              // evaluated at compile time
+         || (!isnan(*values) && !isnan(*weights)))
+        && *weights != 0)
+    {
+      T v = *values;
+      double w = *weights;
+      assert(w > 0 || "weights assumed > 0");
+      W += w;
+      auto old_M = M;
+      auto q = w/W;
+      M = old_M + q*(v - old_M);
+      S += w*(v - old_M)*(v - M);
+      N += (w - N)*q;
+    }
+  } while ((done = (winfo.advanceLoop(weights),
+                    srcinfo.advanceLoop(values)))
+           < srcinfo.naxes);
+  return done;
+}
+
 int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 // f(<x> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS,
 //         /DOUBLE])
@@ -1702,10 +1774,9 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 //    then the result is always DOUBLE.
 // LS 19 July 2000
 {
-  int32_t       result, n, i, done, n2, save[MAX_DIMS], haveWeights;
+  int32_t       result, n, i, n2, save[MAX_DIMS], haveWeights;
   Pointer       src, trgt, src0, trgt0, weight, weight0;
-  double        mean, sdev, temp, nn;
-  doubleComplex         cmean;
+  DoubleComplex         cmean;
   LoopInfo      srcinfo, trgtinfo, winfo;
   Symboltype outtype;
   extern Scalar         lastsdev, lastmean;
@@ -1781,46 +1852,46 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
 
      TODO: Extend this algorithm to weighted data */
 
-  // we make two passes: one to get the average, and then one to calculate
-  // the standard deviation; this way we limit truncation and roundoff
-  // errors
+  double        mean, sdev, temp, nn;
+
+  double M, S, N;
+  int32_t done;
+
   if (haveWeights) {
     switch (symbol_type(ps[0])) {
       case LUX_INT8:
-        do {
-          mean = 0.0;
-          memcpy(save, srcinfo.coords, srcinfo.ndim*sizeof(int32_t));
-          src0 = src;
-          weight0 = weight;
-          nn = 0;
+        if (omitNaNs)
+        {
           do {
-            mean += (double) *src.ui8 * *weight.ui8;
-            nn += (double) *weight.ui8;
-          }
-          while (winfo.advanceLoop(&weight.ui8),
-                 srcinfo.advanceLoop(&src.ui8) < srcinfo.naxes);
-          memcpy(srcinfo.coords, save, srcinfo.ndim*sizeof(int32_t));
-          src = src0;
-          weight = weight0;
-          mean /= (nn? nn: 1);
-          sdev = 0.0;
-          do {
-            temp = ((double) *src.ui8 - mean);
-            sdev += temp*temp* *weight.ui8;
-          } while ((done = (winfo.advanceLoop(&weight.ui8),
-                            srcinfo.advanceLoop(&src.ui8))) < srcinfo.naxes);
-          if (!nn)
-            nn = 1;
-          sdev /= nn;
-          switch (outtype) {
+            done = calculations_for_sdev<uint8_t,true>(srcinfo, winfo,
+                                                       src.ui8, weight.ui8,
+                                                       M, S, N);
+            switch (outtype) {
             case LUX_FLOAT:
-              *trgt.f++ = (float) sdev;
+              *trgt.f++ = (float) (N? S/N: 0);
               break;
             case LUX_DOUBLE:
-              *trgt.d++ = sdev;
+              *trgt.d++ = (N? S/N: 0);
               break;
-          }
-        } while (done < srcinfo.rndim);
+            }
+          } while (done < srcinfo.rndim);
+        }
+        else
+        {
+          do {
+            done = calculations_for_sdev<uint8_t,false>(srcinfo, winfo,
+                                                        src.ui8, weight.ui8,
+                                                        M, S, N);
+            switch (outtype) {
+            case LUX_FLOAT:
+              *trgt.f++ = (float) (N? S/N: 0);
+              break;
+            case LUX_DOUBLE:
+              *trgt.d++ = (N? S/N: 0);
+              break;
+            }
+          } while (done < srcinfo.rndim);
+        }
         break;
       case LUX_INT16:
         do {
@@ -5299,7 +5370,7 @@ int32_t lux_crosscorr(int32_t narg, int32_t ps[])
   int32_t       i, iq1, iq2, result, n, save[MAX_DIMS], done;
   Symboltype type, outtype;
   double        meanx, meany, kx, ky, pxy, tempx, tempy;
-  doubleComplex         cmeanx, cmeany, cpxy, ctempx, ctempy;
+  DoubleComplex         cmeanx, cmeany, cpxy, ctempx, ctempy;
   Pointer       src1, src2, src1save, src2save, trgt;
   LoopInfo      srcinfo1, srcinfo2, trgtinfo;
 

@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <malloc.h> // for free malloc
 #include <math.h> // for floor
 #include <stdio.h> // for asprintf sscanf
-#include <string.h> // for strcmpo
+#include <string.h> // for strcmp
 #include <time.h> // for localtime time gmtime
 #include <stdlib.h>             // for strtol
 // END HEADERS
@@ -92,9 +92,11 @@ static double CaltoCJD(int32_t year, int32_t month, double day,
     text is stored in memory allocated by the routine.  Free the
     memory when you're done with it.
  */
-static char *CJDNto3S(int32_t CJDN,
-                      void (*CJDNtoCal3)(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day),
-                      char const * const *monthnames)
+static char*
+CJDNto3S(int32_t CJDN,
+         void (*CJDNtoCal3)(int32_t CJDN, int32_t *year, int32_t *month,
+                            int32_t *day),
+         char const * const *monthnames)
 {
   int32_t year, month, day;
   char *date;

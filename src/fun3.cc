@@ -673,8 +673,8 @@ int32_t lux_fft_expand(int32_t narg, int32_t ps[])
   standard_redef_array(iq, LUX_DOUBLE, ndim, dims, 0, NULL,
                        infos[2].mode, &ptrs[2], &infos[2]);
   free(dims);
-  infos[0].setAxes(1, NULL, SL_EACHBLOCK);
-  infos[2].setAxes(1, NULL, SL_EACHBLOCK);
+  infos[0].setAxes(make_iota<int32_t>(1), SL_EACHBLOCK);
+  infos[2].setAxes(make_iota<int32_t>(1), SL_EACHBLOCK);
 
   do {
     gsl_fft_expand(ptrs[0].d, infos[0].dims[0], 1,
@@ -752,7 +752,7 @@ int32_t lux_imaginary(int32_t narg, int32_t ps[])
   if (!symbolIsNumerical(ps[0]))
     return cerror(ILL_CLASS, ps[0]);
   if (!isComplexType(symbol_type(ps[0])))
-    return lux_zero(1, &ps[0]);         // no imaginary part
+    return lux_zerof(1, &ps[0]);         // no imaginary part
 
   outtype = (symbol_type(ps[0]) == LUX_CFLOAT)? LUX_FLOAT: LUX_DOUBLE;
 
@@ -2704,24 +2704,24 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
         // take first value as initial values
         max.f = min.f = src.cf->real*src.cf->real
           + src.cf->imaginary*src.cf->imaginary;
-        minloc = maxloc = src.cf - (floatComplex *) srcinfo.data0;
+        minloc = maxloc = src.cf - (FloatComplex *) srcinfo.data0;
         do {
           value = src.cf->real*src.cf->real
             + src.cf->imaginary*src.cf->imaginary;
           if (value > max.f) {
             max.f = value;
-            maxloc = src.cf - (floatComplex *) srcinfo.data0;
+            maxloc = src.cf - (FloatComplex *) srcinfo.data0;
           } else if (value < min.d) {
             min.f = value;
-            minloc = src.cf - (floatComplex *) srcinfo.data0;
+            minloc = src.cf - (FloatComplex *) srcinfo.data0;
           }
         } while ((n = srcinfo.advanceLoop(&src.ui8)) < n1);
         switch (code) {
           case 0:               // max value
-            *trgt.cf++ = ((floatComplex *) srcinfo.data0)[maxloc];
+            *trgt.cf++ = ((FloatComplex *) srcinfo.data0)[maxloc];
             break;
           case 1:               // min value
-            *trgt.cf++ = ((floatComplex *) srcinfo.data0)[minloc];
+            *trgt.cf++ = ((FloatComplex *) srcinfo.data0)[minloc];
             break;
           case 2:               // max location
             *trgt.i32++ = maxloc;
@@ -2740,24 +2740,24 @@ int32_t maxormin(int32_t narg, int32_t ps[], int32_t code)
         // take first value as initial values
         max.d = min.d = src.cd->real*src.cd->real
           + src.cd->imaginary*src.cd->imaginary;
-        minloc = maxloc = src.cd - (doubleComplex *) srcinfo.data0;
+        minloc = maxloc = src.cd - (DoubleComplex *) srcinfo.data0;
         do {
           value = src.cd->real*src.cd->real
             + src.cd->imaginary*src.cd->imaginary;
           if (value > max.d) {
             max.d = value;
-            maxloc = src.cd - (doubleComplex *) srcinfo.data0;
+            maxloc = src.cd - (DoubleComplex *) srcinfo.data0;
           } else if (value < min.d) {
             min.d = value;
-            minloc = src.cd - (doubleComplex *) srcinfo.data0;
+            minloc = src.cd - (DoubleComplex *) srcinfo.data0;
           }
         } while ((n = srcinfo.advanceLoop(&src.ui8)) < n1);
         switch (code) {
           case 0:               // max value
-            *trgt.cd++ = ((doubleComplex *) srcinfo.data0)[maxloc];
+            *trgt.cd++ = ((DoubleComplex *) srcinfo.data0)[maxloc];
             break;
           case 1:               // min value
-            *trgt.cd++ = ((doubleComplex *) srcinfo.data0)[minloc];
+            *trgt.cd++ = ((DoubleComplex *) srcinfo.data0)[minloc];
             break;
           case 2:               // max location
             *trgt.i32++ = maxloc;
@@ -3660,12 +3660,12 @@ int32_t neutral(void *p, int32_t n)
 }
 //-------------------------------------------------------------------------
 #if HAVE_LIBGSL
-const csplineInfo empty_cubic_spline(void) {
-  const csplineInfo c = { NULL, NULL, NULL, NULL };
+const CsplineInfo empty_cubic_spline(void) {
+  const CsplineInfo c = { NULL, NULL, NULL, NULL };
   return c;
 }
 //-------------------------------------------------------------------------
-void cleanup_cubic_spline_tables(csplineInfo *cspl) {
+void cleanup_cubic_spline_tables(CsplineInfo *cspl) {
   if (cspl->spline) {
     gsl_spline_free(cspl->spline);
     gsl_interp_accel_free(cspl->acc);
@@ -3681,7 +3681,7 @@ void cleanup_cubic_spline_tables(csplineInfo *cspl) {
 int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
                         void *yy, int32_t yType, int32_t yStep,
                         int32_t nPoints, uint8_t periodic, uint8_t akima,
-                        csplineInfo *cspl)
+                        CsplineInfo *cspl)
 // installs a cubic spline for later quick multiple interpolations
 // <xx> must point to the x coordinates, which are of LUX data type <xType>
 // Each next <xStep>th element is taken.  Likewise for <yy>, <yType>,
@@ -3816,7 +3816,7 @@ int32_t cubic_spline_tables(void *xx, int32_t xType, int32_t xStep,
   return 0;
 }
 //-------------------------------------------------------------------------
-double cspline_value(double x, csplineInfo *cspl)
+double cspline_value(double x, CsplineInfo *cspl)
 // interpolate using cubic splines.   Assumes <cspl> contains the required
 // information about the cubic spline (installed with cubic_spline_tables()
 {
@@ -3838,7 +3838,7 @@ double cspline_value(double x, csplineInfo *cspl)
   return gsl_spline_eval(s, x, cspl->acc);
 }
 //-------------------------------------------------------------------------
-double cspline_derivative(double x, csplineInfo *cspl)
+double cspline_derivative(double x, CsplineInfo *cspl)
 // returns the derivative of a cubic spline at position <x>.  Assumes that
 // the required information about the spline is available in <cspl>
 // (installed with cubic_spline_tables).
@@ -3867,7 +3867,7 @@ double integrate_linear(double a, double b,
 }
 //-------------------------------------------------------------------------
 #if HAVE_LIBGSL
-double cspline_integral(double x1, double x2, csplineInfo *cspl)
+double cspline_integral(double x1, double x2, CsplineInfo *cspl)
 // returns the integral of a cubic spline between positions <x1> and
 // <x2>.  Assumes that the required information about the spline is
 // available in <cspl> (installed with cubic_spline_tables).  LS
@@ -3906,14 +3906,14 @@ double cspline_integral(double x1, double x2, csplineInfo *cspl)
 }
 //-------------------------------------------------------------------------
 void cspline_value_and_derivative(double x, double *v, double *d,
-                                  csplineInfo *cspl)
+                                  CsplineInfo *cspl)
 // returns interpolated value and derivative using cubic splines. LS 9may98
 {
   gsl_spline_eval_e(cspl->spline, x, cspl->acc, v);
   gsl_spline_eval_deriv_e(cspl->spline, x, cspl->acc, d);
 }
 //-------------------------------------------------------------------------
-double cspline_second_derivative(double x, csplineInfo *cspl)
+double cspline_second_derivative(double x, CsplineInfo *cspl)
 /* returns the value of the second derivative of the spline indicated by
  <cspl> at position <x>.  LS 11may98 */
 {
@@ -3922,7 +3922,7 @@ double cspline_second_derivative(double x, csplineInfo *cspl)
 //-------------------------------------------------------------------------
 #define LIMIT   40
 double find_cspline_value(double value, double x1, double x2,
-                          csplineInfo *cspl)
+                          CsplineInfo *cspl)
 // seeks and returns that value of the coordinate between <x1> and <x2>
 // at which the specified <value> occurs, using cubic spline interpolation
 // <x1> must be smaller than <x2>.
@@ -3972,7 +3972,7 @@ double find_cspline_value(double value, double x1, double x2,
 }
 //-------------------------------------------------------------------------
 void find_cspline_extremes(double x1, double x2, double *minpos, double *min,
-                           double *maxpos, double *max, csplineInfo *cspl)
+                           double *maxpos, double *max, CsplineInfo *cspl)
 /* determines the position and values of extremes between positions <x1>
  and <x2>, using cubic spline interpolation.  <x1> must be smaller that
  <x2>.  The found positions and values are returned through the
@@ -4105,7 +4105,7 @@ int32_t lux_cubic_spline(int32_t narg, int32_t ps[])
 {
 #if HAVE_LIBGSL
   static char   haveTable = '\0';
-  static csplineInfo    cspl = { NULL, NULL, NULL, NULL };
+  static CsplineInfo    cspl = { NULL, NULL, NULL, NULL };
   int32_t       xNewSym, xNew2Sym, xTabSym, yTabSym, size, oldType, result_sym;
   Pointer       src, src2, trgt;
   int32_t       lux_convert(int32_t, int32_t [], Symboltype, int32_t);
@@ -4252,7 +4252,7 @@ int32_t lux_cubic_spline_extreme(int32_t narg, int32_t ps[])
   double        thisextpos, thisext, x1, x2;
   LoopInfo      yinfo;
   Pointer       y, x, minpos, min, maxpos, max, rightedge, ptr, q;
-  csplineInfo   cspl = { NULL, NULL, NULL, NULL };
+  CsplineInfo   cspl = { NULL, NULL, NULL, NULL };
 
   if (!symbolIsNumericalArray(ps[0]))
     return cerror(NEED_NUM_ARR, ps[0]);

@@ -17,4 +17,4 @@
 # You should have received a copy of the GNU General Public License
 # along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = historicephemerides src . test doc
+SUBDIRS = src doc

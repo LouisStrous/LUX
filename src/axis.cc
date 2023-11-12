@@ -73,10 +73,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
     \param[in] mode says how to treat the axes.
 
-    \returns 0 for success, -1 for failure.
+    \returns `LUX_OK` for success, `LUX_ERROR` for failure.
  */
-int32_t
-LoopInfo::setAxes(int32_t nAxes, int32_t *axes, int32_t mode)
+Symbol
+LoopInfo::setAxes(int32_t nAxes, const int32_t *axes, int32_t mode)
 {
   int32_t i;
   int32_t temp[MAX_DIMS];
@@ -114,6 +114,12 @@ LoopInfo::setAxes(int32_t nAxes, int32_t *axes, int32_t mode)
     memcpy(this->axes, axes, nAxes*sizeof(*axes));
   this->setAxisMode(mode);
   return 0;
+}
+
+Symbol
+LoopInfo::setAxes(const std::vector<int32_t>& axes, int32_t mode)
+{
+  return setAxes(static_cast<int32_t>(axes.size()), &axes[0], mode);
 }
 //-------------------------------------------------------------------------
 /** Gather information for looping through a LUX array.
@@ -229,7 +235,7 @@ LoopInfo::setupDimensionLoop(int32_t ndim, int32_t const *dims,
 /// element (2,0,0) (to element (3,0,0)) yields 0, (3,0,0) yields 1, (3,4,0)
 /// yields 2, and (3,4,5) yields 3.
 int32_t
-LoopInfo::advanceLoop(void* ptr)
+LoopInfo::advanceLoop(const void* ptr)
 {
   int32_t i, done;
 
@@ -237,7 +243,7 @@ LoopInfo::advanceLoop(void* ptr)
     done = this->rndim;
   else {
     // advance pointer
-    auto p = static_cast<char**>(ptr);
+    auto p = static_cast<char**>(const_cast<void*>(ptr));
     *p += this->step[this->advanceaxis]*this->stride;
 
     done = this->advanceaxis;   // default: not done yet
@@ -528,16 +534,13 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
                                int32_t nLess, int32_t const * less,
                                LoopInfo *tinfo, Pointer *tptr)
 {
-  int32_t       target, n, i, ndim, dims[MAX_DIMS], naxes, axes[MAX_DIMS], j,
-    nOmitAxes = 0, omitAxes[MAX_DIMS];
+  int32_t       target, n, i, j, nOmitAxes = 0, omitAxes[MAX_DIMS];
   Pointer       ptr;
 
-  ndim = this->ndim;           // default
-  memcpy(dims, this->dims, ndim*sizeof(*dims));
+  std::vector<int32_t> dims {this->dims, this->dims + this->ndim};
+  std::vector<int32_t> axes {this->axes, this->axes + this->naxes};
   for (i = 0; i < ndim; i++)
     omitAxes[i] = 0;
-  naxes = this->naxes;
-  memcpy(axes, this->axes, naxes*sizeof(*axes));
   // it is assumed that 0 <= axes[i] < ndim for i = 0..naxes-1
 
   if (nLess && less) {
@@ -571,16 +574,12 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
       for (i = j = 0; i < ndim; i++)
         if (retain[i])
           newIndexToOld[j++] = i;
-      // update dims[] and ndim
-      int32_t newvalues[MAX_DIMS];
+      // update dims[]
+      std::vector<int32_t> newvalues;
       if (j) {
         for (i = 0; i < j; i++)
-          newvalues[i] = dims[newIndexToOld[i]];
-        memcpy(dims, newvalues, j*sizeof(*dims));
-        ndim = j;
-      } else {
-        // there are no dimensions left; get a scalar
-        ndim = 0;
+          newvalues.push_back(dims[newIndexToOld[i]]);
+        dims = newvalues;
       }
       // update axes[] and naxes
       for (i = 0; i < naxes; i++)
@@ -592,11 +591,11 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
         if (retain[i])
           newIndexToOld[j++] = i;
       if (j) {
+        newvalues.clear();
         for (i = 0; i < j; i++)
-          newvalues[i] = axes[newIndexToOld[i]];
-        memcpy(axes, newvalues, j*sizeof(*axes));
+          newvalues.push_back(axes[newIndexToOld[i]]);
+        axes = newvalues;
       }
-      naxes = j;
     }
   }
 
@@ -606,25 +605,24 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
   if (nMore && more) {
     if (nMore < 1)
       return luxerror("Illegal number %d of dimensions to add", -1, nMore);
-    if (nMore + ndim > MAX_DIMS)
+    if (nMore + dims.size() > MAX_DIMS)
       return luxerror("Requested total number of dimensions %d "
-                    "exceeds allowed maximum %d", -1, nMore + ndim, MAX_DIMS);
-    if (nMore + naxes > MAX_DIMS)
+                      "exceeds allowed maximum %d", -1, nMore + dims.size(),
+                      MAX_DIMS);
+    if (nMore + axes.size() > MAX_DIMS)
       return luxerror("Total number of axes %d after growing "
-                    "exceeds allowed maximum %d", nMore + naxes, MAX_DIMS);
+                      "exceeds allowed maximum %d", nMore + axes.size(),
+                      MAX_DIMS);
     for (i = 0; i < nMore; i++)
       if (more[i] < 1)
         return luxerror("Illegal size %d requested for new dimension %d", -1,
                       more[i], i);
-    memmove(dims + nMore, dims, ndim*sizeof(*dims));
-    memcpy(dims, more, nMore*sizeof(*dims));
-    ndim += nMore;
+    dims.insert(dims.begin(), more, more + nMore);
     for (i = 0; i < naxes; i++) // adjust axes for new dimensions
       axes[i] += nMore;
-    memmove(axes + nMore, axes, naxes*sizeof(*axes));
+    axes.insert(axes.begin(), nMore, 0);
     for (i = 0; i < nMore; i++)
       axes[i] = i;
-    naxes += nMore;
   }
 
   if (!less && !more) {
@@ -638,7 +636,7 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
       if ((tmode & (SL_COMPRESS | SL_COMPRESSALL)) == SL_COMPRESS)
         n = 1;                  // omit one axis only
       else
-        n = this->naxes;       // omit all axes
+        n = this->naxes;        // omit all axes
 
       if (this->axes) {        // have specific axes
         if (tmode & SL_ONEDIMS)  // replace by dimension of 1
@@ -646,32 +644,27 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
             dims[this->axes[i]] = 1;
         else {                  // really omit
           if (this->naxes      // no fake 1D
-              && ndim > n) {    // and no dimensions left either
+              && dims.size() > n) { // and no dimensions left either
             for (i = 0; i < n; i++)
               dims[this->axes[i]] = 0; // set omitted dims to 0
-            ndim -= n;          // adjust number of dimensions
-            i = 0;              // now remove the zeros
-            for (j = 0; j < ndim; i++)
-              if (dims[i])
-                dims[j++] = dims[i];
+            // remove elements equal to 0
+            auto e = std::remove_if(dims.begin(), dims.end(),
+                                    [](auto x){return (x == 0);});
+            dims.erase(e, dims.end());
           } else                // it yields a single number -> scalar
-            ndim = 0;           // scalar
+            dims.clear();       // scalar
         } // end of if (mode & ... )
       } else {                  // assume all axes were specified
-        ndim -= n;              // adjust number of dimensions
-        memcpy(dims, dims + n, ndim*sizeof(int32_t)); // move up by <n>
+        dims.erase(dims.begin(), dims.begin() + n);
       }
-      naxes -= n;
-      if (naxes < 0)
-        naxes = 0;
-      memcpy(axes, axes + n, naxes*sizeof(int32_t));
+      axes.erase(axes.begin(), axes.begin() + n);
       break;
     }
   }
 
   // create the output symbol
-  if (ndim) {           // get an array
-    target = array_scratch(ttype, ndim, dims);
+  if (dims.size()) {            // get an array
+    target = array_scratch(ttype, dims.size(), &dims[0]);
     ptr.i32 = (int32_t *) array_data(target);
   } else {                      // get a scalar
     if (isStringType(ttype)) {
@@ -696,7 +689,8 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
    element of tinfo. */
 
   // fill loop structure for output symbol
-  tinfo->setupDimensionLoop(ndim, dims, ttype, naxes, axes, tptr, tmode);
+  tinfo->setupDimensionLoop(dims.size(), &dims[0], ttype, axes.size(), &axes[0],
+                            tptr, tmode);
   return target;
 }
 //-----------------------------------------------------------------------

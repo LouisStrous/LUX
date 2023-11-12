@@ -307,7 +307,7 @@ lux_astron2(int32_t narg, int32_t ps[])
 
   return result;
 #else
-  return cerror(NOSUPPORT, 0, "ASTRON2", "libcalceph")
+  return cerror(NOSUPPORT, 0, "ASTRON2", "libcalceph");
 #endif
 }
 REGISTER(astron2, f, astron2, 2, 4, ":::equinox:1keepdims:~6ecliptical:2equatorial:4bare:~8polar:8xyz:16date:32conjspread", HAVE_LIBCALCEPH)

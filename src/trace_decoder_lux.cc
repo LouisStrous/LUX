@@ -52,7 +52,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #define huff_EXTEND(x,s)  ((x) < extend_test[s] ? (x) + extend_offset[s] : (x))
 #define MAX_GAPS  50
- extern        struct sym_desc sym[];
+ extern        SymbolImpl sym[];
  extern        struct sym_list                *subr_sym_list[];
  extern        int32_t        temp_base;
  extern        int32_t        edb_context;

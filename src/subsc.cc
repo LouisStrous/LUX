@@ -23,6 +23,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <cassert>
 #include <stdlib.h>
 #include <string.h>
 #include "action.hh"
@@ -966,18 +967,18 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
 // strings, associated variables, file maps, and function pointers.
 // rewritten LS 6aug96
 {
-  int32_t       nsym, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum,
-        size[MAX_DIMS], todim[MAX_DIMS], *index[MAX_DIMS], nelem, *iptr,
-        trgtndim, trgtdims[MAX_DIMS], fromdim[MAX_DIMS], one = 1, offset0,
-        stride[MAX_DIMS], offset, width, tally[MAX_DIMS], step[MAX_DIMS],
-        noutdim, ps2[MAX_DIMS], narr, combineType;
+  uint32_t trgtndim;
+  int32_t nsym, i, n, iq, ndim, *dims, start[MAX_DIMS], j, nsum, size[MAX_DIMS],
+    todim[MAX_DIMS], *index[MAX_DIMS], nelem, *iptr, trgtdims[MAX_DIMS],
+    fromdim[MAX_DIMS], one = 1, offset0, stride[MAX_DIMS], offset, width,
+    tally[MAX_DIMS], step[MAX_DIMS], noutdim, ps2[MAX_DIMS], narr, combineType;
   Symboltype type;
   Symbolclass class_id;
   int16_t       *ap;
   Pointer       src, trgt;
   wideScalar    value, item;
   uint8_t       subsc_type[MAX_DIMS], sum[MAX_DIMS];
-  listElem      *le;
+  ListElem* le;
   FILE  *fp = NULL;
   int32_t       lux_subsc_subgrid(int32_t, int32_t []);
   int32_t lux_endian(int32_t, int32_t []);
@@ -1475,8 +1476,8 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       if (iq == LUX_ERROR)
         goto lux_subsc_1;
       symbol_class(iq) = LUX_LIST;
-      n = size[0]*sizeof(listElem);
-      le = list_symbols(iq) = (listElem*) malloc(n);
+      n = size[0]*sizeof(ListElem);
+      le = list_symbols(iq) = (ListElem*) malloc(n);
       if (!list_symbols(iq)) {
         cerror(ALLOC_ERR, iq);
         goto lux_subsc_1;
@@ -1484,7 +1485,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
       symbol_memory(iq) = n;
       switch (subsc_type[0]) {
         case LUX_RANGE:
-          memcpy(le, clist_symbols(nsym) + start[0], size[0]*sizeof(listElem));
+          memcpy(le, clist_symbols(nsym) + start[0], size[0]*sizeof(ListElem));
           break;
         case LUX_ARRAY:
           n = size[0];
@@ -2339,7 +2340,7 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
   if (symbol_class(nsym) != LUX_ARRAY) // not an array
     return cerror(NEED_ARR, nsym);
   // get old size
-  oldSize = array_size(nsym);
+  oldSize = array_size(nsym);   // bytes
   ndim = 0;
   if (narg > 1) {
     for (i = 1; i < narg; i++)
@@ -2364,21 +2365,24 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
   } else {
     dims[ndim++] = oldSize;
   }
-  newSize = 1;                  // calculate new size
+  newSize = 1;                  // calculate new size, in bytes
   for (i = 0; i < ndim; i++)
     newSize *= dims[i];
   if (newSize != oldSize && redim_warn_flag)
     printf("WARNING: result from REDIM is different than original\n");
+  if (newSize != oldSize) {
+    oldSize = oldSize*lux_type_size[array_type(nsym)] + sizeof(Array);
+    newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(Array);
+    data = (Array *) Realloc(array_header(nsym), newSize);
+    if (!data)
+      return luxerror("Resizing of array memory failed", nsym);
+    if (newSize > oldSize)
+      memset(((char*) data) + oldSize, 0, newSize - oldSize);
+    array_header(nsym) = data;
+    symbol_memory(nsym) = newSize;
+  }
   memcpy(array_dims(nsym), dims, ndim*sizeof(int32_t));
   array_num_dims(nsym) = ndim;
-  newSize = newSize*lux_type_size[array_type(nsym)] + sizeof(Array);
-  data = (Array *) Realloc(array_header(nsym), newSize);
-  if (!data)
-    return luxerror("Resizing of array memory failed", nsym);
-  if (newSize > oldSize)
-    memset(((char*) data) + oldSize, 0, newSize - oldSize);
-  array_header(nsym) = data;
-  symbol_memory(nsym) = newSize;
   return 1;
 }
  //-------------------------------------------------------------------------
@@ -2412,10 +2416,10 @@ int32_t lux_concat_list(int32_t narg, int32_t ps[])
 
   if (isStruct) {               // result is an LUX_LIST
     symbol_class(result) = LUX_LIST;
-    list_symbols(result) = (listElem*) Malloc(nelem*sizeof(listElem));
+    list_symbols(result) = (ListElem*) Malloc(nelem*sizeof(ListElem));
     if (!list_symbols(result))
       return cerror(ALLOC_ERR, 0);
-    symbol_memory(result) = nelem*sizeof(listElem);
+    symbol_memory(result) = nelem*sizeof(ListElem);
   } else {
     symbol_class(result) = LUX_CLIST;
     clist_symbols(result) = (int16_t*) Malloc(nelem*sizeof(int16_t));
@@ -2494,6 +2498,190 @@ int32_t lux_concat_list(int32_t narg, int32_t ps[])
     } // end for (i = 0; ...)
   }
   return result;                // everything OK
+}
+ //-------------------------------------------------------------------------
+void
+copyScalarToArray(int32_t src, Pointer tgt, Symboltype tgttype)
+{
+  assert(symbolIsScalar(src));
+  assert(tgttype >= scalar_type(src));
+  switch (tgttype)
+  {
+  case LUX_INT8:
+    // source is_INT8 too
+    *tgt.ui8 = scalar_value(src).ui8;
+    break;
+  case LUX_INT16:
+    // source is LUX_INT16 or lower
+    switch (scalar_type(src))
+    {
+    case LUX_INT8:
+      *tgt.i16 = scalar_value(src).ui8;
+      break;
+    case LUX_INT16:
+      *tgt.i16 = scalar_value(src).i16;
+      break;
+    }
+    break;
+  case LUX_INT32:
+    // source is LUX_INT32 or lower
+    switch (scalar_type(src))
+    {
+    case LUX_INT8:
+      *tgt.i32 = scalar_value(src).ui8;
+      break;
+    case LUX_INT16:
+      *tgt.i32 = scalar_value(src).i16;
+      break;
+    case LUX_INT32:
+      *tgt.i32 = scalar_value(src).i32;
+      break;
+    }
+    break;
+  case LUX_INT64:
+    // source is LUX_INT64 or lower
+    switch (scalar_type(src))
+    {
+    case LUX_INT8:
+      *tgt.i64 = scalar_value(src).ui8;
+      break;
+    case LUX_INT16:
+      *tgt.i64 = scalar_value(src).i16;
+      break;
+    case LUX_INT32:
+      *tgt.i64 = scalar_value(src).i32;
+      break;
+    case LUX_INT64:
+      *tgt.i64 = scalar_value(src).i64;
+      break;
+    }
+    break;
+  case LUX_FLOAT:
+    // source is LUX_FLOAT or less
+    switch (scalar_type(src))
+    {
+    case LUX_INT8:
+      *tgt.f = scalar_value(src).ui8;
+      break;
+    case LUX_INT16:
+      *tgt.f = scalar_value(src).i16;
+      break;
+    case LUX_INT32:
+      *tgt.f = scalar_value(src).i32;
+      break;
+    case LUX_INT64:
+      *tgt.f = scalar_value(src).i64;
+      break;
+    case LUX_FLOAT:
+      *tgt.f = scalar_value(src).f;
+      break;
+    }
+    break;
+  case LUX_DOUBLE:
+    // source is LUX_DOUBLE or less
+    switch (scalar_type(src))
+    {
+    case LUX_INT8:
+      *tgt.d = scalar_value(src).ui8;
+      break;
+    case LUX_INT16:
+      *tgt.d = scalar_value(src).i16;
+      break;
+    case LUX_INT32:
+      *tgt.d = scalar_value(src).i32;
+      break;
+    case LUX_INT64:
+      *tgt.d = scalar_value(src).i64;
+      break;
+    case LUX_FLOAT:
+      *tgt.d = scalar_value(src).f;
+      break;
+    case LUX_DOUBLE:
+      *tgt.d = scalar_value(src).d;
+      break;
+    }
+    break;
+  case LUX_CFLOAT:
+    // source is LUX_CFLOAT or less
+    switch (scalar_type(src))
+    {
+    case LUX_INT8:
+      tgt.cf->real = scalar_value(src).ui8;
+      tgt.cf->imaginary = 0;
+      break;
+    case LUX_INT16:
+      tgt.cf->real = scalar_value(src).i16;
+      tgt.cf->imaginary = 0;
+      break;
+    case LUX_INT32:
+      tgt.cf->real = scalar_value(src).i32;
+      tgt.cf->imaginary = 0;
+      break;
+    case LUX_INT64:
+      tgt.cf->real = scalar_value(src).i64;
+      tgt.cf->imaginary = 0;
+      break;
+    case LUX_FLOAT:
+      tgt.cf->real = scalar_value(src).f;
+      tgt.cf->imaginary = 0;
+      break;
+    case LUX_DOUBLE:
+      tgt.cf->real = scalar_value(src).d;
+      tgt.cf->imaginary = 0;
+      break;
+    case LUX_CFLOAT:
+      {
+        auto& c = complex_scalar_data(src).cf;
+        tgt.cf->real = c->real;
+        tgt.cf->imaginary = c->imaginary;
+      }
+      break;
+    }
+    break;
+  case LUX_CDOUBLE:
+    switch (scalar_type(src))
+    {
+    case LUX_INT8:
+      tgt.cd->real = scalar_value(src).ui8;
+      tgt.cd->imaginary = 0;
+      break;
+    case LUX_INT16:
+      tgt.cd->real = scalar_value(src).i16;
+      tgt.cd->imaginary = 0;
+      break;
+    case LUX_INT32:
+      tgt.cd->real = scalar_value(src).i32;
+      tgt.cd->imaginary = 0;
+      break;
+    case LUX_INT64:
+      tgt.cd->real = scalar_value(src).i64;
+      tgt.cd->imaginary = 0;
+      break;
+    case LUX_FLOAT:
+      tgt.cd->real = scalar_value(src).f;
+      tgt.cd->imaginary = 0;
+      break;
+    case LUX_DOUBLE:
+      tgt.cd->real = scalar_value(src).d;
+      tgt.cd->imaginary = 0;
+      break;
+    case LUX_CFLOAT:
+      {
+        auto& c = complex_scalar_data(src).cf;
+        tgt.cd->real = c->real;
+        tgt.cd->imaginary = c->imaginary;
+      }
+      break;
+    case LUX_CDOUBLE:
+      {
+        auto& c = complex_scalar_data(src).cd;
+        tgt.cd->real = c->real;
+        tgt.cd->imaginary = c->imaginary;
+      }
+      break;
+    }
+    break;
+  }
 }
  //-------------------------------------------------------------------------
 int32_t lux_concat(int32_t narg, int32_t ps[])
@@ -2625,29 +2813,24 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
       q2.ui8 = (uint8_t*) array_data(nsym);
       for (i = 0; i < narg; i++) {
         iq = ps[i];
-        switch (symbol_class(iq)) {
-          case LUX_SCAL_PTR:
-            iq = dereferenceScalPointer(iq);
-            // fall-thru to LUX_SCALAR
-          case LUX_SCALAR:
-            memcpy(&temp.ui8, &scalar_value(iq).ui8,
-                   lux_type_size[scalar_type(iq)]);
-            if (scalar_type(iq) != toptype)
-              convertPointer(&temp, scalar_type(iq), toptype);
-            memcpy(q2.ui8, &temp.ui8, n);
-            q2.ui8 += n;          // add the right Byte count for each element
-            break;
-          case LUX_CSCALAR:
-            memcpy(q2.ui8, complex_scalar_data(iq).cf, n);
-            q2.ui8 += n;
-            break;
-          case LUX_STRING:
-            *q2.sp++ = strsave(string_value(iq));
-            break;
-          case LUX_UNDEFINED:   // ignore
-            break;
-          default:              //just in case
-            return cerror(ILL_CLASS, iq);
+        switch (symbol_class(iq))
+        {
+        case LUX_SCAL_PTR:
+          iq = dereferenceScalPointer(iq);
+          // fall-thru to LUX_SCALAR
+        case LUX_SCALAR:
+        case LUX_CSCALAR:
+          copyScalarToArray(iq, q2, toptype);
+          q2.ui8 += n;
+          break;
+        case LUX_STRING:
+          *q2.sp = strsave(string_value(iq));
+          q2.ui8 += n;
+          break;
+        case LUX_UNDEFINED:   // ignore
+          break;
+        default:              //just in case
+          return cerror(ILL_CLASS, iq);
         }
       }
       return nsym;

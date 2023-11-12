@@ -26,6 +26,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef INCLUDED_ACTION_HH
 #define INCLUDED_ACTION_HH
 
+#include <numeric>              // for iota
+#include <vector>
+
 #include "luxdefs.hh"
 #include "error.hh"
 #include "dmalloc.hh"
@@ -41,14 +44,14 @@ extern int32_t          scrat[], lux_file_open[], errorSym,
 extern int32_t  lux_type_size[];
 
 extern FILE             *inputStream, *lux_file[];
-extern hashTableEntry   *varHashTable[], *subrHashTable[], *funcHashTable[],
+extern HashTableEntry   *varHashTable[], *subrHashTable[], *funcHashTable[],
                         *blockHashTable[];
-extern symTableEntry    sym[];
-extern internalRoutine  *subroutine, *function;
+extern SymbolImpl    sym[];
+extern InternalRoutine  *subroutine, *function;
 extern int32_t          nSubroutine, nFunction, curLineNumber, compileLevel,
                         ignoreInput, curSymbol, axisTally[];
 extern unsigned int     internalMode;
-extern struct boundsStruct      bounds;
+extern BoundsStruct      bounds;
 extern int32_t  (*lux_converts[])(int32_t, int32_t []);
 
 FILE* openPathFile(char const*, int32_t);
@@ -63,20 +66,20 @@ char* strsave_system(char*);
 char* symbolIdent(int32_t, int32_t);
 
 char const* className(int32_t);
-char const* keyName(internalRoutine* routine, int32_t number, int32_t index);
-char const* symName(int32_t, hashTableEntry*[]);
+char const* keyName(InternalRoutine* routine, int32_t number, int32_t index);
+char const* symName(int32_t, HashTableEntry*[]);
 char const* symbolProperName(int32_t);
 char const* typeName(int32_t);
 
-csplineInfo const empty_cubic_spline(void);
+CsplineInfo const empty_cubic_spline(void);
 
-double cspline_derivative(double, csplineInfo*);
-double cspline_second_derivative(double, csplineInfo*);
-double cspline_value(double, csplineInfo*);
+double cspline_derivative(double, CsplineInfo*);
+double cspline_second_derivative(double, CsplineInfo*);
+double cspline_value(double, CsplineInfo*);
 double double_arg(int32_t);
 double famod(double,double);
 double fasmod(double,double);
-double find_cspline_value(double, double, double, csplineInfo*);
+double find_cspline_value(double, double, double, CsplineInfo*);
 double hypota(int32_t, double*);
 double vhypot(int32_t, double, double, ...);
 
@@ -88,27 +91,28 @@ int setupDimensionLoop(LoopInfo*, int32_t, int32_t const*, Symboltype, int32_t,
 int32_t Sprintf(char*, char*, ...);
 int32_t approximately_equal(double, double, double);
 int32_t approximately_equal_f(float, float, float);
-int32_t approximately_equal_z(doubleComplex, doubleComplex, double);
-int32_t approximately_equal_z_f(floatComplex, floatComplex, float);
+int32_t approximately_equal_z(DoubleComplex, DoubleComplex, double);
+int32_t approximately_equal_z_f(FloatComplex, FloatComplex, float);
 int32_t array_clone(int32_t, Symboltype);
+int32_t array_clone_zero(int32_t, Symboltype);
 int32_t array_scratch(Symboltype, int32_t, int32_t []);
 int32_t cerror(int32_t, int32_t, ...);
 int32_t convertRange(int32_t);
 int32_t copyEvalSym(int32_t);
 int32_t copySym(int32_t);
 int32_t cubic_spline_tables(void*, int32_t, int32_t, void*, int32_t, int32_t,
-                            int32_t, uint8_t, uint8_t, csplineInfo*);
+                            int32_t, uint8_t, uint8_t, CsplineInfo*);
 int32_t dereferenceScalPointer(int32_t);
 int32_t double_arg_stat(int32_t, double*);
 int32_t essentially_equal(double, double, double);
 int32_t essentially_equal_f(float, float, float);
-int32_t essentially_equal_z(doubleComplex, doubleComplex, double);
-int32_t essentially_equal_z_f(floatComplex, floatComplex, float);
+int32_t essentially_equal_z(DoubleComplex, DoubleComplex, double);
+int32_t essentially_equal_z_f(FloatComplex, FloatComplex, float);
 int32_t eval(int32_t);
 int32_t evals(int32_t);
 int32_t findInternalName(char const*, int32_t);
-int32_t findName(char const*, hashTableEntry**, int32_t);
-int32_t findSym(int32_t, hashTableEntry*[], int32_t);
+int32_t findName(char const*, HashTableEntry**, int32_t);
+int32_t findSym(int32_t, HashTableEntry*[], int32_t);
 int32_t float_arg_stat(int32_t, float*);
 int32_t getNumerical(int32_t, Symboltype, int32_t*, Pointer*, char, int32_t*,
                      Pointer*);
@@ -129,6 +133,7 @@ int32_t lux_long(int32_t, int32_t []);
 int32_t lux_string(int32_t, int32_t []);
 int32_t lux_word(int32_t, int32_t []);
 int32_t lux_zero(int32_t, int32_t []);
+int32_t lux_zerof(int32_t, int32_t []);
 int32_t luxerror(char const*, int32_t, ...);
 int32_t my_fprintf(FILE*, char*, ...);
 int32_t nextLoops(LoopInfo*, LoopInfo*);
@@ -174,17 +179,17 @@ int32_t setup_x(void);
 
 void addVerify(char*, char);
 void checkErrno(void);
-void cleanup_cubic_spline_tables(csplineInfo*);
+void cleanup_cubic_spline_tables(CsplineInfo*);
 void clearToPopTempVariable(int32_t);
 void convertPointer(Scalar*, Symboltype, Symboltype);
 void convertWidePointer(wideScalar*, int32_t, int32_t);
-void cspline_value_and_derivative(double, double*, double*, csplineInfo*);
+void cspline_value_and_derivative(double, double*, double*, CsplineInfo*);
 void deleteFacts(int32_t symbol, int32_t type);
 void deleteStack(void);
 void dupList(void);
 void embed(int32_t, int32_t);
 void endian(void*, int32_t, int32_t);
-void find_cspline_extremes(double, double, double*, double*, double*, double*, csplineInfo*);
+void find_cspline_extremes(double, double, double*, double*, double*, double*, CsplineInfo*);
 void freeString(int32_t);
 void mark(int32_t);
 void newStack(int32_t);
@@ -331,6 +336,25 @@ get_scalar_value(int32_t iq)
     cerror(ILL_TYPE, iq);
     return 0;
   }
+}
+
+/// A template function that produces a vector with elements incrementing
+/// from zero.
+///
+/// \tparam T is the data type of the elements.
+///
+/// \param n is the number of elements to put in the vector.
+///
+/// \param start is the value to store in the first element.
+///
+/// \returns the vector.
+template<typename T>
+std::vector<T>
+make_iota(size_t n, T start = T{})
+{
+  std::vector<T> result(n);
+  std::iota(result.begin(), result.end(), start);
+  return result;
 }
 
 #endif

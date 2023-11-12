@@ -91,6 +91,8 @@ nonbind_sources = \
 	gifread_lux.cc\
 	gifwrite_lux.cc\
 	gnuplot_interface.cc\
+	gslpp_roots.cc\
+	gslpp_roots.hh\
 	gslpp_sort.cc\
 	gslpp_sort.hh\
 	gslpp_sort_vector.hh\

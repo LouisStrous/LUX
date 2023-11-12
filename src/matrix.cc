@@ -98,10 +98,12 @@ int32_t lux_matrix_product(int32_t narg, int32_t ps[])
   standard_redef_array(iq, LUX_DOUBLE, tndim, tdims, 0, NULL,
                        infos[2].mode, &ptrs[2], &infos[2]);
   free(tdims);
-  infos[0].setAxes(2, NULL, SL_EACHBLOCK);
-  infos[1].setAxes(2, NULL, SL_EACHBLOCK);
-  infos[2].setAxes(2, NULL, SL_EACHBLOCK);
-
+  {
+    auto i2 = make_iota<int32_t>(2);
+    infos[0].setAxes(i2, SL_EACHBLOCK);
+    infos[1].setAxes(i2, SL_EACHBLOCK);
+    infos[2].setAxes(i2, SL_EACHBLOCK);
+  }
   int32_t j, k;
   if (internalMode & 1) {       // /OUTER
     do {
@@ -338,11 +340,11 @@ int32_t lux_transpose_matrix(int32_t narg, int32_t ps[])
   memcpy(dims + 2, infos[0].dims + 2, (infos[0].ndim - 2)*sizeof(int32_t));
   standard_redef_array(iq, LUX_DOUBLE, infos[0].ndim, dims, 0, NULL,
                        infos[1].mode, &ptrs[1], &infos[1]);
-  dims[0] = 0;
-  dims[1] = 1;
-  infos[0].setAxes(2, dims, SL_EACHBLOCK);
-  infos[1].setAxes(2, dims, SL_EACHBLOCK);
-  free(dims);
+  {
+    auto i2 = make_iota<int32_t>(2);
+    infos[0].setAxes(i2, SL_EACHBLOCK);
+    infos[1].setAxes(i2, SL_EACHBLOCK);
+  }
   n = infos[0].dims[0]*infos[0].dims[1];
   do {
     matrix_transpose(ptrs[0].d, ptrs[1].d, infos[0].dims[0], infos[0].dims[1]);

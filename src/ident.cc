@@ -34,7 +34,7 @@ FILE        *outputStream;
 char const* symbolProperName(int32_t symbol)
 // returns the proper name of the symbol, if any, or NULL
 {
-  hashTableEntry        **hashTable, *hp;
+  HashTableEntry        **hashTable, *hp;
   int32_t        hashValue;
 
   if (symbol < 0 || symbol >= NAMED_END) // out of range
@@ -66,7 +66,7 @@ char const* symbolProperName(int32_t symbol)
   return NULL;                        // did not find it
 }
 //---------------------------------------------------------------------
-int32_t fmt_entry(formatInfo *fmi)
+int32_t fmt_entry(FormatInfo *fmi)
 /* finds the next format entry in format string <fmi->current> and returns
    information in other members of <fmi>.  These members are:
 
@@ -318,7 +318,7 @@ int32_t fmt_entry(formatInfo *fmi)
   return type;
 }
 //---------------------------------------------------------------------
-formatInfo        theFormat;
+FormatInfo        theFormat;
 char *fmttok(char *format)
 /* returns the next token from the installed format.  If <format> is equal
    to NULL, then the next token from the last installed format is returned.
@@ -329,7 +329,7 @@ char *fmttok(char *format)
 // and NULL is returned.  If an error occurs, then theFormat.type is
 // set to FMT_ERROR and NULL is returned.  LS 12nov99
 {
-  formatInfo        *fmi = &theFormat;
+  FormatInfo        *fmi = &theFormat;
 
   if (format) {                        // we install the new format
     fmi->format = (char*) realloc(fmi->format, strlen(format) + 1);
@@ -379,7 +379,7 @@ int32_t Sprintf_general(char *str, char *format, va_list ap)
    recognized: everything else is printed as plain text.  LS 16nov98 */
 // Sprintf does not attempt to write into <format>.
 {
-  static formatInfo        ownfmi, *fmi;
+  static FormatInfo        ownfmi, *fmi;
   int32_t        width, n;
   double        d, d2;
   char        *p;
@@ -521,17 +521,17 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   Scalar        number;
   int32_t        i, j, n, m;
   Pointer        ptr;
-  listElem        *sptr;
-  enumElem        *eptr;
-  extractSec        *sec;
-  structElem        *se;
-  structPtr        *spe;
-  structPtrMember        *spm;
+  ListElem* sptr;
+  EnumElem* eptr;
+  ExtractSec* sec;
+  StructElem* se;
+  StructPtr* spe;
+  StructPtrMember        *spm;
   int16_t        *arg;
   extern int32_t        fileLevel, errorSym;
   extern char        *errorPtr;
   static int32_t        indent = 0;
-  int32_t        identStruct(structElem *);
+  int32_t identStruct(StructElem *);
 
   save = curScrat;
 
@@ -1159,34 +1159,34 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     sprintf(curScrat, "symbol('%s')", string_value(meta_target(symbol)));
     break;
   case LUX_CARRAY:
-    ptr.cf = (floatComplex*) array_data(symbol);
-    n = array_size(symbol);
     strcpy(curScrat++, "[");
+    n = array_size(symbol);
     if ((mode & I_TRUNCATE)
         && n > 3) {
-      j = 3;
-      i = 1;
+      j = 3;                        // number to print
+      i = 1;                        // did truncate
     } else {
-      j = n;
-      i = 0;
+      j = n;                        // print all
+      i = 0;                        // no truncation
     }
+    ptr.cf = (FloatComplex*) array_data(symbol);
     switch (array_type(symbol)) {
     case LUX_CFLOAT:
       while (j--) {
         sprintf(curScrat, "(%g%+-1gi)", ptr.cf->real, ptr.cf->imaginary);
         curScrat += strlen(curScrat);
-        if (i || j)
+        if (j || i)
           strcpy(curScrat++, ",");
-        ptr.cf++;
+        ++ptr.cf;
       }
       break;
     case LUX_CDOUBLE:
       while (j--) {
         sprintf(curScrat, "(%g%+-1gi)", ptr.cd->real, ptr.cd->imaginary);
         curScrat += strlen(curScrat);
-        if (i || j)
+        if (j || i)
           strcpy(curScrat++, ",");
-        ptr.cd++;
+        ++ptr.cd;
       }
       break;
     }
@@ -1194,11 +1194,21 @@ char *symbolIdent(int32_t symbol, int32_t mode)
       sprintf(curScrat, "...");
       curScrat += strlen(curScrat);
     }
-    if (mode & I_LENGTH) {
-      sprintf(curScrat, " (%1d#)", n);
-      curScrat += strlen(curScrat);
-    }
     strcpy(curScrat, "]");
+    if (mode & I_LENGTH) {
+      curScrat += strlen(curScrat);
+      sprintf(curScrat, " (");
+      curScrat += 2;
+      ptr.i32 = array_dims(symbol);
+      n = array_num_dims(symbol);
+      while (n--) {
+        sprintf(curScrat, "%1d", *ptr.i32++);
+        curScrat += strlen(curScrat);
+        if (n)
+          strcpy(curScrat++, ",");
+      }
+      strcpy(curScrat++, "#)");
+    }
     break;
   case LUX_SUBROUTINE: case LUX_FUNCTION: case LUX_BLOCKROUTINE:
   case LUX_DEFERRED_SUBR: case LUX_DEFERRED_FUNC: case LUX_DEFERRED_BLOCK:
@@ -1968,7 +1978,8 @@ char *symbolIdent(int32_t symbol, int32_t mode)
   return curScrat;
 }
 //---------------------------------------------------------------------
-int32_t identStruct(structElem *se)
+int32_t
+identStruct(StructElem* se)
 {
   int32_t        n, nelem, ndim, *dims, ndim2, *dims2;
   char const * arrName[] = {
@@ -2046,7 +2057,7 @@ void dumpTree(int32_t symbol)
   char** sp;
   char const noName[] = "-";
   char const* name;
-  extractSec        *eptr;
+  ExtractSec* eptr;
 
   if (!indent)
     puts(symbolIdent(symbol, 0));

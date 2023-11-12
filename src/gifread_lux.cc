@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include <math.h>
 #include "lux_structures.hh"
- extern struct sym_desc sym[];
+ extern SymbolImpl sym[];
 
 /// Attributes of a GIF screen
 struct GIFScreen {

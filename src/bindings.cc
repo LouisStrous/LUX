@@ -204,10 +204,10 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
       return LUX_ERROR;
     axes = oneaxis;
     naxes = 1;
-    infos[0].setAxes(0, NULL, SL_EACHROW);
+    infos[0].setAxes({}, SL_EACHROW);
     if (isfunction) {
       iret = 1;
-      infos[iret].setAxes(0, NULL, SL_EACHROW);
+      infos[iret].setAxes({}, SL_EACHROW);
     } else
       iret = 0;
     break;
@@ -249,10 +249,10 @@ int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
   }
   int32_t iaxis;
   for (iaxis = 0; iaxis < naxes; iaxis++) {
-    infos[0].setAxes(1, &axes[iaxis], SL_EACHROW);
+    infos[0].setAxes({axes[iaxis]}, SL_EACHROW);
     ptrs[0] = ptrs0;
     if (isfunction) {
-      infos[iret].setAxes(1, &axes[iaxis], SL_EACHROW);
+      infos[iret].setAxes({axes[iaxis]}, SL_EACHROW);
       ptrs[iret] = ptrsr;
     }
     do {
@@ -868,7 +868,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
       return LUX_ERROR;
     axes = oneaxis;
     naxes = 1;
-    infos[0].setAxes(0, NULL, SL_EACHROW);
+    infos[0].setAxes({}, SL_EACHROW);
     iret = 1;
     break;
   case 2:                       // source, axes
@@ -895,7 +895,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
   ptrsr = ptrs[iret];
   int32_t iaxis;
   for (iaxis = 0; iaxis < naxes; iaxis++) {
-    infos[0].setAxes(1, &axes[iaxis], SL_EACHROW);
+    infos[0].setAxes({axes[iaxis]}, SL_EACHROW);
     ptrs[0] = ptrs0;
     ptrs[iret] = ptrsr;
     do {
@@ -1731,8 +1731,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     ipar1 = 1;
     ipar2 = -1;
     iret = 2;
-    infos[0].setAxes(0, NULL, SL_EACHROW);
-    infos[iret].setAxes(0, NULL, SL_EACHROW);
+    infos[0].setAxes({}, SL_EACHROW);
+    infos[iret].setAxes({}, SL_EACHROW);
     break;
   case 3:                       // source, param1, param2
     if ((iq = sa.set(narg, ps, "iD*;iD;iD;rD&", &ptrs, &infos)) < 0)
@@ -1740,8 +1740,8 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
     ipar1 = 1;
     ipar2 = 2;
     iret = 3;
-    infos[0].setAxes(0, NULL, SL_EACHROW);
-    infos[iret].setAxes(0, NULL, SL_EACHROW);
+    infos[0].setAxes({}, SL_EACHROW);
+    infos[iret].setAxes({}, SL_EACHROW);
     break;
   case 4:                       // source, axis, param1, param2
     if ((iq = sa.set(narg, ps, "iD*;iL;iD;iD;rD&", &ptrs, &infos)) < 0)
@@ -3940,7 +3940,7 @@ lux_v_sddsd_iairq_012_f_(int32_t narg, int32_t ps[],
 void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name,
                     int32_t min_arg, int32_t max_arg, char const* spec)
 {
-  internalRoutine ir;
+  InternalRoutine ir;
 
   if (!registered_functions) {
     registered_functions = malloctype(obstack);
@@ -3975,7 +3975,7 @@ void register_lux_f(int32_t (*f)(int32_t, int32_t []), char const* name,
 void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name,
                     int32_t min_arg, int32_t max_arg, char const* spec)
 {
-  internalRoutine ir;
+  InternalRoutine ir;
 
   if (!registered_subroutines) {
     registered_subroutines = malloctype(obstack);

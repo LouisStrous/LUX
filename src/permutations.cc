@@ -2,14 +2,17 @@
 
 // standard includes
 
-#include <algorithm>
-#include <cassert>
-#include <numeric>              // for std::iota
-#include <vector>
+#include "config.h"
+
+#if HAVE_LIBGSL
+# include <algorithm>
+# include <cassert>
+# include <numeric>              // for std::iota
+# include <vector>
 
 // own includes
 
-#include "permutations.hh"
+# include "permutations.hh"
 
 /// Ensure that the first rank is the least, by circular rotation of rank \a
 /// values.  All rank values get adjusted via \f$ (r + ∆r) \bmod n \f$ where \f$
@@ -185,3 +188,4 @@ permutation_number_circular_from_ranks(std::vector<size_t> r)
   // return the rank-based linear permutation number of elements 2 and up
   return permutation_number_linear_rank(&r[1], r.size() - 1);
 }
+#endif

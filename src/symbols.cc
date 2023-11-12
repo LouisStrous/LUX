@@ -312,7 +312,7 @@ int32_t to_scalar(int32_t nsym, Symboltype type)
   symbol_class(nsym) = isRealType(type)? LUX_SCALAR: LUX_CSCALAR;
   symbol_type(nsym) = type;
   if (isComplexType(type)) {
-    complex_scalar_data(nsym).cf = (floatComplex*) malloc(lux_type_size[type]);
+    complex_scalar_data(nsym).cf = (FloatComplex*) malloc(lux_type_size[type]);
     if (!complex_scalar_data(nsym).cf)
       return cerror(ALLOC_ERR, 0);
   }
@@ -339,6 +339,8 @@ int32_t array_clone(int32_t symbol, Symboltype type)
  void        *ptr;
  extern int32_t        pipeSym, pipeExec;
 
+ if (!symbolIsArray(symbol))
+   return cerror(NEED_ARR, symbol);
  size = ((symbol_memory(symbol) - sizeof(Array))
          / lux_type_size[array_type(symbol)]) * lux_type_size[type]
    + sizeof(Array);
@@ -347,7 +349,8 @@ int32_t array_clone(int32_t symbol, Symboltype type)
             / lux_type_size[array_type(symbol)]) * lux_type_size[type]
      + sizeof(Array);
    if (fsize != (float) size)
-     return luxerror("The number of bytes requested for the array\n(about %g) is too great", 0, fsize);
+     return luxerror("The number of bytes requested for the array\n"
+                     "(about %g) is too great", 0, fsize);
  }
  if (!pipeExec
      && pipeSym
@@ -374,6 +377,14 @@ int32_t array_clone(int32_t symbol, Symboltype type)
  }
  array_type(n) = type;
  return n;
+}
+//-----------------------------------------------------
+int32_t
+array_clone_zero(int32_t symbol, Symboltype type)
+{
+  if (!symbolIsArray(symbol))
+    return cerror(NEED_ARR, symbol);
+  return array_scratch(type, array_num_dims(symbol), array_dims(symbol));
 }
 //-----------------------------------------------------
 int32_t numerical_clone(int32_t iq, Symboltype type) {
@@ -1121,7 +1132,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         if (isComplexType(totype)) {
           value = scalar_value(iq);
           src.ui8 = &value.ui8;
-          complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
+          complex_scalar_data(result).cf = (FloatComplex*) malloc(trgtstep);
           symbol_memory(result) = trgtstep;
           if (!complex_scalar_data(result).cf)
             return cerror(ALLOC_ERR, 0);
@@ -1189,7 +1200,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
           trgt.ui8 = &scalar_value(result).ui8;
         } else {                        // complex output
           symbol_class(result) = LUX_CSCALAR;
-          complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
+          complex_scalar_data(result).cf = (FloatComplex*) malloc(trgtstep);
           if (!complex_scalar_data(result).cf)
             return cerror(ALLOC_ERR, 0);
           symbol_memory(result) = trgtstep;
@@ -1311,11 +1322,11 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
             if (trgtstep <= srcstep)
               do_realloc = 2;
             else {
-              complex_scalar_data(result).cf = (floatComplex*)
+              complex_scalar_data(result).cf = (FloatComplex*)
                 realloc(complex_scalar_data(result).cf, trgtstep);
             }
           } else
-            complex_scalar_data(result).cf = (floatComplex*) malloc(trgtstep);
+            complex_scalar_data(result).cf = (FloatComplex*) malloc(trgtstep);
           if (!do_realloc && !complex_scalar_data(result).cf)
             return cerror(ALLOC_ERR, 0);
           symbol_memory(result) = trgtstep;
@@ -2018,7 +2029,7 @@ int32_t lux_convert(int32_t narg, int32_t ps[], Symboltype totype, int32_t isFun
         symbol_memory(result) = size;
         break;
       case 2:
-        complex_scalar_data(result).cf = (floatComplex*)
+        complex_scalar_data(result).cf = (FloatComplex*)
           realloc(complex_scalar_data(result).cf, size);
         if (!complex_scalar_data(result).cf)
           return cerror(ALLOC_ERR, 0);
@@ -2158,7 +2169,7 @@ int32_t redef_scalar(int32_t nsym, Symboltype ntype, void *val)
       break;
     case LUX_CFLOAT:
       complex_scalar_memory(nsym) = lux_type_size[LUX_CFLOAT];
-      complex_scalar_data(nsym).cf = (floatComplex*) malloc(complex_scalar_memory(nsym));
+      complex_scalar_data(nsym).cf = (FloatComplex*) malloc(complex_scalar_memory(nsym));
       if (!complex_scalar_data(nsym).cf)
         return cerror(ALLOC_ERR, nsym);
       symbol_class(nsym) = LUX_CSCALAR;
@@ -2167,7 +2178,7 @@ int32_t redef_scalar(int32_t nsym, Symboltype ntype, void *val)
       break;
     case LUX_CDOUBLE:
       complex_scalar_memory(nsym) = lux_type_size[LUX_CDOUBLE];
-      complex_scalar_data(nsym).cd = (doubleComplex*) malloc(complex_scalar_memory(nsym));
+      complex_scalar_data(nsym).cd = (DoubleComplex*) malloc(complex_scalar_memory(nsym));
       if (!complex_scalar_data(nsym).cd)
         return cerror(ALLOC_ERR, nsym);
       symbol_class(nsym) = LUX_CSCALAR;
@@ -2367,7 +2378,7 @@ int32_t strarr(int32_t narg, int32_t ps[])
  return iq;
 }
 //-----------------------------------------------------
-int32_t show_routine(internalRoutine *table, int32_t tableLength, int32_t narg, int32_t ps[])
+int32_t show_routine(InternalRoutine *table, int32_t tableLength, int32_t narg, int32_t ps[])
 /* shows all routine names that contain a specified substring,
  or all of them */
 {
@@ -2375,7 +2386,7 @@ int32_t show_routine(internalRoutine *table, int32_t tableLength, int32_t narg, 
  int32_t        i, nOut = 0, nLine = uTermCol/16;
  char        *chars, *p;
  char        *name, **ptr;
- keyList        *keys;
+ KeyList        *keys;
 
  if (internalMode & 1)                // /PARAMETERS
  { if (symbol_class(*ps) != LUX_STRING)
@@ -2388,7 +2399,7 @@ int32_t show_routine(internalRoutine *table, int32_t tableLength, int32_t narg, 
    printf("%s %s, (%1d:%1d) arguments\n",
           table == subroutine? "subroutine": "function",
           table[i].name, table[i].minArg, table[i].maxArg);
-   keys = (keyList*) table[i].keys;
+   keys = (KeyList*) table[i].keys;
    if (keys)
    { printf("parameters: ");
      if (keys->suppressEval)
@@ -2430,7 +2441,7 @@ int32_t lux_switch(int32_t narg, int32_t ps[])
    LS 9nov98 9oct2010*/
 {
  int32_t        sym1, sym2;
- symTableEntry        temp1, temp2;
+ SymbolImpl        temp1, temp2;
 
  sym1 = ps[0];
  sym2 = ps[1];
@@ -2705,16 +2716,16 @@ int32_t namevar(int32_t symbol, int32_t safe)
   return iq;
 }
 //-------------------------------------------------------------------------
-char const* keyName(internalRoutine *routine, int32_t number, int32_t index)
+char const* keyName(InternalRoutine *routine, int32_t number, int32_t index)
 // returns the name of the <index>th positional keyword of <routine>
 // #<number>.  LS 19jan95
 {
-  keyList        *list;
+  KeyList        *list;
   char                **keys;
 
   if (index < 0 || index >= routine[number].maxArg)
     return "(illegal)";
-  list = (keyList *) routine[number].keys;
+  list = (KeyList *) routine[number].keys;
   keys = list->keys;
   if (index < 0) return "(unnamed)";        // before first named key
   while (*keys && index)

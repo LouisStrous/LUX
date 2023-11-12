@@ -451,23 +451,8 @@ union Scalar
   double d;
   char *s;
   char **sp;
-};
-
-// wideScalar is equal to scalar plus the complex data types; we have
-// separate scalar and wideScalars because wideScalar is wider, which is
-// not always desirable.
-union wideScalar
-{
-  uint8_t ui8;
-  int16_t i16;
-  int32_t i32;
-  int64_t i64;
-  float f;
-  double d;
   FloatComplex cf;
   DoubleComplex cd;
-  char *s;
-  char **sp;
 };
 
 /// A union of pointers to all data types that LUX arrays can hold.

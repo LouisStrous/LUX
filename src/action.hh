@@ -182,7 +182,6 @@ void checkErrno(void);
 void cleanup_cubic_spline_tables(CsplineInfo*);
 void clearToPopTempVariable(int32_t);
 void convertPointer(Scalar*, Symboltype, Symboltype);
-void convertWidePointer(wideScalar*, int32_t, int32_t);
 void cspline_value_and_derivative(double, double*, double*, CsplineInfo*);
 void deleteFacts(int32_t symbol, int32_t type);
 void deleteStack(void);

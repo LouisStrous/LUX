@@ -151,7 +151,6 @@ int32_t lux_distr_f(int32_t narg, int32_t ps[])
   Symboltype type, type2;
   Pointer arg1, arg2, res;
   int32_t       lux_zero(int32_t, int32_t []);
-  void convertWidePointer(wideScalar *, int32_t, int32_t);
 
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)

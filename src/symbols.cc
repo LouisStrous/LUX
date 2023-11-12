@@ -2141,9 +2141,9 @@ int32_t create_sub_ptr(int32_t nsym, char *p, int32_t index)
 int32_t redef_scalar(int32_t nsym, Symboltype ntype, void *val)
 // redefine symbol nsym to be a scalar of type ntype with value *val
 {
-  wideScalar        *value;
+  Scalar* value;
 
-  value = (wideScalar *) val;
+  value = (Scalar *) val;
 
   undefine(nsym);
   symbol_class(nsym) = LUX_SCALAR;

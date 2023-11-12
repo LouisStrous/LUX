@@ -976,7 +976,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
   Symbolclass class_id;
   int16_t       *ap;
   Pointer       src, trgt;
-  wideScalar    value, item;
+  Scalar    value, item;
   uint8_t       subsc_type[MAX_DIMS], sum[MAX_DIMS];
   ListElem* le;
   FILE  *fp = NULL;

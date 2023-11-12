@@ -56,7 +56,6 @@ static Pointer  work;
 int32_t         minmax(int32_t *, int32_t, int32_t), neutral(void *, int32_t);
 void    zerobytes(void *, int32_t), zap(int32_t);
 int32_t         simple_scale(void *, int32_t, int32_t, void *);
-void convertWidePointer(wideScalar *, int32_t, int32_t);
 int32_t readNumber(YYSTYPE *);
 //-------------------------------------------------------------------------
 int32_t evalString(char *expr, int32_t nmax)
@@ -1565,7 +1564,6 @@ int32_t lux_hist(int32_t narg, int32_t ps[]) // histogram function
   Array *h;
   Pointer q1, q2;
   int32_t       lux_zero(int32_t, int32_t []);
-  void convertWidePointer(wideScalar *, int32_t, int32_t);
 
   if (narg == 2)
     return lux_hist_dense(narg, ps);

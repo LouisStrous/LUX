@@ -2401,7 +2401,7 @@ int32_t insert(int32_t narg, int32_t ps[])
         srcType, stride[MAX_DIMS], tally[MAX_DIMS], offset0, nmult,
         tstep[MAX_DIMS], offset, onestep, unit, combineType;
   Pointer       src, trgt;
-  wideScalar    value;
+  Scalar    value;
   char  *name;
   FILE  *fp;
   extern int32_t        trace, step;
@@ -3787,7 +3787,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
     oldInternalMode, *ps2, srcMult;
   int16_t       *ps;
   Pointer       src, trgt;
-  wideScalar    value;
+  Scalar    value;
   char  *name, keepps2;
   FILE  *fp;
   extern int32_t        trace, step, insert_subr;

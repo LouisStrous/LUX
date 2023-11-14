@@ -23,7 +23,7 @@ SUBDIRS = fonts
 #  -I$(top_srcdir)/historicephemerides
 AM_CPPFLAGS = -Werror
 
-AM_YFLAGS = -d
+AM_YFLAGS = -d -Wno-yacc
 ACLOCAL_AMFLAGS = -I m4
 
 nonbind_sources = \
@@ -177,6 +177,8 @@ lux_LDADD = liblux.a
 #lux$(EXEEXT): $(top_builddir)/historicephemerides/libhistoricephemerides_c.a
 
 luxparser.cc: luxparser.yy
+
+fun3.cc: luxparser.cc
 
 thebindings.cc: $(nonbind_sources) bindings.hh bindings.pl
 	perl bindings.pl

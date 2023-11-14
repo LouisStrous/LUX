@@ -46,10 +46,10 @@ extern int32_t  scrat[],        /* general-purpose scratch storage (once.h) */
 extern int16_t  curContext,     /* context of current execution */
                 listStack[],    /* stack of unincorporated list items */
                 *listStackItem; /* next free list stack item */
-extern hashTableEntry   *varHashTable[], /* name hash table for variables */
+extern HashTableEntry   *varHashTable[], /* name hash table for variables */
                 *funcHashTable[], /* name hash table for functions */
                 *blockHashTable[]; /* name hash table for block routines */
-extern symTableEntry    sym[];  /* all symbols */
+extern SymbolImpl sym[];  /* all symbols */
 char    debugLine = 0,          /* we're not in a debugger line */
         errorState = 0,         /* we've not just experienced an error */
         compileOnly = 0;        /* not just compiling but also executing */
@@ -63,7 +63,7 @@ int16_t popList(void);          /* pop an item from the list stack's top */
 int32_t stackListLength(void),  /* return length of list at top of stack */
         isInternalSubr(int32_t),        /* 1 if symbol is internal subroutine */
         installExec(void),
-        findSym(int32_t, hashTableEntry *[], int32_t),
+        findSym(int32_t, HashTableEntry *[], int32_t),
         installSubsc(int32_t),
         addSubsc(int32_t, int32_t, int32_t), newSubrSymbol(int32_t),
         newSymbol(Symbolclass, ...), newBlockSymbol(int32_t), copySym(int32_t),
@@ -922,7 +922,7 @@ int32_t yyerror(const char *s)
      /* reports errors occurring during parsing (required by yyparse()) */
 {
  extern int32_t curLineNumber;  /* current line number */
- extern compileInfo     *curCompileInfo;
+ extern CompileInfo     *curCompileInfo;
 
  if (setup & 1024)      /* no parser warnings */
    return 0;

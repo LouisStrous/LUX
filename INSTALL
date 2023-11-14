@@ -1,3 +1,19 @@
+Here are brief installation instructions for Lux:
+
+Create the configure script for Lux:
+
+  ./bootstrap
+
+Configure the makefiles:
+
+  ./configure
+
+Build:
+
+  make
+
+Here follow generic installation instructions:
+
 Installation Instructions
 *************************
 

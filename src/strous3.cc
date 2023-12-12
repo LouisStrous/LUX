@@ -3294,13 +3294,58 @@ int32_t lux_commonfactors(int32_t narg, int32_t ps[]) {
 REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 
 #if HAVE_LIBGSL
-struct PermutationChangeInterval
+
+/// Details of a time interval and the circular or semicircular permutation
+/// changes that have been detected in it.
+struct Permutation_change_interval
 {
-  double tmin;
-  double tmax;
+  /// The start time of the interval.
+  double time1;
+
+  /// The end time of the interval.
+  double time2;
+
+  /// The positions of the objects at the start time.
+  std::vector<double> positions1;
+
+  /// The positions of the objects at the end time.
+  std::vector<double> positions2;
+
+  /// The lower bound on the count of permutation changes during the interval.
   size_t change_count;
-  int object1;
-  int object2;
+
+  /// The permutation number at the start time.
+  size_t permutation1;
+
+  /// The permutation number at the end time.
+  size_t permutation2;
+
+  /// For circular permutations: The index (into \a positions1 and \a
+  /// positions2) of the one object that is involved in the permutation change.
+  /// This is defined only if the change count is 1.
+  ///
+  /// For semicircular permutations: The index of the object at the start of the
+  /// biggest gap at the start time.
+  size_t item1;
+
+  /// For circular permutations: The index of the other object that is involved
+  /// in the permutation change.  This is defined only if the change count is 1.
+  ///
+  /// For semicircular permutations: The index of the object at the start of the
+  /// biggest gap at the end time.
+  size_t item2;
+
+  /// For semicircular permutations: The index of the object at the end of the
+  /// biggest gap at the start time.
+  size_t item1_2;
+
+  /// For semicircular permutations: The index of the object at the end of the
+  /// biggest gap at the end time.
+  size_t item2_2;
+
+  /// The shift of the second circular permutation that is needed to make it
+  /// look most like the first circular permutation.
+  size_t shift;
 };
 
 /// Returns the absolute difference between two values of the same type, even if
@@ -3320,18 +3365,94 @@ T abs_diff(T x1, T x2)
   return x1 < x2? x2 - x1: x1 - x2;
 }
 
-struct PermutationChange {
-  double t;
-  int object1;
-  int object2;
-  size_t final_permutation;
+/// A struct that holds details of a single permutation change.
+struct Permutation_change
+{
+  double t;                     //!< The Julian Date of the permutation change
+  size_t object1;               //!< The index of the one swapping object
+  size_t object2;               //!< The index of the other swapping object
+  size_t final_permutation;     //!< The permutation number after the change
 };
+
+/// A collection of instances of Permutation_change holding details of a
+/// sequence of permutation changes.
+using Permutation_change_intervals = std::list<Permutation_change_interval>;
+
+/// Bisect a Permutation_change_interval, splitting it into two such intervals
+/// of equal duration.
+///
+/// \param f is a function object or a pointer to a function of `t` that
+/// produces the positions ("angles") that define the permutation, one position
+/// for each object.
+///
+/// \param[in,out] pcis holds the permutation change intervals and gets modified
+/// by the call.
+///
+/// \param it is an iterator into \a pcis that points to the interval that is to
+/// be bisected.
+///
+/// \param period is the maximum value at which the positions wrap around.  The
+/// positions must be between 0 (inclusive) and \a period (exclusive).
+///
+/// \param semicircular says whether to look for changes based on semicircular
+/// permutations rather than circular permutations.  See
+/// permutation_semicircular_rank() for information about semicircular
+/// permutations.
+template<typename FuncType>
+bool
+bisect_interval(FuncType f, Permutation_change_intervals& pcis,
+                Permutation_change_intervals::iterator it,
+                double period, bool semicircular)
+{
+  auto midtime = (it->time1 + it->time2)/2;
+
+  // construct the first sub-interval in pci, and reduce *it to the
+  // second sub-interval
+  Permutation_change_interval pci;
+  pci.time1 = it->time1;
+  pci.time2 = it->time1 = midtime;
+  pci.positions1 = it->positions1;
+  pci.positions2 = it->positions1 = f(pci.time2);
+  pci.change_count
+    = permutation_distance_circular_rank(pci.positions1,
+                                         pci.positions2,
+                                         pci.shift);
+  it->change_count
+    = permutation_distance_circular_rank(it->positions1,
+                                         it->positions2,
+                                         it->shift);
+  if (semicircular)
+  {
+    pci.permutation1 = it->permutation1;
+    pci.permutation2 = it->permutation1
+      = permutation_number_semicircular_rank(pci.positions2, period);
+  }
+  if (pci.change_count > 0
+      || (semicircular && pci.permutation1 != pci.permutation2))
+  {
+    // the first sub-interval can stay; insert it before the original
+    // interval which has shrunk to become the second sub-interval
+    pcis.insert(it, pci);
+    return true;
+  }
+  if  (it->change_count == 0
+       && (!semicircular || it->permutation1 == it->permutation2))
+    // the second sub-interval is not interesting
+    it = pcis.erase(it);
+  else {
+    return true;
+    ++it;
+  }
+  return false;
+}
 
 /// Locate values of the independent coordinate (here denoted `t`) at which the
 /// circular rank permutation of objects changes.
 ///
 /// The used algorithm may fail to locate some relevant values of `t` if some of
 /// the objects pass each other more than once during the searched interval.
+///
+/// \tparam FuncType is the type of the function object.
 ///
 /// \param f is a function object or a pointer to a function of `t` that
 /// produces the positions ("angles") that define the permutation, one position
@@ -3349,230 +3470,283 @@ struct PermutationChange {
 /// permutation_semicircular_rank() for information about semicircular
 /// permutations.
 ///
-/// \returns a vector of PermutationChange that reports the values of `t` at
+/// \returns a vector of Permutation_change that reports the values of `t` at
 /// which the permutation changes, and the 0-based indexes (in ascending order)
 /// of the two objects that switch places at that time.
+///
+/// \todo Can I use std::function instead of FuncType?
 template<typename FuncType>
-std::vector<PermutationChange>
-find_permutation_changes(FuncType f, double period, double tmin, double tmax,
+std::vector<Permutation_change>
+find_permutation_changes(FuncType f, double period, double t1, double t2,
                          bool semicircular)
 {
-  std::vector<PermutationChange> ts;
+  std::vector<Permutation_change> ts;
 
-  std::vector<double> vmin = f(tmin);
+  Permutation_change_interval pci;
+  pci.positions1 = f(t1);
 
-  if (vmin.size() < 2)          // cannot detect changes
+  if (pci.positions1.size() < 2) // cannot detect changes
     return ts;
 
-  std::vector<double> vmax = f(tmax);
-  size_t dtot = permutation_distance_circular_rank(vmin, vmax);
-  if (!dtot) {
-    return ts;                  // no permutation changes
+  pci.positions2 = f(t2);
+
+  // A circular permutation change is also a semicircular permutation change,
+  // but there may be more semicircular permutation changes than circular
+  // permutation changes.  The latter cases are those where no items trade
+  // places but which gap is greatest changes.
+
+  // First we locate the circular permutation changes
+
+  size_t dtot = permutation_distance_circular_rank(pci.positions1,
+                                                   pci.positions2, pci.shift);
+
+  if (!dtot && !semicircular)
+    return ts;                  // no circular permutation changes
+
+  // locate intervals with a single circular permutation change
+
+  Permutation_change_intervals pcis;
+
+  pci.time1 = t1;
+  pci.time2 = t2;
+  pci.change_count = dtot;
+  if (semicircular)
+  {
+    pci.permutation1
+      = permutation_number_semicircular_rank(pci.positions1, period);
+    pci.permutation2
+      = permutation_number_semicircular_rank(pci.positions2, period);
   }
-  if (dtot > 0) {
-    // locate intervals with a single permutation change
+  pcis.push_back(pci);
 
-    std::list<PermutationChangeInterval> intervals;
-    PermutationChangeInterval pci;
-    pci.tmin         = tmin;
-    pci.tmax         = tmax;
-    pci.change_count = dtot;
-    intervals.push_back(pci);
-
-    while (1) {
-      bool bad = false;
-      for (auto it = intervals.begin(); it != intervals.end(); ) {
-        switch (it->change_count) {
-        case 0:                 // no permutation change: remove
-          it = intervals.erase(it);
-          break;
-        case 1:                 // single permutation change: ok
-          ++it;
-          break;
-        default:                // too many permutation changes: split
-          pci.tmin = it->tmin;
-          pci.tmax = (it->tmin + it->tmax)/2;
-          it->tmin = pci.tmax;
-          vmin = f(pci.tmin);
-          vmax = f(pci.tmax);
-          pci.change_count = permutation_distance_circular_rank(vmin, vmax);
-          if (pci.change_count > 0) {
-            intervals.insert(it, pci);
-            if (pci.change_count != 1)
-              bad = true;
-            std::swap(vmin, vmax);
-            vmax = f(it->tmax);
-            it->change_count = permutation_distance_circular_rank(vmin, vmax);
-            if (it->change_count == 0) {
-              it = intervals.erase(it);
-            } else if (it->change_count != 1) {
-              bad = true;
+  bool again = true;
+  while (again)
+  {
+    while (again)
+    {
+      again = false;
+      for (auto it = pcis.begin(); it != pcis.end(); )
+      {
+        switch (it->change_count)
+        {
+          case 0:                 // no circular permutation change
+            // Remove the interval if we're looking for circular permutation
+            // changes only or if we're looking for semicircular permutation
+            // changes and the initial and final semicircular permutations are
+            // the same.
+            if (!semicircular || it->permutation1 == it->permutation2)
+              it = pcis.erase(it);
+            else           // semicircular permutation change: keep the interval
+              ++it;
+            break;
+          case 1:               // single circular permutation change: keep
+            ++it;
+            break;
+          default:         // more than one circular permutation changes: bisect
+            if (bisect_interval(f, pcis, it, period, semicircular))
+              again = true;
+#if 0
+            auto midtime = (it->time1 + it->time2)/2;
+            // construct the first sub-interval in pci, and reduce *it to the
+            // second sub-interval
+            pci.time1 = it->time1;
+            pci.time2 = it->time1 = midtime;
+            pci.positions1 = it->positions1;
+            pci.positions2 = it->positions1 = f(pci.time2);
+            pci.change_count
+              = permutation_distance_circular_rank(pci.positions1,
+                                                   pci.positions2,
+                                                   pci.shift);
+            it->change_count
+              = permutation_distance_circular_rank(it->positions1,
+                                                   it->positions2,
+                                                   it->shift);
+            if (semicircular)
+            {
+              pci.permutation1 = it->permutation1;
+              pci.permutation2 = it->permutation1
+                = permutation_number_semicircular_rank(pci.positions2, period);
+            }
+            if (pci.change_count > 0
+                || (semicircular && pci.permutation1 != pci.permutation2))
+            {
+              // the first sub-interval can stay; insert it before the original
+              // interval which has shrunk to become the second sub-interval
+              pcis.insert(it, pci);
+              again = true;
+            }
+            if  (it->change_count == 0
+                 && (!semicircular || it->permutation1 == it->permutation2))
+              // the second sub-interval is not interesting
+              it = pcis.erase(it);
+            else {
+              again = true;
               ++it;
             }
-          } else {
-            bad = true;
-            ++it;
+#endif
+            break;
+        }
+      }
+    }
+
+    // Now intervals is a list in which every element has change_count == 1 or
+    // we're looking for semicircular permutation changes and change_count == 0
+    // and the initial and final semicircular permutations differ.
+
+    // find the times of permutation changes
+    for (auto it = pcis.begin(); it != pcis.end(); )
+    {
+      if (it->change_count == 1) // a circular permutation change
+      {
+        auto ranks1 = sort_rank(it->positions1);
+        auto ranks2 = sort_rank(it->positions2);
+        auto n = ranks2.size();
+        for (auto rit = ranks2.begin(); rit < ranks2.end(); ++rit)
+        {
+          auto r = *rit + it->shift;
+          *rit = (r >= n)? r - n: r;
+        }
+
+        // with three elements there are only two distinct circular
+        // permutations, so it is impossible to say which two elements switched
+        // places.
+
+        if (n > 2)
+        {
+          size_t ix;
+          for (ix = 0; ix != n; ++ix)
+          {
+            auto ad = abs_diff(ranks1[ix], ranks2[ix]);
+            if (ad == 1)
+            {
+              it->item1 = ix;
+              break;
+            }
+            else if (ad  > 1)
+            {
+              printf("Unexpected state in find_permutation_changes: "
+                     "rank difference > 1 "
+                     "for interval JD%.5f - JD%.5f", it->time1, it->time2);
+            }
           }
+          for (++ix; ix != ranks1.size(); ++ix)
+          {
+            auto ad = abs_diff(ranks1[ix], ranks2[ix]);
+            if (ad == 1)
+            {
+              it->item2 = ix;
+              break;
+            }
+            else if (ad  > 1)
+            {
+              printf("Unexpected state in find_permutation_changes: "
+                     "rank difference > 1 "
+                     "for interval JD%.5f - JD%.5f", it->time1, it->time2);
+            }
+          }
+        }
+        else
+          // 2 items
+          // \todo can we handle this case better?
+          return ts;
+
+        // Now we know which two items switched places.  We locate the time of
+        // conjunction based on the difference in their positions.
+
+        auto getd = [&](double t) -> double
+        {
+          auto v = f(t);
+          return fasmod(v[it->item1] - v[it->item2], period);
+        };
+
+        // determine the final permutation number
+        size_t pn2;
+        if (semicircular)
+          pn2 = permutation_number_semicircular_rank(it->positions2, period);
+        else
+          pn2 = permutation_number_circular_rank(it->positions2);
+
+        Gsl_root_fsolver grf(gsl_root_fsolver_brent, getd, it->time1,
+                             it->time2);
+        double test = grf.get_root();
+        if (isnan(test))
+        {
+          bisect_interval(f, pcis, it, period, semicircular);
+          again = true;
           break;
         }
+        else
+        {
+          ts.push_back({test, it->item1, it->item2, pn2});
+          it = pcis.erase(it);
+        }
       }
-      if (!bad)
-        break;
+      else                      // a semicircular permutation change
+      {
+        // determine which is the greatest gap at the initinal and final times
+        auto index1 = sort_index(it->positions1);
+        double biggest_gap = -1;
+        int ix_biggest_gap;
+        for (int i = 0; i < index1.size(); ++i)
+        {
+          auto gap = fasmod(it->positions1[index1[(i + 1)%index1.size()]]
+                            - it->positions1[index1[i]], period);
+          if (gap > biggest_gap)
+          {
+            biggest_gap = gap;
+            ix_biggest_gap = i;
+          }
+        }
+        it->item1 = index1[ix_biggest_gap];
+        it->item1_2 = index1[(ix_biggest_gap + 1)%index1.size()];
+
+        auto index2 = sort_index(it->positions2);
+        biggest_gap = -1;
+        for (int i = 0; i < index2.size(); ++i)
+        {
+          auto gap = fasmod(it->positions2[index2[(i + 1)%index2.size()]]
+                            - it->positions2[index2[i]], period);
+          if (gap > biggest_gap)
+          {
+            biggest_gap = gap;
+            ix_biggest_gap = i;
+          }
+        }
+        it->item2 = index2[ix_biggest_gap];
+        it->item2_2 = index2[(ix_biggest_gap + 1)%index2.size()];
+
+        // Now we know which two gaps switched being the biggest.  We locate the
+        // time of semicircular permutation change based on the difference in
+        // their sizes.
+
+        auto getd = [&](double t) -> double
+        {
+          auto v = f(t);
+          auto gap1 = fasmod(v[it->item1_2] - v[it->item1], period);
+          auto gap2 = fasmod(v[it->item2_2] - v[it->item2], period);
+          return gap1 - gap2;
+        };
+
+        // determine the final permutation number
+        size_t pn2 = permutation_number_semicircular_rank(it->positions2,
+                                                          period);
+
+        Gsl_root_fsolver grf(gsl_root_fsolver_brent, getd, it->time1,
+                             it->time2);
+        double test = grf.get_root();
+        if (isnan(test))
+        {
+          bisect_interval(f, pcis, it, period, semicircular);
+          again = true;
+          break;
+        }
+        else {
+          ts.push_back({test, 0, 0, pn2});
+          it = pcis.erase(it);
+        }
+      }
     }
-    // Now intervals is a list in which every element has change_count == 1.
-    // Figure out which two objects switch places during each interval
-    for (auto it = intervals.begin(); it != intervals.end(); ++it) {
-      vmin = f(it->tmin);
-      std::vector<size_t> rmin = sort_rank(vmin);
-      rotate_ranks_greatest_at_end(rmin);
-
-      vmax = f(it->tmax);
-      std::vector<size_t> rmax = sort_rank(vmax);
-      rotate_ranks_greatest_at_end(rmax);
-
-      // with three elements there are only two distinct circular permutations,
-      // so it is impossible to say which two elements switched places.
-
-      // with four or more elements, if the switching pair does not include the
-      // last element (case A):
-
-      // (Note that all but the last of the elements may be shuffled randomly
-      // compared to the example.)
-
-      // 0 - 1 - 2 - 3
-      // 1 - 0 - 2 - 3
-      // only two items differ; they differ by 1
-
-      // if the switching pair consists of the largest two ranks (case B):
-
-      // 0 - 1 - 2 - 3
-      // 0 - 1 - 3 - 2 gets rotated to
-      // 1 - 2 - 0 - 3
-      // the last item is the same, one item differs by n − 1, the rest differs
-      // by 1
-
-      // if the switching pair consists of the greatest and smallest ranks (case
-      // C):
-
-      // 0 - 1 - 2 - 3
-      // 3 - 1 - 2 - 0 gets rotated to
-      // 2 - 0 - 1 - 3
-      // the last item is the same, one item differs by n − 1, the rest differs
-      // by 1
-
-      if (rmin.size() > 2) {
-        size_t ix;
-        for (ix = 0; ix != rmin.size(); ++ix) {
-          if (abs_diff(rmin[ix], rmax[ix]) > 1) {
-            break;
-          }
-        }
-        if (ix == rmin.size()) { // case A
-          for (ix = 0; ix != rmin.size(); ++ix) {
-            if (abs_diff(rmin[ix], rmax[ix]) == 1) {
-              it->object1 = ix;
-              break;
-            }
-          }
-          for (++ix; ix != rmin.size(); ++ix) {
-            if (abs_diff(rmin[ix], rmax[ix]) == 1) {
-              it->object2 = ix;
-              break;
-            }
-          }
-        } else {                // case B or C
-          it->object1 = ix;
-          it->object2 = rmin.size() - 1;
-        }
-      } else {
-        // 2 items
-        // \todo can we handle this case better?
-        return ts;
-      } // end if (rmin.size() > 2)
-
-      // Now we know which two items switched places.  We locate the time of
-      // conjunction based on the difference in their positions.
-
-      auto getd = [&](double t) -> double {
-        auto v = f(t);
-        return fasmod(v[it->object1] - v[it->object2], period);
-      };
-
-      // determine the final permutation number
-      size_t pmax = permutation_number_circular_rank(vmax);
-
-      Gsl_root_fsolver grf(gsl_root_fsolver_brent, getd, it->tmin, it->tmax);
-      double t_test = grf.get_root();
-
-      if (0) {
-        auto dmin = getd(it->tmin);
-        auto dmax = getd(it->tmax);
-        size_t count = 0;
-        while (1) {
-          // the switch occurs sometime between tmin and tmax
-          auto test = (dmax*it->tmin - dmin*it->tmax)
-            /(dmax          - dmin         );
-          if (test < it->tmin || test > it->tmax) {
-            // the estimate is outside the bracket; bisect instead
-            test = (it->tmin + it->tmax)/2;
-          }
-          if (++count > 20) {
-            // we're likely in some kind of loop; abort
-            ts.push_back({test, it->object1, it->object2, pmax});
-            break;
-          }
-          auto dest = getd(test);
-          if (dmin*dest < 0) {
-            // the target time is between tmin and test
-            if (test == it->tmax) {
-              // we cannot improve anymore
-              ts.push_back({test, it->object1, it->object2, pmax});
-              break;
-            }
-            // see if we can tighten tmin, too
-            auto test2 = 2*test - it->tmax;
-            if (test2 > it->tmin) {
-              auto dest2 = getd(test2);
-              if (dest2*dmin > 0) {
-                it->tmin = test2;
-                dmin = dest2;
-              }
-            }
-            it->tmax = test;
-            dmax = dest;
-          } else if (dest*dmax < 0) {
-            // the target time is between test and tmax
-            if (test == it->tmin) {
-              // we cannot improve anymore
-              ts.push_back({test, it->object1, it->object2, pmax});
-              break;
-            }
-            // see if we can tighten tmax, too
-            auto test2 = 2*test - it->tmin;
-            if (test2 < it->tmax) {
-              auto dest2 = getd(test2);
-              if (dest2*dmax > 0) {
-                it->tmax = test2;
-                dmax = dest2;
-              }
-            }
-            it->tmin = test;
-            dmin = dest;
-          } else {
-            // we cannot improve anymore
-            ts.push_back({test, it->object1, it->object2, pmax});
-            break;
-          }
-          if ((it->tmax - it->tmin) < std::max(it->tmax, it->tmin)
-              * 2*std::numeric_limits<double>::epsilon()) {
-            // we likely cannot improve anymore
-            ts.push_back({test, it->object1, it->object2, pmax});
-            break;
-          }
-        }
-      }
-    } // end for (auto it = intervals.begin(); it != intervals.end(); ++it)
-  } // end if (dtot > 0)
+  }
   return ts;
 }
 
@@ -3615,7 +3789,7 @@ lux_planetpermutationchanges(int32_t narg, int32_t ps[])
     return l;
   };
 
-  std::vector<PermutationChange> pc
+  std::vector<Permutation_change> pc
     = find_permutation_changes(gl, 2*M_PI, t1, t2, (internalMode & 1) != 0);
 
   int32_t size = pc.size();

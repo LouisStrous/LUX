@@ -93,25 +93,62 @@ int lux_to_calceph_object_id(int lux_object_id)
 void
 astropos(double JD, int target_object, int observer_object, double xyz[3])
 {
-  // got de431t.bsp from ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp
+  // got de441.bsp from ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp
 #if HAVE_LIBCALCEPH
-  static t_calcephbin* de431 = NULL;
-  if (!de431)                   // TODO: make filename configurable
-    de431 = calceph_open(expand_name("~/data/de431t.bsp", NULL));
+  static t_calcephbin* de441 = NULL;
+  if (!de441)
+  {
+    // TODO: make filename configurable
+    de441 = calceph_open(expand_name("~/data/de441.bsp", NULL));
+    if (de441)
+    {
+      int timescale = calceph_gettimescale(de441);
+      switch (timescale)
+      {
+        case 1:
+          puts("Ephemeris timescale is TDB.");
+          break;
+        case 2:
+          puts("Ephemeris timescale is TCB.");
+          break;
+        default:
+          printf("Ephemeris timescale is #%d.\n", timescale);
+          break;
+      }
+
+      double jd1;
+      double jd2;
+      int continuous;
+      calceph_gettimespan(de441, &jd1, &jd2, &continuous);
+      printf("Ephemeris timespan is JD%.10g - JD%.10g.\n", jd1, jd2);
+      switch (continuous)
+      {
+        case 1:
+          puts("Ephemerides are available for all bodies for the entire timespan.");
+          break;
+        case 2:
+          puts("There are breaks in the ephemerides for some bodies.");
+          break;
+        case 3:
+          puts("Ephemerides are available for smaller timespans for some bodies.");
+          break;
+      }
+    }
+  }
 
   bool ok = false;
-  if (de431) {
+  if (de441) {
     const int units = (CALCEPH_UNIT_KM + CALCEPH_UNIT_SEC);
     double posvel[6];
 
     target_object = lux_to_calceph_object_id(target_object);
     observer_object = lux_to_calceph_object_id(observer_object);
 
-    // If we use calceph_compute() then it complains that the DE431 ephemeris
+    // If we use calceph_compute() then it complains that the DE441 ephemeris
     // file doesn't provide a definition of the "AU" constant (i.e., the size of
     // an Astronomical Unit).  So we must use calceph_compute_unit() instead and
     // ask for kilometers, and convert the results to AU ourselves.
-    if (calceph_compute_unit(de431, JD, 0, target_object, observer_object,
+    if (calceph_compute_unit(de441, JD, 0, target_object, observer_object,
                              CALCEPH_UNIT_KM + CALCEPH_UNIT_SEC, posvel)) {
       // got km, convert to AU
       for (int i = 0; i < 3; ++i)
@@ -119,15 +156,15 @@ astropos(double JD, int target_object, int observer_object, double xyz[3])
     }
   } else {
     // retrieval failed.  Return NaNs.
-    double nan = std::nan("DE431");
+    double nan = std::nan("DE441");
     std::fill(xyz, xyz + 3, nan);
   }
 #else
-  cerror(NOSUPPORT, 0, "DE431", "libcalceph");
+  cerror(NOSUPPORT, 0, "DE441", "libcalceph");
 #endif
 }
 
-/// Get positions of astronomical objects from NASA JPL DE431.
+/// Get positions of astronomical objects from NASA JPL DE441.
 int32_t
 lux_astron2(int32_t narg, int32_t ps[])
 {

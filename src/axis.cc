@@ -663,7 +663,9 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
   }
 
   // create the output symbol
-  if (dims.size()) {            // get an array
+  if (dims.size() > 1
+      || (dims.size() == 1 && dims[0] > 1))
+  {            // get an array
     target = array_scratch(ttype, dims.size(), &dims[0]);
     ptr.i32 = (int32_t *) array_data(target);
   } else {                      // get a scalar
@@ -818,7 +820,7 @@ int32_t standardLoop(int32_t data, int32_t axisSym, int32_t mode,
 
   if (axisSym > 0) {            // <axisSym> is a regular symbol
     if (!symbolIsNumerical(axisSym))
-      return luxerror("Need a numerical argument", axisSym); // <axisSym> was not numerical
+      return luxerror("Need a numerical argument", axisSym);
     i = lux_long(1, &axisSym);  // get a LONG copy
     numerical(i, NULL, NULL, &nAxes, &axes); // get info
   } else {

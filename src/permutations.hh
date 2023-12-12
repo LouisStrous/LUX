@@ -712,7 +712,7 @@ permutation_distance_linear_rank(size_t n, const T* v1, const T* v2)
   for (int i1 = 0; i1 < n - 1; ++i1) {
     for (int i2 = i1 + 1; i2 < n; ++i2) {
       d += (   ((v1[i1] > v1[i2]) && (v2[i1] < v2[i2]))
-               || ((v1[i1] < v1[i2]) && (v2[i1] > v2[i2])));
+            || ((v1[i1] < v1[i2]) && (v2[i1] > v2[i2])));
     }
   }
   return d;
@@ -797,12 +797,17 @@ permutation_distance_linear_index(const std::vector<T>& i1,
 /// \param[in] v2 points at the beginning of the values that define the second
 /// permutation.
 ///
+/// \param[out] shift receives the nonnegative shift of the ranks of the second
+/// permutation for which the least Kendall tau distance between the two
+/// permutations was found.
+///
 /// \returns the nonnegative distance, which is less than \f$(n - 1)(n - 2)/2\f$
 /// for permutations of \f$n\f$ elements if \f$n\f$ is 2 or greater, and is 0
 /// otherwise.
 template<typename T>
 size_t
-permutation_distance_circular_rank(size_t n, const T* v1, const T* v2)
+permutation_distance_circular_rank(size_t n, const T* v1, const T* v2,
+                                   size_t& shift)
 {
   if (n < 2)
     return 0;
@@ -810,30 +815,78 @@ permutation_distance_circular_rank(size_t n, const T* v1, const T* v2)
   size_t d_min = std::numeric_limits<size_t>::max();
   std::vector<size_t> r1 = sort_rank(v1, 1, n); // get the ranks
   std::vector<size_t> r2 = sort_rank(v2, 1, n);
-  for (size_t i1 = 0; i1 < n; ++i1) {
-    for (size_t i2 = 0; i2 < n; ++i2) {
-      size_t d = permutation_distance_linear_rank(r1, r2);
-      if (d < d_min)
-        d_min = d;
-
-      // adjust the r2 ranks for the next circular candidate; calculate (r + 1)
-      // mod n
-      for (int i = 0; i < n; ++i) {
-        if (r2[i] == n - 1)
-          r2[i] = 0;
-        else
-          ++r2[i];
-      }
+  size_t sh;
+  for (size_t s = 0; s < n; ++s) {
+    size_t d = permutation_distance_linear_rank(r1, r2);
+    if (d < d_min)
+    {
+      sh = s;
+      d_min = d;
     }
-    // adjust the r1 ranks for the next circular candidate
+
+    // adjust the ranks for the next circular candidate; calculate (r + 1) mod
+    // n
     for (int i = 0; i < n; ++i) {
-      if (r1[i] == n - 1)
-        r1[i] = 0;
+      if (r2[i] == n - 1)
+        r2[i] = 0;
       else
-        ++r1[i];
+        ++r2[i];
     }
   }
+  shift = sh;
   return d_min;
+}
+
+/// Returns the Kendall tau distance between two rank-based circular
+/// permutations.  See permutations.hh for a discussion of permutations.
+///
+/// \param[in] n is the number of elements in each permutation.
+///
+/// \param[in] v1 points at the beginning of the values that define the first
+/// permutation.
+///
+/// \param[in] v2 points at the beginning of the values that define the second
+/// permutation.
+///
+/// \returns the nonnegative distance, which is less than \f$(n - 1)(n - 2)/2\f$
+/// for permutations of \f$n\f$ elements if \f$n\f$ is 2 or greater, and is 0
+/// otherwise.
+template<typename T>
+size_t
+permutation_distance_circular_rank(size_t n, const T* v1, const T* v2)
+{
+  size_t s;
+  return permutation_distance_circular_rank(n, v1, v2, s);
+}
+
+/// Returns the Kendall tau distance between two rank-based circular
+/// permutations.
+///
+/// Is like permutation_distance_circular_rank(const T*, const T*, size_t) but
+/// with the values passed in via a `std::vector`.
+///
+/// \param[in] v1 contains the values that define the first permutation.
+///
+/// \param[in] v2 contains the values that define the second permutation.
+///
+/// \param[out] shift receives the nonnegative shift of the ranks of the second
+/// permutation for which the least Kendall tau distance between the two
+/// permutations was found.
+///
+/// \returns the nonnegative distance, which is less than \f$(n - 1)(n - 2)/2\f$
+/// for permutations of \f$n\f$ elements if \f$n\f$ is 2 or greater, and is 0
+/// otherwise.
+template<typename T>
+size_t
+permutation_distance_circular_rank(const std::vector<T>& v1,
+                                   const std::vector<T>& v2,
+                                   size_t& shift)
+{
+  if (v1.size() != v2.size())
+    return 0;
+
+  return permutation_distance_circular_rank(v1.size(), v1.data(), v2.data(),
+                                            shift);
 }
 
 /// Returns the Kendall tau distance between two rank-based circular
@@ -854,10 +907,37 @@ size_t
 permutation_distance_circular_rank(const std::vector<T>& v1,
                                    const std::vector<T>& v2)
 {
-  if (v1.size() != v2.size())
-    return 0;
+  size_t s;
+  return permutation_distance_circular_rank(v1, v2, s);
+}
 
-  return permutation_distance_circular_rank(v1.size(), v1.data(), v2.data());
+/// Returns the Kendall tau distance between two index-based circular
+/// permutations.  See permutations.hh for a discussion of permutations.
+///
+/// \param[in] n is the number of elements in each permutation.
+///
+/// \param[in] i1 points at the beginning of the indexes that define the first
+/// permutation.
+///
+/// \param[in] i2 points at the beginning of the indexes that define the second
+/// permutation.
+///
+/// \param[out] shift receives the nonnegative shift of the ranks of the second
+/// permutation for which the least Kendall tau distance between the two
+/// permutations was found.
+///
+/// \returns the nonnegative distance, which is less than \f$(n - 1)(n - 2)/2\f$
+/// for permutations of \f$n\f$ elements if \f$n\f$ is 2 or greater, and is 0
+/// otherwise.
+template<typename T>
+size_t
+permutation_distance_circular_index(size_t n, const T* i1, const T* i2,
+                                    size_t& shift)
+{
+  std::vector<size_t> r1 = sort_index(i1, 1, n);
+  std::vector<size_t> r2 = sort_index(i2, 1, n);
+
+  return permutation_distance_circular_rank<size_t>(r1, r2, shift);
 }
 
 /// Returns the Kendall tau distance between two index-based circular
@@ -878,10 +958,8 @@ template<typename T>
 size_t
 permutation_distance_circular_index(size_t n, const T* i1, const T* i2)
 {
-  std::vector<size_t> r1 = sort_index(i1, 1, n);
-  std::vector<size_t> r2 = sort_index(i2, 1, n);
-
-  return permutation_distance_circular_rank<size_t>(r1, r2);
+  size_t s;
+  return permutation_distance_circular_index(n, i1, i2, s);
 }
 
 /// Returns the Kendall tau distance between two index-based circular

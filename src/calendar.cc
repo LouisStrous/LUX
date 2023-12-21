@@ -1725,7 +1725,7 @@ void CJDNtoLongCountA(int32_t const *CJDN, int32_t *longcount)
   int32_t i;
   Div_t x;
 
-  x.quot = *CJDN;
+  x.quot = *CJDN - LONGCOUNT_EPOCH;
   for (i = arraysize(longcount_periods) - 1; i >= 0; i--) {
     x = adiv(x.quot, longcount_periods[i]);
     longcount[i + 1] = x.rem;
@@ -1779,6 +1779,7 @@ void CJDtoLongCountA(double const *CJD, double *longcount)
   int32_t i;
   int32_t d = floor(*CJD);
   double frac = *CJD - d;
+  d -= LONGCOUNT_EPOCH;
   for (i = arraysize(longcount_periods) - 1; i >= 0; i--) {
     Div_t x = adiv(d, longcount_periods[i]);
     d = x.quot;

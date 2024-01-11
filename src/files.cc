@@ -204,7 +204,7 @@ char *expand_name(char const* name, char const* extension)
  return expname;
 }
 //-------------------------------------------------------------------------
-int32_t lux_setenv(int32_t narg, int32_t ps[])
+int32_t lux_setenv(ArgumentCount narg, int32_t ps[])
 /* specify or display an environment variable; these are useful in file names.
    Uses POSIX routine putenv(char *string)
    LS 1apr94, 20jul2000 */
@@ -230,7 +230,7 @@ int32_t lux_setenv(int32_t narg, int32_t ps[])
  return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_getenv(int32_t narg, int32_t ps[])
+int32_t lux_getenv(ArgumentCount narg, int32_t ps[])
 // get an environment variable; these are useful in file names.
 /* Headers:
    <stdlib.h>: getenv()
@@ -252,7 +252,7 @@ int32_t lux_getenv(int32_t narg, int32_t ps[])
  return result;
 }
 //---------------------------------------------------------------------------
-int32_t lux_spawn(int32_t narg, int32_t ps[])                // execute a shell command
+int32_t lux_spawn(ArgumentCount narg, int32_t ps[])                // execute a shell command
  /* uses the system call to execute a shell command, but may not be the
          shell you want! depends on local setup */
 /* Headers:
@@ -271,7 +271,7 @@ int32_t lux_spawn(int32_t narg, int32_t ps[])                // execute a shell 
   else return result == 0? 1: -1;
  }
 //---------------------------------------------------------------------------
-int32_t lux_spawn_f(int32_t narg, int32_t ps[])                // execute a shell command
+int32_t lux_spawn_f(ArgumentCount narg, int32_t ps[])                // execute a shell command
  /* uses the system call to execute a shell command, but may not be the
          shell you want! depends on local setup */
 /* Headers:
@@ -384,7 +384,7 @@ FILE *openPathFile(char const* name, int32_t mode)
   return fin;
 }
 //-------------------------------------------------------------------------
-int32_t lux_ulib(int32_t narg, int32_t ps[])
+int32_t lux_ulib(ArgumentCount narg, int32_t ps[])
  //set ulib path
 /* Headers:
    <stdio.h>: printf()
@@ -405,7 +405,7 @@ int32_t lux_ulib(int32_t narg, int32_t ps[])
  return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_type(int32_t narg, int32_t ps[])
+int32_t lux_type(ArgumentCount narg, int32_t ps[])
  // (stdin) printing
 {
   int32_t        type_ascii(int32_t, int32_t [], FILE *);
@@ -413,7 +413,7 @@ int32_t lux_type(int32_t narg, int32_t ps[])
   return type_ascii(narg, ps, stdout);
 }
 //-------------------------------------------------------------------------
-int32_t lux_printf(int32_t narg, int32_t ps[])
+int32_t lux_printf(ArgumentCount narg, int32_t ps[])
  // file (stdin) reading and formatting
 /* Headers:
    <stdio.h>: FILE
@@ -439,7 +439,7 @@ int32_t lux_printf(int32_t narg, int32_t ps[])
   return result;
  }
 //-------------------------------------------------------------------------
-int32_t lux_printf_f(int32_t narg, int32_t ps[])
+int32_t lux_printf_f(ArgumentCount narg, int32_t ps[])
  // a function version that returns 1 if read OK
 {
   return lux_printf(narg, ps) == LUX_OK? LUX_ONE: LUX_ZERO;
@@ -672,7 +672,7 @@ int32_t input_format_check(char *format, char **next, char **widths, int32_t *da
   return is_explicit;
 }
 //-------------------------------------------------------------------------
-int32_t lux_format_set(int32_t narg, int32_t ps[])
+int32_t lux_format_set(ArgumentCount narg, int32_t ps[])
  /* check & set (multiple) print formats.  Allowed formats:
      [anything] % [digits] [.] [digits] {one of diouxXeEfgGsz}
     d,i,o,u,x,X-types are put in !format_i; e,E,f,g,G-types in !format_f,
@@ -1121,7 +1121,7 @@ char *nextformat(char *fmt, int32_t mode)
   return theFormat.start;
 }
 //-------------------------------------------------------------------------
-int32_t type_ascii(int32_t narg, int32_t ps[], FILE *fp)
+int32_t type_ascii(ArgumentCount narg, int32_t ps[], FILE *fp)
 /* print the argument(s) in ASCII format to the file at <fp>.  If any
    one but the last argument starts with a C-style format (beginning
    with %) then such an argument is a format specification and the
@@ -1208,7 +1208,7 @@ int32_t type_ascii(int32_t narg, int32_t ps[], FILE *fp)
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
+int32_t type_formatted_ascii(ArgumentCount narg, int32_t ps[], FILE *fp)
 /* print using a user-supplied format string.  Arguments are cast to
    the expected type.  If <fp> is equal to NULL, then prints into a
    string at <curScrat>. 13oct98 */
@@ -1936,7 +1936,7 @@ int32_t type_formatted_ascii(int32_t narg, int32_t ps[], FILE *fp)
   return LUX_ERROR;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fprint(int32_t narg, int32_t ps[])
+int32_t lux_fprint(ArgumentCount narg, int32_t ps[])
  // (stdout) printing
 /* Headers:
    <stdio.h>: FILE, stdout
@@ -1948,7 +1948,7 @@ int32_t lux_fprint(int32_t narg, int32_t ps[])
  return        type_formatted_ascii(narg, ps, fp);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fprintf(int32_t narg, int32_t ps[])
+int32_t lux_fprintf(ArgumentCount narg, int32_t ps[])
  // file (stdout) formatting and printing
 /* Headers:
    <stdio.h>: FILE
@@ -1968,7 +1968,7 @@ int32_t lux_fprintf(int32_t narg, int32_t ps[])
  return        type_formatted_ascii(narg - 1, &ps[1], fp);
 }
 //-------------------------------------------------------------------------
-int32_t lux_close(int32_t narg, int32_t ps[]) /* close subroutine */                
+int32_t lux_close(ArgumentCount narg, int32_t ps[]) /* close subroutine */                
 /* Headers:
    <stdio.h>: fclose()
    <stdlib.h>: free()
@@ -1988,7 +1988,7 @@ int32_t lux_close(int32_t narg, int32_t ps[]) /* close subroutine */
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t open_file(int32_t narg, int32_t ps[], char const* access, char function)
+int32_t open_file(ArgumentCount narg, int32_t ps[], char const* access, char function)
  /* generic file opening routine, called by OPENR, OPENW, OPENU routines
     and functions   LS 8jul92
     openu must open a file for reading and writing anywhere in the file.
@@ -2063,7 +2063,7 @@ int32_t open_file(int32_t narg, int32_t ps[], char const* access, char function)
  return (function)? result_sym: 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_openr_f(int32_t narg, int32_t ps[])// openr subroutine
+int32_t lux_openr_f(ArgumentCount narg, int32_t ps[])// openr subroutine
  /* intended mainly for reading ASCII files in old LUX, but may be useful
  for streams in general for UNIX version */
  // associates a file (or a stream) with a lun
@@ -2072,19 +2072,19 @@ int32_t lux_openr_f(int32_t narg, int32_t ps[])// openr subroutine
   return open_file(narg, ps, "r", 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_openw_f(int32_t narg, int32_t ps[])// openw subroutine
+int32_t lux_openw_f(ArgumentCount narg, int32_t ps[])// openw subroutine
  // like openr but for (over)writing
 {
   return open_file(narg, ps, "w", 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_openu_f(int32_t narg, int32_t ps[])// openu subroutine
+int32_t lux_openu_f(ArgumentCount narg, int32_t ps[])// openu subroutine
 // like openr but for updating
 {
   return open_file(narg, ps, "u", 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_openr(int32_t narg, int32_t ps[])// openr subroutine
+int32_t lux_openr(ArgumentCount narg, int32_t ps[])// openr subroutine
 /* intended mainly for reading ASCII files in old LUX, but may be useful
    for streams in general for UNIX version */
 // associates a file (or a stream) with a lun
@@ -2092,19 +2092,19 @@ int32_t lux_openr(int32_t narg, int32_t ps[])// openr subroutine
   return open_file(narg, ps, "r", 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_openw(int32_t narg, int32_t ps[])// openw subroutine
+int32_t lux_openw(ArgumentCount narg, int32_t ps[])// openw subroutine
 // like openr but for output
 {
   return open_file(narg, ps, "w", 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_openu(int32_t narg, int32_t ps[])// openu subroutine
+int32_t lux_openu(ArgumentCount narg, int32_t ps[])// openu subroutine
 // like openr but for updating
 {
   return open_file(narg, ps, "u", 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_rewindf(int32_t narg, int32_t ps[]) //rewind file subroutine
+int32_t lux_rewindf(ArgumentCount narg, int32_t ps[]) //rewind file subroutine
 /* Headers:
    <stdio.h>: fseek()
  */
@@ -2121,7 +2121,7 @@ int32_t lux_rewindf(int32_t narg, int32_t ps[]) //rewind file subroutine
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_read(int32_t narg, int32_t ps[])
+int32_t lux_read(ArgumentCount narg, int32_t ps[])
  // keyboard (stdin) or file (batch) reading and formatting
 /* Headers:
    <stdio.h>: stdin
@@ -2133,7 +2133,7 @@ int32_t lux_read(int32_t narg, int32_t ps[])
                    (internalMode & 1)? ASK_MORE: TRUNCATE_EOF);
 }
 //-------------------------------------------------------------------------
-int32_t readf(int32_t narg, int32_t ps[], int32_t flag)
+int32_t readf(ArgumentCount narg, int32_t ps[], int32_t flag)
  // file (stdin) reading and formatting
 /* Headers:
    <stdio.h>: FILE
@@ -2151,13 +2151,13 @@ int32_t readf(int32_t narg, int32_t ps[], int32_t flag)
   return read_ascii(narg - 1, &ps[1], fp, flag);
 }
 //-------------------------------------------------------------------------
-int32_t lux_readf(int32_t narg, int32_t ps[])
+int32_t lux_readf(ArgumentCount narg, int32_t ps[])
 // file (stdin) reading and formatting
 {
   return readf(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_readf_f(int32_t narg, int32_t ps[])
+int32_t lux_readf_f(ArgumentCount narg, int32_t ps[])
 // a function version that returns 1 if read OK
 {
   return readf(narg, ps, 0)? LUX_ONE: LUX_ZERO;
@@ -2205,7 +2205,7 @@ char *moreInput(FILE *fp, char *separators)
   return curScrat;
 }
 //-------------------------------------------------------------------------
-int32_t read_ascii(int32_t narg, int32_t ps[], FILE *fp, int32_t flag)
+int32_t read_ascii(ArgumentCount narg, int32_t ps[], FILE *fp, int32_t flag)
 /* read ascii stream, format and load into passed arguments
    called by lux_read and lux_readf
    flag: 0 -> no error messages (function)
@@ -2505,7 +2505,7 @@ int32_t gscanf(void **source, char const* format, void *arg, int32_t isString)
   return i;
 }
 //-------------------------------------------------------------------------
-int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t showerrors,
+int32_t read_formatted_ascii(ArgumentCount narg, int32_t ps[], void *ptr, int32_t showerrors,
                          int32_t isString)
 /* read from ascii source <ptr> according to a specified format string,
    which is taken from ps[0].  If <isString> is equal to 0, then <ptr> is
@@ -2832,7 +2832,7 @@ int32_t read_formatted_ascii(int32_t narg, int32_t ps[], void *ptr, int32_t show
   return nout;
 }
 //-------------------------------------------------------------------------
-int32_t lux_freadf(int32_t narg, int32_t ps[])
+int32_t lux_freadf(ArgumentCount narg, int32_t ps[])
 // FREADF,lun,format,var,...
 /* Headers:
    <stdio.h>: FILE
@@ -2855,7 +2855,7 @@ int32_t lux_freadf(int32_t narg, int32_t ps[])
     return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fread(int32_t narg, int32_t ps[])
+int32_t lux_fread(ArgumentCount narg, int32_t ps[])
 // FREAD,format,var,...
 /* Headers:
    <stdio.h>: stdin
@@ -2878,7 +2878,7 @@ int32_t lux_fread(int32_t narg, int32_t ps[])
   return iq;
 }
 //-------------------------------------------------------------------------
-int32_t lux_freadf_f(int32_t narg, int32_t ps[])
+int32_t lux_freadf_f(ArgumentCount narg, int32_t ps[])
 // FREADF(lun,format,var,...)
 /* Headers:
    <stdio.h>: FILE
@@ -2910,7 +2910,7 @@ int32_t lux_freadf_f(int32_t narg, int32_t ps[])
   return iq;
 }
 //-------------------------------------------------------------------------
-int32_t lux_assoc_input(int32_t narg, int32_t ps[])
+int32_t lux_assoc_input(ArgumentCount narg, int32_t ps[])
      /* use an associated variable as a guide to reading a file
         syntax:  y = x(record_offset)
         y = x(subsc)
@@ -3290,7 +3290,7 @@ void fz_print_header(FILE *fin, int32_t n) // internal utility
     fseek(fin, n, SEEK_CUR);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fzinspect(int32_t narg, int32_t ps[])                // fzinspect subroutine
+int32_t lux_fzinspect(ArgumentCount narg, int32_t ps[])                // fzinspect subroutine
  // return some info about an fz file
  /* subr version, fzinspect(name, param, [header])
  where name is the file name, param is an I*4 array containing the following:
@@ -3351,7 +3351,7 @@ int32_t lux_fzinspect(int32_t narg, int32_t ps[])                // fzinspect su
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t fzhead(int32_t narg, int32_t ps[], int32_t flag) // fzhead subroutine
+int32_t fzhead(ArgumentCount narg, int32_t ps[], int32_t flag) // fzhead subroutine
  // read header in fz files
  // PROCEDURE -- Called by: FZHEAD,'FILENAME' [,TEXT HEADER]
  // LUX_FUNCTION  -- Called by: FZHEAD('FILENAME' [,TEXT HEADER]
@@ -3397,7 +3397,7 @@ int32_t fzhead(int32_t narg, int32_t ps[], int32_t flag) // fzhead subroutine
    to disk and tape, so that the files are Byte for Byte equal, whether
    written from a DEC or an SGI machine.   LS 10/8/92 */
 //-------------------------------------------------------------------------
-int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) // fzread subroutine
+int32_t fzread(ArgumentCount narg, int32_t ps[], int32_t flag) // fzread subroutine
  // read standard f0 files, compressed or not
  // PROCEDURE -- Called by: FZREAD,VAR,'FILENAME' [,TEXT HEADER]
 /* Headers:
@@ -3578,7 +3578,7 @@ int32_t fzread(int32_t narg, int32_t ps[], int32_t flag) // fzread subroutine
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) // fzwrite subroutine
+int32_t fzwrite(ArgumentCount narg, int32_t ps[], int32_t flag) // fzwrite subroutine
  /* write standard f0 files, uncompressed
     flag = 0: procedure   flag = 1: function */
  // If you are storing an updated version of a big file and if something
@@ -3758,7 +3758,7 @@ int32_t fzwrite(int32_t narg, int32_t ps[], int32_t flag) // fzwrite subroutine
 }
 //-------------------------------------------------------------------------
 int32_t fcwrite(int32_t, int32_t [], int32_t);
-int32_t fcrunwrite(int32_t narg, int32_t ps[], int32_t flag)// fcrunwrite subroutine
+int32_t fcrunwrite(ArgumentCount narg, int32_t ps[], int32_t flag)// fcrunwrite subroutine
 // write standard f0 files, run-length compressed format
 // flag: 0 -> procedure, 1 -> function.  LS 10nov99
 {
@@ -3770,7 +3770,7 @@ int32_t fcrunwrite(int32_t narg, int32_t ps[], int32_t flag)// fcrunwrite subrou
   return iq;
 }
 //-------------------------------------------------------------------------
-int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine */        
+int32_t fcwrite(ArgumentCount narg, int32_t ps[], int32_t flag)/* fcwrite subroutine */        
  // write standard f0 files, compressed format
  // not done yet 12/11/91
  // flag = 0: procedure  flag = 1: function   LS 1mar93
@@ -3955,45 +3955,45 @@ int32_t fcwrite(int32_t narg, int32_t ps[], int32_t flag)/* fcwrite subroutine *
  return LUX_ERROR;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fzread(int32_t narg, int32_t ps[])
+int32_t lux_fzread(ArgumentCount narg, int32_t ps[])
  // routine version
 { return fzread(narg, ps, 0); }
 //-------------------------------------------------------------------------
-int32_t lux_fzwrite(int32_t narg, int32_t ps[])
+int32_t lux_fzwrite(ArgumentCount narg, int32_t ps[])
  // routine version
 { return fzwrite(narg, ps, 0); }
 //-------------------------------------------------------------------------
-int32_t lux_fzhead(int32_t narg, int32_t ps[])
+int32_t lux_fzhead(ArgumentCount narg, int32_t ps[])
  // routine version
 { return fzhead(narg, ps, 0); }
 //-------------------------------------------------------------------------
-int32_t lux_fcwrite(int32_t narg, int32_t ps[])
+int32_t lux_fcwrite(ArgumentCount narg, int32_t ps[])
  // routine version
 { return fcwrite(narg, ps, 0); }
 //-------------------------------------------------------------------------
-int32_t lux_fcrunwrite(int32_t narg, int32_t ps[])
+int32_t lux_fcrunwrite(ArgumentCount narg, int32_t ps[])
 { return fcrunwrite(narg, ps, 0); }
 //-------------------------------------------------------------------------
-int32_t lux_fzread_f(int32_t narg, int32_t ps[])
+int32_t lux_fzread_f(ArgumentCount narg, int32_t ps[])
  // a function version that returns 1 if read OK
  { return (fzread(narg, ps, 1) == 1)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_fzhead_f(int32_t narg, int32_t ps[])
+int32_t lux_fzhead_f(ArgumentCount narg, int32_t ps[])
  // a function version that returns 1 if read OK
  { return (fzhead(narg, ps, 1) == 1)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_fzwrite_f(int32_t narg, int32_t ps[])
+int32_t lux_fzwrite_f(ArgumentCount narg, int32_t ps[])
  // function version
 { return (fzwrite(narg, ps, 1) == 1)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_fcwrite_f(int32_t narg, int32_t ps[])
+int32_t lux_fcwrite_f(ArgumentCount narg, int32_t ps[])
  // function version
 { return (fcwrite(narg, ps, 1) == 1)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_fcrunwrite_f(int32_t narg, int32_t ps[])
+int32_t lux_fcrunwrite_f(ArgumentCount narg, int32_t ps[])
 { return (fcrunwrite(narg, ps, 1) == 1)? LUX_OK: LUX_ERROR; }
 //-------------------------------------------------------------------------
-int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
+int32_t readu(ArgumentCount narg, int32_t ps[], int32_t flag)
 /* read unformatted data from a file into a variable, which must be predefined.
    syntax: readu,lun,x [,y,...]
    LS 12may93 */
@@ -4049,7 +4049,7 @@ int32_t readu(int32_t narg, int32_t ps[], int32_t flag)
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
+int32_t writeu(ArgumentCount narg, int32_t ps[], int32_t flag)
 /* write unformatted data from a variable into a file.
    syntax: writeu,lun,x [,y,...]
    LS 12may93 */
@@ -4101,19 +4101,19 @@ int32_t writeu(int32_t narg, int32_t ps[], int32_t flag)
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_readu(int32_t narg, int32_t ps[])
+int32_t lux_readu(ArgumentCount narg, int32_t ps[])
  // subroutine version
 { return readu(narg, ps, 0); }
 //-------------------------------------------------------------------------
-int32_t lux_readu_f(int32_t narg, int32_t ps[])
+int32_t lux_readu_f(ArgumentCount narg, int32_t ps[])
  // function version
 { return (readu(narg, ps, 1) == 1)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_writeu(int32_t narg, int32_t ps[])
+int32_t lux_writeu(ArgumentCount narg, int32_t ps[])
  // subroutine version
 { return writeu(narg, ps, 0); }
 //-------------------------------------------------------------------------
-int32_t lux_writeu_f(int32_t narg, int32_t ps[])
+int32_t lux_writeu_f(ArgumentCount narg, int32_t ps[])
  // function version
 { return (writeu(narg, ps, 1) == 1)? 1: 4; }
 //-------------------------------------------------------------------------
@@ -4173,7 +4173,7 @@ void astore_one(FILE *fp, int32_t iq)
   }
 }
 //-------------------------------------------------------------------------
-int32_t astore(int32_t narg, int32_t ps[], int32_t flag)
+int32_t astore(ArgumentCount narg, int32_t ps[], int32_t flag)
 /* STORE,x1 [, x2, x3, ...], file
   stores arbitrary data <x1>, <x2>, etcetera in file <file>.  The names
   (if any) as well as the data are stored.  LS 11mar97 */
@@ -4229,12 +4229,12 @@ int32_t astore(int32_t narg, int32_t ps[], int32_t flag)
   return flag? LUX_ONE: 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_astore(int32_t narg, int32_t ps[])
+int32_t lux_astore(ArgumentCount narg, int32_t ps[])
 {
   return astore(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_astore_f(int32_t narg, int32_t ps[])
+int32_t lux_astore_f(ArgumentCount narg, int32_t ps[])
 {
   return astore(narg, ps, 0);
 }
@@ -4331,7 +4331,7 @@ int32_t arestore_one(FILE* fp, int32_t iq, int32_t reverseOrder)
   return 0;
 }
 //-------------------------------------------------------------------------
-int32_t arestore(int32_t narg, int32_t ps[], int32_t flag)
+int32_t arestore(ArgumentCount narg, int32_t ps[], int32_t flag)
 /* ARESTORE [, x1, x2, x3, ...], file
   restores data <x1>, <x2>, etcetera from file <file>.
   if no data arguments are specified, then the whole contents of
@@ -4426,18 +4426,18 @@ int32_t arestore(int32_t narg, int32_t ps[], int32_t flag)
   return LUX_ONE;
 }
 //-------------------------------------------------------------------------
-int32_t lux_arestore(int32_t narg, int32_t ps[])
+int32_t lux_arestore(ArgumentCount narg, int32_t ps[])
 {
   return arestore(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_arestore_f(int32_t narg, int32_t ps[])
+int32_t lux_arestore_f(ArgumentCount narg, int32_t ps[])
      // function form of lux_restore
 {
   return arestore(narg, ps, 0);
 }
 //-------------------------------------------------------------------------
-int32_t fileptr(int32_t narg, int32_t ps[], char function)
+int32_t fileptr(ArgumentCount narg, int32_t ps[], char function)
 // shows or sets a file pointer.
 /* FILEPTR,lun
      shows the position of the file pointer of the file opened on
@@ -4522,17 +4522,17 @@ int32_t fileptr(int32_t narg, int32_t ps[], char function)
   return function? LUX_ONE: 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fileptr(int32_t narg, int32_t ps[])
+int32_t lux_fileptr(ArgumentCount narg, int32_t ps[])
 {
   return fileptr(narg, ps, (char) 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fileptr_f(int32_t narg, int32_t ps[])
+int32_t lux_fileptr_f(ArgumentCount narg, int32_t ps[])
 {
   return fileptr(narg, ps, (char) 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_dump_lun(int32_t narg, int32_t ps[])
+int32_t lux_dump_lun(ArgumentCount narg, int32_t ps[])
 // lists the files associated with all used logical units
 // LS 2mar97
 /* Headers:
@@ -4554,7 +4554,7 @@ int32_t lux_dump_lun(int32_t narg, int32_t ps[])
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_get_lun(int32_t narg, int32_t ps[])
+int32_t lux_get_lun(ArgumentCount narg, int32_t ps[])
 // returns a free logical unit number
 {
   int32_t        i, n;
@@ -4569,7 +4569,7 @@ int32_t lux_get_lun(int32_t narg, int32_t ps[])
   return luxerror("No free LUNs available", 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_chdir(int32_t narg, int32_t ps[])
+int32_t lux_chdir(ArgumentCount narg, int32_t ps[])
 /* CHDIR,name changes directory to <name>.  CHDIR shows the current
    directory.  LS 12aug97 */
 /* Headers:
@@ -4599,7 +4599,7 @@ int32_t lux_chdir(int32_t narg, int32_t ps[])
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_filesize(int32_t narg, int32_t ps[])
+int32_t lux_filesize(ArgumentCount narg, int32_t ps[])
 // FILESIZE(file) returns the size (in bytes) of the file, or -1 if the
 // file cannot be opened for reading.  LS 10nov97
 /* Headers:
@@ -4622,7 +4622,7 @@ int32_t lux_filesize(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_freads(int32_t narg, int32_t ps[])
+int32_t lux_freads(ArgumentCount narg, int32_t ps[])
      // FREADS,<string>,<format>,<arg1>,... reads arguments from the
      // string under guidance of the <format>.
 {
@@ -4632,7 +4632,7 @@ int32_t lux_freads(int32_t narg, int32_t ps[])
                               1, LUX_STRING) == LUX_ERROR? LUX_ERROR: LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_freads_f(int32_t narg, int32_t ps[])
+int32_t lux_freads_f(ArgumentCount narg, int32_t ps[])
      // FREADS(<string>,<format>,<arg1>,...) reads arguments from the
      /* string under guidance of the <format>.  Returns 0 if an error occurred,
         1 otherwise.  LS 25jan99 */
@@ -4656,7 +4656,7 @@ int32_t lux_freads_f(int32_t narg, int32_t ps[])
   return iq;
 }
 //-------------------------------------------------------------------------
-int32_t lux_file_to_fz(int32_t narg, int32_t ps[])
+int32_t lux_file_to_fz(ArgumentCount narg, int32_t ps[])
 // FILETOFZ,file,type,dims  transforms a regular file with unformatted
 // data to an uncompressed FZ file with the indicated type and dimensions,
 // but only if the size of the file is approriate for the specified
@@ -4813,7 +4813,7 @@ char* file_find(char const* sdir, char const* fname)
   return NULL;
 }
 //-------------------------------------------------------------------------
-int32_t lux_findfile(int32_t narg, int32_t ps[])
+int32_t lux_findfile(ArgumentCount narg, int32_t ps[])
 // find a file given a starting path
 /* Headers:
    <string.h>: strlen(), strchr(), printf(), NULL, strcpy()
@@ -4871,7 +4871,7 @@ static regex_t        re;
 #ifndef REG_BASIC
 #define REG_BASIC        0
 #endif
-int32_t lux_getmatchedfiles(int32_t narg, int32_t ps[])// get all file names that match
+int32_t lux_getmatchedfiles(ArgumentCount narg, int32_t ps[])// get all file names that match
  // call is:  strings = getmatchedfiles( expr, path, [maxfiles] )
  /* uses regular expression matches, not the more familiar shell wildcarding,
  this is more general but not as intuitive, it uses the Unix routines
@@ -4904,7 +4904,7 @@ int32_t lux_getmatchedfiles(int32_t narg, int32_t ps[])// get all file names tha
 #endif
  //-------------------------------------------------------------------------
 #if HAVE_REGEX_H
-int32_t lux_getmatchedfiles_r(int32_t narg, int32_t ps[])        // also search subdir
+int32_t lux_getmatchedfiles_r(ArgumentCount narg, int32_t ps[])        // also search subdir
  // call is:  strings = getmatchedfiles_r( expr, path, [maxfiles] )
 {
   int32_t        result_sym;
@@ -5068,7 +5068,7 @@ int32_t directs_get(char *startpath)
 #if HAVE_REGEX_H
 // lux_getfiles_r() calls lux_getfiles() which calls file_get() which uses
 // <regex.h>
-int32_t lux_getfiles_r(int32_t narg, int32_t ps[])        // also search subdir
+int32_t lux_getfiles_r(ArgumentCount narg, int32_t ps[])        // also search subdir
  // call is:  strings = getfiles_r( path, [maxfiles] )
 {
   int32_t        result_sym;
@@ -5083,7 +5083,7 @@ int32_t lux_getfiles_r(int32_t narg, int32_t ps[])        // also search subdir
 //-------------------------------------------------------------------------
 #if HAVE_REGEX_H
 // lux_getfiles() calls file_get() which uses <regex.h>
-int32_t lux_getfiles_m(int32_t narg, int32_t ps[], int32_t match_flag)
+int32_t lux_getfiles_m(ArgumentCount narg, int32_t ps[], int32_t match_flag)
 // get all file names in directory
 // call is:  strings = getfiles( path, [maxfiles] )
 /* Headers:
@@ -5144,7 +5144,7 @@ int32_t lux_getfiles_m(int32_t narg, int32_t ps[], int32_t match_flag)
   return result_sym;
 }
  //-------------------------------------------------------------------------
-int32_t lux_getfiles(int32_t narg, int32_t ps[], int32_t match_flag)
+int32_t lux_getfiles(ArgumentCount narg, int32_t ps[], int32_t match_flag)
 {
   return lux_getfiles_m(narg, ps, 0:
 }
@@ -5153,7 +5153,7 @@ int32_t lux_getfiles(int32_t narg, int32_t ps[], int32_t match_flag)
 #if HAVE_REGEX_H
 // lux_getdirectories() calls lux_getfiles() which calls file_get() which
 // uses <regex.h>
-int32_t lux_getdirectories(int32_t narg, int32_t ps[], int match_flag)
+int32_t lux_getdirectories(ArgumentCount narg, int32_t ps[], int match_flag)
 // get all subdirectories in directory
 // call is:  strings = getdirectories( path, [maxfiles] )
 {
@@ -5163,7 +5163,7 @@ int32_t lux_getdirectories(int32_t narg, int32_t ps[], int match_flag)
 }
 #endif
 //-------------------------------------------------------------------------
-int32_t lux_identify_file(int32_t narg, int32_t ps[])
+int32_t lux_identify_file(ArgumentCount narg, int32_t ps[])
 /* tries to identify the type of a file based on the values of its
  first four bytes (its "magic number") LS 21sep98 */
 /* Headers:
@@ -5418,7 +5418,7 @@ void printfw(char const* format, ...)
   va_end(ap);
 }
 //-------------------------------------------------------------------------
-int32_t lux_hex(int32_t narg, int32_t ps[])
+int32_t lux_hex(ArgumentCount narg, int32_t ps[])
 /* a temporary routine that types arg in hex notation, until we have
    a fully formatted print */
 /* Headers:
@@ -5721,7 +5721,7 @@ void apply_bscale_bzero_blank(uint8_t *ptr, int32_t nelem, float bscale, float b
 }
 //-------------------------------------------------------------------------
 int32_t fits_read(int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, float);
-int32_t lux_fits_read_general(int32_t narg, int32_t ps[], int32_t func)// read fits files
+int32_t lux_fits_read_general(ArgumentCount narg, int32_t ps[], int32_t func)// read fits files
  // status = fits_read(x, name, [h], [x2], [h2], [extvar_preamble])
 {
   int32_t        hsym = 0, mode, xhsym=0, xdsym =0;
@@ -5760,17 +5760,17 @@ int32_t lux_fits_read_general(int32_t narg, int32_t ps[], int32_t func)// read f
     return mode;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fits_read(int32_t narg, int32_t ps[])
+int32_t lux_fits_read(ArgumentCount narg, int32_t ps[])
 {
   return lux_fits_read_general(narg, ps, 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fits_read_f(int32_t narg, int32_t ps[])
+int32_t lux_fits_read_f(ArgumentCount narg, int32_t ps[])
 {
   return lux_fits_read_general(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fits_header_f(int32_t narg, int32_t ps[])// read fits header
+int32_t lux_fits_header_f(ArgumentCount narg, int32_t ps[])// read fits header
 // status = fits_header(name, [h], [h2], [extvar_preamble])
 {
   int32_t        hsym = 0, mode, xhsym = 0;
@@ -5795,7 +5795,7 @@ int32_t lux_fits_header_f(int32_t narg, int32_t ps[])// read fits header
   return fits_read(mode, 0, ps[0], hsym, 0, 0, xhsym, 0, 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fits_xread_f(int32_t narg, int32_t ps[])// read fits extension and headers
+int32_t lux_fits_xread_f(ArgumentCount narg, int32_t ps[])// read fits extension and headers
  // status = fits_xread(x2, name, [h], [h2], [offset], [extvar_preamble])
 {
  int32_t        hsym = 0, mode, xhsym = 0, offsetsym = 0;
@@ -6851,7 +6851,7 @@ int32_t fits_read(int32_t mode, int32_t dsym, int32_t namsym, int32_t hsym, int3
   return fits_fatality(fin);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fits_write_general(int32_t narg, int32_t ps[], int32_t func)
+int32_t lux_fits_write_general(ArgumentCount narg, int32_t ps[], int32_t func)
 // FITS_WRITE,data,file [,header,slice] [,/VOCAL]
 // LS 18nov99
 /* Headers:
@@ -7129,17 +7129,17 @@ int32_t lux_fits_write_general(int32_t narg, int32_t ps[], int32_t func)
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fits_write(int32_t narg, int32_t ps[])
+int32_t lux_fits_write(ArgumentCount narg, int32_t ps[])
 {
   return lux_fits_write_general(narg, ps, 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fits_write_f(int32_t narg, int32_t ps[])
+int32_t lux_fits_write_f(ArgumentCount narg, int32_t ps[])
 {
   return lux_fits_write_general(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fileread(int32_t narg, int32_t ps[])
+int32_t lux_fileread(ArgumentCount narg, int32_t ps[])
  // raw file read routine: fileread,lun,array,start,num,type
  /* the file must be opened with a lun, the start position and num are in units
  of the Byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8); i.e.,
@@ -7205,7 +7205,7 @@ int32_t lux_fileread(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
  //-------------------------------------------------------------------------
-int32_t lux_filewrite(int32_t narg, int32_t ps[])
+int32_t lux_filewrite(ArgumentCount narg, int32_t ps[])
  // raw file write routine: filewrite,lun,array,[start]
  /* the file must be opened with a lun, the start position and num are in units
  of the Byte size for the data type (types 0 to 4 for I*1,I*2,I*4,F*4,F*8);

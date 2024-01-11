@@ -184,7 +184,7 @@ struct obstack *registered_functions = NULL, *registered_subroutines = NULL;
 /// f(i0, i0.dims[0], i0.step[0]);
 /// advance(i0);
 /// \endverbatim
-int32_t lux_ivarl_copy_eachaxis_(int32_t narg, int32_t ps[],
+int32_t lux_ivarl_copy_eachaxis_(ArgumentCount narg, int32_t ps[],
                                  int32_t (*f)(double *, size_t count,
                                               size_t stride),
                                  int32_t isfunction)
@@ -301,7 +301,7 @@ double call_split_times(double t1, double t2,
     @return the symbol containing the result of the function call
  */
 int32_t
-lux_d_dT3_iaiqiqrq_012_f_(int32_t narg, int32_t ps[],
+lux_d_dT3_iaiqiqrq_012_f_(ArgumentCount narg, int32_t ps[],
                           double (*f)(double, double, double))
 {
   Pointer *ptrs;
@@ -358,7 +358,7 @@ lux_d_dT3_iaiqiqrq_012_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dT4_iaiqT3rq_0T3_4_f_(int32_t narg, int32_t ps[],
+lux_d_dT4_iaiqT3rq_0T3_4_f_(ArgumentCount narg, int32_t ps[],
                             double (*f)(double, double, double, double))
 {
   Pointer *ptrs;
@@ -396,7 +396,7 @@ lux_d_dT4_iaiqT3rq_0T3_4_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dT4_iaiqrq_01_2_f_(int32_t narg, int32_t ps[],
+lux_d_dT4_iaiqrq_01_2_f_(ArgumentCount narg, int32_t ps[],
                          double (*f)(double, double, double, double))
 {
   Pointer *ptrs;
@@ -444,7 +444,7 @@ lux_d_dT4_iaiqrq_01_2_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(int32_t narg, int32_t ps[],
+lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(ArgumentCount narg, int32_t ps[],
                                       double (*f)(double, double, double,
                                                   double, double [3][3]))
 {
@@ -491,7 +491,7 @@ lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dT6_iaiT4rq_0z1T4_5_f_(int32_t narg, int32_t ps[],
+lux_d_dT6_iaiT4rq_0z1T4_5_f_(ArgumentCount narg, int32_t ps[],
                              double (*f)(double, double, double, double,
                                          double, double))
 {
@@ -550,7 +550,7 @@ lux_d_dT6_iaiT4rq_0z1T4_5_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_d_iarq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
+lux_d_d_iarq_0_1_f_(ArgumentCount narg, int32_t ps[], double (*f)(double))
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -589,7 +589,7 @@ lux_d_d_iarq_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double))
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dd_iaibrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
+lux_d_dd_iaibrq_01_2_f_(ArgumentCount narg, int32_t ps[], double (*f)(double, double))
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -633,7 +633,7 @@ lux_d_dd_iaibrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dd_iaiqrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
+lux_d_dd_iaiqrq_01_2_f_(ArgumentCount narg, int32_t ps[], double (*f)(double, double))
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -668,7 +668,7 @@ lux_d_dd_iaiqrq_01_2_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dd_iarq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
+lux_d_dd_iarq_0z_1_f_(ArgumentCount narg, int32_t ps[], double (*f)(double, double))
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -726,7 +726,7 @@ lux_d_dd_iarq_0z_1_f_(int32_t narg, int32_t ps[], double (*f)(double, double))
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dp33d_i33aimmqrcq_01_2_f_(int32_t narg, int32_t ps[],
+lux_d_dp33d_i33aimmqrcq_01_2_f_(ArgumentCount narg, int32_t ps[],
                                 double (*f)(double [3][3], double))
 {
   Pointer *ptrs;
@@ -765,7 +765,7 @@ lux_d_dp33d_i33aimmqrcq_01_2_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dp3_i3arm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double [3]))
+lux_d_dp3_i3arm3q_0_1_f_(ArgumentCount narg, int32_t ps[], double (*f)(double [3]))
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -807,7 +807,7 @@ lux_d_dp3_i3arm3q_0_1_f_(int32_t narg, int32_t ps[], double (*f)(double [3]))
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_dp3dp3_i3aiqrm3q_01_2_f_(int32_t narg, int32_t ps[],
+lux_d_dp3dp3_i3aiqrm3q_01_2_f_(ArgumentCount narg, int32_t ps[],
                                double (*f)(double [3], double [3]))
 {
   Pointer *ptrs;
@@ -853,7 +853,7 @@ lux_d_dp3dp3_i3aiqrm3q_01_2_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
+lux_d_sd_iaiarxq_000_2_f_(ArgumentCount narg, int32_t ps[],
                           double (*f)(double *, size_t count, size_t stride))
 {
   Pointer *ptrs, ptrs0, ptrsr;
@@ -935,7 +935,7 @@ lux_d_sd_iaiarxq_000_2_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[],
+lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(ArgumentCount narg, int32_t ps[],
                                         int32_t (*f)(double, double, double,
                                                      double, double, double,
                                                      double, double, double,
@@ -982,7 +982,7 @@ lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_dT3dpdp_iaiqrq_0z122_f_(int32_t narg, int32_t ps[],
+lux_i_dT3dpdp_iaiqrq_0z122_f_(ArgumentCount narg, int32_t ps[],
                               int32_t (*f)(double, double, double, double *,
                                            double *))
 {
@@ -1027,7 +1027,7 @@ lux_i_dT3dpdp_iaiqrq_0z122_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_i_dT5dp3_i3aiirq_120003_f_(int32_t narg, int32_t ps[],
+lux_i_dT5dp3_i3aiirq_120003_f_(ArgumentCount narg, int32_t ps[],
                                int32_t (*f)(double, double, double, double,
                                             double, double [3]))
 {
@@ -1074,7 +1074,7 @@ lux_i_dT5dp3_i3aiirq_120003_f_(int32_t narg, int32_t ps[],
 /// @param [in] f pointer to C++ function to bind
 /// @return the symbol containing the result of the function call
 int32_t
-lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
+lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(ArgumentCount narg, int32_t ps[],
                                   int32_t (*f)(double, double, double, double,
                                                double, double, double [2][3]))
 {
@@ -1119,7 +1119,7 @@ lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_dddp23T2_iaop2p3qocq_0z12_s_(int32_t narg, int32_t ps[],
+lux_i_dddp23T2_iaop2p3qocq_0z12_s_(ArgumentCount narg, int32_t ps[],
                                    int32_t (*f)(double, double, double [2][3],
                                                 double [2][3]))
 {
@@ -1189,7 +1189,7 @@ lux_i_dddp23T2_iaop2p3qocq_0z12_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_dddpdp_iarq_0z11_f_(int32_t narg, int32_t ps[],
+lux_i_dddpdp_iarq_0z11_f_(ArgumentCount narg, int32_t ps[],
                           int32_t (*f)(double, double, double *, double *))
 {
   Pointer *ptrs;
@@ -1231,7 +1231,7 @@ lux_i_dddpdp_iarq_0z11_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_ddidp23_iairp3p2q_0z12_f_(int32_t narg, int32_t ps[],
+lux_i_ddidp23_iairp3p2q_0z12_f_(ArgumentCount narg, int32_t ps[],
                                 int32_t (*f)(double, double, int32_t,
                                              double [2][3]))
 {
@@ -1279,7 +1279,7 @@ lux_i_ddidp23_iairp3p2q_0z12_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_ddipT3dp_iarp3q_0z1111_f_(int32_t narg, int32_t ps[],
+lux_i_ddipT3dp_iarp3q_0z1111_f_(ArgumentCount narg, int32_t ps[],
                                 int32_t (*f)(double, double, int32_t *,
                                              int32_t *, int32_t *, double *))
 {
@@ -1383,7 +1383,7 @@ lux_i_ddipT3dp_iarp3q_0z1111_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(int32_t narg, int32_t ps[],
+lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(ArgumentCount narg, int32_t ps[],
                                       int32_t (*f)(double [2][3], double *,
                                                    double *, double *, double *,
                                                    double *, double *))
@@ -1432,7 +1432,7 @@ lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_dpiT3dp_iaiirq_00T3_f_(int32_t narg, int32_t ps[],
+lux_i_dpiT3dp_iaiirq_00T3_f_(ArgumentCount narg, int32_t ps[],
                              int32_t (*f)(double *, int32_t, int32_t,
                                           int32_t, double *))
 {
@@ -1476,7 +1476,7 @@ lux_i_dpiT3dp_iaiirq_00T3_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_dpiidp_iairq_00T2_f_(int32_t narg, int32_t ps[],
+lux_i_dpiidp_iairq_00T2_f_(ArgumentCount narg, int32_t ps[],
                            int32_t (*f)(double *, int32_t, int32_t, double *))
 {
   Pointer *ptrs;
@@ -1519,7 +1519,7 @@ lux_i_dpiidp_iairq_00T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_idT3dp3_i3airq_10002_f_(int32_t narg, int32_t ps[],
+lux_i_idT3dp3_i3airq_10002_f_(ArgumentCount narg, int32_t ps[],
                               int32_t (*f)(int32_t, double, double, double,
                                            double [3]))
 {
@@ -1563,7 +1563,7 @@ lux_i_idT3dp3_i3airq_10002_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_idp3dpT3_ii3arcq_0T222_f_(int32_t narg, int32_t ps[],
+lux_i_idp3dpT3_ii3arcq_0T222_f_(ArgumentCount narg, int32_t ps[],
                                 int32_t (*f)(int32_t, double [3], double *,
                                              double *, double *))
 {
@@ -1605,7 +1605,7 @@ lux_i_idp3dpT3_ii3arcq_0T222_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_idpdp_iarp2q_011_f_(int32_t narg, int32_t ps[],
+lux_i_idpdp_iarp2q_011_f_(ArgumentCount narg, int32_t ps[],
                           int32_t (*f)(int32_t, double *, double *))
 {
   Pointer *ptrs;
@@ -1648,7 +1648,7 @@ lux_i_idpdp_iarp2q_011_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_sd_iaia_000_s_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
+lux_i_sd_iaia_000_s_(ArgumentCount narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
 {
   return lux_ivarl_copy_eachaxis_(narg, ps, f, 0);
 }
@@ -1685,7 +1685,7 @@ lux_i_sd_iaia_000_s_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t c
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_sd_iaiarq_000_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
+lux_i_sd_iaiarq_000_f_(ArgumentCount narg, int32_t ps[], int32_t (*f)(double *, size_t count, size_t stride))
 {
   return lux_ivarl_copy_eachaxis_(narg, ps, f, 1);
 }
@@ -1713,7 +1713,7 @@ lux_i_sd_iaiarq_000_f_(int32_t narg, int32_t ps[], int32_t (*f)(double *, size_t
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
+lux_i_sdddsd_iaiiirq_000T333_f_(ArgumentCount narg, int32_t ps[],
                                 int32_t (*f)(double *, size_t srcount,
                                              size_t srcstride, double par1,
                                              double par2, double *,
@@ -1794,7 +1794,7 @@ lux_i_sdddsd_iaiiirq_000T333_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(int32_t narg, int32_t ps[],
+lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double, double, double,
                                             double [3][3]))
 {
@@ -1842,7 +1842,7 @@ lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(int32_t narg, int32_t ps[],
+lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(ArgumentCount narg, int32_t ps[],
                                void (*f)(double, double, double, double [3]))
 {
   Pointer *ptrs;
@@ -1891,7 +1891,7 @@ lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(int32_t narg, int32_t ps[],
+lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double, double, double,
                                             double, double [3][3]))
 {
@@ -1939,7 +1939,7 @@ lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(int32_t narg, int32_t ps[],
+lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(ArgumentCount narg, int32_t ps[],
                                     void (*f)(double, double, double,
                                               double, double [3][3]))
 {
@@ -1988,7 +1988,7 @@ lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(int32_t narg, int32_t ps[],
+lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double, double, double, double,
                                             double *, double *, double *))
 {
@@ -2029,7 +2029,7 @@ lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(int32_t narg, int32_t ps[],
+lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(ArgumentCount narg, int32_t ps[],
                                     void (*f)(double, double, double, double,
                                               double *, double *, double *,
                                               double *))
@@ -2081,7 +2081,7 @@ lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
+lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(ArgumentCount narg, int32_t ps[],
                                               void (*f)(double, double, double,
                                                         double, double *,
                                                         double [3][3],
@@ -2137,7 +2137,7 @@ lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(int32_t narg, int32_t ps[],
+lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(ArgumentCount narg, int32_t ps[],
                                 void (*f)(double, double, double, double,
                                           double *, double *))
 {
@@ -2178,7 +2178,7 @@ lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(int32_t narg, int32_t ps[],
+lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(ArgumentCount narg, int32_t ps[],
                                    void (*f)(double, double, double, double,
                                              double *, double *))
 {
@@ -2220,7 +2220,7 @@ lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
+lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double, double, double, double,
                                             double, double, double [2][3]))
 {
@@ -2267,7 +2267,7 @@ lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(int32_t narg, int32_t ps[],
+lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(ArgumentCount narg, int32_t ps[],
                                      void (*f)(double, double, double,
                                                double, double, double,
                                                double [3][3]))
@@ -2316,7 +2316,7 @@ lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(int32_t narg, int32_t ps[],
+lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(ArgumentCount narg, int32_t ps[],
                                  void (*f)(double, double, double, double,
                                            double, double, double *,
                                            double *, double *, double *,
@@ -2364,7 +2364,7 @@ lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[],
+lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(ArgumentCount narg, int32_t ps[],
                                       void (*f)(double, double, double,
                                                 double, double, double,
                                                 double, double, double [3][3]))
@@ -2417,7 +2417,7 @@ lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(int32_t narg, int32_t ps[],
+lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(ArgumentCount narg, int32_t ps[],
                                    void (*f)(double, double, double [3][3],
                                              double [3][3]))
 {
@@ -2467,7 +2467,7 @@ lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(int32_t narg, int32_t ps[],
+lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(ArgumentCount narg, int32_t ps[],
                                        void (*f)(double, double, double [3][3],
                                                  double [3][3], double [3][3]))
 {
@@ -2541,7 +2541,7 @@ lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddp33_iarp3p3q_0z1_f_(int32_t narg, int32_t ps[],
+lux_v_dddp33_iarp3p3q_0z1_f_(ArgumentCount narg, int32_t ps[],
                              void (*f)(double, double, double [3][3]))
 {
   Pointer *ptrs;
@@ -2585,7 +2585,7 @@ lux_v_dddp33_iarp3p3q_0z1_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddp3_iaiqrp3q_0T2_f_(int32_t narg, int32_t ps[],
+lux_v_dddp3_iaiqrp3q_0T2_f_(ArgumentCount narg, int32_t ps[],
                             void (*f)(double, double, double [3]))
 {
   Pointer *ptrs;
@@ -2629,7 +2629,7 @@ lux_v_dddp3_iaiqrp3q_0T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddp3dpT3_i3aiirq_120333_f_(int32_t narg, int32_t ps[],
+lux_v_dddp3dpT3_i3aiirq_120333_f_(ArgumentCount narg, int32_t ps[],
                                   int32_t (*f)(double, double, double [3],
                                                double *, double *, double *))
 {
@@ -2672,7 +2672,7 @@ lux_v_dddp3dpT3_i3aiirq_120333_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddpT16_iaoqT16_0z1T16_s_(int32_t narg, int32_t ps[],
+lux_v_dddpT16_iaoqT16_0z1T16_s_(ArgumentCount narg, int32_t ps[],
                                 void (*f)(double, double, double *, double *,
                                           double *, double *, double *,
                                           double *, double *, double *,
@@ -2717,7 +2717,7 @@ lux_v_dddpT16_iaoqT16_0z1T16_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddpT3_iaoqT3_0z1T3_s_(int32_t narg, int32_t ps[],
+lux_v_dddpT3_iaoqT3_0z1T3_s_(ArgumentCount narg, int32_t ps[],
                              void (*f)(double, double, double *, double *,
                                        double *))
 {
@@ -2763,7 +2763,7 @@ lux_v_dddpT3_iaoqT3_0z1T3_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
+lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(ArgumentCount narg, int32_t ps[],
                                               void (*f)(double, double,
                                                         double *, double *,
                                                         double *, double [3][3],
@@ -2816,7 +2816,7 @@ lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddpT4_iaoqT4_0z1T4_s_(int32_t narg, int32_t ps[],
+lux_v_dddpT4_iaoqT4_0z1T4_s_(ArgumentCount narg, int32_t ps[],
                              void (*f)(double, double, double *, double *,
                                        double *, double *))
 {
@@ -2852,7 +2852,7 @@ lux_v_dddpT4_iaoqT4_0z1T4_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dddpdp_iaoqoq_0z12_s_(int32_t narg, int32_t ps[],
+lux_v_dddpdp_iaoqoq_0z12_s_(ArgumentCount narg, int32_t ps[],
                             void (*f)(double, double, double *, double *))
 {
   Pointer *ptrs;
@@ -2889,7 +2889,7 @@ lux_v_dddpdp_iaoqoq_0z12_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_ddp33_iao33q_01_s_(int32_t narg, int32_t ps[],
+lux_v_ddp33_iao33q_01_s_(ArgumentCount narg, int32_t ps[],
                          void (*f)(double, double [3][3]))
 {
   Pointer *ptrs;
@@ -2926,7 +2926,7 @@ lux_v_ddp33_iao33q_01_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_ddpdp_iaoqoq_012_s_(int32_t narg, int32_t ps[],
+lux_v_ddpdp_iaoqoq_012_s_(ArgumentCount narg, int32_t ps[],
                           void (*f)(double, double*, double*))
 {
   Pointer *ptrs;
@@ -2970,7 +2970,7 @@ lux_v_ddpdp_iaoqoq_012_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(int32_t narg, int32_t ps[],
+lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double [2][3],
                                             double [2][3], double [2]))
 {
@@ -3019,7 +3019,7 @@ lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp23T3_i23aiqrq_0T2_f_(int32_t narg, int32_t ps[],
+lux_v_dp23T3_i23aiqrq_0T2_f_(ArgumentCount narg, int32_t ps[],
                              void (*f)(double [2][3], double [2][3],
                                        double [2][3]))
 {
@@ -3065,7 +3065,7 @@ lux_v_dp23T3_i23aiqrq_0T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(int32_t narg, int32_t ps[],
+lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(ArgumentCount narg, int32_t ps[],
                                      void (*f)(double [2][3], double *,
                                                double *, double *, double *,
                                                double *, double *))
@@ -3112,7 +3112,7 @@ lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp23dpdp_i23aommqocq_0T2_s_(int32_t narg, int32_t ps[],
+lux_v_dp23dpdp_i23aommqocq_0T2_s_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double [2][3], double *, double *))
 {
   Pointer *ptrs;
@@ -3152,7 +3152,7 @@ lux_v_dp23dpdp_i23aommqocq_0T2_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33T2_i33arq_01_f_(int32_t narg, int32_t ps[],
+lux_v_dp33T2_i33arq_01_f_(ArgumentCount narg, int32_t ps[],
                           void (*f)(double [3][3], double [3][3]))
 {
   Pointer *ptrs;
@@ -3198,7 +3198,7 @@ lux_v_dp33T2_i33arq_01_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33T3_i33aiqrq_0T2_f_(int32_t narg, int32_t ps[],
+lux_v_dp33T3_i33aiqrq_0T2_f_(ArgumentCount narg, int32_t ps[],
                              void (*f)(double [3][3], double [3][3],
                                        double [3][3]))
 {
@@ -3239,7 +3239,7 @@ lux_v_dp33T3_i33aiqrq_0T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33_r33_0_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3]))
+lux_v_dp33_r33_0_f_(ArgumentCount narg, int32_t ps[], void (*f)(double [3][3]))
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -3282,7 +3282,7 @@ lux_v_dp33_r33_0_f_(int32_t narg, int32_t ps[], void (*f)(double [3][3]))
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(int32_t narg, int32_t ps[],
+lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(ArgumentCount narg, int32_t ps[],
                                       void (*f)(double [3][3], double,
                                                 double [3][3],
                                                 double [3][3]))
@@ -3335,7 +3335,7 @@ lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(int32_t narg, int32_t ps[],
+lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(ArgumentCount narg, int32_t ps[],
                                       void (*f)(double [3][3], double [2][3],
                                                 double [2][3]))
 {
@@ -3384,7 +3384,7 @@ lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(int32_t narg, int32_t ps[],
+lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double [3][3], double [3],
                                             double [3]))
 {
@@ -3430,7 +3430,7 @@ lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33dp3_i33armq_01_f_(int32_t narg, int32_t ps[],
+lux_v_dp33dp3_i33armq_01_f_(ArgumentCount narg, int32_t ps[],
                             void (*f)(double [3][3], double [3]))
 {
   Pointer *ptrs;
@@ -3473,7 +3473,7 @@ lux_v_dp33dp3_i33armq_01_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp33dpdp_i33aommqocq_0T2_s_(int32_t narg, int32_t ps[],
+lux_v_dp33dpdp_i33aommqocq_0T2_s_(ArgumentCount narg, int32_t ps[],
                                   void (*f)(double [3][3], double *, double *))
 {
   Pointer *ptrs;
@@ -3518,7 +3518,7 @@ lux_v_dp33dpdp_i33aommqocq_0T2_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp3T3_i3aiqrq_0T2_f_(int32_t narg, int32_t ps[],
+lux_v_dp3T3_i3aiqrq_0T2_f_(ArgumentCount narg, int32_t ps[],
                            void (*f)(double [3], double [3],
                                      double [3]))
 {
@@ -3562,7 +3562,7 @@ lux_v_dp3T3_i3aiqrq_0T2_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp3dp33_i3arp3q_01_f_(int32_t narg, int32_t ps[],
+lux_v_dp3dp33_i3arp3q_01_f_(ArgumentCount narg, int32_t ps[],
                             void (*f)(double [3], double [3][3]))
 {
   Pointer *ptrs;
@@ -3602,7 +3602,7 @@ lux_v_dp3dp33_i3arp3q_01_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp3dpT3_i3arq_0111_f_(int32_t narg, int32_t ps[],
+lux_v_dp3dpT3_i3arq_0111_f_(ArgumentCount narg, int32_t ps[],
                             void (*f)(double [3], double *, double *, double *))
 {
   Pointer *ptrs;
@@ -3641,7 +3641,7 @@ lux_v_dp3dpT3_i3arq_0111_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp3dp_o33o3_01_s_(int32_t narg, int32_t ps[],
+lux_v_dp3dp_o33o3_01_s_(ArgumentCount narg, int32_t ps[],
                         void (*f)(double [3][3], double [3]))
 {
   Pointer *ptrs;
@@ -3681,7 +3681,7 @@ lux_v_dp3dp_o33o3_01_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp3dpdp3_i3aomqoq_0T2_s_(int32_t narg, int32_t ps[],
+lux_v_dp3dpdp3_i3aomqoq_0T2_s_(ArgumentCount narg, int32_t ps[],
                                void (*f)(double [3], double *, double [3]))
 {
   Pointer *ptrs;
@@ -3723,7 +3723,7 @@ lux_v_dp3dpdp3_i3aomqoq_0T2_s_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dp3dpdp_i3arm3p2q_011_f_(int32_t narg, int32_t ps[],
+lux_v_dp3dpdp_i3arm3p2q_011_f_(ArgumentCount narg, int32_t ps[],
                                void (*f)(double [3], double *, double *))
 {
   Pointer *ptrs;
@@ -3759,7 +3759,7 @@ lux_v_dp3dpdp_i3arm3p2q_011_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_dpT3_r3_000_f_(int32_t narg, int32_t ps[],
+lux_v_dpT3_r3_000_f_(ArgumentCount narg, int32_t ps[],
                      void (*f)(double *, double *, double *))
 {
   Pointer *tgts;
@@ -3795,7 +3795,7 @@ lux_v_dpT3_r3_000_f_(int32_t narg, int32_t ps[],
 // @param [in] f pointer to C++ function to bind
 // @return the symbol containing the result of the function call
 int32_t
-lux_v_sddsd_iairq_012_f_(int32_t narg, int32_t ps[],
+lux_v_sddsd_iairq_012_f_(ArgumentCount narg, int32_t ps[],
                          void (*f)(double *, size_t, size_t, double,
                                    double *, size_t, size_t))
 {

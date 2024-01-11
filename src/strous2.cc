@@ -40,14 +40,14 @@ int32_t         minmax(int32_t *, int32_t, int32_t),
 int32_t d_decomp(double *, int32_t, int32_t),
   d_solve(double *, double *, int32_t, int32_t);
 //---------------------------------------------------------
-int32_t lux_noop(int32_t narg, int32_t ps[])
+int32_t lux_noop(ArgumentCount narg, int32_t ps[])
      /* no operation - a dummy routine that provides an entry point
         for debuggers */
 {
   return 1;
 }
 //---------------------------------------------------------
-int32_t lux_zap(int32_t narg, int32_t ps[])
+int32_t lux_zap(ArgumentCount narg, int32_t ps[])
 // remove the specified symbols completely: i.e. leave no trace
 // only allowed from main execution level, to prevent zapping of
 // a variable which may be referenced later on in an already-compiled
@@ -77,7 +77,7 @@ int32_t lux_zap(int32_t narg, int32_t ps[])
   return 1;
 }
 //---------------------------------------------------------
-int32_t showstats(int32_t narg, int32_t ps[])
+int32_t showstats(ArgumentCount narg, int32_t ps[])
 {
   extern int16_t        listStack[], *listStackItem, curContext;
   extern int32_t        nNamedVariable, nTempVariable, markIndex,
@@ -104,7 +104,7 @@ int32_t showstats(int32_t narg, int32_t ps[])
   return 1;
 }
 //---------------------------------------------------------
-int32_t lux_system(int32_t narg, int32_t ps[])
+int32_t lux_system(ArgumentCount narg, int32_t ps[])
 // pass a string to the operating system
 {
   char  *name;
@@ -114,7 +114,7 @@ int32_t lux_system(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //---------------------------------------------------------
-int32_t lux_psum(int32_t narg, int32_t ps[])
+int32_t lux_psum(ArgumentCount narg, int32_t ps[])
 /* Y = PSUM(X, POWERS [,AXES, CLASS][,/ONEDIM,/NORMALIZE,/SINGLE]) returns a
    weighted sum of <x>. */
 // The weights are equal to the coordinates in the dimensions given in
@@ -423,7 +423,7 @@ int32_t multiCompare(const void *arg1, const void *arg2)
   return 0;
 }
 //---------------------------------------------------------
-int32_t lux_tolookup(int32_t narg, int32_t ps[])
+int32_t lux_tolookup(ArgumentCount narg, int32_t ps[])
 // TOLOOKUP,src,list,index rewrites <src> as <list(index)>, with
 // <list> a list of unique members of <src> (sorted in ascending
 // order) and <index> ranging between 0 and NUM_ELEM(list) - 1.
@@ -544,7 +544,7 @@ int32_t cmp(const void *x1, const void *x2)
   return 1;                     // or some compilers complain
 }
 //---------------------------------------------------------
-int32_t lux_orderfilter(int32_t narg, int32_t ps[])
+int32_t lux_orderfilter(ArgumentCount narg, int32_t ps[])
 // Applies an ordinal filter to a data set
 /* syntax:  Y = ORDFILTER([ORDER=ORDER,] X [[,AXES],WIDTH,
                 /MEDIAN,/MINIMUM,/MAXIMUM]) */
@@ -679,14 +679,14 @@ int32_t lux_orderfilter(int32_t narg, int32_t ps[])
   return output;
 }
 //---------------------------------------------------------
-int32_t lux_medfilter(int32_t narg, int32_t ps[])
+int32_t lux_medfilter(ArgumentCount narg, int32_t ps[])
      // median filter
 {
   internalMode = 1;
   return lux_orderfilter(narg, ps);
 }
 //---------------------------------------------------------
-int32_t lux_quantile(int32_t narg, int32_t ps[])
+int32_t lux_quantile(ArgumentCount narg, int32_t ps[])
 // QUANTILE([<order> ,] <data> [, <axes>])
 {
   int32_t       output, t, nelem, i;
@@ -802,14 +802,14 @@ int32_t lux_quantile(int32_t narg, int32_t ps[])
   return output;
 }
 //---------------------------------------------------------
-int32_t lux_median(int32_t narg, int32_t ps[])
+int32_t lux_median(ArgumentCount narg, int32_t ps[])
      // median filter
 {
   internalMode = 1;
   return lux_quantile(narg, ps);
 }
 //---------------------------------------------------------
-int32_t lux_minfilter(int32_t narg, int32_t ps[])
+int32_t lux_minfilter(ArgumentCount narg, int32_t ps[])
      // minimum filter
 // Applies a running minimum filter to a data set
 // syntax:  Y = MINFILTER(X [[,AXIS], WIDTH])
@@ -1096,7 +1096,7 @@ int32_t lux_minfilter(int32_t narg, int32_t ps[])
   return result;
 }
 //---------------------------------------------------------
-int32_t lux_maxfilter(int32_t narg, int32_t ps[])
+int32_t lux_maxfilter(ArgumentCount narg, int32_t ps[])
 // maximum filter
 // Applies a running maximum filter to a data set
 // syntax:  Y = MAXFILTER(X [[,AXIS], WIDTH])
@@ -1383,7 +1383,7 @@ int32_t lux_maxfilter(int32_t narg, int32_t ps[])
   return result;
 }
 //---------------------------------------------------------
-int32_t lux_distarr(int32_t narg, int32_t ps[])
+int32_t lux_distarr(ArgumentCount narg, int32_t ps[])
 // DISTARR(dims[,center,stretch]) returns a FLOAT array of dimensions <dims>
 // wherein each element contains the distance of the coordinates of
 // that element to the point given in <center>, after stretching each
@@ -1477,7 +1477,7 @@ int32_t lux_distarr(int32_t narg, int32_t ps[])
   return result;
 }
 //---------------------------------------------------------
-int32_t lux_multisieve(int32_t narg, int32_t ps[])
+int32_t lux_multisieve(ArgumentCount narg, int32_t ps[])
 /*  MULTISIEVE, x, y, list, index
     returns <list> and <index> such that
     <x(list(index(j-1):index(j)-1))> EQ <y(j)>
@@ -1672,7 +1672,7 @@ int32_t lux_multisieve(int32_t narg, int32_t ps[])
   return 1;
 }
 //---------------------------------------------------------
-int32_t lux_temp(int32_t narg, int32_t ps[])
+int32_t lux_temp(ArgumentCount narg, int32_t ps[])
 // experimental routine: returns temp copy of symbol if it is
 // a named symbol
 {
@@ -1684,7 +1684,7 @@ int32_t lux_temp(int32_t narg, int32_t ps[])
   else return *ps;
 }
 //---------------------------------------------------------
-int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
+int32_t shift(ArgumentCount narg, int32_t ps[], int32_t isFunction)
 /* SHIFT(x[,axes],dist[,BLANK=blank][,/TRANSLATE]) shifts the data in
  <x> over distances <dist> (a scalar or an array containing one
  integer number per dimension) along the indicated <axes> (a scalar or
@@ -1861,17 +1861,17 @@ int32_t shift(int32_t narg, int32_t ps[], int32_t isFunction)
   return isFunction? iq: LUX_OK;
 }
 //---------------------------------------------------------
-int32_t lux_shift_f(int32_t narg, int32_t ps[])
+int32_t lux_shift_f(ArgumentCount narg, int32_t ps[])
 {
   return shift(narg, ps, 1);
 }
 //---------------------------------------------------------
-int32_t lux_shift(int32_t narg, int32_t ps[])
+int32_t lux_shift(ArgumentCount narg, int32_t ps[])
 {
   return shift(narg, ps, 0);
 }
 //---------------------------------------------------------
-int32_t lux_swaphalf(int32_t narg, int32_t ps[])
+int32_t lux_swaphalf(ArgumentCount narg, int32_t ps[])
 // SWAPHALF,d  swaps elements of <d> such that new coordinate x_i' is
 // related to old coordinate x_i according to
 // x_i' = (x_i + n_i/2) mod n_i  where n_i is the size of <d> in
@@ -1929,7 +1929,7 @@ int32_t lux_swaphalf(int32_t narg, int32_t ps[])
   return 1;
 }
 //---------------------------------------------------------
-int32_t lux_equivalence(int32_t narg, int32_t ps[])
+int32_t lux_equivalence(ArgumentCount narg, int32_t ps[])
 // returns equivalence classes.  If <x1> and <x2> are equivalence relations
 // such that for all <i> elements <x1(i)> and <x2(i)> are in the same class
 // then <y> = EQUIVALENCE(<x1>,<x2>) returns in each <y(i)> the smallest
@@ -1988,7 +1988,7 @@ int32_t lux_equivalence(int32_t narg, int32_t ps[])
   return result;
 }
 //---------------------------------------------------------
-int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
+int32_t local_extrema(ArgumentCount narg, int32_t ps[], int32_t code)
 /* local extreme search in multiple dimensions
    (x [, diagonal], /DEGREE, /SUBGRID])
    <x>: data
@@ -2512,27 +2512,27 @@ int32_t local_extrema(int32_t narg, int32_t ps[], int32_t code)
   return result;
 }
 //---------------------------------------------------------
-int32_t lux_find_maxloc(int32_t narg, int32_t ps[])
+int32_t lux_find_maxloc(ArgumentCount narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 3);
 }
 //---------------------------------------------------------
-int32_t lux_find_minloc(int32_t narg, int32_t ps[])
+int32_t lux_find_minloc(ArgumentCount narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 1);
 }
 //---------------------------------------------------------
-int32_t lux_find_max(int32_t narg, int32_t ps[])
+int32_t lux_find_max(ArgumentCount narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 2);
 }
 //---------------------------------------------------------
-int32_t lux_find_min(int32_t narg, int32_t ps[])
+int32_t lux_find_min(ArgumentCount narg, int32_t ps[])
 {
   return local_extrema(narg, ps, 0);
 }
 //---------------------------------------------------------
-int32_t lux_replace_values(int32_t narg, int32_t ps[])
+int32_t lux_replace_values(ArgumentCount narg, int32_t ps[])
 /* REPLACE,x,src,trgt
   replaces all occurrences in <x> of each element of <src> by
   the corresponding element of <trgt>.  <src> must be in ascending order!
@@ -2730,7 +2730,7 @@ int32_t lux_replace_values(int32_t narg, int32_t ps[])
   return LUX_ONE;
 }
 //---------------------------------------------------------
-int32_t lux_lsq(int32_t narg, int32_t ps[])
+int32_t lux_lsq(ArgumentCount narg, int32_t ps[])
 /* linear least squares fit.
    a = LSQ(x,y[,w,COV=cov,ERR=err,CHISQ=chisq,/FORMAL])
    The model is that y = a(0)*x(...,0) + a(1)*x(...,1) + ... + error term
@@ -3055,7 +3055,7 @@ Theory:
 }
 //---------------------------------------------------------
 int32_t         lux_indgen(int32_t, int32_t []);
-int32_t lux_lsq2(int32_t narg, int32_t ps[])
+int32_t lux_lsq2(ArgumentCount narg, int32_t ps[])
 /* linear least squares fit.
    a = LLSQ(x,y[,axis,FWHM=fwhm,WEIGHTS=w,COV=cov,ERR=err,CHISQ=chisq,
        /FORMAL,/REDUCE])
@@ -3547,7 +3547,7 @@ Theory:
   return result;
 }
 //---------------------------------------------------------
-int32_t lux_runprod(int32_t narg, int32_t ps[])
+int32_t lux_runprod(ArgumentCount narg, int32_t ps[])
 // RUNPROD( data [, axis]) returns a running product of <data>
 // along the indicated <axis>.  LS 13jul98
 {

@@ -74,13 +74,13 @@ int32_t        lux_gifread(int32_t, int32_t []);
 void        process(int32_t, unsigned char **);
 
  //-------------------------------------------------------------------------
-int32_t lux_gifread_f(int32_t narg, int32_t ps[])
+int32_t lux_gifread_f(ArgumentCount narg, int32_t ps[])
  // a function version that returns 1 if read OK
  {
  if ( lux_gifread(narg, ps) == 1 ) return 1; else return 4;
  }
  //-------------------------------------------------------------------------
-int32_t lux_gifread(int32_t narg, int32_t ps[])       // gifread subroutine
+int32_t lux_gifread(ArgumentCount narg, int32_t ps[])       // gifread subroutine
  // read a "simple" gif file, 8 bit deep
  /* call is gifread,array,file,map where map is the color map, if
  map not in argument list, you don't get it! */

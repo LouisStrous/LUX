@@ -35,7 +35,7 @@ static double        a1, a2, a3,a4,a5, a6, a7, a8, a9 ,a10, a11, a12, a13, a14, 
 extern int32_t        badmatch;
 double        meritc;
 //-------------------------------------------------------------------------
-int32_t lux_subshift(int32_t narg, int32_t ps[]) // LCT for a cell
+int32_t lux_subshift(ArgumentCount narg, int32_t ps[]) // LCT for a cell
      // wants 2 arrays, already F*8 and extracted, both the same size
      // returns the shift
 {
@@ -70,7 +70,7 @@ int32_t lux_subshift(int32_t narg, int32_t ps[]) // LCT for a cell
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_subshiftc(int32_t narg, int32_t ps[]) // LCT for a cell, sym version
+int32_t lux_subshiftc(ArgumentCount narg, int32_t ps[]) // LCT for a cell, sym version
  // subshiftc, s1b, s2b, xoff, yoff, mask
  // 3/4/97 added apodizer array, optional
  // wants 2 or 3 arrays, already F*8 and extracted, both the same size
@@ -933,7 +933,7 @@ double  subshiftc_apod(double* xa, double* xb, double* gg, int32_t nx, int32_t n
  return mertc(sxz, syz);
  }
  //-------------------------------------------------------------------------
-int32_t lux_dilate(int32_t narg, int32_t ps[])
+int32_t lux_dilate(ArgumentCount narg, int32_t ps[])
 // dilates a 2D image.  LS 9nov98
 {
   int32_t        nx, ny, n, result;
@@ -1072,7 +1072,7 @@ int32_t lux_dilate(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_erode(int32_t narg, int32_t ps[])
+int32_t lux_erode(ArgumentCount narg, int32_t ps[])
 // erodes a 2D image.  LS 9nov98, 9may2000
 {
   int32_t        nx, ny, result, n;

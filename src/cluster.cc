@@ -38,7 +38,7 @@ int32_t fptrCompare(const void *p1, const void *p2)
   return 0;
 }
 //----------------------------------------------------------------
-int32_t lux_cluster(int32_t narg, int32_t ps[])
+int32_t lux_cluster(ArgumentCount narg, int32_t ps[])
 /* CLUSTER, DATA [, CENTERS=c, INDEX=i, SIZE=sz, SAMPLE=s, PHANTOM=p,
    MAXIT=m, RMS=r, /UPDATE, /ITERATE, /VOCAL, /QUICK]
 

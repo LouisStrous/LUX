@@ -32,6 +32,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <stdio.h>
 
+#include "types.hh"
+
 #define malloctype(T) (T*) malloc(sizeof(T))
 #define calloctype(count, T) (T*) calloc(count, sizeof(T))
 #define realloctype(ptr, T) (T*) realloc(ptr, sizeof(T))

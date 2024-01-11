@@ -6,7 +6,7 @@
 
 // <x> = readimage(<file>)
 int32_t
-lux_read_image_oiio(int32_t narg, int32_t ps[])
+lux_read_image_oiio(ArgumentCount narg, int32_t ps[])
 {
   char* filename;
 

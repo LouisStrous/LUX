@@ -215,7 +215,7 @@ int32_t coordTrf(float *x, float *y, int32_t from, int32_t to)
   return 1;
 }
 //---------------------------------------------------------------------
-int32_t lux_coordtrf(int32_t narg, int32_t ps[])
+int32_t lux_coordtrf(ArgumentCount narg, int32_t ps[])
 // transform coordinates between various coordinate systems
 // syntax:  COORDTRF,xold,yold[,xnew,ynew]
 // specify the coordinate systems with keywords:

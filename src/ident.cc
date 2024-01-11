@@ -2546,7 +2546,7 @@ void dumpLine(int32_t symbol)
   dumpTree(symbol);
 }
 //-------------------------------------------------------------------------
-int32_t lux_list(int32_t narg, int32_t ps[])
+int32_t lux_list(ArgumentCount narg, int32_t ps[])
 /* shows the definition of a user-defined subroutine, function,
    or block routine */
 /* LIST,symbol  or  LIST,'name'  lists the definition of the given symbol

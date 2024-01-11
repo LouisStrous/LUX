@@ -33,11 +33,11 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 extern int32_t  redim_warn_flag, range_warn_flag;
 int32_t         lux_assoc_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym),
   lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym),
-  lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type), lux_assoc_input(int32_t, int32_t []),
+  lux_gmap(ArgumentCount narg, int32_t ps[], Symboltype new_type), lux_assoc_input(int32_t, int32_t []),
   simple_reverse(int32_t *p1, int32_t *p2, int32_t n, int32_t type), getBody(int32_t),
   string_sub(int32_t, int32_t []);
 //-------------------------------------------------------------------------
-int32_t lux_inserter(int32_t narg, int32_t ps[])
+int32_t lux_inserter(ArgumentCount narg, int32_t ps[])
 /* syntax: insert,target,source [,origin]
    inserts <source> in <target>, starting at <target> coordinates
    <origin> (one or more).
@@ -284,7 +284,7 @@ int32_t lux_inserter(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_smap(int32_t narg, int32_t ps[])
+int32_t lux_smap(ArgumentCount narg, int32_t ps[])
  // convert type (and class) to a string
 {
   int32_t n;
@@ -340,55 +340,55 @@ int32_t lux_smap(int32_t narg, int32_t ps[])
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_bmap(int32_t narg,int32_t ps[])
+int32_t lux_bmap(ArgumentCount narg,int32_t ps[])
 // convert type to uint8_t without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_INT8);
 }
 //-------------------------------------------------------------------------
-int32_t lux_wmap(int32_t narg, int32_t ps[])
+int32_t lux_wmap(ArgumentCount narg, int32_t ps[])
 // convert type to uint8_t without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_INT16);
 }
 //-------------------------------------------------------------------------
-int32_t lux_lmap(int32_t narg, int32_t ps[])
+int32_t lux_lmap(ArgumentCount narg, int32_t ps[])
 // convert type to long without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_INT32);
 }
 //-------------------------------------------------------------------------
-int32_t lux_int64map(int32_t narg, int32_t ps[])
+int32_t lux_int64map(ArgumentCount narg, int32_t ps[])
 // convert type to long without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_INT64);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fmap(int32_t narg, int32_t ps[])
+int32_t lux_fmap(ArgumentCount narg, int32_t ps[])
 // convert type to float without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_FLOAT);
 }
 //-------------------------------------------------------------------------
-int32_t lux_dmap(int32_t narg, int32_t ps[])
+int32_t lux_dmap(ArgumentCount narg, int32_t ps[])
 // convert type to double without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_DOUBLE);
 }
 //-------------------------------------------------------------------------
-int32_t lux_cfmap(int32_t narg, int32_t ps[])
+int32_t lux_cfmap(ArgumentCount narg, int32_t ps[])
 // convert type to cfloat without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_CFLOAT);
 }
 //-------------------------------------------------------------------------
-int32_t lux_cdmap(int32_t narg, int32_t ps[])
+int32_t lux_cdmap(ArgumentCount narg, int32_t ps[])
 // convert type to cdouble without changing memory contents
 {
   return lux_gmap(narg, ps, LUX_CDOUBLE);
 }
 //-------------------------------------------------------------------------
-int32_t lux_gmap(int32_t narg, int32_t ps[], Symboltype new_type)
+int32_t lux_gmap(ArgumentCount narg, int32_t ps[], Symboltype new_type)
                 // general part for map routines
 {
   Pointer q1,q3;
@@ -486,7 +486,7 @@ void rearr(int32_t x[], int32_t rear[], int32_t nd)
 }
 //-------------------------------------------------------------------------
 #define rint(value) ((int32_t) (value + ((value >= 0)? 0.5: -0.5)))
-int32_t lux_reverse(int32_t narg, int32_t ps[])
+int32_t lux_reverse(ArgumentCount narg, int32_t ps[])
 /* y = REVERSE(x [, axes, center] [, /ZERO])
  reverse <x> in the indicated <axes>, around the specified <center>.
  if any elements would have to reverse into <y> from outside <x>, then
@@ -962,7 +962,7 @@ int32_t treatListArguments_w(int32_t *narg, int16_t *ps[], int32_t offset)
 #define INNER   1
 #define OUTER   2
 
-int32_t lux_subsc_func(int32_t narg, int32_t ps[])
+int32_t lux_subsc_func(ArgumentCount narg, int32_t ps[])
 // decipher and extract subscripted values from a symbol; supports arrays,
 // strings, associated variables, file maps, and function pointers.
 // rewritten LS 6aug96
@@ -2009,7 +2009,7 @@ int32_t lux_subsc_func(int32_t narg, int32_t ps[])
   return LUX_ERROR;
 }                                               // end of lux_subsc
  //-------------------------------------------------------------------------
-int32_t string_sub(int32_t narg, int32_t ps[])
+int32_t string_sub(ArgumentCount narg, int32_t ps[])
 // subscripts for strings, called by lux_subc
 /* the string is in ps[narg]; narg indicates the number of subscripts.
  LS 19aug98 */
@@ -2099,7 +2099,7 @@ int32_t string_sub(int32_t narg, int32_t ps[])
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_symclass(int32_t narg, int32_t ps[])
+int32_t lux_symclass(ArgumentCount narg, int32_t ps[])
  //return the class of the argument symbol
  /* NOTE: scalar pointers (class 8) are returned as scalars (class 1)
     LS 13may92 */
@@ -2121,7 +2121,7 @@ int32_t lux_symclass(int32_t narg, int32_t ps[])
   return result_sym;
 }
  //-------------------------------------------------------------------------
-int32_t lux_symdtype(int32_t narg, int32_t ps[])
+int32_t lux_symdtype(ArgumentCount narg, int32_t ps[])
  //return the type of the argument symbol
 {
   int32_t       nsym, result_sym;
@@ -2139,7 +2139,7 @@ int32_t lux_symdtype(int32_t narg, int32_t ps[])
   return result_sym;
 }
  //-------------------------------------------------------------------------
-int32_t lux_num_elem(int32_t narg, int32_t ps[])
+int32_t lux_num_elem(ArgumentCount narg, int32_t ps[])
 /* return the number of elements in the argument symbol, or the number
    contained within the specified dimensions.
    call:  NUM_ELEM(x [, dims]) */
@@ -2214,7 +2214,7 @@ int32_t lux_num_elem(int32_t narg, int32_t ps[])
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_num_dimen(int32_t narg, int32_t ps[])
+int32_t lux_num_dimen(ArgumentCount narg, int32_t ps[])
  //return the number of dimensions in the argument symbol
 {
   int32_t       nsym, nd, result_sym;
@@ -2239,7 +2239,7 @@ int32_t lux_num_dimen(int32_t narg, int32_t ps[])
   return result_sym;
 }
  //-------------------------------------------------------------------------
-int32_t lux_dimen(int32_t narg, int32_t ps[])
+int32_t lux_dimen(ArgumentCount narg, int32_t ps[])
 // DIMEN(x [,axes]) returns the indicated dimensions of <x>.  If <x> is
 // a scalar or a string, then a scalar 1 is returned.  If <x> has only
 // one dimension, then that is returned in a scalar.  If <axes> is not
@@ -2301,7 +2301,7 @@ int32_t lux_dimen(int32_t narg, int32_t ps[])
   return iq;
 }
  //-------------------------------------------------------------------------
-int32_t lux_redim_f(int32_t narg, int32_t ps[])
+int32_t lux_redim_f(ArgumentCount narg, int32_t ps[])
  // redimension an array, a function version, returns input symbol
 {
   int32_t       result, n, *args;
@@ -2322,7 +2322,7 @@ int32_t lux_redim_f(int32_t narg, int32_t ps[])
   return n;
 }
  //-------------------------------------------------------------------------
-int32_t lux_redim(int32_t narg, int32_t ps[])
+int32_t lux_redim(ArgumentCount narg, int32_t ps[])
      // redimension an array
      // NOTE: my array_size() calculates the number of elements in an
      // array from the size of the allocated memory and this assumes that
@@ -2386,7 +2386,7 @@ int32_t lux_redim(int32_t narg, int32_t ps[])
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_concat_list(int32_t narg, int32_t ps[])
+int32_t lux_concat_list(ArgumentCount narg, int32_t ps[])
 // concatenation involving LUX_CLIST or LUX_LIST. LS 15jun98
 {
   int32_t       result, i, iq, nelem = 0, j, indx;
@@ -2684,7 +2684,7 @@ copyScalarToArray(int32_t src, Pointer tgt, Symboltype tgttype)
   }
 }
  //-------------------------------------------------------------------------
-int32_t lux_concat(int32_t narg, int32_t ps[])
+int32_t lux_concat(ArgumentCount narg, int32_t ps[])
  /* lux's concatenation function, insisted on by idl users, but works a bit
          differently
  there are 2 modes
@@ -3136,19 +3136,19 @@ int32_t lux_concat(int32_t narg, int32_t ps[])
   } // end of if else 2-or-more args
 }                                               //end of lux_concat
 //-------------------------------------------------------------------------
-int32_t lux_isscalar(int32_t narg, int32_t ps[])
+int32_t lux_isscalar(ArgumentCount narg, int32_t ps[])
 // return 1 if symbol is a scalar, 0 otherwise
 { return (symbol_class(*ps) == LUX_SCALAR)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_isarray(int32_t narg, int32_t ps[])
+int32_t lux_isarray(ArgumentCount narg, int32_t ps[])
 // return 1 if symbol is an array, 0 otherwise
 { return (symbol_class(*ps) == LUX_ARRAY)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_isstring(int32_t narg, int32_t ps[])
+int32_t lux_isstring(ArgumentCount narg, int32_t ps[])
 // return 1 if symbol is a string, 0 otherwise
 { return (symbol_class(*ps) == LUX_STRING)? 1: 4; }
 //-------------------------------------------------------------------------
-int32_t lux_subsc_subgrid(int32_t narg, int32_t ps[])
+int32_t lux_subsc_subgrid(ArgumentCount narg, int32_t ps[])
 /* like x(subsc,/inner) but with linear interpolation for fractional
    coordinates.  LS 19jun97 */
 /* the target (subscripted) symbol is in ps[narg]; narg indicates the
@@ -3374,7 +3374,7 @@ int32_t extractNumerical(Pointer src, Pointer trgt, Symboltype type,
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_roll(int32_t narg, int32_t ps[])
+int32_t lux_roll(ArgumentCount narg, int32_t ps[])
 // ROLL(array, target) rearranges the dimensions of <array> according to
 // <target>.  If <target> is a scalar, then the dimensions list is shifted
 // cyclically over that number of elements.  If <target> is a numerical

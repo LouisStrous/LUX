@@ -9,7 +9,7 @@ open my $ifh, '<', 'bindings.hh';
 
 my %expected_types;
 while (<$ifh>) {
-  if (/int32_t +(\w+)\(.*?,.*?, *(.*?)\);/) {
+  if (/Symbol +(\w+)\(.*?,.*?, *(.*?)\);/) {
     $expected_types{$1} = $2;
   }
 }

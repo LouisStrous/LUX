@@ -324,7 +324,7 @@ void sprint_time (char *out, TIME t, char const* zone, int32_t precision)
  seconds from the string */
  }
  //--------------------------------------------------------------------------
-int32_t lux_tai_from_date(int32_t narg, int32_t ps[]) // returns TAI
+int32_t lux_tai_from_date(ArgumentCount narg, int32_t ps[]) // returns TAI
  // call is tai =  tai_from_date(year, doy, hour, minute, second)
  // may want to upgrade to accept strings using Rick's routines
  {
@@ -339,7 +339,7 @@ int32_t lux_tai_from_date(int32_t narg, int32_t ps[]) // returns TAI
  return result_sym;
  }
  //--------------------------------------------------------------------------
-int32_t lux_date_from_tai(int32_t narg, int32_t ps[]) // returns date string
+int32_t lux_date_from_tai(ArgumentCount narg, int32_t ps[]) // returns date string
  // call is s =  date_from_tai(tai)
  {
  char        utc[64];                // just to hold times
@@ -355,7 +355,7 @@ int32_t lux_date_from_tai(int32_t narg, int32_t ps[]) // returns date string
  return result_sym;
  }
  //--------------------------------------------------------------------------
-int32_t lux_tri_name_from_tai(int32_t narg, int32_t ps[]) // returns date string
+int32_t lux_tri_name_from_tai(ArgumentCount narg, int32_t ps[]) // returns date string
  // call is s =  tri_name_tai(tai)
  {
  char        *p;
@@ -379,28 +379,28 @@ int32_t lux_tri_name_from_tai(int32_t narg, int32_t ps[]) // returns date string
  }
  //--------------------------------------------------------------------------
 int32_t ephem_setup(int32_t, int32_t []);
-int32_t lux_sun_b(int32_t narg, int32_t ps[])// sun_b function
+int32_t lux_sun_b(ArgumentCount narg, int32_t ps[])// sun_b function
  // returns solar B angle, b = sun_b(day_of_year, year)
 {
   choice = 0;
   return ephem_setup(narg,ps);
 }
  //--------------------------------------------------------------------------
-int32_t lux_sun_r(int32_t narg, int32_t ps[]) // sun_r function
+int32_t lux_sun_r(ArgumentCount narg, int32_t ps[]) // sun_r function
  // returns solar radius, r = sun_r(day_of_year, year)
  {
  choice = 1;
  return        ephem_setup(narg,ps);
  }
  //--------------------------------------------------------------------------
-int32_t lux_sun_d(int32_t narg, int32_t ps[]) // sun_d function
+int32_t lux_sun_d(ArgumentCount narg, int32_t ps[]) // sun_d function
  // returns solar d angle, d = sun_d(day_of_year, year)
  {
  choice = 2;
  return        ephem_setup(narg,ps);
  }
  //--------------------------------------------------------------------------
-int32_t lux_sun_p(int32_t narg, int32_t ps[]) // sun_p function
+int32_t lux_sun_p(ArgumentCount narg, int32_t ps[]) // sun_p function
  // returns solar P angle, p = sun_p(day_of_year, year)
  {
  choice = 3;
@@ -408,7 +408,7 @@ int32_t lux_sun_p(int32_t narg, int32_t ps[]) // sun_p function
  }
  //--------------------------------------------------------------------------
 int32_t        execute_error(int32_t), sephem(int32_t, float);
-int32_t ephem_setup(int32_t narg, int32_t ps[])
+int32_t ephem_setup(ArgumentCount narg, int32_t ps[])
  {
  int32_t        nsym, result_sym, j, nd, n, iy;
  float        day;

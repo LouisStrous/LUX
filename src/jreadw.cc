@@ -71,7 +71,7 @@ METHODDEF void c_ui_method_selection (compress_info_ptr cinfo)
   jselwjfif(cinfo);
 }
  //-------------------------------------------------------------------------
-int32_t lux_write_jpeg_f(int32_t narg, int32_t ps[])
+int32_t lux_write_jpeg_f(ArgumentCount narg, int32_t ps[])
 // a function version that returns 1 if read OK
 {
   int32_t        lux_write_jpeg(int32_t, int32_t []);
@@ -82,7 +82,7 @@ int32_t lux_write_jpeg_f(int32_t narg, int32_t ps[])
     return LUX_ZERO;
 }
  //-------------------------------------------------------------------------
-int32_t lux_write_jpeg(int32_t narg, int32_t ps[])        // jpeg write subroutine
+int32_t lux_write_jpeg(ArgumentCount narg, int32_t ps[])        // jpeg write subroutine
  // 10/17/92, start with 2-D uint8_t files
 {
  struct compress_info_struct cinfo;
@@ -245,7 +245,7 @@ METHODDEF void d_ui_method_selection (decompress_info_ptr cinfo)
   cinfo->methods->output_term = output_term;
  }
  //-------------------------------------------------------------------------
-int32_t lux_read_jpeg_f(int32_t narg, int32_t ps[])
+int32_t lux_read_jpeg_f(ArgumentCount narg, int32_t ps[])
 // a function version that returns 1 if read OK
 {
   int32_t        lux_read_jpeg(int32_t, int32_t []);
@@ -256,7 +256,7 @@ int32_t lux_read_jpeg_f(int32_t narg, int32_t ps[])
     return LUX_ZERO;
 }
  //-------------------------------------------------------------------------
-int32_t lux_read_jpeg(int32_t narg, int32_t ps[])        // jpeg read subroutine
+int32_t lux_read_jpeg(ArgumentCount narg, int32_t ps[])        // jpeg read subroutine
  // 10/17/92, start with 2-D uint8_t files
  {
  char        *name;

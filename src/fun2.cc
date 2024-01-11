@@ -47,7 +47,7 @@ int32_t         f_decomp(float *, int32_t, int32_t), d_decomp(double *, int32_t,
   f_solve(float *, float *, int32_t, int32_t), d_solve(double *, double *, int32_t, int32_t),
   lux_replace(int32_t, int32_t);
 //-------------------------------------------------------------------------
-int32_t lux_runsum(int32_t narg, int32_t ps[])
+int32_t lux_runsum(ArgumentCount narg, int32_t ps[])
 /*generate a running sum
   syntax:  y = runsum(x [,axis,order])
   <axis> is the dimension along which summing is performed; for each of the
@@ -143,7 +143,7 @@ int32_t lux_runsum(int32_t narg, int32_t ps[])
  return result_sym;
 }                                               //end of lux_runsum
 //-------------------------------------------------------------------------
-int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
+int32_t index_sdev(ArgumentCount narg, int32_t ps[], int32_t sq)
 // calculates standard deviations or variances by class.
 // f(<x>, <classes> [, <weights>, /SAMPLE, /POPULATION, /DOUBLE])
 // we assume that ps[0] and ps[1] are numerical arrays with the same number
@@ -955,7 +955,7 @@ int32_t index_sdev(int32_t narg, int32_t ps[], int32_t sq)
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_covariance(int32_t narg, int32_t ps[])
+int32_t lux_covariance(ArgumentCount narg, int32_t ps[])
 // f(<x> , <y> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS,
 //         /DOUBLE])
 // Returns the covariance of <x> and <y>, which must be
@@ -1747,7 +1747,7 @@ calculations_for_sdev(LoopInfo& srcinfo,
   return done;
 }
 
-int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
+int32_t sdev(ArgumentCount narg, int32_t ps[], int32_t sq)
 // f(<x> [, <mode>, WEIGHTS=<weights>, /SAMPLE, /POPULATION, /KEEPDIMS,
 //         /DOUBLE])
 // with f = SDEV (sq = 1) or VARIANCE (sq = 0)
@@ -2499,13 +2499,13 @@ int32_t sdev(int32_t narg, int32_t ps[], int32_t sq)
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_sdev(int32_t narg, int32_t ps[])
+int32_t lux_sdev(ArgumentCount narg, int32_t ps[])
      // return standard deviation
 {
   return sdev(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_variance(int32_t narg, int32_t ps[])
+int32_t lux_variance(ArgumentCount narg, int32_t ps[])
      // returns variance
 {
   return sdev(narg, ps, 0);
@@ -2561,7 +2561,7 @@ S₂ = 0 + (1 - 2)*(1 - 4/3)*2 = 2/3
 s = √(2/3/(3 - 1)) = √(1/3) = ⅓√3
  */
 //-------------------------------------------------------------------------
-int32_t lux_swab(int32_t narg, int32_t ps[])
+int32_t lux_swab(ArgumentCount narg, int32_t ps[])
 //swap bytes in an array or even an scalar
 //this is a subroutine and swaps the input symbol (not a copy)
 {
@@ -2599,7 +2599,7 @@ int32_t lux_swab(int32_t narg, int32_t ps[])
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_wait(int32_t narg, int32_t ps[])
+int32_t lux_wait(ArgumentCount narg, int32_t ps[])
 // wait the specified # of seconds (floating point)
 {
   float         xq;
@@ -2614,7 +2614,7 @@ int32_t lux_wait(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //---------------------------------------------------------
-int32_t lux_esmooth(int32_t narg, int32_t ps[])
+int32_t lux_esmooth(ArgumentCount narg, int32_t ps[])
   // Exponential Asymmetric Smoothing
   // Syntax: Y = ESMOOTH( X [, AXIS, ORDER] )
 {
@@ -2838,7 +2838,7 @@ void vargsmoothkernel(double width, int32_t nx, int32_t *n2, int32_t *ng, double
   // all done
 }
 //-------------------------------------------------------------------------
-int32_t lux_gsmooth(int32_t narg, int32_t ps[])
+int32_t lux_gsmooth(ArgumentCount narg, int32_t ps[])
  // smooth input array with a gaussian
  // ps[0] is input array and ps[1] is fwhm width
  /* Addition LS 13aug94:  user may supply kernel
@@ -3725,7 +3725,7 @@ int32_t lux_gsmooth(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_lower(int32_t narg, int32_t ps[]) //lower function
+int32_t lux_lower(ArgumentCount narg, int32_t ps[]) //lower function
 // convert all letters in a string to lower case
 {
   uint8_t *p1, *p2;
@@ -3742,7 +3742,7 @@ while (mq--)
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_upper(int32_t narg, int32_t ps[]) //upper function
+int32_t lux_upper(ArgumentCount narg, int32_t ps[]) //upper function
 // convert all letters in a string to upper case
 {
   uint8_t *p1, *p2;
@@ -3759,7 +3759,7 @@ while (mq--)
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strpos(int32_t narg, int32_t ps[]) //STRPOS function
+int32_t lux_strpos(ArgumentCount narg, int32_t ps[]) //STRPOS function
 // returns index of sub string if found
      // added index - LS 11jun97
 {
@@ -3789,7 +3789,7 @@ int32_t lux_strpos(int32_t narg, int32_t ps[]) //STRPOS function
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strcount(int32_t narg, int32_t ps[]) //STRCOUNT function
+int32_t lux_strcount(ArgumentCount narg, int32_t ps[]) //STRCOUNT function
 //  count # of occurences of a substring
 {
   char *p1, *p2, *p3;
@@ -3806,7 +3806,7 @@ sym[result_sym].spec.scalar.i32 = n;
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strreplace(int32_t narg, int32_t ps[]) //STRREPLACE function
+int32_t lux_strreplace(ArgumentCount narg, int32_t ps[]) //STRREPLACE function
 // replace a substring nc times
 {
   char *p1, *p2, *p3, *p4;
@@ -3848,7 +3848,7 @@ if (nc > 0) { while (nc--) { *p4++ = *p1++; } }
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strpbrk(int32_t narg, int32_t ps[])
+int32_t lux_strpbrk(ArgumentCount narg, int32_t ps[])
  /* returns a string from s1 starting with the first char from s2
  found in s1, if none found, an empty string */
 {
@@ -3872,7 +3872,7 @@ int32_t lux_strpbrk(int32_t narg, int32_t ps[])
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strloc(int32_t narg, int32_t ps[]) //STRLOC function
+int32_t lux_strloc(ArgumentCount narg, int32_t ps[]) //STRLOC function
 /* returns rest of source starting at object string
  */
 {
@@ -3893,7 +3893,7 @@ memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strskp(int32_t narg, int32_t ps[]) //STRSKP function
+int32_t lux_strskp(ArgumentCount narg, int32_t ps[]) //STRSKP function
 /*  returns rest of source starting AFTER object string
  */
 {
@@ -3916,7 +3916,7 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_skipc(int32_t narg, int32_t ps[]) //SKIPC function
+int32_t lux_skipc(ArgumentCount narg, int32_t ps[]) //SKIPC function
 // skip over characters
 {
   char *p1, *p2, *p3;
@@ -3936,7 +3936,7 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strsub(int32_t narg, int32_t ps[]) //STRSUB function
+int32_t lux_strsub(ArgumentCount narg, int32_t ps[]) //STRSUB function
 // return a substring
 {
   char *p1, *p3;
@@ -3956,7 +3956,7 @@ if (mq != 0)  memcpy(p3, p1 + off, mq);
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strtrim(int32_t narg, int32_t ps[]) //STRTRIM function
+int32_t lux_strtrim(ArgumentCount narg, int32_t ps[]) //STRTRIM function
 // trim trailing blanks and tabs and any control chars
      // older version took off last OK char, too - fixed.  LS 7may97
 {
@@ -3986,7 +3986,7 @@ int32_t lux_strtrim(int32_t narg, int32_t ps[]) //STRTRIM function
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_istring(int32_t narg, int32_t ps[]) // ISTRING function
+int32_t lux_istring(ArgumentCount narg, int32_t ps[]) // ISTRING function
 // string in I format
 {
 char    s[6], *p3;
@@ -4020,7 +4020,7 @@ memcpy(p3, templine, mq);
 return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fstring(int32_t narg, int32_t ps[])                         // FSTRING function
+int32_t lux_fstring(ArgumentCount narg, int32_t ps[])                         // FSTRING function
 // string from scalar, C-format
 /* syntax:  FSTRING(format, arg1, arg2, ...)
    the argument is modified to suit the data type expected by the format.
@@ -4043,7 +4043,7 @@ int32_t lux_fstring(int32_t narg, int32_t ps[])                         // FSTRI
  return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_string(int32_t narg, int32_t ps[])
+int32_t lux_string(ArgumentCount narg, int32_t ps[])
  /* converts to LUX_STRING
    LS 24apr93 21sep98 8sep99 */
 {
@@ -4129,7 +4129,7 @@ int32_t lux_string(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strlen(int32_t narg, int32_t ps[])//strlen function
+int32_t lux_strlen(ArgumentCount narg, int32_t ps[])//strlen function
 // length, not counting null; duplicates num_elem but insists on string
 {
   int32_t       result_sym, *l, n;
@@ -4158,7 +4158,7 @@ int32_t lux_strlen(int32_t narg, int32_t ps[])//strlen function
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_decomp(int32_t narg, int32_t ps[])//decomp routine
+int32_t lux_decomp(ArgumentCount narg, int32_t ps[])//decomp routine
                 //replaces a square matrix with it's lu decomposition
 {
   int32_t       iq, nd, nx;
@@ -4189,7 +4189,7 @@ case 4:
 return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_dsolve(int32_t narg, int32_t ps[]) //decomp routine
+int32_t lux_dsolve(ArgumentCount narg, int32_t ps[]) //decomp routine
                 //solves a linear system given lu decomp and rhs
 {
 int32_t         iq, jq, nd, nx, toptype, j, outer;
@@ -4235,7 +4235,7 @@ d_solve( q1.d, q2.d, nx, nx ); q2.d += nx;      break;
 return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_pit(int32_t narg, int32_t ps[])     //pit function
+int32_t lux_pit(ArgumentCount narg, int32_t ps[])     //pit function
                         // polynomial fit, CALL IS C=PIT([X],Y,[NPOW])
 {
   double        *a, *fbase, *cfbase;
@@ -4399,7 +4399,7 @@ int32_t setxpit(Symboltype type, int32_t n) /* used by several routines to set u
   return nsym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_detrend(int32_t narg, int32_t ps[])//detrend function
+int32_t lux_detrend(ArgumentCount narg, int32_t ps[])//detrend function
         // detrend using a polynomial fit, CALL IS DT=detrend(Y,[NPOW])
 {
   int32_t       lux_trend(int32_t, int32_t []);
@@ -4408,7 +4408,7 @@ int32_t lux_detrend(int32_t narg, int32_t ps[])//detrend function
   return lux_trend(narg, ps);
 }
 //-------------------------------------------------------------------------
-int32_t lux_trend(int32_t narg, int32_t ps[]) //trend function
+int32_t lux_trend(ArgumentCount narg, int32_t ps[]) //trend function
         // trend using a polynomial fit, CALL IS T=trend(Y,[NPOW])
 {
   double       *a;
@@ -4536,7 +4536,7 @@ qzbase->d += nxq; break;
 return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_poly(int32_t narg, int32_t ps[])
+int32_t lux_poly(ArgumentCount narg, int32_t ps[])
  // y = poly(x,c)
  // x: data values at which to evaluate the polynomials
  // c: coefficients of the polynomial
@@ -4614,7 +4614,7 @@ int32_t lux_poly(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_strtok(int32_t narg, int32_t ps[])
+int32_t lux_strtok(ArgumentCount narg, int32_t ps[])
 /* mimics the C strtok function.
  STRTOK( [<s1>,] <s2>)
  all specified arguments must be strings.  If <s1> is specified and not
@@ -5325,7 +5325,7 @@ void ksmooth(LoopInfo *srcinfo, LoopInfo *trgtinfo, float *kernel, int32_t nkern
   trgtinfo->data->v = trgt.v;
 }
 //-------------------------------------------------------------------------
-int32_t lux_ksmooth(int32_t narg, int32_t ps[])
+int32_t lux_ksmooth(ArgumentCount narg, int32_t ps[])
 // y = KSMOOTH(x, kernel [, axis] [, /BALANCED])
 {
   LoopInfo      srcinfo, trgtinfo;
@@ -5360,7 +5360,7 @@ int32_t lux_ksmooth(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_crosscorr(int32_t narg, int32_t ps[])
+int32_t lux_crosscorr(ArgumentCount narg, int32_t ps[])
 // y = CROSSCORR(x1, x2 [,mode])
 // returns the cross-correlation coefficient between <x1> and <x2>,
 // along the axis indicated by <mode> (if scalar), or as a function of

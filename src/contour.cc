@@ -41,7 +41,9 @@ static        float        xa, xb, ya, yb;
 static        float        xsc, ysc;
 int32_t        tkplot(float, float, int32_t, int32_t);
 //-------------------------------------------------------------------------
-int32_t lux_contour(int32_t narg, int32_t ps[]) /* contour routine */                
+
+
+int32_t lux_contour(ArgumentCount narg, int32_t ps[]) /* contour routine */
 // call is CONTOUR, image, nlev, xa, xb, ya, yb
 {
   Array        *h;

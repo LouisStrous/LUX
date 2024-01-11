@@ -155,7 +155,7 @@ static void rdct_spike(int16_t *start, int32_t ystride, float *ws)
 #define ALN2I 1.442695022
 #define TINY 1.0e-5
 int32_t        despike_count = 0, cell_smooth_type = 1;
-int32_t lux_despike(int32_t narg, int32_t ps[])
+int32_t lux_despike(ArgumentCount narg, int32_t ps[])
 // despike function RAS
 // the call is x = despike(array, [frac, level, niter, cell_flag, rms])
 {
@@ -512,7 +512,7 @@ int32_t lux_despike(int32_t narg, int32_t ps[])
  return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_reorder(int32_t narg, int32_t ps[])// reorder function
+int32_t lux_reorder(ArgumentCount narg, int32_t ps[])// reorder function
 /* the call is x = reorder(array, order)
    where array must be a 2-D array, returns the re-ordered result */
 /* reordering is reversals and transposes of a 2-D array, there are

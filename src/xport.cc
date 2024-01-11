@@ -245,7 +245,7 @@ void xsynchronize(int32_t status)
   printf("X synchronization %sset.\n", status? "": "re");
 }
  //--------------------------------------------------------------------------
-int32_t lux_show_visuals(int32_t narg, int32_t ps[])
+int32_t lux_show_visuals(ArgumentCount narg, int32_t ps[])
 {
   XVisualInfo        *vInfo, vTemplate;
   extern char        *visualNames[];
@@ -289,7 +289,7 @@ int32_t lux_show_visuals(int32_t narg, int32_t ps[])
   return 1;
 }
 //--------------------------------------------------------------------------
-int32_t lux_xclose(int32_t narg, int32_t ps[])
+int32_t lux_xclose(ArgumentCount narg, int32_t ps[])
 // close connection to window manager: close and destroy all windows,
 // pixmaps, color maps, etc.  LS 30jul96
 {
@@ -347,7 +347,7 @@ int32_t ck_area(int32_t wid, int32_t *xpos, int32_t *ypos, int32_t *width, int32
  return 1;
 }
  //--------------------------------------------------------------------------
-int32_t lux_xtvlct(int32_t narg, int32_t ps[])
+int32_t lux_xtvlct(ArgumentCount narg, int32_t ps[])
 // load color table, scaling to available range
 // expect 3 arrays for RGB
 {
@@ -370,7 +370,7 @@ int32_t lux_xtvlct(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //--------------------------------------------------------------------------
-int32_t lux_xopen(int32_t narg, int32_t ps[])
+int32_t lux_xopen(ArgumentCount narg, int32_t ps[])
 // sets or changes the display name for x setup and/or sets or changes the
 // color map default.  LS 30jul96
 {
@@ -409,7 +409,7 @@ int32_t lux_xopen(int32_t narg, int32_t ps[])
   return setup_x();
 }
 //--------------------------------------------------------------------------
-int32_t lux_xexist(int32_t narg, int32_t ps[])// return 1 if window exists
+int32_t lux_xexist(ArgumentCount narg, int32_t ps[])// return 1 if window exists
  // argument is port #
 {
   int32_t     wid;
@@ -427,7 +427,7 @@ int32_t lux_xexist(int32_t narg, int32_t ps[])// return 1 if window exists
   return LUX_ZERO;
 }
 //--------------------------------------------------------------------------
-int32_t lux_xport(int32_t narg, int32_t ps[])        // open a window or pixmap
+int32_t lux_xport(ArgumentCount narg, int32_t ps[])        // open a window or pixmap
  // arguments are port #, width , height (default is 512x512)
  // position x, y, window title (<128 chars), icon title (<16 chars)
  /* might be nice to have some commands to change things like the background
@@ -782,7 +782,7 @@ int32_t lux_xcreat(int32_t wid, uint32_t height, uint32_t width, int32_t xpos,
  return 1;
 }
 //--------------------------------------------------------------------------
-int32_t lux_xsetinputs(int32_t narg, int32_t ps[])                // set the input mask
+int32_t lux_xsetinputs(ArgumentCount narg, int32_t ps[])                // set the input mask
 {
   int32_t        wid;
 
@@ -796,7 +796,7 @@ int32_t lux_xsetinputs(int32_t narg, int32_t ps[])                // set the inp
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_xcursor(int32_t narg, int32_t ps[]) // set the cursor
+int32_t lux_xcursor(ArgumentCount narg, int32_t ps[]) // set the cursor
 {
   int32_t    wid, iq;
   Cursor cursor;
@@ -836,7 +836,7 @@ int32_t lux_xcursor(int32_t narg, int32_t ps[]) // set the cursor
   return LUX_OK;
 }
 //--------------------------------------------------------------------------
-int32_t lux_xsetbackground(int32_t narg, int32_t ps[])// set the background color
+int32_t lux_xsetbackground(ArgumentCount narg, int32_t ps[])// set the background color
  // setbackground [, win#] , color
 // made first argument optional.  Also check that window/pixmap
 // really exists before attempting to change its background color
@@ -894,7 +894,7 @@ int32_t lux_xsetbackground(int32_t narg, int32_t ps[])// set the background colo
   return luxerror("error in foreground color", 0);
 }
 //--------------------------------------------------------------------------
-int32_t lux_xsetforeground(int32_t narg, int32_t ps[])// set the foreground color
+int32_t lux_xsetforeground(ArgumentCount narg, int32_t ps[])// set the foreground color
  // setforeground [, win#] , color
 // made first argument optional.  Also check that window/pixmap
 // really exists before attempting to change its foreground color
@@ -950,7 +950,7 @@ int32_t lux_xsetforeground(int32_t narg, int32_t ps[])// set the foreground colo
   return luxerror("error in foreground color", 0);
 }
 //--------------------------------------------------------------------------
-int32_t lux_xdelete(int32_t narg, int32_t ps[]) // delete a window or a pixmap
+int32_t lux_xdelete(ArgumentCount narg, int32_t ps[]) // delete a window or a pixmap
 {
   int32_t    wid;
 
@@ -969,7 +969,7 @@ int32_t lux_xdelete(int32_t narg, int32_t ps[]) // delete a window or a pixmap
   return 1;
  }
  //--------------------------------------------------------------------------
-int32_t lux_xerase(int32_t narg, int32_t ps[])
+int32_t lux_xerase(ArgumentCount narg, int32_t ps[])
      // erase a window
      // pixmap support added.  LS 8oct97
 {
@@ -1063,7 +1063,7 @@ int32_t lux_xerase(int32_t narg, int32_t ps[])
  return 1;
 }
  //------------------------------------------------------------------------
-int32_t lux_xsetaction(int32_t narg, int32_t ps[])
+int32_t lux_xsetaction(ArgumentCount narg, int32_t ps[])
 /* This routine associates a certain copy action with a window.
    Codes 1 and 2 select sprite action.  A sprite disappears
    without a trace if drawn for a second time.  LS 14apr93 */
@@ -1106,7 +1106,7 @@ int32_t reverseYImage(int32_t iq)
   return lux_reverse(2, ps);
 }
 //------------------------------------------------------------------------
-int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
+int32_t lux_xtv_general(ArgumentCount narg, int32_t ps[], int32_t mode)
 {
   Pointer        data;
   int32_t        type, nx, ny, wid;
@@ -1169,7 +1169,7 @@ int32_t lux_xtv_general(int32_t narg, int32_t ps[], int32_t mode)
                mode, 0.0, 0.0, NULL, NULL);
 }
 //------------------------------------------------------------------------
-int32_t lux_xtvraw(int32_t narg, int32_t ps[])
+int32_t lux_xtvraw(ArgumentCount narg, int32_t ps[])
 // scales non-LUX_INT8 arrays; displays on screen
 /* NOTE: in older versions of LUX the coordinates of the image were
  counted from the upper left-hand corner of the screen, and the
@@ -3324,7 +3324,7 @@ int32_t tvraw(Pointer data, int32_t type, int32_t nx, int32_t ny, float x1, floa
   return iq;
 }
  //------------------------------------------------------------------------
-int32_t lux_colorpixel(int32_t narg, int32_t ps[])
+int32_t lux_colorpixel(ArgumentCount narg, int32_t ps[])
 // maps color indices to pixel values
 {
   Pointer        p, q;
@@ -3587,21 +3587,21 @@ int32_t lux_colorpixel(int32_t narg, int32_t ps[])
   return iq;
 }
  //------------------------------------------------------------------------
-int32_t lux_xtv(int32_t narg, int32_t ps[])
+int32_t lux_xtv(ArgumentCount narg, int32_t ps[])
 /* displays an image, properly colored for the current color map, on screen.
    LS 18jan94 */
 {
   return lux_xtv_general(narg, ps, (narg && symbol_type(ps[0]) == LUX_INT8)? TV_MAP: 0);
 }
  //------------------------------------------------------------------------
-int32_t lux_xtvmap(int32_t narg, int32_t ps[])
+int32_t lux_xtvmap(ArgumentCount narg, int32_t ps[])
 /* displays an image of color indices, mapped to proper pixel values,
   on screen.  LS 18jan94 */
 {
   return lux_xtv_general(narg, ps, TV_MAP);
 }
  //------------------------------------------------------------------------
-int32_t lux_xcopy(int32_t narg, int32_t ps[])
+int32_t lux_xcopy(ArgumentCount narg, int32_t ps[])
  /* 1/8/92 modified to treat negative numbers as pixmaps and 0 and >0 as
    displayed windows */
  // needs lots of checking which isn't implemented yet
@@ -3644,7 +3644,7 @@ int32_t lux_xcopy(int32_t narg, int32_t ps[])
  return 1;
  }
  //------------------------------------------------------------------------
-int32_t lux_xevent(int32_t narg, int32_t ps[])
+int32_t lux_xevent(ArgumentCount narg, int32_t ps[])
 {
  XEvent  report;
  int32_t     nev, i;
@@ -3698,7 +3698,7 @@ int32_t lux_xevent(int32_t narg, int32_t ps[])
  return 1;
  }
  //------------------------------------------------------------------------
-int32_t lux_xpurge(int32_t narg, int32_t ps[]) // just throw away any pending X events
+int32_t lux_xpurge(ArgumentCount narg, int32_t ps[]) // just throw away any pending X events
  {
  XEvent  report;
  int32_t     nev, i;
@@ -3711,7 +3711,7 @@ int32_t lux_xpurge(int32_t narg, int32_t ps[]) // just throw away any pending X 
  return 1;
  }
  //------------------------------------------------------------------------
-int32_t lux_xplace(int32_t narg, int32_t ps[])
+int32_t lux_xplace(ArgumentCount narg, int32_t ps[])
  /* response to a key or button press in an lux window and note the
  time and position */
 {
@@ -3810,7 +3810,7 @@ int32_t xwindow_plot(int32_t ix, int32_t iy, int32_t mode)
  return 1;
 }
  //------------------------------------------------------------------------
-int32_t lux_xflush(int32_t narg, int32_t ps[])
+int32_t lux_xflush(ArgumentCount narg, int32_t ps[])
  {
  XFlush(display);       return 1;
  }
@@ -3849,7 +3849,7 @@ int32_t lux_xpen(int32_t pen, float gray)
  return 1;
 }
  //------------------------------------------------------------------------
-int32_t lux_xfont(int32_t narg, int32_t ps[])
+int32_t lux_xfont(ArgumentCount narg, int32_t ps[])
                                         // set font for a window
  {
  int32_t      wid, iq;
@@ -3869,7 +3869,7 @@ int32_t lux_xfont(int32_t narg, int32_t ps[])
  return 1;
  }
  //------------------------------------------------------------------------
-int32_t lux_xlabel(int32_t narg, int32_t ps[])
+int32_t lux_xlabel(ArgumentCount narg, int32_t ps[])
                                         // user labels
  {
  int32_t     wid, iq, ix, iy, len;
@@ -3890,7 +3890,7 @@ int32_t lux_xlabel(int32_t narg, int32_t ps[])
  return 1;
  }
  //------------------------------------------------------------------------
-int32_t lux_xlabelwidth(int32_t narg, int32_t ps[])
+int32_t lux_xlabelwidth(ArgumentCount narg, int32_t ps[])
                                         // user label width
  {
  int32_t     wid, iq, len, result_sym;
@@ -3930,7 +3930,7 @@ int32_t xlabelwidth(char const* s)
  return  XTextWidth(font_info[wid], s, len );
  }
  //------------------------------------------------------------------------
-int32_t lux_xtvread(int32_t narg, int32_t ps[])
+int32_t lux_xtvread(ArgumentCount narg, int32_t ps[])
 {
  // read from an X window or pixmap and create a uint8_t array
   int32_t  nx, ny, ix, iy, wid, result_sym, dim[2], w, hh;
@@ -4005,8 +4005,8 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
  XDestroyImage(xi);
  XFlush(display);
  if (internalMode & 1) {
-   int32_t lux_colorstogrey(int32_t narg, int32_t ps[]);
-   int32_t lux_delete(int32_t narg, int32_t ps[]);
+   int32_t lux_colorstogrey(ArgumentCount narg, int32_t ps[]);
+   int32_t lux_delete(ArgumentCount narg, int32_t ps[]);
    if (lux_colorstogrey(1, &result_sym) != LUX_OK) {
      lux_delete(1, &result_sym);
      return LUX_ERROR;
@@ -4015,7 +4015,7 @@ int32_t lux_xtvread(int32_t narg, int32_t ps[])
  return reverseYImage(result_sym);
 }
 //------------------------------------------------------------------------
-int32_t lux_xquery(int32_t narg, int32_t ps[])
+int32_t lux_xquery(ArgumentCount narg, int32_t ps[])
 {
   int32_t        xquery(int32_t, int32_t []);
 
@@ -4023,7 +4023,7 @@ int32_t lux_xquery(int32_t narg, int32_t ps[])
   return 1;
 }
  //------------------------------------------------------------------------
-int32_t lux_xquery_f(int32_t narg, int32_t ps[])
+int32_t lux_xquery_f(ArgumentCount narg, int32_t ps[])
 {
  int32_t        result;
  int32_t        xquery(int32_t, int32_t []);
@@ -4033,7 +4033,7 @@ int32_t lux_xquery_f(int32_t narg, int32_t ps[])
  return result;
 }
 //------------------------------------------------------------------------
-int32_t xquery(int32_t narg, int32_t ps[])
+int32_t xquery(ArgumentCount narg, int32_t ps[])
 // note time and position of mouse
 {
   int32_t        wid;
@@ -4065,7 +4065,7 @@ Bool windowButtonPress(Display *display, XEvent *event, XPointer arg)
   return False;
 }
 //------------------------------------------------------------------------
-int32_t lux_check_window(int32_t narg, int32_t ps[])
+int32_t lux_check_window(ArgumentCount narg, int32_t ps[])
      // checks event buffer for any pending window selections
 {
   int32_t        num, w, i;
@@ -4087,7 +4087,7 @@ int32_t lux_check_window(int32_t narg, int32_t ps[])
   return 4;
 }
 //------------------------------------------------------------------------
-int32_t lux_xraise(int32_t narg, int32_t ps[]) // raise (popup) a window
+int32_t lux_xraise(ArgumentCount narg, int32_t ps[]) // raise (popup) a window
 {
   int32_t    wid;
 
@@ -4103,7 +4103,7 @@ int32_t lux_xraise(int32_t narg, int32_t ps[]) // raise (popup) a window
   return 1;
 }
 //------------------------------------------------------------------------
-int32_t lux_xanimate(int32_t narg, int32_t ps[])
+int32_t lux_xanimate(ArgumentCount narg, int32_t ps[])
 // XANIMATE,data [, x, y, FR1=fr1, FR2=fr2, FRSTEP=frstep] [, /TIME,
 // /REPEAT]
 {
@@ -4182,7 +4182,7 @@ int32_t lux_xanimate(int32_t narg, int32_t ps[])
   return 1;
 }
 //---------------------------------------------------------
-int32_t lux_xzoom(int32_t narg, int32_t ps[])
+int32_t lux_xzoom(ArgumentCount narg, int32_t ps[])
 // ZOOM,image [,x,y,window]
 {
   XEvent        event;
@@ -4249,7 +4249,7 @@ int32_t lux_xzoom(int32_t narg, int32_t ps[])
 }
 //---------------------------------------------------------
 int32_t tvplanezoom = 1;
-int32_t lux_xtvplane(int32_t narg, int32_t ps[])
+int32_t lux_xtvplane(ArgumentCount narg, int32_t ps[])
  // use negative zoom factors for compression, not real fast
  // 9/21/96 allow 2-D arrays also but verify that plane is 0
  /* tvplane, cube, in, ix,iy, window
@@ -4418,7 +4418,7 @@ int32_t lux_xtvplane(int32_t narg, int32_t ps[])
   return 1;
 }
 //---------------------------------------------------------
-int32_t lux_threecolors(int32_t narg, int32_t ps[])
+int32_t lux_threecolors(ArgumentCount narg, int32_t ps[])
 // installs color table with three domains
 // THREECOLORS,arg
 /* the color table consists of a grey domain, a red domain, and a blue
@@ -4449,7 +4449,7 @@ int32_t lux_threecolors(int32_t narg, int32_t ps[])
   return threecolors(list, 9);
 }
 //---------------------------------------------------------
-int32_t lux_tv3(int32_t narg, int32_t ps[])
+int32_t lux_tv3(ArgumentCount narg, int32_t ps[])
 // TV3,<image>[,<bitmap1>,<bitmap2>]
 {
   int32_t        iq, nx, ny, mode, i, wid;
@@ -4533,7 +4533,7 @@ int32_t lux_tv3(int32_t narg, int32_t ps[])
 }
 //---------------------------------------------------------
 int32_t invert_flag = 0;
-int32_t lux_xdrawline(int32_t narg, int32_t ps[])
+int32_t lux_xdrawline(ArgumentCount narg, int32_t ps[])
 /* subroutine, call is xdrawline, x1, y1, x2, y2 where the arguments can
    be scalars or arrays but all must match in length */
 // used for X window drawing with lower overhead than xymov calls
@@ -4634,7 +4634,7 @@ int32_t lux_xdrawline(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //---------------------------------------------------------
-int32_t lux_xinvertline(int32_t narg, int32_t ps[])
+int32_t lux_xinvertline(ArgumentCount narg, int32_t ps[])
 // used for X window drawing with lower overhead than xymov calls
 // better for interactive graphics
 {
@@ -4646,7 +4646,7 @@ int32_t lux_xinvertline(int32_t narg, int32_t ps[])
   return iq;
 }
 //------------------------------------------------------------------------
-int32_t lux_xinvertarc(int32_t narg, int32_t ps[])
+int32_t lux_xinvertarc(ArgumentCount narg, int32_t ps[])
 {
   int32_t        iq;
   int32_t        lux_xdrawarc(int32_t, int32_t []);
@@ -4657,7 +4657,7 @@ int32_t lux_xinvertarc(int32_t narg, int32_t ps[])
   return iq;
 }
 //------------------------------------------------------------------------
-int32_t lux_xdrawarc(int32_t narg, int32_t ps[])
+int32_t lux_xdrawarc(ArgumentCount narg, int32_t ps[])
 // subroutine, call is xdrawarc, x1, y1, w, h, [a1, a2, win]
 {
   int32_t     wid, ixs, iys, w, h, xa1, xa2;

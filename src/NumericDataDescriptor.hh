@@ -31,7 +31,7 @@ class NumericDataDescriptor
 public:
   // types
 
-  typedef std::vector<DimensionSize_tp> DimensionsCollection;
+  typedef std::vector<Dimension> DimensionsCollection;
 
   // constructors
 
@@ -56,7 +56,7 @@ public:
   ///
   /// \returns the size of the requested dimension, or 0 if the
   /// dimension does not exist.
-  DimensionSize_tp
+  Dimension
   dimension(int index) const;
 
   /// Returns the count of dimensions.

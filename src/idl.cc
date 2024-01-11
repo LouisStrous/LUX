@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include "action.hh"
 
-int32_t lux_idlrestore(int32_t narg, int32_t ps[])
+int32_t lux_idlrestore(ArgumentCount narg, int32_t ps[])
 /* IDLRESTORE,<filename> restores all variables from the IDL Save file
    with name <filename>.  Supports scalars, strings, and numerical arrays
    LS 18sep98 */
@@ -228,7 +228,7 @@ int32_t lux_idlrestore(int32_t narg, int32_t ps[])
   } while (1);
 }
 //-----------------------------------------------------------------------
-int32_t lux_idlread_f(int32_t narg, int32_t ps[])
+int32_t lux_idlread_f(ArgumentCount narg, int32_t ps[])
 /* IDLREAD(<var>, <filename>) restores the first variable from the IDL
    Save file with name <filename> into <var>.  Supports scalars, strings,
    and numerical arrays.  Returns LUX_ONE on success, LUX_ZERO on failure.

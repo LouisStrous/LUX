@@ -91,7 +91,7 @@ float        zoom_xc = 0.0, zoom_yc = 0.0, zoom_mag = 0.0;
 double        zoom_clo = 0.0, zoom_chi = 0.0;
 int32_t        zoom_frame = 0;
 
-int32_t lux_zoom(int32_t narg, int32_t ps[])
+int32_t lux_zoom(ArgumentCount narg, int32_t ps[])
 // ZOOM,image[,bitmap]
 {
   extern int32_t        menu_setup_done, last_wid, threeColors;
@@ -957,7 +957,7 @@ int32_t lux_zoom(int32_t narg, int32_t ps[])
   } while (1);
 }
 //--------------------------------------------------------------------------
-int32_t tvzoom(int32_t narg, int32_t ps[])
+int32_t tvzoom(ArgumentCount narg, int32_t ps[])
 {
   int32_t        *dims, ndim, axes[2] = {0, 1}, sdims[3], nx, ny, wid;
   int32_t        coords[4], offset, sx, sy, i, stride, step[2];

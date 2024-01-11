@@ -197,7 +197,7 @@ BIND(iauC2txy, v_dT8dp33_iaiqT4rp3p3q_0zzz1T5, f, c2txy, 5, 5, 0, HAVE_LIBSOFA_C
    dimension (year, month, day).  Unexpected results may be given if
    illegal year, month, or day numbers are specified.  Dates before
    -4799-01-01 or after 1465073-02-28 are rejected. */
-int32_t lux_iauCal2jd(int32_t narg, int32_t ps[])
+int32_t lux_iauCal2jd(ArgumentCount narg, int32_t ps[])
 {
   double djm0, djm;
   Pointer *ptrs;
@@ -264,7 +264,7 @@ REGISTER(iauCal2jd, f, cal2jd, 1, 1, 0, HAVE_LIBSOFA_C);
 //-----------------------------------------------------------------------
 /* dat(date) returns delta(AT) = TAI - UTC for the given UTC date
    ([year, month, day]) */
-int32_t lux_iauDat(int32_t narg, int32_t ps[])
+int32_t lux_iauDat(ArgumentCount narg, int32_t ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -415,7 +415,7 @@ BIND(iauEpb, d_dd_iarq_0z_1, f, epb, 1, 1, 0, HAVE_LIBSOFA_C)
 
    Returns the Julian Date corresponding to Besselian epoch <bepoch>
    (e.g., 1957.3). */
-int32_t lux_iauEpb2jd(int32_t narg, int32_t ps[])
+int32_t lux_iauEpb2jd(ArgumentCount narg, int32_t ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -442,7 +442,7 @@ BIND(iauEpj, d_dd_iarq_0z_1, f, epj, 1, 1, 0, HAVE_LIBSOFA_C)
 
    Returns the Julian Date corresponding to Julian epoch <bepoch>
    (e.g., 1957.3). */
-int32_t lux_iauEpj2jd(int32_t narg, int32_t ps[])
+int32_t lux_iauEpj2jd(ArgumentCount narg, int32_t ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;

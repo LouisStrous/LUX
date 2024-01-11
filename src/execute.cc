@@ -2344,7 +2344,7 @@ int32_t execute(int32_t symbol)
   return n;
 }
 //------------------------------------------------------------------
-int32_t lux_execute(int32_t narg, int32_t ps[])
+int32_t lux_execute(ArgumentCount narg, int32_t ps[])
 // execute a string as if it were typed at the keyboard
 // or execute the symbol indicated by number
 // keyword /MAIN (1) has the execution take place at the main level
@@ -2390,7 +2390,7 @@ int32_t compileString(char *string)
 #define INNER   1
 #define OUTER   2
 
-int32_t insert(int32_t narg, int32_t ps[])
+int32_t insert(ArgumentCount narg, int32_t ps[])
 // an insertion statement with subscripted target
 /* ps[0]..ps[narg-3]: subscripts; ps[narg - 2]: source;
    ps[narg - 1]: target */
@@ -5248,7 +5248,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
   return iq;
 }
 //------------------------------------------------------------------
-int32_t lux_test(int32_t narg, int32_t ps[])
+int32_t lux_test(ArgumentCount narg, int32_t ps[])
 // a test function
 {
   int32_t       n, value, *edge, i, *offset;

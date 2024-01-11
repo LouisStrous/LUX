@@ -604,7 +604,7 @@ standard_args_final_symboltype(Symboltype actual, Symboltype limit,
 /// symbol type is requested, or #LUX_NO_SYMBOLTYPE if there aren't any.
 static Symboltype
 standard_args_common_symboltype(const Param_spec_list& param_specs,
-                                int32_t narg, int32_t ps[])
+                                ArgumentCount narg, int32_t ps[])
 {
   Symboltype common_type = LUX_NO_SYMBOLTYPE;
 
@@ -633,7 +633,7 @@ StandardArguments::StandardArguments()
   : m_return_symbol()
 { }
 
-StandardArguments::StandardArguments(int32_t narg, int32_t ps[],
+StandardArguments::StandardArguments(ArgumentCount narg, int32_t ps[],
                                      const std::string& fmt,
                                      Pointer** ptrs, LoopInfo** infos)
 {
@@ -663,7 +663,7 @@ StandardArguments::StandardArguments(int32_t narg, int32_t ps[],
 /// \returns the configured return symbol.  For a LUX subroutine this is
 /// LUX_ONE.
 Symbol
-StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
+StandardArguments::set(ArgumentCount narg, int32_t ps[], const std::string& fmt,
                        Pointer** ptrs, LoopInfo** infos)
 {
   int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
@@ -711,7 +711,7 @@ StandardArguments::set(int32_t narg, int32_t ps[], const std::string& fmt,
     int32_t ref_dims_ix;   /* reference dimension index */
     int32_t src_dims_ix;   /* input dimension index */
     int32_t iq, d;
-    std::vector<DimensionSize_tp> tgt_dims;
+    std::vector<Dimension> tgt_dims;
 
     NumericDataDescriptor srcDescr;
 

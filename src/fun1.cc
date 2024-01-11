@@ -137,7 +137,7 @@ int32_t defined(int32_t symbol, int32_t argument)
           || symbol_class(target) == LUX_UNDEFINED)? 0: 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_defined(int32_t narg, int32_t ps[])
+int32_t lux_defined(ArgumentCount narg, int32_t ps[])
 // DEFINED(x) returns 0 if <x> is itself, or is linked through LUX_TRANSFERs
 // with, a class of LUX_UNUSED or LUX_UNDEFINED.  DEFINED(x,/TARGET) returns 0
 // if it is itself, or is linked through LUX_POINTERs with, a class of
@@ -151,7 +151,7 @@ int32_t lux_defined(int32_t narg, int32_t ps[])
   return defined(*ps, internalMode)? LUX_ONE: LUX_ZERO;
 }
 //-------------------------------------------------------------------------
-int32_t lux_delete(int32_t narg, int32_t ps[])
+int32_t lux_delete(ArgumentCount narg, int32_t ps[])
 // deletes symbols (deallocates memory & makes undefined)
 {
   int32_t   i, iq;
@@ -173,7 +173,7 @@ int32_t lux_delete(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_quit(int32_t narg, int32_t ps[])
+int32_t lux_quit(ArgumentCount narg, int32_t ps[])
 //exit routine, calls are exit,status or quit,status
 {
  int32_t        iq, saveHistory(void);
@@ -208,7 +208,7 @@ int32_t lux_cputime(int32_t n, int32_t ps[])
   return i;
 }
 //-------------------------------------------------------------------------
-int32_t lux_systime(int32_t narg, int32_t ps[])
+int32_t lux_systime(ArgumentCount narg, int32_t ps[])
      // returns the system time in LUX_DOUBLE seconds
 {
   int32_t     i;
@@ -222,7 +222,7 @@ int32_t lux_systime(int32_t narg, int32_t ps[])
   return LUX_ZERO;              // return 0 if not available
 }
 //-------------------------------------------------------------------------
-int32_t lux_ctime(int32_t narg, int32_t ps[])
+int32_t lux_ctime(ArgumentCount narg, int32_t ps[])
      // returns current time and date in a string
 {
   int32_t       i;
@@ -234,7 +234,7 @@ int32_t lux_ctime(int32_t narg, int32_t ps[])
   return i;
 }
 //-------------------------------------------------------------------------
-int32_t lux_time(int32_t narg, int32_t ps[])
+int32_t lux_time(ArgumentCount narg, int32_t ps[])
      // returns current time in a string
      // added \0 to result string  LS 22may94
 {
@@ -250,7 +250,7 @@ int32_t lux_time(int32_t narg, int32_t ps[])
   return i;
 }
 //-------------------------------------------------------------------------
-int32_t lux_date(int32_t narg, int32_t ps[])
+int32_t lux_date(ArgumentCount narg, int32_t ps[])
      // returns current date in a string
 {
   int32_t       i;
@@ -268,7 +268,7 @@ int32_t lux_date(int32_t narg, int32_t ps[])
   return i;
 }
 //-------------------------------------------------------------------------
-int32_t lux_jd(int32_t narg, int32_t ps[])
+int32_t lux_jd(ArgumentCount narg, int32_t ps[])
 // returns current Julian Day (relative to UTC) in double precision
 {
   time_t        t;
@@ -291,7 +291,7 @@ int32_t lux_jd(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_cjd(int32_t narg, int32_t ps[])
+int32_t lux_cjd(ArgumentCount narg, int32_t ps[])
 /* returns current Chronological Julian Day, relative to the current
    time zone */
 {
@@ -302,7 +302,7 @@ int32_t lux_cjd(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_show(int32_t narg, int32_t ps[])
+int32_t lux_show(ArgumentCount narg, int32_t ps[])
 //show some info about symbols by number or subname
 {
   int32_t       iq, i;
@@ -482,7 +482,7 @@ int32_t lux_dump_one(int32_t iq, int32_t full)
   return 0;
 }
 //-------------------------------------------------------------------------
-int32_t lux_dump(int32_t narg, int32_t ps[])
+int32_t lux_dump(ArgumentCount narg, int32_t ps[])
 // show some info about symbols in list
 // internalMode:  1 fixed, 2 system, 4 zero, 8 local, 16 context
 /* 1 -> all fixed numbers (#s < nFixed)
@@ -535,7 +535,7 @@ int32_t lux_dump(int32_t narg, int32_t ps[])
   return 1;
 }                                                       //end of lux_dump
 //-------------------------------------------------------------------------
-int32_t lux_zero(int32_t narg, int32_t ps[])
+int32_t lux_zero(ArgumentCount narg, int32_t ps[])
 // subroutine version,  LUX_ZERO, x, [y ...] zero symbols in list
 {
   int32_t       i, iq, mq, n;
@@ -671,7 +671,7 @@ int32_t lux_zero(int32_t narg, int32_t ps[])
   return 1;
 }                                                       //end of lux_type
 //-------------------------------------------------------------------------
-int32_t lux_onef(int32_t narg, int32_t ps[])
+int32_t lux_onef(ArgumentCount narg, int32_t ps[])
 // ONE(x) returns copy of numerical <x> with all elements equal to 1
 // LS 7apr98
 {
@@ -739,7 +739,7 @@ int32_t lux_onef(int32_t narg, int32_t ps[])
   return iq;
 }
 //-------------------------------------------------------------------------
-int32_t lux_one(int32_t narg, int32_t ps[])
+int32_t lux_one(ArgumentCount narg, int32_t ps[])
 // replaces all values in numerical array ps[0] by ones.
 // LS 7apr98
 {
@@ -814,7 +814,7 @@ int32_t lux_one(int32_t narg, int32_t ps[])
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_zerof(int32_t narg, int32_t ps[])
+int32_t lux_zerof(ArgumentCount narg, int32_t ps[])
 /* function version,  x = LUX_ZERO(y)
    create array x of same type and size as y and set all elements to zero
 
@@ -882,7 +882,7 @@ int32_t lux_zerof(int32_t narg, int32_t ps[])
 // returns a copy of <x> with all elements for which the <mask> is
 // non-zero set equal to NaN.  If <x> is of an integer type, then the
 // copy is promoted to type FLOAT.
-int32_t lux_setnan(int32_t narg, int32_t ps[])
+int32_t lux_setnan(ArgumentCount narg, int32_t ps[])
 {
   int32_t iq;
   Pointer* data;
@@ -953,7 +953,7 @@ int32_t lux_setnan(int32_t narg, int32_t ps[])
 }
 REGISTER(setnan, f, setnan, 1, 2, NULL);
 //-------------------------------------------------------------------------
-int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
+int32_t indgen(ArgumentCount narg, int32_t ps[], int32_t isFunc)
 /* fills array elements with their element index or with the value of
  one of their coordinates */
 /* if called as function: INDGEN(<tgt> [, <axis>])
@@ -1024,18 +1024,18 @@ int32_t indgen(int32_t narg, int32_t ps[], int32_t isFunc)
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_indgen(int32_t narg, int32_t ps[])
+int32_t lux_indgen(ArgumentCount narg, int32_t ps[])
 {
   return indgen(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_indgen_s(int32_t narg, int32_t ps[])
+int32_t lux_indgen_s(ArgumentCount narg, int32_t ps[])
 {
   return indgen(narg, ps, 0);
 }
 REGISTER(indgen_s, s, indgen, 1, 2, "*");
 //-------------------------------------------------------------------------
-int32_t lux_neg_func(int32_t narg, int32_t ps[])
+int32_t lux_neg_func(ArgumentCount narg, int32_t ps[])
      //take the negative of something
 {
   int32_t       n, result;
@@ -1088,7 +1088,7 @@ int32_t lux_neg_func(int32_t narg, int32_t ps[])
   return result;
 } // end of lux_neg_func
 //-------------------------------------------------------------------------
-int32_t lux_isnan(int32_t narg, int32_t ps[])
+int32_t lux_isnan(ArgumentCount narg, int32_t ps[])
      // returns 1 if the argument is not a number (NaN).  Only works
      // if IEEE function isnan is available.  LS 28jun97
 {
@@ -1158,7 +1158,7 @@ int32_t lux_isnan(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
+int32_t zapnan(ArgumentCount narg, int32_t ps[], int32_t func)
 // ZERONANS,value=<value>, <arg1>, <arg2>, ...
 // ZERONANS(value=<value>, <arg1>)
 // replaces NaNs in numerical <arg1> &c with <value> (if defined), or
@@ -1241,21 +1241,21 @@ int32_t zapnan(int32_t narg, int32_t ps[], int32_t func)
   return func? result: LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_zapnan(int32_t narg, int32_t ps[])
+int32_t lux_zapnan(ArgumentCount narg, int32_t ps[])
 // ZAPNAN,value=<value>, <x1>, <x2>, ... replaces NaNs in the <x>s with the
 // scalar <value>, which defaults to zero.  LS 8jun98 27apr99
 {
   return zapnan(narg, ps, 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_zapnan_f(int32_t narg, int32_t ps[])
+int32_t lux_zapnan_f(ArgumentCount narg, int32_t ps[])
 // ZAPNAN(value=<value>, <x>) returns a copy of <x> with all NaNs replaced
 // by the scalar <value> which defaults to zero.  LS 8jun98 27apr99
 {
   return zapnan(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_abs(int32_t narg, int32_t ps[])
+int32_t lux_abs(ArgumentCount narg, int32_t ps[])
 //take the absolute value of something
 {
   int32_t       n, result, iq;
@@ -1356,7 +1356,7 @@ int32_t lux_abs(int32_t narg, int32_t ps[])
   return result;
 }                                               //end of lux_abs
 //-------------------------------------------------------------------------
-int32_t lux_complexsquare(int32_t narg, int32_t ps[])
+int32_t lux_complexsquare(ArgumentCount narg, int32_t ps[])
 /* returns the complex square of argument <x>, i.e., the product of
    <x> and its complex conjugate; if <x> is not complex, then assumes
    that it came from a call to the FFT function with real argument,
@@ -1484,7 +1484,7 @@ int32_t lux_complexsquare(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_conjugate(int32_t narg, int32_t ps[])
+int32_t lux_conjugate(ArgumentCount narg, int32_t ps[])
 // returns the complex conjugate of numerical symbols
 // LS 31jul98
 {
@@ -1537,7 +1537,7 @@ int32_t lux_conjugate(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t index_total(int32_t narg, int32_t ps[], int32_t mean)
+int32_t index_total(ArgumentCount narg, int32_t ps[], int32_t mean)
 // accumulates source values by class
 {
   int32_t       type, offset, *indx, i, size, result, nElem, indices2,
@@ -3979,7 +3979,7 @@ private:
   ScalarTransform<IntermediateType>& m_transform;
 };
 
-int32_t total(int32_t narg, int32_t ps[], bool mean)
+int32_t total(ArgumentCount narg, int32_t ps[], bool mean)
 // TOTAL(x, [ mode, POWER=p, WEIGHTS=w, /KEEPDIMS, /FLOAT, /DOUBLE])
 
 // TOTAL(array) sums all elements of <array> and returns a LUX_SCALAR.
@@ -5354,12 +5354,12 @@ int32_t total(int32_t narg, int32_t ps[], bool mean)
 }
 #undef DEBUG_VOCAL
 //-------------------------------------------------------------------------
-int32_t lux_total(int32_t narg, int32_t ps[])
+int32_t lux_total(ArgumentCount narg, int32_t ps[])
  {
    return total(narg, ps, 0);
  }
 //-------------------------------------------------------------------------
-int32_t lux_mean(int32_t narg, int32_t ps[])
+int32_t lux_mean(ArgumentCount narg, int32_t ps[])
  {
    return total(narg, ps, 1);
  }
@@ -5508,166 +5508,166 @@ DoubleComplex c_exp(double real, double imaginary)
 /*math functions with 1 argument, all just call math_funcs with approiate
 code, all have names of form lux_xxx... */
 //-------------------------------------------------------------------------
-int32_t lux_sin(int32_t narg, int32_t ps[])
+int32_t lux_sin(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SIN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_cos(int32_t narg, int32_t ps[])
+int32_t lux_cos(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_COS);
 }
 //-------------------------------------------------------------------------
-int32_t lux_tan(int32_t narg, int32_t ps[])
+int32_t lux_tan(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_TAN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_asin(int32_t narg, int32_t ps[])
+int32_t lux_asin(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ASIN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_acos(int32_t narg, int32_t ps[])
+int32_t lux_acos(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ACOS);
 }
 //-------------------------------------------------------------------------
-int32_t lux_atan(int32_t narg, int32_t ps[])
+int32_t lux_atan(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ATAN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_sinh(int32_t narg, int32_t ps[])
+int32_t lux_sinh(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SINH);
 }
 //-------------------------------------------------------------------------
-int32_t lux_cosh(int32_t narg, int32_t ps[])
+int32_t lux_cosh(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_COSH);
 }
 //-------------------------------------------------------------------------
-int32_t lux_tanh(int32_t narg, int32_t ps[])
+int32_t lux_tanh(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_TANH);
 }
 //-------------------------------------------------------------------------
-int32_t lux_asinh(int32_t narg, int32_t ps[])
+int32_t lux_asinh(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ASINH);
 }
 //-------------------------------------------------------------------------
-int32_t lux_acosh(int32_t narg, int32_t ps[])
+int32_t lux_acosh(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ACOSH);
 }
 //-------------------------------------------------------------------------
-int32_t lux_atanh(int32_t narg, int32_t ps[])
+int32_t lux_atanh(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ATANH);
 }
 //-------------------------------------------------------------------------
-int32_t lux_sqrt(int32_t narg, int32_t ps[])
+int32_t lux_sqrt(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_SQRT);
 }
 //-------------------------------------------------------------------------
-int32_t lux_cbrt(int32_t narg, int32_t ps[])
+int32_t lux_cbrt(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_CBRT);
 }
 //-------------------------------------------------------------------------
-int32_t lux_exp(int32_t narg, int32_t ps[])
+int32_t lux_exp(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_EXP);
 }
 //-------------------------------------------------------------------------
-int32_t lux_expm1(int32_t narg, int32_t ps[])
+int32_t lux_expm1(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_EXPM1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_log(int32_t narg, int32_t ps[])
+int32_t lux_log(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG);
 }
 //-------------------------------------------------------------------------
-int32_t lux_log10(int32_t narg, int32_t ps[])
+int32_t lux_log10(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG10);
 }
 //-------------------------------------------------------------------------
-int32_t lux_log1p(int32_t narg, int32_t ps[])
+int32_t lux_log1p(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_LOG1P);
 }
 //-------------------------------------------------------------------------
-int32_t lux_erf(int32_t narg, int32_t ps[])
+int32_t lux_erf(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ERF);
 }
 //-------------------------------------------------------------------------
-int32_t lux_erfc(int32_t narg, int32_t ps[])
+int32_t lux_erfc(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_ERFC);
 }
 //-------------------------------------------------------------------------
-int32_t lux_atan2(int32_t narg, int32_t ps[])
+int32_t lux_atan2(ArgumentCount narg, int32_t ps[])
 //the right way to do atan's, the atan2 function, 2 arguments
 {
   return math_funcs_2f(ps[0], ps[1], F_ATAN2);
 }
 //-------------------------------------------------------------------------
-int32_t lux_j0(int32_t narg, int32_t ps[])
+int32_t lux_j0(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_J0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_j1(int32_t narg, int32_t ps[])
+int32_t lux_j1(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_J1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_jn(int32_t narg, int32_t ps[])
+int32_t lux_jn(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_JN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_y0(int32_t narg, int32_t ps[])
+int32_t lux_y0(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_Y0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_y1(int32_t narg, int32_t ps[])
+int32_t lux_y1(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs(ps[0], F_Y1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_yn(int32_t narg, int32_t ps[])
+int32_t lux_yn(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs_i_f(ps[0], ps[1], F_YN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_pow(int32_t narg, int32_t ps[])
+int32_t lux_pow(ArgumentCount narg, int32_t ps[])
 {
   return math_funcs_2f(ps[0], ps[1], F_POW);
 }
 //-------------------------------------------------------------------------
-int32_t lux_voigt(int32_t narg, int32_t ps[])
+int32_t lux_voigt(ArgumentCount narg, int32_t ps[])
 // the voigt function.  LS
 {
   return math_funcs_2f(ps[0], ps[1], F_VOIGT);
 }
 //-------------------------------------------------------------------------
-int32_t lux_gamma(int32_t narg, int32_t ps[])
+int32_t lux_gamma(ArgumentCount narg, int32_t ps[])
 // returns the gamma function - or the natural logarithm of it (if keyword
 // /LOG is present)  LS 11jan96
 {
   return math_funcs(ps[0], (internalMode & 1)? F_LOGGAMMA: F_GAMMA);
 }
 //-------------------------------------------------------------------------
-int32_t lux_beta(int32_t narg, int32_t ps[])
+int32_t lux_beta(ArgumentCount narg, int32_t ps[])
 // the beta function: beta(x,y) = gamma(x)*gamma(y)/gamma(x+y).
 // Switch /COMPLEMENT returns one minus the beta function.
 // LS 11jan96 22jul96
@@ -5675,74 +5675,74 @@ int32_t lux_beta(int32_t narg, int32_t ps[])
   return math_funcs_2f(ps[0], ps[1], (internalMode & 1)? F_LOGBETA: F_BETA);
 }
 //-------------------------------------------------------------------------
-int32_t lux_incomplete_gamma(int32_t narg, int32_t ps[])
+int32_t lux_incomplete_gamma(ArgumentCount narg, int32_t ps[])
 // the incomplete gamma function P(a,x).  LS 11jan96
 {
   return math_funcs_2f(ps[0], ps[1], F_IGAMMA);
 }
 //-------------------------------------------------------------------------
-int32_t lux_chi_square(int32_t narg, int32_t ps[])
+int32_t lux_chi_square(ArgumentCount narg, int32_t ps[])
 // the chi-square function chi2(chi2, nu).  LS 11jan96 19oct96
 {
   return math_funcs_2f(ps[0], ps[1], F_CHI2);
 }
 //-------------------------------------------------------------------------
-int32_t lux_noncentral_chi_square(int32_t narg, int32_t ps[])
+int32_t lux_noncentral_chi_square(ArgumentCount narg, int32_t ps[])
 // the noncentral chi-squre function ncchi2(chi2, nu, nc)
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_NCCHI2);
 }
 //-------------------------------------------------------------------------
-int32_t lux_bessel_i0(int32_t narg, int32_t ps[])
+int32_t lux_bessel_i0(ArgumentCount narg, int32_t ps[])
 // the modified bessel function I0
 {
   return math_funcs(ps[0], F_I0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_bessel_i1(int32_t narg, int32_t ps[])
+int32_t lux_bessel_i1(ArgumentCount narg, int32_t ps[])
 // the modified bessel function I1
 {
   return math_funcs(ps[0], F_I1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_bessel_k0(int32_t narg, int32_t ps[])
+int32_t lux_bessel_k0(ArgumentCount narg, int32_t ps[])
 // the modified bessel function K0
 {
   return math_funcs(ps[0], F_K0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_bessel_k1(int32_t narg, int32_t ps[])
+int32_t lux_bessel_k1(ArgumentCount narg, int32_t ps[])
 // the modified bessel function K1
 {
   return math_funcs(ps[0], F_K1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_bessel_kn(int32_t narg, int32_t ps[])
+int32_t lux_bessel_kn(ArgumentCount narg, int32_t ps[])
 // the modified bessel function Kn
 {
   return math_funcs_i_f(ps[0], ps[1], F_KN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_sgn(int32_t narg, int32_t ps[])
+int32_t lux_sgn(ArgumentCount narg, int32_t ps[])
 // the signum function: returns +1 if the argument is positive, -1 if
 // negative, and 0 if zero.  LS 19may98
 {
   return math_funcs(ps[0], F_SGN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_incomplete_beta(int32_t narg, int32_t ps[])
+int32_t lux_incomplete_beta(ArgumentCount narg, int32_t ps[])
 // the incomplete beta function I_x(a,b).  LS 15jan96
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_IBETA);
 }
 //-------------------------------------------------------------------------
-int32_t lux_student(int32_t narg, int32_t ps[])
+int32_t lux_student(ArgumentCount narg, int32_t ps[])
 // Student's t-distribution.  LS 15jan96
 {
   return math_funcs_2f(ps[0], ps[1], F_STUDENT);
 }
 //-------------------------------------------------------------------------
-int32_t lux_f_ratio(int32_t narg, int32_t ps[])
+int32_t lux_f_ratio(ArgumentCount narg, int32_t ps[])
 // F variance ratio.  LS 15jan96
 {
   return math_funcs_3f(ps[0], ps[1], ps[2], F_FRATIO);

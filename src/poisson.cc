@@ -35,7 +35,7 @@ struct Pyramid {
   Pointer *levels;
 };
 
-int32_t lux_laplace2d(int32_t narg, int32_t ps[])
+int32_t lux_laplace2d(ArgumentCount narg, int32_t ps[])
 // LAPLACE(img) calculates the Laplacian of 2D <img>
 {
   int32_t img, nx, ny, result, i, j;
@@ -438,7 +438,7 @@ void restrict(Pointer x, int32_t type, int32_t nx, int32_t ny, Pointer tgt)
   restrict2(x, x, type, nx, ny, dummy, dummy, 0, tgt);
 }
 
-int32_t lux_antilaplace2d(int32_t narg, int32_t ps[])
+int32_t lux_antilaplace2d(ArgumentCount narg, int32_t ps[])
 {
   int32_t img, result = LUX_ERROR, nx, ny, nx2, ny2, nlevel, i, nelem;
   Symboltype type;

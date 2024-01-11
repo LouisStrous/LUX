@@ -307,7 +307,7 @@ void randomn(int32_t seed, double *output, int32_t number, char hasUniform)
 #endif
 }
 //----------------------------------------------------------------------
-int32_t lux_randomu(int32_t narg, int32_t ps[])
+int32_t lux_randomu(ArgumentCount narg, int32_t ps[])
  //create an array of random elements in the [0,1.0] range (exclusive)
 {
 #if HAVE_LIBGSL
@@ -357,7 +357,7 @@ int32_t lux_randomu(int32_t narg, int32_t ps[])
 #endif
 }
 //-------------------------------------------------------------------------
-int32_t lux_randomd(int32_t narg, int32_t ps[])
+int32_t lux_randomd(ArgumentCount narg, int32_t ps[])
 // RANDOMD([seed,]distr,dimens) generates a LONG array with dimensions
 // <dimens> with each number drawn at random from the range 0 through
 // <NUM_ELEM(distr) - 1> (inclusive) according to the distribution
@@ -409,7 +409,7 @@ int32_t lux_randomd(int32_t narg, int32_t ps[])
 #endif
 }
 //-------------------------------------------------------------------------
-int32_t lux_randomn(int32_t narg, int32_t ps[])
+int32_t lux_randomn(ArgumentCount narg, int32_t ps[])
  //create a normal distribution of pseudo-random #'s, centered at 0 with
  /* a width of 1.0
  uses Box-Muller transformation, given 2 uniformly random #'s (0 to 1 range)
@@ -436,7 +436,7 @@ int32_t lux_randomn(int32_t narg, int32_t ps[])
 #endif
 }
 //-------------------------------------------------------------------------
-int32_t lux_randome(int32_t narg, int32_t ps[])
+int32_t lux_randome(ArgumentCount narg, int32_t ps[])
  /* create an exponential distribution of pseudo-random #'s, centered
     at 0 with a given scale length */
 {
@@ -478,7 +478,7 @@ int32_t lux_randome(int32_t narg, int32_t ps[])
 }
 REGISTER(randome, f, randome, 3, MAX_DIMS, "%1%limit:scale");
 //-------------------------------------------------------------------------
-int32_t lux_randomb(int32_t narg, int32_t ps[])
+int32_t lux_randomb(ArgumentCount narg, int32_t ps[])
 // RANDOMB([SEED=seed,] dimens, [/LONG])
 // returns a BYTE array of the indicated dimensions where each value
 // is either a 0 or a 1. LS 21jul98
@@ -527,7 +527,7 @@ int32_t lux_randomb(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_randoml(int32_t narg, int32_t ps[])
+int32_t lux_randoml(ArgumentCount narg, int32_t ps[])
 // RANDOML([SEED=seed,] dimens)
 // returns a FLOAT or DOUBLE (if /DOUBLE is set) array of the indicated
 // dimensions, filled with values drawn from a logarithmic distribution
@@ -590,7 +590,7 @@ int32_t lux_randoml(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_random(int32_t narg, int32_t ps[])
+int32_t lux_random(ArgumentCount narg, int32_t ps[])
 // General pseudo-random-number generating routine.  Switches select the
 // distribution of the numbers.  General Syntax:
 //   Y = RANDOM([SEED=seed, PERIOD=period,] dimens

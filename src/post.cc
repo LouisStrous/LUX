@@ -396,7 +396,7 @@ int32_t postcolor(char *barray, int32_t nx, int32_t ny, float xbot, float xtop, 
   return LUX_OK;
 }
 //------------------------------------------------------------------------
-int32_t postrelease(int32_t narg, int32_t ps[])
+int32_t postrelease(ArgumentCount narg, int32_t ps[])
 {
   char  ok = 0;
   int32_t        bb1, bb2, bb3, bb4;

@@ -4347,7 +4347,7 @@ void xminfo(int32_t w)
     printf("%d\n", baseheight);
 }
 //-------------------------------------------------------------------------
-int32_t lux_xminfo(int32_t narg, int32_t ps[])
+int32_t lux_xminfo(ArgumentCount narg, int32_t ps[])
 {
   int32_t        w;
   int32_t        minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;

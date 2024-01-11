@@ -166,7 +166,7 @@ astropos(double JD, int target_object, int observer_object, double xyz[3])
 
 /// Get positions of astronomical objects from NASA JPL DE441.
 int32_t
-lux_astron2(int32_t narg, int32_t ps[])
+lux_astron2(ArgumentCount narg, int32_t ps[])
 {
 #if HAVE_LIBCALCEPH
   std::vector<int32_t> output_dimensions;

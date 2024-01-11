@@ -146,7 +146,7 @@ void manualTerm(int32_t number)
     isSpecial[(unsigned char) special[i][0]] = 1;
 }
 //--------------------------------------------------------------------
-int32_t lux_manualterm(int32_t narg, int32_t ps[])
+int32_t lux_manualterm(ArgumentCount narg, int32_t ps[])
 // select a manual terminal specification
 {
   int32_t        i;

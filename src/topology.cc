@@ -32,7 +32,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 //------------------------------------------------------------------
 #define SEEK_MAXIMUM    (LUX_DOUBLE + 1)
-int32_t segment_2d(int32_t narg, int32_t ps[])
+int32_t segment_2d(ArgumentCount narg, int32_t ps[])
 /* does image segmentation on two-dimensional arrays.
    it is assumed that's what <x> is!
    Y = SEGMENT(x [, sign]) */
@@ -275,7 +275,7 @@ int32_t segment_2d(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t segment_general(int32_t narg, int32_t ps[])
+int32_t segment_general(ArgumentCount narg, int32_t ps[])
 /* Y = SEGMENT(X) curvature-based segmentation in multiple dimensions
    SEGMENT(x [, sign, DIAGONAL=diagonal, /DEGREE])
    <x>: data
@@ -546,7 +546,7 @@ int32_t segment_general(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_segment(int32_t narg, int32_t ps[])
+int32_t lux_segment(ArgumentCount narg, int32_t ps[])
 {
   if (narg <= 2 && (internalMode == 0) && symbolIsNumericalArray(ps[0])
       && array_num_dims(ps[0]) == 2)
@@ -556,7 +556,7 @@ int32_t lux_segment(int32_t narg, int32_t ps[])
 }
 //-------------------------------------------------------------------------
 #define DEG22_5         (M_PI/8)
-int32_t lux_segment_dir(int32_t narg, int32_t ps[])
+int32_t lux_segment_dir(ArgumentCount narg, int32_t ps[])
 /* y = SEGMENTDIR(<im>, <phi> [,<sign>])
    segmentates image <im> only one-dimensionally in the direction <phi>
    (radians measured counterclockwise from the positive x-axis).
@@ -850,7 +850,7 @@ int32_t lux_segment_dir(int32_t narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_max_dir(int32_t narg, int32_t ps[])
+int32_t lux_max_dir(ArgumentCount narg, int32_t ps[])
 /* y = MAXDIR(<im>, <phi> [,<sign>])
    returns 1s at the locations of local extremes in image <im> only
    one-dimensionally in the direction <phi> (radians measured
@@ -1161,7 +1161,7 @@ int32_t lux_max_dir(int32_t narg, int32_t ps[])
 #define EDGE            -1
 #define MARKED          -2
 #define EDGEMARKED      -3
-int32_t area_2d(int32_t narg, int32_t ps[])
+int32_t area_2d(ArgumentCount narg, int32_t ps[])
 /* AREA,image
  assigns labels to contiguous sets of non-zeros in the bitmap <image>.
  <image> must be a 2D LONG array. */
@@ -1354,7 +1354,7 @@ int32_t area_2d(int32_t narg, int32_t ps[])
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
+int32_t area_general(ArgumentCount narg, int32_t ps[], int32_t isFunction)
 /* AREA,bitmap[,seeds,numbers,diagonal]
  <bitmap> is assumed to be a LONG array. */
 /* identifies distinct areas with values equal to 1 in a bitmap.
@@ -1613,7 +1613,7 @@ int32_t area_general(int32_t narg, int32_t ps[], int32_t isFunction)
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_area(int32_t narg, int32_t ps[])
+int32_t lux_area(ArgumentCount narg, int32_t ps[])
 // AREA,bitmap [, SEED=<seed>, NUMBERS=<numbers>, DIAGONAL=<diagonal>]
 {
   if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_INT32)
@@ -1627,7 +1627,7 @@ int32_t lux_area(int32_t narg, int32_t ps[])
 }
 //----------------------------------------------------------------------
 #define SEEK_MAXIMUM    (LUX_DOUBLE + 1)
-int32_t area2_2d(int32_t narg, int32_t ps[])
+int32_t area2_2d(ArgumentCount narg, int32_t ps[])
 /* AREA2,bitmap,data [,sign]
  assigns numerical labels to those elements of <bitmap> that have values
  equal to 1.  A particular label is assigned to all eligible elements that
@@ -2067,7 +2067,7 @@ int32_t area2_2d(int32_t narg, int32_t ps[])
   return 1;
 }
 //----------------------------------------------------------------------
-int32_t area2_general(int32_t narg, int32_t ps[])
+int32_t area2_general(ArgumentCount narg, int32_t ps[])
 /* AREA,bitmap,data[,seed,numbers,diagonal,sign]
  <bitmap> is assumed to be a LONG array. */
 /* identifies distinct areas with values equal to 1 in a bitmap.
@@ -2545,7 +2545,7 @@ int32_t area2_general(int32_t narg, int32_t ps[])
   return 1;
 }
 //----------------------------------------------------------------------
-int32_t lux_area2(int32_t narg, int32_t ps[])
+int32_t lux_area2(ArgumentCount narg, int32_t ps[])
 {
   if (!symbolIsNumericalArray(ps[0]) || array_type(ps[0]) != LUX_INT32)
     return luxerror("Need LONG array", ps[0]);
@@ -2561,7 +2561,7 @@ int32_t lux_area2(int32_t narg, int32_t ps[])
   return area2_general(narg, ps);
 }
 //----------------------------------------------------------------------
-int32_t lux_basin(int32_t narg, int32_t ps[])
+int32_t lux_basin(ArgumentCount narg, int32_t ps[])
 /* Returns a basin map derived from altitude map <im>
    Syntax:  y = basin(im [,/DIFFERENCE,/SINK,/NUMBER])
    <mode>:  1 /NUMBER -> assign different number to each basin, starting
@@ -2737,7 +2737,7 @@ int32_t lux_basin(int32_t narg, int32_t ps[])
  return result_sym;
 }
 //----------------------------------------------------------------------
-int32_t lux_basin2(int32_t narg, int32_t ps[])
+int32_t lux_basin2(ArgumentCount narg, int32_t ps[])
 /* Returns a basin map derived from "altitude" map <data>
    Syntax:  y = basin(data [, sign, /DIFFERENCE,/SINK,/NUMBER])
       <data>: data array
@@ -4261,7 +4261,7 @@ int32_t lux_basin2(int32_t narg, int32_t ps[])
   return result;
 }
 //----------------------------------------------------------------------
-int32_t lux_extreme_general(int32_t narg, int32_t ps[])
+int32_t lux_extreme_general(ArgumentCount narg, int32_t ps[])
 /* Y = ESEGMENT(X) seeks positions of local extremes
    ESEGMENT(x [, sign, DIAGONAL=diagonal, THRESHOLD=threshold])
    <x>: data
@@ -4815,7 +4815,7 @@ int32_t lux_extreme_general(int32_t narg, int32_t ps[])
   return result;
 }
 //----------------------------------------------------------------------
-int32_t lux_inpolygon(int32_t narg, int32_t ps[])
+int32_t lux_inpolygon(ArgumentCount narg, int32_t ps[])
 /* INPOLYGON(x,y,lx,ly) returns the indices of those points <x,y> that
  lie within the polyhon defined by points <lx,ly>.  LS 24nov98 */
 {
@@ -4960,7 +4960,7 @@ int32_t intcmp(const void *arg1, const void *arg2)
   return *(int32_t *) arg1 - *(int32_t *) arg2;
 }
 //----------------------------------------------------------------------
-int32_t lux_area_connect(int32_t narg, int32_t ps[])
+int32_t lux_area_connect(ArgumentCount narg, int32_t ps[])
 /* AREACONNECT(im1, im2 [, compact] [, /RAW]) determines connections
  between areas in segmented images <im1> and <im2>.  If /RAW is specified,
  then the raw links

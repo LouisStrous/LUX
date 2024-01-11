@@ -57,7 +57,7 @@ If no <regex> is specified, then the last one is used again.
 
 */
 
-int32_t lux_regex(int32_t narg, int32_t ps[]) {
+int32_t lux_regex(ArgumentCount narg, int32_t ps[]) {
   char *text, *regex;
   int32_t result, flags, i;
   static regex_t preg;

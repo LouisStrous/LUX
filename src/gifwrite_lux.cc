@@ -56,7 +56,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
  static void char_out(int32_t), flush_char(void);
 
  //-------------------------------------------------------------------------
-int32_t lux_gifwrite(int32_t narg, int32_t ps[]) // gifwrite subroutine
+int32_t lux_gifwrite(ArgumentCount narg, int32_t ps[]) // gifwrite subroutine
  // write a very plain gif file, 8 bit deep
  /* call is gifwrite,array,file,[map] where map is the color map
  and must be (3,256) I*1 in rgb triplets */
@@ -137,7 +137,7 @@ int32_t lux_gifwrite(int32_t narg, int32_t ps[]) // gifwrite subroutine
  return 1;
  }
  //-------------------------------------------------------------------------
-int32_t lux_gifwrite_f(int32_t narg, int32_t ps[])
+int32_t lux_gifwrite_f(ArgumentCount narg, int32_t ps[])
  // a function version that returns 1 if read OK
  {
  if ( lux_gifwrite(narg, ps) == 1 ) return 1; else return 4;

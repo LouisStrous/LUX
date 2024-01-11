@@ -47,7 +47,7 @@ extern int32_t        byte_count;        // defined in files.c
 int32_t        tape_messages=1;
 static        int32_t        tape_fd[MAXTAPE], neof[MAXTAPE], neot[MAXTAPE];
 //-------------------------------------------------------------------------
-int32_t lux_tape_status(ArgumentCount narg, int32_t ps[])// print tape status
+int32_t lux_tape_status(ArgumentCount narg, Symbol ps[])// print tape status
 {
   int32_t   fd, j;
 
@@ -63,7 +63,7 @@ int32_t lux_tape_status(ArgumentCount narg, int32_t ps[])// print tape status
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t tape_setup(ArgumentCount narg, int32_t ps[])                // for internal use
+int32_t tape_setup(ArgumentCount narg, Symbol ps[])                // for internal use
 {
   char        *name;
 
@@ -119,7 +119,7 @@ int32_t check_tape_io(int32_t iq)
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_rewind(ArgumentCount narg, int32_t ps[])// rewind a tape drive
+int32_t lux_rewind(ArgumentCount narg, Symbol ps[])// rewind a tape drive
 {
   int32_t        fd;
 
@@ -128,14 +128,14 @@ int32_t lux_rewind(ArgumentCount narg, int32_t ps[])// rewind a tape drive
   return check_tape_io(ioctl(fd, MTIOCTOP, &rew));
 }
 //-------------------------------------------------------------------------
-int32_t lux_weof(ArgumentCount narg, int32_t ps[]) // write an eof on tape drive
+int32_t lux_weof(ArgumentCount narg, Symbol ps[]) // write an eof on tape drive
 {
 int32_t        fd;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
 return check_tape_io( ioctl(fd, MTIOCTOP, &mtweof) );
 }
 //-------------------------------------------------------------------------
-int32_t lux_unload(ArgumentCount narg, int32_t ps[])// unload a tape drive
+int32_t lux_unload(ArgumentCount narg, Symbol ps[])// unload a tape drive
 {
   int32_t        fd;
 
@@ -149,7 +149,7 @@ int32_t lux_unload(ArgumentCount narg, int32_t ps[])// unload a tape drive
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_skipr(ArgumentCount narg, int32_t ps[]) // skip records
+int32_t lux_skipr(ArgumentCount narg, Symbol ps[]) // skip records
 {
 int32_t        fd, nr;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
@@ -163,7 +163,7 @@ tape_op.mt_op = MTBSR;        tape_op.mt_count = -nr;
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
 //-------------------------------------------------------------------------
-int32_t lux_skipf(ArgumentCount narg, int32_t ps[]) // skip records
+int32_t lux_skipf(ArgumentCount narg, Symbol ps[]) // skip records
 {
 int32_t        fd, nf;
 if ( (fd = tape_setup(narg,ps)) < 0) return -1;;
@@ -177,7 +177,7 @@ tape_op.mt_op = MTBSF;        tape_op.mt_count = -nf;
 return check_tape_io( ioctl(fd, MTIOCTOP, &tape_op) );
 }
 //-------------------------------------------------------------------------
-int32_t lux_taprd(ArgumentCount narg, int32_t ps[])
+int32_t lux_taprd(ArgumentCount narg, Symbol ps[])
 // read tape record.  Modified LS 27mar98 to read records until the
 // requested number of bytes is read (or an error occurs)
 {
@@ -218,7 +218,7 @@ int32_t lux_taprd(ArgumentCount narg, int32_t ps[])
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_tapwrt(ArgumentCount narg, int32_t ps[]) // read tape record
+int32_t lux_tapwrt(ArgumentCount narg, Symbol ps[]) // read tape record
  {
  int32_t        fd, nbr, iq, j, nd, n, type;
  Array *h;
@@ -247,7 +247,7 @@ int32_t lux_tapwrt(ArgumentCount narg, int32_t ps[]) // read tape record
  return 1;
  }
  //-------------------------------------------------------------------------
-int32_t lux_tapebufout(ArgumentCount narg, int32_t ps[])                        // write tape record
+int32_t lux_tapebufout(ArgumentCount narg, Symbol ps[])                        // write tape record
  /*the call is TAPEBUFOUT,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 16384 bytes
@@ -308,7 +308,7 @@ int32_t lux_tapebufout(ArgumentCount narg, int32_t ps[])                        
  return 1;
  }
  //-------------------------------------------------------------------------
-int32_t lux_tapebufin(ArgumentCount narg, int32_t ps[])// read tape record
+int32_t lux_tapebufin(ArgumentCount narg, Symbol ps[])// read tape record
  /*the call is TAPEBUFIN,tape#,array,[recsize,offset,len]
  the defaults for offset and len are just the whole array (or what is left of
  it if just offset is specified) and the default for recsize is 32768 bytes
@@ -403,7 +403,7 @@ int32_t lux_tapebufin(ArgumentCount narg, int32_t ps[])// read tape record
  return 1;
  }
  //-------------------------------------------------------------------------
-int32_t lux_wait_for_tape(ArgumentCount narg, int32_t ps[]) // read tape record
+int32_t lux_wait_for_tape(ArgumentCount narg, Symbol ps[]) // read tape record
 {
 // a dummy version, we'll need this when we do asynchronous tape i/o
 return 1;

@@ -40,7 +40,7 @@ float        crunch_bpp;
 int32_t        crunch_slice = 5;
 static int32_t        crunch_run_flag=0;
 
-int32_t        docrunch(ArgumentCount narg, int32_t ps[], int32_t showerror),
+int32_t        docrunch(ArgumentCount narg, Symbol ps[], int32_t showerror),
    anacrunch(uint8_t *, short [], int32_t, int32_t, int32_t, int32_t),
    anacrunch8(uint8_t *, uint8_t [], int32_t, int32_t, int32_t, int32_t),
    anacrunchrun(uint8_t *, short [], int32_t, int32_t, int32_t, int32_t),
@@ -56,7 +56,7 @@ int32_t anacrunch32(uint8_t *, int32_t *, int32_t, int32_t, int32_t, int32_t),
 void        swapl(void *, int32_t);
 
  //--------------------------------------------------------------------------
-int32_t lux_crunchrun(ArgumentCount narg, int32_t ps[])                // crunch subroutine
+int32_t lux_crunchrun(ArgumentCount narg, Symbol ps[])                // crunch subroutine
  /* compress an array with imbedded run length encoding plus variable
  bit encoding */                
  //  lux call is: crunchrun, IN, b ,OUT
@@ -70,17 +70,17 @@ int32_t lux_crunchrun(ArgumentCount narg, int32_t ps[])                // crunch
   return iq;
 }
 //--------------------------------------------------------------------------
-int32_t lux_crunch(ArgumentCount narg, int32_t ps[])
+int32_t lux_crunch(ArgumentCount narg, Symbol ps[])
 {
   return docrunch(narg, ps, 1);
 }
 //--------------------------------------------------------------------------
-int32_t lux_crunch_f(ArgumentCount narg, int32_t ps[])
+int32_t lux_crunch_f(ArgumentCount narg, Symbol ps[])
 {
   return docrunch(narg, ps, 0);
 }
 //--------------------------------------------------------------------------
-int32_t docrunch(ArgumentCount narg, int32_t ps[], int32_t showerror)// crunch subroutine
+int32_t docrunch(ArgumentCount narg, Symbol ps[], int32_t showerror)// crunch subroutine
  /* compress an array */
  //  lux call is: crunch, IN, b ,OUT
  /* note that OUT must be predefined and limit is used to make certain we
@@ -157,7 +157,7 @@ int32_t docrunch(ArgumentCount narg, int32_t ps[], int32_t showerror)// crunch s
   return LUX_OK;
 }
  //--------------------------------------------------------------------------
-int32_t lux_decrunch(ArgumentCount narg, int32_t ps[])                // decrunch subroutine
+int32_t lux_decrunch(ArgumentCount narg, Symbol ps[])                // decrunch subroutine
  /* decompress an array */
  //  decrunch, IN, OUT
 {

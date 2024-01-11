@@ -224,7 +224,7 @@ int32_t multiplyProjection(float *projection, float *matrix)
   return 1;
 }
 //-----------------------------------------------------------------------
-int32_t lux_projection(ArgumentCount narg, int32_t ps[])
+int32_t lux_projection(ArgumentCount narg, Symbol ps[])
 // change the projection parameters.  The three transformations
 // translation, rotation, and scaling must be added into the projection
 // matrix in the opposite order from the one in which they are to be
@@ -488,7 +488,7 @@ int32_t project(float x, float y, float z)
   return 1;
 }
 //---------------------------------------------------------------------
-int32_t lux_project(ArgumentCount narg, int32_t ps[])
+int32_t lux_project(ArgumentCount narg, Symbol ps[])
 // development routine.  uses project to project a 3-element vector
 // using the current projection matrix
 {
@@ -526,7 +526,7 @@ int32_t tkproj(float x, float y, float z, int32_t mode)
   return 1;
 }
 //---------------------------------------------------------------------
-int32_t lux_fitUnitCube(ArgumentCount narg, int32_t ps[])
+int32_t lux_fitUnitCube(ArgumentCount narg, Symbol ps[])
 // scales and translates the projection so that the projected unit cube
 // fits nicely on the screen
 {
@@ -661,7 +661,7 @@ int32_t axis(float ds, float t, float tr, float v, float dv, int32_t nt,
   return 1;
 }
 //---------------------------------------------------------------------
-int32_t lux_plot3d(ArgumentCount narg, int32_t ps[])
+int32_t lux_plot3d(ArgumentCount narg, Symbol ps[])
 // development routine.
 {
   int32_t        iq, nx, ny, i, ixlog, iylog, izlog;
@@ -1081,7 +1081,7 @@ int32_t scanPolygon(int32_t *x1, int32_t *x2, int32_t *y, char code)
   return 1;
 }
 //---------------------------------------------------------------------
-int32_t lux_inPolygon(ArgumentCount narg, int32_t ps[])
+int32_t lux_inPolygon(ArgumentCount narg, Symbol ps[])
 // returns indices to all (integer-coordinate) points inside an
 // integer-coordinate polygon.  Syntax: I = INPOLYGON(XVERTEX,YVERTEX)
 // IN DEVELOPMENT
@@ -1204,7 +1204,7 @@ int32_t hiddenLine(float x, float y, int32_t mode)
   return LUX_OK;
 }
 //---------------------------------------------------------------------
-int32_t lux_projectmap(ArgumentCount narg, int32_t ps[])
+int32_t lux_projectmap(ArgumentCount narg, Symbol ps[])
 // PROJECTIMAGE(map, h [, HDIST=delta, ANGLE=angle, MAG=mag, XMAP=xmap,
 //              YMAP=ymap, SIZE=n])
 // returns an array of size <n(0)> by <n(1)> elements (or <n> by <n> if

@@ -101,7 +101,7 @@ void solar_physical(double jd, int32_t select)
   }
 }
 //------------------------------------------------------------------------
-int32_t lux_solar_physical(ArgumentCount narg, int32_t ps[], int32_t select)
+int32_t lux_solar_physical(ArgumentCount narg, Symbol ps[], int32_t select)
 // LS < 1998
 {
   int32_t        n, result;
@@ -131,22 +131,22 @@ int32_t lux_solar_physical(ArgumentCount narg, int32_t ps[], int32_t select)
   return result;
 }
 //------------------------------------------------------------------------
-int32_t lux_solar_p(ArgumentCount narg, int32_t ps[])
+int32_t lux_solar_p(ArgumentCount narg, Symbol ps[])
 {
   return lux_solar_physical(narg, ps, 0);
 }
 //------------------------------------------------------------------------
-int32_t lux_solar_b(ArgumentCount narg, int32_t ps[])
+int32_t lux_solar_b(ArgumentCount narg, Symbol ps[])
 {
   return lux_solar_physical(narg, ps, 1);
 }
 //------------------------------------------------------------------------
-int32_t lux_solar_l(ArgumentCount narg, int32_t ps[])
+int32_t lux_solar_l(ArgumentCount narg, Symbol ps[])
 {
   return lux_solar_physical(narg, ps, (internalMode & 1)? 4: 2);
 }
 //------------------------------------------------------------------------
-int32_t lux_solar_r(ArgumentCount narg, int32_t ps[])
+int32_t lux_solar_r(ArgumentCount narg, Symbol ps[])
 {
   return lux_solar_physical(narg, ps, 3);
 }

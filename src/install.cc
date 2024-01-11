@@ -2913,7 +2913,7 @@ int32_t compile(char *string)
 }
 //----------------------------------------------------------------
 #if DEVELOP
-int32_t lux_compile(ArgumentCount narg, int32_t ps[])
+int32_t lux_compile(ArgumentCount narg, Symbol ps[])
 {
   char  *string;
   int32_t       result, value;
@@ -3320,7 +3320,7 @@ char const* className(int32_t class_id)
  return classes[hash].name;
 }
 //----------------------------------------------------------------
-int32_t lux_classname(ArgumentCount narg, int32_t ps[])
+int32_t lux_classname(ArgumentCount narg, Symbol ps[])
      // returns name associated with class number
 {
   int32_t       class_id, result;
@@ -3335,7 +3335,7 @@ int32_t lux_classname(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //----------------------------------------------------------------
-int32_t lux_typeName(ArgumentCount narg, int32_t ps[])
+int32_t lux_typeName(ArgumentCount narg, Symbol ps[])
      // returns name associated with type number
 {
   int32_t       type, result;
@@ -3382,7 +3382,7 @@ char const* filetypeName(int32_t filetype)
   return filetypeNames[filetype];
 }
 //----------------------------------------------------------------
-int32_t lux_filetype_name(ArgumentCount narg, int32_t ps[])
+int32_t lux_filetype_name(ArgumentCount narg, Symbol ps[])
 {
   char const* name;
   int32_t       result;
@@ -3937,7 +3937,7 @@ void convertScalar(Scalar *target, int32_t nsym, Symboltype type)
  }
 }
 //----------------------------------------------------------------
-int32_t lux_symbol_memory(ArgumentCount narg, int32_t ps[])
+int32_t lux_symbol_memory(ArgumentCount narg, Symbol ps[])
 // returns the total of the memory allocated for each LUX symbol
 // - which is NOT the same as the total allocated memory.
 // Note:  some small stuff is not included.
@@ -3971,7 +3971,7 @@ int32_t lux_symbol_memory(ArgumentCount narg, int32_t ps[])
  return i;
 }
 //----------------------------------------------------------------
-int32_t lux_trace(ArgumentCount narg, int32_t ps[])
+int32_t lux_trace(ArgumentCount narg, Symbol ps[])
 // activates/deactivates trace facility
 {
   extern float  CPUtime;
@@ -4700,7 +4700,7 @@ int32_t strcasecmp_p(char *s1, char *s2)
 //----------------------------------------------------------------
 int32_t         nBreakpoint = 0;
 Breakpoint  breakpoint[NBREAKPOINTS];
-int32_t lux_breakpoint(ArgumentCount narg, int32_t ps[])
+int32_t lux_breakpoint(ArgumentCount narg, Symbol ps[])
 // BREAKPOINT,string[,/SET,/VARIABLE]
 // BREAKPOINT,n[,/DISABLE,/ENABLE,/DELETE]
 // BREAKPOINT,/LIST
@@ -4808,7 +4808,7 @@ int32_t lux_breakpoint(ArgumentCount narg, int32_t ps[])
 //----------------------------------------------------------------
 int16_t         watchVars[NWATCHVARS];
 int32_t         nWatchVars = 0;
-int32_t lux_watch(ArgumentCount narg, int32_t ps[])
+int32_t lux_watch(ArgumentCount narg, Symbol ps[])
 // WATCH,<variable>[,/DELETE,/LIST]
 {
   static int32_t        curWatchVar = 0;
@@ -4852,7 +4852,7 @@ int32_t lux_watch(ArgumentCount narg, int32_t ps[])
   return LUX_OK;
 }
 //----------------------------------------------------------------
-int32_t lux_symbol_number(ArgumentCount narg, int32_t ps[])
+int32_t lux_symbol_number(ArgumentCount narg, Symbol ps[])
      // returns the symbol number of the argument
 {
   int32_t       result;
@@ -4950,7 +4950,7 @@ void checkTemps(void)
 }
 //----------------------------------------------------------------
 #include <unistd.h>
-int32_t lux_restart(ArgumentCount narg, int32_t ps[])
+int32_t lux_restart(ArgumentCount narg, Symbol ps[])
 {
   extern char   *programName;
   int32_t       saveHistory(void);
@@ -5123,7 +5123,7 @@ int32_t makeStruct(int32_t symbol, char const* tag, StructElem** se,
   return LUX_OK;
 }
 //----------------------------------------------------------------
-int32_t lux_struct(ArgumentCount narg, int32_t ps[])
+int32_t lux_struct(ArgumentCount narg, Symbol ps[])
 /* definition of a structure.  Structures can contain values of all
    numerical and string types, with individual dimensional structures
    for each component.  Each element of a structure covers a specific
@@ -5410,7 +5410,7 @@ int32_t findName(char const* name, HashTableEntry *hashTable[], int32_t context)
  return i;
 }
 //----------------------------------------------------------------
-int32_t lux_verify(ArgumentCount narg, int32_t ps[])
+int32_t lux_verify(ArgumentCount narg, Symbol ps[])
 /* verifies that all referenced subroutines, functions, and files
    actually exist */
 {

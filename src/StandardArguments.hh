@@ -478,7 +478,7 @@ public:
   ///
   /// Both a `+`NUMBER and a `-`NUMBER may be given in the same dimension
   /// specification \c dim_spec.
-  StandardArguments(ArgumentCount narg, int32_t ps[], const std::string& fmt,
+  StandardArguments(ArgumentCount narg, Symbol ps[], const std::string& fmt,
                     Pointer** ptrs = nullptr, LoopInfo** infos = nullptr);
 
   // const methods
@@ -492,7 +492,7 @@ public:
   int32_t result() const;
 
   // non-const methods
-  int32_t set(ArgumentCount narg, int32_t ps[], const std::string& fmt,
+  int32_t set(ArgumentCount narg, Symbol ps[], const std::string& fmt,
               Pointer** ptrs = nullptr, LoopInfo** infos = nullptr);
 
   /// Returns the Pointer for the argument with the given index.

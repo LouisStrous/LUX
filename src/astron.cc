@@ -780,7 +780,7 @@ int32_t gcd(int32_t a, int32_t b)
   return b;
 }
 //--------------------------------------------------------------------------
-int32_t lux_calendar(ArgumentCount narg, int32_t ps[])
+int32_t lux_calendar(ArgumentCount narg, Symbol ps[])
 {
   int32_t result, input_elem_per_date, output_elem_per_date, iq;
   int32_t *dims = NULL, ndim = 0;
@@ -1285,7 +1285,7 @@ int32_t lux_calendar(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //--------------------------------------------------------------------------
-int32_t lux_calendar_OLD(ArgumentCount narg, int32_t ps[])
+int32_t lux_calendar_OLD(ArgumentCount narg, Symbol ps[])
      // general calendar conversion routine
      // syntax: DATE2 = CALENDAR(DATE1, /FROMCALENDAR, /TOCALENDAR)
      // "/FROMCALENDAR":  /FROMCOMMON /FROMGREGORIAN /FROMISLAMIC
@@ -2042,7 +2042,7 @@ int32_t lux_calendar_OLD(ArgumentCount narg, int32_t ps[])
   return iq;
 }
 //--------------------------------------------------------------------------
-int32_t lux_EasterDate(ArgumentCount narg, int32_t ps[])
+int32_t lux_EasterDate(ArgumentCount narg, Symbol ps[])
      // returns dates of Easter in the common calendar (Gregorian-Julian).
      // syntax:  X = EASTERDATE(YEARS), where YEARS is an array.  X will
      // have three elements in its first dimension, in the order year,
@@ -2344,7 +2344,7 @@ void precessEquatorial(double *ra, double *dec, double JDfrom, double JDto)
   *dec = asin(C);
 }
 //--------------------------------------------------------------------------
-int32_t lux_precess(ArgumentCount narg, int32_t ps[])
+int32_t lux_precess(ArgumentCount narg, Symbol ps[])
 /* PRECESS(coords, JDfrom, JDto) precesses the equatorial coordinates
    <coords> from the equinox of <JDfrom> to <JDto>, both measured in
    Julian Days.  <coords>(0,*) is taken to contain right ascensions
@@ -2496,7 +2496,7 @@ int32_t constellation(double alpha, double delta)
 }
 //--------------------------------------------------------------------------
 #define B1875 (2405889.25855047) // from SOFA Epb2jd routine
-int32_t lux_constellation(ArgumentCount narg, int32_t ps[])
+int32_t lux_constellation(ArgumentCount narg, Symbol ps[])
 /* CONSTELLATION(coords [, equinox, /JULIAN, /BESSELIAN]) returns the
    constellation of each set of <coords> relative to the given <equinox>.
    <coords>(0,*) are right ascensions measured in degrees.
@@ -2658,7 +2658,7 @@ int32_t lux_constellation(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //--------------------------------------------------------------------------
-int32_t lux_constellationname(ArgumentCount narg, int32_t ps[])
+int32_t lux_constellationname(ArgumentCount narg, Symbol ps[])
 /* CONSTELLATIONNAME(<index>) returns the official abbreviation of the
    name of the constellation with the given <index> (may be an array),
    as returned by function CONSTELLATION.  LS 2004may03
@@ -2921,7 +2921,7 @@ double siderealTime(double JD, double *dPsi, double ceps)
   return c;
 }
 //--------------------------------------------------------------------------
-int32_t lux_siderealtime(ArgumentCount narg, int32_t ps[])
+int32_t lux_siderealtime(ArgumentCount narg, Symbol ps[])
 // SIDEREALTIME(<jd>) returns the mean sidereal time at the indicated
 // julian dates, in hours
 // LS 31mar2002
@@ -3288,7 +3288,7 @@ int32_t readExtra(char const* file, char mode)
   return 1;
 }
 //--------------------------------------------------------------------------
-int32_t lux_readorbits(ArgumentCount narg, int32_t ps[])
+int32_t lux_readorbits(ArgumentCount narg, Symbol ps[])
 /* READORBITS [,<file>,/LIST,/REPLACE] reads orbital information from <file>.
  Lists comments if /LIST is specified.  Replace preread data (if any)
  if /REPLACE is specified, else merges */
@@ -3313,7 +3313,7 @@ void showExtra(void)
     puts("No auxilliary orbits have been read.");
 }
 //--------------------------------------------------------------------------
-int32_t lux_showorbits(ArgumentCount narg, int32_t ps[])
+int32_t lux_showorbits(ArgumentCount narg, Symbol ps[])
 {
   showExtra();
   return 1;
@@ -4045,7 +4045,7 @@ void galtoeq(double *pos, double equinox, char forward)
   }
 }
 //--------------------------------------------------------------------------
-int32_t lux_astrf(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_astrf(ArgumentCount narg, Symbol ps[]) {
 /* ASTRF(<coords>[, <equinox>, /JULIAN, /BESSELIAN]
    [, /FROMEQUATORIAL, /FROMECLIPTICAL, /FROMGALACTIC]
    [, /TOEQUATORIAL, /TOECLIPTICAL, /TOGALACTIC])
@@ -4278,7 +4278,7 @@ void printHBRtoXYZ(double *lbr)
 }
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
-int32_t lux_astropos(ArgumentCount narg, int32_t ps[])
+int32_t lux_astropos(ArgumentCount narg, Symbol ps[])
      // returns the positions of a set of heavenly bodies at a specific
      // set of times, for equinox 2000.0
      // Syntax: X = ASTRON(JDs, OBJECTS [, OBJECT0, OBSERVER=OBSERVER,

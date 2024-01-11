@@ -1004,7 +1004,7 @@ int32_t threecolors(float *list, int32_t n)
   return LUX_OK;
 }
 //---------------------------------------------------------
-int32_t lux_colorComponents(ArgumentCount narg, int32_t ps[])
+int32_t lux_colorComponents(ArgumentCount narg, Symbol ps[])
 // colorcomponents,pixels,r,g,b
 // takes raw pixel values <pixels> and returns the relative red, green,
 // and blue components in <r>, <g>, and <b>, which range between 0 and 255.
@@ -1093,7 +1093,7 @@ int32_t lux_colorComponents(ArgumentCount narg, int32_t ps[])
   return LUX_OK;
 }
 //---------------------------------------------------------
-int32_t lux_pixelsto8bit(ArgumentCount narg, int32_t ps[])
+int32_t lux_pixelsto8bit(ArgumentCount narg, Symbol ps[])
  /* pixelsto8bit,pixels,bits,colormap
     returns 8-bit pixel values in <bits> and a color map in <colormap>
     based on the pixel values in <pixels>.
@@ -1218,7 +1218,7 @@ int32_t lux_pixelsto8bit(ArgumentCount narg, int32_t ps[])
   return LUX_ERROR;
 }
 //---------------------------------------------------------
-int32_t lux_colorstogrey(ArgumentCount narg, int32_t ps[])
+int32_t lux_colorstogrey(ArgumentCount narg, Symbol ps[])
 /* colorstogrey,pixels
    takes raw pixel values and replaces them by the corresponding grey
    scale values, which range between 0 and 255.

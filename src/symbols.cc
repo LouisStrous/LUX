@@ -181,7 +181,7 @@ int32_t transfer(int32_t symbol)
 }
 //-----------------------------------------------------
 int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
-int32_t lux_convertsym(ArgumentCount narg, int32_t ps[])
+int32_t lux_convertsym(ArgumentCount narg, Symbol ps[])
      // Y = CONVERT(X, TYPE) returns a copy of X converted to data type
      // TYPE (according to #TYPE).  LS 1aug97
 {
@@ -605,7 +605,7 @@ char *string_arg(int32_t nsym)
  return string_value(nsym);
 }
 //-----------------------------------------------------
-int32_t lux_byte(ArgumentCount narg, int32_t ps[])
+int32_t lux_byte(ArgumentCount narg, Symbol ps[])
 // returns a LUX_INT8 version of the argument
 {
   return lux_convert(narg, ps, LUX_INT8, 1);
@@ -613,7 +613,7 @@ int32_t lux_byte(ArgumentCount narg, int32_t ps[])
 REGISTER(byte, f, byte, 1, 1, "*");
 REGISTER(byte, f, uint8, 1, 1, "*");
 //-----------------------------------------------------
-int32_t lux_word(ArgumentCount narg, int32_t ps[])
+int32_t lux_word(ArgumentCount narg, Symbol ps[])
 // returns a LUX_INT16 version of the argument
 {
   return lux_convert(narg, ps, LUX_INT16, 1);
@@ -621,7 +621,7 @@ int32_t lux_word(ArgumentCount narg, int32_t ps[])
 REGISTER(word, f, word, 1, 1, "*");
 REGISTER(word, f, int16, 1, 1, "*");
 //-----------------------------------------------------
-int32_t lux_long(ArgumentCount narg, int32_t ps[])
+int32_t lux_long(ArgumentCount narg, Symbol ps[])
 // returns a LUX_INT32 version of the argument
 {
   return lux_convert(narg, ps, LUX_INT32, 1);
@@ -629,7 +629,7 @@ int32_t lux_long(ArgumentCount narg, int32_t ps[])
 REGISTER(long, f, long, 1, 1, "*");
 REGISTER(long, f, int32, 1, 1, "*");
 //-----------------------------------------------------
-int32_t lux_int64(ArgumentCount narg, int32_t ps[])
+int32_t lux_int64(ArgumentCount narg, Symbol ps[])
 // returns a LUX_INT64 version of the argument
 {
   return lux_convert(narg, ps, LUX_INT64, 1);
@@ -764,7 +764,7 @@ lux_floor_action(LoopInfo* infos, Int* num, Int* denom, Int* tgt)
 
 /// Implements the LUX `floor` function
 int32_t
-lux_floor(ArgumentCount narg, int32_t ps[])
+lux_floor(ArgumentCount narg, Symbol ps[])
 {
   StandardArguments sa;
   Pointer* ptrs;
@@ -975,7 +975,7 @@ lux_ceil_action(LoopInfo* infos, Int* num, Int* denom, Int* tgt)
 
 /// Implements the LUX `ceil` function
 int32_t
-lux_ceil(ArgumentCount narg, int32_t ps[])
+lux_ceil(ArgumentCount narg, Symbol ps[])
 {
   StandardArguments sa;
   Pointer* ptrs;
@@ -1058,32 +1058,32 @@ lux_ceil(ArgumentCount narg, int32_t ps[])
 }
 REGISTER(ceil, f, ceil, 1, 2, nullptr);
 //-----------------------------------------------------
-int32_t lux_float(ArgumentCount narg, int32_t ps[])
+int32_t lux_float(ArgumentCount narg, Symbol ps[])
 // returns a LUX_FLOAT version of the argument
 {
   return lux_convert(narg, ps, LUX_FLOAT, 1);
 }
 //-----------------------------------------------------
-int32_t lux_double(ArgumentCount narg, int32_t ps[])
+int32_t lux_double(ArgumentCount narg, Symbol ps[])
 // returns a LUX_DOUBLE version of the argument
 {
   return lux_convert(narg, ps, LUX_DOUBLE, 1);
 }
 //-----------------------------------------------------
-int32_t lux_cfloat(ArgumentCount narg, int32_t ps[])
+int32_t lux_cfloat(ArgumentCount narg, Symbol ps[])
 // returns an LUX_CFLOAT version of the argument
 {
   return lux_convert(narg, ps, LUX_CFLOAT, 1);
 }
 //-----------------------------------------------------
-int32_t lux_cdouble(ArgumentCount narg, int32_t ps[])
+int32_t lux_cdouble(ArgumentCount narg, Symbol ps[])
 // returns an LUX_CDOUBLE version of the argument
 {
   return lux_convert(narg, ps, LUX_CDOUBLE, 1);
 }
 //-----------------------------------------------------
 extern int32_t        nFixed;
-int32_t lux_convert(ArgumentCount narg, int32_t ps[], Symboltype totype, int32_t isFunc)
+int32_t lux_convert(ArgumentCount narg, Symbol ps[], Symboltype totype, int32_t isFunc)
 // converts ps[0] to data type <totype>.
 /* we use this function in one of two modes: function mode (isFunc != 0)
    or subroutine mode (isFunc = 0).  In function mode, there can be
@@ -2040,55 +2040,55 @@ int32_t lux_convert(ArgumentCount narg, int32_t ps[], Symboltype totype, int32_t
   return isFunc? result: LUX_OK;
 }
 //-----------------------------------------------------
-int32_t lux_byte_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_byte_inplace(ArgumentCount narg, Symbol ps[])
 // BYTE,x  converts <x> to LUX_INT8.
 {
   return lux_convert(narg, ps, LUX_INT8, 0);
 }
 //-----------------------------------------------------
-int32_t lux_word_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_word_inplace(ArgumentCount narg, Symbol ps[])
 // WORD,x  converts <x> to LUX_INT16.
 {
   return lux_convert(narg, ps, LUX_INT16, 0);
 }
 //-----------------------------------------------------
-int32_t lux_long_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_long_inplace(ArgumentCount narg, Symbol ps[])
 // LONG,x  converts <x> to LUX_INT32.
 {
   return lux_convert(narg, ps, LUX_INT32, 0);
 }
 //-----------------------------------------------------
-int32_t lux_int64_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_int64_inplace(ArgumentCount narg, Symbol ps[])
 // INT64,x  converts <x> to LUX_INT64.
 {
   return lux_convert(narg, ps, LUX_INT64, 0);
 }
 //-----------------------------------------------------
-int32_t lux_float_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_float_inplace(ArgumentCount narg, Symbol ps[])
 // FLOAT,x  converts <x> to LUX_FLOAT.
 {
   return lux_convert(narg, ps, LUX_FLOAT, 0);
 }
 //-----------------------------------------------------
-int32_t lux_double_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_double_inplace(ArgumentCount narg, Symbol ps[])
 // DOUBLE,x  converts <x> to LUX_DOUBLE.
 {
   return lux_convert(narg, ps, LUX_DOUBLE, 0);
 }
 //-----------------------------------------------------
-int32_t lux_cfloat_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_cfloat_inplace(ArgumentCount narg, Symbol ps[])
 // CFLOAT,x  converts <x> to LUX_CFLOAT.
 {
   return lux_convert(narg, ps, LUX_CFLOAT, 0);
 }
 //-----------------------------------------------------
-int32_t lux_cdouble_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_cdouble_inplace(ArgumentCount narg, Symbol ps[])
 // CDOUBLE,x  converts <x> to LUX_CDOUBLE.
 {
   return lux_convert(narg, ps, LUX_CDOUBLE, 0);
 }
 //-----------------------------------------------------
-int32_t lux_string_inplace(ArgumentCount narg, int32_t ps[])
+int32_t lux_string_inplace(ArgumentCount narg, Symbol ps[])
 // STRING,x  converts <x> into a string form.
 {
   return lux_convert(narg, ps, LUX_STRING_ARRAY, 0);
@@ -2265,7 +2265,7 @@ int32_t redef_array_extra_dims(int32_t tgt, int32_t src, Symboltype type, int32_
   return redef_array(tgt, type, ndim, tgtdims);
 }
 //-----------------------------------------------------
-int32_t lux_bytarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_bytarr(ArgumentCount narg, Symbol ps[])
 // create an array of I*1 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2277,7 +2277,7 @@ int32_t lux_bytarr(ArgumentCount narg, int32_t ps[])
 REGISTER(bytarr, f, bytarr, 1, MAX_DIMS, nullptr);
 REGISTER(bytarr, f, uint8arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
-int32_t lux_intarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_intarr(ArgumentCount narg, Symbol ps[])
 // create an array of I*2 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2289,7 +2289,7 @@ int32_t lux_intarr(ArgumentCount narg, int32_t ps[])
 REGISTER(intarr, f, intarr, 1, MAX_DIMS, nullptr);
 REGISTER(intarr, f, int16arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
-int32_t lux_lonarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_lonarr(ArgumentCount narg, Symbol ps[])
 // create an array of I*4 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2301,7 +2301,7 @@ int32_t lux_lonarr(ArgumentCount narg, int32_t ps[])
 REGISTER(lonarr, f, lonarr, 1, MAX_DIMS, nullptr);
 REGISTER(lonarr, f, int32arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
-int32_t lux_int64arr(ArgumentCount narg, int32_t ps[])
+int32_t lux_int64arr(ArgumentCount narg, Symbol ps[])
 // create an array of 64-bit elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2312,7 +2312,7 @@ int32_t lux_int64arr(ArgumentCount narg, int32_t ps[])
 }
 REGISTER(int64arr, f, int64arr, 1, MAX_DIMS, nullptr);
 //-----------------------------------------------------
-int32_t fltarr(ArgumentCount narg, int32_t ps[])
+int32_t fltarr(ArgumentCount narg, Symbol ps[])
 // create an array of F*4 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2322,7 +2322,7 @@ int32_t fltarr(ArgumentCount narg, int32_t ps[])
  return array_scratch(LUX_FLOAT, narg, dims);
 }
 //-----------------------------------------------------
-int32_t dblarr(ArgumentCount narg, int32_t ps[])
+int32_t dblarr(ArgumentCount narg, Symbol ps[])
 // create an array of I*1 elements
 {
  int32_t        dims[MAX_DIMS];
@@ -2332,7 +2332,7 @@ int32_t dblarr(ArgumentCount narg, int32_t ps[])
  return array_scratch(LUX_DOUBLE, narg, dims);
 }
 //-----------------------------------------------------
-int32_t cfltarr(ArgumentCount narg, int32_t ps[])
+int32_t cfltarr(ArgumentCount narg, Symbol ps[])
 // create a CFLOAT array
 {
   int32_t        dims[MAX_DIMS];
@@ -2342,7 +2342,7 @@ int32_t cfltarr(ArgumentCount narg, int32_t ps[])
   return array_scratch(LUX_CFLOAT, narg, dims);
 }
 //-----------------------------------------------------
-int32_t cdblarr(ArgumentCount narg, int32_t ps[])
+int32_t cdblarr(ArgumentCount narg, Symbol ps[])
 // create a CDOUBLE array
 {
   int32_t        dims[MAX_DIMS];
@@ -2352,7 +2352,7 @@ int32_t cdblarr(ArgumentCount narg, int32_t ps[])
   return array_scratch(LUX_CDOUBLE, narg, dims);
 }
 //-----------------------------------------------------
-int32_t strarr(ArgumentCount narg, int32_t ps[])
+int32_t strarr(ArgumentCount narg, Symbol ps[])
 // create an array of NULL string pointers
 {
  int32_t        dims[MAX_DIMS], iq, size, n;
@@ -2378,7 +2378,7 @@ int32_t strarr(ArgumentCount narg, int32_t ps[])
  return iq;
 }
 //-----------------------------------------------------
-int32_t show_routine(InternalRoutine *table, int32_t tableLength, ArgumentCount narg, int32_t ps[])
+int32_t show_routine(InternalRoutine *table, int32_t tableLength, ArgumentCount narg, Symbol ps[])
 /* shows all routine names that contain a specified substring,
  or all of them */
 {
@@ -2424,17 +2424,17 @@ int32_t show_routine(InternalRoutine *table, int32_t tableLength, ArgumentCount 
  return 1;
 }
 //-----------------------------------------------------
-int32_t lux_show_subr(ArgumentCount narg, int32_t ps[])
+int32_t lux_show_subr(ArgumentCount narg, Symbol ps[])
 {
  return show_routine(subroutine, nSubroutine, narg, ps);
 }
 //-----------------------------------------------------
-int32_t lux_show_func(ArgumentCount narg, int32_t ps[])
+int32_t lux_show_func(ArgumentCount narg, Symbol ps[])
 {
  return show_routine(function, nFunction, narg, ps);
 }
 //-----------------------------------------------------
-int32_t lux_switch(ArgumentCount narg, int32_t ps[])
+int32_t lux_switch(ArgumentCount narg, Symbol ps[])
 /* switches identity of two symbols.  We cannot just swap the names
    because then the connection between a particular name and a
    particular symbol number is broken.  We must swap the values instead.
@@ -2482,7 +2482,7 @@ int32_t lux_switch(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //-----------------------------------------------------
-int32_t lux_array(ArgumentCount narg, int32_t ps[])
+int32_t lux_array(ArgumentCount narg, Symbol ps[])
 // create an array of the specified type and dimensions
 {
   int32_t        dims[MAX_DIMS];
@@ -2499,7 +2499,7 @@ int32_t lux_array(ArgumentCount narg, int32_t ps[])
  return array_scratch(type, narg, dims);
 }
 //-----------------------------------------------------
-int32_t lux_assoc(ArgumentCount narg, int32_t ps[])
+int32_t lux_assoc(ArgumentCount narg, Symbol ps[])
 /* returns an associated variable.
   syntax: assoc(lun, array [, offset]) */
 {
@@ -2529,7 +2529,7 @@ int32_t lux_assoc(ArgumentCount narg, int32_t ps[])
  return result;
 }
 //-----------------------------------------------------
-int32_t lux_rfix(ArgumentCount narg, int32_t ps[])
+int32_t lux_rfix(ArgumentCount narg, Symbol ps[])
 /* returns an I*4 version of the argument, rounded to the nearest
  integer if necessary */
 {
@@ -2574,7 +2574,7 @@ int32_t lux_rfix(ArgumentCount narg, int32_t ps[])
  return result;
 }
 //-----------------------------------------------------
-int32_t lux_echo(ArgumentCount narg, int32_t ps[])
+int32_t lux_echo(ArgumentCount narg, Symbol ps[])
 // turn on echoing of input lines from non-keyboard sources
 {
  extern int32_t        echo;
@@ -2583,7 +2583,7 @@ int32_t lux_echo(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //-----------------------------------------------------
-int32_t lux_noecho(ArgumentCount narg, int32_t ps[])
+int32_t lux_noecho(ArgumentCount narg, Symbol ps[])
 // turn on echoing of input lines from non-keyboard sources
 {
  extern int32_t        echo;
@@ -2592,7 +2592,7 @@ int32_t lux_noecho(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //-----------------------------------------------------
-int32_t lux_batch(ArgumentCount narg, int32_t ps[])
+int32_t lux_batch(ArgumentCount narg, Symbol ps[])
 // turn on/off batch mode
 {
  extern char        batch;
@@ -2604,7 +2604,7 @@ int32_t lux_batch(ArgumentCount narg, int32_t ps[])
 //-----------------------------------------------------
 FILE        *recordFile = NULL;
 extern char        recording;
-int32_t lux_record(ArgumentCount narg, int32_t ps[])
+int32_t lux_record(ArgumentCount narg, Symbol ps[])
  // start/stop recording.
  // Syntax:  RECORD [,file] [,/RESET,/INPUT,/OUTPUT]
 {
@@ -2658,7 +2658,7 @@ int32_t lux_record(ArgumentCount narg, int32_t ps[])
 }
 //-------------------------------------------------------------------------
 int32_t step = 0;
-int32_t lux_step(ArgumentCount narg, int32_t ps[])
+int32_t lux_step(ArgumentCount narg, Symbol ps[])
 {
   int32_t        i = 1;
 
@@ -2668,7 +2668,7 @@ int32_t lux_step(ArgumentCount narg, int32_t ps[])
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_varname(ArgumentCount narg, int32_t ps[])
+int32_t lux_varname(ArgumentCount narg, Symbol ps[])
 // returns the name of the variable
 {
   char const* name;
@@ -2746,7 +2746,7 @@ void checkErrno(void)
 }
 //-------------------------------------------------------------------------
 char        allowPromptInInput = 1; // default
-int32_t lux_set(ArgumentCount narg, int32_t ps[])
+int32_t lux_set(ArgumentCount narg, Symbol ps[])
 /* SET[,/SHOWALLOC,/WHITEBACKGROUND,/INVIMCOORDS,/SET,/RESET,/ZOOM]
  governs aspects of the behaviour of various routines.  LS 11mar98 */
 {
@@ -2980,7 +2980,7 @@ int32_t file_map_size(int32_t symbol)
   return size;
 }
 //-------------------------------------------------------------------------
-int32_t lux_pointer(ArgumentCount narg, int32_t ps[])
+int32_t lux_pointer(ArgumentCount narg, Symbol ps[])
 // POINTER,pointer,target [,/FUNCTION, /SUBROUTINE, /INTERNAL, /MAIN]
 // makes named variable
 // <pointer> point at named variable <target>.  If <pointer> is a pointer
@@ -3044,7 +3044,7 @@ int32_t lux_pointer(ArgumentCount narg, int32_t ps[])
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_symbol(ArgumentCount narg, int32_t ps[])
+int32_t lux_symbol(ArgumentCount narg, Symbol ps[])
 // SYMBOL('name') returns the variable with the <name> in the current
 // context, or if not found and if at the main level, then creates
 // such a variable and returns it.  SYMBOL('name',/MAIN) checks
@@ -3097,7 +3097,7 @@ int32_t stringpointer(char *name, int32_t type)
   return -1;                        // not found
 }
 //-------------------------------------------------------------------------
-int32_t lux_show_temps(ArgumentCount narg, int32_t ps[])
+int32_t lux_show_temps(ArgumentCount narg, Symbol ps[])
 // a routine for debugging LUX.  It shows the temporary variables that
 // are currently defined.  LS 2mar97
 {

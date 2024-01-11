@@ -697,7 +697,7 @@ int32_t internal_routine(int32_t symbol, InternalRoutine *routine)
     sym[symbol].spec.array.bstore/sizeof(int16_t) -> # arguments  */
 
   // evalArgs must be int32_t* because it is passed on to individual
-  // routines (int32_t ps[])
+  // routines (Symbol ps[])
  int32_t        nArg, nKeys = 0, i, maxArg, *evalArgs,
         routineNum, n, thisInternalMode = 0, ordinary = 0;
  uint8_t        isSubroutine;
@@ -1001,7 +1001,7 @@ int32_t usr_routine(int32_t symbol)
 {
   // evalArg must be int32_t* because unProtect expects that, because
   // it does so in internal_routine because there it gets passed on
-  // to individual routines (int32_t ps[])
+  // to individual routines (Symbol ps[])
  int32_t        nPar, nStmnt, i, oldContext = curContext, n, routineNum, nKeys = 0,
         ordinary = 0, thisNArg, *evalArg, oldNArg, listSym = 0;
  int16_t        *arg, *par, *list = NULL;
@@ -2344,7 +2344,7 @@ int32_t execute(int32_t symbol)
   return n;
 }
 //------------------------------------------------------------------
-int32_t lux_execute(ArgumentCount narg, int32_t ps[])
+int32_t lux_execute(ArgumentCount narg, Symbol ps[])
 // execute a string as if it were typed at the keyboard
 // or execute the symbol indicated by number
 // keyword /MAIN (1) has the execution take place at the main level
@@ -2390,7 +2390,7 @@ int32_t compileString(char *string)
 #define INNER   1
 #define OUTER   2
 
-int32_t insert(ArgumentCount narg, int32_t ps[])
+int32_t insert(ArgumentCount narg, Symbol ps[])
 // an insertion statement with subscripted target
 /* ps[0]..ps[narg-3]: subscripts; ps[narg - 2]: source;
    ps[narg - 1]: target */
@@ -5248,7 +5248,7 @@ int32_t einsert(int32_t lhs, int32_t rhs)
   return iq;
 }
 //------------------------------------------------------------------
-int32_t lux_test(ArgumentCount narg, int32_t ps[])
+int32_t lux_test(ArgumentCount narg, Symbol ps[])
 // a test function
 {
   int32_t       n, value, *edge, i, *offset;

@@ -28,7 +28,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include <gsl/gsl_linalg.h>
 
-int32_t lux_matrix_product(ArgumentCount narg, int32_t ps[])
+int32_t lux_matrix_product(ArgumentCount narg, Symbol ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -248,7 +248,7 @@ int32_t singular_value_decomposition(double *a_in, size_t ncol, size_t nrow,
    If Sd is the square matrix with the values of S2 on its diagnonal,
    then A = U2 # Sd # transpose(V2).
 */
-int32_t lux_svd(ArgumentCount narg, int32_t ps[])
+int32_t lux_svd(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBGSL
   Pointer *ptrs;
@@ -320,7 +320,7 @@ int32_t matrix_transpose(double *in, double *out, size_t in_ncol, size_t in_nrow
   return 0;
 }
 //--------------------------------------------------------------------
-int32_t lux_transpose_matrix(ArgumentCount narg, int32_t ps[])
+int32_t lux_transpose_matrix(ArgumentCount narg, Symbol ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;
@@ -356,7 +356,7 @@ int32_t lux_transpose_matrix(ArgumentCount narg, int32_t ps[])
 }
 REGISTER(transpose_matrix, f, transpose, 1, 1, NULL);
 //--------------------------------------------------------------------
-int32_t lux_diagonal_matrix(ArgumentCount narg, int32_t ps[])
+int32_t lux_diagonal_matrix(ArgumentCount narg, Symbol ps[])
 {
   Pointer *ptrs;
   LoopInfo *infos;

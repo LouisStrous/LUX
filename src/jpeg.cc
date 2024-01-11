@@ -54,7 +54,7 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 }
 #endif
 //--------------------------------------------------------------------------
-int32_t read_jpeg6b(ArgumentCount narg, int32_t ps[], int32_t isFunc)
+int32_t read_jpeg6b(ArgumentCount narg, Symbol ps[], int32_t isFunc)
 // JREAD,<x>,<file>[,<header>,SHRINK=<shrink>][,/GREYSCALE]
 {
 #if HAVE_LIBJPEG
@@ -182,7 +182,7 @@ int32_t read_jpeg6b(ArgumentCount narg, int32_t ps[], int32_t isFunc)
 #endif
 }
 //--------------------------------------------------------------------------
-int32_t lux_read_jpeg6b(ArgumentCount narg, int32_t ps[])
+int32_t lux_read_jpeg6b(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBJPEG
   return read_jpeg6b(narg, ps, 0);
@@ -191,7 +191,7 @@ int32_t lux_read_jpeg6b(ArgumentCount narg, int32_t ps[])
 #endif
 }
 //--------------------------------------------------------------------------
-int32_t lux_read_jpeg6b_f(ArgumentCount narg, int32_t ps[])
+int32_t lux_read_jpeg6b_f(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBJPEG
   return (read_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
@@ -200,7 +200,7 @@ int32_t lux_read_jpeg6b_f(ArgumentCount narg, int32_t ps[])
 #endif
 }
 //--------------------------------------------------------------------------
-int32_t write_jpeg6b(ArgumentCount narg, int32_t ps[], int32_t isFunc)
+int32_t write_jpeg6b(ArgumentCount narg, Symbol ps[], int32_t isFunc)
 // JWRITE,<x>,<file>[,<header>,<quality>]
 {
 #if HAVE_LIBJPEG
@@ -304,7 +304,7 @@ int32_t write_jpeg6b(ArgumentCount narg, int32_t ps[], int32_t isFunc)
 #endif
 }
 //--------------------------------------------------------------------------
-int32_t lux_write_jpeg6b(ArgumentCount narg, int32_t ps[])
+int32_t lux_write_jpeg6b(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBJPEG
   return write_jpeg6b(narg, ps, 0);
@@ -313,7 +313,7 @@ int32_t lux_write_jpeg6b(ArgumentCount narg, int32_t ps[])
 #endif
 }
 //--------------------------------------------------------------------------
-int32_t lux_write_jpeg6b_f(ArgumentCount narg, int32_t ps[])
+int32_t lux_write_jpeg6b_f(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBJPEG
   return (write_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;

@@ -52,7 +52,7 @@ void printnice(char *p)
   }
 }
 
-int32_t site(ArgumentCount narg, int32_t ps[])
+int32_t site(ArgumentCount narg, Symbol ps[])
 /* Prints greeting message.  More info available when arguments are used.
    Be sure to delete  site.o  before every compilation, because otherwise the
    compilation time etc. aren't updated!   LS 10/5/92 */

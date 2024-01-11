@@ -83,7 +83,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /// \param[in,out] points at the LUX symbol number of the first argument.
 ///
 /// \returns the LUX symbol number of the result.
-int32_t lux_bisect(ArgumentCount narg, int32_t ps[])
+int32_t lux_bisect(ArgumentCount narg, Symbol ps[])
 // y = BISECT([x,] y, values [, AXIS=axis, POS=pos, WIDTH=width])
 // calculates bisector positions
 // <axis> may only have a single dimension.
@@ -491,7 +491,7 @@ static int32_t cmp0(const void *a, const void *b)
 /// \param[in,out] points at the LUX symbol number of the first argument.
 ///
 /// \returns the LUX symbol number of the result.
-int32_t lux_cspline_find(ArgumentCount narg, int32_t ps[])
+int32_t lux_cspline_find(ArgumentCount narg, Symbol ps[])
 // z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index])
 /* locates positions where a certain value gets attained, using cubic
    splines
@@ -728,7 +728,7 @@ int32_t lux_cspline_find(ArgumentCount narg, int32_t ps[])
 /// \param[in,out] points at the LUX symbol number of the first argument.
 ///
 /// \returns the LUX symbol number of the result.
-int32_t lux_monotone_interpolation(ArgumentCount narg, int32_t ps[])
+int32_t lux_monotone_interpolation(ArgumentCount narg, Symbol ps[])
 {
   Pointer *ptrs;
   LoopInfo* infos;
@@ -775,7 +775,7 @@ REGISTER(monotone_interpolation, f, monotoneinterpolate, 3, 3, "1none:2circle:4s
 #define SYNCH_OK        0x5555aaaa
 #define SYNCH_REVERSE   0xaaaa5555
 #endif
-int32_t lux_fitskey(ArgumentCount narg, int32_t ps[])
+int32_t lux_fitskey(ArgumentCount narg, Symbol ps[])
 // FITSKEY(file, key) returns the value associated with the string <key>
 /* in FITS file <file>.  If <file> is a string, then it is taken as the
    name of the FITS file.  If <file> is a scalar, then its (integer) value
@@ -1111,7 +1111,7 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
 }
 //--------------------------------------------------------------------
 #define FACTOR  (0.886226925)   // 0.5*sqrt(pi)
-int32_t lux_dir_smooth(ArgumentCount narg, int32_t ps[])
+int32_t lux_dir_smooth(ArgumentCount narg, Symbol ps[])
 /* Y = DSMOOTH(<data>,<vx>,<vy> [, /TWOSIDED, /ONESIDED, /BOXCAR, /GAUSSIAN,
                /NORMALIZE])
    smooths 2D image <data> in the direction indicated by the
@@ -1441,7 +1441,7 @@ LS 9nov98 */
   return iq;
 }
 //--------------------------------------------------------------------
-int32_t lux_dir_smooth2(ArgumentCount narg, int32_t ps[])
+int32_t lux_dir_smooth2(ArgumentCount narg, Symbol ps[])
 /* Y = LSMOOTH(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector
@@ -1759,7 +1759,7 @@ int32_t lux_dir_smooth2(ArgumentCount narg, int32_t ps[])
   return iq;
 }
 //--------------------------------------------------------------------
-int32_t lux_trajectory(ArgumentCount narg, int32_t ps[])
+int32_t lux_trajectory(ArgumentCount narg, Symbol ps[])
 /* TRAJECTORY,<gx>,<gy>,<vx>,<vy>[,<n>][,<ox>,<oy>])
   Takes the positions indicated by <gx>,<gy> and advances them for <n>
   time steps according to the velocity field in <vx>,<vy>.  The first
@@ -2257,7 +2257,7 @@ void spherical_harmonics(double x, int32_t lmax, double *values)
   }
 }
 //--------------------------------------------------------------------
-int32_t lux_legendre(ArgumentCount narg, int32_t ps[])
+int32_t lux_legendre(ArgumentCount narg, Symbol ps[])
 // LEGENDRE(x, lmax)
 {
   double        x, *values;
@@ -2279,7 +2279,7 @@ int32_t lux_legendre(ArgumentCount narg, int32_t ps[])
   return out;
 }
 //--------------------------------------------------------------------
-int32_t lux_enhanceimage(ArgumentCount narg, int32_t ps[])
+int32_t lux_enhanceimage(ArgumentCount narg, Symbol ps[])
 /* ENHANCEIMAGE(<x> [, <part>, <tgt>, /SYMMETRIC]) enhances an image
   <x>.  The first dimension of <x> is assumed to select between color
   channels.  <x> is assumed to contain BYTE values between 0 and 255,
@@ -2362,7 +2362,7 @@ int32_t lux_enhanceimage(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //--------------------------------------------------------------------
-int32_t lux_hamming(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_hamming(ArgumentCount narg, Symbol ps[]) {
   int32_t nelem, nelem2, ndim, *dims, result, i, type, nr2isarray;
   Pointer src, src2, tgt;
 
@@ -2673,7 +2673,7 @@ int32_t essentially_equal_z_f(FloatComplex a, FloatComplex b, float eps)
 // 1, and are interpreted as decimal SSFCs.  If <level> is not
 // specified, then it is taken equal to the number of bits in <x>,
 // minus 1.
-int32_t lux_ssfc_to_polar(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_ssfc_to_polar(ArgumentCount narg, Symbol ps[]) {
   if (!symbolIsNumerical(ps[0]))
     return luxerror("Need a numerical argument", ps[0]);
   if (narg > 1 && !symbolIsInteger(ps[1]))
@@ -2763,7 +2763,7 @@ REGISTER(ssfc_to_polar, f, ssfctopolar, 1, 2, 0);
 // coordinate, as a nonnegative double-precision value less than 1.
 // If <level> has fewer elements than <coords> has, then the last
 // element of <level> is used for the remaining <coords>.
-int32_t lux_polar_to_ssfc(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_polar_to_ssfc(ArgumentCount narg, Symbol ps[]) {
   if (!symbolIsNumerical(ps[0]))
     return luxerror("Need a numerical argument", ps[0]);
   if (narg > 1 && !symbolIsInteger(ps[1]))
@@ -2906,7 +2906,7 @@ findspans(const Iterator first, const Iterator last, bool cycle,
 // If no spans are found, then return scalar -1.
 //
 // LS 2020-04-29
-int32_t lux_findspans(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_findspans(ArgumentCount narg, Symbol ps[]) {
   int32_t nelem;
   Pointer src;
   if (numerical(ps[0], NULL, NULL, &nelem, &src) < 0)
@@ -3220,7 +3220,7 @@ find_common_factor_category(const Iterator first, const Iterator last,
 // value of <x> belongs to is returned in <categories> if specified.
 // <factors>(<categories)> has the same dimensions as <x> and provides
 // the common factor for each element of <x>.
-int32_t lux_commonfactors(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_commonfactors(ArgumentCount narg, Symbol ps[]) {
 
   // the input values
   int32_t nelem;
@@ -3764,7 +3764,7 @@ find_permutation_changes(FuncType f, double period, double t1, double t2,
 ///
 /// \returns the LUX symbol representing the result.
 int32_t
-lux_planetpermutationchanges(ArgumentCount narg, int32_t ps[])
+lux_planetpermutationchanges(ArgumentCount narg, Symbol ps[])
 {
   double t1 = double_arg(ps[0]);
   double t2 = double_arg(ps[1]);
@@ -3830,7 +3830,7 @@ REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, "1semicirc
 ///
 /// \returns the LUX symbol number representing the result.
 int32_t
-lux_permutationnumber(ArgumentCount narg, int32_t ps[])
+lux_permutationnumber(ArgumentCount narg, Symbol ps[])
 {
   int32_t icount;
   Pointer src;
@@ -4020,7 +4020,7 @@ REGISTER(permutationnumber, f, permutationnumber, 1, 2, "0rank:1index:0linear:2c
 ///
 /// \returns the LUX symbol number of the result.
 int32_t
-lux_permutation(ArgumentCount narg, int32_t ps[])
+lux_permutation(ArgumentCount narg, Symbol ps[])
 {
   auto ipn = int_arg(ps[0]);
   if (ipn < 0)
@@ -4065,7 +4065,7 @@ REGISTER(permutation, f, permutation, 2, 2, "0rank:1index:0linear:2circular", HA
 /// \returns the LUX symbol number of the result.
 ///
 int32_t
-lux_permutationdistance(ArgumentCount narg, int32_t ps[])
+lux_permutationdistance(ArgumentCount narg, Symbol ps[])
 {
   int32_t iq1 = ps[0];
   int32_t iq2 = ps[1];
@@ -4205,7 +4205,7 @@ REGISTER(permutationdistance, f, permutationdistance, 2, 2, "0rank:1index:0linea
 ///
 /// \returns the LUX symbol number of the result.i
 int32_t
-lux_factorial(ArgumentCount narg, int32_t ps[])
+lux_factorial(ArgumentCount narg, Symbol ps[])
 {
   int32_t count;
   int32_t* dims;
@@ -4417,7 +4417,7 @@ lux_decompose_2d_median3_action(const void* vin, int32_t dims[2], void* vout1,
 }
 
 int32_t
-lux_decompose_2d_median3(ArgumentCount narg, int32_t ps[])
+lux_decompose_2d_median3(ArgumentCount narg, Symbol ps[])
 {
   int32_t in = ps[0];
   if (!symbolIsNumericalArray(in)
@@ -4572,7 +4572,7 @@ lux_compose_2d_action(void* vout, int32_t dimsout[2], const void* vin1,
 }
 
 int32_t
-lux_compose_2d(ArgumentCount narg, int32_t ps[])
+lux_compose_2d(ArgumentCount narg, Symbol ps[])
 {
   int32_t in1 = ps[1];
   if (!symbolIsNumericalArray(in1)
@@ -4699,7 +4699,7 @@ lux_div_action(LoopInfo* infos, T* num, T* denom, T* tgt)
 
 /// Implements LUX function `div`.
 int32_t
-lux_div(ArgumentCount narg, int32_t ps[])
+lux_div(ArgumentCount narg, Symbol ps[])
 {
   StandardArguments sa;
   int32_t iq;

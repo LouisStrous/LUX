@@ -37,7 +37,7 @@ enum GplotStatus
 
 static GnuPlot gp;
 
-int32_t lux_gcommand(ArgumentCount narg, int32_t ps[])
+int32_t lux_gcommand(ArgumentCount narg, Symbol ps[])
 {
   if (narg > 1 && ps[1]) {
     gp.set_verbosity(int_arg(ps[1]));
@@ -56,7 +56,7 @@ int32_t lux_gcommand(ArgumentCount narg, int32_t ps[])
 }
 REGISTER(gcommand, s, gcommand, 1, 2, ":verbose");
 
-int32_t lux_gterm(ArgumentCount narg, int32_t ps[])
+int32_t lux_gterm(ArgumentCount narg, Symbol ps[])
 {
   int terminal_number = int_arg(ps[0]);
   if (terminal_number < 0)
@@ -78,7 +78,7 @@ REGISTER(gterm, s, gterm, 1, 1, "");
 /// \par ps is an array of LUX arguments.
 ///
 /// \returns #LUX_OK for success, #LUX_ERROR for failure.
-int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, int32_t ps[])
+int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, Symbol ps[])
 {
   // LUX offers subroutines "plot" and "oplot" based on X11.  "plot"
   // generates a new plot, and "oplot" adds another curve to an
@@ -545,7 +545,7 @@ int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, int32_t ps[])
 /// logarithmic y axes; /loi asks for logarithmic x and linear y axes;
 /// and /loo asks for logarithmic x and y axes.  /liii through /looo
 /// likewise specify linear or logarithmic x, y, and z axes.
-int32_t lux_gplot(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_gplot(ArgumentCount narg, Symbol ps[]) {
   return lux_gplot_backend(GplotStatus::gplot, narg, ps);
 }
 REGISTER(gplot, s, gplot, 1, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
@@ -570,17 +570,17 @@ REGISTER(gplot, s, gplot, 1, 13, ":::linetype:pointtype:dashtype:color:legend:br
 ///
 /// <breaks> is a sorted list of 0-based indexes of points after which the graph
 /// should have a break: the segment to the next point is not drawn.
-int32_t lux_goplot(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_goplot(ArgumentCount narg, Symbol ps[]) {
   return lux_gplot_backend(GplotStatus::goplot, narg, ps);
 }
 REGISTER(goplot, s, goplot, 1, 9, ":::linetype:pointtype:dashtype:color:legend:breaks");
 
-int32_t lux_gaplot(ArgumentCount narg, int32_t ps[]) {
+int32_t lux_gaplot(ArgumentCount narg, Symbol ps[]) {
   return lux_gplot_backend(GplotStatus::gaplot, narg, ps);
 }
 REGISTER(gaplot, s, gaplot, 0, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
-int32_t lux_gnuplot_with_image(ArgumentCount narg, int32_t ps[],
+int32_t lux_gnuplot_with_image(ArgumentCount narg, Symbol ps[],
                                std::string gnuplot_command_fmt) {
   Pointer *data;
   LoopInfo *info;
@@ -607,7 +607,7 @@ int32_t lux_gnuplot_with_image(ArgumentCount narg, int32_t ps[],
 /// Display an image through gnuplot.
 ///
 /// <x> must have two dimensions.
-int32_t lux_gnutv(ArgumentCount narg, int32_t ps[])
+int32_t lux_gnutv(ArgumentCount narg, Symbol ps[])
 {
   return lux_gnuplot_with_image(narg, ps,
                                 "unset xtics; unset ytics; "
@@ -661,7 +661,7 @@ REGISTER(gnutv, s, gtv, 1, 1, NULL);
 /// /lii requests linear x and y axes; /loi requests logarithmic x and
 /// linear y axes; /lio requests linear x and logarithmic y axes; /loo
 /// requests logarithmic x and y axes
-int32_t lux_gnuplot3d(ArgumentCount narg, int32_t ps[])
+int32_t lux_gnuplot3d(ArgumentCount narg, Symbol ps[])
 {
   int32_t enarg = narg - 3;
   int32_t* eps = ps + 3;
@@ -948,7 +948,7 @@ REGISTER(gnuplot3d, s, gplot3d, 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:
 ///
 /// If option /image is given, then the contour plot is shown on top
 /// of the image.  Otherwise, only the contour plot is shown.
-int32_t lux_gnucontour(ArgumentCount narg, int32_t ps[])
+int32_t lux_gnucontour(ArgumentCount narg, Symbol ps[])
 {
   std::ostringstream oss;
 

@@ -217,7 +217,7 @@ int32_t fixPlotStyle(int32_t *symbol, int32_t *line)
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_plot(ArgumentCount narg, int32_t ps[]) // plot routine
+int32_t lux_plot(ArgumentCount narg, Symbol ps[]) // plot routine
  // plots data
 {
   int32_t        oldIer = ier, n;
@@ -234,7 +234,7 @@ int32_t lux_plot(ArgumentCount narg, int32_t ps[]) // plot routine
   return n? 1: LUX_ERROR;
 }
  //-------------------------------------------------------------------------
-int32_t lux_oplot(ArgumentCount narg, int32_t ps[]) // oplot routine
+int32_t lux_oplot(ArgumentCount narg, Symbol ps[]) // oplot routine
  // over plot data
 {
   int32_t        preplot(int32_t, int32_t []),
@@ -248,7 +248,7 @@ int32_t lux_oplot(ArgumentCount narg, int32_t ps[]) // oplot routine
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t preplot(ArgumentCount narg, int32_t ps[])
+int32_t preplot(ArgumentCount narg, Symbol ps[])
  // used by plot and oplot to setup
 {
   int32_t        i, iq, freePos = 1, xfmtsym, yfmtsym;
@@ -1487,7 +1487,7 @@ int32_t tkplot_clip(float x, float y, int32_t lineStyle, int32_t symStyle)
   return 0;
 }
  //------------------------------------------------------------------------
-int32_t lux_pen(ArgumentCount narg, int32_t ps[])
+int32_t lux_pen(ArgumentCount narg, Symbol ps[])
 // PEN, width, currentgray
 // sets or displays the pen width and color
 {
@@ -1503,7 +1503,7 @@ int32_t lux_pen(ArgumentCount narg, int32_t ps[])
   return 1;
 }
 //------------------------------------------------------------------------
-int32_t lux_pencolor(ArgumentCount narg, int32_t ps[])
+int32_t lux_pencolor(ArgumentCount narg, Symbol ps[])
 // sets or displays the current pen color.
 {
   int32_t        iq, nx, xflag, n, nred, ngreen, nblue;
@@ -1629,7 +1629,7 @@ int32_t set_pen(int32_t pen)
   return luxerror("Illegal plot device (%1d)!", 0, lunplt);
 }
  //------------------------------------------------------------------------
-int32_t lux_erase(ArgumentCount narg, int32_t ps[])
+int32_t lux_erase(ArgumentCount narg, Symbol ps[])
 {
   int32_t        postcopy(void), toscreen;
 #if HAVE_LIBX11
@@ -1667,7 +1667,7 @@ int32_t lux_erase(ArgumentCount narg, int32_t ps[])
   return luxerror("Illegal plot device (%1d)!", 0, lunplt);
 }
  //-------------------------------------------------------------------------
-int32_t lux_limits(ArgumentCount narg, int32_t ps[]) //set or examine limits
+int32_t lux_limits(ArgumentCount narg, Symbol ps[]) //set or examine limits
 {
   if (narg == 0)
   { printf("current plot range x axis %f to %f\n", plims[0], plims[1]);
@@ -1689,7 +1689,7 @@ int32_t lux_limits(ArgumentCount narg, int32_t ps[]) //set or examine limits
  return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_window(ArgumentCount narg, int32_t ps[]) //set or examine window
+int32_t lux_window(ArgumentCount narg, Symbol ps[]) //set or examine window
 {
   float        tmp;
 #ifdef DEVELOP
@@ -1734,7 +1734,7 @@ int32_t lux_window(ArgumentCount narg, int32_t ps[]) //set or examine window
   return 1;
  }
  //-------------------------------------------------------------------------
-int32_t lux_pdev(ArgumentCount narg, int32_t ps[])
+int32_t lux_pdev(ArgumentCount narg, Symbol ps[])
 {
   int32_t        postreset(int32_t);
   extern float        postXBot, postYBot, postXTop, postYTop;
@@ -2003,7 +2003,7 @@ int32_t symplot(float x, float y, int32_t symStyle, int32_t lineStyle)
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_xymov(ArgumentCount narg, int32_t ps[])                        // xymov routine
+int32_t lux_xymov(ArgumentCount narg, Symbol ps[])                        // xymov routine
  // subroutine, call is xymov(x, y, [mode, BREAKS=breaks], /boundingbox)
 {
  /* the x, y, and mode arguments can be scalars or vectors in various
@@ -2202,7 +2202,7 @@ int32_t lux_xymov(ArgumentCount narg, int32_t ps[])                        // xy
   return 1;
 }
  //-------------------------------------------------------------------------
-int32_t lux_postimage(ArgumentCount narg, int32_t ps[])                        // postimage routine
+int32_t lux_postimage(ArgumentCount narg, Symbol ps[])                        // postimage routine
  // subroutine, call is postimage(image, x0, x1, y0, y1)
 {
   extern        int32_t        scalemax, scalemin;
@@ -2248,7 +2248,7 @@ int32_t lux_postimage(ArgumentCount narg, int32_t ps[])                        /
   return postgray(ptr, nx, ny, x0, x1, y0, y1, iorder);
 }
  //-------------------------------------------------------------------------
-int32_t lux_postraw(ArgumentCount narg, int32_t ps[])                        // postraw routine
+int32_t lux_postraw(ArgumentCount narg, Symbol ps[])                        // postraw routine
  // subroutine, call is postraw(string)
 {
   int32_t        iq;

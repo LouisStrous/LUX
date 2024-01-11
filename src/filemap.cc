@@ -30,7 +30,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
 //-------------------------------------------------------------------------
-int32_t filemap(Symboltype type, ArgumentCount narg, int32_t ps[])
+int32_t filemap(Symboltype type, ArgumentCount narg, Symbol ps[])
 /* Create a file map symbol (file array) and stores array structure,
    file name and offset */
 {
@@ -74,42 +74,42 @@ int32_t filemap(Symboltype type, ArgumentCount narg, int32_t ps[])
  return iq;
 }
 //-------------------------------------------------------------------------
-int32_t lux_bytfarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_bytfarr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_INT8 file array (file map)
 { return filemap(LUX_INT8, narg, ps); }
 REGISTER(bytfarr, f, bytfarr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 REGISTER(bytfarr, f, uint8farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
-int32_t lux_intfarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_intfarr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_INT16 file array (file map)
 { return filemap(LUX_INT16, narg, ps); }
 REGISTER(intfarr, f, intfarr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 REGISTER(intfarr, f, int16farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
-int32_t lux_lonfarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_lonfarr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_INT32 file array (file map)
 { return filemap(LUX_INT32, narg, ps); }
 REGISTER(lonfarr, f, lonfarr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 REGISTER(lonfarr, f, int32farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
-int32_t lux_int64farr(ArgumentCount narg, int32_t ps[])
+int32_t lux_int64farr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_INT64 file array (file map)
 { return filemap(LUX_INT64, narg, ps); }
 REGISTER(int64farr, f, int64farr, 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 //-------------------------------------------------------------------------
-int32_t fltfarr(ArgumentCount narg, int32_t ps[])
+int32_t fltfarr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_FLOAT file array (file map)
 { return filemap(LUX_FLOAT, narg, ps); }
 //-------------------------------------------------------------------------
-int32_t dblfarr(ArgumentCount narg, int32_t ps[])
+int32_t dblfarr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_DOUBLE file array (file map)
 { return filemap(LUX_DOUBLE, narg, ps); }
 //-------------------------------------------------------------------------
-int32_t cfltfarr(ArgumentCount narg, int32_t ps[])
+int32_t cfltfarr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_CFLOAT file array (file map)
 { return filemap(LUX_CFLOAT, narg, ps); }
 //-------------------------------------------------------------------------
-int32_t cdblfarr(ArgumentCount narg, int32_t ps[])
+int32_t cdblfarr(ArgumentCount narg, Symbol ps[])
 // Create a LUX_CDOUBLE file array (file map)
 { return filemap(LUX_CDOUBLE, narg, ps); }
 //-------------------------------------------------------------------------
@@ -311,7 +311,7 @@ int32_t lux_file_output(int32_t iq, int32_t jq, int32_t offsym, int32_t axsym)
  return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fzarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_fzarr(ArgumentCount narg, Symbol ps[])
 // FZARR(name) returns a file array symbol appropriate for an
 // uncompressed FZ file.
 {

@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t        motif_input_flag = 0;
 
 //-------------------------------------------
-int32_t lux_zeroifnotdefined(ArgumentCount narg, int32_t ps[])
+int32_t lux_zeroifnotdefined(ArgumentCount narg, Symbol ps[])
 /* assigns zero to the argument if the argument is undefined.
  (should replace by DEFAULT,arg,0 instead) */
 {
@@ -40,7 +40,7 @@ int32_t lux_zeroifnotdefined(ArgumentCount narg, int32_t ps[])
   return 1;
 }
 //-------------------------------------------
-int32_t lux_compile_file(ArgumentCount narg, int32_t ps[])
+int32_t lux_compile_file(ArgumentCount narg, Symbol ps[])
 // COMPILE_FILE compiles the contents of a file at the top level
 {
   FILE        *fp;

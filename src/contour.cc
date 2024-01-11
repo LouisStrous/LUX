@@ -43,7 +43,7 @@ int32_t        tkplot(float, float, int32_t, int32_t);
 //-------------------------------------------------------------------------
 
 
-int32_t lux_contour(ArgumentCount narg, int32_t ps[]) /* contour routine */
+int32_t lux_contour(ArgumentCount narg, Symbol ps[]) /* contour routine */
 // call is CONTOUR, image, nlev, xa, xb, ya, yb
 {
   Array        *h;

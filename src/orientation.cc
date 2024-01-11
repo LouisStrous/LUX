@@ -31,7 +31,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 int32_t        lux_replace(int32_t, int32_t);
 //--------------------------------------------------------------------
 #define SQRT3        1.7320508075688772935
-int32_t lux_orientation(ArgumentCount narg, int32_t ps[])
+int32_t lux_orientation(ArgumentCount narg, Symbol ps[])
 // determine local orientation in a two- or three-dimensional data array
 // Syntax: ORIENTATION,data,widths[,orientation,values,wavenumber,
 //                                  grid,order]
@@ -606,7 +606,7 @@ int32_t lux_orientation(ArgumentCount narg, int32_t ps[])
 // r = root3(a,b,c)
 //
 // returns the real roots of x^3 + a x^2 + b x + c = 0,
-int32_t lux_root3(ArgumentCount narg, int32_t ps[])
+int32_t lux_root3(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBGSL
   double a = double_arg(*ps++);

@@ -117,7 +117,7 @@ void enforce_bounds(double *par, double *lowbound, double *hibound, int32_t nPar
   }
 }
 //-----------------------------------------------------------------------
-int32_t lux_generalfit(ArgumentCount narg, int32_t ps[])
+int32_t lux_generalfit(ArgumentCount narg, Symbol ps[])
 /* FIT([X,]Y,START,STEP[,LOWBOUND,HIGHBOUND][,WEIGHTS][,QTHRESH,PTHRESH,
    ITHRESH,DTHRESH][,FAC,NITER,NSAME][,ERR][,FIT][,TTHRESH][,/VOCAL,/DOWN,
    /PCHI][/GAUSSIANS,/POWERFUNC]) */
@@ -726,7 +726,7 @@ double fit2_func(const gsl_vector *a, void *p)
   times the number of parameters.  0 means "no limit".
 
 */
-int32_t lux_generalfit2(ArgumentCount narg, int32_t ps[])
+int32_t lux_generalfit2(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBGSL
   int32_t nPar, nPoints, result, ithresh = 0, nithresh;
@@ -1110,7 +1110,7 @@ void calculate_distribution(double *distr, double *deviation, int32_t *rtoi,
   }
 }
 
-int32_t lux_geneticfit(ArgumentCount narg, int32_t ps[])
+int32_t lux_geneticfit(ArgumentCount narg, Symbol ps[])
 /* FIT2(x,y,START,fit [,mu,ngenerations,population,pcross,pmutate,vocal]
         [,/ELITE,/BYTE,/WORD,/LONG,/FLOAT,/DOUBLE]) */
 {

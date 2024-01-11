@@ -154,7 +154,7 @@ int32_t traverseElement(float xin, float yin, float vx, float vy,
 }
 //--------------------------------------------------------------------
 #define FACTOR        (0.886226925)        // 0.5*sqrt(pi)
-int32_t lux_lic(ArgumentCount narg, int32_t ps[])
+int32_t lux_lic(ArgumentCount narg, Symbol ps[])
 /* Y = LIC(<data>,<vx>,<vy>)
    smooths 2D image <data> in the direction indicated by the
    angle <vx> and <vy>, over a distance indicated by the magnitude of vector

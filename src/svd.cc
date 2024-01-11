@@ -109,7 +109,7 @@ void SVD(double *W, double *Z, int32_t nRow, int32_t nCol)
 #endif
 }
 
-int32_t lux_svd(ArgumentCount narg, int32_t ps[])
+int32_t lux_svd(ArgumentCount narg, Symbol ps[])
 // calculates the singular value decomposition of matrix A, such that
 // A = U S V'
 // SVD,A,U,S,V

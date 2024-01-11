@@ -46,7 +46,7 @@ float        st, ct, x, y, nct, nst, angle, callig_ratio = 1.0;
 float        float_arg(int32_t);
 int32_t        calligCoordSys, current_font = 1;
 //-------------------------------------------------------------------------
-int32_t lux_callig(ArgumentCount narg, int32_t ps[])
+int32_t lux_callig(ArgumentCount narg, Symbol ps[])
 // draws Hershy character sets
 {
   int32_t        iq;

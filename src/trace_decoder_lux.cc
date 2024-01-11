@@ -1086,7 +1086,7 @@ int32_t preload_q()
  return 1;
  }
  //-------------------------------------------------------------------------
-int32_t lux_trace_decoder(ArgumentCount narg, int32_t ps[]) // initial TRACE decompresser
+int32_t lux_trace_decoder(ArgumentCount narg, Symbol ps[]) // initial TRACE decompresser
  // image = trace_decoder(qt, ht, buf)
  {
  /* presently we read each huffman and q result from files, plan to save the

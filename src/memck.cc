@@ -27,7 +27,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 
 //-------------------------------------------------------------------
-int32_t lux_memstat(ArgumentCount narg, int32_t ps[])
+int32_t lux_memstat(ArgumentCount narg, Symbol ps[])
 // returns some info on memory usage
 {
  char                *p;
@@ -39,7 +39,7 @@ int32_t lux_memstat(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //-------------------------------------------------------------------
-int32_t lux_memory(ArgumentCount narg, int32_t ps[])
+int32_t lux_memory(ArgumentCount narg, Symbol ps[])
      // returns size of allocated memory
 {
   int32_t        result;

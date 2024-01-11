@@ -370,7 +370,7 @@ int32_t cerror(int32_t message, int32_t symbol, ...)
   return LUX_ERROR;
 }
 //-------------------------------------------------------------------
-int32_t lux_error(ArgumentCount narg, int32_t ps[])
+int32_t lux_error(ArgumentCount narg, Symbol ps[])
 // allows the user to generate an error message
 // syntax:  error [,format,symbol] [, /store, /restore]
 {

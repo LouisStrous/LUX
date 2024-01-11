@@ -49,7 +49,7 @@ int32_t         lux_convert(int32_t, int32_t [], Symboltype, int32_t), copyToSym
   f_decomp(float *, int32_t, int32_t), f_solve(float *, float *, int32_t, int32_t);
 void    symdumpswitch(int32_t, int32_t);
 //-------------------------------------------------------------------------
-int32_t lux_distr(ArgumentCount narg, int32_t ps[])
+int32_t lux_distr(ArgumentCount narg, Symbol ps[])
 /* DISTR,target,bins,values  puts each <value> in the corresponding
    <bin> of <target>.  LS */
 {
@@ -140,7 +140,7 @@ int32_t lux_distr(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_distr_f(ArgumentCount narg, int32_t ps[])
+int32_t lux_distr_f(ArgumentCount narg, Symbol ps[])
 /* y=DISTR(bins,values)  puts each <value> in the corresponding <bin> and
    returns an array containing bins 0 through max(values). LS */
 {
@@ -453,20 +453,20 @@ int32_t readkey(int32_t mode)
  return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_readkey(ArgumentCount narg, int32_t ps[])
+int32_t lux_readkey(ArgumentCount narg, Symbol ps[])
 // returns the code for the next pressed key and echos that key
 {
  return readkey(1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_readkeyne(ArgumentCount narg, int32_t ps[])
+int32_t lux_readkeyne(ArgumentCount narg, Symbol ps[])
 // returns the code for the next pressed key but does not echo that key
 // see lux_readkey for more info
 {
  return readkey(0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_readarr(ArgumentCount narg, int32_t ps[])
+int32_t lux_readarr(ArgumentCount narg, Symbol ps[])
 // reads array elements until they are exhausted and returns read elements
 // in an array.  Louis Strous 24may92
 {
@@ -513,7 +513,7 @@ int32_t lux_readarr(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_find(ArgumentCount narg, int32_t ps[])
+int32_t lux_find(ArgumentCount narg, Symbol ps[])
 /* for each element of <key>, finds first occurrence of that
    element in <array>.
    Call:  y = FIND(array,key,offset,mode)
@@ -829,7 +829,7 @@ int timespec_diff(struct timespec* two, struct timespec* one)
 }
 //-------------------------------------------------------------------------
 #include <errno.h>
-int32_t lux_help(ArgumentCount narg, int32_t ps[])
+int32_t lux_help(ArgumentCount narg, Symbol ps[])
 {
   char const* topic = narg? string_arg(*ps): "Top";
   char cmd[300];
@@ -896,7 +896,7 @@ void endian(void *pp, int32_t n, int32_t type)
  return;
 }
 //-------------------------------------------------------------------------
-int32_t lux_endian(ArgumentCount narg, int32_t ps[])
+int32_t lux_endian(ArgumentCount narg, Symbol ps[])
 /* Switches an array between littleendian and bigendian or vice versa.
    Works between Ultrix and Irix.  LS 10/12/92 */
 // added support for scalars.  LS 10oct97
@@ -923,7 +923,7 @@ int32_t lux_endian(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_differ(ArgumentCount narg, int32_t ps[])
+int32_t lux_differ(ArgumentCount narg, Symbol ps[])
 /* running difference; reverse of running sum
   syntax:  y = differ(x [[,axis] ,order])
   axis is the dimension along which differencing is performed; for each of the
@@ -1301,7 +1301,7 @@ int32_t lux_differ(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t varsmooth(ArgumentCount narg, int32_t ps[], int32_t cumul)
+int32_t varsmooth(ArgumentCount narg, Symbol ps[], int32_t cumul)
 // SMOOTH(data [[, axis], widths] [,/FW_EDGE_NEIGHBOR])
 {
   int32_t       axisSym, widthSym, nWidth, nData, nDim, result, done, type, outType,
@@ -1858,7 +1858,7 @@ int32_t varsmooth(ArgumentCount narg, int32_t ps[], int32_t cumul)
 }
 //-------------------------------------------------------------------------
 
-int32_t smooth(ArgumentCount narg, int32_t ps[], int32_t cumul)
+int32_t smooth(ArgumentCount narg, Symbol ps[], int32_t cumul)
 /* return smoothed version syntax: y = smooth/runcum(x [,axis,width]
   [,/FW_EDGE_NEIGHBOR]) <axis> is the dimension along which summing is
   performed; for each of the remaining coordinates summing is started
@@ -2435,13 +2435,13 @@ int32_t smooth(ArgumentCount narg, int32_t ps[], int32_t cumul)
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_smooth(ArgumentCount narg, int32_t ps[])
+int32_t lux_smooth(ArgumentCount narg, Symbol ps[])
 // smoothing
 {
   return smooth(narg, ps, 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_runcum(ArgumentCount narg, int32_t ps[])
+int32_t lux_runcum(ArgumentCount narg, Symbol ps[])
 // running cumulative
 { return smooth(narg, ps, 1); }
 //----------------------------------------------------------------------
@@ -2517,7 +2517,7 @@ int32_t pcmp2(const void *arg1, const void *arg2)
   return 1;                     // or some compilers complain
 }
 //----------------------------------------------------------------------
-int32_t lux_match(ArgumentCount narg, int32_t ps[])
+int32_t lux_match(ArgumentCount narg, Symbol ps[])
 /* y = match(target, set) returns the index of each element of <target>
    in <set>, or -1 for elements that are not in <set>.
    LS 14apr97 */
@@ -2572,7 +2572,7 @@ int32_t lux_match(ArgumentCount narg, int32_t ps[])
  return iq;
 }
 //----------------------------------------------------------------------
-int32_t lux_not(ArgumentCount narg, int32_t ps[])
+int32_t lux_not(ArgumentCount narg, Symbol ps[])
 /* returns a uint8_t 1 for every 0, and 0 for every non-zero element.
    LS 25feb93 */
 {
@@ -2598,7 +2598,7 @@ int32_t lux_not(ArgumentCount narg, int32_t ps[])
  return iq;
 }
 //----------------------------------------------------------------------
-int32_t lux_table(ArgumentCount narg, int32_t ps[])
+int32_t lux_table(ArgumentCount narg, Symbol ps[])
 /* General linear interpolation routine.
    Syntax:  ynew = table(x, y, [index,] xnew)
    Use:  The first dimensions of <x> and <y> must be equal and
@@ -2767,7 +2767,7 @@ int32_t lux_table(ArgumentCount narg, int32_t ps[])
  return symr;
 }
 //----------------------------------------------------------------------
-int32_t lux_table2d(ArgumentCount narg, int32_t ps[])
+int32_t lux_table2d(ArgumentCount narg, Symbol ps[])
 /* General linear interpolation routine.
    Syntax:  ynew = table2d(x, y, index, xnew)
    Standard use:  <x> and <y> have the same dimensions; <xnew> and <index>
@@ -2974,7 +2974,7 @@ int32_t lux_table2d(ArgumentCount narg, int32_t ps[])
  return symr;
 }
 //----------------------------------------------------------------------
-int32_t lux_push(ArgumentCount narg, int32_t ps[])
+int32_t lux_push(ArgumentCount narg, Symbol ps[])
 /* Push a number of variables onto the user stack
    LS 27may94 3aug99 */
 {
@@ -2994,7 +2994,7 @@ int32_t lux_push(ArgumentCount narg, int32_t ps[])
   return 1;
 }
 //----------------------------------------------------------------------
-int32_t lux_pop(ArgumentCount narg, int32_t ps[])
+int32_t lux_pop(ArgumentCount narg, Symbol ps[])
 /* pop a number of variables from the user stack, in reverse order from PUSH;
    i.e. after  push,x,y  pop,x,y  restores x and y.
    pop,NUM=<number> pops the top <number> symbols into their original sources.
@@ -3057,7 +3057,7 @@ int32_t lux_pop(ArgumentCount narg, int32_t ps[])
   return isError? LUX_ERROR: LUX_OK;
 }
 //----------------------------------------------------------------------
-int32_t lux_dump_stack(ArgumentCount narg, int32_t ps[])
+int32_t lux_dump_stack(ArgumentCount narg, Symbol ps[])
 /* Displays the contents of the user stack
    LS 27may94 */
 {
@@ -3076,7 +3076,7 @@ int32_t lux_dump_stack(ArgumentCount narg, int32_t ps[])
   return 1;
 }
 //----------------------------------------------------------------------
-int32_t peek(ArgumentCount narg, int32_t ps[])
+int32_t peek(ArgumentCount narg, Symbol ps[])
 // display memory contents
 {
   int32_t       start, nr;
@@ -3096,7 +3096,7 @@ int32_t peek(ArgumentCount narg, int32_t ps[])
   return 1;
 }
 //----------------------------------------------------------------------
-int32_t lux_atomize(ArgumentCount narg, int32_t ps[])
+int32_t lux_atomize(ArgumentCount narg, Symbol ps[])
 /* atomizes and displays symbol *ps - for debugging purposes
    second argument determines whether all individual atomic arguments
    are also lux_dump-ed
@@ -3118,7 +3118,7 @@ int32_t lux_atomize(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //----------------------------------------------------------------------
-int32_t lux_redirect_diagnostic(ArgumentCount narg, int32_t ps[])
+int32_t lux_redirect_diagnostic(ArgumentCount narg, Symbol ps[])
 // specifies file to which diagnostic information is redirected
 // LS 29may93
 {
@@ -3134,7 +3134,7 @@ int32_t lux_redirect_diagnostic(ArgumentCount narg, int32_t ps[])
  return 1;
 }
 //----------------------------------------------------------------------
-int32_t lux_default(ArgumentCount narg, int32_t ps[])
+int32_t lux_default(ArgumentCount narg, Symbol ps[])
 /* syntax:  default,var1,val1,var2,val2,...
    assigns <val1>, <val2>,... to <var1>, <var2>,... if <var1> etc. are
    undefined, i.e. specifies default values.   LS 4jun93 */
@@ -3161,7 +3161,7 @@ int32_t lux_default(ArgumentCount narg, int32_t ps[])
  return n;
 }
 //----------------------------------------------------------------------
-int32_t local_maxormin(ArgumentCount narg, int32_t ps[], int32_t code)
+int32_t local_maxormin(ArgumentCount narg, Symbol ps[], int32_t code)
 /* arguments:  (array, position, code)
    searches for local extreme in <array>, starting at <position> (which
    is either a scalar or an array of indices)
@@ -3978,7 +3978,7 @@ int32_t local_maxormin(ArgumentCount narg, int32_t ps[], int32_t code)
  return iq;
 }
 //----------------------------------------------------------------------
-int32_t lux_local_maxf(ArgumentCount narg, int32_t ps[])
+int32_t lux_local_maxf(ArgumentCount narg, Symbol ps[])
 /* find value of local maximum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMAX, !LASTMAXLOC.
@@ -3986,7 +3986,7 @@ int32_t lux_local_maxf(ArgumentCount narg, int32_t ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 2); }
 //----------------------------------------------------------------------
-int32_t lux_local_maxloc(ArgumentCount narg, int32_t ps[])
+int32_t lux_local_maxloc(ArgumentCount narg, Symbol ps[])
 /* find position of local maximum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMAX, !LASTMAXLOC.
@@ -3994,7 +3994,7 @@ int32_t lux_local_maxloc(ArgumentCount narg, int32_t ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 3); }
 //----------------------------------------------------------------------
-int32_t lux_local_minf(ArgumentCount narg, int32_t ps[])
+int32_t lux_local_minf(ArgumentCount narg, Symbol ps[])
 /* find value of local minimum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMIN, !LASTMINLOC.
@@ -4002,7 +4002,7 @@ int32_t lux_local_minf(ArgumentCount narg, int32_t ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 0); }
 //----------------------------------------------------------------------
-int32_t lux_local_minloc(ArgumentCount narg, int32_t ps[])
+int32_t lux_local_minloc(ArgumentCount narg, Symbol ps[])
 /* find position of local minimum in <array>, starting at <position> and
    walking along the steepest gradient.
    Adjusts !LASTMIN, !LASTMINLOC.
@@ -4010,7 +4010,7 @@ int32_t lux_local_minloc(ArgumentCount narg, int32_t ps[])
    LS 9jun93 */
 { return local_maxormin(narg, ps, 1); }
 //----------------------------------------------------------------------
-int32_t lux_zinv(ArgumentCount narg, int32_t ps[])
+int32_t lux_zinv(ArgumentCount narg, Symbol ps[])
 /* y = zinv(x)
    y = 1.0/x if x not equal to 0, y = 0 otherwise.
    LS 30aug93 */
@@ -4118,7 +4118,7 @@ int32_t lux_zinv(ArgumentCount narg, int32_t ps[])
  return result;
 }
 //----------------------------------------------------------------------
-int32_t lux_bsmooth(ArgumentCount narg, int32_t ps[])
+int32_t lux_bsmooth(ArgumentCount narg, Symbol ps[])
 // binary smooth.  Smooths an array by repeatedly applying two-element
 // (binary) averaging along dimension AXIS.  The number of repeats is
 // WIDTH*WIDTH/2, so the FWHM of this filter is about WIDTH.

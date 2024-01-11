@@ -141,7 +141,7 @@ int32_t evalString(char *expr, int32_t nmax)
  return (result > 0)? copySym(tempSym): LUX_ERROR;
 }
 //-------------------------------------------------------------------------
-int32_t lux_eval(ArgumentCount narg, int32_t ps[])
+int32_t lux_eval(ArgumentCount narg, Symbol ps[])
 /* evaluates a string argument.  If there is a single argument and that
    argument is a single name, then we seek the number of the symbol that
    has that name and return the number, if any.  Otherwise we return the
@@ -192,7 +192,7 @@ int32_t lux_eval(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_tense(ArgumentCount narg, int32_t ps[])                   // tense function
+int32_t lux_tense(ArgumentCount narg, Symbol ps[])                   // tense function
 // splines under tension
 // THE CALL IS  YF=TENSE(X,Y,XF,[SIGMA],[DLHS,DRHS])
 {
@@ -236,7 +236,7 @@ int32_t lux_tense(ArgumentCount narg, int32_t ps[])                   // tense f
   if ( iq == 1) return result_sym; else return -1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_tense_curve(ArgumentCount narg, int32_t ps[])// tense_curve function
+int32_t lux_tense_curve(ArgumentCount narg, Symbol ps[])// tense_curve function
 // splines under tension
 // THE CALL IS  XY=TENSE_CURVE(X,Y,XS,[SIGMA],[DLHS,DRHS])
 {
@@ -290,7 +290,7 @@ free( st);
 if ( iq == 1) return result_sym; else return -1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_tense_loop(ArgumentCount narg, int32_t ps[])/* tense_loop function */             
+int32_t lux_tense_loop(ArgumentCount narg, Symbol ps[])/* tense_loop function */             
 // generates spline under tension for any closed (x,y) curve
 // THE CALL IS  XY=TENSE_LOOP(X,Y,XS,[SIGMA])
 {
@@ -342,7 +342,7 @@ free( st);
 if ( iq == 1) return result_sym; else return -1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_sc(ArgumentCount narg, int32_t ps[])      // sc routine
+int32_t lux_sc(ArgumentCount narg, Symbol ps[])      // sc routine
 // sine-cosine style FFT --  sc, x, s, c
 {
   int32_t       iq, nd, outer, n, mq, dim[MAX_DIMS], jq, nn;
@@ -649,7 +649,7 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
   return 0;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fft_expand(ArgumentCount narg, int32_t ps[])
+int32_t lux_fft_expand(ArgumentCount narg, Symbol ps[])
 {
 #if HAVE_LIBGSL
   Pointer *ptrs;
@@ -692,7 +692,7 @@ REGISTER(fft_expand, f, fftexpand, 2, 2, NULL);
 //#define SQRTHALF      M_SQRT1_2
 //#define SQRTWO                M_SQRT2
 //-------------------------------------------------------------------------
-int32_t lux_real(ArgumentCount narg, int32_t ps[])
+int32_t lux_real(ArgumentCount narg, Symbol ps[])
 // returns the real part of the argument.  LS 17nov98
 {
   int32_t       iq, result, n;
@@ -741,7 +741,7 @@ int32_t lux_real(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_imaginary(ArgumentCount narg, int32_t ps[])
+int32_t lux_imaginary(ArgumentCount narg, Symbol ps[])
 // returns the imaginary part of the argument.  LS 17nov98
 {
   int32_t       iq, result, n;
@@ -790,7 +790,7 @@ int32_t lux_imaginary(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_arg(ArgumentCount narg, int32_t ps[])
+int32_t lux_arg(ArgumentCount narg, Symbol ps[])
 // returns the complex argument of the argument.  LS 17nov98
 {
   int32_t       iq, result, type, n;
@@ -901,7 +901,7 @@ int32_t lux_arg(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_complex(ArgumentCount narg, int32_t ps[])
+int32_t lux_complex(ArgumentCount narg, Symbol ps[])
 // returns a complex version of the argument
 {
   if (!symbolIsNumerical(ps[0]))
@@ -912,7 +912,7 @@ int32_t lux_complex(ArgumentCount narg, int32_t ps[])
     lux_cdouble(1, ps): lux_cfloat(1, ps);
 }
 //-------------------------------------------------------------------------
-int32_t fftshift(ArgumentCount narg, int32_t ps[], int32_t subroutine)
+int32_t fftshift(ArgumentCount narg, Symbol ps[], int32_t subroutine)
 // y = FFTSHIFT(data,dist)
 {
   int32_t       iq, n, mq, j, jq, result, step, ndist;
@@ -1116,17 +1116,17 @@ int32_t fftshift(ArgumentCount narg, int32_t ps[], int32_t subroutine)
   return subroutine? LUX_OK: result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fftshift(ArgumentCount narg, int32_t ps[])
+int32_t lux_fftshift(ArgumentCount narg, Symbol ps[])
 {
   return fftshift(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_fftshift_f(ArgumentCount narg, int32_t ps[])
+int32_t lux_fftshift_f(ArgumentCount narg, Symbol ps[])
 {
   return fftshift(narg, ps, 0);
 }
 //-------------------------------------------------------------------------
-int32_t lux_power(ArgumentCount narg, int32_t ps[])
+int32_t lux_power(ArgumentCount narg, Symbol ps[])
 // power function: POWER(data [,axis, /POWER, /SHAPE])
 {
   int32_t       iq, n, mq, j, jq, outDims[MAX_DIMS], result, step;
@@ -1270,7 +1270,7 @@ int32_t lux_power(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_scb(ArgumentCount narg, int32_t ps[])     // scb routine
+int32_t lux_scb(ArgumentCount narg, Symbol ps[])     // scb routine
 // backwards sine-cosine style FFT --  scb, x, s, c
 {
   int32_t       iq, nd, outer, nx, n, mq, dim[8], j, jq, outer2, nx2;
@@ -1405,7 +1405,7 @@ int32_t lux_scb(ArgumentCount narg, int32_t ps[])     // scb routine
   return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_histr(ArgumentCount narg, int32_t ps[]) // histr function
+int32_t lux_histr(ArgumentCount narg, Symbol ps[]) // histr function
 // running sum histogram, normalized to 1.0
 {
   int32_t       iq, n, nd, j, type, size, nRepeat;
@@ -1463,7 +1463,7 @@ int32_t findint(int32_t current, int32_t *value, int32_t nValue)
   return -low - 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_hist_dense(ArgumentCount narg, int32_t ps[])
+int32_t lux_hist_dense(ArgumentCount narg, Symbol ps[])
 // returns compact histogram for widely spaced data values.
 // HIST(x,l) returns list of present data values in <l> and corresponding
 // histogram as return value.  LS 18feb98
@@ -1550,7 +1550,7 @@ int32_t lux_hist_dense(ArgumentCount narg, int32_t ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_hist(ArgumentCount narg, int32_t ps[]) // histogram function
+int32_t lux_hist(ArgumentCount narg, Symbol ps[]) // histogram function
                                  // (frequency distribution)
 // general histogram function
 // keyword /FIRST produces a histogram of all elements along the 0th
@@ -1661,7 +1661,7 @@ int32_t lux_hist(ArgumentCount narg, int32_t ps[]) // histogram function
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_sieve(ArgumentCount narg, int32_t ps[])
+int32_t lux_sieve(ArgumentCount narg, Symbol ps[])
 /* X=SIEVE(array,condition), where condition is normally a logical array
    array and condition must both be arrays and condition must be at least
    as long as array
@@ -2040,7 +2040,7 @@ int32_t lux_sieve(ArgumentCount narg, int32_t ps[])
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_maxf(ArgumentCount narg, int32_t ps[])
+int32_t lux_maxf(ArgumentCount narg, Symbol ps[])
                                 // finds the max element in an array
 {
   int32_t       maxormin(int32_t, int32_t [], int32_t);
@@ -2453,7 +2453,7 @@ int32_t index_maxormin(int32_t source, int32_t indices, int32_t code)
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t maxormin(ArgumentCount narg, int32_t ps[], int32_t code)
+int32_t maxormin(ArgumentCount narg, Symbol ps[], int32_t code)
 // finds extreme values.  arguments:  <data> [, <axes>] [, /KEEPDIMS]
 /* <code>: 0 -> max value; 1 -> min value; 2 -> max location;
    3 -> min location */
@@ -2781,19 +2781,19 @@ int32_t maxormin(ArgumentCount narg, int32_t ps[], int32_t code)
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_minf(ArgumentCount narg, int32_t ps[])
+int32_t lux_minf(ArgumentCount narg, Symbol ps[])
                                 // finds the min element in an array
 {
   return maxormin(narg, ps, 1);
 }
 //-------------------------------------------------------------------------
-int32_t lux_minloc(ArgumentCount narg, int32_t ps[])
+int32_t lux_minloc(ArgumentCount narg, Symbol ps[])
                                 // finds the min element in an array
 {
 return maxormin(narg, ps, 3);
 }
 //-------------------------------------------------------------------------
-int32_t lux_maxloc(ArgumentCount narg, int32_t ps[])
+int32_t lux_maxloc(ArgumentCount narg, Symbol ps[])
                                 // finds the max element in an array
 {
 return maxormin(narg, ps, 2);
@@ -3127,7 +3127,7 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
   }
 }
 //-------------------------------------------------------------------------
-int32_t lux_scale(ArgumentCount narg, int32_t ps[])
+int32_t lux_scale(ArgumentCount narg, Symbol ps[])
 // scale an array to the range (!scalemin,!scalemax) and put into an array
 // of the smallest data type that can fit any allowed color cell index
 // add keyword /FULLRANGE: scale between 0 and the greatest color
@@ -3215,7 +3215,7 @@ int32_t lux_scale(ArgumentCount narg, int32_t ps[])
   return result_sym;
 }
 //-------------------------------------------------------------------------
-int32_t lux_scalerange(ArgumentCount narg, int32_t ps[])
+int32_t lux_scalerange(ArgumentCount narg, Symbol ps[])
 /* scale an array and put in BYTE result
    SCALERANGE(<data>, <lowgrey>, <higrey> [, <lowvalue>, <hivalue>, /BYTE,
               /ZOOM])
@@ -4065,7 +4065,7 @@ void find_cspline_extremes(double x1, double x2, double *minpos, double *min,
 }
 #endif
 //-------------------------------------------------------------------------
-int32_t lux_cubic_spline(ArgumentCount narg, int32_t ps[])
+int32_t lux_cubic_spline(ArgumentCount narg, Symbol ps[])
 /* Cubic spline interpolation along the first dimension of an array.
    ynew = CSPLINE(xtab, ytab [, xnew [, xnew2]]
           [, /KEEP, /PERIODIC, /GETDERIVATIVE, /GETINTEGRAL])
@@ -4240,7 +4240,7 @@ int32_t lux_cubic_spline(ArgumentCount narg, int32_t ps[])
 #endif
 }
 //-------------------------------------------------------------------------
-int32_t lux_cubic_spline_extreme(ArgumentCount narg, int32_t ps[])
+int32_t lux_cubic_spline_extreme(ArgumentCount narg, Symbol ps[])
 /* CSPLINE_EXTREME, <x>, <y> [, <axis>, POS=<pos>, MINPOS=<minpos>,
    MINVAL=<min>, MAXPOS=<maxpos>, MAXVAL=<max>, /KEEPDIMS, /PERIODIC]
  */
@@ -4540,7 +4540,7 @@ int32_t lux_cubic_spline_extreme(ArgumentCount narg, int32_t ps[])
 #endif
 }
 //-------------------------------------------------------------------------
-int32_t lux_strtol(ArgumentCount narg, int32_t ps[])
+int32_t lux_strtol(ArgumentCount narg, Symbol ps[])
 // corresponds to C strtol
 {
   char  *string;
@@ -4568,7 +4568,7 @@ uint32_t bitmask[] = {
 static uint32_t bits[16] = {
   1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768
 };
-int32_t lux_extract_bits_f(ArgumentCount narg, int32_t ps[])// get a bit field from data
+int32_t lux_extract_bits_f(ArgumentCount narg, Symbol ps[])// get a bit field from data
 // call is xint = extract_bits(array, start, width)
 /* if width is < 0, then abs(width) is used for width and the sign
    is extended */
@@ -4583,7 +4583,7 @@ int32_t lux_extract_bits_f(ArgumentCount narg, int32_t ps[])// get a bit field f
   return result_sym;
 }
 //------------------------------------------------------------------------
-int32_t lux_extract_bits(ArgumentCount narg, int32_t ps[])// get a bit field from data
+int32_t lux_extract_bits(ArgumentCount narg, Symbol ps[])// get a bit field from data
 // call is extract_bits, result, array, start, width
 /* if width is < 0, then abs(width) is used for width and the sign
    is extended */
@@ -4597,7 +4597,7 @@ int32_t lux_extract_bits(ArgumentCount narg, int32_t ps[])// get a bit field fro
   return redef_scalar(result_sym, LUX_INT16, &value);
 }
 //------------------------------------------------------------------------
-int32_t extract_bits(ArgumentCount narg, int32_t ps[], int32_t *value)// internal routine
+int32_t extract_bits(ArgumentCount narg, Symbol ps[], int32_t *value)// internal routine
 {
   int32_t       n, start, width, iq, j, sign_flag, type;
   Pointer       q;
@@ -4633,7 +4633,7 @@ int32_t extract_bits(ArgumentCount narg, int32_t ps[], int32_t *value)// interna
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fade_init(ArgumentCount narg, int32_t ps[])
+int32_t lux_fade_init(ArgumentCount narg, Symbol ps[])
 /* initializes a fade (or dissolve) between 2 uint8_t arrays, the actual
    fade result is obtained with the subroutine fade
    call is: fade_init, x1, x2 */
@@ -4683,7 +4683,7 @@ int32_t lux_fade_init(ArgumentCount narg, int32_t ps[])
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-int32_t lux_fade(ArgumentCount narg, int32_t ps[])
+int32_t lux_fade(ArgumentCount narg, Symbol ps[])
  /* does a fade (or dissolve) between 2 uint8_t arrays, must be initialized
  with fade_init
  call is: fade, weight, result - where n is from 0 to 256 and represents

@@ -63,7 +63,7 @@ default_Bytestack(void)
 
 /** Creates an empty Byte stack.
  *
- * @return The Byte stack, or \c NULL if a problem occurred.
+ * \return The Byte stack, or \c NULL if a problem occurred.
  *
  * The caller is responsible for (eventually) deleting the Byte stack
  * again, using Bytestack_delete().
@@ -91,10 +91,10 @@ Bytestack_create(void)
 /**
  * Deletes a Byte stack.
  *
- * @param b the Byte stack to delete.  May be \c NULL, which refers to
+ * \param b the Byte stack to delete.  May be \c NULL, which refers to
  * the default Byte stack.
  *
- * @see Bytestack_create()
+ * \see Bytestack_create()
  */
 void
 Bytestack_delete(Bytestack b)
@@ -111,13 +111,13 @@ Bytestack_delete(Bytestack b)
 
 /** Adds a minimum number of bytes of room to the Byte stack.
 
-    @param b the Byte stack to enlarge.  May be \c NULL, which refers
+    \param b the Byte stack to enlarge.  May be \c NULL, which refers
     to the default Byte stack.
 
-    @param n the minimum number of bytes to add.  More bytes than this
+    \param n the minimum number of bytes to add.  More bytes than this
     may in fact be added.
 
-    @return 0 upon success, non-zero upon error. */
+    \return 0 upon success, non-zero upon error. */
 static int32_t
 enlarge(Bytestack b, size_t n)
 {
@@ -138,15 +138,15 @@ enlarge(Bytestack b, size_t n)
 /**
  * Pushes text unto a Byte stack.
  *
- * @param b the Byte stack to push unto.  May be \c NULL, which
+ * \param b the Byte stack to push unto.  May be \c NULL, which
  * indicates the default Byte stack.
  *
- * @param text the text to push.
+ * \param text the text to push.
  *
  * Pushes bytes from \p text until but excluding the next following
  * null Byte unto Byte stack \p b.
  *
- * @return The Byte index that indicates the beginning of the pushed
+ * \return The Byte index that indicates the beginning of the pushed
  * text on the Byte stack, or #BYTESTACK_INDEX_ERROR if an error
  * occurred.
  */
@@ -175,18 +175,18 @@ Bytestack_strcat(Bytestack b,
 /**
  * Pushes data unto a Byte stack.
  *
- * @param b the Byte stack to push unto.  May be \c NULL, which
+ * \param b the Byte stack to push unto.  May be \c NULL, which
  * indicates the default Byte stack.
  *
- * @param begin the first Byte to push.
+ * \param begin the first Byte to push.
  *
- * @param end one beyond the last Byte to push.  Must be greater than
+ * \param end one beyond the last Byte to push.  Must be greater than
  * \p begin.
  *
  * Pushes bytes from \p begin until just before \p end unto Byte stack
  * \p b.
  *
- * @return The Byte index that indicates the beginning of the pushed
+ * \return The Byte index that indicates the beginning of the pushed
  * text on the Byte stack, or #BYTESTACK_INDEX_ERROR if an error
  * occurred.
  */
@@ -198,7 +198,6 @@ Bytestack_push_data(Bytestack b,
   size_t n;
   ssize_t p;
   auto bbegin = reinterpret_cast<const unsigned char*>(begin);
-  auto bend = reinterpret_cast<const unsigned char*>(end);
 
   if (!begin)
     return -1;
@@ -230,10 +229,10 @@ Bytestack_push_data(Bytestack b,
 /**
  * Pops data from a Byte stack.
  *
- * @param b the Byte stack to pop from.  May be \c NULL, which
+ * \param b the Byte stack to pop from.  May be \c NULL, which
  * indicates the default Byte stack.
  *
- * @param index the Byte stack index that indicates the beginning of
+ * \param index the Byte stack index that indicates the beginning of
  * the data to pop.
  *
  * Pops data from a Byte stack.  All data from location \p index
@@ -246,7 +245,7 @@ Bytestack_push_data(Bytestack b,
  * Also, the memory holding the data remains owned by the Byte stack
  * and must not be modified or freed by the caller.
  *
- * @return a pointer to the beginning of the popped data.
+ * \return a pointer to the beginning of the popped data.
  */
 char *
 Bytestack_pop(Bytestack b, Bytestack_index index)
@@ -268,10 +267,10 @@ char *Bytestack_pop_all(Bytestack b)
 /**
  * Restores data to a Byte stack.
  *
- * @param b the Byte stack.  May be \c NULL, which indicates the
+ * \param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param size the number of bytes to restore.  Must be non-negative.
+ * \param size the number of bytes to restore.  Must be non-negative.
  *
  * Shifts the stack pointer over the indicated number \p size of
  * bytes, so that that many bytes just beyond the stack pointer that
@@ -281,7 +280,7 @@ char *Bytestack_pop_all(Bytestack b)
  * It is not possible to 'restore' bytes that haven't actually been
  * pushed unto the stack.
  *
- * @return 0 upon success, 1 upon failure (e.g., when \p size is
+ * \return 0 upon success, 1 upon failure (e.g., when \p size is
  * negative or larger than the number of bytes available for
  * restoring).
  */
@@ -299,10 +298,10 @@ Bytestack_restore(Bytestack b, int32_t size)
 /**
  * Temporarily stores a text string on a Byte stack.
  *
- * @param stack the Byte stack.  May be \c NULL, which indicates the
+ * \param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param text the text to temporarily store on the Byte stack.
+ * \param text the text to temporarily store on the Byte stack.
  *
  * Pushes and immediately pops the \p text from Byte stack \p stack
  * again.  In effect, a temporary copy of the text is created, which
@@ -311,7 +310,7 @@ Bytestack_restore(Bytestack b, int32_t size)
  * The memory holding the temporary copy remains owned by the Byte
  * stack and must not be changed or freed by the caller.
  *
- * @return a pointer to the temporary copy of the text.
+ * \return a pointer to the temporary copy of the text.
  */
 char *
 Bytestack_temp_text(Bytestack stack, const char *text)
@@ -322,11 +321,11 @@ Bytestack_temp_text(Bytestack stack, const char *text)
 /**
  * Temporarily stores data on a Byte stack.
  *
- * @param stack the Byte stack.  May be \c NULL, which indicates the
+ * \param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param begin the location of the first Byte to store.
- * @param end one beyond the location of the last Byte to store.
+ * \param begin the location of the first Byte to store.
+ * \param end one beyond the location of the last Byte to store.
  *
  * Pushes and immediately pops the data from the Byte stack \p stack
  * again.  In effect, a temporary copy of the data is created, which
@@ -335,7 +334,7 @@ Bytestack_temp_text(Bytestack stack, const char *text)
  * The memory holding the temporary copy remains owned by the Byte
  * stack and must not be changed or freed by the caller.
  *
- * @return a pointer to the beginning of the temporary copy of the
+ * \return a pointer to the beginning of the temporary copy of the
  * data.
  */
 void *
@@ -348,13 +347,13 @@ Bytestack_temp_data(Bytestack stack, const void *begin,
 /**
  * Temporarily stores text on a Byte stack.
  *
- * @param stack the Byte stack.  May be \c NULL, which indicates the
+ * \param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param fmt the printf-style format string to guide the printing of
+ * \param fmt the printf-style format string to guide the printing of
  * text to the Byte stack.
  *
- * @param ap the list of arguments to print.
+ * \param ap the list of arguments to print.
  *
  * Pushes (under guidance of the format \p fmt) and immediately pops
  * the text from the Byte stack again.  In effect, a temporary copy of
@@ -364,7 +363,7 @@ Bytestack_temp_data(Bytestack stack, const void *begin,
  * The memory holding the temporary copy remains owned by the Byte
  * stack and must not be changed or freed by the caller.
  *
- * @return a pointer to the temporary copy of the text.
+ * \return a pointer to the temporary copy of the text.
  */
 char *
 Bytestack_temp_vsprintf(Bytestack stack, const char *fmt, va_list ap)
@@ -375,10 +374,10 @@ Bytestack_temp_vsprintf(Bytestack stack, const char *fmt, va_list ap)
 /**
  * Temporarily stores text on a Byte stack.
  *
- * @param stack the Byte stack.  May be \c NULL, which indicates the
+ * \param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param fmt the printf-style format string to guide the printing of
+ * \param fmt the printf-style format string to guide the printing of
  * text to the Byte stack.
  *
  * Pushes (under guidance of the format \p fmt) and immediately pops
@@ -389,7 +388,7 @@ Bytestack_temp_vsprintf(Bytestack stack, const char *fmt, va_list ap)
  * The memory holding the temporary copy remains owned by the Byte
  * stack and must not be changed or freed by the caller.
  *
- * @return a pointer to the temporary copy of the text.
+ * \return a pointer to the temporary copy of the text.
  */
 char *
 Bytestack_temp_sprintf(Bytestack stack, const char *fmt, ...)
@@ -415,13 +414,13 @@ char *temp_sprintf(const char *format, ...)
 /**
  * Returns the top of the stack.
  *
- * @param b the Byte stack.  May be \c NULL, which indicates the
+ * \param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
  * Returns the top of the Byte stack, where the next pushed data will
  * be stored.
  *
- * @return the Byte stack index of the top of the Byte stack.
+ * \return the Byte stack index of the top of the Byte stack.
  */
 Bytestack_index
 Bytestack_top(Bytestack b)
@@ -434,15 +433,15 @@ Bytestack_top(Bytestack b)
 /**
  * Peeks at Byte stack data without popping it.
  *
- * @param b the Byte stack.  May be \c NULL, which indicates the
+ * \param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param index the Byte stack index of the data to peek at.
+ * \param index the Byte stack index of the data to peek at.
  *
  * Returns a pointer to some data on the stack \p b, without popping
  * the data from the stack.
  *
- * @return a pointer to the data in the stack.  This pointer is only
+ * \return a pointer to the data in the stack.  This pointer is only
  * guaranteed to remain valid until the next data is pushed unto the
  * Byte stack.
  */
@@ -471,15 +470,15 @@ Bytestack_bytes(Bytestack b, Bytestack_index bi)
 /**
  * Prints data unto a Byte stack.
  *
- * @param b the Byte stack.  May be \c NULL, which indicates the
+ * \param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param fmt the printf-style format string to guide the printing.
+ * \param fmt the printf-style format string to guide the printing.
  *
  * Prints text to the Byte stack \p b under guidance of the format
  * string \p fmt.
  *
- * @return the Byte stack index that points at the beginning of the
+ * \return the Byte stack index that points at the beginning of the
  * newly printed data.
  */
 Bytestack_index
@@ -496,17 +495,17 @@ Bytestack_sprintf(Bytestack b, const char *fmt, ...)
 /**
  * Prints data unto a Byte stack.
  *
- * @param b the Byte stack.  May be \c NULL, which indicates the
+ * \param b the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param fmt: the printf-style format string to guide the printing.
+ * \param fmt: the printf-style format string to guide the printing.
  *
- * @param ap: the list of arguments to print.
+ * \param ap: the list of arguments to print.
  *
  * Prints text to the Byte stack \p b under guidance of the format
  * string \p fmt.
  *
- * @return the Byte stack index that points at the beginning of the
+ * \return the Byte stack index that points at the beginning of the
  * newly printed data.
  */
 Bytestack_index
@@ -657,17 +656,17 @@ typedef struct {
 
 /** Reads from a Byte stack stream.
  *
- * @param cookie the stream cookie.
+ * \param cookie the stream cookie.
  *
- * @param buffer the buffer to store the data read from the stream.
+ * \param buffer the buffer to store the data read from the stream.
  *
- * @param size the maximum number of bytes to read from the stream.
+ * \param size the maximum number of bytes to read from the stream.
  *
  * Reads up to \p size bytes from the stream identified by the \p
  * cookie and stores the read data in the \p buffer, which must be big
  * enough.
  *
- * @return the number of read bytes.
+ * \return the number of read bytes.
  * */
 static ssize_t
 Bytestack_stream_read(void *cookie, char *buffer, size_t size)
@@ -685,18 +684,18 @@ Bytestack_stream_read(void *cookie, char *buffer, size_t size)
 
 /** Writes to a Byte stack stream.
  *
- * @param cookie the stream cookie.
+ * \param cookie the stream cookie.
  *
- * @param buffer the buffer from where to read the data to be written
+ * \param buffer the buffer from where to read the data to be written
  * to the stream.
  *
- * @param size the number of bytes to write to the stream from the
+ * \param size the number of bytes to write to the stream from the
  * buffer.
  *
  * Reads \p size bytes from the \p buffer and writes them to the
  * stream identified by the \p cookie.
  *
- * @return the number of bytes written.
+ * \return the number of bytes written.
  */
 static ssize_t
 Bytestack_stream_write(void *cookie, const char *buffer,
@@ -717,17 +716,17 @@ Bytestack_stream_write(void *cookie, const char *buffer,
 
 /** Seeks a location in a Byte stack stream.
  *
- * @param cookie the stream cookie.
+ * \param cookie the stream cookie.
  *
- * @param position the position to seek, in the style of fseek.
+ * \param position the position to seek, in the style of fseek.
  *
- * @param whence the origin from where to measure the position to
+ * \param whence the origin from where to measure the position to
  * seek, in the style of fseek.
  *
  * Seeks position \p position relative to the location indicated by \p
  * whence in the Byte stack stream identified by \p cookie.
  *
- * @return 0 for success, -1 for failure.
+ * \return 0 for success, -1 for failure.
  */
 static int32_t
 Bytestack_stream_seek(void *cookie, off64_t *position, int32_t whence)
@@ -760,11 +759,11 @@ static void Bytestack_delete_cookie(Bytestack_cookie cookie);
 
 /** Close a Byte stack stream.
  *
- * @param cookie the stream cookie.
+ * \param cookie the stream cookie.
  *
  * Closes the Byte stack stream identified by the \p cookie.
  *
- * @return 0
+ * \return 0
  */
 static int32_t
 Bytestack_stream_close(void *cookie)
@@ -787,9 +786,9 @@ cookie_io_functions_t Bytestack_stream_funcs =
 
 /** Creates a Byte stack stream cookie.
  *
- * @param stack the Byte stack for which to create a cookie.
+ * \param stack the Byte stack for which to create a cookie.
  *
- * @return the cookie, or \c NULL if an error occurred.
+ * \return the cookie, or \c NULL if an error occurred.
  */
 static Bytestack_cookie
 Bytestack_create_cookie(Bytestack stack)
@@ -811,7 +810,7 @@ Bytestack_create_cookie(Bytestack stack)
 
 /** Delete a Byte stack stream cookie.
  *
- * @param cookie the Byte stack stream cookie to delete.
+ * \param cookie the Byte stack stream cookie to delete.
  */
 static void
 Bytestack_delete_cookie(Bytestack_cookie cookie)
@@ -823,10 +822,10 @@ Bytestack_delete_cookie(Bytestack_cookie cookie)
 /**
  * Opens a Byte stack as a \c FILE.
  *
- * @param stack the Byte stack.  May be \c NULL, which indicates the
+ * \param stack the Byte stack.  May be \c NULL, which indicates the
  * default Byte stack.
  *
- * @param opentype the type of access that is requested, similar to
+ * \param opentype the type of access that is requested, similar to
  * the access specified in calls to \c fopen, e.g., "r" for reading,
  * "w" for writing.
  *
@@ -837,7 +836,7 @@ Bytestack_delete_cookie(Bytestack_cookie cookie)
  * \warning This feature is specific to the GNU C Compiler and may not
  * be supported by other C compilers.
  *
- * @return the \c FILE pointer.
+ * \return the \c FILE pointer.
  */
 FILE *
 Bytestack_open(Bytestack stack, const char *opentype)

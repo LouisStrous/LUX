@@ -2979,7 +2979,6 @@ int32_t newSubrSymbol(int32_t index)
   an error is generated. */
 {
  int32_t        n, i;
- extern char    reportBody;
  extern int32_t         findBody;
 
  // In order, look for:

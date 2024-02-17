@@ -553,9 +553,9 @@ int32_t lux_orderfilter(ArgumentCount narg, Symbol ps[])
   int32_t       output, width, w, med, nelem, range[2*MAX_DIMS], *index,
     *offset, i, j;
   float         order;
-  LoopInfo      srcinfo, trgtinfo, tmpinfo, tmpinfo2;
+  LoopInfo      srcinfo, trgtinfo, tmpinfo;
   // we use a global pointer src
-  Pointer       trgt, tmpsrc, tmptrgt;
+  Pointer       trgt, tmpsrc;
 
   if (!ps[1])                   // no <data>
     return luxerror("Need data array", 0);
@@ -2000,7 +2000,7 @@ int32_t local_extrema(ArgumentCount narg, Symbol ps[], int32_t code)
    LS 18may95 4aug97 */
 {
   int32_t       result, sign, degree, n, i, *offset, k, j, *edge,
-        *diagonal, nDiagonal, nDoDim, index, subgrid, ready, done;
+    *diagonal, nDiagonal, index, subgrid, ready, done;
   Pointer       src, trgt, srcl, srcr;
   LoopInfo      srcinfo, trgtinfo;
 

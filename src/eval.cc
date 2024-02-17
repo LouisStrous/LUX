@@ -21894,7 +21894,7 @@ int32_t evalLhs(int32_t symbol)
   int32_t   target, kind, depth, nitem, class_id, modified, result, n, special, j;
   ExtractSec* eptr;
   ExtractSec*  tptr;
-  char  **sptr, *name, *p;
+  char  **sptr, *name;
   int32_t   findTarget(char *, int32_t *, int32_t);
   void  *v;
   extern int32_t    eval_func,  // function number of EVAL function

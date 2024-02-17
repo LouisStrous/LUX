@@ -87,8 +87,8 @@ LoopInfo::setAxes(int32_t nAxes, const int32_t *axes, int32_t mode)
     nAxes = this->ndim;
     axes = NULL;                // treat as if all axes were specified
   } else if ((mode & SL_NEGONED)        // negative-axis treatment
-             && nAxes == 1              // one axis specified
-             && *axes < 0)      // and it is negative
+             && nAxes == 1              // one axis specified 
+            && *axes < 0)      // and it is negative
     nAxes = 0;
 
   if ((mode & SL_ONEAXIS)       // only one axis allowed
@@ -220,6 +220,21 @@ LoopInfo::setupDimensionLoop(int32_t ndim, int32_t const *dims,
   this->setAxisMode(mode);
   return 0;
 }
+
+int32_t
+LoopInfo::set(size_t index)
+{
+  if (index > this->nelem)
+    return EDOM;
+  this->data->ui8 = static_cast<uint8_t*>(this->data0) + index*this->stride;
+  for (int i = 0; i < this->rndim; ++i)
+  {
+    this->coords[i] = index % this->rdims[i];
+    index /= this->rdims[i];
+  }
+  return 0;
+}
+
 //-----------------------------------------------------------------------
 
 /// Advance along a loop.  The coordinates and the pointer to the data are
@@ -534,7 +549,7 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
                                int32_t nLess, int32_t const * less,
                                LoopInfo *tinfo, Pointer *tptr)
 {
-  int32_t       target, n, i, j, nOmitAxes = 0, omitAxes[MAX_DIMS];
+  int32_t       target, n, i, nOmitAxes = 0, omitAxes[MAX_DIMS];
   Pointer       ptr;
 
   std::vector<int32_t> dims {this->dims, this->dims + this->ndim};

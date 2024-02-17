@@ -166,7 +166,7 @@ char *expand_name(char const* name, char const* extension)
  */
 
 {
- int32_t    n, n2, error = 0;
+  int32_t    n, n2;
  char   *envname, *p;
 
         // first expand possible environment variable
@@ -181,15 +181,18 @@ char *expand_name(char const* name, char const* extension)
    envname = getenv(expname);
    if (envname != NULL)                                // translation found
    { n2 = strlen(envname);
-     if (n2 >= BUFSIZE) {error = 1; *expname = '\0';}
+     if (n2 >= BUFSIZE)
+       *expname = '\0';
      else
      { strcpy(expname, envname);
        for (p = expname + n2 - 1; *p == '/'; p--);        // remove spurious /
        *++p = '\0';
        n2 = strlen(expname) + strlen(name) - n;
-       if (n2 >= BUFSIZE) {error = 1; *expname = '\0';}
+       if (n2 >= BUFSIZE)
+         *expname = '\0';
        else strcpy(expname + strlen(expname), name + n); }
-   } else {error = 2; *expname = '\0';}
+   } else
+     *expname = '\0';
  }
  if (*expname == '\0') strcpy(expname, name);
  for (p = expname; *p && *p != '\n'; p++);        // remove \n
@@ -198,8 +201,10 @@ char *expand_name(char const* name, char const* extension)
  { if ((p = strrchr(expname, '/')) == NULL) p = expname;        // last /
    if ((p = strrchr(p, '.')) == NULL || strcmp(p, extension))
      // no extension yet, or extension is unequal to <extension>
-   { if (strlen(expname) + strlen(extension) >= BUFSIZE) error = 1;
-     else strcat(expname, extension); }
+   {
+     if (strlen(expname) + strlen(extension) < BUFSIZE)
+       strcat(expname, extension);
+   }
  }
  return expname;
 }
@@ -2656,7 +2661,6 @@ int32_t read_formatted_ascii(ArgumentCount narg, Symbol ps[], void *ptr, int32_t
       if (theFormat.count < 1) // no explicit count
         theFormat.count = 1; // so read 1
       while (theFormat.count--) {
-        bool count_spaces = false;
         char* input_data;
         char* free_space = curScrat;
         if (theFormat.width > 0 && (internalMode & 1)) {

@@ -32,6 +32,277 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 class StandardArguments
 {
 public:
+  // enums, nested structs
+
+  /// Represents the parameter type from a StandardArguments format
+  /// specification.  The default value is #PS_INPUT.
+  enum Param_spec_type
+  {
+    /// For an input parameter.  Corresponds to `i` in a StandardArguments
+    /// format specification.
+    PS_INPUT,
+
+    /// For an output parameter.  Corresponds to `o` in a format specification.
+    PS_OUTPUT,
+
+    /// For a return parameter.  Corresponds to `r` in a format specification.
+    PS_RETURN
+  };
+
+  /// Selects how to handle a particular dimension, for use in
+  /// StandardArguments.  Each constant is a bit flag that can be combined with
+  /// others through the logical "or" operation.  Not all combinations are
+  /// logical.  The default value is `DS_NONE`.
+  enum Dim_spec_type
+  {
+    /// No selection.
+    DS_NONE = 0,
+
+    /// Accepts the dimension as is.  Corresponds to `:` in the dimension part
+    /// of a StandardArguments format specification.
+    DS_ACCEPT = (1<<0),
+
+    /// Inserts this dimension.  Corresponds to `+` in a format specification.
+    DS_ADD = (1<<1),
+
+    /// Removes this dimension.  Corresponds to `-` in a format specification.
+    DS_REMOVE = (1<<2),
+
+    /// Adds or removes this dimension.
+    DS_ADD_REMOVE = (DS_ADD | DS_REMOVE),
+
+    /// Copies this dimension from the reference symbol.  Corresponds to `&` in
+    /// a format specification.
+    DS_COPY_REF = (1<<3),
+
+    /// This dimension must have exactly the specified size.
+    DS_EXACT = (1<<4),
+
+    /// This dimension must have at least the specified size.  Corresponds to
+    /// `>` in a format specification.
+    DS_ATLEAST = (1<<5),
+  };
+
+  /// Logical or operator for Dim_spec_type.
+  ///
+  /// \param lhs is the left hand side value.
+  ///
+  /// \param rhs is the right hand side value.
+  ///
+  /// \returns the combined value
+  friend Dim_spec_type operator|(const Dim_spec_type lhs,
+                                 const Dim_spec_type rhs);
+
+  /// Logical or-and-assign operator for Dim_spec_type.
+  ///
+  /// \param lhs is a reference to the left hand side value.
+  ///
+  /// \param rhs is the right hand side value.
+  ///
+  /// \returns a reference to the left hand side value after merging in the
+  /// right hand side value.
+  friend Dim_spec_type& operator|=(const Dim_spec_type& lhs,
+                                   const Dim_spec_type rhs);
+
+  /// Represents a single dimension specification from a StandardArguments
+  /// format specification.  The default represents an empty dimension
+  /// specification.
+  struct Dims_spec
+  {
+    /// How to handle the dimension.
+    Dim_spec_type type = DS_NONE;
+
+    /// The size to add, or 0 if not specified.
+    size_t size_add = 0;
+
+    /// The size to remove, or 0 if not specified.
+    size_t size_remove = 0;
+  };
+
+  /// Represents how a data type specification in a StandardArguments format
+  /// specification should be interpreted.  The default value is `PS_EXACT`.
+  enum Type_spec_limit_type
+  {
+    /// The data type is exact.
+    PS_EXACT,
+
+    /// The data type is a lower limit: If an input argument has a data type
+    /// lower than this, then a copy converted to this type is used instead.
+    /// Corresponds to `>` in the data type part of a StandardArguments format
+    /// specification.
+    PS_LOWER_LIMIT,
+
+    /// The data type is an upper limit: If an input argument has a data type
+    /// higher than this, then a copy converted to this type is used instead.
+    /// Corresponds to `<` in the data type part of a StandardArguments format
+    /// specification.
+    PS_UPPER_LIMIT,
+
+    /// The data type is integer.  If an input argument has a floating-point
+    /// data type, then a copy converted to the corresponding integer type
+    /// (`float` to `int32_t`, `double` to `int64_t`) is used instead.
+    /// Corresponds to `~` in the data type part of a StandardArguments format
+    /// specification.
+    PS_FORCE_INTEGER,
+  };
+
+  /// Represents how the remaining dimensions should be handled according to a
+  /// StandardArguments format specification.  The default value is `PS_ABSENT`.
+  enum Remaining_dims_type
+  {
+    /// Only the explicitly mentioned dimensions are present.
+    PS_ABSENT,
+
+    /// Remaining dimensions are equal to the corresponding ones from the
+    /// reference parameter.  Corresponds to `&` in a StandardArguments format
+    /// specification.
+    PS_EQUAL_TO_REFERENCE,
+
+    /// Remaining dimensions are equal to 1 or to the corresponding ones
+    /// from the reference parameter.  Corresponds to `#` in a format
+    /// specification.
+    PS_ONE_OR_EQUAL_TO_REFERENCE,
+
+    /// Remaining dimensions may have arbitrary sizes.  Corresponds to
+    /// `*` in a format specification.
+    PS_ARBITRARY
+  };
+
+  /// Represents the specification of a single parameter in a Param_spec_list
+  /// that is a StandardArguments format specification.  The default represents
+  /// a mandatory input parameter that contains exactly one value (i.e., is
+  /// either a scalar or an array with one element).
+  struct Param_spec
+  {
+    // non-const methods
+
+    /// Sets the optionality of the parameter.
+    ///
+    /// \param is says whether the parameter is optional (`true`) or mandatory
+    /// (`false`).
+    ///
+    /// \returns a reference to the current object.
+    Param_spec& set_optional(bool is = true);
+
+    /// Sets a constraint on the data type of the parameter.
+    ///
+    /// \param t is the constraint to apply, replacing any such constraint that
+    /// was specified earlier.
+    ///
+    /// \returns a reference to the current object.
+    Param_spec& set_data_type_limit(Type_spec_limit_type t);
+
+    /// Sets how dimensions are handled beyond the ones for which explicit
+    /// specifications are provided.
+    ///
+    /// \param t says how to handle the excess dimensions.
+    ///
+    /// \returns a reference to the current object.
+    Param_spec& set_remaining_dims_action(Remaining_dims_type t);
+
+    /// Says whether the current parameter contributes to and takes the common
+    /// data type.  The common data type is the greatest data type among all
+    /// parameters that are marked as contributing to the common data type.
+    ///
+    /// An output or return parameter gets the common type.  If this parameter
+    /// is an input parameter and if the Symbol specified as argument for this
+    /// parameter does not have this type, then a copy is created and converted
+    /// to the specified type and then the copy's data gets processed instead.
+    ///
+    /// \param is says whether the current parameter does (`true`) or does not
+    /// (`false`) contribute to and take the common type.
+    ///
+    /// \returns a reference to the current object.
+    Param_spec& set_use_common_type(bool is = true);
+
+    /// Says whether to omit any dimensions with a size equal to one.
+    ///
+    /// \param is says whether to omit (`true`) or keep (`false`) dimensions
+    /// equal to one.
+    ///
+    /// \returns a reference to the current object.
+    Param_spec& set_omit_dimension_equal_to_one(bool is = true);
+
+    // fields
+
+    /// The parameter type.
+    Param_spec_type logical_type = PS_INPUT;
+
+    /// `true` if the parameter is optional, `false` if is is mandatory.
+    bool is_optional = false;
+
+    /// The data type limitation.
+    Type_spec_limit_type data_type_limit = PS_EXACT;
+
+    /// The data type.
+    Symboltype data_type = LUX_NO_SYMBOLTYPE;
+
+    /// The dimension specifications.
+    std::vector<Dims_spec> dims_spec;
+
+    /// The reference parameter index in #dims_spec.  It defaults to 0.
+    Symbol ref_par = 0;
+
+    /// The axis parameter index in #dims_spec.  It defaults to -2, which
+    /// indicates "none".
+    Symbol axis_par = -2;
+
+    /// How to handle dimensions that aren't explicitly specified.
+    Remaining_dims_type remaining_dims = PS_ABSENT;
+
+    /// `true` if the current dimension has the "common type" flag (`^` in a
+    /// StandardArguments format specification), `false` otherwise.
+    bool common_type = false;
+
+    /// `true` if dimensions equal to one should be suppressed as far as
+    /// possible, `false` otherwise.
+    bool omit_dimensions_equal_to_one = false;
+  };
+
+  /// Represents a vector of parameter specifications (of type Param_spec) for
+  /// use with StandardArguments.  When a LUX function or subroutine gets called
+  /// that uses the StandardArguments interface, then the Param_spec_list
+  ///
+  /// - can specify conditions on the dimensions of the input arguments.
+  ///
+  /// - can specify how to convert the input arguments (of type #Symbol) to a
+  ///   data type more suitable for the back end C++ function.
+  ///
+  /// - specifies the data type and dimensions of the output arguments and (for
+  ///   a LUX function) return #Symbol.  Those dimensions can be specified
+  ///   explicitly and/or be taken from a reference parameter.  And that data
+  ///   type can be specified explicitly and/or be based on the data type of one
+  ///   or more other parameters.
+  ///
+  /// The default is empty, contains no parameter specifications yet.  Use
+  /// new_input_param(), new_output_param(), or new_return_param() to add the
+  /// specification of an input, output, or return parameter.  Specify a single
+  /// return parameter for a Param_spec_list for use with a LUX function. and no
+  /// return parameter for use with a LUX subroutine.
+  ///
+  /// The methods that specify other attributes of a parameter always apply to
+  /// the most recently added parameter.  When you're done with the current
+  /// parameter then use new_input_param(), new_output_param(), or
+  /// new_return_param() to add the next parameter, and so on until you're done.
+  struct Param_spec_list
+    : std::vector<Param_spec>
+  {
+    // const methods
+
+    /// \returns the index of the return parameter specification, or `-1` if
+    /// there is none.
+    int return_param_index() const;
+
+    /// \returns the count of input and output parameters specifications.
+    size_t in_out_param_count() const;
+
+    // fields
+
+    /// Is there a return parameter?  If so then it is stored at the end of
+    /// #param_specs.
+    bool has_return_param = false;
+  };
+
   // public constructors
 
   /// Default constructor.
@@ -118,7 +389,6 @@ public:
   ///
   /// \par Reference Parameter
   ///
-  /// A reference parameter can be indicated for all but the first parameter.
   /// Some missing information (like a data type or a dimension) may be copied
   /// from the reference parameter.  The reference parameter is indicated by a
   /// number or a hyphen (`-`) between square brackets (`[]`) just after the
@@ -198,16 +468,14 @@ public:
   /// type of `float`.  If the input parameter type is at least `float`, then
   /// the return parameter gets the same type as the input parameter.  If the
   /// input parameter type is less than `float`, then an `int32` version of the
-  /// input is made available, and the return parameter is of type `float`.  If
-  /// the input parameter type is at least `float`, then the return value gets
-  /// the same type as the input parameter.
+  /// input is made available, and the return parameter is of type `float`.
   ///
   /// Similarly, a less-than sign (`<`) introduces a maximum data type.
   ///
   /// A tilde (`~`) is like greater-than (`>`) but with the additional condition
   /// that the data type must be integer.  If the data type would be `float`
-  /// then instead it becomes `int32_t`, and if the data type would be `double`
-  /// then it instead becomes `int64_t`.
+  /// then instead it becomes `int32`, and if the data type would be `double`
+  /// then it instead becomes `int64`.
   ///
   /// If the data type specifications for more than one numerical parameter are
   /// followed by a caret (`^`), then all of those parameters get the same data
@@ -408,13 +676,13 @@ public:
   /// - `<` = the type should be at most equal to the indicated type.
   /// - '~' = the type should be at least equal to the indicated type but must
   ///   be integer: float becomes `int32_t` and double becomes `int64_t`.
-  /// - `B` = LUX_INT8
-  /// - `W` = LUX_INT16
-  /// - `L` = LUX_INT32
-  /// - `Q` = LUX_INT64
-  /// - `F` = LUX_FLOAT
-  /// - `D` = LUX_DOUBLE
-  /// - `S` = LUX_STRING
+  /// - `B` = #LUX_INT8
+  /// - `W` = #LUX_INT16
+  /// - `L` = #LUX_INT32
+  /// - `Q` = #LUX_INT64
+  /// - `F` = #LUX_FLOAT
+  /// - `D` = #LUX_DOUBLE
+  /// - `S` = #LUX_STRING
   /// - `^` = all numerical parameters marked like this get the same data type,
   ///   which is the greatest numerical data type among them that would have
   ///   applied if no `^` had been specified.
@@ -481,6 +749,9 @@ public:
   StandardArguments(ArgumentCount narg, Symbol ps[], const std::string& fmt,
                     Pointer** ptrs = nullptr, LoopInfo** infos = nullptr);
 
+  StandardArguments(ArgumentCount narg, Symbol ps[], const Param_spec_list& psl,
+                    Pointer** ptrs = nullptr, LoopInfo** infos = nullptr);
+
   // const methods
 
   /// \returns the count of LUX symbols for which this instance contains
@@ -489,11 +760,59 @@ public:
 
   /// Returns the return symbol, the LUX symbol intended to represent the result
   /// of the call of the LUX subroutine or function.
-  int32_t result() const;
+  Symbol result() const;
 
   // non-const methods
-  int32_t set(ArgumentCount narg, Symbol ps[], const std::string& fmt,
-              Pointer** ptrs = nullptr, LoopInfo** infos = nullptr);
+
+  /// Configure symbols based on the passed symbols and a StandardArguments
+  /// format string.  The configured symbols can be used to handle a call of a
+  /// LUX function or subroutine.
+  ///
+  /// \param[in] narg is the number of symbols passed in \a ps.
+  ///
+  /// \param[in] ps points at the symbols passed into this call.
+  ///
+  /// \param[in] fmt is the StandardArguments format string that says what
+  /// input, output, and return symbols the LUX function or subroutine expects.
+  ///
+  /// \param[in,out] ptrs points (if it is not null) at the address where to
+  /// store a pointer to one Pointer per configured symbol, that points at the
+  /// first data element of each symbol.
+  ///
+  /// \param[in,out] infos points (if it is not null) at the address where to
+  /// store a pointer to one LoopInfo per configured symbol, that holds
+  /// information about the coordinates, dimensional structure, and way to
+  /// traverse the elements.
+  ///
+  /// \returns the configured return symbol.  For a LUX subroutine this is
+  /// LUX_ONE.
+  Symbol set(ArgumentCount narg, Symbol ps[], const std::string& fmt,
+             Pointer** ptrs = nullptr, LoopInfo** infos = nullptr);
+
+  /// Configure symbols based on the passed symbols and a parameter
+  /// specification list.  The configured symbols can be used to handle a call
+  /// of a LUX function or subroutine.
+  ///
+  /// \param[in] narg is the number of symbols passed in \a ps.
+  ///
+  /// \param[in] ps points at the symbols passed into this call.
+  ///
+  /// \param[in] psl is the parameter specification list that says what input,
+  /// output, and return symbols the LUX function or subroutine expects.
+  ///
+  /// \param[in,out] ptrs points (if it is not null) at the address where to
+  /// store a pointer to one Pointer per configured symbol, that points at the
+  /// first data element of each symbol.
+  ///
+  /// \param[in,out] infos points (if it is not null) at the address where to
+  /// store a pointer to one LoopInfo per configured symbol, that holds
+  /// information about the coordinates, dimensional structure, and way to
+  /// traverse the elements.
+  ///
+  /// \returns the configured return symbol.  For a LUX subroutine this is
+  /// LUX_ONE.
+  Symbol set(ArgumentCount narg, Symbol ps[], const Param_spec_list& fmt,
+             Pointer** ptrs = nullptr, LoopInfo** infos = nullptr);
 
   /// Returns the Pointer for the argument with the given index.
   ///
@@ -547,6 +866,8 @@ template<typename T>
 class StandardLoopIterator
 {
 public:
+  // constructors, destructor
+
   /// Constructs an instance for one standard argument.
   ///
   /// \param[in] as represents the relevant StandardArguments.
@@ -564,6 +885,33 @@ public:
     m_loop_info = sa.datainfo(index);
   }
 
+  /// Copy constructor.
+  ///
+  /// \param other is the instance whose contents get copied.
+  StandardLoopIterator(const StandardLoopIterator& other)
+    : m_data(other.m_data), m_loop_info(other.m_loop_info),
+      m_status(other.m_status)
+  { }
+
+  ~StandardLoopIterator() = default;
+
+  // operators
+
+  /// Assignment operator.
+  ///
+  /// \param other is the instance whose contents get assigned to the current
+  /// instance.
+  ///
+  /// \returns a reference to the current instance.
+  StandardLoopIterator&
+  operator=(const StandardLoopIterator& other)
+  {
+    m_data = other.m_data;
+    m_loop_info = other.m_loop_info;
+    m_status = other.m_status;
+    return *this;
+  }
+
   /// Prefix increment.
   StandardLoopIterator&
   operator++()
@@ -579,6 +927,24 @@ public:
     auto old = *this;
     m_status = m_loop_info.advanceLoop(&m_data);
     return old;
+  }
+
+  // const methods
+
+  StandardLoopIterator
+  begin() const
+  {
+    auto result = *this;
+    result.set(0);
+    return result;
+  }
+
+  StandardLoopIterator
+  end() const
+  {
+    auto result = *this;
+    result.set(result.nelem);
+    return result;
   }
 
   /// Returns a reference to the data value currently pointed at.

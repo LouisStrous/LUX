@@ -1,6 +1,6 @@
 /* This is file strous.cc.
 
-Copyright 2013-2014 Louis Strous
+Copyright 2013-2024 Louis Strous
 
 This file is part of LUX.
 
@@ -22,6 +22,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <algorithm>            // for std::binary_search
+#include <iterator>             // for std::distance
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -513,309 +515,173 @@ int32_t lux_readarr(ArgumentCount narg, Symbol ps[])
  return 1;
 }
 //-------------------------------------------------------------------------
-int32_t lux_find(ArgumentCount narg, Symbol ps[])
-/* for each element of <key>, finds first occurrence of that
-   element in <array>.
-   Call:  y = FIND(array,key,offset,mode)
-   <offset>: offset(s) at which search starts; defaults to zero.
-   <mode>: 0 (default): element of <array> = element of <key>.
-           1: element of <array> >= element of <key>.
-           2: as 1, but return element instead of index
-        or 4: if <array> is multi-dimensional, search anew for each
-              combination of all dimensions but the first
-   if a key is not found, then -1 is returned.
-   <offset> is a scalar, or an array of the same size as <key>.
-   LS 1apr94 */
-{
-  Array *h, *har;
-  Pointer       ar, base, key, off, indx, theKey, theOff;
-  char  repeat = 0;
-  int32_t       mode = 0, result, i, index = 0, offset, nRepeat;
-  int32_t       iq, nar, noff, nkey, class_id, n, step, loop;
-  int32_t   dims[MAX_DIMS], ndim;
-  Symboltype type, resulttype;
-
-  iq = ps[0];                   // array
-  CK_ARR(iq,1);
-  har = HEAD(iq);
-  ar.i32 = LPTR(har);  base = ar;
-  type = sym[iq].type;
-  step = lux_type_size[type];
-  GET_SIZE(nar, har->dims, har->ndim);
-  if (narg >= 3)                        // offset
-  { iq = lux_long(1, &ps[2]);
-    GET_NUMERICAL(theOff, noff); }
-  else noff = 0;
-  indx.d = NULL;
-  iq = ps[1];                   // key
-  switch (type)                         // change key to type of array
-  { case LUX_INT8:
-      iq = lux_byte(1, &iq);  break;
-    case LUX_INT16:
-      iq = lux_word(1, &iq);  break;
-    case LUX_INT32:
-      iq = lux_long(1, &iq);  break;
-    case LUX_INT64:
-      iq = lux_int64(1, &iq);  break;
-    case LUX_FLOAT:
-      iq = lux_float(1, &iq);  break;
-    case LUX_DOUBLE:
-      iq = lux_double(1, &iq);  break; }
-  class_id = symbol_class(iq);
-  GET_NUMERICAL(theKey, nkey);
-  if (noff > 1 && nkey > 1 && nkey != noff) return cerror(INCMP_ARG, iq);
-  if (narg >= 4) mode = int_arg(ps[3]);                 // mode
-  else mode = internalMode;
-  if (mode & 4)
-  { repeat = 1;  mode &= ~4;
-    if (noff > 1 && noff != nar/har->dims[0])
-      return luxerror("Need offset for each individual search", ps[2]); }
-  if (mode & 2) resulttype = type; else resulttype = LUX_INT32;
-  if (!repeat && class_id == LUX_SCALAR)
-  { result = scalar_scratch(resulttype);
-    indx.ui8 = &sym[result].spec.scalar.ui8;
-    nRepeat = 1; }
-  else
-  { if (!repeat)
-    { result = array_clone(iq, resulttype);
-      nRepeat = 1; }
-    else
-    { if (nkey == 1)
-      { memcpy(dims, har->dims + 1, (har->ndim - 1)*sizeof(int32_t));
-        ndim = har->ndim - 1; }
-      else
-      { if ((int32_t) h->ndim + (int32_t) har->ndim - 1 > MAX_DIMS)
-          return luxerror("too many dimensions for returned array", iq);
-        memcpy(dims + h->ndim, har->dims + 1, (har->ndim - 1)*sizeof(int32_t));
-        memcpy(dims, h->dims, h->ndim*sizeof(int32_t));
-        ndim = har->ndim - 1 + h->ndim; }
-      result = array_scratch(resulttype, ndim, dims);
-      nRepeat = nar/har->dims[0];
-      nar = har->dims[0]; }
-    h = HEAD(result);  indx.i32 = LPTR(h); }
-  off = theOff;
-  while (nRepeat--)
-  { loop = nkey;
-    key = theKey;
-    while (loop--)
-    { n = nar;  offset = 0;  ar = base;
-      index = 0;
-      if (noff)
-      { offset = *off.i32;
-        n -= offset; }
-      if (offset < 0 || n < 1) n = 0; // index out of range
-      if (n)
-      { if ((mode & 3) == 0)                    // exact match
-        { switch (type)
-          { case LUX_INT8:
-              for (ar.ui8 += offset; n && *(ar.ui8++) != *key.ui8; n--);
-              if (n) index = ar.ui8 - base.ui8; break;
-            case LUX_INT16:
-              for (ar.i16 += offset; n && *(ar.i16++) != *key.i16; n--);
-              if (n) index = ar.i16 - base.i16; break;
-            case LUX_INT32:
-              for (ar.i32 += offset; n && *(ar.i32++) != *key.i32; n--);
-              if (n) index = ar.i32 - base.i32; break;
-            case LUX_INT64:
-              for (ar.i64 += offset; n && *(ar.i64++) != *key.i64; n--);
-              if (n) index = ar.i64 - base.i64; break;
-            case LUX_FLOAT:
-              for (ar.f += offset; n && *(ar.f++) != *key.f; n--);
-              if (n) index = ar.f - base.f; break;
-            case LUX_DOUBLE:
-              for (ar.d += offset; n && *(ar.d++) != *key.d; n--);
-              if (n) index = ar.d - base.d; break; }
-        }
-        else                                    // geq
-          switch (type)
-          { case LUX_INT8:
-              for (ar.ui8 += offset; n && *(ar.ui8++) < *key.ui8; n--);
-              if (n) index = ar.ui8 - base.ui8; break;
-            case LUX_INT16:
-              for (ar.i16 += offset; n && *(ar.i16++) < *key.i16; n--);
-              if (n) index = ar.i16 - base.i16; break;
-            case LUX_INT32:
-              for (ar.i32 += offset; n && *(ar.i32++) < *key.i32; n--);
-              if (n) index = ar.i32 - base.i32; break;
-            case LUX_INT64:
-              for (ar.i64 += offset; n && *(ar.i64++) < *key.i64; n--);
-              if (n) index = ar.i64 - base.i64; break;
-            case LUX_FLOAT:
-              for (ar.f += offset; n && *(ar.f++) < *key.f; n--);
-              if (n) index = ar.f - base.f; break;
-            case LUX_DOUBLE:
-              for (ar.d += offset; n && *(ar.d++) < *key.d; n--);
-              if (n) index = ar.d - base.d; break; }
-      }
-      key.ui8 += step;
-      if ((mode & 2) == 0) *indx.i32++ = index - 1;
-      else switch (type)
-      { case LUX_INT8:
-          *indx.ui8++ = (indx.ui8)? *(base.ui8+index-1): -1; break;
-        case LUX_INT16:
-          *indx.i16++ = (indx.i16)? *(base.i16+index-1): -1; break;
-        case LUX_INT32:
-          *indx.i32++ = (indx.i32)? *(base.i32+index-1): -1; break;
-        case LUX_INT64:
-          *indx.i64++ = (indx.i64)? *(base.i64+index-1): -1; break;
-        case LUX_FLOAT:
-          *indx.f++ = (indx.f)? *(base.f+index-1): -1; break;
-        case LUX_DOUBLE:
-          *indx.d++ = (indx.d)? *(base.d+index-1): -1; break; }
-      if (noff > 1) off.i32++;
-    }   // end of while (loop--)
-    base.ui8 += nar*step;
-  } // end of while (nRepeat--)
-  return result;
-}
-REGISTER(find, f, find, 2, 4, "0exact:1index_ge:2value_ge:4first");
-//-------------------------------------------------------------------------
 template<typename T>
 void
-find2_action(StandardLoopIterator<T> datait,
+find_action(StandardLoopIterator<T> datait,
              StandardLoopIterator<T> keysit,
-             StandardLoopIterator<int32_t> indexit,
+             StandardLoopIterator<int32_t> offsetit,
              StandardLoopIterator<int32_t> targetit,
-             bool reverse)
+             int32_t flags)
 {
   auto data = datait.pointer();
-  auto keys = keysit.pointer();
-  auto index = indexit.pointer();
+  auto offsets = offsetit.pointer();
   auto target = targetit.pointer();
-  auto keys_count = keysit.element_count();
   auto data_count = datait.element_count();
-  auto index_count = indexit.element_count();
-  // if (reverse) {
-  //   for (int i = 0; i < keys_count; ++i) {
-  //     if (index_count && (*index >= data_count || *index < 0)) {
-  //       *target++ = -1;
-  //       if (index_count > 1)
-  //         ++index;
-  //       continue;
-  //     }
-  //     int j;
-  //     for (j = index_count? *index: data_count - 1; j; --j)
-  //       if (*keys == data[j])
-  //         break;
-  //     *target++ = j;
-  //     ++keys;
-  //     if (index_count > 1)
-  //       ++index;
-  //   }
-  // } else {
-  //   for (int i = 0; i < keys_count; i++) {
-  //     if (index_count && (*index >= data_count || *index < 0)) {
-  //       *target++ = -1;
-  //       if (index_count > 1)
-  //         ++index;
-  //       continue;
-  //     }
-  //     int j;
-  //     for (j = index_count? *index: 0; j < data_count; j++)
-  //       if (*keys == data[j])
-  //         break;
-  //     *target++ = (j == data_count? -1: j);
-  //     keys++;
-  //     if (index_count > 1)
-  //       ++index;
-  //   }
-  // }
-  if (reverse) {
-    while (!keysit.done()) {
-      if (index_count && (*indexit >= data_count || *indexit < 0)) {
-        *targetit++ = -1;
-        if (index_count > 1)
-          ++indexit;
-        continue;
+  auto offsets_count = offsetit.element_count();
+
+  bool data_monotonic = (flags & (1 << 0));
+  bool at_or_past     = (flags & (1 << 1));
+
+  bool data_going_up = true;
+  if (data_monotonic)
+  {
+    // figure out if the data increases or decreases
+    auto base = data[0];
+    for (auto ix = 1; ix < data_count; ++ix)
+    {
+      auto x = data[ix];
+      if (x > base)
+        break;                  // data_going_up is already true
+      else if (x < base)
+      {
+        data_going_up = false;
+        break;
       }
-      int j;
-      for (j = index_count? *indexit: data_count - 1; j; --j)
-        if (*keysit == data[j])
-          break;
-      *targetit++ = j;
-      ++keysit;
-      if (index_count > 1)
-        ++indexit;
     }
-  } else {
-    while (!keysit.done()) {
-      if (index_count && (*indexit >= data_count || *indexit < 0)) {
-        *targetit++ = -1;
-        if (index_count > 1)
-          ++indexit;
-        continue;
-      }
-      int j;
-      for (j = index_count? *indexit: 0; j < data_count; j++)
-        if (*keysit == data[j])
+  }
+
+  int32_t offset;
+  if (offsets_count >= 1)
+  {
+    offset = *offsets;
+    --offsets_count;
+  }
+  else
+    offset = 0;
+  while (!keysit.done())
+  {
+    T key = *keysit++;          // value to search for
+
+    if (offset < 0 || offset >= data_count)
+      *target = -1;
+    else if (data_monotonic)
+    {
+      decltype(data) it;
+      if (data_going_up)
+        it = std::lower_bound(data + offset, data + data_count, key);
+      else
+        it = std::lower_bound(data + offset, data + data_count, key,
+                              [](const T& lhs, const T& rhs)
+                              {
+                                return lhs > rhs;
+                              });
+      if ((it == data + data_count)
+          || (!at_or_past && *it != key))
+        *target = -1;
+      else
+        *target = it - data;
+    }
+    else // brute force search
+    {
+      int32_t ix;
+      for (ix = offset; ix < data_count; ++ix)
+      {
+        if (data[ix] == key)    // found it
+        {
+          *target = ix;
           break;
-      *targetit++ = (j == data_count? -1: j);
-      ++keysit;
-      if (index_count > 1)
-        ++indexit;
+        }
+      }
+      if (ix == data_count)     // not found
+        *target = -1;
+    }
+    ++target;
+    if (offsets_count)
+    {
+      offset = *++offsets;
+      --offsets_count;
     }
   }
 }
 
 Symbol
-lux_find2(ArgumentCount narg, Symbol ps[])
-// FIND2(array, key [, offset] [, /reverse])
+lux_find(ArgumentCount narg, Symbol ps[])
+// FIND(data, keys [, offsets] [, /data_monotonic, /at_or_past])
+//
+// Locate the keys in the data, starting at offset, which defaults to 0 (the
+// index of the first data element).
+//
+// /data_monotonic is a promise by the caller that the data values are sorted in
+// ascending or descending order.  Then a faster search algorithm can be used.
+//
+// /at_or_past says to return the index to the first data value that is equal to
+// or past the key.  If /data_monotonic is also specified, then "past the key"
+// means in the direction in which the data is monotonic, otherwise "past the
+// key". means greater than the key.  If /at_or_past is not specifid then only
+// an exact match between key and data is accepted.
 {
-  StandardArguments sa(narg, ps, "i*;i*;iL[-]#?;rL[1]@&");;
+  StandardArguments
+    sa(narg, ps,
+       "i*;"       // data: input argument with arbitrary dimensions
+       "i*;"       // key: input argument with arbitrary dimensions
+       "iL[1]#?;"  // offset: optional input argument, converted to LUX_INT32,
+                   // the element count must be equal to 1 or to that of the key
+       "rL[1]@&"); // return symbol: LUX_INT32, dimensions equal to that of the
+                   // key, omitting dimensions equal to 1 but leaving one if
+                   // there would otherwise be no dimensions at all
   if (sa.result() < 0) {
     return sa.result();
   }
 
-  bool reverse = (internalMode & 1);
   switch (sa.datainfo(0).type) {
   case LUX_INT8:
-    find2_action(StandardLoopIterator<uint8_t>(sa, 0),
+    find_action(StandardLoopIterator<uint8_t>(sa, 0),
                  StandardLoopIterator<uint8_t>(sa, 1),
                  StandardLoopIterator<int32_t>(sa, 2),
                  StandardLoopIterator<int32_t>(sa, 3),
-                 reverse);
+                 internalMode);
     break;
   case LUX_INT16:
-    find2_action(StandardLoopIterator<int16_t>(sa, 0),
-                 StandardLoopIterator<int16_t>(sa, 1),
-                 StandardLoopIterator<int32_t>(sa, 2),
-                 StandardLoopIterator<int32_t>(sa, 3),
-                 reverse);
+    find_action(StandardLoopIterator<int16_t>(sa, 0),
+                StandardLoopIterator<int16_t>(sa, 1),
+                StandardLoopIterator<int32_t>(sa, 2),
+                StandardLoopIterator<int32_t>(sa, 3),
+                internalMode);
     break;
   case LUX_INT32:
-    find2_action(StandardLoopIterator<int32_t>(sa, 0),
-                 StandardLoopIterator<int32_t>(sa, 1),
-                 StandardLoopIterator<int32_t>(sa, 2),
-                 StandardLoopIterator<int32_t>(sa, 3),
-                 reverse);
+    find_action(StandardLoopIterator<int32_t>(sa, 0),
+                StandardLoopIterator<int32_t>(sa, 1),
+                StandardLoopIterator<int32_t>(sa, 2),
+                StandardLoopIterator<int32_t>(sa, 3),
+                internalMode);
     break;
   case LUX_INT64:
-    find2_action(StandardLoopIterator<int64_t>(sa, 0),
-                 StandardLoopIterator<int64_t>(sa, 1),
-                 StandardLoopIterator<int32_t>(sa, 2),
-                 StandardLoopIterator<int32_t>(sa, 3),
-                 reverse);
+    find_action(StandardLoopIterator<int64_t>(sa, 0),
+                StandardLoopIterator<int64_t>(sa, 1),
+                StandardLoopIterator<int32_t>(sa, 2),
+                StandardLoopIterator<int32_t>(sa, 3),
+                internalMode);
     break;
   case LUX_FLOAT:
-    find2_action(StandardLoopIterator<float>(sa, 0),
-                 StandardLoopIterator<float>(sa, 1),
-                 StandardLoopIterator<int32_t>(sa, 2),
-                 StandardLoopIterator<int32_t>(sa, 3),
-                 reverse);
+    find_action(StandardLoopIterator<float>(sa, 0),
+                StandardLoopIterator<float>(sa, 1),
+                StandardLoopIterator<int32_t>(sa, 2),
+                StandardLoopIterator<int32_t>(sa, 3),
+                internalMode);
     break;
   case LUX_DOUBLE:
-    find2_action(StandardLoopIterator<double>(sa, 0),
+    find_action(StandardLoopIterator<double>(sa, 0),
                  StandardLoopIterator<double>(sa, 1),
-                 StandardLoopIterator<int32_t>(sa, 2),
-                 StandardLoopIterator<int32_t>(sa, 3),
-                 reverse);
+                StandardLoopIterator<int32_t>(sa, 2),
+                StandardLoopIterator<int32_t>(sa, 3),
+                internalMode);
     break;
   default:
-    return luxerror("Illegal type in arguments to FIND2 function", 0);
+    return luxerror("Illegal type in arguments to FIND function", 0);
   }
   return sa.result();
 }
-REGISTER(find2, f, find2, 2, 3, "1reverse");
+REGISTER(find, f, find, 2, 3, "1data_monotonic:2at_or_past");
 //-------------------------------------------------------------------------
 int timespec_diff(struct timespec* two, struct timespec* one)
 {
@@ -833,7 +699,6 @@ int32_t lux_help(ArgumentCount narg, Symbol ps[])
 {
   char const* topic = narg? string_arg(*ps): "Top";
   char cmd[300];
-  char topic2[300];
   if (strlen(topic) > 270)
     return luxerror("Help topic is too long: '%s'", 0, topic);
 

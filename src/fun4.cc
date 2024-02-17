@@ -1070,8 +1070,6 @@ template<typename T>
 T
 bilinear_2d_interpolation_backend(const T* in, int ix, int tx, int iy, int ty,
                                   int nix, int niy, int nox, int noy) {
-  auto nix2 = 2*nix;
-  auto niy2 = 2*niy;
   auto nox2 = 2*nox;
   auto noy2 = 2*noy;
 

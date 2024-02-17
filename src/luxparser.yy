@@ -1211,7 +1211,7 @@ int32_t yylex(YYSTYPE *lvalp)
  char const* prompt;
  int32_t        i;
  static int32_t len = 0;
- extern char    recording, *currentInputFile;
+ extern char* currentInputFile;
  extern int32_t curLineNumber;  /* current line number */
  int32_t        getNewLine(char *buffer, size_t bufsize, char const* prompt, char historyFlag),
    showstats(int32_t narg, int32_t ps[]);

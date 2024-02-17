@@ -57,7 +57,7 @@ int32_t site(ArgumentCount narg, Symbol ps[])
    Be sure to delete  site.o  before every compilation, because otherwise the
    compilation time etc. aren't updated!   LS 10/5/92 */
 {
-  char        fmt[] = " %22s %6d %6d\n", hasInclude = 0, *p, *p2;
+  char        fmt[] = " %22s %6d %6d\n", hasInclude = 0;
   void        setPager(int32_t), resetPager(void);
 
   setPager(0);

@@ -12116,7 +12116,6 @@ arguments.
 * filetypename::                Returns the name of the file type
 * filewrite::                   Unformatted writing to a file
 * find::                        Find the first occurrence of particular values
-* find2::
 * findfile::                    Find a particular file
 * findspans::                   Find spans of elements meeting a condition
 * find_max::                    Find the values of local maxima
@@ -18506,67 +18505,99 @@ data is written at the current file position.
 See also: @ref{fileread}, @ref{openw}
 
 @c -------------------------------------
-@node find, find2, filewrite, Internal Routines
+@node find, findfile, filewrite, Internal Routines
 @subsection find
 @findex find
 
-@code{find(@var{array}, @var{key} [, @var{offset}] [, /exact, /index_ge,
-/value_ge, /first])}
+@code{find(@var{data}, @var{keys} [, @var{offsets}] [,
+/data_monotonic, /keys_monotonic, /at_or_past])}
 
-Finds the first occurrence of each element of @code{@var{key}}, starting
-at (the corresponding element of) @code{@var{offset}} in
-@code{@var{array}}.  The search mode keywords are:
+Finds the first occurrence in @code{@var{data}} of each element of
+@code{@var{keys}}, starting at the index into @code{@var{data}} given
+by the corresponding element of @code{@var{offsets}}.  Returns the
+index (into @code{@var{data}}) of the found match, or @code{-1} if no
+match was found.
+
+@code{@var{data}}, @code{@var{keys}}, and @code{@var{offset}} may be
+each be scalar or array.  @code{@var{offsets}} defaults to 0.  If
+@code{@var{offsets}} runs out before @code{@var{data}} does then the
+last element of @code{@var{offsets}} is reused.
+
+By default, the match between key and value must be exact, and the
+order of values in @code{@var{data}} and @code{@var{keys}} can be
+arbitrary.  This can be modified by the flags:
 
 @table @code
-@item /exact
-Seek exact match, return offset or @code{-1} if none found.
-@item /index_ge
-Seek first element greater than or equal to the key.  Return offset or
-@code{-1}, if none found.
-@item /value_ge
-Seek first element greater than or equal to the key.  Return found
-element, or @code{-1} if none found.
-@item /first
-Return a result for each combination of the second and higher
-dimensions.
+@item /data_monotonic
+
+Is a promise by the caller that @code{@var{data}} is sorted in
+ascending or descending order.  Then a much faster search algorithm is
+used that only produces correct results when that condition is met.
+If @code{/data_monotonic} is used when @code{@var{data}} is not sorted
+then wrong results are likely returned.
+
+@item /keys_monotonic
+
+Is a promise by the caller that @code{@var{keys}} is sorted, and in
+the same way as @code{@var{data}}.  @code{/key_monotonic} implies
+@code{/data_monotonic}.  If @code{/data_monotonic} is used when
+@code{@var{data}} and @code{@var{data}} are not sorted or not sorted
+in the same direction then wrong results are likely returned.
+
+@item /at_or_past
+
+Says to return the index of the first data value that is equal to or
+past the key value.  ``Past the key value'' means beyond the key value
+in the direction of variation of the data values if
+@code{/data_monotonic} or @code{/key_monotonic} are specified, or
+greater than the key value if those flags are not specified.
+
 @end table
 
-e.g., if @code{x} is a 3 by 5 by 4 array, then @code{find(x,[1,2])}
-returns the indices of the first occurrence of 1 and 2 in @code{x},
-irrespective of the dimensional structure of @code{x}, and
-@code{find(x,[1, 2],/first)} returns a 2 by 5 by 4 array with the
-results of @code{find(x(*,0,0),1), find(x(*,1,0),1),} etcetera.
-@code{@var{key}} may be a scalar or an array.  @code{@var{offset}} may
-be a scalar or an array of the same size as @code{@var{key}}.
+Some examples:
 
-See also: @ref{find_maxloc}
+@code{find([2, 8, 8, 14, 23], [3, 8, 23])} returns @code{[-1, 1, 4]}
+because key 3 is not in the data, key 8 occurs at index 1, and key 23
+occurs at index 4.
+
+Flags @code{/data_monotonic} and @code{/keys_monotonic} can be applied
+to the previous example, because the data values are sorted in
+ascending order and so are the key values.  Then faster algorithms can
+be used to find the results.
+
+@code{find([23, 14, 8, 8, 2], [3, 8, 23])} returns @code{[4, 1, -1]}.
+Flag @code{/data_monotonic} can be applied to this example because the
+data values are sorted in descending order, and returns the same
+results.  Flag @code{/keys_monotonic} cannot be applied here because
+even though both the keys and data values are sorted they are not
+sorted in the same direction; the data values are sorted in ascending
+order but the keys in descending order.
+
+@code{find([8, 3, 1], 5)} returns @code{-1} because 5 is not among the
+data values.
+
+@code{find([8, 3, 1], 5, /at_or_past)} returns @code{0} because the
+index of the first data value that is greater than or equal to 5 is 0
+(for value 8).
+
+@code{find([8, 3, 1], 5, /data_monotonic, /at_or_past)} returns
+@code{1} because the index of the first data value at or past 5 in
+descending order (the sorting order of the data) is 3 (for value 1).
+
+The number of comparisons of data and key values that are needed for
+@code{x=indgen(lonarr(n)) find(x, x)} is close to @code{0.5*n} per key
+value.  Because @code{x} is in sorted order, we can use
+@code{/data_monotonic}, which reduces the number of comparisons to
+roughly @code{log(n)/log(2)} per key value.  This makes a huge
+difference when @code{n} is large: with 100000 data values, the
+algorithm without @code{/data_monotonic} needs 2995 times more
+comparisons to finish than the algorithm with @code{/data_monotonic}
+does, and that ratio grows with @code{n}.
+
+See also: @ref{find_maxloc}, @ref{find_minloc}
 
 @c -------------------------------------
-@node find2, findfile, find, Internal Routines
-@subsection find
-@findex find2
-
-@code{find2(@var{data}, @var{key} [, @var{start}] [, /reverse])}
-
-Finds the first occurrence of each element of @code{@var{key}} in
-@code{@var{data}}, treating @code{@var{data}} as a one-dimensional
-array, and starting the search at zero-based element index
-@code{@var{start}} and moving forward (if @code{/reverse} is not
-specified) or backward (if @code{/reverse} is specified).  If
-@code{@var{start}} is not specified, then starts at the beginning if
-@code{/reverse} is not specified, or at the end if @code{/reverse} is
-specified.
-
-Returns the zero-based index of each found key, or @code{-1} for a key
-that wasn't found.
-
-This function is intended to eventually replace @ref{find}, when it is
-more complete.
-
-See also: @ref{find}
-
-@c -------------------------------------
-@node findfile, findspans, find2, Internal Routines
+@node findfile, findspans, find, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection findfile
 @findex findfile

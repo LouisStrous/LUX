@@ -37,7 +37,7 @@ typedef struct Bytestack_struct *Bytestack;
 /** Defines an unsigned integral type for an index into a Byte
     stack. The value #BYTESTACK_INDEX_ERROR indicates an error state.
     Other values indicate locations in a Byte stack. */
-typedef ssize_t Bytestack_index;
+typedef size_t Bytestack_index;
 
 Bytestack Bytestack_create(void);
 void Bytestack_delete(Bytestack bytestack);

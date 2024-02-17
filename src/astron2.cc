@@ -136,9 +136,8 @@ astropos(double JD, int target_object, int observer_object, double xyz[3])
     }
   }
 
-  bool ok = false;
-  if (de441) {
-    const int units = (CALCEPH_UNIT_KM + CALCEPH_UNIT_SEC);
+  if (de441)
+  {
     double posvel[6];
 
     target_object = lux_to_calceph_object_id(target_object);

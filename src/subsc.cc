@@ -2703,7 +2703,6 @@ int32_t lux_concat(ArgumentCount narg, Symbol ps[])
   int32_t       nd, j, i, dim[MAX_DIMS], nundef = 0;
   int32_t       iq, nsym, mq, topnd = 0, sflag = 0, n, nq;
   Symboltype toptype = LUX_INT8;
-  Scalar        temp;
 
   if (narg <= 0)
     return cerror(WRNG_N_ARG, 0);

@@ -37,13 +37,10 @@ char        line[BUFSIZE], tLine[BUFSIZE], recording = 0;
 FILE        *inputStream;
 char        *inputString;
 int32_t        curLineNumber = 0, compileLevel = 0;
-static int32_t        promptLength, show = 1;
 int32_t        echo = 0;  // flag: 1 -> echo lines even if not gotten from stdin
 int32_t        getStreamChar(void), getStringChar(void);
 int32_t     (*getChar)(void) = getStreamChar, termCol, termRow, uTermCol, page;
 int32_t        noPrompt = 0;
-static int32_t        col = 0, row = 0, textWidth;
-static char        *thePrompt;
 extern int32_t        scrat[];
 //----------------------------------------------------
 void getTerminalSize(void)

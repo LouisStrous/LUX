@@ -4509,7 +4509,6 @@ lux_compose_2d_action(void* vout, int32_t dimsout[2], const void* vin1,
   const T* in1 = static_cast<const T*>(vin1);
   const T* in2 = static_cast<const T*>(vin2);
   const int side = 3;
-  T data[side*side];
 
   int rightedge = dimsout[0]%side;
   int bottomedge = dimsout[1]%side;

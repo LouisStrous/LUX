@@ -45,7 +45,7 @@ void getTermCaps(void)
 // reads terminal capabilities of terminal type TERM (environment variable)
 // through terminfo or (if terminfo is not available) termcap.
 {
-  char        *terminfo, buf[256], txt[12], *p, *q, found;
+  char        *terminfo, buf[256], txt[12];
   char const* term;
   int32_t        n, i, name_size, bool_count, num_count, str_size, ncap;
   FILE        *fp;

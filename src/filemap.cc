@@ -315,7 +315,7 @@ int32_t lux_fzarr(ArgumentCount narg, Symbol ps[])
 // FZARR(name) returns a file array symbol appropriate for an
 // uncompressed FZ file.
 {
-  char        *name, *p;
+  char        *name;
   int32_t        wwflag, iq, mq;
   FILE        *fp;
   FzHead        *fh;

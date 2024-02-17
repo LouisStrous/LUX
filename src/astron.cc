@@ -1042,7 +1042,6 @@ int32_t lux_calendar(ArgumentCount narg, Symbol ps[])
          else the standard loop ignores the excess elements.  We shift the
          excess to the second dimension. */
       int32_t dims[MAX_DIMS];
-      size_t ndim = 0;
 
       assert(srcinfo.dims[0] % input_elem_per_date == 0);
       memcpy(dims, &srcinfo.dims[0], srcinfo.ndim*sizeof(*dims));
@@ -3435,7 +3434,6 @@ double kepler_v(double M, double e)
   double ad = fabs(delta);
   double srd = sqrt(ad);
   double srd3 = srd*ad;
-  double isrd = 1/srd;
   double isrd3 = 1/srd3;
 
   double Mq;                    // perifocal anomaly
@@ -4315,10 +4313,10 @@ int32_t lux_astropos(ArgumentCount narg, Symbol ps[])
      // 8 - Neptune, 9 - Pluto, 10 - Moon.
 {
   char  tdt, *string;
-  int32_t       iq, nJD, *object, nObjects, object0, dims[MAX_DIMS],
-    nDims, i, j, result, coordSystem, vocal;
-  double        *JD, *f, *f0, longitude, latitude, height = 0.0, rsp,
-    rcp, clat, slat, equinox;
+  int32_t       iq, nJD, *object, nObjects, object0,
+    i, j, result, coordSystem, vocal;
+  double        *JD, *f, *f0, longitude, latitude, height = 0.0,
+    clat, slat, equinox;
   double        tolerance;
 
   if (internalMode & S_CONJSPREAD)      // /CONJSPREAD
@@ -4391,23 +4389,27 @@ int32_t lux_astropos(ArgumentCount narg, Symbol ps[])
     object0 = EARTH;            // no object0: use Earth
   if (object0 != EARTH) {       // not relative to Earth
     if (coordSystem != S_ECLIPTICAL && coordSystem != S_EQUATORIAL)
-      return luxerror("Non-ecliptic/non-equatorial coordinates are only returned relative to the Earth", 0);
+      return luxerror("Non-ecliptic/non-equatorial coordinates are only "
+                      "returned relative to the Earth", 0);
   }
 
   double geocentric_latitude_rad;
 
-  if (narg > 3 && ps[3]) {      // OBSERVER
+  if (narg > 3 && ps[3])        // OBSERVER
+  {
     if (symbol_class(ps[3]) != LUX_ARRAY
         || array_size(ps[3]) != 3)
       return
-        luxerror("OBSERVER must be a three-element array (lat/[deg], lon/[deg], h/[m])", ps[3]);
+        luxerror("OBSERVER must be a three-element array "
+                 "(lat/[deg], lon/[deg], h/[m])", ps[3]);
     iq = lux_double(1, ps + 3);
     f = (double *) array_data(iq);
     latitude = f[0];            // in degrees
     longitude = f[1];           // in degrees
     height = f[2];              // in meters above mean sea level
     if (latitude < -90 || latitude > 90)
-      return luxerror("Illegal latitude: %14.6g; must be between -90 and +90 degrees", ps[3], latitude);
+      return luxerror("Illegal latitude: %14.6g; must be between "
+                      "-90 and +90 degrees", ps[3], latitude);
     latitude *= DEG;
     longitude *= DEG;
     sincos(latitude, &slat, &clat);
@@ -4535,10 +4537,10 @@ int32_t lux_astropos(ArgumentCount narg, Symbol ps[])
 
     double pos_sun_obs[3], r_sun_obs;
     // calculate the position of the observer's planet
-    bool applied_observer_planetocentric_offset
-      = heliocentricXYZr_obs(jd, object0, equinox, geocentric_latitude_rad,
-                             Tsid, height, pos_sun_obs, &r_sun_obs, tolerance,
-                             vocal, internalMode & S_VSOP);
+    // bool applied_observer_planetocentric_offset
+    //   = heliocentricXYZr_obs(jd, object0, equinox, geocentric_latitude_rad,
+    //                          Tsid, height, pos_sun_obs, &r_sun_obs, tolerance,
+    //                          vocal, internalMode & S_VSOP);
     /* cartesian ecliptic heliocentric coordinates of the observer's
        planet at target time */
     // pos_sun_obs[0] = X, pos_sun_obs[1] = Y, pos_sun_obs[2] = Z,

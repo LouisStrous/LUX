@@ -2384,7 +2384,7 @@ int32_t show_routine(InternalRoutine *table, int32_t tableLength, ArgumentCount 
 {
  extern int32_t        uTermCol;
  int32_t        i, nOut = 0, nLine = uTermCol/16;
- char        *chars, *p;
+ char        *chars;
  char        *name, **ptr;
  KeyList        *keys;
 
@@ -2989,7 +2989,7 @@ int32_t lux_pointer(ArgumentCount narg, Symbol ps[])
 // named variable.  LS 11feb97
 {
   int32_t        iq;
-  char        *name, *p;
+  char        *name;
 
   if (ps[0] >= TEMPS_START)
     return luxerror("Intended pointer is not a named variable", ps[0]);
@@ -3062,7 +3062,6 @@ int32_t stringpointer(char *name, int32_t type)
 // LS 1apr97
 {
   int32_t        n;
-  char        *p;
 
   if (type & SP_VAR)
   { n = lookForName(name, varHashTable, curContext);

@@ -79,11 +79,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
       `>`).
 
     - changing `&` to `q`, `+` to `p`, `-` to `m`, `*` to `a`, `=` to
-      `k`.
+      `k`, `#` to `o`, `@` to `z`.
 
     - changing `[...]` to `c`, `{...}` to `x`.
-
-    - changing `#` to `o`.
 
     A repeat of a particular unit (from a `i`/`o`/`r` up to but not
     including the next one; for a repeat count of at least 3, or if
@@ -295,10 +293,10 @@ double call_split_times(double t1, double t2,
     *r++ = f(*i0++, *i1++, *i2++)
     \endverbatim
 
-    @param [in] narg number of symbols in \p ps
-    @param [in] ps array of argument symbols
-    @param [in] f pointer to C function to bind
-    @return the symbol containing the result of the function call
+    \param [in] narg number of symbols in \p ps
+    \param [in] ps array of argument symbols
+    \param [in] f pointer to C function to bind
+    \return the symbol containing the result of the function call
  */
 int32_t
 lux_d_dT3_iaiqiqrq_012_f_(ArgumentCount narg, Symbol ps[],
@@ -353,10 +351,10 @@ lux_d_dT3_iaiqiqrq_012_f_(ArgumentCount narg, Symbol ps[],
 /// *r++ = f(*i0++, *i1++, *i2++, *i3++)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dT4_iaiqT3rq_0T3_4_f_(ArgumentCount narg, Symbol ps[],
                             double (*f)(double, double, double, double))
@@ -391,10 +389,10 @@ lux_d_dT4_iaiqT3rq_0T3_4_f_(ArgumentCount narg, Symbol ps[],
 /// *r++ = f(*i0++, *i1++)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dT4_iaiqrq_01_2_f_(ArgumentCount narg, Symbol ps[],
                          double (*f)(double, double, double, double))
@@ -439,10 +437,10 @@ lux_d_dT4_iaiqrq_01_2_f_(ArgumentCount narg, Symbol ps[],
 /// i2 += 9;
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(ArgumentCount narg, Symbol ps[],
                                       double (*f)(double, double, double,
@@ -486,10 +484,10 @@ lux_d_dT4dp33_iaiqip3p3qrq_00112_3_f_(ArgumentCount narg, Symbol ps[],
 /// *r++ = f(*i0++, 0, *i1, *i2, *i3, *i4)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dT6_iaiT4rq_0z1T4_5_f_(ArgumentCount narg, Symbol ps[],
                              double (*f)(double, double, double, double,
@@ -545,10 +543,10 @@ lux_d_dT6_iaiT4rq_0z1T4_5_f_(ArgumentCount narg, Symbol ps[],
 /// *r++ = f(*i0++)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_d_iarq_0_1_f_(ArgumentCount narg, Symbol ps[], double (*f)(double))
 {
@@ -584,10 +582,10 @@ lux_d_d_iarq_0_1_f_(ArgumentCount narg, Symbol ps[], double (*f)(double))
 /// *r++ = f(*i0++, *i1++)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dd_iaibrq_01_2_f_(ArgumentCount narg, Symbol ps[], double (*f)(double, double))
 {
@@ -628,10 +626,10 @@ lux_d_dd_iaibrq_01_2_f_(ArgumentCount narg, Symbol ps[], double (*f)(double, dou
 /// *r++ = f(*i0++, *i1++)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dd_iaiqrq_01_2_f_(ArgumentCount narg, Symbol ps[], double (*f)(double, double))
 {
@@ -663,10 +661,10 @@ lux_d_dd_iaiqrq_01_2_f_(ArgumentCount narg, Symbol ps[], double (*f)(double, dou
 /// *r++ = f(*i0++, 0)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dd_iarq_0z_1_f_(ArgumentCount narg, Symbol ps[], double (*f)(double, double))
 {
@@ -721,10 +719,10 @@ lux_d_dd_iarq_0z_1_f_(ArgumentCount narg, Symbol ps[], double (*f)(double, doubl
 /// i0 += 9;
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dp33d_i33aimmqrcq_01_2_f_(ArgumentCount narg, Symbol ps[],
                                 double (*f)(double [3][3], double))
@@ -760,10 +758,10 @@ lux_d_dp33d_i33aimmqrcq_01_2_f_(ArgumentCount narg, Symbol ps[],
 /// i0 += 3;
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dp3_i3arm3q_0_1_f_(ArgumentCount narg, Symbol ps[], double (*f)(double [3]))
 {
@@ -802,10 +800,10 @@ lux_d_dp3_i3arm3q_0_1_f_(ArgumentCount narg, Symbol ps[], double (*f)(double [3]
 /// i1 += 3;
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_dp3dp3_i3aiqrm3q_01_2_f_(ArgumentCount narg, Symbol ps[],
                                double (*f)(double [3], double [3]))
@@ -848,10 +846,10 @@ lux_d_dp3dp3_i3aiqrm3q_01_2_f_(ArgumentCount narg, Symbol ps[],
 /// advance(r);
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_d_sd_iaiarxq_000_2_f_(ArgumentCount narg, Symbol ps[],
                           double (*f)(double *, size_t count, size_t stride))
@@ -930,10 +928,10 @@ lux_d_sd_iaiarxq_000_2_f_(ArgumentCount narg, Symbol ps[],
 ///   o8++, o9++, o10++, o11++, o12++, o13++)
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(ArgumentCount narg, Symbol ps[],
                                         int32_t (*f)(double, double, double,
@@ -977,10 +975,10 @@ lux_i_dT10dpT6_iaiqT7oqT6_0T6z7z8T13_s_(ArgumentCount narg, Symbol ps[],
 // *r++ = a + b;
 // \endverbatim
 //
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_dT3dpdp_iaiqrq_0z122_f_(ArgumentCount narg, Symbol ps[],
                               int32_t (*f)(double, double, double, double *,
@@ -1022,10 +1020,10 @@ lux_i_dT3dpdp_iaiqrq_0z122_f_(ArgumentCount narg, Symbol ps[],
 /// r += 3;
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_i_dT5dp3_i3aiirq_120003_f_(ArgumentCount narg, Symbol ps[],
                                int32_t (*f)(double, double, double, double,
@@ -1069,10 +1067,10 @@ lux_i_dT5dp3_i3aiirq_120003_f_(ArgumentCount narg, Symbol ps[],
 /// r += 6;
 /// \endverbatim
 ///
-/// @param [in] narg number of symbols in \p ps
-/// @param [in] ps array of argument symbols
-/// @param [in] f pointer to C++ function to bind
-/// @return the symbol containing the result of the function call
+/// \param [in] narg number of symbols in \p ps
+/// \param [in] ps array of argument symbols
+/// \param [in] f pointer to C++ function to bind
+/// \return the symbol containing the result of the function call
 int32_t
 lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(ArgumentCount narg, Symbol ps[],
                                   int32_t (*f)(double, double, double, double,
@@ -1114,10 +1112,10 @@ lux_i_dT6dp23_iaiqT5op2p3q_0T6_f_(ArgumentCount narg, Symbol ps[],
 // o2 += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_dddp23T2_iaop2p3qocq_0z12_s_(ArgumentCount narg, Symbol ps[],
                                    int32_t (*f)(double, double, double [2][3],
@@ -1184,10 +1182,10 @@ lux_i_dddp23T2_iaop2p3qocq_0z12_s_(ArgumentCount narg, Symbol ps[],
 // *r++ = a + b;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_dddpdp_iarq_0z11_f_(ArgumentCount narg, Symbol ps[],
                           int32_t (*f)(double, double, double *, double *))
@@ -1226,10 +1224,10 @@ lux_i_dddpdp_iarq_0z11_f_(ArgumentCount narg, Symbol ps[],
 // r += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_ddidp23_iairp3p2q_0z12_f_(ArgumentCount narg, Symbol ps[],
                                 int32_t (*f)(double, double, int32_t,
@@ -1274,10 +1272,10 @@ lux_i_ddidp23_iairp3p2q_0z12_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_ddipT3dp_iarp3q_0z1111_f_(ArgumentCount narg, Symbol ps[],
                                 int32_t (*f)(double, double, int32_t *,
@@ -1378,10 +1376,10 @@ lux_i_ddipT3dp_iarp3q_0z1111_f_(ArgumentCount narg, Symbol ps[],
 // i0 += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(ArgumentCount narg, Symbol ps[],
                                       int32_t (*f)(double [2][3], double *,
@@ -1427,10 +1425,10 @@ lux_i_dp23dpT6_i23aom2m3qomqT5_0T6_s_(ArgumentCount narg, Symbol ps[],
 // r += i0.dims[0];
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_dpiT3dp_iaiirq_00T3_f_(ArgumentCount narg, Symbol ps[],
                              int32_t (*f)(double *, int32_t, int32_t,
@@ -1471,10 +1469,10 @@ lux_i_dpiT3dp_iaiirq_00T3_f_(ArgumentCount narg, Symbol ps[],
 // r += i0.dims[0];
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_dpiidp_iairq_00T2_f_(ArgumentCount narg, Symbol ps[],
                            int32_t (*f)(double *, int32_t, int32_t, double *))
@@ -1514,10 +1512,10 @@ lux_i_dpiidp_iairq_00T2_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_idT3dp3_i3airq_10002_f_(ArgumentCount narg, Symbol ps[],
                               int32_t (*f)(int32_t, double, double, double,
@@ -1558,10 +1556,10 @@ lux_i_idT3dp3_i3airq_10002_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_idp3dpT3_ii3arcq_0T222_f_(ArgumentCount narg, Symbol ps[],
                                 int32_t (*f)(int32_t, double [3], double *,
@@ -1600,10 +1598,10 @@ lux_i_idp3dpT3_ii3arcq_0T222_f_(ArgumentCount narg, Symbol ps[],
 // r += 2;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_idpdp_iarp2q_011_f_(ArgumentCount narg, Symbol ps[],
                           int32_t (*f)(int32_t, double *, double *))
@@ -1643,10 +1641,10 @@ lux_i_idpdp_iarp2q_011_f_(ArgumentCount narg, Symbol ps[],
 // advance(i0);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_sd_iaia_000_s_(ArgumentCount narg, Symbol ps[], int32_t (*f)(double *, size_t count, size_t stride))
 {
@@ -1680,10 +1678,10 @@ lux_i_sd_iaia_000_s_(ArgumentCount narg, Symbol ps[], int32_t (*f)(double *, siz
 // advance(r);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_sd_iaiarq_000_f_(ArgumentCount narg, Symbol ps[], int32_t (*f)(double *, size_t count, size_t stride))
 {
@@ -1708,10 +1706,10 @@ lux_i_sd_iaiarq_000_f_(ArgumentCount narg, Symbol ps[], int32_t (*f)(double *, s
 // r += 2;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_i_sdddsd_iaiiirq_000T333_f_(ArgumentCount narg, Symbol ps[],
                                 int32_t (*f)(double *, size_t srcount,
@@ -1789,10 +1787,10 @@ lux_i_sdddsd_iaiiirq_000T333_f_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double, double, double,
@@ -1837,10 +1835,10 @@ lux_v_dT3dp33_iaiqiqrp3p3q_0T3_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(ArgumentCount narg, Symbol ps[],
                                void (*f)(double, double, double, double [3]))
@@ -1886,10 +1884,10 @@ lux_v_dT3dp3_iaiqiqrp3q_0T3_f_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double, double, double,
@@ -1934,10 +1932,10 @@ lux_v_dT4dp33_iaiqT3rp3p3q_0T4_f_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(ArgumentCount narg, Symbol ps[],
                                     void (*f)(double, double, double,
@@ -1983,10 +1981,10 @@ lux_v_dT4dp33_iaiqiqrp3p3q_0z1T3_f_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, 0, *i1++, 0, o2++, o3++, o4++)
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double, double, double, double,
@@ -2024,10 +2022,10 @@ lux_v_dT4dpT3_iaiqoqT3_0z1z2T4_s_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, *i1++, *i2++, 0, o3++, o4++, o5++, o6++)
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(ArgumentCount narg, Symbol ps[],
                                     void (*f)(double, double, double, double,
@@ -2076,10 +2074,10 @@ lux_v_dT4dpT4_iaiqiqoqT4_0T2z3T6_s_(ArgumentCount narg, Symbol ps[],
 // o8 += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(ArgumentCount narg, Symbol ps[],
                                               void (*f)(double, double, double,
@@ -2132,10 +2130,10 @@ lux_v_dT4dpdp3T5_iaiqiqoqop3p3qocqT4_0z1T8_s_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, *i1++, *i2++, *i3++, o4++, o5++);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(ArgumentCount narg, Symbol ps[],
                                 void (*f)(double, double, double, double,
@@ -2173,10 +2171,10 @@ lux_v_dT4dpdp_iaiqT3oqoq_0T5_s_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, *i1++, *i2++, 0, o3++, o4++);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(ArgumentCount narg, Symbol ps[],
                                    void (*f)(double, double, double, double,
@@ -2215,10 +2213,10 @@ lux_v_dT4dpdp_iaiqiqoqoq_0T2z34_s_(ArgumentCount narg, Symbol ps[],
 // r += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double, double, double, double,
@@ -2262,10 +2260,10 @@ lux_v_dT6dp23_iaiqT5op2p3q_0T6_f_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(ArgumentCount narg, Symbol ps[],
                                      void (*f)(double, double, double,
@@ -2311,10 +2309,10 @@ lux_v_dT6dp33_iaiqT3rp3p3q_0z11T4_f_(ArgumentCount narg, Symbol ps[],
 //   o6++, o7++, o8++, o9++, o10++, o11++);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(ArgumentCount narg, Symbol ps[],
                                  void (*f)(double, double, double, double,
@@ -2359,10 +2357,10 @@ lux_v_dT6dpT6_iaiqT5oqT6_0T11_s_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(ArgumentCount narg, Symbol ps[],
                                       void (*f)(double, double, double,
@@ -2412,10 +2410,10 @@ lux_v_dT8dp33_iaiqT4rp3p3q_0zzz1T5_f_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(ArgumentCount narg, Symbol ps[],
                                    void (*f)(double, double, double [3][3],
@@ -2462,10 +2460,10 @@ lux_v_dddp33T2_iaip3p3qrcq_0z12_f_(ArgumentCount narg, Symbol ps[],
 // o3 += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(ArgumentCount narg, Symbol ps[],
                                        void (*f)(double, double, double [3][3],
@@ -2536,10 +2534,10 @@ lux_v_dddp33T3_iao33op3p3qocq_0z1T3_s_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddp33_iarp3p3q_0z1_f_(ArgumentCount narg, Symbol ps[],
                              void (*f)(double, double, double [3][3]))
@@ -2580,10 +2578,10 @@ lux_v_dddp33_iarp3p3q_0z1_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddp3_iaiqrp3q_0T2_f_(ArgumentCount narg, Symbol ps[],
                             void (*f)(double, double, double [3]))
@@ -2624,10 +2622,10 @@ lux_v_dddp3_iaiqrp3q_0T2_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddp3dpT3_i3aiirq_120333_f_(ArgumentCount narg, Symbol ps[],
                                   int32_t (*f)(double, double, double [3],
@@ -2667,10 +2665,10 @@ lux_v_dddp3dpT3_i3aiirq_120333_f_(ArgumentCount narg, Symbol ps[],
 //   o9++, o10++, o11++, o12++, o13++, o14++, o15++, o16++)
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddpT16_iaoqT16_0z1T16_s_(ArgumentCount narg, Symbol ps[],
                                 void (*f)(double, double, double *, double *,
@@ -2712,10 +2710,10 @@ lux_v_dddpT16_iaoqT16_0z1T16_s_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, 0, o1++, o2++, o3++)
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddpT3_iaoqT3_0z1T3_s_(ArgumentCount narg, Symbol ps[],
                              void (*f)(double, double, double *, double *,
@@ -2758,10 +2756,10 @@ lux_v_dddpT3_iaoqT3_0z1T3_s_(ArgumentCount narg, Symbol ps[],
 // o8 += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(ArgumentCount narg, Symbol ps[],
                                               void (*f)(double, double,
@@ -2811,10 +2809,10 @@ lux_v_dddpT3dp33T5_iaoqT3op3p3qocqT4_0z1T8_s_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, 0, o1++, o2++, o3++, o4++);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddpT4_iaoqT4_0z1T4_s_(ArgumentCount narg, Symbol ps[],
                              void (*f)(double, double, double *, double *,
@@ -2847,10 +2845,10 @@ lux_v_dddpT4_iaoqT4_0z1T4_s_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, 0, o1++, o2++);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dddpdp_iaoqoq_0z12_s_(ArgumentCount narg, Symbol ps[],
                             void (*f)(double, double, double *, double *))
@@ -2884,10 +2882,10 @@ lux_v_dddpdp_iaoqoq_0z12_s_(ArgumentCount narg, Symbol ps[],
 // o1 += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_ddp33_iao33q_01_s_(ArgumentCount narg, Symbol ps[],
                          void (*f)(double, double [3][3]))
@@ -2921,10 +2919,10 @@ lux_v_ddp33_iao33q_01_s_(ArgumentCount narg, Symbol ps[],
 // f(*i0++, o1++, o2++);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_ddpdp_iaoqoq_012_s_(ArgumentCount narg, Symbol ps[],
                           void (*f)(double, double*, double*))
@@ -2965,10 +2963,10 @@ lux_v_ddpdp_iaoqoq_012_s_(ArgumentCount narg, Symbol ps[],
 // r += 2;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double [2][3],
@@ -3014,10 +3012,10 @@ lux_v_dp23T2dp2_i23aiqrkmq_0T2_f_(ArgumentCount narg, Symbol ps[],
 // r += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp23T3_i23aiqrq_0T2_f_(ArgumentCount narg, Symbol ps[],
                              void (*f)(double [2][3], double [2][3],
@@ -3060,10 +3058,10 @@ lux_v_dp23T3_i23aiqrq_0T2_f_(ArgumentCount narg, Symbol ps[],
 // i0 += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(ArgumentCount narg, Symbol ps[],
                                      void (*f)(double [2][3], double *,
@@ -3107,10 +3105,10 @@ lux_v_dp23dpT6_iD23aommqocqT5_0T6_s_(ArgumentCount narg, Symbol ps[],
 // i0 += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp23dpdp_i23aommqocq_0T2_s_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double [2][3], double *, double *))
@@ -3147,10 +3145,10 @@ lux_v_dp23dpdp_i23aommqocq_0T2_s_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33T2_i33arq_01_f_(ArgumentCount narg, Symbol ps[],
                           void (*f)(double [3][3], double [3][3]))
@@ -3193,10 +3191,10 @@ lux_v_dp33T2_i33arq_01_f_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33T3_i33aiqrq_0T2_f_(ArgumentCount narg, Symbol ps[],
                              void (*f)(double [3][3], double [3][3],
@@ -3234,10 +3232,10 @@ lux_v_dp33T3_i33aiqrq_0T2_f_(ArgumentCount narg, Symbol ps[],
 // f(r)
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33_r33_0_f_(ArgumentCount narg, Symbol ps[], void (*f)(double [3][3]))
 {
@@ -3277,10 +3275,10 @@ lux_v_dp33_r33_0_f_(ArgumentCount narg, Symbol ps[], void (*f)(double [3][3]))
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(ArgumentCount narg, Symbol ps[],
                                       void (*f)(double [3][3], double,
@@ -3330,10 +3328,10 @@ lux_v_dp33ddp33T2_i33aimmqiqrq_0T3_f_(ArgumentCount narg, Symbol ps[],
 // r += 6;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(ArgumentCount narg, Symbol ps[],
                                       void (*f)(double [3][3], double [2][3],
@@ -3379,10 +3377,10 @@ lux_v_dp33dp23T2_i33aim3p2qrcq_0T2_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double [3][3], double [3],
@@ -3390,7 +3388,6 @@ lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(ArgumentCount narg, Symbol ps[],
 {
   Pointer *ptrs;
   LoopInfo *infos;
-  int32_t step;
 
   StandardArguments sa(narg, ps, "iD3,3*;iD-&;rD[-]&", &ptrs, &infos);
   if (sa.result() < 0)
@@ -3425,10 +3422,10 @@ lux_v_dp33dp3T2_i33aimqrcq_0T2_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33dp3_i33armq_01_f_(ArgumentCount narg, Symbol ps[],
                             void (*f)(double [3][3], double [3]))
@@ -3468,10 +3465,10 @@ lux_v_dp33dp3_i33armq_01_f_(ArgumentCount narg, Symbol ps[],
 // i0 += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp33dpdp_i33aommqocq_0T2_s_(ArgumentCount narg, Symbol ps[],
                                   void (*f)(double [3][3], double *, double *))
@@ -3513,10 +3510,10 @@ lux_v_dp33dpdp_i33aommqocq_0T2_s_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp3T3_i3aiqrq_0T2_f_(ArgumentCount narg, Symbol ps[],
                            void (*f)(double [3], double [3],
@@ -3557,10 +3554,10 @@ lux_v_dp3T3_i3aiqrq_0T2_f_(ArgumentCount narg, Symbol ps[],
 // r += 9;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp3dp33_i3arp3q_01_f_(ArgumentCount narg, Symbol ps[],
                             void (*f)(double [3], double [3][3]))
@@ -3597,10 +3594,10 @@ lux_v_dp3dp33_i3arp3q_01_f_(ArgumentCount narg, Symbol ps[],
 // r += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp3dpT3_i3arq_0111_f_(ArgumentCount narg, Symbol ps[],
                             void (*f)(double [3], double *, double *, double *))
@@ -3636,10 +3633,10 @@ lux_v_dp3dpT3_i3arq_0111_f_(ArgumentCount narg, Symbol ps[],
 // f(o0, o1);
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp3dp_o33o3_01_s_(ArgumentCount narg, Symbol ps[],
                         void (*f)(double [3][3], double [3]))
@@ -3676,10 +3673,10 @@ lux_v_dp3dp_o33o3_01_s_(ArgumentCount narg, Symbol ps[],
 // o2 += 3;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp3dpdp3_i3aomqoq_0T2_s_(ArgumentCount narg, Symbol ps[],
                                void (*f)(double [3], double *, double [3]))
@@ -3718,10 +3715,10 @@ lux_v_dp3dpdp3_i3aomqoq_0T2_s_(ArgumentCount narg, Symbol ps[],
 // r += 2;
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dp3dpdp_i3arm3p2q_011_f_(ArgumentCount narg, Symbol ps[],
                                void (*f)(double [3], double *, double *))
@@ -3754,10 +3751,10 @@ lux_v_dp3dpdp_i3arm3p2q_011_f_(ArgumentCount narg, Symbol ps[],
 // f(&r[0], &r[1], &r[2])
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_dpT3_r3_000_f_(ArgumentCount narg, Symbol ps[],
                      void (*f)(double *, double *, double *))
@@ -3790,10 +3787,10 @@ lux_v_dpT3_r3_000_f_(ArgumentCount narg, Symbol ps[],
 // f(i0, i0.dims[0], 1, i1? *i1: 3, r, r.dims[0], 1));
 // \endverbatim
 
-// @param [in] narg number of symbols in \p ps
-// @param [in] ps array of argument symbols
-// @param [in] f pointer to C++ function to bind
-// @return the symbol containing the result of the function call
+// \param [in] narg number of symbols in \p ps
+// \param [in] ps array of argument symbols
+// \param [in] f pointer to C++ function to bind
+// \return the symbol containing the result of the function call
 int32_t
 lux_v_sddsd_iairq_012_f_(ArgumentCount narg, Symbol ps[],
                          void (*f)(double *, size_t, size_t, double,

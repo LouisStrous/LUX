@@ -26,7 +26,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /// \file
 
 /// axis loop information
-struct LoopInfo {
+struct LoopInfo
+{
   /// A pointer to a `pointer` to the current data element.  For
   /// example, if the data type is LUX_DOUBLE, then the current data
   /// element is at `data->d`.  Gets updated as appropriate when the
@@ -61,7 +62,7 @@ struct LoopInfo {
   int32_t mode;                     //!< desired treatment modes
   int32_t stride;                   //!< bytes per data element
   Symboltype type;                  //!< data type
-  int32_t advanceaxis;              //!< how many axes not to advance (from start)
+  int32_t advanceaxis;          //!< how many axes not to advance (from start)
   int32_t raxes[MAX_DIMS];          //!< from rearranged to old axes
   int32_t iraxes[MAX_DIMS];         //!< from old to rearranged axes
 
@@ -85,7 +86,7 @@ struct LoopInfo {
   void rearrangeEdgeLoop(LoopInfo *trgt, int32_t index);
   int32_t moveLoop(int32_t index, int32_t distance);
   void returnLoop( Pointer *ptr, int32_t index);
-
+  int32_t set(size_t index);
 };
 
 #endif

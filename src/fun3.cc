@@ -148,7 +148,7 @@ int32_t lux_eval(ArgumentCount narg, Symbol ps[])
    value of the expression.  LS 7jan99 */
 {
   int32_t       nmax, result;
-  char  *expr, *p1, *p2, *p3, c;
+  char  *expr, *p1, *p2, *p3;
 
   if (symbol_class(*ps) != LUX_STRING)
     return *ps;

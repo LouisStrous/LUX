@@ -50,7 +50,6 @@ double  voigt(double, double), beta(double, double), gamma(double),
         non_central_chi_square(double, double, double), bessel_i0(double),
         bessel_i1(double), bessel_k0(double), bessel_k1(double),
         bessel_kn(int32_t, double), sgn(double);
-static  int32_t         result_sym;
 int32_t         math_funcs(int32_t, int32_t), math_funcs_2f(int32_t, int32_t, int32_t),
         math_funcs_i_f(int32_t, int32_t, int32_t), math_funcs_3f(int32_t, int32_t, int32_t, int32_t);
 int32_t         lux_zerof(int32_t, int32_t []);
@@ -306,7 +305,7 @@ int32_t lux_show(ArgumentCount narg, Symbol ps[])
 //show some info about symbols by number or subname
 {
   int32_t       iq, i;
-  char  *s, *s2;
+  char  *s;
   int32_t       lux_dump(int32_t, int32_t []);
 
   if (narg == 0)
@@ -824,7 +823,6 @@ int32_t lux_zerof(ArgumentCount narg, Symbol ps[])
    the mask is nonzero.
 */
 {
-  int32_t iq;
   Pointer *data;
   LoopInfo *info;
 
@@ -4000,7 +3998,7 @@ int32_t total(ArgumentCount narg, Symbol ps[], bool mean)
   int32_t       result, done, p, psign, pp, nbase, i, haveWeights, n;
   Symboltype type, outtype;
   uint8_t       *present;
-  Scalar        sum, value, temp, w;
+  Scalar w;
   FloatComplex  sumcf, tempcf, valuecf;
   DoubleComplex         sumcd, tempcd, valuecd;
   float         temp2f;

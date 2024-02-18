@@ -2,7 +2,7 @@
 
 use Modern::Perl;
 
-use File::Find::Rule;           # depends on Text::Glob
+use Path::Iterator::Rule;
 
 open my $ifh, '<', 'bindings.hh';
 
@@ -53,7 +53,8 @@ int32_t luxerror(char const*, int32_t, ...);
 
 EOD
 
-my @files = File::Find::Rule->name('*.cc')->in('.');
+my @files = Path::Iterator::Rule->new->name('*.cc')->all('.',
+                                                         { relative => 1 });
 print "Treating " . scalar(@files) . " files.\n";
 
 foreach my $file (@files) {

@@ -46,9 +46,4 @@ CLEANFILES = doxyfile.stamp
 clean-local:
 	rm -rf $(top_builddir)/doc/lux.doxy doxyfile.stamp
 
-else
-
-all-local:
-	@echo No doxygen, so no output
-
 endif

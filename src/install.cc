@@ -923,8 +923,6 @@ InternalRoutine function_table[] = {
   { "dilate",   1, 1, lux_dilate, 0 },                     // fun5.cc
   { "dimen",    1, 2, lux_dimen, 0 },                      // subsc.cc
   { "distarr",  1, 3, lux_distarr, 0 },                    // strous2.cc
-  { "distr",    2, 2, lux_distr_f,                         // strous.cc
-    "2ignorelimit:4increaselimit" },
   { "dmap",     1, 1, lux_dmap, 0 },     // subsc.cc
   { "doub",     1, 1, lux_double, "*" }, // symbols.cc
   { "double",   1, 1, lux_double, "*" }, // symbols.cc
@@ -1017,8 +1015,6 @@ InternalRoutine function_table[] = {
   { "gsmooth",  1, 4, lux_gsmooth,                // fun2.cc
     ":::kernel:1normalize:2fullnorm:4balanced:8all" },
   { "hamming",  1, 2, lux_hamming, 0 }, // strous3.cc
-  { "hist",     1, 2, lux_hist,         // fun3.cc
-    "1first:2ignorelimit:4increaselimit:8silent" },
   { "histr",    1, 1, lux_histr, // fun3.cc
     "1first:2ignorelimit:4increaselimit:8silent" },
   { "ibeta",    3, 3, lux_incomplete_beta, "*1complement:2log" },  // fun1.cc
@@ -4033,7 +4029,7 @@ int32_t lux_trace(ArgumentCount narg, Symbol ps[])
 char const* defaultRedirect = "diagnostic.lux";
 
 int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
-  maxhistsize = 20000, histmin, histmax, lastmaxloc, lastminloc,
+  histmin, histmax, lastmaxloc, lastminloc,
   scalemin = 0, scalemax = 255, fftdp = 0, lastmax_sym, lastmin_sym,
   autocon = 1, contour_mode, contour_box, contour_nlev = 5,
   contour_border = 3, contour_ticks = 3, contour_tick_pen = 3,
@@ -4477,7 +4473,6 @@ void symbolInitialization(void)
  l_ptr("!last_menu",    &last_menu);
  f_ptr("!lumpx",        &lumpx);
 #endif
- l_ptr("!maxhistsize",          &maxhistsize);
  l_ptr("!maxregridsize", &maxregridsize);
 #if HAVE_LIBX11
  l_ptr("!menu_item",    &menu_item);

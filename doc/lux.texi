@@ -490,7 +490,6 @@ Read-Write Global Variables
 * !lastminloc::                 Last minimum location
 * !lastsdev::                   Last standard deviation
 * !last_menu::                  Last selected menu entry
-* !maxhistsize::                Histogram upper size limit
 * !maxregridsize::              REGRID upper size limit
 * !menu_item::                  Last selected menu item
 * !meritc::                     Last merit value of displacement determination
@@ -10144,7 +10143,6 @@ functions.
 * !lastminloc::                 Last minimum location
 * !lastsdev::                   Last standard deviation
 * !last_menu::                  Last selected menu entry
-* !maxhistsize::                Histogram upper size limit
 * !maxregridsize::              REGRID upper size limit
 * !menu_item::                  Last selected menu item
 * !meritc::                     Last merit value of displacement determination
@@ -10960,7 +10958,7 @@ This variable holds the last calculated standard deviation (through
 See also: @ref{sdev}, @ref{variance}, @ref{!lastmean}
 
 @c ---------------------------------------
-@node !last_menu, !maxhistsize, !lastsdev, Read-Write Global Vars
+@node !last_menu, !maxregridsize, !lastsdev, Read-Write Global Vars
 @subsection !last_menu
 
 The @code{long} number of the LUX menu in which the last event
@@ -10970,15 +10968,7 @@ See also: @ref{!eventsource}, @ref{!eventtype}, @ref{wait_for_menu},
 @ref{xloop}, @ref{xregister}
 
 @c ---------------------------------------
-@node !maxhistsize, !maxregridsize, !last_menu, Read-Write Global Vars
-@subsection !maxhistsize
-
-The @code{long} maximum allowed size of a histogram.
-
-See also: @ref{distr}, @ref{hist}, @ref{histr}
-
-@c ---------------------------------------
-@node !maxregridsize, !menu_item, !maxhistsize, Read-Write Global Vars
+@node !maxregridsize, !menu_item, !last_menu, Read-Write Global Vars
 @subsection !maxregridsize
 
 The @code{long} maximum size in any dimension of the output image in
@@ -16831,7 +16821,7 @@ in that dimensions must be multiplied.
 
 @code{distr, @var{target}, @var{bins}, @var{values}}
 
-@code{distr(@var{bins}, @var{values} [, /ignorelimit, /increaselimit])}
+@code{distr(@var{bins}, @var{values})}
 
 Distributes the @code{@var{values}} over the corresponding
 @code{@var{bins}}.  The function returns an array containing the
@@ -16842,14 +16832,7 @@ first element contains the data for the most negative bin.  If
 @code{hist(bins)}.  The subroutine adds the values to the proper bins of
 @code{@var{target}}.
 
-The function form does not allow a value range over @code{!maxhistsize}
-(measured from the most negative value or zero to the maximum value),
-unless one of the keywords is specified.  @code{/ignorelimit} just
-ignores the value of @code{!maxhistsize}, and @code{/increaselimit}
-increases its value to accomodate the current (possibly very large!)
-range of values.
-
-See also: @ref{hist}, @ref{!maxhistsize}
+See also: @ref{hist}
 
 @c -------------------------------------
 @node div, dmap, distr, Internal Routines
@@ -20759,18 +20742,12 @@ n. Schwarztrauber's fftpack version 4, obtained from the Netlib cd-rom
 @subsection hist
 @findex hist
 
-@code{hist(@var{x} [, @var{l}] [, /first, /ignorelimit, /increaselimit,
-/silent])}
+@code{hist(@var{x} [, @var{l}] [, /first, /silent])}
 
-Returns the histogram (binsize 1) of @code{@var{x}}.  If @code{@var{l}}
-is not specified, then the histogram runs between values @code{!histmin}
-(zero or negative) and @code{!histmax}, and cannot exceed
-@code{!maxhistsize} bins, unless @code{/ignorelimit} or
-@code{/increaselimit} are specified.  @code{/ignorelimit} causes the
-limit to be ignored, so that histograms of arbitrary (possibly very
-large!) size are allowed.  @code{/increaselimit} increases the value of
-@code{!maxhistsize} if necessary to accomodate the current histogram.
-If @code{/first} is specified and @code{@var{x}} is multidimensional,
+Returns the histogram (binsize 1) of @code{@var{x}}.  If
+@code{@var{l}} is not specified, then the histogram runs between
+values @code{!histmin} (zero or negative) and @code{!histmax}.  If
+@code{/first} is specified and @code{@var{x}} is multidimensional,
 then histograms along the first dimension are returned.  By default, a
 single histogram of the whole array is returned.
 
@@ -20780,14 +20757,12 @@ value 0 from @code{@var{x}} but to the most negative value).  If
 @code{/silent} is specified, then the warning is suppressed.
 
 If @code{@var{l}} is specified, then in it a list of unique values in
-@code{@var{x}} is returned, in ascending order, and the return value of
-the function is the corresponding frequency table.  In this case, the
-keywords are ignored, and there is no specific limit on the size of the
-histogram.  This form of the function is useful if one expects that the
-histogram is large yet sparsely occupied.
+@code{@var{x}} is returned, in ascending order, and the return value
+of the function is the corresponding frequency table.  In this ase,
+the keywords are ignored.  This form of the function is useful if one
+expects that the histogram is large yet sparsely occupied.
 
-See also: @ref{histr}, @ref{distr}, @ref{!histmin}, @ref{!histmax},
-@ref{!maxhistsize}
+See also: @ref{histr}, @ref{distr}, @ref{!histmin}, @ref{!histmax}
 
 @c -------------------------------------
 @node histr, ibeta, hist, Internal Routines
@@ -20796,13 +20771,12 @@ See also: @ref{histr}, @ref{distr}, @ref{!histmin}, @ref{!histmax},
 
 @code{histr(@var{x} [, /first, /silent])}
 
-Returns the normalized (to between 0 and 1) running sum of the histogram
-of @code{@var{x}}.  The histogram runs between values @code{!histmin}
-(zero or negative) and @code{!histmax}, and cannot exceed
-@code{!maxhistsize} bins.  If @code{/first} is specified and
-@code{@var{x}} is multidimensional, then histograms along the first
-dimension are returned.  By default, a single histogram of the whole
-array is returned.
+Returns the normalized (to between 0 and 1) running sum of the
+histogram of @code{@var{x}}.  The histogram runs between values
+@code{!histmin} (zero or negative) and @code{!histmax}.  If
+@code{/first} is specified and @code{@var{x}} is multidimensional,
+then histograms along the first dimension are returned.  By default, a
+single histogram of the whole array is returned.
 
 By default, a warning is issued if @code{@var{x}} contains negative
 values (so that the first element of the histogram does not refer to

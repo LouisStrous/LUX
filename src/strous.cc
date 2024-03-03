@@ -146,7 +146,7 @@ int32_t lux_distr_f(ArgumentCount narg, Symbol ps[])
 /* y=DISTR(bins,values)  puts each <value> in the corresponding <bin> and
    returns an array containing bins 0 through max(values). LS */
 {
-  extern int32_t        maxhistsize, histmin, histmax;
+  extern int32_t histmin, histmax;
   extern Scalar         lastmin, lastmax;
   int32_t       iq, i, n, nd, nd2, range, result_sym,
         minmax(int32_t *, int32_t, int32_t);
@@ -186,15 +186,6 @@ int32_t lux_distr_f(ArgumentCount narg, Symbol ps[])
            varName(ps[0]));
     printf("see !histmin and !histmax to find range included\n"); }
   range = histmax - histmin + 1;
-  if (range > maxhistsize) {
-    if ((internalMode & 2) == 0)
-      printf("DISTR - range (%d) larger than !maxhistsize (%d)\n",
-             range, maxhistsize);
-    if (internalMode & 4)       // /INCREASELIMIT
-    { puts("Increasing !maxhistsize to accomodate");
-      maxhistsize = range; }
-    else if (!(internalMode & 2)) // no /IGNORELIMIT or /INCREASELIMIT
-      return LUX_ERROR; }
   result_sym = array_scratch(type2, 1, &range);
   res.i32 = (int32_t*) array_data(result_sym);
   lux_zero(1, &result_sym);             // need to zero initially
@@ -443,6 +434,8 @@ int32_t lux_distr_f(ArgumentCount narg, Symbol ps[])
   }
   return result_sym;
 }
+// ignorelimit and increaselimit are ignored
+REGISTER(distr, f, distr, 2, 2, "2ignorelimit:4increaselimit" );
 //-------------------------------------------------------------------------
 int32_t readkey(int32_t mode)
 {

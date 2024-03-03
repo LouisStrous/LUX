@@ -48,7 +48,7 @@ int32_t rfftid(int32_t *, double *);
 int32_t rfftbd(int32_t *, double *, double *);
 int32_t rfftfd(int32_t *, double *, double *);
 int16_t         *fade1, *fade2;
-extern int32_t  scalemax, scalemin, lastmaxloc, lastminloc, maxhistsize,
+extern int32_t  scalemax, scalemin, lastmaxloc, lastminloc,
   histmin, histmax, fftdp, lastmax_sym, lastmin_sym, errno;
 extern Scalar   lastmin, lastmax;
 static  int32_t         nold = 0, fftdpold, mqold;
@@ -1550,13 +1550,12 @@ int32_t lux_hist_dense(ArgumentCount narg, Symbol ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-int32_t lux_hist(ArgumentCount narg, Symbol ps[]) // histogram function
+Symbol
+lux_hist(ArgumentCount narg, Symbol ps[]) // histogram function
                                  // (frequency distribution)
 // general histogram function
 // keyword /FIRST produces a histogram of all elements along the 0th
 // dimension for all higher dimensions
-// LS 12jul2000: added /SILENT keyword (internalMode & 8) to suppress
-// warnings about negative histogram elements.
 {
   int32_t       iq, i, n, range, result_sym, *dims, nRepeat,
         ndim, axis, one = 1, size;
@@ -1569,7 +1568,8 @@ int32_t lux_hist(ArgumentCount narg, Symbol ps[]) // histogram function
     return lux_hist_dense(narg, ps);
   iq = ps[0];
   switch (symbol_class(iq))
-  { case LUX_ARRAY:
+  {
+    case LUX_ARRAY:
       type = array_type(iq);
       q1.i32 = (int32_t*) array_data(iq);
       n = array_size(iq);
@@ -1604,62 +1604,83 @@ int32_t lux_hist(ArgumentCount narg, Symbol ps[]) // histogram function
   range = histmax + 1;
   if (histmin < 0)
     range -= histmin;
-  if (range > maxhistsize) {
-    if ((internalMode & 2) == 0)  // no /IGNORELIMIT
-      printf("range (%d) larger than !maxhistsize (%d)\n",
-             range, maxhistsize);
-    if (internalMode & 4) {     // /INCREASELIMIT
-      if ((internalMode & 2) == 0)
-        puts("Increasing !maxhistsize to accomodate");
-      maxhistsize = range;
-    } else
-      if (!(internalMode & 2)) // no /IGNORELIMIT or /INCREASELIMIT
-        return LUX_ERROR;
-  }
   axis = internalMode & 1;
   if (axis)
-  { size = *dims;
+  {
+    size = *dims;
     nRepeat = n/size;
     one = nRepeat*range;
     result_sym = array_scratch(LUX_INT32, 1, &one);
     h = HEAD(result_sym);
     h->dims[0] = range;
     if (ndim > 1) memcpy(&h->dims[1], &dims[1], sizeof(int32_t)*(ndim - 1));
-    h->ndim = ndim; }
+    h->ndim = ndim;
+  }
   else
-  { one = range;
+  {
+    one = range;
     size = n;
     nRepeat = 1;
     result_sym = array_scratch(LUX_INT32, 1, &one);
-    h = HEAD(result_sym); }
+    h = HEAD(result_sym);
+  }
   q2.i32 = (int32_t *) ((char *)h + sizeof(Array));
   lux_zero( 1, &result_sym);            // need to zero initially
   // now accumulate the distribution
   while (nRepeat--)
-  { n = size;
+  {
+    n = size;
     switch (type)
-    { case LUX_INT8:
+    {
+      case LUX_INT8:
         while (n--)
-        { i = *q1.ui8++ - histmin;  q2.i32[i]++; }  break;
+        {
+          i = *q1.ui8++ - histmin;
+          q2.i32[i]++;
+        }
+        break;
       case LUX_INT16:
         while (n--)
-        { i = *q1.i16++ - histmin;  q2.i32[i]++; }  break;
+        {
+          i = *q1.i16++ - histmin;
+          q2.i32[i]++;
+        }
+        break;
       case LUX_INT32:
         while (n--)
-        { i = *q1.i32++ - histmin;  q2.i32[i]++; }  break;
+        {
+          i = *q1.i32++ - histmin;
+          q2.i32[i]++;
+        }
+        break;
       case LUX_INT64:
         while (n--)
-        { i = *q1.i64++ - histmin;  q2.i64[i]++; }  break;
+        {
+          i = *q1.i64++ - histmin;
+          q2.i64[i]++;
+        }
+        break;
       case LUX_FLOAT:
         while (n--)
-        { i = *q1.f++ - histmin;  q2.i32[i]++; }  break;
+        {
+          i = *q1.f++ - histmin;
+          q2.i32[i]++;
+        }
+        break;
       case LUX_DOUBLE:
         while (n--)
-        { i = *q1.d++ - histmin;  q2.i32[i]++; }  break;
+        {
+          i = *q1.d++ - histmin;
+          q2.i32[i]++;
+        }
+        break;
       }
-    q2.i32 += range; }
+    q2.i32 += range;
+  }
   return result_sym;
 }
+// ignorelimit, increaselimit, silent are deprecated and ignored
+REGISTER(hist, f, hist, 1, 2, "1first:2ignorelimit:4increaselimit:8silent" );
 //-------------------------------------------------------------------------
 int32_t lux_sieve(ArgumentCount narg, Symbol ps[])
 /* X=SIEVE(array,condition), where condition is normally a logical array

@@ -3069,6 +3069,9 @@ void register_the_bindings()
   int32_t lux_fft_expand(int32_t, int32_t []);
   register_lux_f(lux_fft_expand, "fftexpand", 2, 2, NULL);
 
+  int32_t lux_hist(int32_t, int32_t []);
+  register_lux_f(lux_hist, "hist", 1, 2, "1first:2ignorelimit:4increaselimit:8silent" );
+
   int32_t lux_gcommand(int32_t, int32_t []);
   register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
 
@@ -3744,6 +3747,9 @@ void register_the_bindings()
   register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
 
   register_lux_s(lux_sincos_s, "sincos", 3, 3, NULL);
+
+  int32_t lux_distr(int32_t, int32_t []);
+  register_lux_f(lux_distr, "distr", 2, 2, "2ignorelimit:4increaselimit" );
 
   int32_t lux_find(int32_t, int32_t []);
   register_lux_f(lux_find, "find", 2, 3, "1data_monotonic:2at_or_past");

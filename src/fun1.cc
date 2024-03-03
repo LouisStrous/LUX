@@ -55,10 +55,10 @@ int32_t         math_funcs(int32_t, int32_t), math_funcs_2f(int32_t, int32_t, in
 int32_t         lux_zerof(int32_t, int32_t []);
 
 enum fd {
-  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH, F_TANH,
-  F_SQRT, F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG1P, F_ERF, F_ERFC,
-  F_J0, F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1, F_K0, F_K1,
-  F_SGN, F_ASINH, F_ACOSH, F_ATANH
+  F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH, F_TANH, F_SQRT,
+  F_CBRT, F_EXP, F_EXPM1, F_LOG, F_LOG10, F_LOG2, F_LOG1P, F_ERF, F_ERFC, F_J0,
+  F_J1, F_Y0, F_Y1, F_GAMMA, F_LOGGAMMA, F_I0, F_I1, F_K0, F_K1, F_SGN, F_ASINH,
+  F_ACOSH, F_ATANH
 };
 
 enum fdd {
@@ -74,8 +74,8 @@ enum fddd {
 };
 
 double (*func_d[])(double) = {
-  sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, exp,
-  expm1, log, log10, log1p, erf, erfc, j0, j1, y0, y1, gamma, loggamma,
+  sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, exp, expm1,
+  log, log10, log2, log1p, erf, erfc, j0, j1, y0, y1, gamma, loggamma,
   bessel_i0, bessel_i1, bessel_k0, bessel_k1, sgn, asinh, acosh, atanh
 };
 
@@ -5595,6 +5595,13 @@ int32_t lux_log10(ArgumentCount narg, Symbol ps[])
 {
   return math_funcs(ps[0], F_LOG10);
 }
+//-------------------------------------------------------------------------
+Symbol
+lux_log2(ArgumentCount narg, Symbol ps[])
+{
+  return math_funcs(ps[0], F_LOG2);
+}
+REGISTER(log2, f, log2, 1, 1, nullptr);
 //-------------------------------------------------------------------------
 int32_t lux_log1p(ArgumentCount narg, Symbol ps[])
 {

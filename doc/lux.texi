@@ -12251,6 +12251,7 @@ arguments.
 * log::                         Natural logarithm
 * log10::                       Decimal logarithm
 * log1p::                       Natural logarithm of one plus the argument
+* log2::                        Logarithm to base 2
 * lonarr::                      Create a @code{long} array
 * lonfarr::                     Create a @code{long} file array
 * long::                        Convert to @code{long} value by value
@@ -18587,11 +18588,11 @@ The number of comparisons of data and key values that are needed for
 @code{x=indgen(lonarr(n)) find(x, x)} is close to @code{0.5*n} per key
 value.  Because @code{x} is in sorted order, we can use
 @code{/data_monotonic}, which reduces the number of comparisons to
-roughly @code{log(n)/log(2)} per key value.  This makes a huge
-difference when @code{n} is large: with 100000 data values, the
-algorithm without @code{/data_monotonic} needs 2995 times more
-comparisons to finish than the algorithm with @code{/data_monotonic}
-does, and that ratio grows with @code{n}.
+roughly @code{log2(n)} per key value.  This makes a huge difference
+when @code{n} is large: with 100000 data values, the algorithm without
+@code{/data_monotonic} needs 2995 times more comparisons to finish
+than the algorithm with @code{/data_monotonic} does, and that ratio
+grows with @code{n}.
 
 See also: @ref{find_maxloc}, @ref{find_minloc}
 
@@ -21739,7 +21740,7 @@ Reverse: @ref{exp}
 
 Alias: @ref{alog}
 
-See also: @ref{log10}, @ref{log1p}, @ref{#e}
+See also: @ref{log10}, @ref{log1p}, @ref{log2}, @ref{#e}
 
 @c -------------------------------------
 @node log10, log1p, log, Internal Routines
@@ -21752,10 +21753,10 @@ Returns the decimal logarithm (base 10) of @code{@var{x}}.
 
 Alias: @ref{alog10}
 
-See also: @ref{exp}, @ref{log}, @ref{log1p}
+See also: @ref{exp}, @ref{log}, @ref{log1p}, @ref{log2}
 
 @c -------------------------------------
-@node log1p, lonarr, log10, Internal Routines
+@node log1p, log2, log10, Internal Routines
 @subsection log1p
 @findex log1p
 
@@ -21766,10 +21767,21 @@ Returns the natural logarithm (base @code{#e}) of one more than
 
 Reverse: @code{expm1}
 
-See also: @ref{log}, @ref{log10}, @ref{#e}
+See also: @ref{log}, @ref{log10}, @ref{log2}, @ref{#e}
 
 @c -------------------------------------
-@node lonarr, lonfarr, log1p, Internal Routines
+@node log2, lonarr, log1p, Internal Routines
+@subsection log2
+@findex log2
+
+@code{log2(@var{x})}
+
+Returns the logarithm of @code{@var{x}} to base 2.
+
+See also: @ref{log}, @ref{log10}, @ref{log1p}
+
+@c -------------------------------------
+@node lonarr, lonfarr, log2, Internal Routines
 @subsection lonarr
 @findex lonarr
 

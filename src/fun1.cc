@@ -43,13 +43,13 @@ size_t InstanceID::s_instance_id = 0; // define static member
 void    Quit(int32_t);
 
 extern  double  cbrt(double), expm1(double), log1p(double);
-double  voigt(double, double), beta(double, double), gamma(double),
-        incomplete_gamma(double, double), chi_square(double, double),
-        incomplete_beta(double, double, double), student(double, double),
-        F(double, double, double), loggamma(double), logbeta(double, double),
-        non_central_chi_square(double, double, double), bessel_i0(double),
-        bessel_i1(double), bessel_k0(double), bessel_k1(double),
-        bessel_kn(int32_t, double), sgn(double);
+double F(double, double, double), bessel_i0(double), bessel_i1(double),
+  bessel_k0(double), bessel_k1(double), bessel_kn(int32_t, double),
+  beta(double, double), chi_square(double, double), gamma(double),
+  incomplete_beta(double, double, double), incomplete_gamma(double, double),
+  logbeta(double, double), loggamma(double),
+  non_central_chi_square(double, double, double), sgn(double),
+  student(double, double), voigt(double, double);
 int32_t         math_funcs(int32_t, int32_t), math_funcs_2f(int32_t, int32_t, int32_t),
         math_funcs_i_f(int32_t, int32_t, int32_t), math_funcs_3f(int32_t, int32_t, int32_t, int32_t);
 int32_t         lux_zerof(int32_t, int32_t []);
@@ -61,8 +61,16 @@ enum fd {
   F_ACOSH, F_ATANH
 };
 
-enum fdd {
-  F_ATAN2, F_POW, F_VOIGT, F_BETA, F_LOGBETA, F_IGAMMA, F_CHI2, F_STUDENT
+enum fdd
+{
+  F_ATAN2,                      //!< 2-argument arc tangent
+  F_BETA,                       //!< beta
+  F_CHI2,                       //!< chi square
+  F_IGAMMA,                     //!< incomplete gamma
+  F_LOGBETA,                    //!< logarithm of beta
+  F_POW,                        //!< power
+  F_STUDENT,                    //!< Student's t distribution
+  F_VOIGT,                      //!< Voigt profile
 };
 
 enum fid {
@@ -83,8 +91,9 @@ double (*func_id[])(int32_t, double) = {
   jn, yn, bessel_kn
 };
 
-double (*func_dd[])(double, double) = {
-  atan2, pow, voigt, beta, logbeta, incomplete_gamma, chi_square, student
+double (*func_dd[])(double, double) =
+{
+  atan2, beta, chi_square, incomplete_gamma, logbeta, pow, student, voigt,
 };
 
 double (*func_ddd[])(double, double, double) = {
@@ -5499,9 +5508,6 @@ DoubleComplex c_exp(double real, double imaginary)
   result.imaginary = r*sin(imaginary);
   return result;
 }
-//-------------------------------------------------------------------------
-//-------------------------------------------------------------------------
-//-------------------------------------------------------------------------
 //-------------------------------------------------------------------------
 /*math functions with 1 argument, all just call math_funcs with approiate
 code, all have names of form lux_xxx... */

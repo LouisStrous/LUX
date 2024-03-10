@@ -2980,7 +2980,8 @@ int32_t file_map_size(int32_t symbol)
   return size;
 }
 //-------------------------------------------------------------------------
-int32_t lux_pointer(ArgumentCount narg, Symbol ps[])
+Symbol
+lux_pointer(ArgumentCount narg, Symbol ps[])
 // POINTER,pointer,target [,/FUNCTION, /SUBROUTINE, /INTERNAL, /MAIN]
 // makes named variable
 // <pointer> point at named variable <target>.  If <pointer> is a pointer
@@ -2989,36 +2990,45 @@ int32_t lux_pointer(ArgumentCount narg, Symbol ps[])
 // named variable.  LS 11feb97
 {
   int32_t        iq;
-  char        *name;
+  char const* name;
+  char const* symbolName(Symbol);
 
-  if (ps[0] >= TEMPS_START)
+  name = symbolName(ps[0]);
+  if (!name || !*name)
     return luxerror("Intended pointer is not a named variable", ps[0]);
   if (symbol_class(ps[0]) != LUX_POINTER)
-  { undefine(ps[0]);
+  {
+    undefine(ps[0]);
     symbol_class(ps[0]) = LUX_POINTER;
     transfer_is_parameter(ps[0]) = (Symboltype) 0;
-    transfer_temp_param(ps[0]) = 0; }
+    transfer_temp_param(ps[0]) = 0;
+  }
   iq = eval(ps[1]);
   if (internalMode)                // target must be a string variable
-  { if (symbol_class(iq) != LUX_STRING)
+  {
+    if (symbol_class(iq) != LUX_STRING)
       return cerror(NEED_STR, ps[1]);
     name = string_arg(iq);
   }
   switch (internalMode & 11)
-  { case 8:
+  {
+    case 8:
       iq = findName(name, varHashTable,
                     (internalMode & 8)? 0: curContext);
       if (iq < 0)
         return LUX_ERROR;
     case 0:                        // variable
-      if (iq >= TEMPS_START)
-        return luxerror("Expression does not reduce to a named variable", ps[1]);
+      name = symbolName(iq);
+      if (!name || !*name)
+        return luxerror("Expression does not reduce to a named variable",
+                        ps[1]);
       transfer_target(ps[0]) = iq;
       break;
     case 1:                        // function
     case 2:                        // subroutine
       if (internalMode & 4)        // /INTERNAL
-      { iq = findInternalName(name, (internalMode & 1)? 0: 1);
+      {
+        iq = findInternalName(name, (internalMode & 1)? 0: 1);
         if (iq < 0)
           return LUX_ERROR;
         symbol_class(ps[0]) = LUX_FUNC_PTR;
@@ -3027,7 +3037,8 @@ int32_t lux_pointer(ArgumentCount narg, Symbol ps[])
                                              LUX_SUBROUTINE);
       }
       else
-      { iq = findName(name, internalMode == 1? funcHashTable: subrHashTable,
+      {
+        iq = findName(name, internalMode == 1? funcHashTable: subrHashTable,
                       0);
         if (iq < 0)                // some error occurred
           return iq;
@@ -3037,10 +3048,12 @@ int32_t lux_pointer(ArgumentCount narg, Symbol ps[])
         deferred_routine_filename(iq) = strsave(name);
         if (iq >= TEMPS_START)
           return luxerror("Pointer target is not a named variable", ps[1]);
-        transfer_target(ps[0]) = iq; }
+        transfer_target(ps[0]) = iq;
+      }
       break;
     default:
-      return cerror(INCMP_KEYWORD, 0); }
+      return cerror(INCMP_KEYWORD, 0);
+  }
   return 1;
 }
 //-------------------------------------------------------------------------

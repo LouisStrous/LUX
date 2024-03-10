@@ -10119,6 +10119,7 @@ functions.
 * !fz::                         Free lower y plot bound
 * !fzx::                        Free lower x plot bound
 * !fzz::                        Free lower z plot bound
+* !gsl_show_errors::            Print GNU Scientific Library error messages
 * !height::                     Last window height
 * !histmin::                    Last histogram minimum ordinate
 * !histmax::                    Last histogram maximum ordinate
@@ -10631,7 +10632,7 @@ coordinate on the axis of a plot may be larger than zero.
 See also: @ref{!fz}, @ref{!fzz}, @ref{plot}
 
 @c ---------------------------------------
-@node !fzz, !height, !fzx, Read-Write Global Vars
+@node !fzz, !gsl_show_errors, !fzx, Read-Write Global Vars
 @subsection !fzz
 
 If this @code{long} variable is non-zero, then the lower limit on the Z
@@ -10640,7 +10641,15 @@ coordinate on the axis of a 3D plot may be larger than zero.
 See also: @ref{!fz}, @ref{!fzz}, @ref{plot3d}
 
 @c ---------------------------------------
-@node !height, !histmin, !fzz, Read-Write Global Vars
+@node !gsl_show_errors, !height, !fzz, Read-Write Global Vars
+@subsection !gsl_show_errors
+
+[GSL] If this @code{long} variable is non-zero then errors detected by
+the GNU Scientific Library are reported on the console.  Otherwise no
+such messages are printed.
+
+@c ---------------------------------------
+@node !height, !histmin, !gsl_show_errors, Read-Write Global Vars
 @subsection !height
 
 This @code{long} variable holds the height in pixels of the current

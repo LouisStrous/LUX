@@ -4023,6 +4023,13 @@ int32_t lux_trace(ArgumentCount narg, Symbol ps[])
 #define s_ptr(name, value) installPointer(name, LUX_TEMP_STRING, value)
 #define fnc_p(name, value) installSysFunc(name, value)
 
+#if HAVE_LIBGSL
+/// Should error messages from the Gnu Scientific Library be displayed?  This
+/// global variable is accessable within Lux through `!gsl_show_errors`.
+int32_t gsl_show_errors = 0;
+#endif
+
+
 char const* defaultRedirect = "diagnostic.lux";
 
 int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
@@ -4436,6 +4443,9 @@ void symbolInitialization(void)
  l_ptr("!fzx",          &ifzx);
 #if DEVELOP
  l_ptr("!fzz",          &ifzz);
+#endif
+#if HAVE_LIBGSL
+ l_ptr("!gsl_show_errors", &gsl_show_errors);
 #endif
  f_ptr("!height",       &yfac);
  l_ptr("!histmin",      &histmin);

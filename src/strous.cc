@@ -2120,37 +2120,36 @@ int32_t smooth(ArgumentCount narg, Symbol ps[], int32_t cumul)
       case LUX_FLOAT:
         // we use the Kahan algorithm to limit roundoff error
         do {
-          value.f = 0;            // initialize
-          float c = 0.0;
+          Kahan_sum<float> ks;
           // left-hand edge
           if (internalMode & 1) { // /PARTIAL_WIDTH
             norm = cumul? ww: 0;
             if (ww%2) {                 // odd width
-              kahan_sum(*src.f, value.f, c);
+              ks += *src.f;
               src.f += stride;
               if (!cumul)
                 ++norm;
-              *trgt.f = value.f/norm;
+              *trgt.f = ks()/norm;
               trgt.f += stride;
               i = 1;
             } else
               i = 0;
             for ( ; i < w1; i++) {
-              kahan_sum(*src.f, value.f, c);
+              ks += *src.f;
               src.f += stride;
-              kahan_sum(*src.f, value.f, c);
+              ks += *src.f;
               src.f += stride;
               if (!cumul)
                 norm += 2;
-              *trgt.f = value.f/norm;
+              *trgt.f = ks()/norm;
               trgt.f += stride;
             }
           } else {              // full width
             for (i = 0; i < ww; i++) { // do the left edge
-              kahan_sum(*src.f, value.f, c);
+              ks += *src.f;
               src.f += stride;
             }
-            double v = value.f/norm;
+            double v = ks()/norm;
             for (i = 0; i < w1; i++) {
               *trgt.f = v;
               trgt.f += stride;
@@ -2158,33 +2157,33 @@ int32_t smooth(ArgumentCount narg, Symbol ps[], int32_t cumul)
           }
           // middle part
           for ( ; i < w2; i++) {
-            kahan_sum(*src.f - src.f[offset], value.f, c);
+            ks += *src.f - src.f[offset];
             src.f += stride;
-            *trgt.f = value.f/norm;
+            *trgt.f = ks()/norm;
             trgt.f += stride;
           }
           // right-hand edge
           if (internalMode & 1) { // /PARTIAL_WIDTH
             for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
-              kahan_sum(-src.f[offset], value.f, c);
+              ks += -src.f[offset];
               offset += stride;
-              kahan_sum(-src.f[offset], value.f, c);
+              ks += -src.f[offset];
               offset += stride;
               if (!cumul)
                 norm -= 2;
-              *trgt.f = value.f/norm;
+              *trgt.f = ks()/norm;
               trgt.f += stride;
             }
             if (!(ww%2)) {
-              kahan_sum(-src.f[offset], value.f, c);
+              ks += -src.f[offset];
               offset += stride;
               if (!cumul)
                 --norm;
-              *trgt.f = value.f/norm;
+              *trgt.f = ks()/norm;
               trgt.f += stride;
             }
           } else {
-            float v = value.f/norm;
+            float v = ks()/norm;
             for ( ; i < srcinfo.rdims[0]; i++) { // right edge
               *trgt.f = v;
               trgt.f += stride;
@@ -2196,37 +2195,36 @@ int32_t smooth(ArgumentCount narg, Symbol ps[], int32_t cumul)
       case LUX_DOUBLE:
         // we use the Kahan algorithm to limit roundoff error
         do {
-          value.d = 0;            // initialize
-          double c = 0.0;
+          Kahan_sum<double> ks;
           // left-hand edge
           if (internalMode & 1) { // /PARTIAL_WIDTH
             norm = cumul? ww: 0;
             if (ww%2) {                 // odd width
-              kahan_sum(*src.d, value.d, c);
+              ks += *src.d;
               src.d += stride;
               if (!cumul)
                 ++norm;
-              *trgt.d = value.d/norm;
+              *trgt.d = ks()/norm;
               trgt.d += stride;
               i = 1;
             } else
               i = 0;
             for ( ; i < w1; i++) {
-              kahan_sum(*src.d, value.d, c);
+              ks += *src.d;
               src.d += stride;
-              kahan_sum(*src.d, value.d, c);
+              ks += *src.d;
               src.d += stride;
               if (!cumul)
                 norm += 2;
-              *trgt.d = value.d/norm;
+              *trgt.d = ks()/norm;
               trgt.d += stride;
             }
           } else {              // full width
             for (i = 0; i < ww; i++) { // do the left edge
-              kahan_sum(*src.d, value.d, c);
+              ks += *src.d;
               src.d += stride;
             }
-            double v = value.d/norm;
+            double v = ks()/norm;
             for (i = 0; i < w1; i++) {
               *trgt.d = v;
               trgt.d += stride;
@@ -2234,33 +2232,33 @@ int32_t smooth(ArgumentCount narg, Symbol ps[], int32_t cumul)
           }
           // middle part
           for ( ; i < w2; i++) {
-            kahan_sum(*src.d - src.d[offset], value.d, c);
+            ks += *src.d - src.d[offset];
             src.d += stride;
-            *trgt.d = value.d/norm;
+            *trgt.d = ks()/norm;
             trgt.d += stride;
           }
           // right-hand edge
           if (internalMode & 1) { // /PARTIAL_WIDTH
             for ( ; i < srcinfo.rdims[0] - !(ww%2); i++) {
-              kahan_sum(-src.d[offset], value.d, c);
+              ks  += -src.d[offset];
               offset += stride;
-              kahan_sum(-src.d[offset], value.d, c);
+              ks += -src.d[offset];
               offset += stride;
               if (!cumul)
                 norm -= 2;
-              *trgt.d = value.d/norm;
+              *trgt.d = ks()/norm;
               trgt.d += stride;
             }
             if (!(ww%2)) {
-              kahan_sum(-src.d[offset], value.d, c);
+              ks += -src.d[offset];
               offset += stride;
               if (!cumul)
                 --norm;
-              *trgt.d = value.d/norm;
+              *trgt.d = ks()/norm;
               trgt.d += stride;
             }
           } else {
-            double v = value.d/norm;
+            double v = ks()/norm;
             for ( ; i < srcinfo.rdims[0]; i++) { // right edge
               *trgt.d = v;
               trgt.d += stride;

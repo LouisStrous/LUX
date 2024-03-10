@@ -76,6 +76,7 @@ CsplineInfo const empty_cubic_spline(void);
 double cspline_derivative(double, CsplineInfo*);
 double cspline_second_derivative(double, CsplineInfo*);
 double cspline_value(double, CsplineInfo*);
+
 double double_arg(int32_t);
 double famod(double,double);
 double fasmod(double,double);
@@ -235,41 +236,79 @@ void zerobytes(void*, int32_t);
 
 // Then u + v = (u f+ v) + ((u f- u′) f+ (v f- v″))
 
-/// Adds a value to a sum using the Kahan way of reducing floating-point
-/// round-off error.  See
-/// https://en.wikipedia.org/wiki/Kahan_summation_algorithm for the algorithm.
+/// A class to do summation in the Kahan way to reduce accumulated round-off
+/// error.  See https://en.wikipedia.org/wiki/Kahan_summation_algorithm for the
+/// algorithm.
 ///
-/// The general way of using this function is
-///
-/// \code{.cc}
-/// double sum = 0;
-/// double compensation = 0;
-/// for (auto it = values.begin(); it != values.end(); ++it)
-/// {
-///    kahan_sum(*it, sum, compensation)l
-/// }
-/// \endcode
-///
-/// Afterward, \p sum contains the sum of the values, with reduced round-off
-/// error.
-///
-/// \param[in] value is the value to add to the sum.
-///
-/// \param[in,out] sum is a reference to the variable holding the sum.  It gets
-/// updated by adding the \p value to it.
-///
-/// \param[in,out] compensation is a reference to the Kahan compensation value
-/// that helps reduce round-off error.  It should be 0 at the beginning of the
-/// sum.
+/// \tparam T is the data type of the values being summed.
 template<class T>
-void
-kahan_sum(T value, T& sum, T& compensation)
+class Kahan_sum
 {
-  auto y = value - compensation;
-  auto t = sum + y;
-  compensation = (t - sum) - y;
-  sum = t;
-}
+public:
+  // constructor
+
+  /// Constructor.  The sum is initialized to 0.
+  Kahan_sum()
+    : m_sum(), m_compensation()
+  { }
+
+  // const methods
+
+  /// Get the current sum.
+  ///
+  /// \returns the current sum.
+  T
+  operator()() const
+  {
+    return m_sum;
+  }
+
+  // non-const methods
+
+  /// Assign a value, losing the previous state.
+  ///
+  /// \param x is the value to assign.
+  ///
+  /// \returns a reference to the instance.
+  Kahan_sum&
+  operator=(const T x)
+  {
+    m_sum = x;
+    m_compensation = 0;
+    return *this;
+  }
+
+  /// Add a value.
+  ///
+  /// \param x is the value to add to the sum.
+  ///
+  /// \returns a reference to the instance.
+  Kahan_sum&
+  operator+=(const T x)
+  {
+    auto y = x - m_compensation;
+    auto t = m_sum + y;
+    m_compensation = t - m_sum;
+    m_compensation -= y;
+    m_sum = t;
+    return *this;
+  }
+
+  /// Subtract a value.
+  ///
+  /// \param x is the value to subtract from the sum.
+  ///
+  /// \returns a reference to the instance.
+  Kahan_sum&
+  operator-=(const T x)
+  {
+    return operator+(-x);
+  }
+
+private:
+  T m_sum;                      //!< the sum
+  T m_compensation;             //!< the compensation value
+};
 
 /// A variant of strtol() that accepts a const 2nd argument.  Read a number from
 /// text.
@@ -301,16 +340,18 @@ strtol(const char* str, int base) {
 #define debugout(msg)   printf("DEBUG - %s [%s, line %d]\n", (msg), __FILE__, __LINE__)
 #define debugout1(fmt,arg)      printf("DEBUG - "); printf((fmt), (arg)); printf(" [%s, line %d]\n", __FILE__, __LINE__)
 
-/// Get the value from a scalar Lux symbol and convert it to the desired type.
+/// Get the value from a numerical scalar LUX symbol and convert it to the
+/// desired type.
 ///
 /// \tparam is the desired data type
 ///
-/// \par iq identifies the Lux symbol.
+/// \par iq identifies the LUX symbol.
 ///
-/// \returns the converted value, or 0 if the symbol wasn't a scalar.
+/// \returns the converted value, or reports an error and returns 0 if the
+/// symbol wasn't a scalar.
 template<typename T>
 T
-get_scalar_value(int32_t iq)
+get_scalar_value(Symbol iq)
 {
  if (symbol_class(iq) == LUX_SCAL_PTR)
     iq = dereferenceScalPointer(iq);

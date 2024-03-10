@@ -38,7 +38,7 @@ NumericDataDescriptor::NumericDataDescriptor(Symbol symbol)
   set_from(symbol);
 }
 
-Dimension
+Size
 NumericDataDescriptor::dimension(int index) const
 {
   if (index >= 0 && index < m_dimensions.size()) {

@@ -604,7 +604,7 @@ StandardArguments::set(ArgumentCount narg, Symbol ps[],
     int32_t ref_dims_ix;   /* reference dimension index */
     int32_t src_dims_ix;   /* input dimension index */
     int32_t iq, d;
-    std::vector<Dimension> tgt_dims;
+    std::vector<Size> tgt_dims;
 
     NumericDataDescriptor srcDescr;
 

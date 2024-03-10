@@ -457,7 +457,7 @@ int32_t lux_xmdialog_board(narg, ps)        // see next line for args
  if (narg >7 )  {if (int_arg_stat(ps[7], &my) != 1) return -1;}
  XtSetArg(wargs[n], XmNmarginHeight, my); n++;
  //if (narg >6) {XtSetArg(wargs[n], XmNdeleteResponse, XmDO_NOTHING); n++;}
- // XtSetArg(wargs[n], XmNborderWidth, (Dimension) 10); n++;
+ // XtSetArg(wargs[n], XmNborderWidth, (Size) 10); n++;
  // optional screen position
  if (narg > 4) {
          if (int_arg_stat(ps[4], &ix) != 1) return -1;
@@ -3252,7 +3252,7 @@ int32_t lux_xmgetwidgetsize(narg, ps)
  int32_t     narg, ps[];
  {
  int32_t        w, dxx, dyy;
- Dimension        dx, dy;
+ Size        dx, dy;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtSetArg(wargs[0], XmNwidth, &dx);
  XtSetArg(wargs[1], XmNheight, &dy);
@@ -3268,7 +3268,7 @@ int32_t lux_xmgetwidgetposition(narg, ps)
  int32_t     narg, ps[];
  {
  int32_t        w, dxx, dyy;
- Dimension        dx, dy;
+ Size        dx, dy;
  if ( get_widget_id( ps[0], &w) != 1 ) return -1;
  XtSetArg(wargs[0], XmNx, &dx);
  XtSetArg(wargs[1], XmNy, &dy);
@@ -4063,7 +4063,7 @@ void draw_re_callback(w, ptq, call_data)
  extern         int32_t    wd[], ht[], last_wid,  set_defw();
  extern  float   xfac, yfac;
  extern  int32_t     ixhigh, iyhigh;
- Dimension        ww, wh;
+ Size        ww, wh;
  static        int32_t        kilroy;
 
  /* this callback is particularly likely to cause re-entrant problems in the
@@ -4295,7 +4295,7 @@ void destroy_cb(Widget w, XtPointer ptq, void *call_data)
 void xminfo(int32_t w)
 {
   int32_t        minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;
-  Dimension        width, height;
+  Size        width, height;
 
   if (w < 0 || w >= n_widgets) {
     printf("Invalid widget number %d; valid range 0 through %d\n",
@@ -4351,7 +4351,7 @@ int32_t lux_xminfo(ArgumentCount narg, Symbol ps[])
 {
   int32_t        w;
   int32_t        minwidth, maxwidth, minheight, maxheight, basewidth, baseheight;
-  Dimension        width, height;
+  Size        width, height;
 
   if (get_widget_id(ps[0], &w) == LUX_ERROR)
     return LUX_ERROR;

@@ -577,14 +577,24 @@ find_action(StandardLoopIterator<T> datait,
     else // brute force search
     {
       int32_t ix;
-      for (ix = offset; ix < data_count; ++ix)
-      {
-        if (data[ix] == key)    // found it
+      if (at_or_past)
+        for (ix = offset; ix < data_count; ++ix)
         {
-          *target = ix;
-          break;
+          if (data[ix] >= key)  // found it
+          {
+            *target = ix;
+            break;
+          }
         }
-      }
+      else
+        for (ix = offset; ix < data_count; ++ix)
+        {
+          if (data[ix] == key)    // found it
+          {
+            *target = ix;
+            break;
+          }
+        }
       if (ix == data_count)     // not found
         *target = -1;
     }
@@ -665,7 +675,7 @@ lux_find(ArgumentCount narg, Symbol ps[])
     break;
   case LUX_DOUBLE:
     find_action(StandardLoopIterator<double>(sa, 0),
-                 StandardLoopIterator<double>(sa, 1),
+                StandardLoopIterator<double>(sa, 1),
                 StandardLoopIterator<int32_t>(sa, 2),
                 StandardLoopIterator<int32_t>(sa, 3),
                 internalMode);

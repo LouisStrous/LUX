@@ -485,6 +485,17 @@ int32_t int_arg(int32_t nsym)
 {
   return get_scalar_value<int32_t>(nsym);
 }
+
+/// Get a 64-bit integer value from a scalar symbol.
+///
+/// \param iq is the LUX symbol to query.  It must be a scalar.
+///
+/// \returns the value from the symbol, converted to `int64_t`.
+int64_t
+int64_arg(Symbol iq)
+{
+  return get_scalar_value<int64_t>(iq);
+}
 //-----------------------------------------------------
 int32_t int_arg_stat(int32_t nsym, int32_t *value)
 // returns integer value of symbol <nsym>, if any, or an error

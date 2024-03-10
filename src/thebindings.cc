@@ -3790,7 +3790,7 @@ void register_the_bindings()
 
 #if HAVE_LIBGSL
   int32_t lux_planetpermutationchanges(int32_t, int32_t []);
-  register_lux_f(lux_planetpermutationchanges, "planetpermutationchanges", 3, 3, "1semicircular");
+  register_lux_f(lux_planetpermutationchanges, "planetpermutationchanges", 3, 3, "1verbose");
 #endif
 
 #if HAVE_LIBGSL

@@ -23525,28 +23525,28 @@ the right one.
 If the elements of @code{@var{x}} are in ascending order, then the
 returned permutation number is 0.  The greatest permutation number is
 returned if the data elements are in descending order.  That number is
-equal to @code{factorial(n) − 1} for linear and semicircular
+equal to @code{factorial(n) - 1} for linear and semicircular
 permutations, or @code{factorial(n - 1) - 1} for circular
 permutations.
 
 Semicircular permutations are a non-standard extension.  A
 semicircular permutation is like a circular permutation in that every
 element has two neighbors, and is like a linear permutation in that
-all arrangements of the elements are unique.  Out of all arrangements
+there are definite first and last elements.  Out of all arrangements
 of elements that are equivalent for a circular permutation, the
 semicircular permutation chooses the one in which the span of the
-values is least, or, equivalently, in which the circular distance from
-the greatest element past the period of the circle to the least
-element is greatest.  This is suitable for cases where the elements
-together often only cover a relatively small fraction of the entire
-circle (hence ``semicircular'').
+values from first to last is least, or, equivalently, in which the
+circular distance from the last element to the first element is
+greatest.  This is suitable for cases where the elements together
+often only cover a relatively small fraction of the entire circle
+(hence ``semicircular'').
 
 The semicircular permutation depends not just on the relative order of
 the original values but also on the original values themselves, and is
 only available for rank-based permutations.  To be able to tell how
-big the gap is between the greatest and the least value we need to
-know how big the period of the circle is, so a second argument is
-required.
+big the gap is from the greatest value past the period of the circle
+to the least value we need to know how big the period of the circle
+is, so a second argument is required.
 
 An example: Some objects were measured to be in directions given by
 angles of @code{[210, 355, 140, 12]} degrees, with the corresponding
@@ -23566,8 +23566,8 @@ values lies before the first and after the last element of the
 sequence.  In this example that gap must lie before the angle of 355
 degrees, so the rank of the value 355 must be 0, so the appropriate
 semicircular permutation is @code{[3, 0, 2, 1]}.  The corresponding
-permutation number is the same as for the linear permutation with
-those elements, in this case 19.
+permutation number is the same as for the rank-based linear
+permutation with those elements, in this case 19.
 
 If we move the zero point of the angles backward by 5 degrees then the
 new angles are @code{[215, 0, 145, 17]}.  Then the elements span 215

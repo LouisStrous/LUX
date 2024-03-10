@@ -3,7 +3,7 @@
 
 // This is file permutations.hh.
 //
-// Copyright 2020-2021 Louis Strous
+// Copyright 2020-2024 Louis Strous
 //
 // This file is part of LUX.
 //
@@ -543,55 +543,119 @@ find_circular_index_after_greatest_gap(const T* values,
   return index_after_greatest_gap;
 }
 
-/// Returns a number that uniquely identifies a rank-based semicircular
-/// permutation.  See permutations.hh for a discussion of permutations.
-///
-/// \tparam T is the type of the data values that describe the permutation.
-///
-/// \param[in] v points at the beginning of the array of data values.  There are
-/// assumed to be no duplicate data values.
-///
-/// \param[in] n counts the number of data values.
-///
-/// \param[in] period is the period of the circle.  The data values are assumed
-/// to range between 0 (inclusive) and \a period.
-///
-/// \param[out] gapdiff receives the absolute difference between the greatest
-/// and next greatest gaps.
-///
-/// \returns the rank-based semicircular permutation number, which is a number
-/// between 0 and \f$n! - 1\f$ inclusive.
 template<typename T>
-size_t
-permutation_number_semicircular_rank(const T* v, size_t n, const T period,
-                                     T& gapdiff)
+class Permutation_semicircular_rank
 {
-  if (n < 2)
-    return 0;
+public:
+  Permutation_semicircular_rank(const T* v, size_t n, const T period)
+    : m_data(v), m_data_count(n), m_period(period)
+  {
+    if (m_data_count < 2)
+    {
+      m_permutation_number = 0;
+    }
+    else
+    {
+      // get the indexes
+      auto indexes = sort_index(m_data, 1, m_data_count);
 
-  // get the indexes
-  std::vector<size_t> i = sort_index(v, 1, n);
+      // find the greatest gap
+      m_greatest_gap = -1;      // greatest gap
+      T gap2 = -1;              // greatest-but-one gap
+      m_index_after_greatest_gap;
+      for (auto ix = 0; ix < m_data_count - 1; ++ix)
+      {
+        auto gap = m_data[indexes[ix + 1]] - m_data[indexes[ix]];
+        if (gap > m_greatest_gap)
+        {
+          gap2 = m_greatest_gap;
+          m_greatest_gap = gap;
+          m_index_before_greatest_gap = indexes[ix];
+          m_index_after_greatest_gap = indexes[ix + 1];
+        }
+        else if (gap > gap2)
+        {
+          gap2 = gap;
+        }
+      }
+      {
+        auto gap = m_data[indexes[0]] + m_period - m_data[indexes[n - 1]];
+        if (gap > m_greatest_gap)
+        {
+          gap2 = m_greatest_gap;
+          m_greatest_gap = gap;
+          m_index_before_greatest_gap = indexes[n - 1];
+          m_index_after_greatest_gap = indexes[0];
+        }
+        else if (gap > gap2)
+        {
+          gap2 = gap;
+        }
+      }
+      m_gap_diff = m_greatest_gap - gap2;
 
-  size_t index_after_greatest_gap
-    = find_circular_index_after_greatest_gap(v, i, period, gapdiff);
+      // get the ranks
+      auto ranks = sort_index(indexes);
 
-  // get the ranks
-  std::vector<size_t> r = sort_index(i);
+      // rotate until the gap is before the beginning
+      auto d = ranks[m_index_after_greatest_gap];
+      if (d) {
+        for (int i = 0; i < n; ++i) {
+          // effectively, we calculate (ranks[i] - d) mod n
+          if (ranks[i] < d)
+            ranks[i] += n;
+          ranks[i] -= d;
+        }
+      }
 
-  // rotate until the gap is before the beginning
-  auto d = r[index_after_greatest_gap];
-  if (d) {
-    for (int i = 0; i < n; ++i) {
-      // effectively, we calculate (ranks[i] - d) mod n
-      if (r[i] < d)
-        r[i] += n;
-      r[i] -= d;
+      m_permutation_number = permutation_number_linear_rank(ranks);
     }
   }
 
-  // return rank-based linear permutation number
-  return permutation_number_linear_rank(r);
-}
+  Permutation_semicircular_rank(const std::vector<T>& v, const T period)
+    : Permutation_semicircular_rank(v.data(), v.size(), period)
+  { }
+
+  size_t
+  permutation_number() const
+  {
+    return m_permutation_number;
+  }
+
+  T
+  greatest_gap_size() const
+  {
+    return m_greatest_gap;
+  }
+
+  size_t
+  index_after_greatest_gap() const
+  {
+    return m_index_after_greatest_gap;
+  }
+
+  size_t
+  index_before_greatest_gap() const
+  {
+    return m_index_before_greatest_gap;
+  }
+
+  T
+  greatest_gaps_diff() const
+  {
+    return m_gap_diff;
+  }
+
+private:
+  const T* m_data;
+  const size_t m_data_count;
+  const T m_period;
+  T m_greatest_gap;
+  T m_gap_diff;
+  size_t m_index_before_greatest_gap;
+  size_t m_index_after_greatest_gap;
+  size_t m_permutation_number;
+};
 
 /// Returns a number that uniquely identifies a rank-based semicircular
 /// permutation.  See permutations.hh for a discussion of permutations.
@@ -612,59 +676,8 @@ template<typename T>
 size_t
 permutation_number_semicircular_rank(const T* v, size_t n, const T period)
 {
-  if (n < 2)
-    return 0;
-
-  // get the indexes
-  std::vector<size_t> i = sort_index(v, 1, n);
-
-  size_t index_after_greatest_gap
-    = find_circular_index_after_greatest_gap(v, i, period);
-
-  // get the ranks
-  std::vector<size_t> r = sort_index(i);
-
-  // rotate until the gap is before the beginning
-  auto d = r[index_after_greatest_gap];
-  if (d) {
-    for (int i = 0; i < n; ++i) {
-      // effectively, we calculate (ranks[i] - d) mod n
-      if (r[i] < d)
-        r[i] += n;
-      r[i] -= d;
-    }
-  }
-
-  // return rank-based linear permutation number
-  return permutation_number_linear_rank(r);
-}
-
-/// Returns a number that uniquely identifies a rank-based semicircular
-/// permutation.
-///
-/// Is like permutation_number_semicircular_rank(const T*, size_t) but with the
-/// values passed in via a `std::vector`.
-///
-/// \tparam T is the type of the data values that describe the permutation.
-///
-/// \param[in] v is the vector of data values.  There are assumed to be no
-/// duplicate data values.
-///
-/// \param[in] period is the period of the circle.  The data values are assumed
-/// to range between 0 (inclusive) and \a period.
-///
-/// \param[out] gapdiff receives the absolute difference between the greatest
-/// and next greatest gaps.
-///
-/// \returns the rank-based semicircular permutation number, which is a number
-/// between 0 and \f$n! - 1\f$ inclusive.
-template<typename T>
-size_t
-permutation_number_semicircular_rank(const std::vector<T>& v, T period,
-                                     T& gapdiff)
-{
-  return permutation_number_semicircular_rank(v.data(), v.size(), period,
-                                              gapdiff);
+  Permutation_semicircular_rank psr(v, n, period);
+  return psr.permutation_number();
 }
 
 /// Returns a number that uniquely identifies a rank-based semicircular
@@ -873,9 +886,10 @@ permutation_distance_circular_rank(size_t n, const T* v1, const T* v2)
 /// permutation for which the least Kendall tau distance between the two
 /// permutations was found.
 ///
-/// \returns the nonnegative distance, which is less than \f$(n - 1)(n - 2)/2\f$
-/// for permutations of \f$n\f$ elements if \f$n\f$ is 2 or greater, and is 0
-/// otherwise.
+/// \returns the nonnegative distance if \a v1 and \a v2 have the same number of
+/// elements, and otherwise `std::numeric_limits<size_t>::max()`.  Tje distance
+/// is less than \f$(n - 1)(n - 2)/2\f$ for permutations of \f$n\f$ elements if
+/// \f$n\f$ is 2 or greater, and is 0 otherwise.
 template<typename T>
 size_t
 permutation_distance_circular_rank(const std::vector<T>& v1,
@@ -883,7 +897,7 @@ permutation_distance_circular_rank(const std::vector<T>& v1,
                                    size_t& shift)
 {
   if (v1.size() != v2.size())
-    return 0;
+    return std::numeric_limits<size_t>::max();
 
   return permutation_distance_circular_rank(v1.size(), v1.data(), v2.data(),
                                             shift);
@@ -984,6 +998,91 @@ permutation_distance_circular_index(const std::vector<T>& i1,
     return 0;
 
   return permutation_distance_circular_index(i1.size(), i1.data(), i2.data());
+}
+
+template<typename T>
+size_t
+permutation_distance_semicircular_rank(size_t n, const T* v1, const T* v2,
+                                       size_t& shift)
+{
+  size_t d = permutation_distance_circular_rank(n, v1, v2, shift);
+  if (d <= 1)
+  {
+    // At most one circular permutation change.  Was there a two-gap
+    // semicircular one?  Then there must be a circular shift and (if d == 1)
+    // also an item swap.
+    auto ranks1 = sort_rank(v1);
+    auto ranks2 = sort_rank(v2);
+    auto n = ranks2.size();
+    for (auto rit = ranks2.begin(); rit < ranks2.end(); ++rit)
+    {
+      auto r = *rit + shift;
+      *rit = (r >= n)? r - n: r;
+    }
+    // \todo detect circular shift
+  }
+  return d;
+}
+
+template<typename T>
+size_t
+permutation_distance_semicircular_rank(size_t n, const T* v1, const T* v2)
+{
+  size_t s;
+  return permutation_distance_semicircular_rank(n, v1, v2, s);
+}
+
+template<typename T>
+size_t
+permutation_distance_semicircular_rank(const std::vector<T>& v1,
+                                       const std::vector<T>& v2,
+                                       size_t& shift)
+{
+  if (v1.size() != v2.size())
+    return std::numeric_limits<size_t>::max();
+
+  return permutation_distance_semicircular_rank(v1.size(), v1.data(), v2.data(),
+                                                shift);
+}
+
+template<typename T>
+size_t
+permutation_distance_semicircular_rank(const std::vector<T>& v1,
+                                       const std::vector<T>& v2)
+{
+  size_t s;
+  return permutation_distance_semicircular_rank(v1, v2, s);
+}
+
+template<typename T>
+size_t
+permutation_distance_semicircular_index(size_t n, const T* i1, const T* i2,
+                                        size_t& shift)
+{
+  std::vector<size_t> r1 = sort_index(i1, 1, n);
+  std::vector<size_t> r2 = sort_index(i2, 1, n);
+
+  return permutation_distance_semicircular_rank<size_t>(r1, r2, shift);
+}
+
+template<typename T>
+size_t
+permutation_distance_semicircular_index(size_t n, const T* i1, const T* i2)
+{
+  size_t s;
+  return permutation_distance_semicircular_index(n, i1, i2, s);
+}
+
+template<typename T>
+size_t
+permutation_distance_semicircular_index(const std::vector<T>& i1,
+                                        const std::vector<T>& i2)
+{
+  if (i1.size() != i2.size())
+    return std::numeric_limits<size_t>::max();
+
+  return permutation_distance_semicircular_index(i1.size(), i1.data(),
+                                                 i2.data());
 }
 
 #endif

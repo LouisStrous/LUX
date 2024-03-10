@@ -53,14 +53,19 @@ Gsl_root_fsolver::get_root()
   {
     ++iterations;
     d_status = gsl_root_fsolver_iterate(d_solver);
-    if (!d_status) {            // no problem during iteration
+    if (!d_status)
+    {                           // no problem during iteration
       double x_lo = gsl_root_fsolver_x_lower(d_solver);
       double x_hi = gsl_root_fsolver_x_upper(d_solver);
       d_status = gsl_root_test_interval(x_lo, x_hi, 0, 10*DBL_EPSILON);
-    }
-  } while (d_status == GSL_CONTINUE && iterations < 100);
+    } else
+      break;
+  } while (iterations < 100);
 
-  return gsl_root_fsolver_root(d_solver);
+  if (d_status)
+    return std::nan("");
+  else
+    return gsl_root_fsolver_root(d_solver);
 }
 
 #endif

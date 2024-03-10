@@ -257,6 +257,10 @@ public:
     /// `true` if dimensions equal to one should be suppressed as far as
     /// possible, `false` otherwise.
     bool omit_dimensions_equal_to_one = false;
+
+    /// `true` if the base data type should be taken from the reference
+    /// parameter, `false` otherwise.
+    bool data_type_from_ref = false;
   };
 
   /// Represents a vector of parameter specifications (of type Param_spec) for
@@ -321,7 +325,7 @@ public:
   /// expected for the LUX subroutine or function.  See below for a detailed
   /// description.
   ///
-  /// \parm[in,out] ptrs is the address, if it is not null, where a pointer to
+  /// \param[in,out] ptrs is the address, if it is not null, where a pointer to
   /// the instances of Pointer corresponding to the arguments and the return
   /// value, if any (which comes at the end) is written.
   ///
@@ -383,9 +387,9 @@ public:
   /// \verbatim i;i;o;o \endverbatim
   ///
   /// The above specification says that the first two parameters are
-  /// single-element input parameters, and the next two are output parameters
-  /// with the same data type and dimensions as the first parameter.  An example
-  /// call is `foo,3,5,x,y`.
+  /// single-element input parameters of arbitrary type, and the next two are
+  /// output parameters with the same data type and dimensions as the first
+  /// parameter.  An example call is `foo,3,5,x,y`.
   ///
   /// \par Reference Parameter
   ///
@@ -427,7 +431,10 @@ public:
   /// Parameter data types may be specified for any parameter, immediately after
   /// the parameter type.  Explicit parameter data types are indicated by one of
   /// the letters `B W L Q F D S` corresponding to `int8` through `int64`,
-  /// `float`, `double`, and `string`, respectively.
+  /// `float`, `double`, and `string`, respectively.  In addition, the special
+  /// value `Z` indicates that the data type should be copied from the reference
+  /// parameter.  This behavior is standard for output and return parameters but
+  /// not for input parameters.
   ///
   /// An output or return parameter for which an explicit data type is specified
   /// gets set to that data type.
@@ -443,10 +450,19 @@ public:
   ///
   /// \verbatim iF;rL \endverbatim
   ///
-  /// says that the first argument must be a single-element argument and that a
-  /// `float` copy is made available for processing, if the argument isn't
-  /// `float` already.  Also, a single-element `int32` return value is created
-  /// and made available for receiving output.
+  /// says that the first parameter is an input parameter, the corresponding
+  /// argument must have a single-element, and that a `float` copy is made
+  /// available for processing, if the argument isn't `float` already.  Also, a
+  /// single-element `int32` return value is created and made available for
+  /// receiving output.
+  ///
+  /// \verbatim i;iZ \endverbatim
+  ///
+  /// says that the first parameter is an input parameter and that the
+  /// corresponding argument must have a single data value.  The second
+  /// parameter is an input parameter, too, and a version of the corresponding
+  /// argument that has the same data type as the reference parameter (which by
+  /// default is the first parameter) is made available to the back-end.
   ///
   /// If the explicit data type is numeric (i.e., not `S`) and is preceded by a
   /// greater-than sign (`>`), then the data type is a minimum.  If the data

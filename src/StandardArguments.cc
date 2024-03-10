@@ -136,34 +136,38 @@ parse_standard_arg_fmt(const std::string& format, Param_spec_list& psl)
       // optional data type specification
       switch (*fmt)
       {
-      case 'B':
-        p_spec.data_type = LUX_INT8;
-        ++fmt;
-        break;
-      case 'W':
-        p_spec.data_type = LUX_INT16;
-        ++fmt;
-        break;
-      case 'L':
-        p_spec.data_type = LUX_INT32;
-        ++fmt;
-        break;
-      case 'Q':
-        p_spec.data_type = LUX_INT64;
-        ++fmt;
-        break;
-      case 'F':
-        p_spec.data_type = LUX_FLOAT;
-        ++fmt;
-        break;
-      case 'D':
-        p_spec.data_type = LUX_DOUBLE;
-        ++fmt;
-        break;
-      case 'S':
-        p_spec.data_type = LUX_TEMP_STRING;
-        ++fmt;
-        break;
+        case 'B':
+          p_spec.data_type = LUX_INT8;
+          ++fmt;
+          break;
+        case 'W':
+          p_spec.data_type = LUX_INT16;
+          ++fmt;
+          break;
+        case 'L':
+          p_spec.data_type = LUX_INT32;
+          ++fmt;
+          break;
+        case 'Q':
+          p_spec.data_type = LUX_INT64;
+          ++fmt;
+          break;
+        case 'F':
+          p_spec.data_type = LUX_FLOAT;
+          ++fmt;
+          break;
+        case 'D':
+          p_spec.data_type = LUX_DOUBLE;
+          ++fmt;
+          break;
+        case 'S':
+          p_spec.data_type = LUX_TEMP_STRING;
+          ++fmt;
+          break;
+        case 'Z':
+          p_spec.data_type_from_ref = true;
+          ++fmt;
+          break;
       } // end of switch (*fmt)
 
       if (*fmt == '^')
@@ -550,7 +554,8 @@ standard_args_common_symboltype(const Param_spec_list& param_specs,
 
 StandardArguments::StandardArguments()
   : m_return_symbol()
-{ }
+{
+}
 
 StandardArguments::StandardArguments(ArgumentCount narg, Symbol ps[],
                                      const std::string& fmt,
@@ -926,8 +931,12 @@ StandardArguments::set(ArgumentCount narg, Symbol ps[],
         if (pspec.common_type)
           type = common_type;
         else
+        {
+          if (pspec.data_type_from_ref)
+            type = symbol_type(ps[ref_param]);
           type = standard_args_final_symboltype(type, pspec.data_type,
                                                 pspec.data_type_limit);
+        }
         iq = lux_convert(1, &iq, type, 1);
         break;
       case StandardArguments::PS_OUTPUT: case StandardArguments::PS_RETURN:

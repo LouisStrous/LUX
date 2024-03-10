@@ -616,7 +616,8 @@ lux_find(ArgumentCount narg, Symbol ps[])
   StandardArguments
     sa(narg, ps,
        "i*;"       // data: input argument with arbitrary dimensions
-       "i*;"       // key: input argument with arbitrary dimensions
+       "iZ*;" // key: input argument with arbitrary dimensions, converted to the
+              // type of the reference parameter (here the data)
        "iL[1]#?;"  // offset: optional input argument, converted to LUX_INT32,
                    // the element count must be equal to 1 or to that of the key
        "rL[1]@&"); // return symbol: LUX_INT32, dimensions equal to that of the

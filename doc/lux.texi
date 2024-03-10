@@ -16713,22 +16713,32 @@ See also: @ref{Diagnostic Output}, @ref{record}
 @subsection differ
 @findex differ
 
-@code{differ(@var{x} [, @var{axis}, @var{order}] [, /central])}
+@code{differ(@var{x} [, @var{axis}, @var{order}] [, /central, /circular])}
 
 Returns the running difference of @code{@var{x}}: each element of the
 result contains the difference between the corresponding element of
 @code{@var{x}} and its |@code{@var{order}}|-th predecessor.  The
-predecessors of the first elements are taken to be zero.  If
-@code{@var{axis}} is not specified (or negative), then @code{@var{x}} is
-treated as a 1d array.  Otherwise, differencing is done along the
-indicated axis (dimension), and is started over for each of the other
-dimensions.  If @code{@var{order}} is positive, then the unavailable
-(first) values of each result vector are set to zero; if negative, then
+predecessors of the first elements are taken to be zero.
+
+If @code{@var{axis}} is not specified (or negative), then
+@code{@var{x}} is treated as a 1d array.  Otherwise, differencing is
+done along the indicated axis (dimension), and is started over for
+each of the other dimensions.
+
+If @code{/circular} is specified and @code{@var{order}} is positive
+then the differencing is circular, with the unavailable (first) value
+of each result vector set to the difference between the first and last
+original values.
+
+Otherwise, if @code{@var{order}} is positive, then the unavailable
+(first) values of each result vector are set to 0; if negative, then
 the value from the original is copied (i.e. reverse of @code{runsum}).
-The default @code{@var{order}} is 1.  The @code{/central} keyword
-indicates that central differencing is performed, i.e. the differences
-are put in the middle of the range instead of at the end.  For central
-differencing, the border values are always set to zero.
+The default @code{@var{order}} is 1.
+
+The @code{/central} keyword indicates that central differencing is
+performed, i.e. the differences are put in the middle of the range
+instead of at the end.  For central differencing, the border values
+are always set to zero.
 
 Both @code{@var{axis}} and @code{@var{order}} may contain multiple
 elements, in which case a differencing pass is performed for each of the

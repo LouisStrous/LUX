@@ -47,93 +47,155 @@ int32_t         f_decomp(float *, int32_t, int32_t), d_decomp(double *, int32_t,
   f_solve(float *, float *, int32_t, int32_t), d_solve(double *, double *, int32_t, int32_t),
   lux_replace(int32_t, int32_t);
 //-------------------------------------------------------------------------
-int32_t lux_runsum(ArgumentCount narg, Symbol ps[])
-/*generate a running sum
-  syntax:  y = runsum(x [,axis,order])
-  <axis> is the dimension along which summing is performed; for each of the
-  remaining coordinates summing is started over at zero.  <order> is the
-  summation order, such that n-th order summation is the reverse of the
-  n-th order difference (see lux_differ).  If <axis> isn't specified,
-  or is negative, then <x> is taken to be a 1D array and summation is
-  done with floating point or double-precision arithmetic.  Otherwise,
-  the result has the same type as <x>.  axis & order extension by LS 26nov92
-  implementation of 1D double-precision case LS 11feb2007 */
+/// Generate a running sum
+///
+/// Syntax:  y = runsum(x [,axis,order])
+///
+/// <axis> is the dimension along which summing is performed; for each of the
+/// remaining coordinates summing is started over at zero.  <order> is the
+/// summation order, such that n-th order summation is the reverse of the n-th
+/// order difference (see lux_differ).  If <axis> isn't specified, or is
+/// negative, then <x> is taken to be a 1D array and summation is done with
+/// floating point or double-precision arithmetic.  Otherwise, the result has
+/// the same type as <x>.  axis & order extension by LS 26nov92 implementation
+/// of 1D double-precision case LS 11feb2007
+Symbol
+lux_runsum(ArgumentCount narg, Symbol ps[])
 {
  Pointer q1,q2,p;
- int32_t        result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
+ int32_t result_sym, iq, axis, m, n, i, j, done, *dims, ndim, tally[8], step[8];
  int32_t        xdims[8], order, size;
  Array  *h;
 
- if (narg > 2) order = int_arg(ps[2]); else order = -1;
- if (narg > 1) axis = int_arg(ps[1]); else axis = -1;
+ if (narg > 2)
+   order = int_arg(ps[2]);
+ else
+   order = -1;
+ if (narg > 1)
+   axis = int_arg(ps[1]);
+ else
+   axis = -1;
  iq = ps[0];
- if (iq < 0) return iq;                                         // error pass-thru
- if (symbol_class(iq) == LUX_SCAL_PTR) iq = dereferenceScalPointer(iq);
-                                                        //float the input
+ if (iq < 0)
+   return iq;         // error pass-thru
+ if (symbol_class(iq) == LUX_SCAL_PTR)
+   iq = dereferenceScalPointer(iq);
+
+ //float the input
  type = sym[iq].type;
- if (axis == -1 && type < LUX_FLOAT) {
+ if (axis == -1 && type < LUX_FLOAT)
+ {
    iq = lux_float(1, ps);       // pseudo-1D case
    type = LUX_FLOAT;
  }
- switch (symbol_class(iq))      {
+ switch (symbol_class(iq))
+ {
    case LUX_SCALAR:
-        //trivial, just return value
+     //trivial, just return value
      return iq;
    case LUX_ARRAY:
      h = HEAD(iq);
      if (axis >= 0)                                     // axis specified
-     { dims = h->dims; ndim = h->ndim;
-       if (axis >= ndim) return cerror(ILL_DIM, ps[1]); }
+     {
+       dims = h->dims;
+       ndim = h->ndim;
+       if (axis >= ndim)
+         return cerror(ILL_DIM, ps[1]);
+     }
      else
-     { dims = &m; ndim = 1; axis = 0; }
+     {
+       dims = &m;
+       ndim = 1;
+       axis = 0;
+     }
      if (axis >= 0 && h->dims[axis] < ABS(order) + 1) // nothing to do
        return ps[0];
      q1.i32 = LPTR(h);
      GET_SIZE(m, h->dims, h->ndim);
      if (ABS(order) > m - 1)
-     { puts("Runsum order too large for input array");
-       return cerror(INCMP_ARG, ps[2]); }
-     if (order == 0) order = 1;
-     memcpy(xdims, dims, sizeof(int32_t)*ndim);                 // copy dims
+     {
+       puts("Runsum order too large for input array");
+       return cerror(INCMP_ARG, ps[2]);
+     }
+     if (order == 0)
+       order = 1;
+     memcpy(xdims, dims, sizeof(int32_t)*ndim); // copy dims
      result_sym = array_clone(iq, type);
      h = HEAD(result_sym);
      q2.i32 = LPTR(h);
-             // set up for walk through array
-     for (i = 0; i < ndim; i++) tally[i] = 1;
+     // set up for walk through array
+     for (i = 0; i < ndim; i++)
+       tally[i] = 1;
      n = size = *step = lux_type_size[type];
-     for (i = 1; i < ndim; i++) step[i] = (n *= dims[i - 1]);
+     for (i = 1; i < ndim; i++)
+       step[i] = (n *= dims[i - 1]);
      if (axis)                           // put requested axis first
-     { n = *step; *step = step[axis]; step[axis] = n;
-       n = *xdims; *xdims = xdims[axis]; xdims[axis] = n; }
-     for (i = ndim - 1; i; i--) step[i] -= step[i - 1]*xdims[i - 1];
-        // treat edge
+     {
+       n = *step;
+       *step = step[axis];
+       step[axis] = n;
+       n = *xdims;
+       *xdims = xdims[axis];
+       xdims[axis] = n;
+     }
+     for (i = ndim - 1; i; i--)
+       step[i] -= step[i - 1]*xdims[i - 1];
+     // treat edge
      p.ui8 = q2.ui8;
      for (i = 0; i < ABS(order); i++)
-     { memcpy(q2.ui8, q1.ui8, size);
-       q2.ui8 += *step;  q1.ui8 += *step; }
+     {
+       memcpy(q2.ui8, q1.ui8, size);
+       q2.ui8 += *step;
+       q1.ui8 += *step;
+     }
      *xdims -= ABS(order);
      do                                         // main loop
-     { switch (type)
-       { case LUX_INT8:         *q2.ui8 = *q1.ui8 + *p.ui8; break;
-         case LUX_INT16:        *q2.i16 = *q1.i16 + *p.i16; break;
-         case LUX_INT32:        *q2.i32 = *q1.i32 + *p.i32; break;
-         case LUX_INT64:        *q2.i64 = *q1.i64 + *p.i64; break;
-         case LUX_FLOAT:        *q2.f = *q1.f + *p.f; break;
-         case LUX_DOUBLE:       *q2.d = *q1.d + *p.d; break; }
-       q2.ui8 += *step; q1.ui8 += *step; p.ui8 += *step;
+     {
+       switch (type)
+       {
+         case LUX_INT8:
+           *q2.ui8 = *q1.ui8 + *p.ui8;
+           break;
+         case LUX_INT16:
+           *q2.i16 = *q1.i16 + *p.i16;
+           break;
+         case LUX_INT32:
+           *q2.i32 = *q1.i32 + *p.i32;
+           break;
+         case LUX_INT64:
+           *q2.i64 = *q1.i64 + *p.i64;
+           break;
+         case LUX_FLOAT:
+           *q2.f = *q1.f + *p.f;
+           break;
+         case LUX_DOUBLE:
+           *q2.d = *q1.d + *p.d;
+           break;
+       }
+       q2.ui8 += *step;
+       q1.ui8 += *step;
+       p.ui8 += *step;
        for (i = 0; i < ndim; i++)
-       { if (tally[i]++ != xdims[i])
-         { done = 0;
-           break; }
-         tally[i] = 1; done = 1;
+       {
+         if (tally[i]++ != xdims[i])
+         {
+           done = 0;
+           break;
+         }
+         tally[i] = 1;
+         done = 1;
          q1.ui8 += step[i + 1];
-         q2.ui8 += step[i + 1]; }
+         q2.ui8 += step[i + 1];
+       }
        if (i > 0 && i < ndim)   // start of new line -- improved 19feb95 LS
-       { p.ui8 = q2.ui8;
+       {
+         p.ui8 = q2.ui8;
          for (j = 0; j < ABS(order); j++)
-         { memcpy(q2.ui8, q1.ui8, size);
+         {
+           memcpy(q2.ui8, q1.ui8, size);
            q2.ui8 += *step;
-           q1.ui8 += *step; }
+           q1.ui8 += *step;
+         }
        }
      } while (!done);
      break;
@@ -141,7 +203,8 @@ int32_t lux_runsum(ArgumentCount narg, Symbol ps[])
      return cerror(ILL_CLASS, iq);
  }
  return result_sym;
-}                                               //end of lux_runsum
+}
+REGISTER(runsum, f, runsum,  1, 3, "*");
 //-------------------------------------------------------------------------
 int32_t index_sdev(ArgumentCount narg, Symbol ps[], int32_t sq)
 // calculates standard deviations or variances by class.

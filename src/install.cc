@@ -712,7 +712,7 @@ extern LuxRoutine lux_abs, lux_acos, lux_arestore_f, lux_arg,
   lux_readkeyne, lux_readu_f, lux_real, lux_redim_f,
   lux_regrid, lux_regrid3, lux_regrid3ns, lux_reorder,
   lux_reverse, lux_rfix, lux_root3, lux_runcum, lux_runprod,
-  lux_runsum, lux_scale, lux_scalerange,
+  lux_scale, lux_scalerange,
   lux_sdev, lux_segment, lux_segment_dir, lux_sgn,
   lux_shift_f, lux_sieve, lux_sin, lux_sinh, lux_skipc,
   lux_smap, lux_smooth, lux_solar_b, lux_solar_l,
@@ -1124,7 +1124,6 @@ InternalRoutine function_table[] = {
   { "root3",    3, 3, lux_root3, 0 },                          // orientation.cc
   { "runcum",   1, 3, lux_runcum, "*1partial_width:2varsum" }, // strous.cc
   { "runprod",  1, 2, lux_runprod, "*" },                      // strous2.cc
-  { "runsum",   1, 3, lux_runsum, "*" },                       // fun2.cc
   { "scale",    1, 3, lux_scale, "*1fullrange:2zoom" },        // fun3.cc
   { "scalerange", 3, 5, lux_scalerange, "*1fullrange:2zoom" }, // fun3.cc
   { "scanf",    2, MAX_ARG, lux_freadf_f, "|1|1eof" },         // files.cc

@@ -3050,6 +3050,9 @@ void register_the_bindings()
   int32_t lux_log2(int32_t, int32_t []);
   register_lux_f(lux_log2, "log2", 1, 1, nullptr);
 
+  int32_t lux_runsum(int32_t, int32_t []);
+  register_lux_f(lux_runsum, "runsum", 1, 3, "*");
+
   register_lux_f(lux_esmooth_asymmetric_f, "esmooth1", 1, 2, NULL);
 
   register_lux_f(lux_esmooth_symmetric_f, "esmooth2", 1, 2, NULL);

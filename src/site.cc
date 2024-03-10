@@ -63,7 +63,7 @@ int32_t site(ArgumentCount narg, Symbol ps[])
   setPager(0);
   if (!internalMode || internalMode == 255) {
     printw("*** Welcome to " PACKAGE_STRING "\n");
-    printw("Copyright 2013-2023 Louis Strous.\n"
+    printw("Copyright 2013-2024 Louis Strous.\n"
            "This program comes with ABSOLUTELY NO WARRANTY; "
            "for details type ‘info,/warranty’.  "
            "This is free software, and you are welcome to redistribute "

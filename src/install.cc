@@ -116,7 +116,7 @@ extern LuxRoutine lux_area, lux_area2, lux_arestore, lux_astore,
   lux_scb, lux_set, lux_setenv, lux_shift, lux_show, lux_show_func,
   lux_show_subr, lux_spawn, lux_step, lux_string_inplace,
   lux_subshift, lux_subshiftc, lux_swab, lux_swaphalf, lux_switch,
-  lux_system, lux_tolookup, lux_trace, lux_type, lux_ulib, lux_wait,
+  lux_system, lux_trace, lux_type, lux_ulib, lux_wait,
   lux_watch, lux_word_inplace, lux_writeu, lux_zap, lux_zapnan,
   lux_zero, postrelease, showstats, site;
 
@@ -504,7 +504,6 @@ InternalRoutine         subroutine_table[] = {
   { "tapwrt",   2, 2, lux_tapwrt, 0 },         // tape.c
 #endif
   { "threecolors", 0, 1, lux_threecolors, 0 }, // xport.c
-  { "tolookup", 2, 3, lux_tolookup, "1one" },  // strous2.c
   { "trace",    0, 1, lux_trace,               // install.c
     "1file:2loop:4braces:8routine:143all:16showstats:32cputime"
     ":64showexec:128enter" },

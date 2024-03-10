@@ -22,13 +22,15 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-#include <limits.h>
-#include <float.h>
 #include "action.hh"
+#include <algorithm>
+#include <ctype.h>
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+#include <memory>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>             // for sbrk()
 
 int32_t         minmax(int32_t *, int32_t, int32_t),
@@ -397,10 +399,10 @@ int32_t multiCompare(const void *arg1, const void *arg2)
     break;
   case LUX_INT64:
     for (i = 0; i < multiCompNCoord; i++) {
-      d.i32 = (int32_t) multiCompData.i64[i1 + i*multiCompNPoints]
-        - (int32_t) multiCompData.i64[i2 + i*multiCompNPoints];
-      if (d.i32)
-        return d.i32;
+      d.i64 = multiCompData.i64[i1 + i*multiCompNPoints]
+        - multiCompData.i64[i2 + i*multiCompNPoints];
+      if (d.i64)
+        return d.i64 > 0? 1: -1;
     }
     break;
   case LUX_FLOAT:
@@ -423,65 +425,152 @@ int32_t multiCompare(const void *arg1, const void *arg2)
   return 0;
 }
 //---------------------------------------------------------
-int32_t lux_tolookup(ArgumentCount narg, Symbol ps[])
-// TOLOOKUP,src,list,index rewrites <src> as <list(index)>, with
-// <list> a list of unique members of <src> (sorted in ascending
-// order) and <index> ranging between 0 and NUM_ELEM(list) - 1.
-// If <src> is multidimensional, then its last dimension is
-// taken to run along a vector and <list> will be a list of
-// vectors.  Keyword /ONE signals treatment of <src> as a big
-// 1D vector.  LS 9nov95 7may96 16oct97
+template<typename T>
+struct MultiCompare
 {
-  int32_t       iq, *index, i, dims[2], curIndex, n, *order, size,
-        nd, j;
-  uint8_t       *list;
+  MultiCompare(const T* data, Size coordinates_count, T tolerance = 0)
+    : m_data(data), m_coordinates_count(coordinates_count),
+      m_tolerance(tolerance)
+  { }
 
-  if (symbol_class(*ps) != LUX_ARRAY)
-    return cerror(NEED_ARR, *ps);
-  iq = *ps;                     // SRC
-  multiCompData.i32 = (int32_t *) array_data(iq);
-  multiCompType = array_type(iq);
-  index = array_dims(iq);
-  nd = array_num_dims(iq);
-  if (internalMode & 1)                 // /ONE
-    multiCompNCoord = 1;
+  bool
+  operator()(const Size& ilhs, const Size& irhs)
+  {
+    for (Size i = 0; i < m_coordinates_count; ++i)
+    {
+      auto lhs = m_data[i + ilhs*m_coordinates_count];
+      auto rhs = m_data[i + irhs*m_coordinates_count];
+      if (lhs < rhs)
+        return true;
+      else if (lhs > rhs)
+        return false;
+    }
+    return false;
+  }
+
+  bool
+  equals(Size ilhs, Size irhs)
+  {
+    for (Size i = 0; i < m_coordinates_count; ++i)
+    {
+      auto lhs = m_data[i + ilhs*m_coordinates_count];
+      auto rhs = m_data[i + irhs*m_coordinates_count];
+      if (lhs < rhs
+          && rhs - lhs > m_tolerance)
+        return false;
+      if (lhs > rhs
+          && lhs - rhs > m_tolerance)
+        return false;
+    }
+    return true;
+  }
+
+  const T* m_data;
+  Size m_coordinates_count;
+  T m_tolerance;
+};
+
+template<typename T>
+Symbol
+tolookup_action(ArgumentCount narg, Symbol ps[])
+{
+  Symbol iq = *ps;              // <src>
+
+  Size nd = array_num_dims(iq);
+  Size* dims = array_dims(iq);
+
+  Size coords_per_point;
+  if (internalMode & 1)         // /one: <src> is interpreted as one-dimensional
+    coords_per_point = 1;
+  else              // <src>(*,0,0,...) are the coordinates of the first element
+    coords_per_point = nd > 1? dims[0]: 1;
+  Size points_count = array_size(iq)/coords_per_point;
+
+  auto src = static_cast<const T*>(array_data(iq));
+
+  T tolerance;
+  if (narg >= 4 && ps[3])
+    tolerance = get_scalar_value<T>(ps[3]);
   else
-    multiCompNCoord = nd > 1? index[nd - 1]: 1; // # dimensions
-  multiCompNPoints = array_size(iq)/multiCompNCoord; // # data points
-  ALLOCATE(order, multiCompNPoints, int32_t);
-  for (i = 0; i < multiCompNPoints; i++)
-    order[i] = i;               // initialize
-  qsort(order, multiCompNPoints, sizeof(int32_t), multiCompare); // sort
+    tolerance = 0;
+  MultiCompare<T> mc{src, coords_per_point, tolerance };
 
-  n = 1;
-  for (i = 0; i < multiCompNPoints - 1; i++) // count number of unique
-                                             // members
-    if (multiCompare(order + i, order + i + 1))
+  auto order = std::vector<Size>(points_count);
+  std::iota(&order[0], &order[points_count], 0);
+  std::sort(&order[0], &order[points_count], mc);
+  // now <src>(*,order[i]) are in ascending order (defined by mc)
+
+  // count number of unique members
+  Size n = 1;
+  for (Size i = 0; i < points_count - 1; ++i)
+    if (!mc.equals(order[i], order[i + 1]))
       n++;
-  j = (multiCompNCoord > 1)? nd - 1: nd;
-  redef_array(ps[2], LUX_INT32, j, index); // INDEX
-  index = (int32_t *) array_data(ps[2]);
-  dims[0] = n;
-  dims[1] = multiCompNCoord;
-  redef_array(ps[1], array_type(iq), dims[1] > 1? 2: 1, dims); // LIST
 
-  list = (uint8_t *) array_data(ps[1]);
-  size = lux_type_size[array_type(iq)];
-  for (j = 0; j < multiCompNCoord; j++)
-    memcpy(list + j*n*size,
-           multiCompData.ui8 + (order[0] + j*multiCompNPoints)*size, size);
+  // create symbols for <index> and <list>
+  if (coords_per_point > 1)
+  {
+    redef_array(ps[2], LUX_INT32, nd - 1, dims + 1); // <index>
+
+    Size outdims[2];
+    outdims[0] = coords_per_point;
+    outdims[1] = n;
+    redef_array(ps[1], lux_symboltype_for_type<T>, 2, outdims); // <list>
+  }
+  else
+  {
+    redef_array(ps[2], LUX_INT32, nd, dims);               // <index>
+    redef_array(ps[1], lux_symboltype_for_type<T>, 1, &n); // <list>
+  }
+  auto index = static_cast<int32_t*>(array_data(ps[2]));
+  auto list = static_cast<T*>(array_data(ps[1]));
+
+  // the first one is always unique
+  memcpy(list, src + order[0]*coords_per_point, coords_per_point*sizeof(T));
+  Size curIndex;
   index[order[0]] = curIndex = 0;
-  for (i = 1; i < multiCompNPoints; i++)
-    if (multiCompare(order + i - 1, order + i)) // unequal
-    { index[order[i]] = ++curIndex;
-      for (j = 0; j < multiCompNCoord; j++)
-        memcpy(list + (curIndex + j*n)*size,
-               multiCompData.ui8 + (order[i] + j*multiCompNPoints)*size, size);
+  for (Size i = 1; i < points_count; i++)
+  {
+    if (!mc.equals(order[i - 1], order[i])) // unequal
+    {
+      index[order[i]] = ++curIndex;
+      memcpy(list + curIndex*coords_per_point,
+             src + order[i]*coords_per_point, coords_per_point*sizeof(T));
     } else
       index[order[i]] = curIndex;
-  free(order);
+  }
   return 1;
 }
+
+Symbol
+lux_tolookup(ArgumentCount narg, Symbol ps[])
+// tolookup,src,list,index,tolerance rewrites <src> as <list(index)>, with
+// <list> a list of unique members of <src> (sorted in ascending order) and
+// <index> ranging between 0 and num_elem(list) - 1.  <tolerance> is the
+// tolerance for detecting uniqueness.  If <src> is multidimensional, then its
+// last dimension is taken to run along a vector and <list> will be a list of
+// vectors.  Keyword /one signals treatment of <src> as a big 1D vector.  LS
+// 9nov95 7may96 16oct97
+{
+  if (symbol_class(*ps) != LUX_ARRAY)
+    return cerror(NEED_ARR, *ps);
+  switch (array_type(*ps))
+  {
+    case LUX_INT8:
+      return tolookup_action<uint8_t>(narg, ps);
+    case LUX_INT16:
+      return tolookup_action<int16_t>(narg, ps);
+    case LUX_INT32:
+      return tolookup_action<int32_t>(narg, ps);
+    case LUX_INT64:
+      return tolookup_action<int64_t>(narg, ps);
+    case LUX_FLOAT:
+      return tolookup_action<float>(narg, ps);
+    case LUX_DOUBLE:
+      return tolookup_action<double>(narg, ps);
+  }
+  return LUX_ONE;
+}
+REGISTER(tolookup, s, tolookup, 2, 4, "1one");
 //---------------------------------------------------------
 Pointer         src;
 Symboltype type;

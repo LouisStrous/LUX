@@ -28225,12 +28225,17 @@ See also: @ref{tv3}, @ref{tvlct}, @ref{zoom}
 @subsection tolookup
 @findex tolookup
 
-@code{tolookup, @var{src}, @var{list}, @var{index} [, /one]}
+@code{tolookup, @var{src}, @var{list}[, @var{index}, @var{tolerance}, /one]}
 
 Determines a lookup table for @code{@var{src}} in @code{@var{list}} such
 that @code{@var{list}} contains no duplicate members, and
 @code{@var{index}} contains an index to the member of @code{@var{list}}
 that corresponds to each member of @code{@var{src}}.
+
+@code{@var{tolerance}} is the tolerance for detecting duplicates and
+defaults to 0.  If the difference between successive (after sorting)
+elements is less than or equal to the tolerance then those elements
+are considered to be equal.
 
 If @code{@var{src}} has only one dimension or if @code{/one} is
 specified, then @code{@var{index}} has the same number of elements as
@@ -28239,26 +28244,34 @@ equal to the number of unique members of @code{@var{src}}.  In that
 case, @code{@var{list}(@var{index})} is an exact copy of
 @code{@var{src}}.
 
-If @code{@var{src}} has more than one dimension, then its last dimension
-is taken to contain the numbers that define each member, and the
-remaining dimensions select the different members.  In that case,
-@code{@var{list}} gets two dimensions: the first one loops over all
-unique members, the second one contains the defining numbers for each
-member (and has the same dimension as the last dimension of
-@code{@var{list}}).  Then, @code{@var{index}} gets all but the last
-dimension of @code{@var{src}}.
+If @code{@var{src}} has more than one dimension and @code{/one} is not
+specified, then its first dimension is taken to contain the numbers
+that define each member, and the remaining dimensions select the
+different members.  In that case, @code{@var{list}} gets two
+dimensions: the first one loops over the defining numbers for each
+member, and the second one loops over all unique members.  Then,
+@code{@var{index}} gets all but the first dimension of
+@code{@var{src}}, and @code{@var{list(*,@var{index})}} is an exact
+copy of @code{@var{src}}.
 
-For example, if @code{@var{src}} is a 2 by 3 by 4 array, then it is
-taken to contain six (2 times 3) individual members which are each
-characterized by 4 numbers (e.g., the second member is
-@code{@var{src}(1,0,*)}).  If there are three unique 4-element members
-in @code{@var{src}}, then
-@code{tolookup,@var{src},@var{list},@var{index}} yields
-@code{@var{list}} as a 3 by 4 array and @code{@var{index}} as a 2 by 3
-array.  In that case, @code{@var{src}(0,0,*)} is equal to
-@code{@var{list}(@var{index}(0,0))}, and @code{@var{src}(1,2,*)} to
-@code{@var{list}(@var{index}(1,2))}, and in general @code{@var{src}}
-equal to @code{@var{list}(@var{index},*)}.
+Let @code{x = redim([1, 2, 1, 3, 1, 2, 2, 5, 2, 4, 1, 3], [2, 3, 2])}.
+Then @code{tolookup, x, l, i} interprets @code{x} as a sequence of 3×2
+= 6 members that each have two coordinates.  The first member is
+@code{[1, 2]}, the second member is @code{[1, 3]}, and so on.
+@code{l} ends up as a 2 by 4 array containing values @code{[1, 2, 1,
+3, 2, 4, 2, 5]}, corresponding to members @code{[1, 2]}, @code{[1,
+3]}, @code{[2, 4]}, and @code{[2, 5]}, because those are the unique
+members that occur in @code{x}.  @code{i} ends up as a 3 by 2 array
+containing values @code{[0, 1, 0, 3, 2, 1]} that are indexes that
+identify a member from @code{l} such that @code{l(*,i)} is equal to
+@code{x}.
+
+And @code{tolookup, x, l, i, /one} interprets @code{x} as a sequence
+of 2×3×2 = 12 numbers and changes @code{l} to be a 5-element array
+@code{[1, 2, 3, 4, 5]} because those are the unique values in
+@code{x}.  And @code{i} ends up as a 2 by 3 by 2 array with values
+@code{[0, 1, 0, 2, 0, 1, 1, 4, 1, 3, 0, 2]} that identify a value from
+@code{l} such that @code{l(i)} is equal to @var{x}.
 
 @c -------------------------------------
 @node total, tr, tolookup, Internal Routines

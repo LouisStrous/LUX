@@ -3754,6 +3754,9 @@ void register_the_bindings()
   int32_t lux_find(int32_t, int32_t []);
   register_lux_f(lux_find, "find", 2, 3, "1data_monotonic:2at_or_past");
 
+  int32_t lux_tolookup(int32_t, int32_t []);
+  register_lux_s(lux_tolookup, "tolookup", 2, 4, "1one");
+
   int32_t lux_monotone_interpolation(int32_t, int32_t []);
   register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");
 

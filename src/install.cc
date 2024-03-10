@@ -399,7 +399,6 @@ InternalRoutine         subroutine_table[] = {
   { "newallocs", 0, 1, lux_newallocs, "1reset" }, // debug.c
 #endif
   { "noecho",   0, 0, lux_noecho, 0 },         // symbols.c
-  { "noop",     0, 0, lux_noop, 0 },           // strous2.c
   { "one",      1, 1, lux_one, 0 },            // fun1.c
   { "openr",    2, 2, lux_openr, "1get_lun" }, // files.c
   { "openu",    2, 2, lux_openu, "1get_lun" }, // files.c

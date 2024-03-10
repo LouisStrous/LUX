@@ -48,6 +48,7 @@ int32_t lux_noop(ArgumentCount narg, Symbol ps[])
 {
   return 1;
 }
+REGISTER(noop, s, noop, 0, 0, nullptr);
 //---------------------------------------------------------
 int32_t lux_zap(ArgumentCount narg, Symbol ps[])
 // remove the specified symbols completely: i.e. leave no trace

@@ -2955,9 +2955,20 @@ int32_t lux_findspans(ArgumentCount narg, Symbol ps[]) {
 }
 REGISTER(findspans, f, findspans, 1, 1, "1cycle");
 
+/// Place a vector in a LUX symbol.
+///
+/// \tparam T is the data type of the data elements.
+///
+/// \param data refers to the vector of data elements.
+///
+/// \param lux_symbol refers to the Lux symbol that receives the data.  Its
+/// previous contents are lost.  It is changed into a LUX one-dimensional array
+/// of the appropriate type and size.
+///
+/// \returns the LUX symbol, or #LUX_ERROR if there was a problem.
 template<class T>
-int32_t
-convert_vector_to_lux_array(const std::vector<T>& data, int32_t lux_symbol)
+Symbol
+convert_vector_to_lux_array(const std::vector<T>& data, Symbol lux_symbol)
 {
   // convert <data> to a one-dimensional LUX array
   int32_t size = static_cast<int32_t>(data.size());
@@ -2998,17 +3009,33 @@ convert_vector_to_lux_array(const std::vector<T>& data, int32_t lux_symbol)
   return result;
 }
 
+/// Returns the nonnegative remainder of a division.
+///
+/// \param x is the value to divide.
+///
+/// \param n is the divisor or modulus.
+///
+/// \returns The remainder \( r \) of dividing \( x \) by \( n \) such that \( 0
+/// ≤ r \lt |n| \).
 template<typename Integer,
          std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
 Integer
-nn_mod(Integer a, Integer b)
+nn_mod(Integer value, Integer period)
 {
-  Integer result = a%b;
+  Integer result = value % period;
   if (result < 0)
-    result += std::abs(b);
+    result += std::abs(period);
   return result;
 }
 
+/// Returns the nonnegative remainder of a division.
+///
+/// \param x is the value to divide.
+///
+/// \param n is the divisor or modulus.
+///
+/// \returns The remainder \( r \) of dividing \( x \) by \( n \) such that \( 0
+/// ≤ r \lt |n| \).
 template<typename Float,
          std::enable_if_t<std::is_floating_point<Float>::value, bool> = true>
 Float
@@ -3512,8 +3539,33 @@ bisect_interval(FuncType f, Permutation_change_intervals& pcis,
     it = pcis.erase(it);
 }
 
+/// A function object that calculates the deviation needed for locating the time
+/// of a two-gap semicircular permutation change.
 struct Getdeviation_two_gaps
 {
+  /// Constructor.  The results of using this object are correct if the interval
+  /// from \a t1 to \a t2 contains only a single semicircular permutation change
+  /// and if that permutation change is of the two-gap variety (i.e., is not
+  /// also a circular permutation change).
+  ///
+  /// If these conditions are not met then this object may or may not detect
+  /// that.  If ok() returns `false` or operator()() returns NaN then a problem
+  /// was detected.
+  ///
+  /// \param f is a function-like object that produces a vector of
+  /// angular(-like) position values (one per object) as a function of the
+  /// independent coordinate (usually time).  The positions values must range
+  /// between 0 (inclusive) and \a period (exclusive).
+  ///
+  /// \param period is the period of the positions.  The positions are assumed
+  /// to vary between 0 (inclusive) and \a period (exclusive), with 0 and \a
+  /// period being equivalent.
+  ///
+  /// \param t1 is the beginning of the interval of the independent coordinate.
+  ///
+  /// \param t2 is the end of the interval of the independent coordinate.
+  ///
+  /// \param verbose says whether operator()() should print a progress message.
   Getdeviation_two_gaps(std::function<std::vector<double>(double)> f,
                         double period, double t1, double t2,
                         bool verbose = false)
@@ -3521,11 +3573,39 @@ struct Getdeviation_two_gaps
       m_psr1(f(t1), period), m_psr2(f(t2), period)
   { }
 
+  /// Is there definitely a semicircular permutation change within the interval
+  /// from \a t1 to \a t2?
+  ///
+  /// \returns `true` if the semicircular permutation numbers at the start and
+  /// end of the interval differ, `false` if they are equal.
   bool ok() const
   {
     return m_psr1.permutation_number() != m_psr2.permutation_number();
   }
 
+  /// Returns a measure of the deviation from the time of the two-gap
+  /// semicircular permutation change.  This can be used with a root finding
+  /// algorithm to locate the time of the permutation change.
+  ///
+  /// The calculated value is the difference between the size at time \a t of
+  /// the gap that is greatest at the start of the interval specified via the
+  /// constructor and the size at time \a t of the gap that is greatest at the
+  /// end of the interval.
+  ///
+  /// If the interval does not contain exactly one semicircular permutation
+  /// change or if that permutation change is not of the two-gap variety (i.e.,
+  /// is also a circular permutation change) then the result is useless.
+  ///
+  /// If the object was constructed with verbosity on then the results are
+  /// printed to standard output, similar to `: 1234.567 => -0.3651 [17] 2g`.
+  /// The first number (here 1234.567) is the value of \a t.  The second number
+  /// (here -0.3651) is the calculated deviation.  The third number (here 17) is
+  /// the semicircular permutation number at time \a t.
+  ///
+  /// \param t is the time for which to calculate the deviation.
+  ///
+  /// \returns the deviation, or NaN if an additional semicircular permutation
+  /// change is detected within the interval.
   double operator()(double t)
   {
     Permutation_semicircular_rank psr(m_f(t), m_period);
@@ -3554,15 +3634,47 @@ struct Getdeviation_two_gaps
     return d;
   }
 
+  /// A functor producing positions.
   std::function<std::vector<double>(double)> m_f;
-  double m_period;
+
+  double m_period;              //!< the period of the positions
+
+  /// Information about the semicircular permutation at the start of the
+  /// interval.
   Permutation_semicircular_rank<double> m_psr1;
+
+  /// Information about the semicircular permutation at the end of the interval.
   Permutation_semicircular_rank<double> m_psr2;
-  bool m_verbose;
+
+  bool m_verbose;               //!< should we be verbose?
 };
 
+/// A function object that calculates the deviation needed for locating the time
+/// of a two-item semicircular permutation change.
 struct Getdeviation_two_items
 {
+  /// Constructor.  The results of using this object are correct if the interval
+  /// from \a t1 to \a t2 contains only a single semicircular permutation change
+  /// and if that permutation change is of the two-item variety (i.e., is also a
+  /// circular permutation change).
+  ///
+  /// If these conditions are not met then this object may or may not detect
+  /// that.  If ok() returns `false` or operator()() returns NaN then a problem
+  /// was detected.
+  ///
+  /// \param f is a function-like object that produces a vector of
+  /// angular(-like) position values (one per object) as a function of the
+  /// independent coordinate (usually time).  The positions values must range
+  /// between 0 (inclusive) and \a period (exclusive).
+  ///
+  /// \param period is the period of the positions.  The positions are assumed
+  /// to vary between 0 (inclusive) and \a period (exclusive), with 0 and \a
+  /// period being equivalent.
+  ///
+  /// \param it points at an object providing information about the interval and
+  /// the permutations at the start and end of that interval.
+  ///
+  /// \param verbose says whether operator()() should print a progress message.
   Getdeviation_two_items(std::function<std::vector<double>(double)> f,
                          double period,
                          Permutation_change_intervals::iterator it,
@@ -3570,11 +3682,37 @@ struct Getdeviation_two_items
     : m_f(f), m_period(period), m_verbose(verbose), m_it(it)
   { }
 
+  /// Is there definitely a semicircular permutation change within the interval
+  /// from \a t1 to \a t2?
+  ///
+  /// \returns `true` if the semicircular permutation numbers at the start and
+  /// end of the interval differ, `false` if they are equal.
   bool ok() const
   {
     return m_it->permutation_begin != m_it->permutation_end;
   }
 
+  /// Returns a measure of the deviation from the time of the two-item
+  /// semicircular permutation change.  This can be used with a root finding
+  /// algorithm to locate the time of the permutation change.
+  ///
+  /// The calculated value is the difference at time \a t between the positions
+  /// of the two items involved in the permutation change.
+  ///
+  /// If the interval does not contain exactly one semicircular permutation
+  /// change or if that permutation change is not of the two-item variety (i.e.,
+  /// is not also a circular permutation change) then the result is useless.
+  ///
+  /// If the object was constructed with verbosity on then the results are
+  /// printed to standard output, similar to `: 1234.567 => -0.3651 [17] 2i`.
+  /// The first number (here 1234.567) is the value of \a t.  The second number
+  /// (here -0.3651) is the calculated deviation.  The third number (here 17) is
+  /// the semicircular permutation number at time \a t.
+  ///
+  /// \param t is the time for which to calculate the deviation.
+  ///
+  /// \returns the deviation, or NaN if an additional semicircular permutation
+  /// change is detected within the interval.
   double operator()(double t)
   {
     Permutation_semicircular_rank psr(m_f(t), m_period);
@@ -3597,10 +3735,16 @@ struct Getdeviation_two_items
     return d;
   }
 
+  /// A functor producing positions.
   std::function<std::vector<double>(double)> m_f;
-  double m_period;
+
+  double m_period;              //!< the period of the positions
+
+  /// Points at information about the interval and about the permutations at the
+  /// start and end of that interval.
   Permutation_change_intervals::iterator m_it;
-  bool m_verbose;
+
+  bool m_verbose;               //!< should we be verbose?
 };
 
 /// Locate values of the independent coordinate (here denoted `t`) at which the
@@ -3609,26 +3753,22 @@ struct Getdeviation_two_items
 /// The used algorithm may fail to locate some relevant values of `t` if some of
 /// the objects pass each other more than once during the searched interval.
 ///
-/// \tparam FuncType is the type of the function object.
-///
 /// \param[in,out] results gets the found instances of Permutation_change
 /// appended to it, that reports the values of `t` at which the permutation
 /// changes, and the 0-based indexes (in ascending order) of the two objects
 /// that switch places at that time, and the permutation number that is valid
 /// just after that permutation change.
 ///
-/// \param f is a function object or a pointer to a function of `t` that
-/// produces the positions ("angles") that define the permutation, one position
-/// for each object.
+/// \param f is a function-like object that produces the positions ("angles")
+/// that define the permutation, one position for each object, as a function of
+/// `t`.
 ///
 /// \param period is the maximum value at which the positions wrap around.  The
 /// positions must be between 0 (inclusive) and \a period (exclusive).
 ///
-/// \param tmin is the beginning of the interval of `t` to search.
+/// \param t1 is the beginning of the interval of `t` to search.
 ///
-/// \param tmax is the end of the interval of `t` to search.
-///
-/// \todo Can I use std::function instead of FuncType?
+/// \param t2 is the end of the interval of `t` to search.
 void
 find_permutation_changes(std::vector<Permutation_change>& results,
                          std::function<std::vector<double>(double)> f,
@@ -3638,7 +3778,8 @@ find_permutation_changes(std::vector<Permutation_change>& results,
   if (depth >= 10)
   {
     if (verbose)
-      printf("find_permutation_changes: abandoning search at depth 10\n");
+      printf("find_permutation_changes: abandoning search for interval "
+             "%.17g - %.17g at depth %d\n", t1, t2, depth);
     return;                     // avoid infinite recursion
   }
 
@@ -3763,6 +3904,8 @@ find_permutation_changes(std::vector<Permutation_change>& results,
       if (psr_middle.permutation_number() != psr_begin.permutation_number()
           && psr_middle.permutation_number() != psr_end.permutation_number())
       {
+        /// \todo: isn't this already covered by classify_permutation_changes?
+
         // there is at least one extra permutation change in the interval:
         bisect_interval(f, pcis, it, period);
         continue;

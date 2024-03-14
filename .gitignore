@@ -31,3 +31,5 @@ test-driver
 
 # don't include log files
 *.log
+
+TAGS

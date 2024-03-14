@@ -435,7 +435,7 @@ int32_t lux_distr_f(ArgumentCount narg, Symbol ps[])
   return result_sym;
 }
 // ignorelimit and increaselimit are ignored
-REGISTER(distr, f, distr, 2, 2, "2ignorelimit:4increaselimit" );
+REGISTER(distr_f, f, distr, 2, 2, "2ignorelimit:4increaselimit" );
 //-------------------------------------------------------------------------
 int32_t readkey(int32_t mode)
 {

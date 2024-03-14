@@ -3751,8 +3751,8 @@ void register_the_bindings()
 
   register_lux_s(lux_sincos_s, "sincos", 3, 3, NULL);
 
-  int32_t lux_distr(int32_t, int32_t []);
-  register_lux_f(lux_distr, "distr", 2, 2, "2ignorelimit:4increaselimit" );
+  int32_t lux_distr_f(int32_t, int32_t []);
+  register_lux_f(lux_distr_f, "distr", 2, 2, "2ignorelimit:4increaselimit" );
 
   int32_t lux_find(int32_t, int32_t []);
   register_lux_f(lux_find, "find", 2, 3, "1data_monotonic:2at_or_past");

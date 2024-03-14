@@ -3440,6 +3440,7 @@ struct Permutation_change
   size_t object2;               //!< The index of the other swapping object
   size_t permutation1;          //!< The permutation number before the change
   size_t permutation2;          //!< The permutation number after the change
+  double spread;                //!< The angle spanned by the objects
 };
 
 /// A collection of instances of Permutation_change holding details of a
@@ -3840,9 +3841,6 @@ find_permutation_changes(std::vector<Permutation_change>& results,
           *rit = (r >= element_count)? r - element_count: r;
         }
       }
-      // with three elements there are only two distinct circular
-      // permutations, so it is impossible to say which two elements switched
-      // places.
 
       size_t ix;
       for (ix = 0; ix != element_count; ++ix)
@@ -3900,17 +3898,6 @@ find_permutation_changes(std::vector<Permutation_change>& results,
       it->item1_atendtime = psr_end.index_before_greatest_gap();
       it->item2_atendtime = psr_end.index_after_greatest_gap();
 
-      Permutation_semicircular_rank psr_middle(it->positions_middle, period);
-      if (psr_middle.permutation_number() != psr_begin.permutation_number()
-          && psr_middle.permutation_number() != psr_end.permutation_number())
-      {
-        /// \todo: isn't this already covered by classify_permutation_changes?
-
-        // there is at least one extra permutation change in the interval:
-        bisect_interval(f, pcis, it, period);
-        continue;
-      }
-
       // Now we know which two gaps switched being the biggest.  We locate the
       // time of semicircular permutation change based on the difference in
       // their sizes.
@@ -3944,7 +3931,7 @@ find_permutation_changes(std::vector<Permutation_change>& results,
     else                        // we found the time of the permutation change
     {
       auto tjustbefore = std::nextafter(tchange, Backward);
-      auto tjustafter = std::nextafter(tchange, Forward);
+      auto tjustafter = tchange;
       auto pnjustbefore = permutation_number_semicircular_rank(f(tjustbefore),
                                                                period);
       auto pnjustafter = permutation_number_semicircular_rank(f(tjustafter),
@@ -3970,13 +3957,10 @@ find_permutation_changes(std::vector<Permutation_change>& results,
       // but in practice this isn't always the case
       if (pnjustbefore == pnjustafter)
       {
-        static size_t maxtry = 10;
-        size_t thistry = 0;
         auto base = pnjustbefore;
         // widen the bracket to find the permutation change nearby
         while (1)
         {
-          ++thistry;
           tjustbefore = std::nextafter(tjustbefore, Backward);
           tjustafter = std::nextafter(tjustafter, Forward);
           pnjustbefore = permutation_number_semicircular_rank(f(tjustbefore),
@@ -3985,13 +3969,6 @@ find_permutation_changes(std::vector<Permutation_change>& results,
                                                              period);
           if (pnjustbefore != pnjustafter)
             break;
-        }
-        if (thistry > maxtry)
-        {
-          maxtry = thistry;
-          printf("find_permutation_changes: maxtry increased to %lu "
-                 "for interval JD%.16g - %.16g\n", maxtry,
-                 it->time_begin, it->time_end);
         }
         if (pnjustafter == base)
           // the time of the permutation change is just after tjustbefore
@@ -4011,17 +3988,20 @@ find_permutation_changes(std::vector<Permutation_change>& results,
         continue;
       }
 
+      Permutation_semicircular_rank psr(f(tjustafter), period);
       if (it->has_two_item_change)
       {
         results.push_back({tjustafter, it->item1_atbegintime,
-            it->item2_atbegintime, pnjustbefore, pnjustafter});
+            it->item2_atbegintime, pnjustbefore, pnjustafter,
+            period - psr.greatest_gap_size()});
         if (verbose)
           printf("found %.17g [%lu => %lu] 2i\n", tjustafter,
                  pnjustbefore, pnjustafter);
       }
       else
       {
-        results.push_back({tjustafter, 0, 0, pnjustbefore, pnjustafter});
+        results.push_back({tjustafter, 0, 0, pnjustbefore, pnjustafter,
+            period - psr.greatest_gap_size()});
         if (verbose)
           printf("found %.17g [%lu => %lu] 2g\n", tjustafter,
                  pnjustbefore, pnjustafter);
@@ -4127,7 +4107,7 @@ lux_planetpermutationchanges(ArgumentCount narg, Symbol ps[])
   int32_t iq;
   if (size > 0) {
     int32_t dims[2];
-    dims[0] = 5;
+    dims[0] = 6;
     dims[1] = size;
     iq = array_scratch(LUX_DOUBLE, 2, dims);
     Pointer tgt;
@@ -4138,6 +4118,7 @@ lux_planetpermutationchanges(ArgumentCount narg, Symbol ps[])
       *tgt.d++ = it->object2;
       *tgt.d++ = it->permutation1;
       *tgt.d++ = it->permutation2;
+      *tgt.d++ = it->spread*RAD;
     }
   } else {
     iq = LUX_MINUS_ONE;

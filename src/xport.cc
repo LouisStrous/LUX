@@ -20,6 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // LUX routines dealing with (X window) data windows.
 #include "config.h"
+#if HAVE_X11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>                // key symbol definitions LS 23nov92
@@ -4713,3 +4714,4 @@ int32_t lux_xdrawarc(ArgumentCount narg, Symbol ps[])
   return LUX_OK;
 }
 //---------------------------------------------------------
+#endif

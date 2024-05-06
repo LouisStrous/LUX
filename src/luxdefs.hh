@@ -857,8 +857,8 @@ extern char const* symbolStack[];
    if (!(size)) arg = NULL; \
    else { if (!(arg = (type *) malloc((size)*sizeof(type))))\
    return luxerror("Memory allocation error\n", 0); }
-#define eallocate(arg, size, type)\
- (size? ((arg = (type *) Malloc((size)*sizeof(type)))? 1: 0): (arg = NULL, 0))
+// #define eallocate(arg, size, type)\
+//  (size? ((arg = (type *) Malloc((size)*sizeof(type)))? 1: 0): (arg = NULL, 0))
 #define GET_NUMERICAL(PTR, SIZE) \
   switch (symbol_class(iq)) \
   { case LUX_SCALAR:    PTR.i32 = &sym[iq].spec.scalar.i32;  SIZE = 1;  break;  \

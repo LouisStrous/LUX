@@ -297,10 +297,12 @@ InternalRoutine         subroutine_table[] = {
   { "cluster",  2, 8, lux_cluster, // cluster.c
     "|32|:centers:index:size:sample:empty:maxit:rms:1update:2iterate"
     ":4vocal:8quick:16record:32ordered" },
+#if HAVE_X11
   { "colorcomponents", 4, 4, lux_colorComponents, 0 }, // color.c
   { "colorstogrey", 1, 1, lux_colorstogrey, 0 },       // color.c
 #if MOTIF
   { "compile_file", 1, 1, lux_compile_file, 0 }, // motifextra.c
+#endif
 #endif
   { "contour",  1, 6, lux_contour, // contour.c
     "image:levels:xmin:xmax:ymin:ymax:style:dashsize:1autocontour"
@@ -373,7 +375,9 @@ InternalRoutine         subroutine_table[] = {
   { "getmin9",  3, 3, lux_getmin9, 0 },                   // fun4.c
   { "gifread",  2, 3, lux_gifread, 0 },                   // gifread_lux.c
   { "gifwrite", 2, 3, lux_gifwrite, 0 },                  // gifwrite_lux.c
+#if HAVE_X11
   { "hairs",    0, 0, lux_xplace, 0 },                    // xport.c
+#endif
   { "help",     0, 1, lux_help, "1manual" },              // strous.c
   { "hex",      1, MAX_ARG, lux_hex, 0 },                 // files.c
   { "idlrestore", 1, 1, lux_idlrestore, 0 },              // idl.c
@@ -388,12 +392,14 @@ InternalRoutine         subroutine_table[] = {
   { "limits",   0, 6, lux_limits, 0 },                           // plots.c
   { "list",     1, 1, lux_list, 0 },                             // ident.c
   { "long",     1, MAX_ARG, lux_long_inplace, 0 },               // symbols.c
+#if HAVE_X11
   { "menu",     1, MAX_ARG, lux_menu, 0 },                       // menu.c
   { "menuhide", 1, 1, lux_menu_hide, 0 },                        // menu.c
   { "menuitem", 3, 3, lux_menu_item, 0 },                        // menu.c
   { "menupop",  1, MAX_ARG, lux_menu_pop, 0 },                   // menu.c
   { "menuread", 4, 4, lux_menu_read, 0 },                        // menu.c
   { "menuzap",  1, 1, lux_menu_kill, 0 },                        // menu.c
+#endif
   { "multisieve", 4, 4, lux_multisieve, 0 },                     // strous2.c
 #if DEBUG
   { "newallocs", 0, 1, lux_newallocs, "1reset" }, // debug.c
@@ -414,7 +420,9 @@ InternalRoutine         subroutine_table[] = {
   { "peek",     1, 2, peek, 0 },                              // strous.c
   { "pen",      0, 2, lux_pen, "width:color:1standardgray" }, // plots.c
   { "pencolor", 0, 1, lux_pencolor, 0 },                      // plots.c
+#if HAVE_X11
   { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 },              // color.c
+#endif
   { "plot",     1, 15, lux_plot,                              // plots.c
     "1dvi:2dev:3img:4plt:5rim:6rpl:64keep:128whole:256clipbars"
     ":1024lii:1280lio:1536loi:1792loo:xdata:ydata:symbol:line"
@@ -461,11 +469,15 @@ InternalRoutine         subroutine_table[] = {
     "visual:1set:2reset:4showalloc:8whitebackground:16ulimcoords"
     ":32yreverseimg:64oldversion:128zoom:1024allowprompts"
     ":2048xsynchronize:4096parsesilent" },
+#if HAVE_X11
   { "setbackground", 1, 2, lux_xsetbackground, 0 },       // xport.c
   { "setbg",    1, 2, lux_xsetbackground, 0 },            // xport.c
+#endif
   { "setenv",   1, 1, lux_setenv, 0 },                    // files.c
+#if HAVE_X11
   { "setfg",    1, 2, lux_xsetforeground, 0 },            // xport.c
   { "setforeground", 1, 2, lux_xsetforeground, 0 },       // xport.c
+#endif
   { "shift",    1, 4, lux_shift, ":::blank:1translate" }, // strous2.c
   { "show",     0, 1, lux_show, 0 },                      // fun1.c
   { "showorbits", 0, 0, lux_showorbits, 0 },              // astron.c
@@ -478,7 +490,9 @@ InternalRoutine         subroutine_table[] = {
 #if DEBUG
   { "show_temps", 0, 0, lux_show_temps, 0 }, // symbols.c
 #endif
+#if HAVE_X11
   { "show_visuals", 0, 0, lux_show_visuals, 0 }, // xport.c
+#endif
 #if HAVE_SYS_MTIO_H
   { "skipf",    1, 2, lux_skipf, 0 }, // tape.c
   { "skipr",    1, 2, lux_skipr, 0 }, // tape.c
@@ -502,13 +516,16 @@ InternalRoutine         subroutine_table[] = {
   { "taprd",    2, 2, lux_taprd, 0 },          // tape.c
   { "tapwrt",   2, 2, lux_tapwrt, 0 },         // tape.c
 #endif
+#if HAVE_X11
   { "threecolors", 0, 1, lux_threecolors, 0 }, // xport.c
+#endif
   { "trace",    0, 1, lux_trace,               // install.c
     "1file:2loop:4braces:8routine:143all:16showstats:32cputime"
     ":64showexec:128enter" },
 #if DEVELOP
   { "trajectory", 3, 7, lux_trajectory, 0 }, // strous3.c
 #endif
+#if HAVE_X11
   { "tv",       1, 5, lux_xtv,  // xport.c
     ":x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
     ":64screen:128postscript:192pdev:256plotwindow:512zoom"
@@ -527,6 +544,7 @@ InternalRoutine         subroutine_table[] = {
     ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
     ":64screen:128postscript:192pdev:256plotwindow:512zoom" },
   { "tvread",   0, 5, lux_xtvread, "1greyscale" },              // xport.c
+#endif
   { "ty",       1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
   { "type",     1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
   { "ulib",     0, 1, lux_ulib, 0 },                            // files.c
@@ -535,7 +553,9 @@ InternalRoutine         subroutine_table[] = {
 #endif
   { "verify",   0, 1, lux_verify, 0 },             // install.c
   { "wait",     1, 1, lux_wait, 0 },               // fun2.c
+#if HAVE_X11
   { "wait_for_menu", 0, 1, lux_wait_for_menu, 0 }, // menu.c
+#endif
 #if HAVE_SYS_MTIO_H
   { "wait_for_tape", 1, 1, lux_wait_for_tape, 0 }, // tape.c
 #endif
@@ -550,6 +570,7 @@ InternalRoutine         subroutine_table[] = {
   { "word",     1, 1, lux_word_inplace, 0 },   // symbols.c
   { "writeu",   2, MAX_ARG, lux_writeu, 0 },   // files.c
   { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, // jpeg.c
+#if HAVE_X11
   { "xanimate", 1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, // xport.c
   { "xclose",   0, 0, lux_xclose, 0 },                        // xport.c
   { "xcopy",    2, 8, lux_xcopy, 0 },                         // xport.c
@@ -652,13 +673,16 @@ InternalRoutine         subroutine_table[] = {
   { "xymov",    2, 4, lux_xymov,                   // plots.c
     "|192|:::breaks:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
     ":64boundingbox:128movefirst:256altdash" },
+#endif
   { "zap",      1, MAX_ARG, lux_zap, "+1pointer" }, // strous2.c
   { "zero",     1, MAX_ARG, lux_zero, 0 },          // fun1.c
 #if MOTIF
   { "zeroifnotdefined", 1, MAX_ARG, lux_zeroifnotdefined, 0}, // motifextra.c
 #endif
   { "zeronans", 1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
+#if HAVE_X11
   { "zoom",     1, 3, lux_zoom, "1oldcontrast" },      // zoom.c
+#endif
 };
 int32_t nSubroutine = sizeof(subroutine_table)/sizeof(InternalRoutine);
 
@@ -749,8 +773,10 @@ extern LuxRoutine lux_project, lux_bsmooth, lux_compile,
 
 extern LuxRoutine lux_gifread_f, lux_gifwrite_f;
 
+#if HAVE_X11
 extern LuxRoutine lux_check_menu, lux_check_window, lux_colorpixel,
   lux_event_name, lux_xlabelwidth, lux_xquery_f, lux_xexist;
+#endif
 
 extern LuxRoutine lux_calendar, lux_EasterDate, // lux_orbitalElement,
   lux_astropos, lux_precess, lux_constellation,
@@ -883,11 +909,15 @@ InternalRoutine function_table[] = {
   { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, // filemap.cc
     "%1%offset:1readonly:2swap" },
   { "cfmap",    1, 1, lux_cfmap, 0 },                        // subsc.cc
+#if HAVE_X11
   { "checkmenu", 0, 1, lux_check_menu, 0 },                  // menu.cc
   { "checkwindow", 0, 1, lux_check_window, 0 },              // xport.cc
+#endif
   { "chi2",     2, 2, lux_chi_square, "*1complement:2log" }, // fun1.cc
   { "classname", 1, 1, lux_classname, 0 },                   // install.cc
+#if HAVE_X11
   { "colorpixel", 1, 1, lux_colorpixel, "*" },               // xport.cc
+#endif
 #if DEVELOP
   { "compile",  1, 1, lux_compile, 0 }, // install.cc
 #endif
@@ -938,7 +968,9 @@ InternalRoutine function_table[] = {
     ":sign:diagonal:threshold" },
   { "esmooth",  1, 3, lux_esmooth, 0 },                        // fun2.cc
   { "eval",     1, 2, lux_eval, "1allnumber" },                // fun3.cc
+#if HAVE_X11
   { "eventname", 0, 1, lux_event_name, 0 },                    // menu.cc
+#endif
   { "exp",      1, 1, lux_exp, "*" },                          // fun1.cc
   { "expand",   2, 4, lux_expand, "1smooth:2nearest" },        // fun4.cc
   { "expm1",    1, 1, lux_expm1, "*" },                        // fun1.cc
@@ -1195,7 +1227,9 @@ InternalRoutine function_table[] = {
   { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, // trace_decoder_ana.cc
   { "trend",    1, 2, lux_trend, "*" },            // fun2.cc
   { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, // ephem.cc
+#if HAVE_X11
   { "tvread",   1, 5, lux_xtvread, "1greyscale" },         // xport.cc
+#endif
   { "typename", 1, 1, lux_typeName, 0 },                   // install.cc
   { "upcase",   1, 1, lux_upper, 0 },                      // fun2.cc
   { "upper",    1, 1, lux_upper, 0 },                      // fun2.cc
@@ -1206,6 +1240,7 @@ InternalRoutine function_table[] = {
   { "wmap",     1, 1, lux_wmap, 0 },             // subsc.cc
   { "writeu",   2, MAX_ARG, lux_writeu, 0 },     // files.cc
   { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.cc
+#if HAVE_X11
   { "xexist",   1, 1, lux_xexist, 0 },           // xport.cc
   { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 },   // xport.cc
 #if MOTIF
@@ -1266,6 +1301,7 @@ InternalRoutine function_table[] = {
   { "xtvread",  1, 5, lux_xtvread, "1greyscale" }, // xport.cc
 #if MOTIF
   { "xtwindow", 1, 1, lux_xtwindow, 0 }, // motif.cc
+#endif
 #endif
   { "zero",     1, 2, lux_zerof, "*" },            // fun1.cc
   { "zeronans", 1, 2, lux_zapnan_f, "*%1%value" }, // fun1.cc
@@ -2428,13 +2464,22 @@ int32_t newSymbol(Symbolclass kind, ...)
                              UINT8_MAX);
               }
               routine_num_parameters(n) = nArg;
-              if (nArg
-                  && !(routine_parameters(n)
-                       = (int16_t *) malloc(nArg*sizeof(int16_t)))) {
-                                // could not allocate room for parameters
-                va_end(ap);
-                reportBody = 0;
-                return luxerror("Routine-definition memory-allocation error", 0);
+              if (nArg)
+              {
+                // For unknown reasons, g++ -Werror version 14.0.1 on Fedora 40
+                // produces an "alloc-size-larger-than" compiler error if
+                // variable s has type size_t in the next statement.  nArg < 256
+                // and sizeof(int16_t) == 2 so s < 512, which fits in a
+                // uint16_t.
+                uint16_t s = nArg*sizeof(int16_t);
+                if (!(routine_parameters(n)
+                      = (int16_t *) malloc(s)))
+                {
+                  // could not allocate room for parameters
+                  va_end(ap);
+                  reportBody = 0;
+                  return luxerror("Routine-definition memory-allocation error", 0);
+                }
               }
             } else              // deferred compilation
               symbol_class(n) = (kind == LUX_SUBROUTINE)?
@@ -2453,11 +2498,19 @@ int32_t newSymbol(Symbolclass kind, ...)
             arg = routine_parameters(n) + nArg;
             // now save parameters (start at back)
             if (kind != LUX_BLOCKROUTINE) {
-              if (nArg &&
-                  !eallocate(routine_parameter_names(n), nArg, char *)) {
-                // could not allocate memory to store the parameter names
-                va_end(ap);
-                return luxerror("Memory allocation error", 0);
+              if (nArg)
+              {
+                auto p = static_cast<char**>(malloc(nArg*sizeof(char*)));
+                if (p)
+                {
+                  routine_parameter_names(n) = p;
+                }
+                else
+                {
+                  // could not allocate memory to store the parameter names
+                  va_end(ap);
+                  return luxerror("Memory allocation error", 0);
+                }
               }
               key = routine_parameter_names(n) + nArg;
               while (nArg--) {

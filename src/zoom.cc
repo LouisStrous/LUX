@@ -22,6 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#if HAVE_X11
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -1070,3 +1071,4 @@ int32_t tvzoom(ArgumentCount narg, Symbol ps[])
   return LUX_OK;
 }
 //--------------------------------------------------------------------------
+#endif

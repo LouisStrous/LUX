@@ -1,6 +1,6 @@
-/* This is file lux.ccc.
+/* This is file lux.c.
 
-Copyright 2013-2014 Louis Strous
+Copyright 2013-2024 Louis Strous
 
 This file is part of LUX.
 
@@ -17,9 +17,32 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-int do_main(int, char **);
 
+/// The main function.
+///
+/// \param argc is the count of arguments with which the program was started
+/// from the command line.
+///
+/// \param argv points to an array of the arguments.
+///
+/// \returns 0 if all is well, non-0 otherwise.
 int main(int argc, char **argv)
 {
+  int do_main(int, char **);
+
   return do_main(argc, argv);
 }
+
+/// \page ext-lib External Libraries
+///
+/// LUX makes use of various external libraries.  If any of those libraries
+/// aren't linked into your copy of LUX then you cannot use the that depend on
+/// the missing libraries.
+///
+/// \section ext-lib-gsl GNU Scientific Library
+///
+/// Functions that are marked as shown below require the <a
+/// href="https://www.gnu.org/software/gsl/">GNU Scientific Library</a> to be
+/// compiled into LUX:
+///
+/// \warning Requires \ref ext-lib-gsl.

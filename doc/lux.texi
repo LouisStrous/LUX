@@ -466,6 +466,7 @@ Read-Write Global Variables
 * !fz::                         Free lower y plot bound
 * !fzx::                        Free lower x plot bound
 * !fzz::                        Free lower z plot bound
+* !gsl_show_errors::            Print GNU Scientific Library error messages
 * !height::                     Last window height
 * !histmin::                    Last histogram minimum ordinate
 * !histmax::                    Last histogram maximum ordinate
@@ -748,6 +749,8 @@ Internal Functions and Subroutines
 * ee06a::                       Equation of Equinoxes, IAU 2000A/2006
 * eect00::                      Equation of Equinoxes complementary terms
 * eform::                       Earth reference ellipsoid
+* eigensystem::                 Eigenvalues and eigenvectors
+* eigenvalues::                 Eigenvalues
 * enablenewline::               Tell LUX to resume interpreting newlines
 * endian::                      Convert between little-endian and big-endian
 * enhanceimage::                Enhance the intensities of an image
@@ -820,6 +823,8 @@ Internal Functions and Subroutines
 * findspans::                   Find spans of elements meeting a condition
 * find_max::                    Find the values of local maxima
 * find_maxloc::                 Find the locations of local maxima
+* find_extreme::
+* find_extremeloc::
 * find_min::                    Find the values of local minima
 * find_minloc::                 Find the locations of local minima
 * fit::                         Fit arbitrary function to data
@@ -952,6 +957,7 @@ Internal Functions and Subroutines
 * log::                         Natural logarithm
 * log10::                       Decimal logarithm
 * log1p::                       Natural logarithm of one plus the argument
+* log2::                        Logarithm to base 2
 * lonarr::                      Create a @code{long} array
 * lonfarr::                     Create a @code{long} file array
 * long::                        Convert to @code{long} value by value
@@ -965,7 +971,7 @@ Internal Functions and Subroutines
 * maxdir::
 * maxfilter::                   Running maximum
 * maxloc::                      Location of maximum
-* mdiagonal::
+* mdiagonal::                   Diagonal matrix
 * mean::                        Mean value
 * medfilter::                   Running median
 * median::                      Median valuey
@@ -980,7 +986,7 @@ Internal Functions and Subroutines
 * minfilter::                   Running minimum
 * minloc::                      Location of minimum
 * mod::                         Modulus
-* mproduct::
+* mproduct::                    Matrix product
 * multisieve::                  Determine locations of particular values
 * name::
 * ncchi2::                      Non-central chi-square function
@@ -1488,10 +1494,6 @@ sc
 scb
 
 * scb Details::
-
-svd
-
-* svd Applications::
 
 @end detailmenu
 @end menu
@@ -12046,6 +12048,8 @@ arguments.
 * ee06a::                       Equation of Equinoxes, IAU 2000A/2006
 * eect00::                      Equation of Equinoxes complementary terms
 * eform::                       Earth reference ellipsoid
+* eigensystem::                 Eigenvalues and eigenvectors
+* eigenvalues::                 Eigenvalues
 * enablenewline::               Tell LUX to resume interpreting newlines
 * endian::                      Convert between little-endian and big-endian
 * enhanceimage::                Enhance the intensities of an image
@@ -12118,6 +12122,8 @@ arguments.
 * findspans::                   Find spans of elements meeting a condition
 * find_max::                    Find the values of local maxima
 * find_maxloc::                 Find the locations of local maxima
+* find_extreme::
+* find_extremeloc::
 * find_min::                    Find the values of local minima
 * find_minloc::                 Find the locations of local minima
 * fit::                         Fit arbitrary function to data
@@ -12264,7 +12270,7 @@ arguments.
 * maxdir::
 * maxfilter::                   Running maximum
 * maxloc::                      Location of maximum
-* mdiagonal::
+* mdiagonal::                   Diagonal matrix
 * mean::                        Mean value
 * medfilter::                   Running median
 * median::                      Median valuey
@@ -12279,7 +12285,7 @@ arguments.
 * minfilter::                   Running minimum
 * minloc::                      Location of minimum
 * mod::                         Modulus
-* mproduct::
+* mproduct::                    Matrix product
 * multisieve::                  Determine locations of particular values
 * name::
 * ncchi2::                      Non-central chi-square function
@@ -17231,7 +17237,7 @@ UT1 more regular.
 See also: @ref{Astronomical Coordinate Calculations}
 
 @c -------------------------------------
-@node eform, enablenewline, eect00, Internal Routines
+@node eform, eigensystem, eect00, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection eform
 @findex eform
@@ -17245,7 +17251,60 @@ grs80, 3 = wgs72.  Unsupported ellipsoid identifiers yield radius and
 flattening equal to 0.
 
 @c -------------------------------------
-@node enablenewline, endian, eform, Internal Routines
+@node eigensystem, eigenvalues, eform, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection eigensystem
+@findex eigensystem
+
+@code{eigensystem,@var{X},@var{E},@var{V}}
+
+[GSL] Determines the eigenvalues and eigenvectors of real symmetric
+matrices.
+
+@code{@var{X}} contains the matrices to decompose.  It may have more
+than 2 dimensions, in which case the 3rd and higher dimensions iterate
+over the matrices.  The below description is for a two-dimensional
+@code{@var{X}}.
+
+No check is done if the matrix @code{@var{X}} is symmetric.  If it is
+not then you get results for a different matrix.
+
+@code{eigensystem,X,E,V} decomposes @code{@var{X}} into @code{@var{V}
+# @var{E} # transpose(@var{V})} where @code{@var{E}} is a diagnonal
+matrix and @code{@var{V}} is an orthonormal matrix.  @code{@var{E}}
+and @code{@var{V}} get the same dimensions as @code{@var{X}}.  The
+diagonal of @code{@var{E}} contains the eigenvalues in descending
+order of absolute magnitude, and @code{@var{V}} contains the
+corresponding eigenvectors, which form an orthonormal basis.
+
+See also: @ref{eigenvalues}, @ref{svd}
+
+@c -------------------------------------
+@node eigenvalues, enablenewline, eigensystem, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection eigenvalues
+@findex eigenvalues
+
+@code{eigenvalues(@var{X})}
+
+[GSL] Returns the eigenvalues of real symmetric matrices.
+
+@code{@var{X}} contains the matrices to decompose.  It may have more
+than 2 dimensions, in which case the 3rd and higher dimensions iterate
+over the matrices.  The below description is for a two-dimensional
+@code{@var{X}}.
+
+No check is done if the matrix @code{@var{X}} is symmetric.  If it is
+not then you get results for a different matrix.
+
+@code{@var{E}} get the dimensions of @code{@var{X}} except for the
+first one.  The eigenvalues for each matrix are returned in descending
+order of absolute magnitude.
+
+See also: @ref{eigensystem}
+
+@c -------------------------------------
+@node enablenewline, endian, eigenvalues, Internal Routines
 @comment  node-name,  next,  previous,  up
 @subsection enablenewline
 @findex enablenewline
@@ -17572,7 +17631,7 @@ to zero, then a 0 is returned for the element of interest, and a 1
 otherwise.  On the one-element-wide edges a 1 is returned if the element
 of interest is unequal to zero, or a 0 otherwise, except if
 @code{/zeroedge} is specified, in which case the edges are always set to
-zero. 
+zero.
 
 See also: @ref{dilate}
 
@@ -18780,6 +18839,162 @@ plateau is returned.
 
 See also: @ref{find}, @ref{local_max}, @ref{find_max},
 @ref{find_minloc}
+
+@c -------------------------------------
+@node find_extreme, find_extremeloc, find_maxloc, Internal Routines
+@comment  node-name,  next,  previous,  up
+@subsection find_extreme
+@findex find_extreme
+
+@code{find_extreme(@var{data} [, diagonal=@var{diagonal}, /degree,
+/subgrid])}
+
+By default, seeks local extremes (maxima and minima) in @code{data}
+and returns their values.  @code{data} must be numerical and may have
+multiple dimensions.
+
+If @code{@var{diagonal}} is specified, then it must be an array with
+one element per dimension of @code{@var{data}}.  The elements that are
+equal to 0 indicate which dimensions are not checked for a local
+maximum or minimum.  The elements that are equal to 1 and 2 (after
+conversion to type @code{long}) indicate in which dimensions checking
+is performed.  The elements that are equal to 2 indicate in which
+dimensions checked directions may be diagonal.  Elements equal to 1
+indicate that no diagonals are allowed in those dimensions.  All such
+directions either have non-zero coordinate offsets only in those
+dimensions, or have only a single non-zero coordinate offset (i.e., a
+non-diagnonal or orthogonal direction).  Only approved directions are
+checked.  If @code{@var{diagonal}} contains @code{n1} ones and
+@code{n2} twos, then the number of directions per data element that
+will be considered is equal to @code{m = 2^n2 - 1 + n1}.
+
+For example, regard a two-dimensional array.  We'll call the first
+dimension the east-west direction and the second one the north-south
+dimension.  Then, if @code{@var{diagonal} = [1,0]}, values are
+returned for all points that are local maxima or minima in the
+east-west direction without regards to any other direction.  If
+@code{@var{diagonal} = [1,1]}, then all points are approved that are
+local maxima or minima in the east-west direction and also in the
+north-south direction, without regards to the other
+(northeast-southwest, southeast-northwest) directions.  If
+@code{@var{diagonal} = [2,2]}, then all directions are checked.
+
+For a three-dimensional array, if @code{@var{diagonal} = [2,2,1]}, then
+the only checked directions that have a non-zero third coordinate offset
+are those that are along the 3rd axis.  If @code{@var{diagonal} =
+[1,1,0]}, then only directions along (and not between) the first two
+axes are checked.
+
+If @code{/degree} is specified, then the number of directions per data
+element where the data shows a local maximum or minimum is returned
+instead.  This number always lies between 0 and the total number
+@code{m} of directions given above.  @code{find_extreme(@var{data},
+/degree) eq m} returns an array with 1s at all positions returned by
+@code{find_extreme(@var{data})}, but the latter form is considerably
+faster because for each element it stops checking as soon as a
+direction without a local maximum or minimum is found.  For noise data
+in arbitrary numbers of dimensions, on average at most 2 local maximum
+determinations per data element are performed if @code{/degree} is not
+specified, compared to @code{m}, which is grows exponentially with the
+number of dimensions in the worst case, if @code{/degree} is
+specified.
+
+If @code{/subgrid} is specified, then the value of the local maximum
+or minimum is taken from a quadratic hypersurface fitted to the local
+neighborhood of the local maximum or minimum.
+
+The used algorithm decides whether a particular data point is a local
+maximum or minimum by looking at its nearest neighbors only.  This
+means that it cannot decide if a region in which all adjacent data
+values are equal constitutes a local maximum or minimum.  Such regions
+are ignored.
+
+See also: @ref{find_extremeloc}, @ref{find_max}, @ref{find_min}
+
+@c -------------------------------------
+@node find_extremeloc, find_min, find_extreme, Internal Routines
+@subsection find_extremeloc
+@findex find_extremeloc
+
+@code{find_extremeloc(@var{data} [, diagonal=@var{diagonal}, /degree,
+/subgrid, /coords, /old])}
+
+By default, seeks local maxima or minima in @code{@var{data}} and
+returns their positions as indices to @code{data}.  If @code{/coords}
+is specified, then returns coordinates to @code{data} in an array with
+the different coordinates in the first dimension (i.e., if @code{x} is
+the result, then @code{x(*,0)} contains the first coordinate of each
+found position.  @code{data} must be numerical and may have multiple
+dimensions.
+
+If @code{@var{diagonal}} is specified, then it must be an array with
+one element per dimension of @code{@var{data}}.  The elements that are
+equal to 0 indicate which dimensions are not checked for a local
+maximum or minimum.  The elements that are equal to 1 and 2 (after
+conversion to type @code{long}) indicate in which dimensions checking
+is performed.  The elements that are equal to 2 indicate in which
+dimensions checked directions may be diagonal.  Elements equal to 1
+indicate that no diagonals are allowed in those dimensions.  All such
+directions either have non-zero coordinate offsets only in those
+dimensions, or have only a single non-zero coordinate offset (i.e., a
+non-diagnonal or orthogonal direction).  Only approved directions are
+checked.  If @code{@var{diagonal}} contains @code{n1} ones and
+@code{n2} twos, then the number of directions per data element in
+@code{n} dimensions that will be considered is equal to @code{m = 2^n2
+- 1 + n1}.
+
+For example, regard a two-dimensional array.  We'll call the first
+dimension the east-west direction and the second one the north-south
+dimension.  Then, if @code{@var{diagonal} = [1,0]}, all points are
+returned that are local maxima or minima in the east-west direction
+without regards to any other direction.  If @code{@var{diagonal} =
+[1,1]}, then all points are returned that are local maxima or minima
+in the east-west direction and also in the north-south direction,
+without regards to the other (northeast-southwest,
+southeast-northwest) directions.  If @code{@var{diagonal} = [2,2]},
+then all directions are checked.
+
+For a three-dimensional array, if @code{@var{diagonal} = [2,2,1]}, then
+the only checked directions that have a non-zero third coordinate offset
+are those that are along the 3rd axis.  If @code{@var{diagonal} =
+[1,1,0]}, then only directions along the first two axes are checked.
+
+If @code{/degree} is specified, then the number of directions per data
+element where the data shows a local maximum or minimum is returned
+instead.  This number always lies between 0 and the total number
+@code{m} of directions given above.  @code{find_extremeloc(@var{data},
+/degree) eq m} returns an array with 1s at all positions returned by
+@code{find_extremeloc(@var{data})}, but the latter form is
+considerably faster because for each element it stops checking as soon
+as a direction without a local maximum or minimum is found.  For noise
+data in arbitrary numbers of dimensions, on average at most 4 local
+maximum or minimum comparisons per data element are performed,
+compared to @code{m}, which is grows exponentially with the number of
+dimensions in the worst case, if @code{/degree} is specified.
+
+If @code{/subgrid} is specified, then the value of the local maximum
+or minimum is taken from a quadratic hypersurface fitted to the local
+neighborhood of the local maximum or minimum.
+
+The used algorithm decides whether a particular data point is a local
+maximum or minimum by looking at its nearest neighbors only.  This
+means that it cannot decide if a region in which all adjacent data
+values are equal constitutes a local maximum or minimum.  Such regions
+are ignored.
+
+If @code{/old} is specified, then an older algorithm for
+two-dimensional @code{@var{data}} is used instead, which always
+returns indices to @code{data} (as if @code{/coords} is not
+specified).  In that case, each value that is greater than the eight
+values immediately surrounding it is a local maximum, and likewise for
+a local minimum.  The edges of the image are not considered.  Of a
+multi-pixel local maximum or minimum, only one position is returned.
+Of a plateau that is larger than three by three pixels, the algorithm
+cannot determine whether it is a local extreme or not, and one
+position in the plateau is returned.
+
+See also: @ref{find}, @ref{find_extreme}, @ref{find_minloc},
+@ref{find_maxloc}
 
 @c -------------------------------------
 @node find_min, find_minloc, find_maxloc, Internal Routines
@@ -22116,12 +22331,14 @@ See also: @ref{max}, @ref{!lastmax}, @ref{!lastmaxloc}
 @subsection mdiagonal
 @findex mdiagonal
 
-@code{mdiagonal(@var{values})}
+@code{mdiagonal(@var{values} [, @var{rowcount} [, @var{colcount}]])}
 
-Returns a square matrix with the specified @code{@var{values}} on the
-diagonal, and zeros everywhere else.  The matrix has its number of
-rows and columns equal to the number of elements in
-@code{@var{values}}.
+Returns a matrix with the specified @code{@var{values}} on the
+diagonal and zeros everywhere else.  If @code{@var{rowcount}} and
+@code{@var{colcount}} are specified then the matrix gets those numbers
+of rows and columns.  The default value of the row count is the number
+of elements in @code{@var{values}}, and the default value of the
+column count is the row count.
 
 @c -------------------------------------
 @node mean, medfilter, mdiagonal, Internal Routines
@@ -22506,9 +22723,9 @@ of the first two dimensions is calculated for each element of
 @code{@var{m1}} beyond the first two dimension and for the
 corresponding element of @code{@code{m2}}.
 
-For example, if @code{x = indgen(dblarr(2,3,4))} and @code{y =
-indgen(dblarr(5,2,4))}, then @code{z = mproduct(x,y)} or @code{z =
-mproduct(x,y,/inner)} gets dimensions 5, 3, 4, and @code{z(*,*,i)} is
+For example, if @code{x = indgen(dblarr(3,2,4))} and @code{y =
+indgen(dblarr(2,5,4))}, then @code{z = mproduct(x,y)} or @code{z =
+mproduct(x,y,/inner)} gets dimensions 3, 5, 4, and @code{z(*,*,i)} is
 equal to @code{mproduct(x(*,*,i),y(*,*,i))}.
 
 If @code{/outer} is selected, then dimensions beyond the first two do
@@ -22517,13 +22734,13 @@ first two dimensions is calculated for each possible combination of
 one element of @code{@var{m1}} beyond the first two dimensions and one
 element of @code{@var{m2}} beyond the first two dimensions.
 
-For example, if @code{x = indgen(dblarr(2,3,4)} and @code{y =
-indgen(dblarr(5,2,4)}, then @code{z = mproduct(x,y,/outer)} gets
-dimensions 5, 3, 4, 4, and @code{z(*,*,i,j)} is equal to
+For example, if @code{x = indgen(dblarr(3,2,4)} and @code{y =
+indgen(dblarr(2,5,4)}, then @code{z = mproduct(x,y,/outer)} gets
+dimensions 3, 5, 4, 4, and @code{z(*,*,i,j)} is equal to
 @code{mproduct(x(*,*,i),y(*,*,j))}.
 
 This functions gets called when the @code{#} operator is used.
-@code{x # y} is equivalent to @code{mproduct(x,y)}.
+@code{x # y} is equivalent to @code{mproduct(x,y,/inner)}.
 
 See also: @ref{decomp}, @ref{dsolve}, @ref{svd}
 
@@ -27631,97 +27848,40 @@ See also: @ref{sun_b}, @ref{sun_d}, @ref{sun_p}
 @subsection svd
 @findex svd
 
-@code{svd, @var{m}, @var{u2}, @var{s2}, @var{v2}}
-   
-Calculates the 'thin' singular value decomposition of matrix
-@code{@var{m}}, which is easier to calculate and takes less storage
-than the 'full' singular value decomposition.  @code{@var{m}} must be
-of a real (non-complex) data type.
+@code{svd, @var{X}, @var{U}, @var{S}, @var{V}}
 
-If @code{@var{m}} is an m-by-n matrix (has m rows and n columns), then
-@code{@var{m} = @var{u} # @var{s} # transpose(@var{v})} is the 'full'
-singular value decomposition of @code{@var{m}}, where @code{@var{u}}
-is an m-by-m orthonormal matrix, @code{@var{s}} is an m-by-n matrix
-with nonnegative numbers on the diagonal and zeros elsewhere, and
-@code{@var{v}} is an n-by-n orthonormal matrix.  The diagonal entries
-of @code{@var{s}} are the singular values of @code{@var{m}}
+Calculates the 'thin' singular value decomposition (SVD) of matrix
+@code{@var{X}}, which is easier to calculate and takes less storage
+than the 'full' SVD does.  @code{@var{X}} must be of a real
+(non-complex) data type.
 
-In @code{@var{s2}} is returned a vector containing the min(n,m)
-singular values of @code{@var{m}} in non-increasing order.
+@code{@var{X}} may have more than 2 dimensions.  Then the 3rd and
+later dimensions iterate over the different matrices, and each matrix
+is processed separately.  The remainder of this description is for a
+2-dimensional @code{@var{X}}.
 
-If m = n, then returned @code{@var{u2}} and @code{@var{v2}} have the
-same dimensions as @code{@var{m}}, and @code{@var{u2}} is
-@code{@var{u}}, and @code{@var{v2}} is @code{@var{v}}.  In that case,
-the 'thin' singular value decomposition is equal to the 'full'
-singular value decomposition.
+Let @code{@var{X}} be an @var{r}-by-@var{c} matrix (i.e., it has
+@var{r} rows and @var{c} columns).  Let @var{n = min(r,c)} be the
+lesser of the dimensions of @code{@var{X}}.
 
-If m > n, then @code{@var{u2}} is @code{@var{u}} except that the
-rightmost columns of @code{@var{u}} beyond the first min(m,n) columns
-are omitted.  These correspond to the bottommost all-zero rows of
-@code{@var{s}}.  @code{@var{u2}} has the same dimensions as
-@code{@var{m}}.  @code{@var{v2}} is @code{@var{v}}.  Then
-@code{@var{m} = @var{u2} # mdiagonal(@var{s2}) # transpose(@var{v2}}.
+Then @code{@var{X} = @var{U} # @var{S} # transpose(@var{V})} is the
+'full' singular value decomposition of @code{@var{X}}, where
+@code{@var{U}} is an @var{m}-by-@var{m} orthonormal matrix,
+@code{@var{S}} is an @var{m}-by-@var{n} matrix with nonnegative
+numbers on the diagonal and zeros elsewhere, and @code{@var{V}} is an
+@var{n}-by-@var{n} orthonormal matrix.  The diagonal entries of
+@code{@var{S}} are the singular values of @code{@var{X}}
 
-If m < n, then @code{@var{m} = transpose(@var{u2}) #
-mdiagonal(@var{s2}) # @var{v2}}.  In that case, @code{@var{v2}}
-is @code{@var{v}} except that the bottommost rows of @code{@var{v}}
-beyond the first min(m,n) rows are omitted.  These correspond to the
-rightmost all-zero columns of @code{@var{s}}.  @code{@var{v2}} has the
-same dimensions as @code{@var{m}}.  @code{@var{u2}} is the transpose
-of @code{@var{u}}.
+The 'thin' SVD omits rows or columns from @code{@var{U}},
+@code{@var{S}}, and @code{@var{V}} for which there are no singular
+values.  The thin SVD is @code{@var{X} = @var{U} # @var{S} #
+transpose(@var{V})}, too, but now @code{@var{U}} is an
+@var{r}-by-@var{n} matrix, @code{@var{S}} is an @var{n}-by-@var{n}
+diagonal matrix, and @code{@var{V}} is a @var{c}-by-@var{n} matrix.
+
+If @var{r = c} then the thin and full SVDs are equivalent.
 
 See also: @ref{mdiagonal}, @ref{transpose}
-
-@menu
-* svd Applications::
-@end menu
-
-@c -------------------------------------
-@node svd Applications,  , svd, svd
-@comment  node-name,  next,  previous,  up
-@subsubsection svd Applications
-
-Applications of the singular value decomposition:
-
-a nonnegative real number @code{s} is a singular value of matrix
-@code{m} if there exist unit-length vectors @code{u} and @code{v} such
-that @code{m # v = s * u} and @code{transpose(m) # u = s * v}.
-@code{u} and @code{v} are then called the left-singular and
-right-singular vectors for @code{s}.  After @code{svd, m, u2, s2, v2},
-the elements of @code{s2} are the singular values of @code{m}.
-
-The pseudo-inverse of matrix @code{m} with singular value
-decomposition @code{m = u2 # mdiagonal(s2) # transpose(v2)} is
-equal to @code{Mpi = v2 # mdiagonal(Spi) # transpose(u2)}, where
-vector @code{Spi} is obtained from vector @code{s2} by replacing each
-non-zero element by its reciprocal.  The solution of the linear
-least-squares problem @code{m # b = y} is @code{bs = Mpi # y}, but
-going through the pseudoinverse is not the most efficient method of
-solving the least-squares problem.
-
-The unit vector @code{x} that yields the smallest @code{m # x} is the
-right singular vector of @code{m} corresponding to the smallest
-singular value.
-
-The null space of matrix @code{m} is spanned by the right singular
-vectors corresponding to vanishing singular values of @code{m}.  The
-range of matrix @code{m} is spanned by the left singular vectors
-corresponding to non-zero singular values of @code{m}.  The rank of
-matrix @code{m} equals the number of non-zero singular values.
-
-The matrix @code{Mr} of rank @code{r} that best approximates matrix
-@code{m} (by minimizing the Frobenius norm of the difference) is
-@code{Mr = u2 # mdiagonal(Sr) # transpose(v2)} where @code{Sr} is
-the same as @code{s2} but has all singular values beyond the first
-@code{r} set to zero.
-
-The orthonormal matrix @code{r} closest to @code{m} (under the
-Frobenius norm) is @code{u # transpose(v)} -- i.e., has all singular
-values replaced by 1.
-
-The orthonormal matrix @code{r} which most closely maps @code{a} to
-@code{b} (for the orthogonal Procrustes problem) is the nearest
-orthonormal matrix to @code{transpose(a) # b}.
 
 @c -------------------------------------
 @node swab, swapb, svd, Internal Routines
@@ -28426,7 +28586,7 @@ there.
 Returns a copy of the given @code{@var{matrix}}, with the first two
 dimensions transposed.  @code{@var{matrix}} must have at least 2
 dimensions.  If @code{@var{y} = transpose(@var{x})}, then
-@code{@var{y}(@var{i},@var{j}) = @var{x}(@var{j},@var{i})}.
+@code{@var{y}(@var{i},@var{j},/all) = @var{x}(@var{j},@var{i},/all)}.
 
 @c -------------------------------------
 @node trend, tri_name_from_tai, transpose, Internal Routines

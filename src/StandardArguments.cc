@@ -788,8 +788,8 @@ StandardArguments::set(ArgumentCount narg, Symbol ps[],
         case StandardArguments::DS_ACCEPT:         /* copy from input */
           if (src_dims_ix >= srcDescr.dimensions_count())
           {
-            m_return_symbol = luxerror("Cannot copy non-existent dimension %d",
-                                       ps[param_ix], src_dims_ix);
+            m_return_symbol = luxerror("Need at least %d dimensions",
+                                       ps[param_ix], src_dims_ix + 1);
             return m_return_symbol;
           }
           else

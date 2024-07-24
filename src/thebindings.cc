@@ -3737,11 +3737,17 @@ void register_the_bindings()
   int32_t lux_svd(int32_t, int32_t []);
   register_lux_s(lux_svd, "svd", 4, 4, NULL);
 
+  int32_t lux_eigensystem(int32_t, int32_t []);
+  register_lux_s(lux_eigensystem, "eigensystem", 2, 4, NULL);
+
+  int32_t lux_eigenvalues(int32_t, int32_t []);
+  register_lux_f(lux_eigenvalues, "eigenvalues", 1, 1, NULL);
+
   int32_t lux_transpose_matrix(int32_t, int32_t []);
   register_lux_f(lux_transpose_matrix, "transpose", 1, 1, NULL);
 
   int32_t lux_diagonal_matrix(int32_t, int32_t []);
-  register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 1, NULL);
+  register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 3, NULL);
 
   int32_t lux_read_image_oiio(int32_t, int32_t []);
   register_lux_f(lux_read_image_oiio, "readimage", 1, 1, NULL);
@@ -3762,6 +3768,24 @@ void register_the_bindings()
 
   int32_t lux_tolookup(int32_t, int32_t []);
   register_lux_s(lux_tolookup, "tolookup", 2, 4, "1one");
+
+  int32_t lux_find_maxloc(int32_t, int32_t []);
+  register_lux_f(lux_find_maxloc, "find_maxloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
+
+  int32_t lux_find_minloc(int32_t, int32_t []);
+  register_lux_f(lux_find_minloc, "find_minloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
+
+  int32_t lux_find_extremeloc(int32_t, int32_t []);
+  register_lux_f(lux_find_extremeloc, "find_extremeloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
+
+  int32_t lux_find_max(int32_t, int32_t []);
+  register_lux_f(lux_find_max, "find_max", 1, 3, "::diagonal:1degree:2subgrid");
+
+  int32_t lux_find_min(int32_t, int32_t []);
+  register_lux_f(lux_find_min, "find_min", 1, 3, "::diagonal:1degree:2subgrid");
+
+  int32_t lux_find_extreme(int32_t, int32_t []);
+  register_lux_f(lux_find_extreme, "find_extreme", 1, 3, "::diagonal:1degree:2subgrid");
 
   int32_t lux_monotone_interpolation(int32_t, int32_t []);
   register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");

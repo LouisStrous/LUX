@@ -985,14 +985,6 @@ InternalRoutine function_table[] = {
   { "filetype", 1, 1, lux_identify_file, 0 },                  // files.cc
   { "filetypename", 1, 1, lux_filetype_name, 0 },              // install.cc
   { "findfile", 2, 2, lux_findfile, 0 },         // files.cc
-  { "find_max", 1, 3, lux_find_max,              // strous2.cc
-    "::diagonal:1degree:2subgrid" },
-  { "find_maxloc", 1, 3, lux_find_maxloc, // strous2.cc
-    "::diagonal:1degree:2subgrid:4coords:8old" },
-  { "find_min", 1, 3, lux_find_min, // strous2.cc
-    "::diagonal:1degree:2subgrid" },
-  { "find_minloc", 1, 3, lux_find_minloc, // strous2.cc
-    "::diagonal:1degree:2subgrid:4coords" },
   { "fit",      3, 17, lux_generalfit, // fit.cc
     "|4|::start:step:lowbound:highbound:weights:qthresh:pthresh:ithresh"
     ":dthresh:fac:niter:nsame:err:fit:tthresh:1vocal:4down:8pchi"

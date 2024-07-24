@@ -24,234 +24,90 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <map>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include "action.hh"
 
-char const* errorMessages[] = {
-// COND_NO_SCAL:
- "Condition must be scalar",
-// ILL_COMB:
-#ifdef __STDC__
- "Illegal argument combination (%s %s %s %s %s)",
-#else
- "Illegal argument combination",
-#endif
-// INCMP_DIMS:
- "Incompatible dimensions",
-// ALLOC_ERR:
- "Memory allocation error",
-// NO_FLT_COND:
-#ifdef __STDC__
- "%s operator expects integer operands, not %s",
-#else
- "operator expects integer operands",
-#endif
-// ILL_CLASS:
- "Argument is of an illegal class",
-// ILL_TYPE:
- "Expression type %s is not allowed here",
-// ILL_SYM:
-#ifdef __STDC__
- "Illegal symbol number: %d (%s)",
-#else
- "Illegal symbol number",
-#endif
-// ILL_DIM:
- "Illegal dimension",
-// MYST_CLASS:
- "Mysterious class in binary operation or function",
-// NO_SCAL:
- "Argument must be a scalar",
-// ILL_ARG:
- "Illegal argument",
-// CST_LHS:
- "Unmodifiable variable",
-// ONLY_A_S:
- "Only numerical types allowed",
-// ILL_W_STR:
- "Illegal operation with string",
-// INCMP_ARR:
- "Array is incompatible with previous one",
-// ILL_ARG_LIST:
- "Illegal argument list",
-// SUBSC_RANGE:
- "Subscript/index/coordinate out of range",
-// INCMP_INNER_BC:
- "Inner dimension Byte count is not a multiple of element length",
-// LUX_SUB_ARG:
- "(X) Impossible error in lux_sub_arg",
-// NEED_ARR:
- "Need numerical array",
-// N_DIMS_OVR:
- "Too many dimensions",
-// DUPL_INDX:
- "Duplicate index",
-// IMPOSSIBLE:
- "An impossible error",
-// N_STR_DIMS_OVR:
- "Too many subscripts for a string",
-// NEED_DIMS:
- "Need dimensions",
-// ARR_SMALL:
- "Array too small",
-// WRNG_N_ARG:
- "Wrong number of arguments",
-// ILL_CMB_S_NON_S:
- "Illegal combination of string and non-string",
-// SUBSC_NO_INDX:
- "Variable cannot be subscripted",
-// ILL_N_SUBSC:
- "Illegal number of subscripts",
-// ILL_REARRANGE:
- "Illegal dimension rearrangement attempted",
-// ILL_SUBSC_TYPE:
- "Illegal subscript type",
-// DIM_SMALL:
- "Negative dimension",
-// ONLY_1_IF_ARR:
- "Only one argument allowed if an array is used",
-// NEED_STR:
- "Need a string argument",
-// ILL_LUN:
- "Illegal logical unit",
-// LUN_CLOSED:
- "No file is open on the logical unit",
-// READ_ONLY:
- "File is open for reading only",
-// ILL_FORMAT_STR:
- "Illegal format string",
-// UNDEF_ARG:
- "Undefined argument",
-// USED_LUN:
- "Logical unit is already in use",
-// READ_EOF:
- "Reached the end of the file",
-// POS_ERR:
- "Disk file positioning error",
-// READ_ERR:
- "Disk file read error",
-// WRITE_ERR:
- "Disk file write error",
-// ERR_OPEN:
- "Could not open the file",
-// INCMP_ARG:
- "Argument is incompatible with its predecessors",
-// NEED_POS_ARG:
- "Need positive argument",
-// NEED_2D_ARR:
- "Need two-dimensional real array",
-// EMPTY_STACK:
- "Stack is empty",
-// NEED_INT_ARG:
- "Need integer argument",
-// INDX_RANGE:
- "Index out of range",
-// COORD_RANGE:
- "Coordinate(s) out of range",
-// NEED_1D_ARR:
- "Need one-dimensional array",
-// RET_ARG_NO_ATOM:
- "Illegal return argument",
-// NEED_2D_SQ_ARR:
- "Need square two-dimensional array",
-// INCMP_LU_RHS:
- "Incompatible LU decomposition and RHS in DSOLVE",
-// ILL_POWER:
- "Illegal power requested",
-// NEED_1D_2D_ARR:
- "Need one-dimensional or two-dimensional array",
-// BAD_CONTOURS:
- "Bad $CONTOURS array",
-// WIN_NOT_EXIST:
- "Window does not exist",
-// BAD_GRID:
- "Displacement grid not in correct format",
-// NEED_3x3_ARR:
- "Need 3-by-3 array",
-// NEED_NTRV_2D_ARR:
- "Need non-trivial two-dimensional array",
-// N_ARG_OVR:
- "Too many arguments",
-// ILL_SUSBC_LHS:
- "Illegal subscripts on left-hand side variable",
-// WR_N_SUBSC:
- "Incompatible number of subscripts",
- // BAD_STRUCT_KEY:
- "Bad key to element of structure",
-// ILL_TYPE_IN:
-#ifdef __STDC__
- "Illegal type (%d, %s) in %s",
-#else
- "Illegal type",
-#endif
-// NEED_4x4_ARR:
- "Need 4-by-4 array",
-// NEED_3_ARR:
- "Need 3-element array",
-// ILL_PROJ_MAT:
- "Illegal projection matrix",
-// NEED_2_ARR:
- "Need 2-element array",
-// ILL_COORD_SYS:
-#ifdef __STDC__
- "Illegal coordinate system, number %1d",
-#else
- "Illegal coordinate system",
-#endif
-// WRITE_ONLY:
- "File is open for writing only",
-// RANGE_START:
-#ifdef __STDC__
- "Illegal range start %1d (object size %1d)",
-#else
- "Illegal range start",
-#endif
-// RANGE_END:
-#ifdef __STDC__
- "Illegal range end %1d (object size %1d)",
-#else
- "Illegal range end",
-#endif
-// ILL_SUBSC:
-#ifdef __STDC__
- "Subscript out of range (value: %1d, size: %1d)",
-#else
- "Subscript out of range",
-#endif
-// INCMP_KEYWORD:
- "Incompatible keywords",
- // NEED_SCAL:
- "Need a scalar here",
- // ILL_AXIS:
- "Illegal axis number: %1d",
- // NEED_NUM_ARR:
- "Need numerical array",
- // NEED_NAMED:
- "Need a named variable",
- // NO_COMPLEX:
- "Complex numbers are not supported by this routine",
- // ILL_NUM_DIM:
- "Illegal number of dimensions for current argument",
- // NEED_REAL_SCAL:
- "Need a real scalar here",
- // NEED_REAL_ARR:
- "Need a real array here",
- // NEED_REAL_ARG:
- "Need a real scalar or array here",
-#ifndef X11
-// NO_X11:
- "Sorry, this version of LUX was compiled without X Window support",
-#endif
- "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
- // NEED_BYTE:
- "Need BYTE argument",
- // NOSUPPORT:
- "%s is not supported because this application was compiled without %s"
+std::map<int, char const*> errorMessages = {
+  {ALLOC_ERR, "Memory allocation error"},
+  {BAD_CONTOURS, "Bad $CONTOURS array"},
+  {BAD_GRID, "Displacement grid not in correct format"},
+  {BAD_STRUCT_KEY, "Bad key to element of structure"},
+  {COND_NO_SCAL, "Condition must be scalar"},
+  {CST_LHS, "Unmodifiable variable"},
+  {DIM_SMALL, "Negative dimension"},
+  {ERR_OPEN, "Could not open the file"},
+  {ILL_ARG, "Illegal argument"},
+  {ILL_ARG_LIST, "Illegal argument list"},
+  {ILL_AXIS, "Illegal axis number: %1d"},
+  {ILL_CLASS, "Argument is of an illegal class"},
+  {ILL_CMB_S_NON_S, "Illegal combination of string and non-string"},
+  {ILL_COMB, "Illegal argument combination (%s %s %s %s %s)"},
+  {ILL_COORD_SYS, "Illegal coordinate system, number %1d"},
+  {ILL_DIM, "Illegal dimension"},
+  {ILL_LUN, "Illegal logical unit"},
+  {ILL_NUM_DIM, "Illegal number of dimensions for current argument"},
+  {ILL_N_SUBSC, "Illegal number of subscripts"},
+  {ILL_POWER, "Illegal power requested"},
+  {ILL_REARRANGE, "Illegal dimension rearrangement attempted"},
+  {ILL_SUBSC, "Subscript out of range (value: %1d, size: %1d)"},
+  {ILL_SUBSC_LHS, "Illegal subscripts on left-hand side variable"},
+  {ILL_SUBSC_TYPE, "Illegal subscript type"},
+  {ILL_SYM, "Illegal symbol number: %d (%s)"},
+  {ILL_TYPE, "Expression type %s is not allowed here"},
+  {ILL_W_STR, "Illegal operation with string"},
+  {IMPOSSIBLE, "An impossible error"},
+  {INCMP_ARG, "Argument is incompatible with its predecessors"},
+  {INCMP_ARR, "Array is incompatible with previous one"},
+  {INCMP_DIMS, "Incompatible dimensions"},
+  {INCMP_KEYWORD, "Incompatible keywords"},
+  {INCMP_LU_RHS, "Incompatible LU decomposition and RHS in DSOLVE"},
+  {LUN_CLOSED, "No file is open on the logical unit"},
+  {NEED_1D_2D_ARR, "Need one-dimensional or two-dimensional array"},
+  {NEED_1D_ARR, "Need one-dimensional array"},
+  {NEED_2D_ARR, "Need two-dimensional real array"},
+  {NEED_2D_SQ_ARR, "Need square two-dimensional array"},
+  {NEED_2_ARR, "Need 2-element array"},
+  {NEED_3_ARR, "Need 3-element array"},
+  {NEED_3x3_ARR, "Need 3-by-3 array"},
+  {NEED_4x4_ARR, "Need 4-by-4 array"},
+  {NEED_ARR, "Need numerical array"},
+  {NEED_BYTE, "Need BYTE argument"},
+  {NEED_INT_ARG, "Need integer argument"},
+  {NEED_NAMED, "Need a named variable"},
+  {NEED_NTRV_2D_ARR, "Need non-trivial two-dimensional array"},
+  {NEED_NUM_ARR, "Need numerical array"},
+  {NEED_POS_ARG, "Need positive argument"},
+  {NEED_REAL_ARR, "Need a real array here"},
+  {NEED_REAL_SCAL, "Need a real scalar here"},
+  {NEED_SCAL, "Need a scalar here"},
+  {NEED_STR, "Need a string argument"},
+  {NOSUPPORT, "%s is not supported because this application was compiled without %s"},
+  {NO_COMPLEX, "Complex numbers are not supported by this routine"},
+  {NO_FLT_COND, "%s operator expects integer operands, not %s"},
+  {NO_SCAL, "Argument must be a scalar"},
+  {N_ARG_OVR, "Too many arguments"},
+  {N_DIMS_OVR, "Too many dimensions"},
+  {N_STR_DIMS_OVR, "Too many subscripts for a string"},
+  {ONLY_1_IF_ARR, "Only one argument allowed if an array is used"},
+  {ONLY_A_S, "Only numerical types allowed"},
+  {POS_ERR, "Disk file positioning error"},
+  {RANGE_END, "Illegal range end %1d (object size %1d)"},
+  {RANGE_START, "Illegal range start %1d (object size %1d)"},
+  {READ_EOF, "Reached the end of the file"},
+  {READ_ERR, "Disk file read error"},
+  {READ_ONLY, "File is open for reading only"},
+  {RET_ARG_NO_ATOM, "Illegal return argument"},
+  {SUBSC_NO_INDX, "Variable cannot be subscripted"},
+  {SUBSC_RANGE, "Subscript/index/coordinate out of range"},
+  {USED_LUN, "Logical unit is already in use"},
+  {WRITE_ERR, "Disk file write error"},
+  {WRITE_ONLY, "File is open for writing only"},
+  {WRNG_N_ARG, "Wrong number of arguments"},
 };
 
-int32_t     nErrorMessages = sizeof(errorMessages)/sizeof(char **);
 #if __STDC__
 char        *what(int32_t, char);
 #else
@@ -264,10 +120,11 @@ char        *errorPtr = NULL;
 static char        storedErrorMessage[256];
 
 //-------------------------------------------------------------------
-char *verrorMessage(char const* message, int32_t symbol, va_list ap)
+char const*
+verrorMessage(char const* message, Symbol symbol, va_list ap)
 // returns error messages
 {
-  char        *ptr;
+  char *ptr;
 
   ptr = curScrat;
   if (currentInputFile)
@@ -301,18 +158,19 @@ char *verrorMessage(char const* message, int32_t symbol, va_list ap)
   return curScrat;
 }
 //-------------------------------------------------------------------
-char *errorMessage(char const* message, int32_t symbol, ...)
+char const*
+errorMessage(char const* message, int32_t symbol, ...)
 {
-  char        *result;
-  va_list        ap;
+  va_list ap;
 
   va_start(ap, symbol);
-  result = verrorMessage(message, symbol, ap);
+  auto result = verrorMessage(message, symbol, ap);
   va_end(ap);
   return result;
 }
 //-------------------------------------------------------------------
-int32_t luxerror(char const* message, int32_t symbol, ...)
+Symbol
+luxerror(char const* message, Symbol symbol, ...)
 // displays error messages
 {
   va_list        ap;
@@ -331,7 +189,8 @@ int32_t luxerror(char const* message, int32_t symbol, ...)
   return LUX_ERROR;
 }
 //-------------------------------------------------------------------
-int32_t cerror(int32_t message, int32_t symbol, ...)
+Symbol
+cerror(int32_t message, Symbol symbol, ...)
 // displays error messages according to message numbers
 {
   va_list        ap;
@@ -354,9 +213,10 @@ int32_t cerror(int32_t message, int32_t symbol, ...)
       errorSym = symbol;
   } else {
     va_start(ap, symbol);
-    if (message < 0 || message >= nErrorMessages)
+    auto it = errorMessages.find(message);
+    if (it == errorMessages.cend())
       return luxerror("Illegal Error Number (%d)", 0, message);
-    puts(verrorMessage(errorMessages[message], symbol, ap));
+    puts(verrorMessage(it->second, symbol, ap));
     va_end(ap);
     errorSym = symbol;
     if (errorPtr) {
@@ -370,7 +230,8 @@ int32_t cerror(int32_t message, int32_t symbol, ...)
   return LUX_ERROR;
 }
 //-------------------------------------------------------------------
-int32_t lux_error(ArgumentCount narg, Symbol ps[])
+Symbol
+lux_error(ArgumentCount narg, Symbol ps[])
 // allows the user to generate an error message
 // syntax:  error [,format,symbol] [, /store, /restore]
 {

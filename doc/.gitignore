@@ -17,6 +17,7 @@ texinfo.tex
 version.texi
 
 # doxygen
+Doxyfile
 doxyfile.stamp
 lux.doxy
 

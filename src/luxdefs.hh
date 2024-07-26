@@ -338,48 +338,10 @@ enum TraceMode
 #define FMT_MIX                 (1 << 9) // _ modifier
 #define FMT_MIX2                (1 << 10) // = modifier
 
-// tv, tvraw modes
-#define TV_SCREEN       (1 << 6) // 64
-#define TV_POSTSCRIPT   (1 << 7) // 128
-#define TV_PDEV         (TV_SCREEN | TV_POSTSCRIPT) // 192
-#define TV_PLOTWINDOW   (1 << 8) // 256
-#define TV_ZOOM         (1 << 9) // 512
-#define TV_CENTER       (1 << 10) // 1024
-#define TV_SCALE        (1 << 11) // 2048
-#define TV_MAP          (1 << 12) // 4096
-#define TV_RAW          (1 << 13) // 8192
-#define TV_24           (1 << 14) // 16384
-
-// for inspecting X11 visual classes (e.g., in color.c)
-#define visualIsRW(code)                        (code % 2 == 1)
-#define visualIsRO(code)                        (code % 2 == 0)
-#define visualIsGray(code)                      (code < 3)
-#define visualIsColor(code)                     (code >= 3)
-#define visualPrimariesAreLinked(code)          (code < 4)
-#define visualPrimariesAreSeparate(code)        (code >= 4)
-#define visualIsLegal(code)                     (code >= 0 && code < 6)
-
-#define PLOT_INFTY      (FLT_MAX/2)
-// PLOT_INFTY cannot be as large as FLT_MAX or internal errors in SYMPLOT
-// occur  - LS 21mar94
-
 const double PI = 3.141592653589793238463;
 const double TWOPI = 2*PI;
 const double DEG = PI/180;
 const double RAD = 180/PI;
-
-// coordinate systems
-#define LUX_DEP 0               // LUX_DVI or LUX_DEV, depending on
-                                // coordinate magnitudes
-#define LUX_DVI 1               // device-independent
-#define LUX_DEV 2               // device-dependent (xport)
-#define LUX_IMG 3               // image coordinates (tv)
-#define LUX_PLT 4               // plot coordinates
-#define LUX_RIM 5               // relative image coordinates
-#define LUX_RPL 6               // relative plot coordinates
-#define LUX_X11 7               // X coordinate system
-#define LUX_XLOG        64              // logarithmic X
-#define LUX_YLOG        128             // logarithmic Y
 
 // debug breakpoint modes
 #define DEBUG_STEP      1

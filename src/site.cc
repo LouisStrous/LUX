@@ -105,11 +105,6 @@ int32_t site(ArgumentCount narg, Symbol ps[])
   if (internalMode & 8)                // /PACKAGES
   {
     printw("****PACKAGES\n");
-#if HAVE_LIBX11
-    if (!hasInclude) printw("Packages: ");
-    printw("X11 ");
-    hasInclude = 1;
-#endif
 #ifdef JPEG
     if (!hasInclude) printw("Packages: ");
     printw("JPEG ");
@@ -134,12 +129,6 @@ int32_t site(ArgumentCount narg, Symbol ps[])
     printwf("Array dimensions: max %d\n", MAX_DIMS);
     printwf("User stack size (#STACK): %d variables\n", STACKSIZE);
     printwf("Debugging breakpoints: max %d\n", MAXDEBUG);
-#if HAVE_LIBX11
-    printwf("X ports: %d\n", MAXWINDOWS);
-    printwf("X pixmaps: %d\n", MAXPIXMAPS);
-    printwf("X color cells: max %d\n", MAXCOLORS);
-    printwf("X menus: %d\n", MAXMENU);
-#endif
   }
   if (internalMode & 128) {        // /KEYS
     puts("****TERMINAL KEYS\n");

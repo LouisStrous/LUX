@@ -37,6 +37,8 @@ enum GplotStatus
 
 static GnuPlot gp;
 
+float plims[4];
+
 int32_t lux_gcommand(ArgumentCount narg, Symbol ps[])
 {
   if (narg > 1 && ps[1]) {
@@ -282,8 +284,6 @@ int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, Symbol ps[])
     if (!done)
       gp.send("set title\n");
 
-    extern float plims[];
-
     // prevent gnuplot widening the plot to the nearest round values
     gp.send("set auto fix\n");
 
@@ -460,8 +460,6 @@ int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, Symbol ps[])
       type_text = oss.str();
     }
 
-    extern int current_pen;
-
     std::ostringstream using_oss;
     using_oss << "using ";
 
@@ -477,8 +475,7 @@ int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, Symbol ps[])
       break;
     }
 
-    using_oss << " with " << with_text
-              << " lw " << current_pen;
+    using_oss << " with " << with_text;
 
     if (!type_text.empty())
       using_oss << " " << type_text;

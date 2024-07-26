@@ -140,8 +140,7 @@ int32_t        anacrunchrun(uint8_t *, int16_t [], int32_t, int32_t, int32_t, in
 int32_t        anacrunch32(uint8_t *, int32_t [], int32_t, int32_t, int32_t, int32_t);
 #endif
 
-int32_t        byte_count;                // also used by tape.c, which is only
-                                // included if HAVE_SYS_MTIO_H is defined
+int32_t        byte_count;
 
 void read_a_number_fp(FILE *, Scalar *, Symboltype *);
 

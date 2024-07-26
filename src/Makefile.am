@@ -60,10 +60,7 @@ nonbind_sources = \
 	calendar.hh\
 	cdiv.hh\
 	cluster.cc\
-	color.cc\
 	constellations.hh\
-	contour.cc\
-	coord.cc\
 	crunch.cc\
 	decomp.cc\
 	dmalloc.hh\
@@ -97,12 +94,9 @@ nonbind_sources = \
 	gslpp_sort.hh\
 	gslpp_sort_vector.hh\
 	gslpp_vector.hh\
-	hersh.cc\
-	hershey.hh\
 	history.c\
 	history.h\
 	ident.cc\
-	idl.cc\
 	install.cc\
 	install.hh\
 	intmath.cc\
@@ -115,14 +109,12 @@ nonbind_sources = \
 	lux_func_if.cc\
 	lux_func_if.hh\
 	lux_structures.hh\
-	luxcon.cc\
 	luxdefs.hh\
 	luxparser.hh\
 	luxparser.yy\
 	luxsofa.cc\
 	matrix.cc\
 	memck.cc\
-	menu.cc\
 	oiio.cc\
 	once.hh\
 	orientation.cc\
@@ -131,12 +123,9 @@ nonbind_sources = \
 	paerror.cc\
 	permutations.cc\
 	permutations.hh\
-	plots.cc\
 	poisson.cc\
-	post.cc\
 	precession.cc\
 	printf_extensions.cc\
-	projection.cc\
 	random.cc\
 	readline.c\
 	readline.h\
@@ -153,22 +142,16 @@ nonbind_sources = \
 	subsc.cc\
 	symbols.cc\
 	symbols.hh\
-	tape.cc\
 	tense.cc\
 	terminal.cc\
 	terminfo.cc\
 	terminfo.hh\
 	topology.cc\
-	trace_decoder_lux.cc\
 	types.hh\
-	visualclass.c\
-	visualclass.h\
 	vsop.cc\
 	vsop.hh\
 	vsop87adata.cc\
-	vsop87cdata.cc\
-	xport.cc\
-	zoom.cc
+	vsop87cdata.cc
 
 bin_PROGRAMS = lux
 lux_SOURCES = lux.cc

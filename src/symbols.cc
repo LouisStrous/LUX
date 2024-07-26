@@ -34,18 +34,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 #include "cdiv.hh"
 #include "editor.hh"                // for BUFSIZE
-extern "C" {
-#include "visualclass.h"
-}
-#if HAVE_LIBX11
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#endif
 
 void        zerobytes(void *, int32_t), updateIndices(void), symdumpswitch(int32_t, int32_t);
-#if HAVE_LIBX11
-void        xsynchronize(int32_t);
-#endif
 int32_t        installString(char const*), fixContext(int32_t, int32_t), lux_replace(int32_t, int32_t);
 char *fmttok(char *);
 int32_t Sprintf_tok(char *, ...);
@@ -179,7 +169,31 @@ int32_t transfer(int32_t symbol)
   }
   return symbol;
 }
-//-----------------------------------------------------
+ //-------------------------------------------------------------------------
+Symbol
+lux_limits(ArgumentCount narg, Symbol ps[]) //set or examine limits
+{
+  extern float plims[4];
+
+  if (narg == 0)
+  { printf("current plot range x axis %f to %f\n", plims[0], plims[1]);
+    printf("                   y axis %f to %f\n", plims[2], plims[3]);
+    printf("                   z axis %f to %f\n", plims[4], plims[5]);
+    return 1; }
+  if (narg > 0)
+    plims[0] = float_arg(ps[0]);
+  if (narg > 1)
+    plims[1] = float_arg(ps[1]);
+  if (narg > 2)
+    plims[2] = float_arg(ps[2]);
+  if (narg > 3)
+    plims[3] = float_arg(ps[3]);
+  if (narg > 4)
+    plims[4] = float_arg(ps[4]);
+  if (narg > 5)
+    plims[5] = float_arg(ps[5]);
+ return 1;
+}
 int32_t lux_convert(int32_t, int32_t [], Symboltype, int32_t);
 int32_t lux_convertsym(ArgumentCount narg, Symbol ps[])
      // Y = CONVERT(X, TYPE) returns a copy of X converted to data type
@@ -2762,48 +2776,10 @@ int32_t lux_set(ArgumentCount narg, Symbol ps[])
  governs aspects of the behaviour of various routines.  LS 11mar98 */
 {
   extern int32_t        setup;
-#if HAVE_LIBX11
-  char        *string;
-  char const* visualNames[] = { "StaticGray", "StaticColor", "TrueColor",
-                           "GrayScale", "PseudoColor", "DirectColor",
-                           "SG", "SC", "TC", "GS", "PC", "DC",
-                           "GSL", "CSL", "CSI", "GDL", "CDL", "CDI" };
-  int32_t        visualClassCode[] = { StaticGray, StaticColor, TrueColor,
-                              GrayScale, PseudoColor, DirectColor };
-  int32_t        setup_x_visual(int32_t), i;
-  extern int32_t        connect_flag;
-  extern Visual        *visual;
-#endif
 
   if (narg) {
     if (*ps) {                        // VISUAL
-#if HAVE_LIBX11
-      if (!symbolIsStringScalar(*ps))
-        return cerror(NEED_STR, *ps);
-      string = string_value(*ps);
-      for (i = 0; i < 18; i++)
-        if (!strcasecmp(string, visualNames[i])) // found it
-          break;
-      if (i == 18) {                // wasn't in the list
-        printf("Unknown visual name, \"%s\".\nSelect from:\n", string);
-        for (i = 0; i < 12; i++)
-          printf("%s ", visualNames[i]);
-        putchar('\n');
-        return luxerror("Invalid visual", *ps);
-      }
-      i = visualClassCode[i % 6];
-      if (connect_flag) {
-        if (i == visualclass(visual))
-          return LUX_OK;        // already use the selected visual class
-        else
-          return luxerror("Already using a %s visual.", 0,
-                          visualNames[visualclass(visual)]);
-      }
-      if (setup_x_visual(i) == LUX_ERROR)
-        return LUX_ERROR;
-#else
       return luxerror("Need X11 package to set the visual", 0);
-#endif
     }
   }
   if (internalMode & 1)                // /SET: copy exactly
@@ -2825,11 +2801,6 @@ int32_t lux_set(ArgumentCount narg, Symbol ps[])
         puts("/YREVERSEIMG: Image origin in upper left-hand corner.");
       if (setup & 16)
         puts("/OLDVERSION: Backward compatibility mode.");
-#if HAVE_LIBX11
-      if (setup & 32)
-        puts("/ZOOM: Automatic image zoom.");
-#endif
-      if (setup & 256)
         puts("/ALLOWPROMPTS: Allow LUX prompts at the beginning of input lines.");
       if (setup & 512)
         puts("/XSYNCHRONIZE: Graphics output occurs immediately.");
@@ -2839,10 +2810,6 @@ int32_t lux_set(ArgumentCount narg, Symbol ps[])
       puts("No SETUP selections.");
   }
   allowPromptInInput = (setup & 256)? 1: 0;
-#if HAVE_LIBX11
-  if (internalMode & 2048)
-    xsynchronize(setup & 512? 1: 0);
-#endif
   return LUX_ONE;
 }
 //-------------------------------------------------------------------------

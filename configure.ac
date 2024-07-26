@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([lux], [1.4.1], [lux@quae.nl])
+AC_INIT([lux], [1.5.0], [lux@quae.nl])
 AM_EXTRA_RECURSIVE_TARGETS([debug])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_LANG([C++])
@@ -39,7 +39,6 @@ AC_CHECK_LIB([m], [sin])
 AC_CHECK_LIB([jpeg], [jpeg_start_decompress])
 AC_CHECK_LIB([gslcblas], [cblas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_sf_bessel_J0])
-AC_CHECK_LIB([X11], [XOpenDisplay])
 AC_CHECK_LIB([readline], [readline])
 AC_CHECK_LIB([sofa_c], [iauBi00])
 AC_CHECK_LIB([calceph], [calceph_open])

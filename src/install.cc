@@ -92,25 +92,25 @@ static char     installing = 1;
 typedef int32_t LuxRoutine(int32_t, int32_t*);
 
 extern LuxRoutine lux_area, lux_area2, lux_arestore, lux_astore,
-  lux_atomize, lux_batch, lux_byte_inplace, lux_callig,
+  lux_atomize, lux_batch, lux_byte_inplace,
   lux_cdouble_inplace, lux_cfloat_inplace, lux_chdir, lux_close,
-  lux_cluster, lux_contour, lux_coordmap, lux_coordtrf, lux_crunch,
+  lux_cluster, lux_coordmap, lux_crunch,
   lux_crunchrun, lux_cubic_spline_extreme, lux_debug, lux_decomp,
   lux_decrunch, lux_default, lux_delete, lux_disableNewline,
   lux_distr, lux_double_inplace, lux_dsolve, lux_dump, lux_dump_lun,
-  lux_dump_stack, lux_echo, lux_enableNewline, lux_endian, lux_erase,
+  lux_dump_stack, lux_echo, lux_enableNewline, lux_endian,
   lux_error, lux_execute, lux_extract_bits, lux_fade, lux_fade_init,
   lux_fcrunwrite, lux_fcwrite, lux_fftshift, lux_file_to_fz,
   lux_fileptr, lux_fileread, lux_filewrite, lux_fits_read,
   lux_fits_write, lux_float_inplace, lux_format_set, lux_fprint,
   lux_fprintf, lux_fread, lux_freadf, lux_freads, lux_fzhead,
   lux_fzinspect, lux_fzread, lux_fzwrite, lux_getmin9, lux_help,
-  lux_hex, lux_idlrestore, lux_inserter, lux_int64_inplace,
+  lux_hex, lux_inserter, lux_int64_inplace,
   lux_limits, lux_list, lux_long_inplace, lux_manualterm,
   lux_multisieve, lux_noecho, lux_noop, lux_one, lux_openr, lux_openu,
-  lux_openw, lux_oplot, lux_orientation, lux_pdev, lux_pen,
-  lux_pencolor, lux_plot, lux_pointer, lux_pop, lux_postimage,
-  lux_postraw, lux_printf, lux_push, lux_quit, lux_read, lux_readarr,
+  lux_openw, lux_orientation,
+  lux_pointer, lux_pop,
+  lux_printf, lux_push, lux_quit, lux_read, lux_readarr,
   lux_readf, lux_readu, lux_record, lux_redim,
   lux_redirect_diagnostic, lux_replace_values, lux_rewindf, lux_sc,
   lux_scb, lux_set, lux_setenv, lux_shift, lux_show, lux_show_func,
@@ -118,13 +118,12 @@ extern LuxRoutine lux_area, lux_area2, lux_arestore, lux_astore,
   lux_subshift, lux_subshiftc, lux_swab, lux_swaphalf, lux_switch,
   lux_system, lux_trace, lux_type, lux_ulib, lux_wait,
   lux_watch, lux_word_inplace, lux_writeu, lux_zap, lux_zapnan,
-  lux_zero, postrelease, showstats, site;
+  lux_zero, showstats, site;
 
 int32_t         lux_name();
 
 #if DEVELOP
-extern LuxRoutine lux_fitUnitCube, lux_projection, lux_plot3d,
-  lux_trajectory, lux_getmin2, lux_projectmap;
+extern LuxRoutine lux_trajectory, lux_getmin2, lux_projectmap;
 #endif
 
 #if DEBUG
@@ -134,53 +133,17 @@ extern LuxRoutine checkList, lux_whereisAddress, lux_show_temps,
 
 extern LuxRoutine lux_read_jpeg6b, lux_write_jpeg6b;
 
-#if HAVE_SYS_MTIO_H
-extern LuxRoutine lux_tape_status, lux_rewind, lux_weof, lux_unload,
-  lux_skipr, lux_skipf, lux_taprd, lux_tapwrt, lux_tapebufin,
-  lux_tapebufout, lux_wait_for_tape;
-#endif
-
 extern LuxRoutine lux_gifread, lux_gifwrite;
 
-extern LuxRoutine lux_menu, lux_menu_hide, lux_menu_item,
-  lux_menu_kill, lux_menu_pop, lux_menu_read,
-  lux_register_event, lux_window, lux_xcopy,
-  lux_xdelete, lux_xdrawline, lux_xevent, lux_xflush,
-  lux_xfont,
-  lux_xlabel, lux_xloop, lux_xopen, lux_xplace,
-  lux_xport, lux_xpurge, lux_xquery, lux_xsetaction,
-  lux_xsetbackground, lux_xsetforeground, lux_xtv,
-  lux_xtvlct, lux_xtvmap, lux_xtvraw, lux_xtvread,
-  lux_xymov, lux_wait_for_menu, lux_xclose, lux_xraise,
-  lux_xcursor, lux_xanimate, lux_xzoom, lux_show_visuals,
-  lux_zoom, lux_xtvplane, lux_threecolors, lux_tv3,
-  lux_xinvertline, lux_xinvertarc, lux_xdrawarc, lux_colorComponents,
-  lux_colorstogrey, lux_pixelsto8bit;
-
-#if MOTIF
-extern LuxRoutine lux_xmalignment, lux_xmarmcolor, lux_xmattach,
-  lux_xmattach_relative, lux_xmbackgroundcolor,
-  lux_xmbordercolor, lux_xmborderwidth, lux_xmbottomshadowcolor,
-  lux_xmdestroy, lux_xmdrawinglink, lux_xmfont,
-  lux_xmforegroundcolor, lux_xmgetpixmap, lux_xmgetwidgetsize,
-  lux_xmlistadditem, lux_xmlistdeleteall, lux_xmlistdeleteitem,
-  lux_xmlistfunc, lux_xmlistselect, lux_xmlistsubr,
-  lux_xmmessage, lux_xmposition, lux_xmprompt,
-  lux_xmscaleresetlimits, lux_xmscalesetvalue,
-  lux_xmselectcolor, lux_xmsensitive, lux_xmsetcolors,
-  lux_xmsetlabel, lux_xmsetmargins, lux_xmsetmnemonic,
-  lux_xmsetmodal, lux_xmsetoptionselection, lux_xmsetpixmap,
-  lux_xmtextappend, lux_xmtexterase, lux_xmtextfieldseteditable,
-  lux_xmtextfieldsetstring, lux_xmtextseteditable,
-  lux_xmtextsetposition, lux_xmtextsetrowcolumnsize,
-  lux_xmtextsetstring, lux_xmtogglesetstate,
-  lux_xmtopshadowcolor, lux_xtloop, lux_xtmanage,
-  lux_xtunmanage, lux_xmquery, lux_xmscrollbarsetvalues,
-  lux_xmsetdirectory, lux_xmsettitle, lux_xmset_text_output,
-  lux_xmsize, lux_xmtextfieldsetmaxlength, lux_xtpopup,
-  lux_xtpopdown, lux_xmraise, lux_xmresizepolicy, lux_xmtextreplace,
-  lux_xmgetwidgetposition, lux_xminfo;
-#endif
+extern LuxRoutine lux_menu, lux_menu_hide, lux_menu_item, lux_menu_kill,
+  lux_menu_pop, lux_menu_read, lux_register_event, lux_xcopy, lux_xdelete,
+  lux_xdrawline, lux_xevent, lux_xflush, lux_xfont, lux_xlabel, lux_xloop,
+  lux_xopen, lux_xplace, lux_xport, lux_xpurge, lux_xquery, lux_xsetaction,
+  lux_xsetbackground, lux_xsetforeground, lux_xtv, lux_xtvlct, lux_xtvmap,
+  lux_xtvraw, lux_xtvread, lux_xymov, lux_wait_for_menu, lux_xclose, lux_xraise,
+  lux_xcursor, lux_xanimate, lux_xzoom, lux_show_visuals, lux_zoom,
+  lux_xtvplane, lux_threecolors, lux_tv3, lux_xinvertline, lux_xinvertarc,
+  lux_xdrawarc, lux_colorComponents, lux_colorstogrey, lux_pixelsto8bit;
 
 extern LuxRoutine lux_readorbits, lux_showorbits;
 
@@ -188,10 +151,6 @@ extern LuxRoutine peek;
 extern LuxRoutine lux_breakpoint;
 extern LuxRoutine insert;
 LuxRoutine lux_restart;
-
-#if MOTIF
-int32_t         lux_zeroifnotdefined(), lux_compile_file();     // browser
-#endif
 
 #define MAX_ARG         100
 
@@ -280,13 +239,9 @@ InternalRoutine         subroutine_table[] = {
   { "breakpoint", 0, 1, lux_breakpoint,             // install.c
     "0set:1enable:2disable:3delete:4list:8variable" },
   { "byte",     1, MAX_ARG, lux_byte_inplace, 0, }, // symbols.c
-  { "c",        1, 7, lux_callig,                   // hersh.c
-    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
 #if CALCULATOR
   { "calculator", 0, 0, lux_calculator, 0 }, // calculator.c
 #endif
-  { "callig",   1, 7, lux_callig, // hersh.c
-    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl" },
   { "cdouble",  1, MAX_ARG, lux_cdouble_inplace, 0 }, // symbols.c
   { "cfloat",   1, MAX_ARG, lux_cfloat_inplace, 0 },  // symbols.c
   { "chdir",    0, 1, lux_chdir, "1show" },           // files.c
@@ -297,18 +252,6 @@ InternalRoutine         subroutine_table[] = {
   { "cluster",  2, 8, lux_cluster, // cluster.c
     "|32|:centers:index:size:sample:empty:maxit:rms:1update:2iterate"
     ":4vocal:8quick:16record:32ordered" },
-#if HAVE_X11
-  { "colorcomponents", 4, 4, lux_colorComponents, 0 }, // color.c
-  { "colorstogrey", 1, 1, lux_colorstogrey, 0 },       // color.c
-#if MOTIF
-  { "compile_file", 1, 1, lux_compile_file, 0 }, // motifextra.c
-#endif
-#endif
-  { "contour",  1, 6, lux_contour, // contour.c
-    "image:levels:xmin:xmax:ymin:ymax:style:dashsize:1autocontour"
-    ":2usercontour" },
-  { "coordtrf", 2, 4, lux_coordtrf, // coord.c
-   "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:8todvi:16todev:24toimg:32toplt:40torim:48torpl:56tox11" },
   { "crunch",   3, 3, lux_crunch, 0 }, // crunch.c
   { "crunchrun",        3, 3, lux_crunchrun, 0 }, // crunch.c
   { "cspline_extr", 5, 8, lux_cubic_spline_extreme, "1keepdims:2periodic:4akima::::pos:minpos:minval:maxpos:maxval" }, // fun3.c
@@ -329,8 +272,6 @@ InternalRoutine         subroutine_table[] = {
   { "dump_stack", 0, 0, lux_dump_stack, 0 }, // strous.c
   { "echo",     0, 1, lux_echo, 0 },         // symbols.c
   { "endian",   1, 1, lux_endian, 0 },       // strous.c
-  { "erase",    0, 5, lux_erase,             // plots.c
-    "0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11:64screen:128postscript:192pdev" },
   { "execute",  1, 1, lux_execute, "1main" },         // execute.c
   { "exit",     0, 1, lux_quit, 0 },                  // fun1.c
   { "extract_bits", 4, 4, lux_extract_bits, 0 },      // fun3.c
@@ -351,9 +292,6 @@ InternalRoutine         subroutine_table[] = {
   { "fileread", 5, 5, lux_fileread, 0 },                     // files.c
   { "filetofz", 3, 3, lux_file_to_fz, 0 },                   // files.c
   { "filewrite", 2, 3, lux_filewrite, 0 },                   // files.c
-#if DEVELOP
-  { "fit3dcube", 0, 0, lux_fitUnitCube, 0 }, // projection.c
-#endif
   { "fits_read", 2, 7, lux_fits_read, // files.c
     "|1|1translate:2rawvalues::::::blank" },
   { "fits_write", 2, 4, lux_fits_write, "1vocal" },       // files.c
@@ -375,12 +313,8 @@ InternalRoutine         subroutine_table[] = {
   { "getmin9",  3, 3, lux_getmin9, 0 },                   // fun4.c
   { "gifread",  2, 3, lux_gifread, 0 },                   // gifread_lux.c
   { "gifwrite", 2, 3, lux_gifwrite, 0 },                  // gifwrite_lux.c
-#if HAVE_X11
-  { "hairs",    0, 0, lux_xplace, 0 },                    // xport.c
-#endif
   { "help",     0, 1, lux_help, "1manual" },              // strous.c
   { "hex",      1, MAX_ARG, lux_hex, 0 },                 // files.c
-  { "idlrestore", 1, 1, lux_idlrestore, 0 },              // idl.c
   { "info",     0, 0, site,                               // site.c
     "1table:2time:4platform:8packages:16warranty:32copy"
     ":64bugs:128keys:255all" },
@@ -392,14 +326,6 @@ InternalRoutine         subroutine_table[] = {
   { "limits",   0, 6, lux_limits, 0 },                           // plots.c
   { "list",     1, 1, lux_list, 0 },                             // ident.c
   { "long",     1, MAX_ARG, lux_long_inplace, 0 },               // symbols.c
-#if HAVE_X11
-  { "menu",     1, MAX_ARG, lux_menu, 0 },                       // menu.c
-  { "menuhide", 1, 1, lux_menu_hide, 0 },                        // menu.c
-  { "menuitem", 3, 3, lux_menu_item, 0 },                        // menu.c
-  { "menupop",  1, MAX_ARG, lux_menu_pop, 0 },                   // menu.c
-  { "menuread", 4, 4, lux_menu_read, 0 },                        // menu.c
-  { "menuzap",  1, 1, lux_menu_kill, 0 },                        // menu.c
-#endif
   { "multisieve", 4, 4, lux_multisieve, 0 },                     // strous2.c
 #if DEBUG
   { "newallocs", 0, 1, lux_newallocs, "1reset" }, // debug.c
@@ -409,41 +335,15 @@ InternalRoutine         subroutine_table[] = {
   { "openr",    2, 2, lux_openr, "1get_lun" }, // files.c
   { "openu",    2, 2, lux_openu, "1get_lun" }, // files.c
   { "openw",    2, 2, lux_openw, "1get_lun" }, // files.c
-  { "oplot",    1, 13, lux_oplot,              // plots.c
-    "1dvi:2dev:3img:4plt:5rim:6rpl:128whole:256clipbars:xdata:ydata"
-    ":symbol:line:xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks"
-    ":xbarsize:ybarsize" },
   { "orientation", 3, 8, lux_orientation, // orientation.c
     "1vocal:2getj:0parallel:4perpendicular:::orientation:values"
     ":wavenumber:grid:aspect:order" },
-  { "pdev",     0, 1, lux_pdev, 0 },                          // plots.c
   { "peek",     1, 2, peek, 0 },                              // strous.c
-  { "pen",      0, 2, lux_pen, "width:color:1standardgray" }, // plots.c
-  { "pencolor", 0, 1, lux_pencolor, 0 },                      // plots.c
-#if HAVE_X11
-  { "pixelsto8bit", 3, 3, lux_pixelsto8bit, 0 },              // color.c
-#endif
-  { "plot",     1, 15, lux_plot,                              // plots.c
-    "1dvi:2dev:3img:4plt:5rim:6rpl:64keep:128whole:256clipbars"
-    ":1024lii:1280lio:1536loi:1792loo:xdata:ydata:symbol:line"
-    ":xtitle:ytitle:title:dashsize:xerrors:yerrors:breaks:xbarsize"
-    ":ybarsize:xfmt:yfmt" },
-#if DEVELOP
-  { "plot3d",   1, 1, lux_plot3d, "1hide:2cube" }, // projection.c
-#endif
   { "pointer",  2, 2, lux_pointer, // symbols.c
     "+:1function:2subroutine:4internal:8main" },
   { "pop",      1, MAX_ARG, lux_pop, "%1%num" },                  // strous.c
-  { "postimage", 1, 5, lux_postimage, 0 },                        // plots.c
-  { "postraw",  1, 1, lux_postraw, 0 },                           // plots.c
-  { "postrel",  0, 4, postrelease, 0 },                           // plots.c
-  { "postrelease", 0, 4, postrelease, 0 },                        // plots.c
   { "print",    1, MAX_ARG, lux_type, "1join:2raw:4separate" },   // files.c
   { "printf",   1, MAX_ARG, lux_printf, "1join:2raw:4separate" }, // files.c
-#if DEVELOP
-  { "projection", 0, MAX_ARG, lux_projection, // projection.c
-    "1reset:2original::translate:rotate:scale:perspective:oblique" },
-#endif
   { "push",     1, MAX_ARG, lux_push, 0 },                        // strous.c
   { "quit",     0, 1, lux_quit, 0 },                              // fun1.c
   { "read",     1, MAX_ARG, lux_read, "1askmore:2word:4flush" },  // files.c
@@ -457,27 +357,15 @@ InternalRoutine         subroutine_table[] = {
   { "replace",  3, 3, lux_replace_values, 0 },                    // strous2.c
   { "restart",  0, 0, lux_restart, 0 },                           // install.c
   { "restore",  2, 3, lux_fzread, "1printheader" },               // files.c
-#if HAVE_SYS_MTIO_H
-  { "rewind",   1, 1, lux_rewind, 0 }, // tape.c
-#endif
   { "rewindf",  1, 1, lux_rewindf, 0 },                    // files.c
   { "s",        0, 1, lux_show, 0 },                       // fun1.c
   { "sc",       3, 3, lux_sc, 0 },                         // fun3.c
   { "scanf",    2, MAX_ARG, lux_freadf, "+1countspaces" }, // files.c
   { "scb",      3, 3, lux_scb, "1even:2odd" },             // fun3.c
   { "set",      0, 1, lux_set,                             // symbols.c
-    "visual:1set:2reset:4showalloc:8whitebackground:16ulimcoords"
-    ":32yreverseimg:64oldversion:128zoom:1024allowprompts"
-    ":2048xsynchronize:4096parsesilent" },
-#if HAVE_X11
-  { "setbackground", 1, 2, lux_xsetbackground, 0 },       // xport.c
-  { "setbg",    1, 2, lux_xsetbackground, 0 },            // xport.c
-#endif
+    ":1set:2reset:4showalloc:64oldversion:1024allowprompts"
+    ":4096parsesilent" },
   { "setenv",   1, 1, lux_setenv, 0 },                    // files.c
-#if HAVE_X11
-  { "setfg",    1, 2, lux_xsetforeground, 0 },            // xport.c
-  { "setforeground", 1, 2, lux_xsetforeground, 0 },       // xport.c
-#endif
   { "shift",    1, 4, lux_shift, ":::blank:1translate" }, // strous2.c
   { "show",     0, 1, lux_show, 0 },                      // fun1.c
   { "showorbits", 0, 0, lux_showorbits, 0 },              // astron.c
@@ -489,13 +377,6 @@ InternalRoutine         subroutine_table[] = {
   { "show_subr", 0, 1, lux_show_subr, "1parameters" }, // symbols.c
 #if DEBUG
   { "show_temps", 0, 0, lux_show_temps, 0 }, // symbols.c
-#endif
-#if HAVE_X11
-  { "show_visuals", 0, 0, lux_show_visuals, 0 }, // xport.c
-#endif
-#if HAVE_SYS_MTIO_H
-  { "skipf",    1, 2, lux_skipf, 0 }, // tape.c
-  { "skipr",    1, 2, lux_skipr, 0 }, // tape.c
 #endif
   { "spawn",    1, 1, lux_spawn, "1silent" },                   // files.c
   { "sscanf",   2, MAX_ARG, lux_freads, "1countspaces" },       // files.c
@@ -509,185 +390,32 @@ InternalRoutine         subroutine_table[] = {
   { "swaphalf", 1, 1, lux_swaphalf, 0 },                        // strous2.c
   { "switch",   2, 2, lux_switch, 0 },                          // symbols.c
   { "t",        1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
-#if HAVE_SYS_MTIO_H
-  { "tapebufin", 2, 5, lux_tapebufin, 0 },     // tape.c
-  { "tapebufout", 2, 5, lux_tapebufout, 0 },   // tape.c
-  { "tape_status", 0, 0, lux_tape_status, 0 }, // tape.c
-  { "taprd",    2, 2, lux_taprd, 0 },          // tape.c
-  { "tapwrt",   2, 2, lux_tapwrt, 0 },         // tape.c
-#endif
-#if HAVE_X11
-  { "threecolors", 0, 1, lux_threecolors, 0 }, // xport.c
-#endif
   { "trace",    0, 1, lux_trace,               // install.c
     "1file:2loop:4braces:8routine:143all:16showstats:32cputime"
     ":64showexec:128enter" },
 #if DEVELOP
   { "trajectory", 3, 7, lux_trajectory, 0 }, // strous3.c
 #endif
-#if HAVE_X11
-  { "tv",       1, 5, lux_xtv,  // xport.c
-    ":x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
-    ":64screen:128postscript:192pdev:256plotwindow:512zoom"
-    ":1024center:16384bit24" },
-  { "tv3",      1, 7, lux_tv3,  // xport.c
-    ":two:three:x:y:window:scale:0dep:1dvi:2dev:3img:4plt:5rim"
-    ":6rpl:7x11:64screen:128postscript:192pdev:256plotwindow"
-    ":512zoom:1024center" },
-  { "tvlab",    3, 4, lux_xlabel, 0 },            // xport.c
-  { "tvlct",    3, 3, lux_xtvlct, "1fixedsize" }, // xport.c
-  { "tvmap",    1, 5, lux_xtvmap,                 // xport.c
-    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
-    ":64screen:128postscript:192pdev:256plotwindow:512zoom" },
-  { "tvplane",  1, 5, lux_xtvplane, 0 }, // xport.c
-  { "tvraw",    1, 5, lux_xtvraw,        // xport.c
-    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
-    ":64screen:128postscript:192pdev:256plotwindow:512zoom" },
-  { "tvread",   0, 5, lux_xtvread, "1greyscale" },              // xport.c
-#endif
   { "ty",       1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
   { "type",     1, MAX_ARG, lux_type, "1join:2raw:4separate" }, // files.c
   { "ulib",     0, 1, lux_ulib, 0 },                            // files.c
-#if HAVE_SYS_MTIO_H
-  { "unload",   1, 1, lux_unload, 0 }, // tape.c
-#endif
   { "verify",   0, 1, lux_verify, 0 },             // install.c
   { "wait",     1, 1, lux_wait, 0 },               // fun2.c
-#if HAVE_X11
-  { "wait_for_menu", 0, 1, lux_wait_for_menu, 0 }, // menu.c
-#endif
-#if HAVE_SYS_MTIO_H
-  { "wait_for_tape", 1, 1, lux_wait_for_tape, 0 }, // tape.c
-#endif
   { "watch",    1, 1, lux_watch, "1delete:2list" }, // install.c
-#if HAVE_SYS_MTIO_H
-  { "weof",     1, 1, lux_weof, 0 }, // tape.c
-#endif
 #if DEBUG
   { "where",    1, 1, lux_whereisAddress, "1cut" }, // debug.c
 #endif
-  { "window",   0, 6, lux_window, 0 },         // plots.c
   { "word",     1, 1, lux_word_inplace, 0 },   // symbols.c
   { "writeu",   2, MAX_ARG, lux_writeu, 0 },   // files.c
   { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, // jpeg.c
-#if HAVE_X11
-  { "xanimate", 1, 6, lux_xanimate, ":::fr1:fr2:frs:1time" }, // xport.c
-  { "xclose",   0, 0, lux_xclose, 0 },                        // xport.c
-  { "xcopy",    2, 8, lux_xcopy, 0 },                         // xport.c
-  { "xcursor",  2, 4, lux_xcursor, 0 },                       // xport.c
-  { "xdelete",  1, 1, lux_xdelete, 0 },                       // xport.c
-  { "xdrawarc", 4, 7, lux_xdrawarc, 0 },                      // xport.c
-  { "xdrawline", 4, 5, lux_xdrawline, 0 },                    // xport.c
-  { "xevent",   0, 0, lux_xevent, 0 },                        // xport.c
-  { "xflush",   0, 0, lux_xflush, 0 },                        // xport.c
-  { "xfont",    1, 2, lux_xfont, 0 },                         // xport.c
-  { "xinvertarc", 4, 7, lux_xinvertarc, 0 },                  // xport.c
-  { "xinvertline", 4, 5, lux_xinvertline, 0 },                // xport.c
-  { "xlabel",   3, 4, lux_xlabel, 0 },                        // xport.c
-  { "xloop",    0, 1, lux_xloop, 0 },                         // menu.c
-#if MOTIF
-  { "xmalignment", 2, 2, lux_xmalignment, 0 },                       // motif.c
-  { "xmarmcolor", 2, 2, lux_xmarmcolor, 0 },                         // motif.c
-  { "xmattach", 6, 6, lux_xmattach, 0 },                             // motif.c
-  { "xmattach_relative", 5, 5, lux_xmattach_relative, 0 },           // motif.c
-  { "xmbackgroundcolor", 2, 2, lux_xmbackgroundcolor, 0 },           // motif.c
-  { "xmbordercolor", 2, 2, lux_xmbordercolor, 0 },                   // motif.c
-  { "xmborderwidth", 2, 2, lux_xmborderwidth, 0 },                   // motif.c
-  { "xmbottomshadowcolor", 2, 2, lux_xmbottomshadowcolor, 0 },       // motif.c
-  { "xmdestroy", 1, 1, lux_xmdestroy, 0 },                           // motif.c
-  { "xmdrawinglink", 2, 2, lux_xmdrawinglink, 0 },                   // motif.c
-  { "xmfont",   2, 2, lux_xmfont, 0 },                               // motif.c
-  { "xmforegroundcolor", 2, 2, lux_xmforegroundcolor, 0 },           // motif.c
-  { "xmgetpixmap", 2, 2, lux_xmgetpixmap, 0 },                       // motif.c
-  { "xmgetwidgetposition", 3, 3, lux_xmgetwidgetposition, 0 },       // motif.c
-  { "xmgetwidgetsize", 3, 3, lux_xmgetwidgetsize, 0 },               // motif.c
-  { "xminfo",   1, 1, lux_xminfo, 0 },                               // motif.c
-  { "xmlistadditem", 2, 3, lux_xmlistadditem, 0 },                   // motif.c
-  { "xmlistdeleteall", 1, 1, lux_xmlistdeleteall, 0 },               // motif.c
-  { "xmlistdeleteitem", 2, 2, lux_xmlistdeleteitem, 0 },             // motif.c
-  { "xmlistfunc", 1, 1, lux_xmlistfunc, 0 },                         // motif.c
-  { "xmlistselect", 2, 3, lux_xmlistselect, 0 },                     // motif.c
-  { "xmlistsubr", 1, 1, lux_xmlistsubr, 0 },                         // motif.c
-  { "xmmessage", 1, 5, lux_xmmessage, 0 },                           // motif.c
-  { "xmposition", 3, 5, lux_xmposition, 0 },                         // motif.c
-  { "xmprompt", 3, 8, lux_xmprompt, 0 },                             // motif.c
-  { "xmquery",  1, 1, lux_xmquery, 0 },                              // motif.c
-  { "xmraise",  1, 1, lux_xmraise, 0 },                              // motif.c
-  { "xmresizepolicy",   2, 2, lux_xmresizepolicy, 0 },               // motif.c
-  { "xmscaleresetlimits", 3, 4, lux_xmscaleresetlimits, 0 },         // motif.c
-  { "xmscalesetvalue", 2, 2, lux_xmscalesetvalue, 0 },               // motif.c
-  { "xmscrollbarsetvalues", 1, 5, lux_xmscrollbarsetvalues, 0 },     // motif.c
-  { "xmselectcolor", 2, 2, lux_xmselectcolor, 0 },                   // motif.c
-  { "xmsensitive", 2, 2, lux_xmsensitive, 0 },                       // motif.c
-  { "xmsetcolors", 2, 2, lux_xmsetcolors, 0 },                       // motif.c
-  { "xmsetdirectory", 2, 2, lux_xmsetdirectory, 0 },                 // motif.c
-  { "xmsetlabel", 2, 2, lux_xmsetlabel, 0 },                         // motif.c
-  { "xmsetmargins", 3, 3, lux_xmsetmargins, 0 },                     // motif.c
-  { "xmsetmnemonic", 2, 2, lux_xmsetmnemonic, 0 },                   // motif.c
-  { "xmsetmodal", 2, 2, lux_xmsetmodal, 0 },                         // motif.c
-  { "xmsetoptionselection", 2, 2, lux_xmsetoptionselection, 0 },     // motif.c
-  { "xmsetpixmap", 2, 2, lux_xmsetpixmap, 0 },                       // motif.c
-  { "xmsettitle", 2, 2, lux_xmsettitle, 0 },                         // motif.c
-  { "xmset_text_output", 1, 1, lux_xmset_text_output, 0 },           // motif.c
-  { "xmsize",   3, 3, lux_xmsize, 0 },                               // motif.c
-  { "xmtextappend", 2, 3, lux_xmtextappend, 0 },                     // motif.c
-  { "xmtexterase", 1, 1, lux_xmtexterase, 0 },                       // motif.c
-  { "xmtextfieldseteditable", 2, 2, lux_xmtextfieldseteditable, 0 }, // motif.c
-  { "xmtextfieldsetmaxlength", 2, 2, lux_xmtextfieldsetmaxlength,    // motif.c
-    0 },
-  { "xmtextfieldsetstring", 2, 3, lux_xmtextfieldsetstring, 0 },     // motif.c
-  { "xmtextreplace", 3, 4, lux_xmtextreplace, 0 },                   // motif.c
-  { "xmtextseteditable", 2, 2, lux_xmtextseteditable, 0 },           // motif.c
-  { "xmtextsetposition", 2, 2, lux_xmtextsetposition, 0 },           // motif.c
-  { "xmtextsetrowcolumnsize", 3, 3, lux_xmtextsetrowcolumnsize, 0 }, // motif.c
-  { "xmtextsetstring", 2, 2, lux_xmtextsetstring, 0 },               // motif.c
-  { "xmtogglesetstate", 2, 3, lux_xmtogglesetstate, 0 },             // motif.c
-  { "xmtopshadowcolor", 2, 2, lux_xmtopshadowcolor, 0 },             // motif.c
-#endif
-  { "xopen",    0, 1, lux_xopen, // xport.c
-    "1private_colormap:2default_colormap:4selectvisual" },
-  { "xplace",   0, 2, lux_xplace, // xport.c
-    "1dvi:2dev:3img:4plt:5rim:6rpl:7x11" },
-  { "xport",    0, 7, lux_xport, 0 },       // xport.c
-  { "xpurge",   0, 0, lux_xpurge, 0 },      // xport.c
-  { "xquery",   0, 1, lux_xquery, 0 },      // xport.c
-  { "xraise",   1, 1, lux_xraise, 0 },      // xport.c
-  { "xregister", 0, 3, lux_register_event , // menu.c
-    "1keypress:4buttonpress:8buttonrelease:16pointermotion:32enterwindow"
-    ":64leavewindow:127allevents:128allwindows:256allmenus:512deselect"
-    "::window:menu" },
-  { "xsetaction", 0, 2, lux_xsetaction, 0 }, // xport.c
-#if MOTIF
-  { "xtloop",   0, 1, lux_xtloop, 0 },       // motif.c
-  { "xtmanage", 1, 1, lux_xtmanage, 0 },     // motif.c
-  { "xtpopdown", 1, 1, lux_xtpopdown, 0 },   // motif.c
-  { "xtpopup",  1, 1, lux_xtpopup, 0 },      // motif.c
-  { "xtunmanage", 1, 1, lux_xtunmanage, 0 }, // motif.c
-#endif
-  { "xtv",      1, 4, lux_xtv,  // xport.c
-    ":::window:scale:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
-    ":64screen:128postscript:192pdev:256plotwindow:512zoom" },
-  { "xtvread",  0, 5, lux_xtvread, "1greyscale" }, // xport.c
-  { "xwin",     0, 7, lux_xport, 0 },              // xport.c
-  { "xwindow",  0, 7, lux_xport, 0 },              // xport.c
-  { "xymov",    2, 4, lux_xymov,                   // plots.c
-    "|192|:::breaks:0dep:1dvi:2dev:3img:4plt:5rim:6rpl:7x11"
-    ":64boundingbox:128movefirst:256altdash" },
-#endif
   { "zap",      1, MAX_ARG, lux_zap, "+1pointer" }, // strous2.c
   { "zero",     1, MAX_ARG, lux_zero, 0 },          // fun1.c
-#if MOTIF
-  { "zeroifnotdefined", 1, MAX_ARG, lux_zeroifnotdefined, 0}, // motifextra.c
-#endif
   { "zeronans", 1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
-#if HAVE_X11
-  { "zoom",     1, 3, lux_zoom, "1oldcontrast" },      // zoom.c
-#endif
 };
 int32_t nSubroutine = sizeof(subroutine_table)/sizeof(InternalRoutine);
 
 extern LuxRoutine lux_abs, lux_acos, lux_arestore_f, lux_arg,
-  lux_array, lux_asin, lux_assoc, lux_astore_f, lux_atan,
+  lux_array, lux_asin, lux_astore_f, lux_atan,
   lux_atan2, lux_basin, lux_basin2, lux_beta, lux_bisect,
   lux_bmap, bytarr, lux_byte, bytfarr, lux_cbrt, cdblarr,
   cdblfarr, lux_cdmap, lux_cdouble, lux_ceil, lux_cfloat,
@@ -712,7 +440,7 @@ extern LuxRoutine lux_abs, lux_acos, lux_arestore_f, lux_arg,
   lux_fstring, lux_fzarr, lux_fzhead_f, lux_fzread_f,
   lux_fzwrite_f, lux_gamma, lux_generalfit, lux_get_lun,
   lux_getenv, lux_gridmatch, lux_gsmooth, lux_hamming, lux_hilbert,
-  lux_histr, lux_identify_file, lux_idlread_f,
+  lux_histr, lux_identify_file,
   lux_imaginary, lux_incomplete_beta, lux_incomplete_gamma,
   lux_index, lux_indgen, lux_inpolygon, intarr, int64arr,
   int64farr, intfarr, lux_int64,
@@ -748,7 +476,7 @@ extern LuxRoutine lux_abs, lux_acos, lux_arestore_f, lux_arg,
   lux_symbol_memory, lux_symbol_number, lux_symclass,
   lux_symdtype, lux_systime, lux_table, lux_tai_from_date,
   lux_tan, lux_tanh, lux_temp, lux_tense, lux_tense_curve,
-  lux_tense_loop, lux_time, lux_total, lux_trace_decoder,
+  lux_tense_loop, lux_time, lux_total,
   lux_trend, lux_tri_name_from_tai, lux_typeName, lux_upper,
   lux_variance, lux_varname, lux_voigt, lux_wait_for_menu,
   lux_wmap, lux_word, lux_y0, lux_y1, lux_yn,
@@ -773,36 +501,9 @@ extern LuxRoutine lux_project, lux_bsmooth, lux_compile,
 
 extern LuxRoutine lux_gifread_f, lux_gifwrite_f;
 
-#if HAVE_X11
-extern LuxRoutine lux_check_menu, lux_check_window, lux_colorpixel,
-  lux_event_name, lux_xlabelwidth, lux_xquery_f, lux_xexist;
-#endif
-
 extern LuxRoutine lux_calendar, lux_EasterDate, // lux_orbitalElement,
   lux_astropos, lux_precess, lux_constellation,
   lux_constellationname, lux_enhanceimage;
-
-#if MOTIF
-
-extern LuxRoutine lux_xmarrow, lux_xmboard, lux_xmbutton,
-  lux_xmcheckbox, lux_xmcolumns, lux_xmcommand,
-  lux_xmdialog_board, lux_xmdrawingarea, lux_xmfileselect,
-  lux_xmform, lux_xmframe, lux_xmgetoptionselection,
-  lux_xmgetwidgetaddress, lux_xmhscale, lux_xmlabel,
-  lux_xmlist, lux_xmlistcount, lux_xmlistfromfile,
-  lux_xmmenubar, lux_xmoptionmenu, lux_xmpixmapbutton,
-  lux_xmpulldownmenu, lux_xmradiobox, lux_xmrows,
-  lux_xmscalegetvalue, lux_xmscrolledwindow, lux_xmseparator,
-  lux_xmtext, lux_xmtextbox, lux_xmtextfield,
-  lux_xmtextfieldarray, lux_xmtextfieldgetstring,
-  lux_xmtextfromfile, lux_xmtextgetstring, lux_xmtogglegetstate,
-  lux_xmvscale, lux_xtparent, lux_xtwindow, lux_xmdialog_form,
-  lux_xmaddfiletolist, lux_xmtoplevel_form,
-  lux_xmtoplevel_board, lux_xmpixmapoptionmenu, lux_xmscrolledwindowapp,
-  lux_xmfilegetlist, lux_xmhscrollbar, lux_xmtextgetinsertposition,
-  lux_xmtextgetlastposition, lux_xmtextgetselection, lux_xmvscrollbar;
-
-#endif
 
 extern LuxRoutine lux_read_jpeg6b_f, lux_write_jpeg6b_f;
 
@@ -836,7 +537,6 @@ InternalRoutine function_table[] = {
   { "array",    1, MAX_DIMS + 1, lux_array, 0 },               // symbols.cc
   { "asin",     1, 1, lux_asin, "*" },                         // fun1.cc
   { "asinh",    1, 1, lux_asinh, "*" },                        // fun1.cc
-  { "assoc",    2, 3, lux_assoc, "::offset" },                 // symbols.cc
   { "astore",   2, MAX_ARG, lux_astore_f, 0 },                 // files.cc
   { "astrf",    1, 2, lux_astrf,                               // astron.cc
     "1fromequatorial:2fromecliptical:4fromgalactic:8toequatorial"
@@ -909,15 +609,8 @@ InternalRoutine function_table[] = {
   { "cfltfarr", 3, MAX_DIMS + 1, cfltfarr, // filemap.cc
     "%1%offset:1readonly:2swap" },
   { "cfmap",    1, 1, lux_cfmap, 0 },                        // subsc.cc
-#if HAVE_X11
-  { "checkmenu", 0, 1, lux_check_menu, 0 },                  // menu.cc
-  { "checkwindow", 0, 1, lux_check_window, 0 },              // xport.cc
-#endif
   { "chi2",     2, 2, lux_chi_square, "*1complement:2log" }, // fun1.cc
   { "classname", 1, 1, lux_classname, 0 },                   // install.cc
-#if HAVE_X11
-  { "colorpixel", 1, 1, lux_colorpixel, "*" },               // xport.cc
-#endif
 #if DEVELOP
   { "compile",  1, 1, lux_compile, 0 }, // install.cc
 #endif
@@ -968,9 +661,6 @@ InternalRoutine function_table[] = {
     ":sign:diagonal:threshold" },
   { "esmooth",  1, 3, lux_esmooth, 0 },                        // fun2.cc
   { "eval",     1, 2, lux_eval, "1allnumber" },                // fun3.cc
-#if HAVE_X11
-  { "eventname", 0, 1, lux_event_name, 0 },                    // menu.cc
-#endif
   { "exp",      1, 1, lux_exp, "*" },                          // fun1.cc
   { "expand",   2, 4, lux_expand, "1smooth:2nearest" },        // fun4.cc
   { "expm1",    1, 1, lux_expm1, "*" },                        // fun1.cc
@@ -1040,7 +730,6 @@ InternalRoutine function_table[] = {
   { "histr",    1, 1, lux_histr, // fun3.cc
     "1first:2ignorelimit:4increaselimit:8silent" },
   { "ibeta",    3, 3, lux_incomplete_beta, "*1complement:2log" },  // fun1.cc
-  { "idlread",  2, 2, lux_idlread_f, 0 },                          // strous3.cc
   { "igamma",   2, 2, lux_incomplete_gamma, "*1complement:2log" }, // fun1.cc
   { "imaginary", 1, 1, lux_imaginary, 0 },                         // fun3.cc
   { "index",    1, 1, lux_index, "*1axis:2rank" },                 // fun4.cc
@@ -1216,12 +905,8 @@ InternalRoutine function_table[] = {
 #endif
   { "total",    1, 4, lux_total, // fun1.cc
     "::power:weights:1double:2keepdims:4float:8omitnans" },
-  { "trace_decoder", 3, 3, lux_trace_decoder, 0 }, // trace_decoder_ana.cc
   { "trend",    1, 2, lux_trend, "*" },            // fun2.cc
   { "tri_name_from_tai", 1, 1, lux_tri_name_from_tai, 0 }, // ephem.cc
-#if HAVE_X11
-  { "tvread",   1, 5, lux_xtvread, "1greyscale" },         // xport.cc
-#endif
   { "typename", 1, 1, lux_typeName, 0 },                   // install.cc
   { "upcase",   1, 1, lux_upper, 0 },                      // fun2.cc
   { "upper",    1, 1, lux_upper, 0 },                      // fun2.cc
@@ -1232,69 +917,6 @@ InternalRoutine function_table[] = {
   { "wmap",     1, 1, lux_wmap, 0 },             // subsc.cc
   { "writeu",   2, MAX_ARG, lux_writeu, 0 },     // files.cc
   { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.cc
-#if HAVE_X11
-  { "xexist",   1, 1, lux_xexist, 0 },           // xport.cc
-  { "xlabelwidth", 1, 1, lux_xlabelwidth, 0 },   // xport.cc
-#if MOTIF
-  { "xmaddfiletolist", 2, 2, lux_xmaddfiletolist, 0 },           // motif.cc
-  { "xmarrow",  3, 4, lux_xmarrow, 0 },                          // motif.cc
-  { "xmboard",  1, 5, lux_xmboard, 0 },                          // motif.cc
-  { "xmbutton", 3, 5, lux_xmbutton, 0 },                         // motif.cc
-  { "xmcheckbox", 5, 32, lux_xmcheckbox, 0 },                    // motif.cc
-  { "xmcolumns", 3, 5, lux_xmcolumns, 0 },                       // motif.cc
-  { "xmcommand", 3, 7, lux_xmcommand, 0 },                       // motif.cc
-  { "xmdialog_board", 4, 9, lux_xmdialog_board, 0 },             // motif.cc
-  { "xmdialog_form", 4, 8, lux_xmdialog_form, 0 },               // motif.cc
-  { "xmdrawingarea", 2, 7, lux_xmdrawingarea, 0 },               // motif.cc
-  { "xmfilegetlist",    1, 1, lux_xmfilegetlist, 0 },            // motif.cc
-  { "xmfileselect", 3, 12, lux_xmfileselect, 0 },                // motif.cc
-  { "xmform",   1, 7, lux_xmform, 0 },                           // motif.cc
-  { "xmframe",  1, 5, lux_xmframe, 0 },                          // motif.cc
-  { "xmgetoptionselection", 1, 1, lux_xmgetoptionselection, 0 }, // motif.cc
-  { "xmgetwidgetaddress", 1, 1, lux_xmgetwidgetaddress, 0 },     // motif.cc
-  { "xmhscale", 5, 8, lux_xmhscale, 0 },                         // motif.cc
-  { "xmhscrollbar", 5, 6, lux_xmhscrollbar, 0 },                 // motif.cc
-  { "xmlabel",  2, 5, lux_xmlabel, 0 },                          // motif.cc
-  { "xmlist",   3, 6, lux_xmlist, 0 },                           // motif.cc
-  { "xmlistcount", 1, 1, lux_xmlistcount, 0 },                   // motif.cc
-  { "xmlistfromfile", 4, 6, lux_xmlistfromfile, 0 },             // motif.cc
-  { "xmmenubar", 4, 32, lux_xmmenubar, 0 },                      // motif.cc
-  { "xmoptionmenu", 6, 50, lux_xmoptionmenu, 0 },                // motif.cc
-  { "xmpixmapbutton", 3, 3, lux_xmpixmapbutton, 0 },             // motif.cc
-  { "xmpixmapoptionmenu", 6, 32, lux_xmpixmapoptionmenu, 0 },    // motif.cc
-  { "xmpulldownmenu", 6, 32, lux_xmpulldownmenu, 0 },            // motif.cc
-  { "xmradiobox", 5, 32, lux_xmradiobox, 0 },                    // motif.cc
-  { "xmrows",   3, 5, lux_xmrows, 0 },                           // motif.cc
-  { "xmscalegetvalue", 1, 1, lux_xmscalegetvalue, 0 },           // motif.cc
-  { "xmscrolledwindow", 3, 3, lux_xmscrolledwindow, 0 },         // motif.cc
-  { "xmscrolledwindowapp", 1, 4, lux_xmscrolledwindowapp, 0 },   // motif.cc
-  { "xmseparator", 1, 4, lux_xmseparator, 0 },                   // motif.cc
-  { "xmtext",   1, 5, lux_xmtext, 0 },                           // motif.cc
-  { "xmtextbox", 1, 5, lux_xmtextbox, 0 },                       // motif.cc
-  { "xmtextfield", 4, 8, lux_xmtextfield, 0 },                   // motif.cc
-  { "xmtextfieldarray", 9, 40, lux_xmtextfieldarray, 0 },        // motif.cc
-  { "xmtextfieldgetstring", 1, 1, lux_xmtextfieldgetstring, 0 }, // motif.cc
-  { "xmtextfromfile", 2, 6, lux_xmtextfromfile, 0 },             // motif.cc
-  { "xmtextgetinsertposition", 1, 1, lux_xmtextgetinsertposition, // motif.cc
-    0 },
-  { "xmtextgetlastposition", 1, 1, lux_xmtextgetlastposition, 0 }, // motif.cc
-  { "xmtextgetselection", 1, 3, lux_xmtextgetselection, 0 },       // motif.cc
-  { "xmtextgetstring", 1, 1, lux_xmtextgetstring, 0 },             // motif.cc
-  { "xmtogglegetstate", 1, 1, lux_xmtogglegetstate, 0 },           // motif.cc
-  { "xmtoplevel_board", 3, 5, lux_xmtoplevel_board, 0 },           // motif.cc
-  { "xmtoplevel_form", 3, 7, lux_xmtoplevel_form, 0 },             // motif.cc
-  { "xmvscale", 5, 8, lux_xmvscale, 0 },                           // motif.cc
-  { "xmvscrollbar", 5, 6, lux_xmvscrollbar, 0 },                   // motif.cc
-#endif
-  { "xquery",   0, 1, lux_xquery_f, 0 }, // xport.cc
-#if MOTIF
-  { "xtparent", 1, 1, lux_xtparent, 0 }, // motif.cc
-#endif
-  { "xtvread",  1, 5, lux_xtvread, "1greyscale" }, // xport.cc
-#if MOTIF
-  { "xtwindow", 1, 1, lux_xtwindow, 0 }, // motif.cc
-#endif
-#endif
   { "zero",     1, 2, lux_zerof, "*" },            // fun1.cc
   { "zeronans", 1, 2, lux_zapnan_f, "*%1%value" }, // fun1.cc
   { "zinv",     1, 1, lux_zinv, "*" },             // strous.cc
@@ -4077,59 +3699,23 @@ int32_t gsl_show_errors = 0;
 
 char const* defaultRedirect = "diagnostic.lux";
 
-int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0,
-  histmin, histmax, lastmaxloc, lastminloc,
-  scalemin = 0, scalemax = 255, fftdp = 0, lastmax_sym, lastmin_sym,
-  autocon = 1, contour_mode, contour_box, contour_nlev = 5,
-  contour_border = 3, contour_ticks = 3, contour_tick_pen = 3,
-  contour_style = 1, setup = 0, tempSym, iformat, fformat, sformat,
-  cformat, tformat, projectSym, projectTk = 0, stackSym, psfile,
-  MSBfirst, area_diag = 1, lastmean_sym, lastsdev_sym, r_d_sym,
-  d_r_sym;
+int32_t range_warn_flag = 0, redim_warn_flag = 0, error_extra = 0, histmin,
+  histmax, lastmaxloc, lastminloc, scalemin = 0, scalemax = 255, fftdp = 0,
+  lastmax_sym, lastmin_sym, setup = 0, tempSym, iformat, fformat, sformat,
+  cformat, tformat, projectSym, projectTk = 0, stackSym, MSBfirst, area_diag =
+  1, lastmean_sym, lastsdev_sym, r_d_sym, d_r_sym;
 
-float   contour_dash_lev, contour_tick_fac = 0.5, *p3d;
 Scalar  lastmin, lastmax, lastmean, lastsdev;
-extern int32_t  lunplt, landscape, iorder, ilabx, ilaby, irxf, iryf, ndx,
-        ndxs, nd, ndys, ifz, ifzx, ier, ifont, ndlabx, ndlaby,
-        ndot, ipltyp, iblank, maxregridsize, nExecuted,
-        kb, nArg, ixhigh, iyhigh,
-        tvsmt, badmatch, fstepx, fstepy,
-        sort_flag, crunch_bits, crunch_slice, byte_count,
-        current_pen, updateBoundingBox, index_cnt, uTermCol, page;
+extern int32_t ndx, ndxs, nd, ndys, maxregridsize, nExecuted, kb, nArg, tvsmt,
+  badmatch, sort_flag, crunch_bits, crunch_slice, byte_count,
+  index_cnt, uTermCol, page;
 extern double   meritc;
-#if MOTIF
-extern int32_t  radio_state, radio_button;
-#endif
-extern float    xfac, yfac, xmin, xmax, ymin, ymax,
-        wxb, wxt, wyb, wyt, ticx, ticxr, ticy, ticyr, plims[],
-        fsized,         symsize, symratio, startx, starty, stepx, stepy,
-        callig_xb, callig_yb, callig_ratio, slabx, slaby,
-        dashsize, crunch_bpp, postXBot, postXTop,
-        postYBot, postYTop, xerrsize, yerrsize;
+extern float plims[], stepx, stepy, slabx, slaby, crunch_bpp;
 extern int16_t  *stackPointer;
 
 #if DEVELOP
 extern int32_t  irzf, ifzz, ndz, ndzs, resample_type, fstepz;
 extern float    wzb, wzt, ticz, ticzr, zmin, zmax, defaultProjection[], dvz;
-#endif
-
-#if HAVE_LIBX11
-extern int32_t  text_menus, tvplanezoom;
-#endif
-
-#if HAVE_LIBX11
-extern int32_t lux_button, eventSource, xcoord, ycoord, lux_keycode, lux_keysym,
-  last_menu, menu_item, lux_event, preventEventFlush, root_x, root_y,
-  xerrors, last_wid, display_width, display_height, private_colormap,
-  zoom_frame, foreground_pixel, nColors, colormin, colormax, lux_keystate;
-
-extern float    tviy, tviyb, tvix, tvixb, xhair, yhair, menu_x, menu_y,
-                tvscale, zoom_xc, zoom_yc, zoom_mag, lumpx;
-extern double   last_time, zoom_clo, zoom_chi;
-#endif
-
-#if MOTIF
-extern int32_t  motif_flag;
 #endif
 
 char    *firstbreak;            // for memck.c
@@ -4170,30 +3756,6 @@ EnumElem typesStruct[]
   { "cfloat", LUX_CFLOAT },
   { "cdouble", LUX_CDOUBLE },
   { "undefined", LUX_UNDEFINED }
-};
-
-EnumElem eventStruct[]
-= { // see lux_register_event in menu.c
-  { "KEYPRESS", 1 },
-  { "BUTTONPRESS", 4 },
-  { "BUTTONRELEASE", 8 },
-  { "POINTERMOTION", 16 },
-  { "ENTERWINDOW", 32 },
-  { "LEAVEWINDOW", 64 },
-  { "WINDOW", 256 },
-  { "MENU", 512 }
-};
-
-EnumElem coordSysStruct[]
-= {
-  { "DEP", 0 },
-  { "DVI", 1 },
-  { "DEV", 2 },
-  { "IMG", 3 },
-  { "PLT", 4 },
-  { "RIM", 5 },
-  { "RPL", 6 },
-  { "X11", 7 },
 };
 
 EnumElem filetypeStruct[]
@@ -4321,10 +3883,6 @@ void symbolInitialization(void)
  l_fix("#max_dims",     MAX_DIMS);
  f_fix("#eps_float",    FLT_EPSILON);
  d_fix("#eps_double",   DBL_EPSILON);
-#if HAVE_LIBX11
- l_fix("#num_windows",  MAXWINDOWS - 1);
- l_fix("#num_pixmaps",  MAXPIXMAPS - 1);
-#endif
  d_fix("#pi",           M_PI);
  d_fix("#2pi",          2*M_PI);
  d_fix("#e",            M_E);
@@ -4351,22 +3909,6 @@ void symbolInitialization(void)
  symbol_memory(stackSym) = sizeof(classesStruct);
  nFixed++;
 
- iq = installString("#coordsys");
- stackSym = findVar(iq, 0);
- symbol_class(stackSym) = LUX_ENUM;
- enum_type(stackSym) = LUX_INT32;
- enum_list(stackSym) = coordSysStruct;
- symbol_memory(stackSym) = sizeof(coordSysStruct);
- nFixed++;
-
- iq = installString("#event");
- stackSym = findVar(iq, 0);
- symbol_class(stackSym) = LUX_ENUM;
- enum_type(stackSym) = LUX_INT32;
- enum_list(stackSym) = eventStruct;
- symbol_memory(stackSym) = sizeof(eventStruct);
- nFixed++;
-
  iq = installString("#filetype");
  stackSym = findVar(iq, 0);
  symbol_class(stackSym) = LUX_ENUM;
@@ -4382,22 +3924,6 @@ void symbolInitialization(void)
  enum_list(stackSym) = typesStruct;
  symbol_memory(stackSym) = sizeof(typesStruct);
  nFixed++;
-
-#if DEVELOP
- iq = installString("#p3d");
- projectSym = findVar(iq, 0);
- symbol_class(projectSym) = LUX_ARRAY;
- array_type(projectSym) = LUX_FLOAT;
- symbol_memory(projectSym) =
-   sizeof(Array) + 16*sizeof(float);
- eallocate(p, i, char);
- array_header(projectSym) = (Array *) p;
- array_num_dims(projectSym) = 2;
- array_dims(projectSym)[0] = array_dims(projectSym)[1] = 4;
- memcpy((float*) array_data(projectSym), defaultProjection, 16*sizeof(float));
- p3d = (float *) array_data(projectSym);
- nFixed++;
-#endif
 
  iq = installString("#stack");
  stackSym = findVar(iq, 0);
@@ -4419,57 +3945,20 @@ void symbolInitialization(void)
  s_ptr("#version",      (char*) PACKAGE_VERSION);
 
  l_ptr("!area_diag",    &area_diag);
- l_ptr("!autocon",      &autocon);
  l_ptr("!badmatch",     &badmatch);
- l_ptr("!bb_update",    &updateBoundingBox);
  l_ptr("!bc",           &byte_count);
-#if HAVE_LIBX11
- l_ptr("!button",       &lux_button);
-#endif
- f_ptr("!bxb",          &postXBot);
- f_ptr("!bxt",          &postXTop);
- f_ptr("!byb",          &postYBot);
- f_ptr("!byt",          &postYTop);
  fnc_p("!cjd",          12);
  l_ptr("!col",          &uTermCol);
-#if HAVE_LIBX11
- l_ptr("!colormax",     &colormax);
- l_ptr("!colormin",     &colormin);
-#endif
- l_ptr("!contour_border",       &contour_border);
- l_ptr("!contour_box",          &contour_box);
- f_ptr("!contour_dash_lev",     &contour_dash_lev);
- l_ptr("!contour_mode",         &contour_mode);
- l_ptr("!contour_nlev",         &contour_nlev);
- l_ptr("!contour_style",        &contour_style);
- l_ptr("!contour_ticks",        &contour_ticks);
- l_ptr("!contour_tick_pen",     &contour_tick_pen);
- f_ptr("!contour_tick_fac",     &contour_tick_fac);
  fnc_p("!cputime",      2);
- f_ptr("!cratio",       &callig_ratio);
  l_ptr("!crunch_bits",  &crunch_bits);
  f_ptr("!crunch_bpp",   &crunch_bpp);
  l_ptr("!crunch_slice", &crunch_slice);
  fnc_p("!ctime",        5);
- f_ptr("!dashsize",     &dashsize);
  fnc_p("!date",                 7);
  l_ptr("!despike_count", &despike_count);
- l_ptr("!dlabx",        &ndlabx);
- l_ptr("!dlaby",        &ndlaby);
- l_ptr("!dot",          &ndot);
- l_ptr("!dots",                 &ndot);
- l_ptr("!erase",        &ier);
  l_ptr("!error_extra",  &error_extra);
  l_ptr("!errno",        &errno);
-#if HAVE_LIBX11
- l_ptr("!eventsource",  &eventSource);
- l_ptr("!eventtype",    &lux_event);
-#endif
  l_ptr("!fftdp",        &fftdp);
- l_ptr("!font",                 &ifont);
-#if HAVE_LIBX11
- l_ptr("!foreground_color",     &foreground_pixel);
-#endif
  fformat = s_ptr("!format_f", strsave("%14.7g"));
  iformat = s_ptr("!format_i", strsave("%10jd"));
  sformat = s_ptr("!format_s", strsave("%s"));
@@ -4478,86 +3967,22 @@ void symbolInitialization(void)
  fmt_float = string_value(fformat);
  fmt_string = string_value(sformat);
  fmt_complex = string_value(cformat);
- f_ptr("!fsize",        &fsized);
- l_ptr("!fstepx",       &fstepx);
- l_ptr("!fstepy",       &fstepy);
-#if DEVELOP
- l_ptr("!fstepz",       &fstepz);
-#endif
- l_ptr("!fz",           &ifz);
- l_ptr("!fzx",          &ifzx);
-#if DEVELOP
- l_ptr("!fzz",          &ifzz);
-#endif
 #if HAVE_LIBGSL
  l_ptr("!gsl_show_errors", &gsl_show_errors);
 #endif
- f_ptr("!height",       &yfac);
  l_ptr("!histmin",      &histmin);
  l_ptr("!histmax",      &histmax);
- l_ptr("!iblank",       &iblank);
- l_ptr("!iorder",       &iorder);
-#if HAVE_LIBX11
- l_ptr("!ix",           &xcoord);
-#endif
- l_ptr("!ixhigh",       &ixhigh);
-#if HAVE_LIBX11
- l_ptr("!iy",           &ycoord);
-#endif
- l_ptr("!iyhigh",       &iyhigh);
  fnc_p("!jd",           11);
-#if HAVE_LIBX11                         // a non-X11 version of this is needed
- l_ptr("!kb",           &kb);
- l_ptr("!keycode",      &lux_keycode);
- l_ptr("!keystate",     &lux_keystate);
- l_ptr("!keysym",       &lux_keysym);
-#endif
- l_ptr("!labx",                 &ilabx);
- l_ptr("!laby",                 &ilaby);
- l_ptr("!landscape",    &landscape);
  l_ptr("!lastmax",      &lastmax);
  l_ptr("!lastmaxloc",   &lastmaxloc);
  l_ptr("!lastmean",     &lastmean);
  l_ptr("!lastmin",      &lastmin);
  l_ptr("!lastminloc",   &lastminloc);
  l_ptr("!lastsdev",     &lastsdev);
-#if HAVE_LIBX11
- l_ptr("!last_menu",    &last_menu);
- f_ptr("!lumpx",        &lumpx);
-#endif
  l_ptr("!maxregridsize", &maxregridsize);
-#if HAVE_LIBX11
- l_ptr("!menu_item",    &menu_item);
-#endif
  d_ptr("!meritc",       &meritc);
-#if MOTIF
- l_ptr("!motif",        &motif_flag);
-#endif
- f_ptr("!mxb",          &xmin);
- f_ptr("!mxt",          &xmax);
- f_ptr("!myb",          &ymin);
- f_ptr("!myt",          &ymax);
-#if DEVELOP
- f_ptr("!mzb",          &zmin);
- f_ptr("!mzt",          &zmax);
-#endif
  l_ptr("!narg",                 &nArg);
-#if HAVE_LIBX11
- l_ptr("!ncolorcells",  &nColors);
-#endif
  l_ptr("!nexecuted",    &nExecuted);
-#if HAVE_LIBX11
- l_ptr("!noeventflush",         &preventEventFlush);
-#endif
- l_ptr("!pdev",         &lunplt);
- l_ptr("!pen",          &current_pen);
- l_ptr("!pltyp",        &ipltyp);
- f_ptr("!plxerrb",      &xerrsize);
- f_ptr("!plyerrb",      &yerrsize);
-#if HAVE_LIBX11
- l_ptr("!private_colormap", &private_colormap);
-#endif
- psfile = s_ptr("!ps_file", strsave("junk.eps"));
  l_ptr("!range_warn_flag",      &range_warn_flag);
  l_ptr("!read_count",   &index_cnt);
  fnc_p("!readkey",      8);
@@ -4566,102 +3991,23 @@ void symbolInitialization(void)
 #if DEVELOP
  l_ptr("!regrid_type",  &resample_type);
 #endif
-#if HAVE_LIBX11
- l_ptr("!root_x",       &root_x);
- l_ptr("!root_y",       &root_y);
-#endif
  l_ptr("!row",          &page);
- l_ptr("!rx",           &irxf);
- l_ptr("!ry",           &iryf);
-#if DEVELOP
- l_ptr("!rz",           &irzf);
-#endif
  l_ptr("!scalemax",     &scalemax);
  l_ptr("!scalemin",     &scalemin);
-#if HAVE_LIBX11
- l_ptr("!screen_height", &display_height);
- l_ptr("!screen_width",         &display_width);
-#endif
  l_ptr("!sort_flag",    &sort_flag);
- f_ptr("!startx",       &startx);
- f_ptr("!starty",       &starty);
- f_ptr("!stepx",        &stepx);
- f_ptr("!stepy",        &stepy);
- f_ptr("!symratio",     &symratio);
- f_ptr("!symsize",      &symsize);
  fnc_p("!systime",      10);
-#if HAVE_LIBX11
- l_ptr("!textmenus",    &text_menus); // development of text menus
-#endif
- f_ptr("!tickx",        &ticx);
- f_ptr("!tickxr",       &ticxr);
- f_ptr("!ticky",        &ticy);
- f_ptr("!tickyr",       &ticyr);
-#if DEVELOP
- f_ptr("!tickz",        &ticz);
- f_ptr("!tickzr",       &ticzr);
-#endif
  fnc_p("!time",                 6);
-#if HAVE_LIBX11
- f_ptr("!tvix",                 &tvix);
- f_ptr("!tvixb",        &tvixb);
- f_ptr("!tviy",                 &tviy);
- f_ptr("!tviyb",        &tviyb);
- l_ptr("!tvplanezoom",  &tvplanezoom); // browser
-#endif
-#if HAVE_LIBX11
- f_ptr("!tvscale",      &tvscale);
-#endif
  l_ptr("!tvsmt",        &tvsmt);
  l_ptr("!project",      &projectTk);
- f_ptr("!width",        &xfac);
-#if HAVE_LIBX11
- l_ptr("!window",       &last_wid);
-#endif
- f_ptr("!wxb",                  &wxb);
- f_ptr("!wxt",                  &wxt);
- f_ptr("!wyb",                  &wyb);
- f_ptr("!wyt",                  &wyt);
-#if DEVELOP
- f_ptr("!wzb",          &wzb);
- f_ptr("!wzt",          &wzt);
-#endif
  f_ptr("!xb",           &plims[0]);
- f_ptr("!xc",           &callig_xb);
-#if HAVE_LIBX11
- l_ptr("!xerrors",      &xerrors);
- f_ptr("!xf",           &xhair);
- f_ptr("!xmenu",        &menu_x);
-#endif
  f_ptr("!xt",           &plims[1]);
-#if HAVE_LIBX11
- d_ptr("!xtime",        &last_time);
-#endif
  f_ptr("!yb",           &plims[2]);
- f_ptr("!yc",           &callig_yb);
-#if HAVE_LIBX11
- f_ptr("!yf",           &yhair);
- f_ptr("!ymenu",        &menu_y);
-#endif
  f_ptr("!yt",           &plims[3]);
 #if YYDEBUG
  l_ptr("!yydebug",      &yydebug);
 #endif
  f_ptr("!zb",           &plims[4]);
-#if HAVE_LIBX11
- l_ptr("!zoomframe",    &zoom_frame);
- d_ptr("!zoomhigh",     &zoom_chi);
- d_ptr("!zoomlow",      &zoom_clo);
- f_ptr("!zoommag",      &zoom_mag);
- f_ptr("!zoomx",        &zoom_xc);
- f_ptr("!zoomy",        &zoom_yc);
-#endif
  f_ptr("!zt",           &plims[5]);
-
-#if MOTIF
- l_ptr("$radio_button",         &radio_button);
- l_ptr("$radio_state",  &radio_state); // browser
-#endif
 
         /* create a "universal" variable to assign to
            in  EVAL(string) */

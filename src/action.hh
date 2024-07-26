@@ -174,10 +174,6 @@ int32_t transferAll(int32_t symbol);
 int32_t translateEscapes(char*);
 int32_t unnextchar(int32_t, FILE*);
 
-#if HAVE_LIBX11
-int32_t setup_x(void);
-#endif
-
 void addVerify(char*, char);
 void checkErrno(void);
 void cleanup_cubic_spline_tables(CsplineInfo*);

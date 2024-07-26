@@ -2831,11 +2831,7 @@ void scale(Pointer data, uint8_t type, int32_t size, double datalow, double data
   double        drange, dfac, doff;
   float         ffac, foff;
   Pointer       trgt;
-#if HAVE_LIBX11
-  extern Symboltype colorIndexType;
-#else
   int32_t       colorIndexType = LUX_INT8;
-#endif
 
   trgt.ui8 = (uint8_t*) dest;
   drange = datahigh - datalow;
@@ -3158,15 +3154,8 @@ int32_t lux_scale(ArgumentCount narg, Symbol ps[])
   Scalar        min, max;
   Pointer q1, q2;
   double        sd, qd;
-#if HAVE_LIBX11
-  extern double         zoom_clo, zoom_chi;
-  extern int32_t threeColors;
-  extern int32_t display_cells;
-  extern Symboltype colorIndexType;
-#else
   int32_t display_cells = 256;
   Symboltype colorIndexType = LUX_INT8;
-#endif
 
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)
@@ -3185,12 +3174,6 @@ int32_t lux_scale(ArgumentCount narg, Symbol ps[])
       scalemin = 0;
       scalemax = display_cells - 1;
     }
-#if HAVE_LIBX11
-    else if (threeColors) {
-      scalemin = 0;
-      scalemax = display_cells/3 - 1;
-    }
-#endif
     simple_scale(q1.i32, n, type, q2.ui8); // scale and put in output array
     scalemin = oldScalemin;
     scalemax = oldScalemax;
@@ -3200,12 +3183,6 @@ int32_t lux_scale(ArgumentCount narg, Symbol ps[])
     if (narg == 2)
       return cerror(WRNG_N_ARG, 0);
     // this is messier than the simple scale because of over/under flows
-#if HAVE_LIBX11
-    if (narg == 1) {            // have /ZOOM
-      min.d = zoom_clo;
-      max.d = zoom_chi;
-    } else
-#endif
       if (type == LUX_DOUBLE) { // array is double, get input as double
         min.d = double_arg(ps[1]);
         max.d = double_arg(ps[2]);
@@ -3221,12 +3198,6 @@ int32_t lux_scale(ArgumentCount narg, Symbol ps[])
       sd = (double) 255.999;
       qd = (double) 0.0;
     } else
-#if HAVE_LIBX11
-      if (threeColors) {
-        sd = (double) 84.999;
-        qd = (double) 0.0;
-      } else
-#endif
       {
         sd = (double) scalemax + 0.999;
         qd = (double) scalemin;
@@ -3256,15 +3227,8 @@ int32_t lux_scalerange(ArgumentCount narg, Symbol ps[])
   Scalar        min, max;
   Pointer q1, q2;
   double        sd, qd, logrey, higrey;
-#if HAVE_LIBX11
-  extern double         zoom_clo, zoom_chi;
-  extern int32_t        threeColors;
-  extern int32_t display_cells;
-  extern Symboltype colorIndexType;
-#else
   int32_t       display_cells = 256;
   Symboltype colorIndexType = LUX_INT8;
-#endif
 
   iq = ps[0];
   if (symbol_class(iq) != LUX_ARRAY)
@@ -3291,12 +3255,6 @@ int32_t lux_scalerange(ArgumentCount narg, Symbol ps[])
       scalemin = (int32_t) (logrey*(display_cells - 0.001));
       scalemax = (int32_t) (higrey*(display_cells - 0.001));
     }
-#if HAVE_LIBX11
-    else if (threeColors) {
-      scalemin = (int32_t) ((display_cells/3 - 0.001)*logrey);
-      scalemax = (int32_t) ((display_cells/3 - 0.001)*higrey);
-    }
-#endif
     else {
       iq = scalemax - scalemin;
       scalemin = (int32_t) (iq*logrey + scalemin);
@@ -3311,12 +3269,6 @@ int32_t lux_scalerange(ArgumentCount narg, Symbol ps[])
     if (narg != 5)
       return cerror(WRNG_N_ARG, 0);
     // this is messier than the simple scale because of over/under flows
-#if HAVE_LIBX11
-    if (narg == 3) {            // have /ZOOM
-      min.d = zoom_clo;
-      max.d = zoom_chi;
-    } else
-#endif
       if (type == LUX_DOUBLE) { // array is double, get input as double
         min.d = double_arg(ps[3]);
         max.d = double_arg(ps[4]);
@@ -3328,12 +3280,6 @@ int32_t lux_scalerange(ArgumentCount narg, Symbol ps[])
       sd = (double) (display_cells - 0.001)*higrey;
       qd = (double) (display_cells - 0.001)*logrey;
     }
-#if HAVE_LIBX11
-    else if (threeColors) {
-      qd = (double) (display_cells/3 - 0.001)*logrey;
-      sd = (double) (display_cells/3 - 0.001)*higrey;
-    }
-#endif
     else {
       iq = scalemax - scalemin;
       qd = iq*logrey + scalemin;
@@ -3474,17 +3420,8 @@ int32_t simple_scale(void *p1, int32_t n, int32_t type, void *p2)
   int32_t         xq;
   float   fq;
   double  dq;
-#if HAVE_LIBX11
-  extern Symboltype colorIndexType;
-  extern int32_t connect_flag;
-#else
   Symboltype colorIndexType = LUX_INT8;
-#endif
 
-#if HAVE_LIBX11
-  if (!connect_flag)
-    setup_x();
-#endif
   q1.i32 = (int32_t*) p1;
   q2.i32 = (int32_t*) p2;
   switch (type) {
@@ -3649,11 +3586,7 @@ int32_t neutral(void *p, int32_t n)
 {
   int32_t       xq;
   Pointer       pp;
-#if HAVE_LIBX11
-  extern Symboltype colorIndexType;
-#else
   Symboltype colorIndexType = LUX_INT8;
-#endif
 
   pp.ui8 = (uint8_t*) p;
   xq = (scalemax - scalemin)/2;

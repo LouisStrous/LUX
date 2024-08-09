@@ -203,7 +203,8 @@ void resetPager(void);
 void returnLoop(LoopInfo*, Pointer*, int32_t);
 void setPager(int32_t);
 void standard_redef_array(int32_t, Symboltype, int32_t, int32_t*, int32_t,
-                          int32_t*, int32_t, Pointer*, LoopInfo*);
+                          int32_t*, int32_t, Pointer*, LoopInfo*,
+                          bool clear = false);
 void unMark(int32_t);
 void unProtect(int32_t*, int32_t);
 void undefine(int32_t);

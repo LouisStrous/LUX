@@ -1808,14 +1808,19 @@ int32_t numerical_or_string(int32_t data, int32_t **dims, int32_t *nDim, int32_t
 
     \param[in,out] info points at a preexisting LoopInfo that gets
     adjusted for walking through the new array.
+
+    \param[in] clear says whether to clear (i.e., set to 0) the contents.
  */
-void standard_redef_array(int32_t iq, Symboltype type,
-                          int32_t num_dims, int32_t *dims,
-                          int32_t naxes, int32_t *axes,
-                          int32_t mode,
-                          Pointer *ptr, LoopInfo *info)
+void
+standard_redef_array(Symbol iq, Symboltype type,
+                     int32_t num_dims, int32_t *dims,
+                     int32_t naxes, int32_t *axes,
+                     int32_t mode, Pointer *ptr, LoopInfo *info,
+                     bool clear)
 {
   redef_array(iq, type, num_dims, dims);
   ptr->v = array_data(iq);
+  if (clear)
+    memset(ptr->ui8, 0, array_size(iq)*lux_type_size[type]);
   info->setupDimensionLoop(num_dims, dims, type, naxes, axes, ptr, mode);
 }

@@ -1,7 +1,7 @@
 /* This is file fun3.cc.
 
 Copyright 2013 Louis Strous, Richard Shine
-Copyright 2014 Louis Strous
+Copyright 2014-2024 Louis Strous
 
 This file is part of LUX.
 
@@ -18,21 +18,24 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-// File fun3.c
-// Various LUX functions.
+/// \file
+/// Various LUX functions.
 #include "config.h"
-#include <limits>
-#include <sys/types.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <limits.h>
+#include <algorithm>
 #include <ctype.h>
-#include <float.h>
-#include <stdlib.h>             // for strtol
 #include <errno.h>
+#include <float.h>
+#include <functional>
+#include <limits.h>
+#include <limits>
+#include <malloc.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>             // for strtol
+#include <string.h>
+#include <sys/types.h>
 #include "action.hh"
+#include "cdiv.hh"
 #include "editorcharclass.hh"
 #include "luxparser.hh"
 #if HAVE_LIBGSL
@@ -1133,8 +1136,10 @@ int32_t lux_power(ArgumentCount narg, Symbol ps[])
   Symboltype type;
   Pointer       src, trgt, work, tmp, otmp, src0, trgt0;
   Scalar        factor;
-  int32_t       rfftb(int32_t *, float *, float *), rfftf(int32_t *, float *, float *),
-    rfftbd(int32_t *, double *, double *), rfftfd(int32_t *, double *, double *),
+  int32_t rfftb(int32_t *, float *, float *),
+    rfftf(int32_t *, float *, float *),
+    rfftbd(int32_t *, double *, double *),
+    rfftfd(int32_t *, double *, double *),
     rffti(int32_t *, float *), rfftid(int32_t *, double *);
   LoopInfo      srcinfo;
 
@@ -4661,3 +4666,261 @@ int32_t lux_fade(ArgumentCount narg, Symbol ps[])
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
+#if HAVE_LIBGSL
+/// Is the given sample count one that allows the fastest calculation of the
+/// Fast Fourier Transform, for the used FFT algorithm?  A good sample count has
+/// no prime divisors other than 2, 3, and 5.
+///
+/// \param x is the sample count to investigate.
+///
+/// \returns `true` if the sample count is acceptable, `false` if not.
+bool
+is_good_fft_size(size_t x)
+{
+  while (x%2 == 0)
+    x /= 2;
+  while (x%3 == 0)
+    x /= 3;
+  while (x%5 == 0)
+    x /= 5;
+  return (x == 1);
+}
+
+/// Locate a sample count that allows the fastest calculation of the Fast
+/// Fourier Transform, for the used FFT algorithm.  A good sample count has no
+/// prime divisors other than 2, 3, and 5.
+///
+/// If \a start is good, then it is returned.  Otherwise the nearest greater
+/// good sample count not exceeding \a upper is sought.  If there is no such
+/// sample count then the nearest lesser sample count not less than 2 is sought.
+///
+/// \param start is the sample count near which a good one is sought.  If \a
+/// start > \a upper then \a upper is used.
+///
+/// \param upper is the upper limit of admissable sample counts.
+///
+/// \returns a good sample count.
+size_t
+find_good_fft_size(size_t start, size_t upper)
+{
+  auto candidate = start;
+  if (candidate > upper)
+    candidate = upper;
+  if (candidate == upper
+      && is_good_fft_size(candidate))
+    return candidate;
+
+  // seek upward
+  while (candidate <= upper)
+  {
+    if (is_good_fft_size(candidate))
+      break;
+    ++candidate;
+  }
+  if (candidate <= upper)
+    return candidate;
+
+  // seek downward
+  candidate = start;
+  while (candidate > 1)
+  {
+    if (is_good_fft_size(candidate))
+      return candidate;
+    --candidate;
+  }
+  return start;
+}
+
+/// Like find_good_fft_size(size_t start, size_t upper) but with \a upper equal
+/// to \a start.
+size_t
+find_good_fft_size(size_t start)
+{
+  return find_good_fft_size(start, start);
+}
+
+Symbol
+lux_welch(ArgumentCount narg, Symbol ps[])
+{
+  // welch(x,minframesize)
+
+  LoopInfo* infos;
+  Pointer* ptrs;
+  StandardArguments sa;
+  Symbol iq;
+  if ((iq = sa.set(narg, ps, "i>D*;iL1;oL?;rD", &ptrs, &infos)) < 0)
+    return LUX_ERROR;
+  const Size total_sample_count = infos[0].nelem; // total sample count
+  if (total_sample_count < 2)
+    return luxerror("Data size must be at least 2", ps[0]);
+
+  Size frame_size = ptrs[1].i32[0]; // minimum frame size
+  if (frame_size < 2)
+    return luxerror("Minimum frame size must be at least 2", ps[1]);
+  if (frame_size > total_sample_count)
+    return luxerror("Minimum frame size must be less than total sample count",
+                    ps[1]);
+
+  const bool do_window = (internalMode & 1);
+  const bool do_fast = (internalMode & 2);
+
+  if (do_fast)
+  {
+    // seek an excellent frame size, one that has only 2, 3, or 5 as prime
+    // divisors.
+    Size candidate = frame_size;
+    while (1)
+    {
+      if (is_good_fft_size(candidate))
+        break;
+      ++candidate;
+    }
+    if (candidate <= total_sample_count)
+    {
+      frame_size = candidate;
+      if (ps[2])
+        ptrs[2].i32[0] = frame_size;
+    } else
+    {
+      // couldn't find a candidate at or above the initial frame size, seek one
+      // below
+      candidate = frame_size;
+      while (1)
+      {
+        if (is_good_fft_size(candidate)
+            || !candidate)
+          break;
+        --candidate;
+      }
+      if (candidate > 1)
+      {
+        frame_size = candidate;
+        if (ps[2])
+          ptrs[2].i32[0] = frame_size;
+      }
+    }
+  }
+
+  // for frame size n and total sample count N, the frame count is ⌊2N/n⌋ − 1
+  int frame_count = 2*total_sample_count;
+  frame_count = frame_count/frame_size - 1;
+
+  // Prepare return symbol.  The number of frequency channels is ⌊n/2⌋ + 1
+  Size output_count = frame_size/2 + 1;
+  standard_redef_array(iq, LUX_DOUBLE, 1, &output_count, 0, NULL,
+                       infos[3].mode, &ptrs[3], &infos[3], true);
+
+  // prepare for gsl_fft_real_transform use
+  auto wavetable = gsl_fft_real_wavetable_alloc(frame_size);
+  auto workspace = gsl_fft_real_workspace_alloc(frame_size);
+  if (!wavetable || !workspace)
+  {
+    free(wavetable);            // the allocation might have succeeded
+    return cerror(ALLOC_ERR, 0);
+  }
+
+  // storage for the FFT results for a single frame
+  std::vector<double> buffer(frame_size);
+
+  std::vector<double> window;
+  if (do_window)
+    window.resize(frame_size);
+
+  struct Cycle
+  {
+    explicit Cycle(double phi)
+      : m_ds(sin(phi)), m_dc(cos(phi)), m_s(-sqrt((1 - m_dc)/2)),
+        m_c(sqrt((1 + m_dc)/2))
+    { }
+
+    double
+    operator()()
+    {
+      double result = m_s;
+      double m_c2 = m_c*m_dc + m_s*m_ds;
+      double m_s2 = -m_c*m_ds + m_s*m_dc;
+      m_c = m_c2;
+      m_s = m_s2;
+      return result*result;
+    }
+
+    double m_ds;
+    double m_dc;
+    // fields m_s and m_c must be declared after field m_ds to ensure that they
+    // get initialized after m_ds upon which their value depends
+    double m_s;
+    double m_c;
+  };
+
+  double window_mean;
+  if (do_window)
+  {
+    std::generate(window.begin(), window.end(), Cycle(PI/frame_size));
+    window_mean = std::reduce(window.begin(), window.end())/window.size();
+  }
+  double* frame_start = ptrs[0].d;
+  double* buffer_start = buffer.data();
+  double* output_start = ptrs[3].d;
+  size_t excess = 0;
+  auto step_parts = cdiv(frame_size, 2);
+  const size_t base_step = step_parts.quot;
+  const size_t excess_step = step_parts.rem;
+  for (int frame = 0; frame < frame_count; ++frame)
+  {
+    // copy next frame into buffer
+    std::copy(frame_start, frame_start + frame_size, buffer_start);
+
+    if (do_window)
+    {
+      // apply window function
+      std::transform(buffer.begin(), buffer.end(), window.begin(),
+                     buffer.begin(), std::multiplies<double>());
+    }
+
+    gsl_fft_real_transform(buffer_start, 1, frame_size, wavetable, workspace);
+
+    // TODO: refactor next code using std::for_each
+
+    // add the power values to the appropriate output values
+
+    // channel 0 counts only once
+    output_start[0] += buffer_start[0]*buffer_start[0];
+    size_t ib;
+    size_t io;
+    for (ib = 1, io = 1; ib < frame_size - 1; ++ib)
+    {
+      // the middle channels count twice (by symmetry)
+      output_start[io] += 2*buffer_start[ib]*buffer_start[ib];
+      if (ib%2 == 0)
+        ++io;
+    }
+    if (frame_size%2)           // final channel counts twice
+      output_start[io] += 2*buffer_start[ib]*buffer_start[ib];
+    else                        // final channel counts once
+      output_start[io] += buffer_start[ib]*buffer_start[ib];
+    frame_start += base_step;
+    excess += excess_step;
+    if (excess >= 2)
+    {
+      ++frame_start;
+      excess -= 2;
+    }
+  }
+  double a;
+  {
+    double denominator = (double) frame_count*frame_size*frame_size;
+    if (do_window)
+      denominator *= window_mean;
+    double numerator = 2.0;
+    a = numerator/denominator;
+  }
+  std::for_each(&output_start[0], &output_start[infos[3].nelem],
+                [a](const double& x) { return a*x; });
+
+  gsl_fft_real_wavetable_free(wavetable);
+  gsl_fft_real_workspace_free(workspace);
+
+  return iq;
+}
+REGISTER(welch, f, welch, 2, 3, "1window:2fast", HAVE_LIBGSL);
+#endif

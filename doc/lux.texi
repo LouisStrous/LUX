@@ -14335,7 +14335,8 @@ See also: @ref{eigenvalues}, @ref{svd}
 @subsection eigenvalues
 @findex eigenvalues
 
-@code{eigenvalues(@var{X})}
+@code{eigenvalues(@var{X, [, /descending, /ascending, /absolute,
+/relative]})}
 
 [GSL] Returns the eigenvalues of real symmetric matrices.
 
@@ -14348,8 +14349,11 @@ No check is done if the matrix @code{@var{X}} is symmetric.  If it is
 not then you get results for a different matrix.
 
 @code{@var{E}} get the dimensions of @code{@var{X}} except for the
-first one.  The eigenvalues for each matrix are returned in descending
-order of absolute magnitude.
+first one.  The eigenvalues for each matrix are sorted based on the
+option keywords: either in descending or ascending order, and based on
+either absolute or relative values.  The default is
+@code{/descending,/absolute} which sorts the eigenvalues in descending
+order of their absolute value.
 
 See also: @ref{eigensystem}
 
@@ -24093,7 +24097,7 @@ See also: @ref{sun_b}, @ref{sun_d}, @ref{sun_p}
 @subsection svd
 @findex svd
 
-@code{svd, @var{X}, @var{U}, @var{S}, @var{V}}
+@code{svd, @var{X}, @var{U}, @var{S}, @var{V} [,/ svarray]}
 
 Calculates the 'thin' singular value decomposition (SVD) of matrix
 @code{@var{X}}, which is easier to calculate and takes less storage
@@ -24125,6 +24129,10 @@ transpose(@var{V})}, too, but now @code{@var{U}} is an
 diagonal matrix, and @code{@var{V}} is a @var{c}-by-@var{n} matrix.
 
 If @var{r = c} then the thin and full SVDs are equivalent.
+
+Option @code{/svarray} causes @code{@var{S}} to receive only the
+singular values.  Then @code{@var{S}} is an @var{n}-element vector
+instead of an @var{m}-by-@var{n} matrix.
 
 See also: @ref{mdiagonal}, @ref{transpose}
 

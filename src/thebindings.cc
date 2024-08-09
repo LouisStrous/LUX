@@ -3735,13 +3735,13 @@ void register_the_bindings()
   register_lux_f(lux_matrix_product, "mproduct", 2, 2, "0inner:1outer");
 
   int32_t lux_svd(int32_t, int32_t []);
-  register_lux_s(lux_svd, "svd", 4, 4, NULL);
+  register_lux_s(lux_svd, "svd", 4, 4, "1svarray");
 
   int32_t lux_eigensystem(int32_t, int32_t []);
   register_lux_s(lux_eigensystem, "eigensystem", 2, 4, NULL);
 
   int32_t lux_eigenvalues(int32_t, int32_t []);
-  register_lux_f(lux_eigenvalues, "eigenvalues", 1, 1, NULL);
+  register_lux_f(lux_eigenvalues, "eigenvalues", 1, 1, "0descending:2ascending:0absolute:1relative:");
 
   int32_t lux_transpose_matrix(int32_t, int32_t []);
   register_lux_f(lux_transpose_matrix, "transpose", 1, 1, NULL);

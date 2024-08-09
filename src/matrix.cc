@@ -334,7 +334,9 @@ singular_value_decomposition(const double* X, const size_t r, const size_t c,
 /// `U` and `V` are semi-orthogonal matrices.  If `X` has `r` rows by `c`
 /// columns and optionally additional dimensions `e`, i.e., has dimensions
 /// `[r,c,e]`, and if `n = min(r,c)` then `U` gets dimensions `[r,n,e]`, `S`
-/// gets dimensions `[n,n,e]`, and `V` gets dimensions `[c,n,e]`.
+/// gets dimensions `[n,n,e]`, and `V` gets dimensions `[c,n,e]`.  Option
+/// /svarray causes S to contain only the singular values, i.e., the diagonal of
+/// the matrix.
 ///
 /// \param narg is the number of arguments (LUX symbols).
 ///
@@ -350,6 +352,7 @@ lux_svd(ArgumentCount narg, Symbol ps[])
   Pointer *ptrs;
   LoopInfo *infos;
   int32_t iq;
+  const bool return_svarray = (internalMode & 1);
 
   StandardArguments sa;
   if ((iq = sa.set(narg, ps, "i>D:,:,*;oD&;oD1;oD1", &ptrs, &infos)) < 0)
@@ -374,10 +377,18 @@ lux_svd(ArgumentCount narg, Symbol ps[])
   standard_redef_array(ps[1], LUX_DOUBLE, dims.size(), &dims[0],
                        0, NULL, infos[1].mode, &ptrs[1], &infos[1]);
 
-  // create S, n by n by e
-  dims[0] = n;                  // n, n, e
-  standard_redef_array(ps[2], LUX_DOUBLE, dims.size(), &dims[0],
-                       0, NULL, infos[2].mode, &ptrs[2], &infos[2]);
+  // create S
+  if (return_svarray)         // /svarray; n by e
+  {
+    standard_redef_array(ps[2], LUX_DOUBLE, dims.size() - 1, &dims[1],
+                         0, NULL, infos[2].mode, &ptrs[2], &infos[2]);
+  } else                        // n by n by e
+  {
+    dims[0] = n;                  // n, n, e
+    standard_redef_array(ps[2], LUX_DOUBLE, dims.size(), &dims[0],
+                         0, NULL, infos[2].mode, &ptrs[2], &infos[2],
+                         true);
+  }
 
   // create V, c by n by e
   dims[0] = c;                // c, n, e
@@ -386,7 +397,10 @@ lux_svd(ArgumentCount narg, Symbol ps[])
 
   infos[0].setAxes(2, NULL, SL_EACHBLOCK); // X
   infos[1].setAxes(2, NULL, SL_EACHBLOCK); // U
-  infos[2].setAxes(2, NULL, SL_EACHBLOCK); // S
+  if (return_svarray)                    // /svarray
+    infos[2].setAxes(1, NULL, SL_EACHBLOCK); // S
+  else
+    infos[2].setAxes(2, NULL, SL_EACHBLOCK); // S
   infos[3].setAxes(2, NULL, SL_EACHBLOCK); // V
 
   std::vector<double> s(n);
@@ -397,13 +411,20 @@ lux_svd(ArgumentCount narg, Symbol ps[])
     ptrs[0].d += infos[0].singlestep[2];
     ptrs[1].d += infos[1].singlestep[2]; // U
     // fill S
-    double* sp = ptrs[2].d;
-    for (int i = 0; i < n; ++i)
+    if (return_svarray)
     {
-      *sp = s[i];
-      sp += n + 1;
+      memcpy(ptrs[2].d, s.data(), n*sizeof(double));
+      ptrs[2].d += infos[2].singlestep[1]; // S
+    } else
+    {
+      double* sp = ptrs[2].d;
+      for (int i = 0; i < n; ++i)
+      {
+        *sp = s[i];
+        sp += n + 1;
+      }
+      ptrs[2].d += infos[2].singlestep[2]; // S
     }
-    ptrs[2].d += infos[2].singlestep[2]; // S
     ptrs[3].d += infos[3].singlestep[2]; // V
   } while (infos[0].advanceLoop(&ptrs[0].ui8) < infos[0].ndim);
   iq = LUX_OK;
@@ -412,9 +433,17 @@ lux_svd(ArgumentCount narg, Symbol ps[])
   return cerror(NOSUPPORT, 0, "svd", "libgsl");
 #endif
 }
-REGISTER(svd, s, svd, 4, 4, NULL);
+REGISTER(svd, s, svd, 4, 4, "1svarray");
 
 #if HAVE_LIBGSL
+enum Eigenvalues_sort
+{
+  descending_absolute,
+  descending,
+  ascending_absolute,
+  ascending,
+};
+
 /// Calculates the eigenvalues of a symmetric real matrix.
 ///
 /// \param X points at the input values, which form a symmetric matrix.  \a X
@@ -427,12 +456,16 @@ REGISTER(svd, s, svd, 4, 4, NULL);
 /// \param s points at memory where the \a n found eigenvalues get stored, in
 /// descending order of absolute magnitude.  \a s must not be null.
 ///
+/// \param esort says how to sort the found eigenvalues.  The default is
+/// Eigenvalues_sort::descending_absolute.
+///
 /// \returns 0 if all is well, and non-0 if there is a problem (such as any of
 /// the pointers being null).
 ///
 /// \warning Requires \ref ext-lib-gsl.
 int
-eigenvalues_symmetric(const double* X, const size_t n, double* s)
+eigenvalues_symmetric(const double* X, const size_t n, double* s,
+                      Eigenvalues_sort esort = descending_absolute)
 {
   if (!X || !s || !n)
   {
@@ -452,10 +485,30 @@ eigenvalues_symmetric(const double* X, const size_t n, double* s)
 
   if (!result)
   {
-    // sort the eigenvalues in descending order of absolute magnitude
-    std::sort(&s_gsl->data[0], &s_gsl->data[n],
-              [](double lhs, double rhs)
-              { return std::abs(rhs) < std::abs(lhs); });
+    // sort the eigenvalues
+    switch (esort)
+    {
+      case ascending:
+        std::sort(&s_gsl->data[0], &s_gsl->data[n],
+                  [](double lhs, double rhs)
+                  { return rhs > lhs; });
+        break;
+      case ascending_absolute:
+        std::sort(&s_gsl->data[0], &s_gsl->data[n],
+                  [](double lhs, double rhs)
+                  { return std::abs(rhs) > std::abs(lhs); });
+        break;
+      case descending:
+        std::sort(&s_gsl->data[0], &s_gsl->data[n],
+                  [](double lhs, double rhs)
+                  { return rhs < lhs; });
+        break;
+      case descending_absolute:
+        std::sort(&s_gsl->data[0], &s_gsl->data[n],
+                  [](double lhs, double rhs)
+                  { return std::abs(rhs) < std::abs(lhs); });
+        break;
+    }
     memcpy(s, s_gsl->data, n*sizeof(double));
   }
 
@@ -629,8 +682,9 @@ lux_eigenvalues(ArgumentCount narg, Symbol ps[])
   infos[1].setAxes(1, NULL, SL_EACHBLOCK); // return symbol
 
   const size_t n = infos[0].dims[0];
+  const auto esort = static_cast<Eigenvalues_sort>(internalMode & 3);
   do {
-    if (eigenvalues_symmetric(ptrs[0].d, n, ptrs[1].d))
+    if (eigenvalues_symmetric(ptrs[0].d, n, ptrs[1].d, esort))
       return luxerror("Eigenvalue determination failed", ps[0]);
 
     ptrs[0].d += infos[0].singlestep[2]; // X
@@ -641,7 +695,7 @@ lux_eigenvalues(ArgumentCount narg, Symbol ps[])
   return cerror(NOSUPPORT, 0, "eigenvalues", "libgsl");
 #endif
 }
-REGISTER(eigenvalues, f, eigenvalues, 1, 1, NULL);
+REGISTER(eigenvalues, f, eigenvalues, 1, 1, "0descending:2ascending:0absolute:1relative:");
 
 /// Produces a transposed matrix.
 ///

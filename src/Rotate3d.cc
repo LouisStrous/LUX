@@ -30,7 +30,6 @@
 #endif
 
 #include "Rotate3d.hh"
-#include "replacements.h"       // if sincos is missing
 
 /// Rotate cartesian coordinates counterclockwise around the X axis
 /// over a specific angle.

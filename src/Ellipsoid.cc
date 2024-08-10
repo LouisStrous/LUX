@@ -28,8 +28,6 @@
 #include "config.h"
 #endif
 
-#include "replacements.h"       // for sincos replacement if needed
-
 #include "Ellipsoid.hh"
 #include "Rotate3d.hh"
 

@@ -77,6 +77,8 @@ int32_t installString(char const* string);
                                  new routine we encounter while we're already
                                  compiling something else */
 
+%expect 38
+
 /* list of tokens that are returned by yylex and have no */
 /* associativity */
 %token TOK_NL 999 TOK_C_ID TOK_S_ID TOK_NUMBER TOK_STR TOK_INCLUDE
@@ -88,7 +90,7 @@ int32_t installString(char const* string);
 %token TOK_DIVIDEIS TOK_POWERIS TOK_RETALL TOK_STRUCTTAG
 %token TOK_ERRORSTATE '=' TOK_ELLIPSIS
 
-/* tokes returned by yylex that have associativity, in order of increasing */
+/* tokens returned by yylex that have associativity, in order of increasing */
 /* precedence */
 %left TOK_ANDIF TOK_ORIF
 %left TOK_AND TOK_OR TOK_XOR '&' '|'
@@ -307,11 +309,15 @@ struct_element:                 /* a structure element: KEY:VALUE or VALUE */
 }
 ;
 
+value:                          // a literal value
+  TOK_NUMBER                    // a number
+  | TOK_STR {                   // a string
+    $$ = newSymbol(LUX_FIXED_STRING, $1);
+  }
+;
+
 expr:                           /* a general expression */
-  TOK_NUMBER                    /* a number */
-| TOK_STR {                     /* a string */
-  $$ = newSymbol(LUX_FIXED_STRING, $1);
-}
+  value
 | lhs
 | var '(' ')' {                 /* a function call without any arguments */
   startList(0);                 /* no arguments */
@@ -788,12 +794,12 @@ opt_case_else:
 
 case_list:                      /* set of cases for CASE */
 
-expr ':' statement {
+value ':' statement {
   startList($1);
   pushList($3);
 }
 
-| case_list expr ':' statement {
+| case_list value ':' statement {
   pushList($2);
   pushList($4);
 }

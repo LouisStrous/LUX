@@ -15,9 +15,12 @@ add_library(liblux STATIC
   ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc)
 target_compile_features(liblux PRIVATE cxx_std_17)
 
+# regenerate the parser if it is outdated
 find_package(BISON 3.0)
-BISON_TARGET(luxbison luxparser.yy ${CMAKE_CURRENT_BINARY_DIR}/luxparser.cc
-  DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/luxparser.hh)
+if (${BISON_FOUND})
+  BISON_TARGET(luxbison luxparser.yy ${CMAKE_CURRENT_BINARY_DIR}/luxparser.cc
+    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/luxparser.hh)
+endif()
 
 # use SOFA if available
 find_path(SOFA_INCLUDE sxofa.h)
@@ -52,13 +55,19 @@ configure_file(config.hh.in config.hh)
 # make config.hh accessible via #include "config.hh"
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc
-  COMMAND perl ${CMAKE_CURRENT_SOURCE_DIR}/bindings.pl ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bindings.pl ${SOURCES}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+# regenerate the bindings if they're outdated
+find_package(Perl 5.28)
+if (${PERL_FOUND})
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc
+    COMMAND perl ${CMAKE_CURRENT_SOURCE_DIR}/bindings.pl ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bindings.pl ${SOURCES}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 
 # define an executable based on the main file
-add_executable(lux "${MAIN}" ${BISON_luxbison_OUTPUTS})
+add_executable(Lux "${MAIN}" ${BISON_luxbison_OUTPUTS})
+# create the executable with a lower-case name
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "lux")
 
 # make the executable depend on the library
-target_link_libraries(lux liblux)
+target_link_libraries(Lux liblux)

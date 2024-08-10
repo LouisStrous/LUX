@@ -36,7 +36,9 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 #include "calendar.hh"
 
+#if !NDEBUG
 size_t InstanceID::s_instance_id = 0; // define static member
+#endif
 
 void    Quit(int32_t);
 

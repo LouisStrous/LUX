@@ -50,17 +50,19 @@ void printnice(char *p)
   }
 }
 
-int32_t site(ArgumentCount narg, Symbol ps[])
+Symbol
+site(ArgumentCount narg, Symbol ps[])
 /* Prints greeting message.  More info available when arguments are used.
    Be sure to delete  site.o  before every compilation, because otherwise the
    compilation time etc. aren't updated!   LS 10/5/92 */
 {
-  char        fmt[] = " %22s %6d %6d\n", hasInclude = 0;
-  void        setPager(int32_t), resetPager(void);
+  char fmt[] = " %22s %6d %6d\n";
+  bool hasInclude = false;
+  void setPager(int32_t), resetPager(void);
 
   setPager(0);
   if (!internalMode || internalMode == 255) {
-    printw("*** Welcome to " PROJECT "\n");
+    printw("*** Welcome to " PROJECT " " VERSION " on " PLATFORM "\n");
     printw("Copyright 2013-2024 Louis Strous.\n"
            "This program comes with ABSOLUTELY NO WARRANTY; "
            "for details type ‘info,/warranty’.  "
@@ -102,13 +104,17 @@ int32_t site(ArgumentCount narg, Symbol ps[])
   }
   if (internalMode & 8)                // /PACKAGES
   {
-    printw("****PACKAGES\n");
-#ifdef JPEG
-    if (!hasInclude) printw("Packages: ");
+    printw("****PACKAGES\nPackages: ");
+#ifdef JPEG_INCLUDE
     printw("JPEG ");
-    hasInclude = 1;
+    hasInclude = true;
 #endif
-    if (hasInclude) printw("\n");
+#ifdef SOFA_INCLUDE
+    printw("SOFA ");
+    hasInclude = true;
+#endif
+    if (hasInclude)
+      printw("\n");
   }
 
   if (internalMode & 1)        {        // give tables info

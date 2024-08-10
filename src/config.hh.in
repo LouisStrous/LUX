@@ -1,11 +1,17 @@
 #pragma once
 
+/// The project name,
 #define PROJECT "@PROJECT_NAME@"
 
+/// The project version.
 #define VERSION "@CMAKE_PROJECT_VERSION@"
 
+/// The architecture on which the program was built.
 #define PLATFORM "@CMAKE_SYSTEM@"
 
+/// Is SOFA (Standards of Fundamental Astronomy) based functionality included?
+/// See https://iausofa.org.
 #cmakedefine SOFA_INCLUDE
 
+/// Is libjpeg based functionality included?  See https://jpegclub.org,
 #cmakedefine JPEG_INCLUDE

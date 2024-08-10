@@ -18,7 +18,7 @@ public:
   identify(const std::string& id = "") const
   {
     printf("instance %lu", m_instance_id);
-    if (!id.empty()) 
+    if (!id.empty())
       printf(" (%s)\n", id.c_str());
     else
       putchar('\n');

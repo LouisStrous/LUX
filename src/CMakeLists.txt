@@ -22,41 +22,50 @@ if (${BISON_FOUND})
     DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/luxparser.hh)
 endif()
 
-# use SOFA if available
-find_path(SOFA_INCLUDE sofa.h)
-if (NOT ${SOFA_INCLUDE} STREQUAL "SOFA_INCLUDE-NOTFOUND")
-  message("Found sofa")
-  find_library(SOFA_LIBRARY sofa_c)
-  target_link_libraries(liblux ${SOFA_LIBRARY})
-  target_include_directories(liblux PRIVATE ${SOFA_INCLUDE})
-endif()
-
-# use GNU readline if available
-find_path(READLINE_INCLUDE readline/readline.h)
-if (NOT ${READLINE_INCLUDE} STREQUAL "READLINE_INCLUDE-NOTFOUND")
-  message("Found readline")
-  find_library(READLINE_LIBRARY readline)
-  target_link_libraries(liblux ${READLINE_LIBRARY})
-  target_include_directories(liblux PRIVATE ${READLINE_INCLUDE})
-endif()
-
 # use GNU Scientific Library if available
 find_path(GSL_INCLUDE gsl/gsl_types.h)
 if (NOT ${GSL_INCLUDE} STREQUAL "GSL_INCLUDE-NOTFOUND")
-  message("Found GSL")
+  message("Found GNU GSL")
   find_library(GSL_LIBRARY gsl)
   find_library(GSLBLAS_LIBRARY gslcblas)
   target_link_libraries(liblux ${GSL_LIBRARY} ${GSLBLAS_LIBRARY})
   target_include_directories(liblux PRIVATE ${GSL_INCLUDE})
 endif()
 
-# use libjpeg if available
+# use IMCCE Calceph if available
+find_path(CALCEPH_INCLUDE gsl/gsl_types.h)
+if (NOT ${CALCEPH_INCLUDE} STREQUAL "CALCEPH_INCLUDE-NOTFOUND")
+  message("Found IMCCE Calceph")
+  find_library(CALCEPH_LIBRARY calceph)
+  target_link_libraries(liblux ${CALCEPH_LIBRARY})
+  target_include_directories(liblux PRIVATE ${CALCEPH_INCLUDE})
+endif()
+
+# use IJG JPEG if available
 find_path(JPEG_INCLUDE jpeglib.h)
 if (NOT ${JPEG_INCLUDE} STREQUAL "JPEG_INCLUDE-NOTFOUND")
-  message("Found JPEG")
+  message("Found IJG JPEG")
   find_library(JPEG_LIBRARY jpeg)
   target_link_libraries(liblux ${JPEG_LIBRARY})
   target_include_directories(liblux PRIVATE ${JPEG_INCLUDE})
+endif()
+
+# use GNU readline if available
+find_path(READLINE_INCLUDE readline/readline.h)
+if (NOT ${READLINE_INCLUDE} STREQUAL "READLINE_INCLUDE-NOTFOUND")
+  message("Found GNU Readline")
+  find_library(READLINE_LIBRARY readline)
+  target_link_libraries(liblux ${READLINE_LIBRARY})
+  target_include_directories(liblux PRIVATE ${READLINE_INCLUDE})
+endif()
+
+# use IAU SOFA if available
+find_path(SOFA_INCLUDE sofa.h)
+if (NOT ${SOFA_INCLUDE} STREQUAL "SOFA_INCLUDE-NOTFOUND")
+  message("Found IAU SOFA")
+  find_library(SOFA_LIBRARY sofa_c)
+  target_link_libraries(liblux ${SOFA_LIBRARY})
+  target_include_directories(liblux PRIVATE ${SOFA_INCLUDE})
 endif()
 
 # create config.hh file to be able to suppress code making use of unavailable

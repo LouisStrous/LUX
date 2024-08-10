@@ -1,3 +1,4 @@
+#pragma once
 /* This is file bindings.hh.
 
 Copyright 2013-2014 Louis Strous
@@ -17,9 +18,6 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef HAVE_BINDINGS_H
-#define HAVE_BINDINGS_H
-
 #include <cstdint>              // for int32_t
 #include <cstdlib>              // for size_t
 #include "types.hh"
@@ -473,4 +471,3 @@ void register_lux_s(int32_t (*f)(int32_t, int32_t []), char const* name,
 // This macro expands to nothing.  Its presence is detected and acted
 // upon by an external script (bindings.pl).
 #define BINDC(func, ...)
-#endif

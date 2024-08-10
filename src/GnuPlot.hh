@@ -1,3 +1,4 @@
+#pragma once
 /* This is file GnuPlot.hh.
 
 Copyright 2017 Louis Strous
@@ -17,11 +18,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef HAVE_GNUPLOT_HH_
-#define HAVE_GNUPLOT_HH_
-
-#  include "config.hh"
+#include "config.hh"
 
 #include "luxdefs.hh"           // for Symboltype
 #include <cstddef>              // for size_t
@@ -187,5 +184,3 @@ private:
 
   DatablockBackendCollection m_datablock_plot_elements;
 };
-
-#endif

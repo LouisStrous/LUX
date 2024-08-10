@@ -9,6 +9,10 @@
 /// The architecture on which the program was built.
 #define PLATFORM "@CMAKE_SYSTEM@"
 
+/// Is the IMCCE Calceph library included?  See
+/// https://www.imcce.fr/inpop/calceph/.
+#cmakedefine01 CALCEPH_INCLUDE
+
 /// Is the GNU Scientific Library included?  See
 /// https://www.gnu.org/software/gsl/.
 #cmakedefine01 GSL_INCLUDE

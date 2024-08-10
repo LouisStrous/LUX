@@ -105,6 +105,10 @@ site(ArgumentCount narg, Symbol ps[])
   if (internalMode & 8)                // /PACKAGES
   {
     printw("****PACKAGES\nPackages: ");
+#if CALCEPH_INCLUDE
+    printw("Calceph ");
+    hasInclude = true;
+#endif
 #if JPEG_INCLUDE
     printw("JPEG ");
     hasInclude = true;

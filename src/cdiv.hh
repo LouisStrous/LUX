@@ -1,5 +1,4 @@
-#ifndef HAVE_CDIV_HH
-#define HAVE_CDIV_HH
+#pragma once
 
 /// A template type to store the results of the cdiv template function.
 template<typename T>
@@ -72,5 +71,3 @@ cdiv(Int numerator, Int denominator) {
   }
   return result;
 }
-
-#endif

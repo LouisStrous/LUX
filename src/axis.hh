@@ -1,3 +1,4 @@
+#pragma once
 /* This is file axis.hh.
 
 Copyright 2013-2014 Louis Strous
@@ -17,9 +18,6 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef HAVE_AXIS_H
-#define HAVE_AXIS_H
-
 #include <vector>
 #include "types.hh"
 
@@ -88,5 +86,3 @@ struct LoopInfo
   void returnLoop( Pointer *ptr, int32_t index);
   int32_t set(size_t index);
 };
-
-#endif

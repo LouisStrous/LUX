@@ -94,7 +94,7 @@ void
 astropos(double JD, int target_object, int observer_object, double xyz[3])
 {
   // got de441.bsp from ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp
-#if HAVE_LIBCALCEPH
+#if CALCEPH_INCLUDE
   static t_calcephbin* de441 = NULL;
   if (!de441)
   {
@@ -167,7 +167,7 @@ astropos(double JD, int target_object, int observer_object, double xyz[3])
 int32_t
 lux_astron2(ArgumentCount narg, Symbol ps[])
 {
-#if HAVE_LIBCALCEPH
+#if CALCEPH_INCLUDE
   std::vector<int32_t> output_dimensions;
   Pointer JDs, target_object_ids;
   int JD_count, target_object_id_count;
@@ -346,4 +346,4 @@ lux_astron2(ArgumentCount narg, Symbol ps[])
   return cerror(NOSUPPORT, 0, "ASTRON2", "libcalceph");
 #endif
 }
-REGISTER(astron2, f, astron2, 2, 4, ":::equinox:1keepdims:~6ecliptical:2equatorial:4bare:~8polar:8xyz:16date:32conjspread", HAVE_LIBCALCEPH)
+REGISTER(astron2, f, astron2, 2, 4, ":::equinox:1keepdims:~6ecliptical:2equatorial:4bare:~8polar:8xyz:16date:32conjspread", CALCEPH_INCLUDE)

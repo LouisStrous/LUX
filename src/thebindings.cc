@@ -2993,7 +2993,7 @@ void register_the_bindings()
 {
   register_lux_f(lux_kepler_v_f, "kepler", 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount");
 
-#if HAVE_LIBCALCEPH
+#if CALCEPH_INCLUDE
   int32_t lux_astron2(int32_t, int32_t []);
   register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdims:~6ecliptical:2equatorial:4bare:~8polar:8xyz:16date:32conjspread");
 #endif

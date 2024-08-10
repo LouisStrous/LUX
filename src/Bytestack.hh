@@ -1,3 +1,4 @@
+#pragma once
 /* This is file Bytestack.hh.
 
 Copyright 2013-2014 Louis Strous
@@ -20,9 +21,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /** \file
   Declarations for a stack of bytes whose size
  * grows as needed when more data is pushed unto it. */
-
-#ifndef HAVE_BYTESTACK_H_
-#define HAVE_BYTESTACK_H_
 
 // HEADERS
 #include <stdio.h>
@@ -76,4 +74,3 @@ size_t Bytestack_bytes(Bytestack bytestack, Bytestack_index index);
 
 char *Bytestack_quotify(Bytestack bytestack,
                         Bytestack_index bi1, Bytestack_index bi2);
-#endif

@@ -11,7 +11,11 @@
 
 /// Is SOFA (Standards of Fundamental Astronomy) based functionality included?
 /// See https://iausofa.org.
-#cmakedefine SOFA_INCLUDE
+#cmakedefine01 SOFA_INCLUDE
 
 /// Is libjpeg based functionality included?  See https://jpegclub.org,
-#cmakedefine JPEG_INCLUDE
+#cmakedefine01 JPEG_INCLUDE
+
+/// Is GNU readline functionality included?  See
+/// https://www.gnu.org/software/readline/.
+#cmakedefine01 READLINE_INCLUDE

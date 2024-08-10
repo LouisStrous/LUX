@@ -1,6 +1,6 @@
 #include "config.hh"
 
-#if SOFA_INCLUDE
+#ifdef SOFA_INCLUDE
 # include <algorithm>
 # include <cmath>
 # include <calceph.h>

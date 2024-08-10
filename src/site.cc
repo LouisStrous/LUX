@@ -62,7 +62,7 @@ site(ArgumentCount narg, Symbol ps[])
 
   setPager(0);
   if (!internalMode || internalMode == 255) {
-    printw("*** Welcome to " PROJECT " " VERSION " on " PLATFORM "\n");
+    printw("*** Welcome to " PROJECT " " VERSION " built on " PLATFORM "\n");
     printw("Copyright 2013-2024 Louis Strous.\n"
            "This program comes with ABSOLUTELY NO WARRANTY; "
            "for details type ‘info,/warranty’.  "
@@ -105,11 +105,15 @@ site(ArgumentCount narg, Symbol ps[])
   if (internalMode & 8)                // /PACKAGES
   {
     printw("****PACKAGES\nPackages: ");
-#ifdef JPEG_INCLUDE
+#if JPEG_INCLUDE
     printw("JPEG ");
     hasInclude = true;
 #endif
-#ifdef SOFA_INCLUDE
+#if READLINE_INCLUDE
+    printw("ReadLine ");
+    hasInclude = true;
+#endif
+#if SOFA_INCLUDE
     printw("SOFA ");
     hasInclude = true;
 #endif

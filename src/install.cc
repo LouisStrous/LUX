@@ -131,8 +131,6 @@ extern LuxRoutine checkList, lux_whereisAddress, lux_show_temps,
                 lux_newallocs, show_files;
 #endif
 
-extern LuxRoutine lux_read_jpeg6b, lux_write_jpeg6b;
-
 extern LuxRoutine lux_gifread, lux_gifwrite;
 
 extern LuxRoutine lux_menu, lux_menu_hide, lux_menu_item, lux_menu_kill,
@@ -321,8 +319,6 @@ InternalRoutine         subroutine_table[] = {
   { "insert",   2, 4, lux_inserter, 0 },                         // subsc.c
   { "int",      1, MAX_ARG, lux_word_inplace, 0 },               // symbols.c
   { "int64",    1, MAX_ARG, lux_int64_inplace, 0 },              // symbols.c
-  { "jpegread", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
-  { "jpegwrite", 2, 4, lux_write_jpeg6b, 0 },                    // jpeg.c
   { "limits",   0, 6, lux_limits, 0 },                           // plots.c
   { "list",     1, 1, lux_list, 0 },                             // ident.c
   { "long",     1, MAX_ARG, lux_long_inplace, 0 },               // symbols.c
@@ -351,7 +347,6 @@ InternalRoutine         subroutine_table[] = {
   { "readf",    2, MAX_ARG, lux_readf, "1askmore:2word" },        // files.c
   { "readorbits", 0, 1, lux_readorbits, "1list:2replace" },       // astron.c
   { "readu",    2, MAX_ARG, lux_readu, 0 },                       // files.c
-  { "read_jpeg", 2, 4, lux_read_jpeg6b, ":::shrink:1greyscale" }, // jpeg.c
   { "record",   0, 1, lux_record, "1input:2output:4reset" },      // symbols.c
   { "redim",    2, 9, lux_redim, 0 },                             // subsc.c
   { "replace",  3, 3, lux_replace_values, 0 },                    // strous2.c
@@ -407,7 +402,6 @@ InternalRoutine         subroutine_table[] = {
 #endif
   { "word",     1, 1, lux_word_inplace, 0 },   // symbols.c
   { "writeu",   2, MAX_ARG, lux_writeu, 0 },   // files.c
-  { "write_jpeg", 2, 4, lux_write_jpeg6b, 0 }, // jpeg.c
   { "zap",      1, MAX_ARG, lux_zap, "+1pointer" }, // strous2.c
   { "zero",     1, MAX_ARG, lux_zero, 0 },          // fun1.c
   { "zeronans", 1, MAX_ARG, lux_zapnan, "*%1%value" }, // fun1.c
@@ -504,8 +498,6 @@ extern LuxRoutine lux_gifread_f, lux_gifwrite_f;
 extern LuxRoutine lux_calendar, lux_EasterDate, // lux_orbitalElement,
   lux_astropos, lux_precess, lux_constellation,
   lux_constellationname, lux_enhanceimage;
-
-extern LuxRoutine lux_read_jpeg6b_f, lux_write_jpeg6b_f;
 
 extern int32_t  vargsmooth;
 extern LuxRoutine lux_test;
@@ -743,8 +735,6 @@ InternalRoutine function_table[] = {
   { "isstring", 1, 1, lux_isstring, 0 }, // subsc.cc
   { "ist",      1, 3, lux_istring, 0 },  // fun2.cc
   { "istring",  1, 3, lux_istring, 0 },  // fun2.cc
-  { "jpegread", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.cc
-  { "jpegwrite", 2, 4, lux_write_jpeg6b_f, 0 },                    // jpeg.cc
   { "ksmooth",  2, 3, lux_ksmooth, "1balanced" },                  // fun2.cc
   { "laplace2d", 1, 1, lux_laplace2d, 0 },                         // poisson.cc
   { "legendre", 2, 2, lux_legendre, "1normalize" },                // strous3.cc
@@ -816,7 +806,6 @@ InternalRoutine function_table[] = {
   { "randomu",  3, MAX_DIMS, lux_randomu, "%2%seed:period" },       // random.cc
   { "readf",    2, MAX_ARG, lux_readf_f, "1askmore:2word" },        // files.cc
   { "readu",    2, MAX_ARG, lux_readu_f, 0 },                       // files.cc
-  { "read_jpeg", 2, 4, lux_read_jpeg6b_f, ":::shrink:1greyscale" }, // jpeg.cc
   { "real",     1, 1, lux_real, 0 },                                // fun3.cc
   { "redim",    1, 9, lux_redim_f, 0 },                             // subsc.cc
 #if HAVE_REGEX_H
@@ -916,7 +905,6 @@ InternalRoutine function_table[] = {
   { "voigt",    2, 2, lux_voigt, "*" },          // fun1.cc
   { "wmap",     1, 1, lux_wmap, 0 },             // subsc.cc
   { "writeu",   2, MAX_ARG, lux_writeu, 0 },     // files.cc
-  { "write_jpeg", 2, 4, lux_write_jpeg6b_f, 0 }, // jpeg.cc
   { "zero",     1, 2, lux_zerof, "*" },            // fun1.cc
   { "zeronans", 1, 2, lux_zapnan_f, "*%1%value" }, // fun1.cc
   { "zinv",     1, 1, lux_zinv, "*" },             // strous.cc

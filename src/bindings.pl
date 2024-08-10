@@ -45,9 +45,6 @@ print $ofh <<EOD;
 #include "config.hh"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
-#if HAVE_LIBSOFA_C
-# include "sofa.h"
-#endif
 
 int32_t luxerror(char const*, int32_t, ...);
 
@@ -100,7 +97,7 @@ foreach my $file (@files) {
     } elsif (/^REGISTER\((.*?)\)/) {
       @data = split /\s*,\s*/, $1;
       {
-        my $text = '';
+        my $text = "#line $. \"$file\"\n";
         $text .= "#if $data[6]\n" if $data[6];
         $text .= <<~EOD;
           int32_t lux_$data[0](int32_t, int32_t []);
@@ -140,4 +137,3 @@ close $ofh;
 #  return result; \
 # } \
 # REGISTER(func ## _ ## fs, fs, name, minarg, maxarg, fsspec)
-

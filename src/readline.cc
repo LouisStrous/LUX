@@ -2,7 +2,7 @@
 /// library is not available
 #include "readline.hh"
 
-#if !HAVE_LIBREADLINE
+#if !READLINE_INCLUDE
 
 # include <stdio.h>
 # include <malloc.h>

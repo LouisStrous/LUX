@@ -2,7 +2,7 @@
 /// library is not available
 #include "history.hh"
 
-#if !HAVE_LIBREADLINE
+#if !READLINE_INCLUDE
 
 int read_history(char* path)
 {

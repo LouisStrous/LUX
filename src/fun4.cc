@@ -3838,7 +3838,7 @@ int32_t lux_bigger235(ArgumentCount narg, Symbol ps[])
   return result;
 }
 //-------------------------------------------------------------------------
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 int32_t single_fft(Pointer data, int32_t n, int32_t type, int32_t back)
 // type = LUX_FLOAT or LUX_DOUBLE
 {
@@ -3866,7 +3866,7 @@ int32_t single_fft(Pointer data, int32_t n, int32_t type, int32_t back)
 int32_t lux_cartesian_to_polar(ArgumentCount narg, Symbol ps[])
 // y = CTOP(x [, x0, y0])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t       nx, ny, result, dims[2], r, rmax, n, az, step, i;
   Symboltype type;
   float         x0, y0, x, y, daz;
@@ -3942,7 +3942,7 @@ int32_t lux_cartesian_to_polar(ArgumentCount narg, Symbol ps[])
 int32_t lux_polar_to_cartesian(ArgumentCount narg, Symbol ps[])
 // y = PTOC(x [, nx, ny, x0, y0])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t       nx, ny, result, dims[2], step, ix, iy;
   Symboltype type;
   float         x0, y0, daz, dx, dy, az, r;

@@ -151,7 +151,7 @@ lux_matrix_product(ArgumentCount narg, Symbol ps[])
 }
 REGISTER(matrix_product, f, mproduct, 2, 2, "0inner:1outer");
 //-------------------------------------------------------------------------
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 /// Fill a row-major GSL matrix from a column-major LUX array.
 ///
 /// \param tgt is the GSL matrix to fill.
@@ -346,7 +346,7 @@ singular_value_decomposition(const double* X, const size_t r, const size_t c,
 Symbol
 lux_svd(ArgumentCount narg, Symbol ps[])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   Pointer *ptrs;
   LoopInfo *infos;
   int32_t iq;
@@ -433,7 +433,7 @@ lux_svd(ArgumentCount narg, Symbol ps[])
 }
 REGISTER(svd, s, svd, 4, 4, "1svarray");
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 enum Eigenvalues_sort
 {
   descending_absolute,
@@ -593,7 +593,7 @@ eigensystem_symmetric(const double* X, const size_t n, double* s, double* V)
 Symbol
 lux_eigensystem(ArgumentCount narg, Symbol ps[])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   Pointer *ptrs;
   LoopInfo *infos;
   int32_t iq;
@@ -663,7 +663,7 @@ REGISTER(eigensystem, s, eigensystem, 2, 4, NULL);
 Symbol
 lux_eigenvalues(ArgumentCount narg, Symbol ps[])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   Pointer *ptrs;
   LoopInfo *infos;
   int32_t iq;

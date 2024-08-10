@@ -2,7 +2,7 @@
 # define INCLUDED_GSLPP_SORT_HH
 
 # include "config.hh"
-# if HAVE_LIBGSL
+# if GSL_INCLUDE
 
 #  include <cstddef>            // for size_t
 #  include <vector>
@@ -296,5 +296,5 @@ sort_rank(const std::vector<T>& data)
   return sort_rank(data.data(), 1, data.size());
 }
 
-# endif  // HAVE_LIBGSL
+# endif  // GSL_INCLUDE
 #endif  // INCLUDED_GSLPP_SORT_HH

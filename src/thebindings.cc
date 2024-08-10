@@ -3059,7 +3059,7 @@ void register_the_bindings()
   int32_t lux_hist(int32_t, int32_t []);
   register_lux_f(lux_hist, "hist", 1, 2, "1first:2ignorelimit:4increaselimit:8silent" );
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t lux_welch(int32_t, int32_t []);
   register_lux_f(lux_welch, "welch", 2, 3, "1window:2fast");
 #endif
@@ -3799,27 +3799,27 @@ void register_the_bindings()
   int32_t lux_commonfactors(int32_t, int32_t []);
   register_lux_s(lux_commonfactors, "commonfactors", 3, 4, NULL);
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t lux_planetpermutationchanges(int32_t, int32_t []);
   register_lux_f(lux_planetpermutationchanges, "planetpermutationchanges", 3, 3, "1verbose");
 #endif
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t lux_permutationnumber(int32_t, int32_t []);
   register_lux_f(lux_permutationnumber, "permutationnumber", 1, 2, "0rank:1index:0linear:2circular");
 #endif
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t lux_permutation(int32_t, int32_t []);
   register_lux_f(lux_permutation, "permutation", 2, 2, "0rank:1index:0linear:2circular");
 #endif
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t lux_permutationdistance(int32_t, int32_t []);
   register_lux_f(lux_permutationdistance, "permutationdistance", 2, 2, "0rank:1index:0linear:2circular");
 #endif
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t lux_factorial(int32_t, int32_t []);
   register_lux_f(lux_factorial, "factorial", 1, 1, NULL);
 #endif

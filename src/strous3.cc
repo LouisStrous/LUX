@@ -52,7 +52,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 // library includes
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 #include <gsl/gsl_sf_gamma.h>
 #include <gslpp_roots.hh>
 #include <gslpp_sort.hh>        // for gsl_sort_index
@@ -101,7 +101,7 @@ int32_t lux_bisect(ArgumentCount narg, Symbol ps[])
    bisector positions are returned in it. */
 // LS 7may98
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t       result, iq, pos, nLev, outDims[MAX_DIMS], step,
     lev, xSym, ySym, vSym, il, ir;
   double        xl, xr, min, minpos, max, maxpos, x1l, x2l, x1r, x2r;
@@ -507,7 +507,7 @@ int32_t lux_cspline_find(ArgumentCount narg, Symbol ps[])
    index <index(i)> and run up to but not including index <index(i+1)>. */
 // LS 2009-08-09
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t       result, iq, nLev, lev, ySym, vSym, i, step, *index, j;
   Pointer       src, level;
   CsplineInfo   cspl;
@@ -3320,7 +3320,7 @@ int32_t lux_commonfactors(ArgumentCount narg, Symbol ps[]) {
 }
 REGISTER(commonfactors, s, commonfactors, 3, 4, NULL);
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 
 /// Details of a time interval and the circular or semicircular permutation
 /// changes that have been detected in it.
@@ -4125,7 +4125,7 @@ lux_planetpermutationchanges(ArgumentCount narg, Symbol ps[])
   }
   return iq;
 }
-REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, "1verbose", HAVE_LIBGSL);
+REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, "1verbose", GSL_INCLUDE);
 
 // iD;iL*?;rL{1} → iiarx
 // lux_i_sd_iiarx_<ptrspec>_f_
@@ -4318,7 +4318,7 @@ lux_permutationnumber(ArgumentCount narg, Symbol ps[])
 
   return result;
 }
-REGISTER(permutationnumber, f, permutationnumber, 1, 2, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
+REGISTER(permutationnumber, f, permutationnumber, 1, 2, "0rank:1index:0linear:2circular", GSL_INCLUDE);
 
 /// Implements the `permutation` function in LUX.
 ///
@@ -4359,7 +4359,7 @@ lux_permutation(ArgumentCount narg, Symbol ps[])
 
   return result;
 }
-REGISTER(permutation, f, permutation, 2, 2, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
+REGISTER(permutation, f, permutation, 2, 2, "0rank:1index:0linear:2circular", GSL_INCLUDE);
 
 /// \ingroup luxroutines
 ///
@@ -4496,7 +4496,7 @@ lux_permutationdistance(ArgumentCount narg, Symbol ps[])
   }
   return iq;
 }
-REGISTER(permutationdistance, f, permutationdistance, 2, 2, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
+REGISTER(permutationdistance, f, permutationdistance, 2, 2, "0rank:1index:0linear:2circular", GSL_INCLUDE);
 
 /// \ingroup luxroutines
 ///
@@ -4564,7 +4564,7 @@ lux_factorial(ArgumentCount narg, Symbol ps[])
   }
   return iq;
 }
-REGISTER(factorial, f, factorial, 1, 1, NULL, HAVE_LIBGSL);
+REGISTER(factorial, f, factorial, 1, 1, NULL, GSL_INCLUDE);
 #endif
 
 /// This template function provides the main action for function

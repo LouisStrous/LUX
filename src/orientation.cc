@@ -606,7 +606,7 @@ int32_t lux_orientation(ArgumentCount narg, Symbol ps[])
 // returns the real roots of x^3 + a x^2 + b x + c = 0,
 int32_t lux_root3(ArgumentCount narg, Symbol ps[])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   double a = double_arg(*ps++);
   double b = double_arg(*ps++);
   double c = double_arg(*ps);

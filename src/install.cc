@@ -3678,7 +3678,7 @@ int32_t lux_trace(ArgumentCount narg, Symbol ps[])
 #define s_ptr(name, value) installPointer(name, LUX_TEMP_STRING, value)
 #define fnc_p(name, value) installSysFunc(name, value)
 
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 /// Should error messages from the Gnu Scientific Library be displayed?  This
 /// global variable is accessable within Lux through `!gsl_show_errors`.
 int32_t gsl_show_errors = 0;
@@ -3955,7 +3955,7 @@ void symbolInitialization(void)
  fmt_float = string_value(fformat);
  fmt_string = string_value(sformat);
  fmt_complex = string_value(cformat);
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
  l_ptr("!gsl_show_errors", &gsl_show_errors);
 #endif
  l_ptr("!histmin",      &histmin);

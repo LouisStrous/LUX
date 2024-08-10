@@ -726,7 +726,7 @@ double fit2_func(const gsl_vector *a, void *p)
 */
 int32_t lux_generalfit2(ArgumentCount narg, Symbol ps[])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t nPar, nPoints, result, ithresh = 0, nithresh;
   gsl_multimin_fminimizer *minimizer = NULL;
   lux_func_if *afif = NULL;

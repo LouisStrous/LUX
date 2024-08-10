@@ -76,9 +76,4 @@ size_t Bytestack_bytes(Bytestack bytestack, Bytestack_index index);
 
 char *Bytestack_quotify(Bytestack bytestack,
                         Bytestack_index bi1, Bytestack_index bi2);
-
-#if HAVE_COOKIE_IO_FUNCTIONS_T
-FILE *Bytestack_open(Bytestack stack, const char *opentype);
-#endif
-
 #endif

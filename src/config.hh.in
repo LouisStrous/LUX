@@ -9,9 +9,9 @@
 /// The architecture on which the program was built.
 #define PLATFORM "@CMAKE_SYSTEM@"
 
-/// Is SOFA (Standards of Fundamental Astronomy) based functionality included?
-/// See https://iausofa.org.
-#cmakedefine01 SOFA_INCLUDE
+/// Is the GNU Scientific Library included?  See
+/// https://www.gnu.org/software/gsl/.
+#cmakedefine01 GSL_INCLUDE
 
 /// Is libjpeg based functionality included?  See https://jpegclub.org,
 #cmakedefine01 JPEG_INCLUDE
@@ -19,3 +19,7 @@
 /// Is GNU readline functionality included?  See
 /// https://www.gnu.org/software/readline/.
 #cmakedefine01 READLINE_INCLUDE
+
+/// Is SOFA (Standards of Fundamental Astronomy) based functionality included?
+/// See https://iausofa.org.
+#cmakedefine01 SOFA_INCLUDE

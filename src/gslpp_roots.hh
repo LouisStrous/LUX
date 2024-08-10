@@ -2,7 +2,7 @@
 # define INCLUDED_GSLPP_ROOTS_HH
 
 # include "config.hh"
-# if HAVE_LIBGSL
+# if GSL_INCLUDE
 
 #  include <gsl/gsl_roots.h>
 

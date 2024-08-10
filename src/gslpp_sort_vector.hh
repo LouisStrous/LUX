@@ -1,7 +1,7 @@
 #ifndef INCLUDED_GSLPP_SORT_VECTOR_HH
 #define INCLUDED_GSLPP_SORT_VECTOR_HH
 #include "config.hh"
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 # include <gsl/gsl_sort_vector.h>
 
 /// \file

@@ -40,10 +40,20 @@ if (NOT ${READLINE_INCLUDE} STREQUAL "READLINE_INCLUDE-NOTFOUND")
   target_include_directories(liblux PRIVATE ${READLINE_INCLUDE})
 endif()
 
+# use GNU Scientific Library if available
+find_path(GSL_INCLUDE gsl/gsl_types.h)
+if (NOT ${GSL_INCLUDE} STREQUAL "GSL_INCLUDE-NOTFOUND")
+  message("Found GSL")
+  find_library(GSL_LIBRARY gsl)
+  find_library(GSLBLAS_LIBRARY gslcblas)
+  target_link_libraries(liblux ${GSL_LIBRARY} ${GSLBLAS_LIBRARY})
+  target_include_directories(liblux PRIVATE ${GSL_INCLUDE})
+endif()
+
 # use libjpeg if available
 find_path(JPEG_INCLUDE jpeglib.h)
 if (NOT ${JPEG_INCLUDE} STREQUAL "JPEG_INCLUDE-NOTFOUND")
-  message("Found libjpeg")
+  message("Found JPEG")
   find_library(JPEG_LIBRARY jpeg)
   target_link_libraries(liblux ${JPEG_LIBRARY})
   target_include_directories(liblux PRIVATE ${JPEG_INCLUDE})

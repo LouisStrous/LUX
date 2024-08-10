@@ -38,7 +38,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "cdiv.hh"
 #include "editorcharclass.hh"
 #include "luxparser.hh"
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 # include <gsl/gsl_fft_real.h>
 # include <gsl/gsl_fft_halfcomplex.h>
 #endif
@@ -424,7 +424,7 @@ int32_t lux_sc(ArgumentCount narg, Symbol ps[])      // sc routine
   return 1;
 }
 //-------------------------------------------------------------------------
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 static gsl_fft_real_wavetable* rwave = NULL;
 static int32_t nrwave = -1;
 static gsl_fft_real_workspace* rwork = NULL;
@@ -505,7 +505,7 @@ void clear_ffttemp(void)
 //-------------------------------------------------------------------------
 int32_t gsl_fft(double *data, size_t n, size_t stride)
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   if (!update_rwave(n) || !update_rwork(n))
     return 1;
 
@@ -537,7 +537,7 @@ BIND(gsl_fft, i_sd_iaia_000, s, fft, 1, 2, "1allaxes:2amplitudes");
 //-------------------------------------------------------------------------
 int32_t gsl_fft_back(double *data, size_t n, size_t stride)
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   if (!update_hwave(n) || !update_rwork(n))
     return 1;
 
@@ -568,7 +568,7 @@ BIND(gsl_fft_back, i_sd_iaia_000, s, fftb, 1, 2, "1allaxes:2amplitudes");
 //-------------------------------------------------------------------------
 int32_t hilbert(double *data, size_t n, size_t stride)
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   if (!update_rwave(n) || !update_hwave(n) || !update_rwork(n))
     return 1;
 
@@ -593,7 +593,7 @@ BIND(hilbert, i_sd_iaia_000, s, hilbert, 1, 2, "1allaxes");
 int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
                    double *tdata, size_t tcount, size_t tstride)
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   if (!update_rwave(scount) || !update_hwave(tcount))
     return 1;
 
@@ -654,7 +654,7 @@ int32_t gsl_fft_expand(double *sdata, size_t scount, size_t sstride,
 //-------------------------------------------------------------------------
 int32_t lux_fft_expand(ArgumentCount narg, Symbol ps[])
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   Pointer *ptrs;
   LoopInfo *infos;
 
@@ -3616,7 +3616,7 @@ int32_t neutral(void *p, int32_t n)
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 const CsplineInfo empty_cubic_spline(void) {
   const CsplineInfo c = { NULL, NULL, NULL, NULL };
   return c;
@@ -3823,7 +3823,7 @@ double integrate_linear(double a, double b,
   return d*((x1 - s)*y2 + (s - x2)*y1)/(x1 - x2);
 }
 //-------------------------------------------------------------------------
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 double cspline_integral(double x1, double x2, CsplineInfo *cspl)
 // returns the integral of a cubic spline between positions <x1> and
 // <x2>.  Assumes that the required information about the spline is
@@ -4060,7 +4060,7 @@ int32_t lux_cubic_spline(ArgumentCount narg, Symbol ps[])
      rid of it.)
    LS 29apr96 */
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   static char   haveTable = '\0';
   static CsplineInfo    cspl = { NULL, NULL, NULL, NULL };
   int32_t       xNewSym, xNew2Sym, xTabSym, yTabSym, size, oldType, result_sym;
@@ -4204,7 +4204,7 @@ int32_t lux_cubic_spline_extreme(ArgumentCount narg, Symbol ps[])
    MINVAL=<min>, MAXPOS=<maxpos>, MAXVAL=<max>, /KEEPDIMS, /PERIODIC]
  */
 {
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
   int32_t       iq, dims[MAX_DIMS], ndim, step, pos, i, mode;
   double        thisextpos, thisext, x1, x2;
   LoopInfo      yinfo;
@@ -4666,7 +4666,7 @@ int32_t lux_fade(ArgumentCount narg, Symbol ps[])
   return LUX_OK;
 }
 //-------------------------------------------------------------------------
-#if HAVE_LIBGSL
+#if GSL_INCLUDE
 /// Is the given sample count one that allows the fastest calculation of the
 /// Fast Fourier Transform, for the used FFT algorithm?  A good sample count has
 /// no prime divisors other than 2, 3, and 5.
@@ -4922,5 +4922,5 @@ lux_welch(ArgumentCount narg, Symbol ps[])
 
   return iq;
 }
-REGISTER(welch, f, welch, 2, 3, "1window:2fast", HAVE_LIBGSL);
+REGISTER(welch, f, welch, 2, 3, "1window:2fast", GSL_INCLUDE);
 #endif

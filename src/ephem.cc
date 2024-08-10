@@ -20,9 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // file ephem, solar ephemeris routines
 // 10/23/97 - add Rick Bogart's timerep stuff, not fully used yet
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include<stdio.h>
 #include<string.h>
 #include <math.h>

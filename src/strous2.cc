@@ -19,9 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File strous2.c
 // Various LUX routines by L. Strous.
-#if HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include "action.hh"
 #include <algorithm>
 #include <ctype.h>

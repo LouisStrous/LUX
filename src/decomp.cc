@@ -21,9 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // File decomp.c
 /* LUX routines for LU decomposition and solution of\n sets of
    linear equations. */
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <stdio.h>
 #include "action.hh"
 //--------------------------------------------------------------------------

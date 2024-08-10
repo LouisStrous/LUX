@@ -21,9 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // internal lux subroutines and functions
 // mostly fft related stuff and solar mappings
  //this is file fun5.c
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <math.h>
 #include <string.h>
 #include "install.hh"

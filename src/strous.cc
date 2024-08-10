@@ -19,9 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File strous.c
 // Various LUX routines by L. Strous.
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <algorithm>            // for std::binary_search
 #include <iterator>             // for std::distance
 #include <stdio.h>

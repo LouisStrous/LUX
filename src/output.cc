@@ -21,9 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // The following routines are like their counterparts with all small
 // letters, but also record the output to a record file, if
 // so instructed.
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include <stdarg.h>
 #include <stdint.h>

@@ -21,9 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // LUX routines for determining 2D and 3D orientation.
 #include <math.h>
 #include <string.h>
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include "action.hh"
 
 #include <gsl/gsl_poly.h>

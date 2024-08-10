@@ -13,9 +13,7 @@
  */
 
 /* LS 10mar99: we use autoconf results from config.h */
-#if HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 /*
  * Normally the __STDC__ macro can be taken as indicating that the system

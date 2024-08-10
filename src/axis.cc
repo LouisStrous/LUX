@@ -42,9 +42,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
     the array is traversed.  See at standardLoop() for more info.
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include <algorithm>            // for std::remove_if
 #include <cassert>

@@ -20,9 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // File filemap.c
 // LUX routines implementing file arrays (file maps).
 // Routines to handle file maps through file arrays
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>

@@ -19,9 +19,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // crunch.c, begun 12/6/91 using fragments from earlier modules
-#if HAVE_CONFIG_H
 #include "config.h"
-#endif
 #include "lux_structures.hh"
  /* 2/4/96, finished adding a 32 bit crunch/decrunch which is especially
  useful for recording darks and flats at La Palma since these are sums of

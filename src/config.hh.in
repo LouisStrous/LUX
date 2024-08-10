@@ -10,15 +10,19 @@
 #define PLATFORM "@CMAKE_SYSTEM@"
 
 /// Is the IMCCE Calceph library included?  See
-/// https://www.imcce.fr/inpop/calceph/.
+/// https://www.imcce.fr/inpop/calceph.
 #cmakedefine01 CALCEPH_INCLUDE
 
 /// Is the GNU Scientific Library included?  See
-/// https://www.gnu.org/software/gsl/.
+/// https://www.gnu.org/software/gsl.
 #cmakedefine01 GSL_INCLUDE
 
-/// Is libjpeg based functionality included?  See https://jpegclub.org,
+/// Is libjpeg based functionality included?  See https://jpegclub.org.
 #cmakedefine01 JPEG_INCLUDE
+
+/// Is OpenImageIO included?  See
+/// https://github.com/AcademySoftwareFoundation/OpenImageIO.
+#cmakedefine01 OIIO_INCLUDE
 
 /// Is GNU readline functionality included?  See
 /// https://www.gnu.org/software/readline/.

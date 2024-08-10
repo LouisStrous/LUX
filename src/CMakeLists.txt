@@ -59,6 +59,16 @@ if (NOT ${READLINE_INCLUDE} STREQUAL "READLINE_INCLUDE-NOTFOUND")
   target_include_directories(liblux PRIVATE ${READLINE_INCLUDE})
 endif()
 
+# use OpenImageIO if available
+find_path(OIIO_INCLUDE OpenImageIO/imageio.h)
+if (NOT ${OIIO_INCLUDE} STREQUAL "OIIO_INCLUDE-NOTFOUND")
+  message("Found AcademySoftwareFoundation OpenImageIO")
+  find_library(OIIO_LIBRARY OpenImageIO)
+  find_library(OIIOUTIL_LIBRARY OpenImageIO_Util)
+  target_link_libraries(liblux ${OIIO_LIBRARY} ${OIIOUTIL_LIBRARY})
+  target_include_directories(liblux PRIVATE ${OIIO_INCLUDE})
+endif()
+
 # use IAU SOFA if available
 find_path(SOFA_INCLUDE sofa.h)
 if (NOT ${SOFA_INCLUDE} STREQUAL "SOFA_INCLUDE-NOTFOUND")

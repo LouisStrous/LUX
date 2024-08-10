@@ -1,6 +1,6 @@
 #include "config.hh"
 
-#if HAVE_LIBOPENIMAGEIO
+#if OIIO_INCLUDE
 #include "action.hh"
 #include <OpenImageIO/imageio.h>
 
@@ -61,6 +61,6 @@ lux_read_image_oiio(ArgumentCount narg, Symbol ps[])
   in->close();
   return result;
 }
-REGISTER(read_image_oiio, f, readimage, 1, 1, NULL, HAVE_LIBOPENIMAGEIO);
+REGISTER(read_image_oiio, f, readimage, 1, 1, NULL, OIIO_INCLUDE);
 
 #endif

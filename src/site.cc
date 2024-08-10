@@ -113,6 +113,10 @@ site(ArgumentCount narg, Symbol ps[])
     printw("JPEG ");
     hasInclude = true;
 #endif
+#if OIIO_INCLUDE
+    printw("OIIO ");
+    hasInclude = true;
+#endif
 #if READLINE_INCLUDE
     printw("ReadLine ");
     hasInclude = true;

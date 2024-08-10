@@ -1,6 +1,6 @@
 /// This file provides dummy stubs for history support, in case the readline
 /// library is not available
-#include "history.h"
+#include "history.hh"
 
 #if !HAVE_LIBREADLINE
 

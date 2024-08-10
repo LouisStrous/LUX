@@ -30,8 +30,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "editor.hh"
 
 #include <stdio.h>
-#include "readline.h"
-#include "history.h"
+#include "readline.hh"
+#include "history.hh"
 
 char        line[BUFSIZE], tLine[BUFSIZE], recording = 0;
 FILE        *inputStream;

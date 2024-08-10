@@ -1,6 +1,6 @@
 /// This file provides dummy stubs for readline support, in case the readline
 /// library is not available
-#include "readline.h"
+#include "readline.hh"
 
 #if !HAVE_LIBREADLINE
 

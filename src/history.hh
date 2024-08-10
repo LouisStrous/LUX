@@ -1,6 +1,6 @@
 #ifndef HISTORY_HH
 # define HISTORY_HH
-# include "config.h"
+# include "config.hh"
 # if HAVE_LIBREADLINE
 #  include <stdio.h>
 #  include <readline/history.h>

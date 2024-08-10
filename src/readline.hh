@@ -1,6 +1,6 @@
 #ifndef READLINE_HH
 # define READLINE_HH
-# include "config.h"
+# include "config.hh"
 # if HAVE_LIBREADLINE
 #  include <stdio.h>
 #  include <readline/readline.h>

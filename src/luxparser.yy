@@ -23,12 +23,12 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "config.h"
+#include "config.hh"
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "readline.h"
-#include "history.h"
+#include "readline.hh"
+#include "history.hh"
 #include "action.hh"
 #include "luxparser.hh"
 #include "editor.hh"

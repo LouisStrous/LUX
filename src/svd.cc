@@ -17,6 +17,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <cstring>
 #include <math.h>
 #include "luxdefs.hh"
 #include "action.hh"
@@ -131,7 +132,7 @@ int32_t lux_svd(ArgumentCount narg, Symbol ps[])
     return cerror(ALLOC_ERR, 0);
   z = (double *) Malloc(d[1]*sizeof(double));
   n = d[0]*d[1];
-  src = array_data(ps[0]);
+  src.v = array_data(ps[0]);
   switch (symbol_type(ps[0])) {
     case LUX_INT8:
       while (n--)
@@ -163,7 +164,7 @@ int32_t lux_svd(ArgumentCount narg, Symbol ps[])
         *a++ = (double) *src.d++;
       a -= n;
       break;
-    }rlof
+    }
   SVD(a, z, d[1], d[0]);
 
   if (ps[1])

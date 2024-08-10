@@ -1,22 +1,11 @@
-// standard includes
-
-#include <algorithm>
-#include <cmath>
-
-// own features include
-
 #include "config.hh"
 
-// libraries
-
-#include <calceph.h>
-#if HAVE_LIBSOFA_C
-# include "sofa.h"
-#endif
-
-// own includes
-
-#include "SolarSystemEphemerides.hh"
+#if SOFA_INCLUDE
+# include <algorithm>
+# include <cmath>
+# include <calceph.h>
+# include <sofa.h>
+# include "SolarSystemEphemerides.hh"
 
 void astropos(double JD, int target_object, int observer_object, double xyz[3]);
 
@@ -358,3 +347,4 @@ SolarSystemEphemerides::polar(double JD, SolarSystemObject target,
   }
   return result;
 }
+#endif

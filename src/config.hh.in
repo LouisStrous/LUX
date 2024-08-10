@@ -1,3 +1,11 @@
 #pragma once
 
+#define PROJECT "@PROJECT_NAME@"
+
+#define VERSION "@CMAKE_PROJECT_VERSION@"
+
+#define PLATFORM "@CMAKE_SYSTEM@"
+
 #cmakedefine SOFA_INCLUDE
+
+#cmakedefine JPEG_INCLUDE

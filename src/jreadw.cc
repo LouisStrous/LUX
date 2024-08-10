@@ -21,8 +21,10 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* jreadw.c, interface with jpeg libraries based on example.c in JPEG
    distribution */
 #include "action.hh"
-#include "jinclude.hh"
-#include <setjmp.h>
+#if JPEG_INCLUDE
+# include "jpeglib.h"
+# include "jerror.h"
+# include <setjmp.h>
 
  // parameters for the current image
  int32_t        nx, ny;
@@ -317,3 +319,4 @@ int32_t lux_read_jpeg(ArgumentCount narg, Symbol ps[])        // jpeg read subro
  fclose(cinfo.input_file);
  return LUX_OK;                        // indicate success
 }
+#endif

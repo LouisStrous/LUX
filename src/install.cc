@@ -3942,7 +3942,7 @@ void symbolInitialization(void)
  l_ptr("#row",          &termRow);
 
  l_ptr("#msbfirst",     &MSBfirst);
- s_ptr("#version",      (char*) PACKAGE_VERSION);
+ s_ptr("#version",      (char*) VERSION);
 
  l_ptr("!area_diag",    &area_diag);
  l_ptr("!badmatch",     &badmatch);

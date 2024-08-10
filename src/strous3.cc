@@ -4126,11 +4126,9 @@ lux_planetpermutationchanges(ArgumentCount narg, Symbol ps[])
   return iq;
 }
 REGISTER(planetpermutationchanges, f, planetpermutationchanges, 3, 3, "1verbose", HAVE_LIBGSL);
-#endif
 
 // iD;iL*?;rL{1} → iiarx
 // lux_i_sd_iiarx_<ptrspec>_f_
-#if HAVE_LIBGSL
 /// Implements the LUX `permutationnumber` function.
 ///
 ///     value = permutationnumber(data [, /rank, /index]
@@ -4321,7 +4319,6 @@ lux_permutationnumber(ArgumentCount narg, Symbol ps[])
   return result;
 }
 REGISTER(permutationnumber, f, permutationnumber, 1, 2, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
-#endif
 
 /// Implements the `permutation` function in LUX.
 ///
@@ -4364,7 +4361,6 @@ lux_permutation(ArgumentCount narg, Symbol ps[])
 }
 REGISTER(permutation, f, permutation, 2, 2, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
 
-#if HAVE_LIBGSL
 /// \ingroup luxroutines
 ///
 /// Implements the `permutationdistance` function in LUX.
@@ -4501,9 +4497,7 @@ lux_permutationdistance(ArgumentCount narg, Symbol ps[])
   return iq;
 }
 REGISTER(permutationdistance, f, permutationdistance, 2, 2, "0rank:1index:0linear:2circular", HAVE_LIBGSL);
-#endif
 
-#if HAVE_LIBGSL
 /// \ingroup luxroutines
 ///
 /// Implements the `factorial` function in LUX.

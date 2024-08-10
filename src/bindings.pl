@@ -45,6 +45,9 @@ print $ofh <<EOD;
 #include "config.hh"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
+#if SOFA_INCLUDE
+# include "sofa.h"
+#endif
 
 int32_t luxerror(char const*, int32_t, ...);
 

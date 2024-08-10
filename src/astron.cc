@@ -93,7 +93,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "astrodat3.hh"
 #include "astron.hh"
 #include "calendar.hh"
-#include "replacements.h"       // if sincos is missing
 #include "vsop.hh"
 
 #define extractbits(value, base, bits) (((value) >> (base)) & ((1 << (bits)) - 1))

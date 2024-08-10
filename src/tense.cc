@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // LUX routines for interpolation along curves.
 // tense.f -- translated by f2c (version of 28 March 1990  0:01:01).
 
-#include "config.h"
+#include "config.hh"
 #include <math.h>
 #include "luxdefs.hh"
 #include "output.hh"

@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // experimental gif writer, learning ....
-#include "config.h"
+#include "config.hh"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

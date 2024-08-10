@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File editor.c
 // Command line editor.
-#include "config.h"
+#include "config.hh"
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>

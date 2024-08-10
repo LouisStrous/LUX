@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // LUX routines about memory use statistics.
-#include "config.h"
+#include "config.hh"
 #include <sys/types.h>
 #include <stdio.h>
 #include <unistd.h>

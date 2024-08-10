@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // Various LUX functions.
 // internal lux subroutines and functions
 //this is file fun2.c
-#include "config.h"
+#include "config.hh"
 #include <sys/time.h>           // for select()
 #include <sys/types.h>
 //#include <malloc.h>

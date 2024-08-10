@@ -1,6 +1,6 @@
 #ifndef INCLUDED_GSLPP_SORT_VECTOR_HH
 #define INCLUDED_GSLPP_SORT_VECTOR_HH
-#include "config.h"
+#include "config.hh"
 #if HAVE_LIBGSL
 # include <gsl/gsl_sort_vector.h>
 

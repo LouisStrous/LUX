@@ -5,7 +5,7 @@
 
 // own features include
 
-#include "config.h"
+#include "config.hh"
 
 // libraries
 

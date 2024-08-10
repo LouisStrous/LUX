@@ -34,7 +34,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 // configuration include
 
-#include "config.h"
+#include "config.hh"
 
 // standard includes
 

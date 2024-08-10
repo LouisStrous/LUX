@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File random.c
 // Various functions related to pseudo-random numbers
-# include "config.h"
+# include "config.hh"
 # include <math.h> // for cos(2) sqrt(2) log(2) sin(1) isnan(1)
 # include <string.h> // for memcpy(5)
 # include "action.hh"

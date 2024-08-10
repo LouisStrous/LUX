@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // LUX sorting routines.
 // file sorts, various sort routines for different types of data
  // taken from Press etal
-#include "config.h"
+#include "config.hh"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>

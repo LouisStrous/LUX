@@ -25,7 +25,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <malloc.h> // for malloc free
 #include <string.h> // for memcpy
 // END HEADERS
-#include "config.h"
+#include "config.hh"
 #include "action.hh"
 #include <algorithm>
 #include <errno.h>

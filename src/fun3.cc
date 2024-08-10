@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /// \file
 /// Various LUX functions.
-#include "config.h"
+#include "config.hh"
 #include <algorithm>
 #include <ctype.h>
 #include <errno.h>

@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File install.c
-#include "config.h"
+#include "config.hh"
 #include "install.hh"
 #include <ctype.h> // for toupper(11) isdigit(3)
 #include <errno.h> // for errno(2)

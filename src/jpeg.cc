@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // LUX support of the Independent JPEG Group's JPEG
 // compression/decompression software, version 6b.
 
-#include "config.h"
+#include "config.hh"
 #include <stdio.h>              // for FILE, fopen(), fclose(), printf()
 #include <ctype.h>              // for isprint()
 #if HAVE_LIBJPEG

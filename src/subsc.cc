@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File subsc.c
 // LUX routines dealing with subscripts.
-#include "config.h"
+#include "config.hh"
 #include <cassert>
 #include <stdlib.h>
 #include <string.h>

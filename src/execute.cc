@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File execute.c
 // LUX statement executor and auxilliary routines.
-#include "config.h"
+#include "config.hh"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config.hh"
 #if HAVE_LIBGSL
 # include <functional>
 # include "gslpp_roots.hh"

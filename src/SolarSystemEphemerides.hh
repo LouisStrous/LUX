@@ -6,7 +6,7 @@
 #include <array>
 
 // our features include
-#include "config.h"
+#include "config.hh"
 
 // our includes
 

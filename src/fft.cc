@@ -510,7 +510,7 @@ wsave   contains initialization calculations which must not be
  */
 
 //------------------------------------------------------------------------
-#include "config.h"
+#include "config.hh"
 #include <math.h>
 #include "action.hh"
 

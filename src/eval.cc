@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File eval.c
 // LUX expression evaluator and auxilliary routines.
-#include "config.h"
+#include "config.hh"
 #include <ctype.h>
 #include <math.h>
 #include <stdlib.h>

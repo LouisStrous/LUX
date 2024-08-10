@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config.hh"
 
 #if HAVE_LIBOPENIMAGEIO
 #include "action.hh"

@@ -25,7 +25,7 @@
 #include <cassert>
 #include <cmath>
 
-#  include "config.h"
+#  include "config.hh"
 
 #include "Rotate3d.hh"
 

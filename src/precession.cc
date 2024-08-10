@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h> // for sin cos
 #include <string.h> // for memcpy
 // END HEADERS
-#include "config.h"
+#include "config.hh"
 #include "action.hh"
 #if HAVE_LIBGSL
 # include <gsl/gsl_poly.h>

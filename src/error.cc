@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // LUX routines for generating error messages.
 // error.c - error messages
 
-#include "config.h"
+#include "config.hh"
 #include <map>
 #include <stdio.h>
 #include <string.h>

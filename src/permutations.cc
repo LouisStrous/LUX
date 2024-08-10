@@ -2,7 +2,7 @@
 
 // standard includes
 
-#include "config.h"
+#include "config.hh"
 
 #if HAVE_LIBGSL
 # include <algorithm>

@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef HAVE_GNUPLOT_HH_
 #define HAVE_GNUPLOT_HH_
 
-#  include "config.h"
+#  include "config.hh"
 
 #include "luxdefs.hh"           // for Symboltype
 #include <cstddef>              // for size_t

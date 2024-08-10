@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File site.c
 // LUX site and version identification routine.
-#include "config.h"
+#include "config.hh"
 
 #include <ctype.h>
 #include <stdio.h>

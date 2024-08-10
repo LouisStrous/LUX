@@ -24,7 +24,7 @@
 
 #include <math.h>
 
-#include "config.h"
+#include "config.hh"
 
 #include "Ellipsoid.hh"
 #include "Rotate3d.hh"

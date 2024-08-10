@@ -48,7 +48,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "config.h"
+#include "config.hh"
 
 #include <unistd.h>                // for close()
 

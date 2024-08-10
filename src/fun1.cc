@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // File fun1.c
 // Various LUX functions.
 //a collection of internal lux subroutines and functions
-#include "config.h"
+#include "config.hh"
 #include <limits>
 #include "InstanceID.hh"
 #include <time.h>

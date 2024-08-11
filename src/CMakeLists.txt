@@ -18,8 +18,8 @@ target_compile_features(liblux PRIVATE cxx_std_17)
 # regenerate the parser if it is outdated
 find_package(BISON 3.0)
 if (${BISON_FOUND})
-  BISON_TARGET(luxbison luxparser.yy ${CMAKE_CURRENT_BINARY_DIR}/luxparser.cc
-    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/luxparser.hh)
+  BISON_TARGET(luxbison luxparser.yy ${CMAKE_CURRENT_SOURCE_DIR}/luxparser.cc
+    DEFINES_FILE ${CMAKE_CURRENT_SOURCE_DIR}/luxparser.hh)
 endif()
 
 # use GNU Scientific Library if available
@@ -88,8 +88,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # regenerate the bindings if they're outdated
 find_package(Perl 5.28)
 if (${PERL_FOUND})
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc
-    COMMAND perl ${CMAKE_CURRENT_SOURCE_DIR}/bindings.pl ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/thebindings.cc
+    COMMAND perl ${CMAKE_CURRENT_SOURCE_DIR}/bindings.pl ${CMAKE_CURRENT_SOURCE_DIR}/thebindings.cc
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bindings.pl ${SOURCES}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

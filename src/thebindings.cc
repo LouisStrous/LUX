@@ -2993,47 +2993,61 @@ void register_the_bindings()
 {
   register_lux_f(lux_kepler_v_f, "kepler", 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount");
 
+#line 349 "astron2.cc"
 #if CALCEPH_INCLUDE
   int32_t lux_astron2(int32_t, int32_t []);
   register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdims:~6ecliptical:2equatorial:4bare:~8polar:8xyz:16date:32conjspread");
 #endif
 
+#line 263 "error.cc"
   int32_t lux_error(int32_t, int32_t []);
   register_lux_s(lux_error, "error", 0, 2, "1store:2restore" );
 
+#line 78 "filemap.cc"
   int32_t lux_bytfarr(int32_t, int32_t []);
   register_lux_f(lux_bytfarr, "bytfarr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
+#line 79 "filemap.cc"
   int32_t lux_bytfarr(int32_t, int32_t []);
   register_lux_f(lux_bytfarr, "uint8farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
+#line 84 "filemap.cc"
   int32_t lux_intfarr(int32_t, int32_t []);
   register_lux_f(lux_intfarr, "intfarr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
+#line 85 "filemap.cc"
   int32_t lux_intfarr(int32_t, int32_t []);
   register_lux_f(lux_intfarr, "int16farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
+#line 90 "filemap.cc"
   int32_t lux_lonfarr(int32_t, int32_t []);
   register_lux_f(lux_lonfarr, "lonfarr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
+#line 91 "filemap.cc"
   int32_t lux_lonfarr(int32_t, int32_t []);
   register_lux_f(lux_lonfarr, "int32farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
+#line 96 "filemap.cc"
   int32_t lux_int64farr(int32_t, int32_t []);
   register_lux_f(lux_int64farr, "int64farr", 3, MAX_DIMS + 1, "%1%offset:1readonly:2swap");
 
+#line 938 "fit.cc"
   int32_t lux_generalfit2(int32_t, int32_t []);
   register_lux_f(lux_generalfit2, "fit3", 5, 7, "x:y:start:step:f:err:ithresh:1vocal");
 
+#line 961 "fun1.cc"
   int32_t lux_setnan(int32_t, int32_t []);
   register_lux_f(lux_setnan, "setnan", 1, 2, NULL);
 
+#line 1043 "fun1.cc"
   int32_t lux_indgen_s(int32_t, int32_t []);
   register_lux_s(lux_indgen_s, "indgen", 1, 2, "*");
 
+#line 5610 "fun1.cc"
   int32_t lux_log2(int32_t, int32_t []);
   register_lux_f(lux_log2, "log2", 1, 1, nullptr);
 
+#line 205 "fun2.cc"
   int32_t lux_runsum(int32_t, int32_t []);
   register_lux_f(lux_runsum, "runsum", 1, 3, "*");
 
@@ -3053,40 +3067,99 @@ void register_the_bindings()
 
   register_lux_s(lux_hilbert_s, "hilbert", 1, 2, "1allaxes");
 
+#line 693 "fun3.cc"
   int32_t lux_fft_expand(int32_t, int32_t []);
   register_lux_f(lux_fft_expand, "fftexpand", 2, 2, NULL);
 
+#line 1688 "fun3.cc"
   int32_t lux_hist(int32_t, int32_t []);
   register_lux_f(lux_hist, "hist", 1, 2, "1first:2ignorelimit:4increaselimit:8silent" );
 
+#line 4925 "fun3.cc"
 #if GSL_INCLUDE
   int32_t lux_welch(int32_t, int32_t []);
   register_lux_f(lux_welch, "welch", 2, 3, "1window:2fast");
 #endif
 
+#line 57 "gnuplot_interface.cc"
   int32_t lux_gcommand(int32_t, int32_t []);
   register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
 
+#line 68 "gnuplot_interface.cc"
   int32_t lux_gterm(int32_t, int32_t []);
   register_lux_s(lux_gterm, "gterm", 1, 1, "");
 
+#line 546 "gnuplot_interface.cc"
   int32_t lux_gplot(int32_t, int32_t []);
   register_lux_s(lux_gplot, "gplot", 1, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
+#line 571 "gnuplot_interface.cc"
   int32_t lux_goplot(int32_t, int32_t []);
   register_lux_s(lux_goplot, "goplot", 1, 9, ":::linetype:pointtype:dashtype:color:legend:breaks");
 
+#line 576 "gnuplot_interface.cc"
   int32_t lux_gaplot(int32_t, int32_t []);
   register_lux_s(lux_gaplot, "gaplot", 0, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
+#line 612 "gnuplot_interface.cc"
   int32_t lux_gnutv(int32_t, int32_t []);
   register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);
 
+#line 934 "gnuplot_interface.cc"
   int32_t lux_gnuplot3d(int32_t, int32_t []);
   register_lux_s(lux_gnuplot3d, "gplot3d", 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
+#line 968 "gnuplot_interface.cc"
   int32_t lux_gnucontour(int32_t, int32_t []);
   register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
+
+#line 183 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_read_jpeg6b(int32_t, int32_t []);
+  register_lux_s(lux_read_jpeg6b, "jpegread", 2, 4, ":::shrink:1greyscale");
+#endif
+
+#line 184 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_read_jpeg6b(int32_t, int32_t []);
+  register_lux_s(lux_read_jpeg6b, "read_jpeg", 2, 4, ":::shrink:1greyscale");
+#endif
+
+#line 190 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_read_jpeg6b_f(int32_t, int32_t []);
+  register_lux_f(lux_read_jpeg6b_f, "jpegread", 2, 4, ":::shrink:1greyscale");
+#endif
+
+#line 191 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_read_jpeg6b_f(int32_t, int32_t []);
+  register_lux_f(lux_read_jpeg6b_f, "read_jpeg", 2, 4, ":::shrink:1greyscale");
+#endif
+
+#line 297 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_write_jpeg6b(int32_t, int32_t []);
+  register_lux_s(lux_write_jpeg6b, "jpegwrite", 2, 4, 0);
+#endif
+
+#line 298 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_write_jpeg6b(int32_t, int32_t []);
+  register_lux_s(lux_write_jpeg6b, "write_jpeg", 2, 4, 0);
+#endif
+
+#line 304 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_write_jpeg6b_f(int32_t, int32_t []);
+  register_lux_f(lux_write_jpeg6b_f, "jpegwrite", 2, 4, 0);
+#endif
+
+#line 305 "jpeg.cc"
+#if JPEG_INCLUDE
+  int32_t lux_write_jpeg6b_f(int32_t, int32_t []);
+  register_lux_f(lux_write_jpeg6b_f, "write_jpeg", 2, 4, 0);
+#endif
 
 #if SOFA_INCLUDE
   register_lux_f(lux_iauBi00_f, "bi00", 0, 0, 0);
@@ -3160,11 +3233,13 @@ void register_the_bindings()
   register_lux_f(lux_iauC2txy_f, "c2txy", 5, 5, 0);
 
 #endif
+#line 263 "luxsofa.cc"
 #if SOFA_INCLUDE
   int32_t lux_iauCal2jd(int32_t, int32_t []);
   register_lux_f(lux_iauCal2jd, "cal2jd", 1, 1, 0);
 #endif
 
+#line 342 "luxsofa.cc"
 #if SOFA_INCLUDE
   int32_t lux_iauDat(int32_t, int32_t []);
   register_lux_f(lux_iauDat, "dat", 0, 1, "1valid");
@@ -3210,6 +3285,7 @@ void register_the_bindings()
   register_lux_f(lux_iauEpb_f, "epb", 1, 1, 0);
 
 #endif
+#line 434 "luxsofa.cc"
 #if SOFA_INCLUDE
   int32_t lux_iauEpb2jd(int32_t, int32_t []);
   register_lux_f(lux_iauEpb2jd, "epb2jd", 1, 1, 0);
@@ -3219,6 +3295,7 @@ void register_the_bindings()
   register_lux_f(lux_iauEpj_f, "epj", 1, 1, 0);
 
 #endif
+#line 461 "luxsofa.cc"
 #if SOFA_INCLUDE
   int32_t lux_iauEpj2jd(int32_t, int32_t []);
   register_lux_f(lux_iauEpj2jd, "epj2jd", 1, 1, 0);
@@ -3720,60 +3797,81 @@ void register_the_bindings()
   register_lux_s(lux_iauXys06a_s, "xys06a", 4, 4, 0);
 
 #endif
+#line 152 "matrix.cc"
   int32_t lux_matrix_product(int32_t, int32_t []);
   register_lux_f(lux_matrix_product, "mproduct", 2, 2, "0inner:1outer");
 
+#line 434 "matrix.cc"
   int32_t lux_svd(int32_t, int32_t []);
   register_lux_s(lux_svd, "svd", 4, 4, "1svarray");
 
+#line 648 "matrix.cc"
   int32_t lux_eigensystem(int32_t, int32_t []);
   register_lux_s(lux_eigensystem, "eigensystem", 2, 4, NULL);
 
+#line 696 "matrix.cc"
   int32_t lux_eigenvalues(int32_t, int32_t []);
   register_lux_f(lux_eigenvalues, "eigenvalues", 1, 1, "0descending:2ascending:0absolute:1relative:");
 
+#line 768 "matrix.cc"
   int32_t lux_transpose_matrix(int32_t, int32_t []);
   register_lux_f(lux_transpose_matrix, "transpose", 1, 1, NULL);
 
+#line 819 "matrix.cc"
   int32_t lux_diagonal_matrix(int32_t, int32_t []);
   register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 3, NULL);
 
+#line 64 "oiio.cc"
+#if OIIO_INCLUDE
   int32_t lux_read_image_oiio(int32_t, int32_t []);
   register_lux_f(lux_read_image_oiio, "readimage", 1, 1, NULL);
+#endif
 
+#line 479 "random.cc"
   int32_t lux_randome(int32_t, int32_t []);
   register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
 
+#line 436 "strous.cc"
   int32_t lux_distr_f(int32_t, int32_t []);
   register_lux_f(lux_distr_f, "distr", 2, 2, "2ignorelimit:4increaselimit" );
 
+#line 686 "strous.cc"
   int32_t lux_find(int32_t, int32_t []);
   register_lux_f(lux_find, "find", 2, 3, "1data_monotonic:2at_or_past");
 
+#line 49 "strous2.cc"
   int32_t lux_noop(int32_t, int32_t []);
   register_lux_s(lux_noop, "noop", 0, 0, nullptr);
 
+#line 572 "strous2.cc"
   int32_t lux_tolookup(int32_t, int32_t []);
   register_lux_s(lux_tolookup, "tolookup", 2, 4, "1one");
 
+#line 2548 "strous2.cc"
   int32_t lux_find_maxloc(int32_t, int32_t []);
   register_lux_f(lux_find_maxloc, "find_maxloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
 
+#line 2555 "strous2.cc"
   int32_t lux_find_minloc(int32_t, int32_t []);
   register_lux_f(lux_find_minloc, "find_minloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
 
+#line 2562 "strous2.cc"
   int32_t lux_find_extremeloc(int32_t, int32_t []);
   register_lux_f(lux_find_extremeloc, "find_extremeloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
 
+#line 2569 "strous2.cc"
   int32_t lux_find_max(int32_t, int32_t []);
   register_lux_f(lux_find_max, "find_max", 1, 3, "::diagonal:1degree:2subgrid");
 
+#line 2576 "strous2.cc"
   int32_t lux_find_min(int32_t, int32_t []);
   register_lux_f(lux_find_min, "find_min", 1, 3, "::diagonal:1degree:2subgrid");
 
+#line 2583 "strous2.cc"
   int32_t lux_find_extreme(int32_t, int32_t []);
   register_lux_f(lux_find_extreme, "find_extreme", 1, 3, "::diagonal:1degree:2subgrid");
 
+#line 769 "strous3.cc"
   int32_t lux_monotone_interpolation(int32_t, int32_t []);
   register_lux_f(lux_monotone_interpolation, "monotoneinterpolate", 3, 3, "1none:2circle:4square:8wide:16full");
 
@@ -3787,97 +3885,125 @@ void register_the_bindings()
 
   register_lux_f(lux_hypot_stride_f, "hypot", 1, 2, ":axis");
 
+#line 2752 "strous3.cc"
   int32_t lux_ssfc_to_polar(int32_t, int32_t []);
   register_lux_f(lux_ssfc_to_polar, "ssfctopolar", 1, 2, 0);
 
+#line 2817 "strous3.cc"
   int32_t lux_polar_to_ssfc(int32_t, int32_t []);
   register_lux_f(lux_polar_to_ssfc, "polartossfc", 1, 2, 0);
 
+#line 2956 "strous3.cc"
   int32_t lux_findspans(int32_t, int32_t []);
   register_lux_f(lux_findspans, "findspans", 1, 1, "1cycle");
 
+#line 3321 "strous3.cc"
   int32_t lux_commonfactors(int32_t, int32_t []);
   register_lux_s(lux_commonfactors, "commonfactors", 3, 4, NULL);
 
+#line 4128 "strous3.cc"
 #if GSL_INCLUDE
   int32_t lux_planetpermutationchanges(int32_t, int32_t []);
   register_lux_f(lux_planetpermutationchanges, "planetpermutationchanges", 3, 3, "1verbose");
 #endif
 
+#line 4321 "strous3.cc"
 #if GSL_INCLUDE
   int32_t lux_permutationnumber(int32_t, int32_t []);
   register_lux_f(lux_permutationnumber, "permutationnumber", 1, 2, "0rank:1index:0linear:2circular");
 #endif
 
+#line 4362 "strous3.cc"
 #if GSL_INCLUDE
   int32_t lux_permutation(int32_t, int32_t []);
   register_lux_f(lux_permutation, "permutation", 2, 2, "0rank:1index:0linear:2circular");
 #endif
 
+#line 4499 "strous3.cc"
 #if GSL_INCLUDE
   int32_t lux_permutationdistance(int32_t, int32_t []);
   register_lux_f(lux_permutationdistance, "permutationdistance", 2, 2, "0rank:1index:0linear:2circular");
 #endif
 
+#line 4567 "strous3.cc"
 #if GSL_INCLUDE
   int32_t lux_factorial(int32_t, int32_t []);
   register_lux_f(lux_factorial, "factorial", 1, 1, NULL);
 #endif
 
+#line 4787 "strous3.cc"
   int32_t lux_decompose_2d_median3(int32_t, int32_t []);
   register_lux_s(lux_decompose_2d_median3, "decompose2dmedian3", 3, 3, NULL);
 
+#line 4950 "strous3.cc"
   int32_t lux_compose_2d(int32_t, int32_t []);
   register_lux_s(lux_compose_2d, "compose2d", 3, 3, NULL);
 
+#line 5055 "strous3.cc"
   int32_t lux_div(int32_t, int32_t []);
   register_lux_f(lux_div, "div", 2, 2, NULL);
 
+#line 638 "symbols.cc"
   int32_t lux_byte(int32_t, int32_t []);
   register_lux_f(lux_byte, "byte", 1, 1, "*");
 
+#line 639 "symbols.cc"
   int32_t lux_byte(int32_t, int32_t []);
   register_lux_f(lux_byte, "uint8", 1, 1, "*");
 
+#line 646 "symbols.cc"
   int32_t lux_word(int32_t, int32_t []);
   register_lux_f(lux_word, "word", 1, 1, "*");
 
+#line 647 "symbols.cc"
   int32_t lux_word(int32_t, int32_t []);
   register_lux_f(lux_word, "int16", 1, 1, "*");
 
+#line 654 "symbols.cc"
   int32_t lux_long(int32_t, int32_t []);
   register_lux_f(lux_long, "long", 1, 1, "*");
 
+#line 655 "symbols.cc"
   int32_t lux_long(int32_t, int32_t []);
   register_lux_f(lux_long, "int32", 1, 1, "*");
 
+#line 662 "symbols.cc"
   int32_t lux_int64(int32_t, int32_t []);
   register_lux_f(lux_int64, "int64", 1, 1, "*");
 
+#line 873 "symbols.cc"
   int32_t lux_floor(int32_t, int32_t []);
   register_lux_f(lux_floor, "floor", 1, 2, nullptr);
 
+#line 1084 "symbols.cc"
   int32_t lux_ceil(int32_t, int32_t []);
   register_lux_f(lux_ceil, "ceil", 1, 2, nullptr);
 
+#line 2302 "symbols.cc"
   int32_t lux_bytarr(int32_t, int32_t []);
   register_lux_f(lux_bytarr, "bytarr", 1, MAX_DIMS, nullptr);
 
+#line 2303 "symbols.cc"
   int32_t lux_bytarr(int32_t, int32_t []);
   register_lux_f(lux_bytarr, "uint8arr", 1, MAX_DIMS, nullptr);
 
+#line 2314 "symbols.cc"
   int32_t lux_intarr(int32_t, int32_t []);
   register_lux_f(lux_intarr, "intarr", 1, MAX_DIMS, nullptr);
 
+#line 2315 "symbols.cc"
   int32_t lux_intarr(int32_t, int32_t []);
   register_lux_f(lux_intarr, "int16arr", 1, MAX_DIMS, nullptr);
 
+#line 2326 "symbols.cc"
   int32_t lux_lonarr(int32_t, int32_t []);
   register_lux_f(lux_lonarr, "lonarr", 1, MAX_DIMS, nullptr);
 
+#line 2327 "symbols.cc"
   int32_t lux_lonarr(int32_t, int32_t []);
   register_lux_f(lux_lonarr, "int32arr", 1, MAX_DIMS, nullptr);
 
+#line 2338 "symbols.cc"
   int32_t lux_int64arr(int32_t, int32_t []);
   register_lux_f(lux_int64arr, "int64arr", 1, MAX_DIMS, nullptr);
 

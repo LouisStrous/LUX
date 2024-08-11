@@ -11,8 +11,8 @@ list(REMOVE_ITEM SOURCES "${MAIN}" "${BINDINGS}")
 # define a library based on the non-main files
 add_library(liblux STATIC
   ${SOURCES}
-  ${CMAKE_CURRENT_BINARY_DIR}/luxparser.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/thebindings.cc)
+  ${CMAKE_CURRENT_SOURCE_DIR}/luxparser.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/thebindings.cc)
 target_compile_features(liblux PRIVATE cxx_std_17)
 
 # regenerate the parser if it is outdated

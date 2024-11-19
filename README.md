@@ -1,3 +1,15 @@
+**NOTICE**: I've decided to stop development of LUX.  I've worked on
+LUX and its predecessor ANA, of which LUX is a fork, since 1990, 34
+years ago as I write this.  I intend to switch to using Python and
+to port useful pieces of LUX functionality to Python modules.  That
+way, more people can benefit from my work, and I can benefit from
+many other people's work.  It's been fun.
+
+The LUX website (lux.quae.nl) will eventually disappear.
+
+                                          Louis Strous, 19-11-2024
+
+
 1 LUX 
 ======
 

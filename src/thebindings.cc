@@ -3081,35 +3081,35 @@ void register_the_bindings()
   register_lux_f(lux_welch, "welch", 2, 3, "1window:2fast");
 #endif
 
-#line 57 "gnuplot_interface.cc"
+#line 59 "gnuplot_interface.cc"
   int32_t lux_gcommand(int32_t, int32_t []);
   register_lux_s(lux_gcommand, "gcommand", 1, 2, ":verbose");
 
-#line 68 "gnuplot_interface.cc"
+#line 70 "gnuplot_interface.cc"
   int32_t lux_gterm(int32_t, int32_t []);
   register_lux_s(lux_gterm, "gterm", 1, 1, "");
 
-#line 546 "gnuplot_interface.cc"
+#line 548 "gnuplot_interface.cc"
   int32_t lux_gplot(int32_t, int32_t []);
   register_lux_s(lux_gplot, "gplot", 1, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
-#line 571 "gnuplot_interface.cc"
+#line 573 "gnuplot_interface.cc"
   int32_t lux_goplot(int32_t, int32_t []);
   register_lux_s(lux_goplot, "goplot", 1, 9, ":::linetype:pointtype:dashtype:color:legend:breaks");
 
-#line 576 "gnuplot_interface.cc"
+#line 578 "gnuplot_interface.cc"
   int32_t lux_gaplot(int32_t, int32_t []);
   register_lux_s(lux_gaplot, "gaplot", 0, 13, ":::linetype:pointtype:dashtype:color:legend:breaks:xtitle:ytitle:ztitle:title:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
-#line 612 "gnuplot_interface.cc"
+#line 615 "gnuplot_interface.cc"
   int32_t lux_gnutv(int32_t, int32_t []);
   register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);
 
-#line 934 "gnuplot_interface.cc"
+#line 937 "gnuplot_interface.cc"
   int32_t lux_gnuplot3d(int32_t, int32_t []);
   register_lux_s(lux_gnuplot3d, "gplot3d", 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
-#line 968 "gnuplot_interface.cc"
+#line 971 "gnuplot_interface.cc"
   int32_t lux_gnucontour(int32_t, int32_t []);
   register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
 
@@ -3830,6 +3830,10 @@ void register_the_bindings()
 #line 479 "random.cc"
   int32_t lux_randome(int32_t, int32_t []);
   register_lux_f(lux_randome, "randome", 3, MAX_DIMS, "%1%limit:scale");
+
+#line 127 "rawimages.cc"
+  int32_t lux_read_raw_image(int32_t, int32_t []);
+  register_lux_f(lux_read_raw_image, "readrawimage", 1, 1, nullptr);
 
 #line 436 "strous.cc"
   int32_t lux_distr_f(int32_t, int32_t []);

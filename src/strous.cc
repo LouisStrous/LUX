@@ -39,7 +39,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "install.hh"
 #include "format.hh"
 #include "editor.hh"            // for BUFSIZE
-#include "readline.hh"
+#include "readline/readline.h"
 #include "FloatingPointAccumulator.hh"
 
 int16_t         stack[STACKSIZE], *stackPointer = &stack[STACKSIZE];

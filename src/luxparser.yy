@@ -27,8 +27,8 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "readline.hh"
-#include "history.hh"
+#include "readline/readline.h"
+#include "readline/history.h"
 #include "action.hh"
 #include "luxparser.hh"
 #include "editor.hh"

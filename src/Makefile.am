@@ -94,8 +94,6 @@ nonbind_sources = \
 	gslpp_sort.hh\
 	gslpp_sort_vector.hh\
 	gslpp_vector.hh\
-	history.cc\
-	history.hh\
 	ident.cc\
 	install.cc\
 	install.hh\
@@ -124,8 +122,6 @@ nonbind_sources = \
 	precession.cc\
 	printf_extensions.cc\
 	random.cc\
-	readline.cc\
-	readline.hh\
 	rawimages.cc\
 	regex.cc\
 	site.cc\

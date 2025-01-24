@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // LUX routines dealing with cluster analysis
 // Louis Strous / started 18 August 1995
-# include "config.hh"
+# include "config.h"
 # include <stdlib.h>
 # include <math.h>
 # include <string.h>

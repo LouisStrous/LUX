@@ -29,7 +29,7 @@
 
 // feature configuration include
 
-#include "config.hh"
+#include "config.h"
 
 // libraries
 

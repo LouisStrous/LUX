@@ -2,7 +2,7 @@
 
 // standard includes
 
-#include "config.hh"
+#include "config.h"
 
 #if GSL_INCLUDE
 # include <algorithm>

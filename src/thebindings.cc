@@ -2,7 +2,7 @@
 
 #include <cstdint>                 // for int32_t
 #include <cstdlib>                 // for size_t
-#include "config.hh"
+#include "config.h"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
 #if SOFA_INCLUDE

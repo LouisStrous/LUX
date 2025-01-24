@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // File fun4.c
 // Various LUX functions.
 /// \file
-#include "config.hh"
+#include "config.h"
 #include <cassert>
 #include <stdio.h>
 #include <math.h>

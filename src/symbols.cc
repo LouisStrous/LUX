@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /// \file
 ///
 /// LUX routines dealing with the creation of LUX symbols.
-#include "config.hh"
+#include "config.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

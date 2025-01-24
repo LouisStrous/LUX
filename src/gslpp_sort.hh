@@ -1,7 +1,7 @@
 #ifndef INCLUDED_GSLPP_SORT_HH
 # define INCLUDED_GSLPP_SORT_HH
 
-# include "config.hh"
+# include "config.h"
 # if GSL_INCLUDE
 
 #  include <cstddef>            // for size_t

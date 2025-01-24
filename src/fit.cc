@@ -20,7 +20,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // File fit.c
 // General fitting procedure
 // Started 22 October 1995.  Louis Strous
-#include "config.hh"
+#include "config.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

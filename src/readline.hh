@@ -1,6 +1,6 @@
 #ifndef READLINE_HH
 # define READLINE_HH
-# include "config.hh"
+# include "config.h"
 # if READLINE_INCLUDE
 #  include <stdio.h>
 #  include <readline/readline.h>

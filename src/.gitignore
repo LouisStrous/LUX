@@ -1,0 +1,7 @@
+# ignore build results
+*.o
+.deps/
+Makefile
+*.in
+lux
+liblux.a

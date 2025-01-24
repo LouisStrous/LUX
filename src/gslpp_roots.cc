@@ -1,4 +1,4 @@
-#include "config.hh"
+#include "config.h"
 #if GSL_INCLUDE
 # include <functional>
 # include "gslpp_roots.hh"

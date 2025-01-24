@@ -1,6 +1,6 @@
 #ifndef HISTORY_HH
 # define HISTORY_HH
-# include "config.hh"
+# include "config.h"
 # if READLINE_INCLUDE
 #  include <stdio.h>
 #  include <readline/history.h>

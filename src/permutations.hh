@@ -192,7 +192,7 @@
 
 // configuration include
 
-#include "config.hh"
+#include "config.h"
 
 // standard includes
 

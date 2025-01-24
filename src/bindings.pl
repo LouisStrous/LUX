@@ -35,6 +35,7 @@ close $ifh;
 
 my @register_bindings;
 
+print "Writing $ARGV[0]\n";
 open my $ofh, '>', $ARGV[0];
 
 print $ofh <<EOD;
@@ -42,7 +43,7 @@ print $ofh <<EOD;
 
 #include <cstdint>                 // for int32_t
 #include <cstdlib>                 // for size_t
-#include "config.hh"
+#include "config.h"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
 #if SOFA_INCLUDE

@@ -1,4 +1,4 @@
-#include "config.hh"
+#include "config.h"
 
 #ifdef SOFA_INCLUDE
 # include <algorithm>

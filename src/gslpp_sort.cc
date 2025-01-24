@@ -2,7 +2,7 @@
 
 // configuration include
 
-#include "config.hh"
+#include "config.h"
 
 // own includes
 

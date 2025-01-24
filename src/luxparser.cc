@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 6 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 6 "luxparser.yy"
 
 /* This is file luxparser.c.
 
@@ -88,7 +88,7 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "config.hh"
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -137,7 +137,7 @@ int32_t statementDepth = 0, keepEVB = 0;
 int32_t yyerror(const char *), yylex(YYSTYPE *);
 int32_t installString(char const* string);
 
-#line 141 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 141 "luxparser.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -160,7 +160,154 @@ int32_t installString(char const* string);
 #  endif
 # endif
 
-#include "luxparser.hh"
+/* Use api.header.include to #include this header
+   instead of duplicating it here.  */
+#ifndef YY_YY_LUXPARSER_HH_INCLUDED
+# define YY_YY_LUXPARSER_HH_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token kinds.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 1000,                /* "invalid token"  */
+    TOK_NL = 999,                  /* TOK_NL  */
+    TOK_C_ID = 1001,               /* TOK_C_ID  */
+    TOK_S_ID = 1002,               /* TOK_S_ID  */
+    TOK_NUMBER = 1003,             /* TOK_NUMBER  */
+    TOK_STR = 1004,                /* TOK_STR  */
+    TOK_INCLUDE = 1005,            /* TOK_INCLUDE  */
+    TOK_REPORT = 1006,             /* TOK_REPORT  */
+    TOK_IF = 1007,                 /* TOK_IF  */
+    TOK_THEN = 1008,               /* TOK_THEN  */
+    TOK_ELSE = 1009,               /* TOK_ELSE  */
+    TOK_FOR = 1010,                /* TOK_FOR  */
+    TOK_REPEAT = 1011,             /* TOK_REPEAT  */
+    TOK_UNTIL = 1012,              /* TOK_UNTIL  */
+    TOK_WHILE = 1013,              /* TOK_WHILE  */
+    TOK_DO = 1014,                 /* TOK_DO  */
+    TOK_CASE = 1015,               /* TOK_CASE  */
+    TOK_ENDCASE = 1016,            /* TOK_ENDCASE  */
+    TOK_NCASE = 1017,              /* TOK_NCASE  */
+    TOK_SUBR = 1018,               /* TOK_SUBR  */
+    TOK_ENDSUBR = 1019,            /* TOK_ENDSUBR  */
+    TOK_FUNC = 1020,               /* TOK_FUNC  */
+    TOK_ENDFUNC = 1021,            /* TOK_ENDFUNC  */
+    TOK_BLOCK = 1022,              /* TOK_BLOCK  */
+    TOK_ENDBLOCK = 1023,           /* TOK_ENDBLOCK  */
+    TOK_RETURN = 1024,             /* TOK_RETURN  */
+    TOK_BREAK = 1025,              /* TOK_BREAK  */
+    TOK_CONTINUE = 1026,           /* TOK_CONTINUE  */
+    TOK_RUN = 1027,                /* TOK_RUN  */
+    TOK_BEGIN = 1028,              /* TOK_BEGIN  */
+    TOK_END = 1029,                /* TOK_END  */
+    TOK_PLUSIS = 1030,             /* TOK_PLUSIS  */
+    TOK_MINUSIS = 1031,            /* TOK_MINUSIS  */
+    TOK_TIMESIS = 1032,            /* TOK_TIMESIS  */
+    TOK_DIVIDEIS = 1033,           /* TOK_DIVIDEIS  */
+    TOK_POWERIS = 1034,            /* TOK_POWERIS  */
+    TOK_RETALL = 1035,             /* TOK_RETALL  */
+    TOK_STRUCTTAG = 1036,          /* TOK_STRUCTTAG  */
+    TOK_ERRORSTATE = 1037,         /* TOK_ERRORSTATE  */
+    TOK_ELLIPSIS = 1038,           /* TOK_ELLIPSIS  */
+    TOK_ANDIF = 1039,              /* TOK_ANDIF  */
+    TOK_ORIF = 1040,               /* TOK_ORIF  */
+    TOK_AND = 1041,                /* TOK_AND  */
+    TOK_OR = 1042,                 /* TOK_OR  */
+    TOK_XOR = 1043,                /* TOK_XOR  */
+    TOK_GE = 1044,                 /* TOK_GE  */
+    TOK_LE = 1045,                 /* TOK_LE  */
+    TOK_GT = 1046,                 /* TOK_GT  */
+    TOK_LT = 1047,                 /* TOK_LT  */
+    TOK_EQ = 1048,                 /* TOK_EQ  */
+    TOK_NE = 1049,                 /* TOK_NE  */
+    TOK_SMOD = 1050,               /* TOK_SMOD  */
+    TOK_UMINUS = 1051              /* TOK_UMINUS  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
+#endif
+/* Token kinds.  */
+#define YYEMPTY -2
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 1000
+#define TOK_NL 999
+#define TOK_C_ID 1001
+#define TOK_S_ID 1002
+#define TOK_NUMBER 1003
+#define TOK_STR 1004
+#define TOK_INCLUDE 1005
+#define TOK_REPORT 1006
+#define TOK_IF 1007
+#define TOK_THEN 1008
+#define TOK_ELSE 1009
+#define TOK_FOR 1010
+#define TOK_REPEAT 1011
+#define TOK_UNTIL 1012
+#define TOK_WHILE 1013
+#define TOK_DO 1014
+#define TOK_CASE 1015
+#define TOK_ENDCASE 1016
+#define TOK_NCASE 1017
+#define TOK_SUBR 1018
+#define TOK_ENDSUBR 1019
+#define TOK_FUNC 1020
+#define TOK_ENDFUNC 1021
+#define TOK_BLOCK 1022
+#define TOK_ENDBLOCK 1023
+#define TOK_RETURN 1024
+#define TOK_BREAK 1025
+#define TOK_CONTINUE 1026
+#define TOK_RUN 1027
+#define TOK_BEGIN 1028
+#define TOK_END 1029
+#define TOK_PLUSIS 1030
+#define TOK_MINUSIS 1031
+#define TOK_TIMESIS 1032
+#define TOK_DIVIDEIS 1033
+#define TOK_POWERIS 1034
+#define TOK_RETALL 1035
+#define TOK_STRUCTTAG 1036
+#define TOK_ERRORSTATE 1037
+#define TOK_ELLIPSIS 1038
+#define TOK_ANDIF 1039
+#define TOK_ORIF 1040
+#define TOK_AND 1041
+#define TOK_OR 1042
+#define TOK_XOR 1043
+#define TOK_GE 1044
+#define TOK_LE 1045
+#define TOK_GT 1046
+#define TOK_LT 1047
+#define TOK_EQ 1048
+#define TOK_NE 1049
+#define TOK_SMOD 1050
+#define TOK_UMINUS 1051
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef int YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
+#endif
+
+
+
+
+int yyparse (void);
+
+
+#endif /* !YY_YY_LUXPARSER_HH_INCLUDED  */
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -1752,7 +1899,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* lines: next_line  */
-#line 129 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 129 "luxparser.yy"
           {                     /* a statement or a newline */
   if (compileOnly && yyvsp[0])        /* if we're just compiling (and not
                                    immediately executing, and the statement
@@ -1760,11 +1907,11 @@ yyreduce:
                                    it at the start of a new list */
     startList(yyvsp[0]);
 }
-#line 1764 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1911 "luxparser.cc"
     break;
 
   case 3: /* lines: lines next_line  */
-#line 137 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 137 "luxparser.yy"
                   {             /* next member in a set of statements and
                                    newlines */
   if (compileOnly && yyvsp[0])        /* if we're just compiling and the statement
@@ -1772,11 +1919,11 @@ yyreduce:
                                    the list */
     pushList(yyvsp[0]);
 }
-#line 1776 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1923 "luxparser.cc"
     break;
 
   case 4: /* next_line: statement  */
-#line 148 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 148 "luxparser.yy"
             {                   /* $1 > 0 indicates succesful execution.
                                    $1 < 0 indicates an error or a premature
                                    end to a loop structure (CONTINUE,
@@ -1799,11 +1946,11 @@ yyreduce:
     YYABORT;
   }
 }
-#line 1803 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1950 "luxparser.cc"
     break;
 
   case 5: /* next_line: TOK_NL  */
-#line 170 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 170 "luxparser.yy"
          {  /* a newline; newlines are only passed to the parser by
                    yylex() if disableNewline is equal to 0 */
     if (debugLine)              /* if this is a dbg> line then we quit after
@@ -1811,25 +1958,25 @@ yyreduce:
       YYACCEPT;
     yyval = 0;                     /* else we ignore it */
 }
-#line 1815 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1962 "luxparser.cc"
     break;
 
   case 11: /* statement: TOK_RETURN opt_arg  */
-#line 185 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 185 "luxparser.yy"
                      {          /* a RETURN statement */
   yyval = newSymbol(LUX_EVB, EVB_RETURN, yyvsp[0]);
 }
-#line 1823 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1970 "luxparser.cc"
     break;
 
   case 12: /* $@1: %empty  */
-#line 188 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 188 "luxparser.yy"
              { disableNewline++; }
-#line 1829 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1976 "luxparser.cc"
     break;
 
   case 13: /* statement: begingroup $@1 statement_list endgroup  */
-#line 188 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 188 "luxparser.yy"
                                                            {
   /* a statement block */
   /* after the initial {, more input is needed to complete the statement.
@@ -1842,93 +1989,93 @@ yyreduce:
   statementDepth--;             /* was incremented by statement_list */
   disableNewline--;             /* back to initial */
 }
-#line 1846 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1993 "luxparser.cc"
     break;
 
   case 14: /* statement: TOK_BREAK  */
-#line 200 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 200 "luxparser.yy"
                         { yyval = LOOP_BREAK; }
-#line 1852 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 1999 "luxparser.cc"
     break;
 
   case 15: /* statement: TOK_CONTINUE  */
-#line 201 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 201 "luxparser.yy"
                         { yyval = LOOP_CONTINUE; }
-#line 1858 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2005 "luxparser.cc"
     break;
 
   case 16: /* statement: TOK_INCLUDE  */
-#line 202 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 202 "luxparser.yy"
               {                     /* a @file statement */
   yyval = newSymbol(LUX_EVB, EVB_FILE, yyvsp[0], FILE_INCLUDE);
 }
-#line 1866 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2013 "luxparser.cc"
     break;
 
   case 17: /* statement: TOK_REPORT  */
-#line 205 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 205 "luxparser.yy"
              {                      /* a @@file statement */
   yyval = newSymbol(LUX_EVB, EVB_FILE, yyvsp[0], FILE_REPORT);
 }
-#line 1874 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2021 "luxparser.cc"
     break;
 
   case 18: /* statement: TOK_RETALL  */
-#line 208 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 208 "luxparser.yy"
                         { yyval = LOOP_RETALL; }
-#line 1880 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2027 "luxparser.cc"
     break;
 
   case 19: /* statement: TOK_RUN ',' var  */
-#line 209 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 209 "luxparser.yy"
                         { yyval = newBlockSymbol(yyvsp[0]); }
-#line 1886 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2033 "luxparser.cc"
     break;
 
   case 20: /* statement: TOK_RUN var  */
-#line 210 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 210 "luxparser.yy"
                         { yyval = newBlockSymbol(yyvsp[0]); }
-#line 1892 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2039 "luxparser.cc"
     break;
 
   case 21: /* statement: error  */
-#line 211 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 211 "luxparser.yy"
         {                       /* some error */
   puts("Illegal statement");    /* generate message */
   errorState = 1;               /* signal the error */
   YYABORT;                      /* quite this parse */
 }
-#line 1902 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2049 "luxparser.cc"
     break;
 
   case 22: /* statement: TOK_ERRORSTATE  */
-#line 216 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 216 "luxparser.yy"
                         { YYABORT; }
-#line 1908 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2055 "luxparser.cc"
     break;
 
   case 23: /* opt_arg: %empty  */
-#line 220 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 220 "luxparser.yy"
             { yyval = 0; }
-#line 1914 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2061 "luxparser.cc"
     break;
 
   case 24: /* opt_arg: ',' expr  */
-#line 221 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 221 "luxparser.yy"
            { yyval = yyvsp[0]; }
-#line 1920 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2067 "luxparser.cc"
     break;
 
   case 29: /* assignment: lhs '=' expr  */
-#line 233 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 233 "luxparser.yy"
                {                /* simple assignment */
   yyval = newSymbol(LUX_EVB, EVB_REPLACE, yyvsp[-2], yyvsp[0]);
 }
-#line 1928 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2075 "luxparser.cc"
     break;
 
   case 30: /* assignment: lhs op_assign expr  */
-#line 236 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 236 "luxparser.yy"
                      {          /* an operator-assignment (e.g. X += 2) */
   if (symbol_class(yyvsp[-2]) == LUX_EXTRACT)
     yyval = newSymbol(LUX_EVB, EVB_REPLACE, copySym(yyvsp[-2]),
@@ -1937,29 +2084,29 @@ yyreduce:
     yyval = newSymbol(LUX_EVB, EVB_REPLACE, yyvsp[-2],
                    newSymbol(LUX_BIN_OP, yyvsp[-1], yyvsp[-2], yyvsp[0]));
 }
-#line 1941 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2088 "luxparser.cc"
     break;
 
   case 31: /* tag_list: TOK_STRUCTTAG  */
-#line 247 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 247 "luxparser.yy"
                             { startList(yyvsp[0]); }
-#line 1947 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2094 "luxparser.cc"
     break;
 
   case 32: /* tag_list: tag_list TOK_STRUCTTAG  */
-#line 248 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 248 "luxparser.yy"
                             { pushList(yyvsp[0]); }
-#line 1953 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2100 "luxparser.cc"
     break;
 
   case 33: /* member_spec: '(' subsc_list ')'  */
-#line 253 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 253 "luxparser.yy"
                         { pushList(LUX_RANGE);  yyval = 1; }
-#line 1959 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2106 "luxparser.cc"
     break;
 
   case 34: /* member_spec: '(' subsc_list error  */
-#line 254 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 254 "luxparser.yy"
                        {
   if ((setup & 1024) == 0)
     puts("Unbalanced ()");
@@ -1967,23 +2114,23 @@ yyreduce:
   pushList(LUX_RANGE);
   yyval = 1;
 }
-#line 1971 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2118 "luxparser.cc"
     break;
 
   case 35: /* member_spec: tag_list  */
-#line 261 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 261 "luxparser.yy"
                         { pushList(LUX_LIST);  yyval = 1; }
-#line 1977 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2124 "luxparser.cc"
     break;
 
   case 36: /* member_spec: member_spec '(' subsc_list ')'  */
-#line 262 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 262 "luxparser.yy"
                                  { pushList(LUX_RANGE);  yyval = yyvsp[-3] + 1; }
-#line 1983 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2130 "luxparser.cc"
     break;
 
   case 37: /* member_spec: member_spec '(' subsc_list error  */
-#line 263 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 263 "luxparser.yy"
                                    {
   if ((setup & 1024) == 0)
     puts("Unbalanced ()");
@@ -1991,807 +2138,807 @@ yyreduce:
   pushList(LUX_RANGE);
   yyval = yyvsp[-3] + 1;
 }
-#line 1995 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2142 "luxparser.cc"
     break;
 
   case 38: /* member_spec: member_spec tag_list  */
-#line 270 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 270 "luxparser.yy"
                         { pushList(LUX_LIST);  yyval = yyvsp[-1] + 1; }
-#line 2001 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2148 "luxparser.cc"
     break;
 
   case 39: /* lhs: var member_spec  */
-#line 275 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 275 "luxparser.yy"
                 {
   pushList(yyvsp[0]);                 /* the number of element extraction lists */
   pushList(-yyvsp[-1]);                /* minus indicates "var" */
   yyval = newSymbol(LUX_EXTRACT);
 }
-#line 2011 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2158 "luxparser.cc"
     break;
 
   case 40: /* lhs: var  */
-#line 280 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 280 "luxparser.yy"
                         { yyval = findVar(yyvsp[0], curContext); }
-#line 2017 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2164 "luxparser.cc"
     break;
 
   case 43: /* struct_list: struct_element  */
-#line 291 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 291 "luxparser.yy"
                  {
     pushList(LUX_NEW_LIST);     /* the stack contents is now:
                                    key expr LUX_NEW_LIST */
     swapList(1, 2);             /* reverse stack contents to: */
     swapList(2, 3);             /* LUX_NEW_LIST key expr */
 }
-#line 2028 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2175 "luxparser.cc"
     break;
 
   case 45: /* struct_element: TOK_C_ID ':' expr  */
-#line 302 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 302 "luxparser.yy"
                     {
     pushList(yyvsp[-2]);
     pushList(yyvsp[0]);
 }
-#line 2037 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2184 "luxparser.cc"
     break;
 
   case 46: /* struct_element: expr  */
-#line 306 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 306 "luxparser.yy"
        {
     pushList(-1);
     pushList(yyvsp[0]);
 }
-#line 2046 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2193 "luxparser.cc"
     break;
 
   case 48: /* value: TOK_STR  */
-#line 314 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 314 "luxparser.yy"
             {                   // a string
     yyval = newSymbol(LUX_FIXED_STRING, yyvsp[0]);
   }
-#line 2054 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2201 "luxparser.cc"
     break;
 
   case 51: /* expr: var '(' ')'  */
-#line 322 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 322 "luxparser.yy"
               {                 /* a function call without any arguments */
   startList(0);                 /* no arguments */
   pushList(-yyvsp[-2]);
   yyval = newSymbol(LUX_EXTRACT);
 }
-#line 2064 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2211 "luxparser.cc"
     break;
 
   case 52: /* expr: expr member_spec  */
-#line 327 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 327 "luxparser.yy"
                    {    /* expressions may be subscripted */
   pushList(yyvsp[0]);                 /* the number of element extraction lists */
   pushList(yyvsp[-1]);                 /* the expression */
   yyval = newSymbol(LUX_EXTRACT);
 }
-#line 2074 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2221 "luxparser.cc"
     break;
 
   case 53: /* expr: '&' var  */
-#line 332 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 332 "luxparser.yy"
           {             /* a variable or function/routine pointer */
   yyval = newSymbol(LUX_POINTER, yyvsp[0]);
 }
-#line 2082 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2229 "luxparser.cc"
     break;
 
   case 54: /* expr: '(' range ')'  */
-#line 335 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 335 "luxparser.yy"
                 {               /* a range expression */
   yyval = yyvsp[-1];
 }
-#line 2090 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2237 "luxparser.cc"
     break;
 
   case 55: /* expr: '(' range error  */
-#line 338 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 338 "luxparser.yy"
                   {
   if ((setup & 1024) == 0)
     puts("Unbalanced ()");
   yyerrok;
   yyval = yyvsp[-1];
 }
-#line 2101 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2248 "luxparser.cc"
     break;
 
   case 56: /* expr: '{' struct_list '}'  */
-#line 344 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 344 "luxparser.yy"
                       {         /* a structure */
   yyval = newSymbol(LUX_PRE_LIST);
 }
-#line 2109 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2256 "luxparser.cc"
     break;
 
   case 57: /* expr: '{' struct_list error  */
-#line 347 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 347 "luxparser.yy"
                         {
   if ((setup & 1024) == 0)
     puts("Unbalanced {}");
   yyerrok;
   yyval = newSymbol(LUX_PRE_LIST);
 }
-#line 2120 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2267 "luxparser.cc"
     break;
 
   case 58: /* expr: '{' '}'  */
-#line 353 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 353 "luxparser.yy"
           {                     /* an empty list */
   pushList(LUX_NEW_LIST);
   yyval = newSymbol(LUX_PRE_LIST);
 }
-#line 2129 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2276 "luxparser.cc"
     break;
 
   case 59: /* expr: '(' expr ')'  */
-#line 357 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 357 "luxparser.yy"
                {
   yyval = yyvsp[-1];
 }
-#line 2137 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2284 "luxparser.cc"
     break;
 
   case 60: /* expr: '(' expr error  */
-#line 360 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 360 "luxparser.yy"
                  {
   if ((setup & 1024) == 0)
     puts("Unbalanced ()");
   yyerrok;
   yyval = yyvsp[-1];
 }
-#line 2148 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2295 "luxparser.cc"
     break;
 
   case 61: /* expr: '[' expr_list ']'  */
-#line 366 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 366 "luxparser.yy"
                     {           /* concatenation */
   yyval = newSymbol(LUX_INT_FUNC, LUX_CONCAT_FUN);
 }
-#line 2156 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2303 "luxparser.cc"
     break;
 
   case 62: /* expr: '[' expr_list error  */
-#line 369 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 369 "luxparser.yy"
                       {
   if ((setup & 1024) == 0)
     puts("Unbalanced []");
   yyval = newSymbol(LUX_INT_FUNC, LUX_CONCAT_FUN);
   yyerrok;
 }
-#line 2167 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2314 "luxparser.cc"
     break;
 
   case 63: /* expr: expr '+' expr  */
-#line 378 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 378 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_ADD, yyvsp[-2], yyvsp[0]);
 }
-#line 2175 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2322 "luxparser.cc"
     break;
 
   case 64: /* expr: expr '-' expr  */
-#line 381 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 381 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_SUB, yyvsp[-2], yyvsp[0]);
 }
-#line 2183 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2330 "luxparser.cc"
     break;
 
   case 65: /* expr: expr '*' expr  */
-#line 384 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 384 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_MUL, yyvsp[-2], yyvsp[0]);
 }
-#line 2191 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2338 "luxparser.cc"
     break;
 
   case 66: /* expr: expr '/' expr  */
-#line 387 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 387 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_DIV, yyvsp[-2], yyvsp[0]);
 }
-#line 2199 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2346 "luxparser.cc"
     break;
 
   case 67: /* expr: expr '\\' expr  */
-#line 390 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 390 "luxparser.yy"
                  {
   yyval = newSymbol(LUX_BIN_OP, LUX_IDIV, yyvsp[-2], yyvsp[0]);
 }
-#line 2207 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2354 "luxparser.cc"
     break;
 
   case 68: /* expr: expr '%' expr  */
-#line 393 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 393 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_MOD, yyvsp[-2], yyvsp[0]);
 }
-#line 2215 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2362 "luxparser.cc"
     break;
 
   case 69: /* expr: expr TOK_SMOD expr  */
-#line 396 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 396 "luxparser.yy"
                      {
   yyval = newSymbol(LUX_BIN_OP, LUX_SMOD, yyvsp[-2], yyvsp[0]);
 }
-#line 2223 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2370 "luxparser.cc"
     break;
 
   case 70: /* expr: expr '^' expr  */
-#line 399 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 399 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_POW, yyvsp[-2], yyvsp[0]);
 }
-#line 2231 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2378 "luxparser.cc"
     break;
 
   case 71: /* expr: expr '>' expr  */
-#line 402 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 402 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_MAX, yyvsp[-2], yyvsp[0]);
 }
-#line 2239 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2386 "luxparser.cc"
     break;
 
   case 72: /* expr: expr '<' expr  */
-#line 405 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 405 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_BIN_OP, LUX_MIN, yyvsp[-2], yyvsp[0]);
 }
-#line 2247 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2394 "luxparser.cc"
     break;
 
   case 73: /* expr: expr TOK_EQ expr  */
-#line 408 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 408 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_BIN_OP, LUX_EQ, yyvsp[-2], yyvsp[0]);
 }
-#line 2255 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2402 "luxparser.cc"
     break;
 
   case 74: /* expr: expr TOK_NE expr  */
-#line 411 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 411 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_BIN_OP, LUX_NE, yyvsp[-2], yyvsp[0]);
 }
-#line 2263 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2410 "luxparser.cc"
     break;
 
   case 75: /* expr: expr TOK_GE expr  */
-#line 414 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 414 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_BIN_OP, LUX_GE, yyvsp[-2], yyvsp[0]);
 }
-#line 2271 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2418 "luxparser.cc"
     break;
 
   case 76: /* expr: expr TOK_GT expr  */
-#line 417 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 417 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_BIN_OP, LUX_GT, yyvsp[-2], yyvsp[0]);
 }
-#line 2279 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2426 "luxparser.cc"
     break;
 
   case 77: /* expr: expr TOK_LT expr  */
-#line 420 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 420 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_BIN_OP, LUX_LT, yyvsp[-2], yyvsp[0]);
 }
-#line 2287 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2434 "luxparser.cc"
     break;
 
   case 78: /* expr: expr TOK_LE expr  */
-#line 423 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 423 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_BIN_OP, LUX_LE, yyvsp[-2], yyvsp[0]);
 }
-#line 2295 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2442 "luxparser.cc"
     break;
 
   case 79: /* expr: expr TOK_AND expr  */
-#line 426 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 426 "luxparser.yy"
                     {
   yyval = newSymbol(LUX_BIN_OP, LUX_AND, yyvsp[-2], yyvsp[0]);
 }
-#line 2303 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2450 "luxparser.cc"
     break;
 
   case 80: /* expr: expr TOK_OR expr  */
-#line 429 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 429 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_BIN_OP, LUX_OR, yyvsp[-2], yyvsp[0]);
 }
-#line 2311 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2458 "luxparser.cc"
     break;
 
   case 81: /* expr: expr TOK_XOR expr  */
-#line 432 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 432 "luxparser.yy"
                     {
   yyval = newSymbol(LUX_BIN_OP, LUX_XOR, yyvsp[-2], yyvsp[0]);
 }
-#line 2319 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2466 "luxparser.cc"
     break;
 
   case 82: /* expr: expr '&' expr  */
-#line 435 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 435 "luxparser.yy"
                 {               /* testing & for AND */
   yyval = newSymbol(LUX_BIN_OP, LUX_AND, yyvsp[-2], yyvsp[0]);
 }
-#line 2327 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2474 "luxparser.cc"
     break;
 
   case 83: /* expr: expr '|' expr  */
-#line 438 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 438 "luxparser.yy"
                 {               /* testing | for OR */
   yyval = newSymbol(LUX_BIN_OP, LUX_OR, yyvsp[-2], yyvsp[0]);
 }
-#line 2335 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2482 "luxparser.cc"
     break;
 
   case 84: /* expr: expr TOK_ANDIF expr  */
-#line 441 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 441 "luxparser.yy"
                       {             /* conditional and */
   yyval = newSymbol(LUX_IF_OP, LUX_ANDIF, yyvsp[-2], yyvsp[0]);
 }
-#line 2343 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2490 "luxparser.cc"
     break;
 
   case 85: /* expr: expr TOK_ORIF expr  */
-#line 444 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 444 "luxparser.yy"
                      {              /* conditional or */
   yyval = newSymbol(LUX_IF_OP, LUX_ORIF, yyvsp[-2], yyvsp[0]);
 }
-#line 2351 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2498 "luxparser.cc"
     break;
 
   case 86: /* expr: expr '#' expr  */
-#line 447 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 447 "luxparser.yy"
                 {               /* matrix multiplication */
   startList(yyvsp[-2]);
   pushList(yyvsp[0]);
   yyval = newSymbol(LUX_INT_FUNC, LUX_MATMUL_FUN);
 }
-#line 2361 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2508 "luxparser.cc"
     break;
 
   case 87: /* expr: '-' expr  */
-#line 452 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 452 "luxparser.yy"
                             {
   startList(yyvsp[0]);
   yyval = newSymbol(LUX_INT_FUNC, LUX_NEG_FUN);
 }
-#line 2370 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2517 "luxparser.cc"
     break;
 
   case 88: /* expr: '+' expr  */
-#line 456 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 456 "luxparser.yy"
                             {
   yyval = yyvsp[0];
 }
-#line 2378 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2525 "luxparser.cc"
     break;
 
   case 89: /* expr_list: expr  */
-#line 462 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 462 "luxparser.yy"
                         { startList(yyvsp[0]); }
-#line 2384 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2531 "luxparser.cc"
     break;
 
   case 90: /* expr_list: expr_list ',' expr  */
-#line 463 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 463 "luxparser.yy"
                         { pushList(yyvsp[0]); }
-#line 2390 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2537 "luxparser.cc"
     break;
 
   case 91: /* range: expr ':' expr  */
-#line 473 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 473 "luxparser.yy"
               {
   yyval = newSymbol(LUX_PRE_RANGE, yyvsp[-2], yyvsp[0]);
 }
-#line 2398 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2545 "luxparser.cc"
     break;
 
   case 92: /* range: expr ':' '*' '-' expr  */
-#line 476 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 476 "luxparser.yy"
                         {
   yyval = newSymbol(LUX_PRE_RANGE, yyvsp[-4], -yyvsp[0]);
 }
-#line 2406 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2553 "luxparser.cc"
     break;
 
   case 93: /* range: expr ':' '*'  */
-#line 479 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 479 "luxparser.yy"
                {
   yyval = newSymbol(LUX_PRE_RANGE, yyvsp[-2], -LUX_ONE);
 }
-#line 2414 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2561 "luxparser.cc"
     break;
 
   case 94: /* range: '*' '-' expr ':' expr  */
-#line 482 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 482 "luxparser.yy"
                         {
   yyval = newSymbol(LUX_PRE_RANGE, -yyvsp[-2], yyvsp[0]);
 }
-#line 2422 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2569 "luxparser.cc"
     break;
 
   case 95: /* range: '*' '-' expr ':' '*' '-' expr  */
-#line 485 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 485 "luxparser.yy"
                                 {
   yyval = newSymbol(LUX_PRE_RANGE, -yyvsp[-4], -yyvsp[0]);
 }
-#line 2430 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2577 "luxparser.cc"
     break;
 
   case 96: /* range: '*' '-' expr ':' '*'  */
-#line 488 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 488 "luxparser.yy"
                        {
   yyval = newSymbol(LUX_PRE_RANGE, -yyvsp[-2], -LUX_ONE);
 }
-#line 2438 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2585 "luxparser.cc"
     break;
 
   case 97: /* range: '*' '-' expr  */
-#line 491 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 491 "luxparser.yy"
                {
   yyval = newSymbol(LUX_PRE_RANGE, -yyvsp[0], LUX_ZERO);
 }
-#line 2446 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2593 "luxparser.cc"
     break;
 
   case 98: /* range: '*'  */
-#line 494 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 494 "luxparser.yy"
       {
   yyval = newSymbol(LUX_PRE_RANGE, -LUX_ONE, LUX_ZERO);
 }
-#line 2454 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2601 "luxparser.cc"
     break;
 
   case 100: /* subsc: range ':' '+'  */
-#line 507 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 507 "luxparser.yy"
                 {
   pre_range_sum(yyvsp[-2]) = 1;
   yyval = yyvsp[-2];
 }
-#line 2463 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2610 "luxparser.cc"
     break;
 
   case 101: /* subsc: range ':' '>' expr  */
-#line 512 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 512 "luxparser.yy"
                      {
   pre_range_redirect(yyvsp[-3]) = yyvsp[0];
   yyval = yyvsp[-3];
 }
-#line 2472 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2619 "luxparser.cc"
     break;
 
   case 102: /* subsc: '+'  */
-#line 517 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 517 "luxparser.yy"
       {
   yyval = newSymbol(LUX_PRE_RANGE, LUX_ZERO, -LUX_ONE);
   pre_range_sum(yyval) = 1;
 }
-#line 2481 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2628 "luxparser.cc"
     break;
 
   case 103: /* subsc: '>' expr  */
-#line 522 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 522 "luxparser.yy"
            {
   yyval = newSymbol(LUX_PRE_RANGE, LUX_ZERO, -LUX_ONE);
   pre_range_redirect(yyval) = yyvsp[0];
 }
-#line 2490 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2637 "luxparser.cc"
     break;
 
   case 104: /* subsc: expr ':' '>' expr  */
-#line 527 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 527 "luxparser.yy"
                     {
   yyval = newSymbol(LUX_PRE_RANGE, yyvsp[-3], LUX_ZERO);
   pre_range_redirect(yyval) = yyvsp[0];
 }
-#line 2499 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2646 "luxparser.cc"
     break;
 
   case 105: /* subsc: expr ':' '+'  */
-#line 532 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 532 "luxparser.yy"
                {
   yyval = newSymbol(LUX_PRE_RANGE, yyvsp[-2], LUX_ZERO);
   pre_range_sum(yyval) = 1;
 }
-#line 2508 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2655 "luxparser.cc"
     break;
 
   case 109: /* subsc_list: subsc_or_key  */
-#line 549 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 549 "luxparser.yy"
              {
   startList(yyvsp[0]);
 }
-#line 2516 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2663 "luxparser.cc"
     break;
 
   case 110: /* subsc_list: subsc_list ',' subsc_or_key  */
-#line 553 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 553 "luxparser.yy"
                               {
   pushList(yyvsp[0]);
 }
-#line 2524 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2671 "luxparser.cc"
     break;
 
   case 111: /* op_assign: TOK_PLUSIS  */
-#line 560 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 560 "luxparser.yy"
            {
   yyval = LUX_ADD;
 }
-#line 2532 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2679 "luxparser.cc"
     break;
 
   case 112: /* op_assign: TOK_MINUSIS  */
-#line 564 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 564 "luxparser.yy"
               {
   yyval = LUX_SUB;
 }
-#line 2540 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2687 "luxparser.cc"
     break;
 
   case 113: /* op_assign: TOK_TIMESIS  */
-#line 568 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 568 "luxparser.yy"
               {
   yyval = LUX_MUL;
 }
-#line 2548 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2695 "luxparser.cc"
     break;
 
   case 114: /* op_assign: TOK_DIVIDEIS  */
-#line 572 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 572 "luxparser.yy"
                {
   yyval = LUX_DIV;
 }
-#line 2556 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2703 "luxparser.cc"
     break;
 
   case 115: /* routine_execution: TOK_C_ID s_arglist  */
-#line 579 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 579 "luxparser.yy"
                    {
   yyval = newSubrSymbol(yyvsp[-1]);
 }
-#line 2564 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2711 "luxparser.cc"
     break;
 
   case 117: /* s_arglist: %empty  */
-#line 587 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 587 "luxparser.yy"
               {
   pushList(LUX_NEW_LIST);
 }
-#line 2572 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2719 "luxparser.cc"
     break;
 
   case 118: /* arglist: arg  */
-#line 594 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 594 "luxparser.yy"
     {
   startList(yyvsp[0]);
 }
-#line 2580 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2727 "luxparser.cc"
     break;
 
   case 119: /* arglist: arglist ',' arg  */
-#line 598 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 598 "luxparser.yy"
                   {
   pushList(yyvsp[0]);
 }
-#line 2588 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2735 "luxparser.cc"
     break;
 
   case 121: /* key: key_param '=' expr  */
-#line 611 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 611 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_KEYWORD, yyvsp[-2], yyvsp[0]);
 }
-#line 2596 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2743 "luxparser.cc"
     break;
 
   case 122: /* key: '/' key_param  */
-#line 615 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 615 "luxparser.yy"
                 {
   yyval = newSymbol(LUX_KEYWORD, yyvsp[0], LUX_ONE);
 }
-#line 2604 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2751 "luxparser.cc"
     break;
 
   case 125: /* $@2: %empty  */
-#line 629 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 629 "luxparser.yy"
          {
   disableNewline++;
 }
-#line 2612 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2759 "luxparser.cc"
     break;
 
   case 126: /* @3: %empty  */
-#line 631 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 631 "luxparser.yy"
                        {
   yyval = newSymbol(LUX_SUBROUTINE, yyvsp[-1]);
 }
-#line 2620 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2767 "luxparser.cc"
     break;
 
   case 127: /* routine_definition: TOK_SUBR $@2 TOK_C_ID f_paramlist @3 statement_list endsubr  */
-#line 633 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 633 "luxparser.yy"
                          {
   yyval = newSymbol(LUX_SUBROUTINE, -yyvsp[-2] - 1);
   statementDepth--;
   disableNewline--;
 }
-#line 2630 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2777 "luxparser.cc"
     break;
 
   case 128: /* $@4: %empty  */
-#line 639 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 639 "luxparser.yy"
            {
   disableNewline++;
 }
-#line 2638 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2785 "luxparser.cc"
     break;
 
   case 129: /* @5: %empty  */
-#line 641 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 641 "luxparser.yy"
                        {
   yyval = newSymbol(LUX_FUNCTION, yyvsp[-1]);
 }
-#line 2646 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2793 "luxparser.cc"
     break;
 
   case 130: /* routine_definition: TOK_FUNC $@4 TOK_C_ID f_paramlist @5 statement_list endfunc  */
-#line 643 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 643 "luxparser.yy"
                          {
   yyval = newSymbol(LUX_FUNCTION, -yyvsp[-2] - 1);
   statementDepth--;
   disableNewline--;
 }
-#line 2656 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2803 "luxparser.cc"
     break;
 
   case 131: /* $@6: %empty  */
-#line 649 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 649 "luxparser.yy"
             {
   disableNewline++;
 }
-#line 2664 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2811 "luxparser.cc"
     break;
 
   case 132: /* @7: %empty  */
-#line 651 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 651 "luxparser.yy"
            {
   yyval = newSymbol(LUX_BLOCKROUTINE, yyvsp[0]);
 }
-#line 2672 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2819 "luxparser.cc"
     break;
 
   case 133: /* routine_definition: TOK_BLOCK $@6 TOK_C_ID @7 statement_list endblock  */
-#line 653 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 653 "luxparser.yy"
                           {
   yyval = newSymbol(LUX_BLOCKROUTINE, -yyvsp[-2] - 1);
   statementDepth--;
   disableNewline--;
 }
-#line 2682 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2829 "luxparser.cc"
     break;
 
   case 141: /* paramlist2: paramlist ',' TOK_ELLIPSIS  */
-#line 676 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 676 "luxparser.yy"
                              {
   pushList(LUX_EXTEND);
 }
-#line 2690 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2837 "luxparser.cc"
     break;
 
   case 142: /* s_paramlist: %empty  */
-#line 684 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 684 "luxparser.yy"
             {
   pushList(LUX_NEW_LIST);
 }
-#line 2698 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2845 "luxparser.cc"
     break;
 
   case 144: /* paramlist: TOK_C_ID  */
-#line 693 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 693 "luxparser.yy"
          {
   startList(yyvsp[0]);
 }
-#line 2706 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2853 "luxparser.cc"
     break;
 
   case 145: /* paramlist: paramlist ',' TOK_C_ID  */
-#line 697 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 697 "luxparser.yy"
                          {
   pushList(yyvsp[0]);
 }
-#line 2714 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2861 "luxparser.cc"
     break;
 
   case 146: /* statement_list: statement  */
-#line 704 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 704 "luxparser.yy"
           {
   startList(yyvsp[0]);
   statementDepth++;
 }
-#line 2723 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2870 "luxparser.cc"
     break;
 
   case 147: /* statement_list: statement_list statement  */
-#line 709 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 709 "luxparser.yy"
                            {
   pushList(yyvsp[0]);
   if (yyvsp[0] == LUX_ERROR)
     yyval = LUX_ERROR;
 }
-#line 2733 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2880 "luxparser.cc"
     break;
 
   case 148: /* f_paramlist: '(' ')'  */
-#line 719 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 719 "luxparser.yy"
         {                       /* empty list */
   pushList(LUX_NEW_LIST);
 }
-#line 2741 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2888 "luxparser.cc"
     break;
 
   case 151: /* $@8: %empty  */
-#line 730 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 730 "luxparser.yy"
        {
   disableNewline++;
 }
-#line 2749 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2896 "luxparser.cc"
     break;
 
   case 152: /* $@9: %empty  */
-#line 732 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 732 "luxparser.yy"
                 {
   disableNewline--;
 }
-#line 2757 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2904 "luxparser.cc"
     break;
 
   case 153: /* selection: TOK_IF $@8 expr opt_then $@9 statement opt_else  */
-#line 734 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 734 "luxparser.yy"
                      {
   yyval = newSymbol(LUX_EVB, EVB_IF, yyvsp[-4], yyvsp[-1], yyvsp[0]);
 }
-#line 2765 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2912 "luxparser.cc"
     break;
 
   case 154: /* $@10: %empty  */
-#line 738 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 738 "luxparser.yy"
            {
   disableNewline++;
 }
-#line 2773 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2920 "luxparser.cc"
     break;
 
   case 155: /* selection: TOK_CASE $@10 case_list opt_case_else TOK_ENDCASE  */
-#line 740 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 740 "luxparser.yy"
                                       {
   pushList(yyvsp[-1]);
   yyval = newSymbol(LUX_EVB, EVB_CASE);
   disableNewline--;
 }
-#line 2783 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2930 "luxparser.cc"
     break;
 
   case 156: /* $@11: %empty  */
-#line 746 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 746 "luxparser.yy"
             {
   disableNewline++;
 }
-#line 2791 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2938 "luxparser.cc"
     break;
 
   case 157: /* selection: TOK_NCASE $@11 expr statement_list opt_case_else TOK_ENDCASE  */
-#line 748 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 748 "luxparser.yy"
                                                 {
   pushList(yyvsp[-1]);
   pushList(yyvsp[-3]);
@@ -2799,200 +2946,200 @@ yyreduce:
   yyval = newSymbol(LUX_EVB, EVB_NCASE);
   disableNewline--;
 }
-#line 2803 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2950 "luxparser.cc"
     break;
 
   case 160: /* opt_else: %empty  */
-#line 765 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 765 "luxparser.yy"
             {
   yyval = 0;
 }
-#line 2811 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2958 "luxparser.cc"
     break;
 
   case 161: /* opt_else: TOK_ELSE statement  */
-#line 769 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 769 "luxparser.yy"
                      {
   yyval = yyvsp[0];
 }
-#line 2819 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2966 "luxparser.cc"
     break;
 
   case 162: /* opt_case_else: %empty  */
-#line 776 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 776 "luxparser.yy"
             {
   yyval = 0;
 }
-#line 2827 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2974 "luxparser.cc"
     break;
 
   case 163: /* $@12: %empty  */
-#line 780 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 780 "luxparser.yy"
            {
   disableNewline++;
 }
-#line 2835 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2982 "luxparser.cc"
     break;
 
   case 164: /* opt_case_else: TOK_ELSE $@12 statement  */
-#line 782 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 782 "luxparser.yy"
             {
   yyval = yyvsp[0];
   disableNewline--;
 }
-#line 2844 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2991 "luxparser.cc"
     break;
 
   case 165: /* $@13: %empty  */
-#line 787 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 787 "luxparser.yy"
            {
   disableNewline++;
 }
-#line 2852 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 2999 "luxparser.cc"
     break;
 
   case 166: /* opt_case_else: TOK_ELSE $@13 ':' statement  */
-#line 789 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 789 "luxparser.yy"
                 {               /* Dick's case else */
   yyval = yyvsp[-1];
   disableNewline--;
 }
-#line 2861 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3008 "luxparser.cc"
     break;
 
   case 167: /* case_list: value ':' statement  */
-#line 797 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 797 "luxparser.yy"
                     {
   startList(yyvsp[-2]);
   pushList(yyvsp[0]);
 }
-#line 2870 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3017 "luxparser.cc"
     break;
 
   case 168: /* case_list: case_list value ':' statement  */
-#line 802 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 802 "luxparser.yy"
                                 {
   pushList(yyvsp[-2]);
   pushList(yyvsp[0]);
 }
-#line 2879 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3026 "luxparser.cc"
     break;
 
   case 169: /* $@14: %empty  */
-#line 810 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 810 "luxparser.yy"
         {
   disableNewline++;
 }
-#line 2887 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3034 "luxparser.cc"
     break;
 
   case 170: /* $@15: %empty  */
-#line 812 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 812 "luxparser.yy"
                                              {
   disableNewline--;
 }
-#line 2895 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3042 "luxparser.cc"
     break;
 
   case 171: /* loop: TOK_FOR $@14 TOK_C_ID '=' expr ',' expr opt_step opt_do $@15 statement  */
-#line 814 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 814 "luxparser.yy"
             {
   yyval = findVar(yyvsp[-8], curContext);
   yyval = newSymbol(LUX_EVB, EVB_FOR, yyval, yyvsp[-6], yyvsp[-4], yyvsp[-3], yyvsp[0]);
 }
-#line 2904 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3051 "luxparser.cc"
     break;
 
   case 172: /* $@16: %empty  */
-#line 819 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 819 "luxparser.yy"
              {
   disableNewline++;
 }
-#line 2912 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3059 "luxparser.cc"
     break;
 
   case 173: /* $@17: %empty  */
-#line 821 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 821 "luxparser.yy"
                       {
   disableNewline--;
 }
-#line 2920 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3067 "luxparser.cc"
     break;
 
   case 174: /* loop: TOK_REPEAT $@16 statement TOK_UNTIL $@17 expr  */
-#line 823 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 823 "luxparser.yy"
        {
   yyval = newSymbol(LUX_EVB, EVB_REPEAT, yyvsp[-3], yyvsp[0]);
 }
-#line 2928 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3075 "luxparser.cc"
     break;
 
   case 175: /* $@18: %empty  */
-#line 827 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 827 "luxparser.yy"
          {
   disableNewline++;
 }
-#line 2936 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3083 "luxparser.cc"
     break;
 
   case 176: /* $@19: %empty  */
-#line 829 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 829 "luxparser.yy"
                       {
   disableNewline--;
 }
-#line 2944 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3091 "luxparser.cc"
     break;
 
   case 177: /* loop: TOK_DO $@18 statement TOK_WHILE $@19 expr  */
-#line 831 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 831 "luxparser.yy"
        {
   yyval = newSymbol(LUX_EVB, EVB_DO_WHILE, yyvsp[-3], yyvsp[0]);
 }
-#line 2952 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3099 "luxparser.cc"
     break;
 
   case 178: /* $@20: %empty  */
-#line 835 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 835 "luxparser.yy"
             {
   disableNewline++;
 }
-#line 2960 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3107 "luxparser.cc"
     break;
 
   case 179: /* $@21: %empty  */
-#line 837 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 837 "luxparser.yy"
        {
   disableNewline--;
 }
-#line 2968 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3115 "luxparser.cc"
     break;
 
   case 180: /* loop: TOK_WHILE $@20 expr $@21 opt_do statement  */
-#line 839 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 839 "luxparser.yy"
                    {
   yyval = newSymbol(LUX_EVB, EVB_WHILE_DO, yyvsp[-3], yyvsp[0]);
 }
-#line 2976 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3123 "luxparser.cc"
     break;
 
   case 181: /* opt_step: %empty  */
-#line 846 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 846 "luxparser.yy"
             {
   yyval = LUX_ONE;
 }
-#line 2984 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3131 "luxparser.cc"
     break;
 
   case 182: /* opt_step: ',' expr  */
-#line 850 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 850 "luxparser.yy"
            {
   yyval = yyvsp[0];
 }
-#line 2992 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3139 "luxparser.cc"
     break;
 
 
-#line 2996 "/home/louis/src/lux-cmake/src/luxparser.cc"
+#line 3143 "luxparser.cc"
 
       default: break;
     }
@@ -3185,7 +3332,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 862 "/home/louis/src/lux-cmake/src/luxparser.yy"
+#line 862 "luxparser.yy"
 
 
 #include <stdio.h>

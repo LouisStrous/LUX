@@ -17,7 +17,9 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
-#  include "config.hh"
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
 #include "action.hh"
 #include "GnuPlot.hh"
 #include <cmath>                // for fmodf
@@ -606,6 +608,7 @@ int32_t lux_gnutv(ArgumentCount narg, Symbol ps[])
 {
   return lux_gnuplot_with_image(narg, ps,
                                 "unset xtics; unset ytics; "
+                                "set palette grey; "
                                 "plot '-' binary array=(%d,%d) format=\"%s\" "
                                 "notitle with image;");
 }

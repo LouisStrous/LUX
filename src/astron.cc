@@ -83,7 +83,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <time.h>
 
-#include "config.hh"
+#include "config.h"
 
 #include "AstronomicalConstants.hh"
 #include "Ellipsoid.hh"

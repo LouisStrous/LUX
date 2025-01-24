@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_HOME_LOUIS_SRC_LUX_CMAKE_SRC_LUXPARSER_HH_INCLUDED
-# define YY_YY_HOME_LOUIS_SRC_LUX_CMAKE_SRC_LUXPARSER_HH_INCLUDED
+#ifndef YY_YY_LUXPARSER_HH_INCLUDED
+# define YY_YY_LUXPARSER_HH_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -109,6 +109,63 @@ extern int yydebug;
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
+/* Token kinds.  */
+#define YYEMPTY -2
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 1000
+#define TOK_NL 999
+#define TOK_C_ID 1001
+#define TOK_S_ID 1002
+#define TOK_NUMBER 1003
+#define TOK_STR 1004
+#define TOK_INCLUDE 1005
+#define TOK_REPORT 1006
+#define TOK_IF 1007
+#define TOK_THEN 1008
+#define TOK_ELSE 1009
+#define TOK_FOR 1010
+#define TOK_REPEAT 1011
+#define TOK_UNTIL 1012
+#define TOK_WHILE 1013
+#define TOK_DO 1014
+#define TOK_CASE 1015
+#define TOK_ENDCASE 1016
+#define TOK_NCASE 1017
+#define TOK_SUBR 1018
+#define TOK_ENDSUBR 1019
+#define TOK_FUNC 1020
+#define TOK_ENDFUNC 1021
+#define TOK_BLOCK 1022
+#define TOK_ENDBLOCK 1023
+#define TOK_RETURN 1024
+#define TOK_BREAK 1025
+#define TOK_CONTINUE 1026
+#define TOK_RUN 1027
+#define TOK_BEGIN 1028
+#define TOK_END 1029
+#define TOK_PLUSIS 1030
+#define TOK_MINUSIS 1031
+#define TOK_TIMESIS 1032
+#define TOK_DIVIDEIS 1033
+#define TOK_POWERIS 1034
+#define TOK_RETALL 1035
+#define TOK_STRUCTTAG 1036
+#define TOK_ERRORSTATE 1037
+#define TOK_ELLIPSIS 1038
+#define TOK_ANDIF 1039
+#define TOK_ORIF 1040
+#define TOK_AND 1041
+#define TOK_OR 1042
+#define TOK_XOR 1043
+#define TOK_GE 1044
+#define TOK_LE 1045
+#define TOK_GT 1046
+#define TOK_LT 1047
+#define TOK_EQ 1048
+#define TOK_NE 1049
+#define TOK_SMOD 1050
+#define TOK_UMINUS 1051
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -123,4 +180,4 @@ typedef int YYSTYPE;
 int yyparse (void);
 
 
-#endif /* !YY_YY_HOME_LOUIS_SRC_LUX_CMAKE_SRC_LUXPARSER_HH_INCLUDED  */
+#endif /* !YY_YY_LUXPARSER_HH_INCLUDED  */

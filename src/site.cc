@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File site.c
 // LUX site and version identification routine.
-#include "config.hh"
+#include "config.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -62,7 +62,7 @@ site(ArgumentCount narg, Symbol ps[])
 
   setPager(0);
   if (!internalMode || internalMode == 255) {
-    printw("*** Welcome to " PROJECT " " VERSION " built on " PLATFORM "\n");
+    printw("*** Welcome to " PACKAGE_STRING " built on " PLATFORM "\n");
     printw("Copyright 2013-2024 Louis Strous.\n"
            "This program comes with ABSOLUTELY NO WARRANTY; "
            "for details type ‘info,/warranty’.  "

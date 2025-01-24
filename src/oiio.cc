@@ -1,4 +1,4 @@
-#include "config.hh"
+#include "config.h"
 
 #if OIIO_INCLUDE
 #include "action.hh"

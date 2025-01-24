@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 // File topology.c
 // LUX routine for identifying and labeling disjoint areas in a bitmap.
-#include "config.hh"
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>

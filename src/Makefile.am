@@ -94,17 +94,14 @@ nonbind_sources = \
 	gslpp_sort.hh\
 	gslpp_sort_vector.hh\
 	gslpp_vector.hh\
-	history.c\
-	history.h\
+	history.cc\
+	history.hh\
 	ident.cc\
 	install.cc\
 	install.hh\
 	intmath.cc\
 	intmath.hh\
-	jconfig.h\
-	jinclude.h\
 	jpeg.cc\
-	jpegdata.h\
 	lux_bitmap.xbm\
 	lux_func_if.cc\
 	lux_func_if.hh\
@@ -127,11 +124,10 @@ nonbind_sources = \
 	precession.cc\
 	printf_extensions.cc\
 	random.cc\
-	readline.c\
-	readline.h\
+	readline.cc\
+	readline.hh\
+	rawimages.cc\
 	regex.cc\
-	replacements.h\
-	sincos.cc\
 	site.cc\
 	SolarSystemEphemerides.cc\
 	SolarSystemEphemerides.hh\
@@ -155,7 +151,7 @@ nonbind_sources = \
 
 bin_PROGRAMS = lux
 lux_SOURCES = lux.cc
-lux_LDADD = liblux.a
+lux_LDADD = liblux.a /usr/lib64/libraw.so
 
 #lux$(EXEEXT): $(top_builddir)/historicephemerides/libhistoricephemerides_c.a
 
@@ -164,7 +160,7 @@ luxparser.cc: luxparser.yy
 fun3.cc: luxparser.cc
 
 thebindings.cc: $(nonbind_sources) bindings.hh bindings.pl
-	perl bindings.pl
+	perl bindings.pl $@
 
 # build library, too; makes building test binaries easier
 noinst_LIBRARIES = liblux.a

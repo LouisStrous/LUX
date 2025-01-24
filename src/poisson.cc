@@ -19,7 +19,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* File poisson.c
    LUX routines to calculate Laplacian and anti-Laplacian */
-#include "config.hh"
+#include "config.h"
 #include "action.hh"
 #include <string.h>             // for memcpy
 

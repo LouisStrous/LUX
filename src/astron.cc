@@ -251,7 +251,7 @@ extern int32_t fullVSOP;
 
 void LBRtoXYZ(double *pos, double *pos2);
 void XYZtoLBR(double *, double *);
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
 void XYZ_eclipticPrecession(double *pos, double equinox1, double equinox2);
 #endif
 
@@ -3698,7 +3698,7 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
       if ((internalMode & S_BARE) == 0) {
         if (internalMode & S_FK5) {
           if (J2000 != JDE) {
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
             if (vocal)
               printf("ASTRON: precess ecliptic coordinates from J2000.0 to ecliptic of date (JD %1$.14g = %1$-#24.6J)\n", JDE);
             XYZ_eclipticPrecession(pos, J2000, JDE); // precess to equinox of date
@@ -3714,7 +3714,7 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
             printXYZtoLBR(pos);
           }
           if (JDE != equinox) {
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
             if (vocal)
               printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
             XYZ_eclipticPrecession(pos, JDE, equinox); // precess to desired equinox
@@ -3726,7 +3726,7 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
           }
         } else {
           if (J2000 != equinox) {
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
             if (vocal)
               printf("ASTRON: precess ecliptic coordinates from J2000.0 to JD %1$.14g = %1$-#24.6J\n", equinox);
             XYZ_eclipticPrecession(pos, J2000, equinox); // precess to desired equinox
@@ -3755,7 +3755,7 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
           }
         }
         if (JDE != equinox) {
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
           if (vocal)
             printf("ASTRON: precess ecliptic coordinates from JD %1$.14g = %1$-#24.6J to JD %2$.14g = %2$-#24.6J\n", JDE, equinox);
           XYZ_eclipticPrecession(pos, JDE, equinox); // precess to desired equinox

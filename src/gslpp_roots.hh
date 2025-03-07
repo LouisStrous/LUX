@@ -1,8 +1,8 @@
 #ifndef INCLUDED_GSLPP_ROOTS_HH
 # define INCLUDED_GSLPP_ROOTS_HH
 
-# include "config.hh"
-# if GSL_INCLUDE
+# include "config.h"
+# if HAVE_LIBGSL
 
 #  include <gsl/gsl_roots.h>
 

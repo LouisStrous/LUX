@@ -8,7 +8,7 @@
 
 #include "gslpp_sort.hh"
 
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
 
 // char
 

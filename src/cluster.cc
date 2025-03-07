@@ -134,7 +134,7 @@ int32_t lux_cluster(ArgumentCount narg, Symbol ps[])
 // point.  update the closest cluster center and the PDGV condition
 // until the closest cluster center has been found.
 {
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   void        random_unique(int32_t seed, int32_t *output, int32_t number, int32_t modulo);
   int32_t        iq, nClusters, nVectorDim, nVectors, i, j, *index, size, dataIndex;
   float        *data, *dataPoint, n1, n2, f;

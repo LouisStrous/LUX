@@ -34,7 +34,7 @@
 // libraries
 
 #include <calceph.h>
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 # include "sofa.h"
 #endif
 

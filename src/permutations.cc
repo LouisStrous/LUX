@@ -4,7 +4,7 @@
 
 #include "config.h"
 
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
 # include <algorithm>
 # include <cassert>
 # include <numeric>              // for std::iota

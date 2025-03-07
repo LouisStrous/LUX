@@ -1,5 +1,5 @@
 #include "config.h"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
 # include <functional>
 # include "gslpp_roots.hh"
 # include "gsl/gsl_errno.h"         // for GSL_CONTINUE

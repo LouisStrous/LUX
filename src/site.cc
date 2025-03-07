@@ -121,7 +121,7 @@ site(ArgumentCount narg, Symbol ps[])
     printw("ReadLine ");
     hasInclude = true;
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
     printw("SOFA ");
     hasInclude = true;
 #endif

@@ -5,7 +5,7 @@
 #include "config.h"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 # include "sofa.h"
 #endif
 
@@ -155,7 +155,7 @@ lux_hilbert_s(int32_t narg, int32_t ps[])
   return result;
 }
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauBi00(double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -173,7 +173,7 @@ lux_iauBi00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauBp00(double, double, double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -191,7 +191,7 @@ lux_iauBp00_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauBp06(double, double, double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -209,7 +209,7 @@ lux_iauBp06_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauBpn2xy(double[3][3], double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -227,7 +227,7 @@ lux_iauBpn2xy_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2i00a(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -245,7 +245,7 @@ lux_iauC2i00a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2i00b(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -263,7 +263,7 @@ lux_iauC2i00b_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2i06a(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -281,7 +281,7 @@ lux_iauC2i06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2ibpn(double, double, double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -299,7 +299,7 @@ lux_iauC2ibpn_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2ixy(double, double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -317,7 +317,7 @@ lux_iauC2ixy_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2ixys(double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -335,7 +335,7 @@ lux_iauC2ixys_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2s(double[3], double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -353,7 +353,7 @@ lux_iauC2s_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2t00a(double, double, double, double, double, double,double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -371,7 +371,7 @@ lux_iauC2t00a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2t00b(double, double, double, double, double, double,double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -389,7 +389,7 @@ lux_iauC2t00b_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2t06a(double, double, double, double, double, double,double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -407,7 +407,7 @@ lux_iauC2t06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2tcio(double[3][3], double, double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -425,7 +425,7 @@ lux_iauC2tcio_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2teqx(double[3][3], double, double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -443,7 +443,7 @@ lux_iauC2teqx_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2tpe(double, double, double, double, double, double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -461,7 +461,7 @@ lux_iauC2tpe_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauC2txy(double, double, double, double, double, double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -479,7 +479,7 @@ lux_iauC2txy_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauDtdb(double, double, double, double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -497,7 +497,7 @@ lux_iauDtdb_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double do_iauEe00(double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -515,7 +515,7 @@ lux_do_iauEe00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEe00a(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -533,7 +533,7 @@ lux_iauEe00a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEe00b(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -551,7 +551,7 @@ lux_iauEe00b_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEe06a(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -569,7 +569,7 @@ lux_iauEe06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEect00(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -587,7 +587,7 @@ lux_iauEect00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauEform(int32_t, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -605,7 +605,7 @@ lux_iauEform_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEo06a(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -623,7 +623,7 @@ lux_iauEo06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEors(double[3][3], double)
 /// suitable for use as a LUX subroutine or function.
@@ -641,7 +641,7 @@ lux_iauEors_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEpb(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -659,7 +659,7 @@ lux_iauEpb_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEpj(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -677,7 +677,7 @@ lux_iauEpj_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauEpv00(double, double, double[2][3], double[2][3])
 /// suitable for use as a LUX subroutine or function.
@@ -695,7 +695,7 @@ lux_iauEpv00_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEqeq94(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -713,7 +713,7 @@ lux_iauEqeq94_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauEra00(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -731,7 +731,7 @@ lux_iauEra00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFad03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -749,7 +749,7 @@ lux_iauFad03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFae03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -767,7 +767,7 @@ lux_iauFae03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFaf03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -785,7 +785,7 @@ lux_iauFaf03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFaju03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -803,7 +803,7 @@ lux_iauFaju03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFal03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -821,7 +821,7 @@ lux_iauFal03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFalp03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -839,7 +839,7 @@ lux_iauFalp03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFama03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -857,7 +857,7 @@ lux_iauFama03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFame03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -875,7 +875,7 @@ lux_iauFame03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFane03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -893,7 +893,7 @@ lux_iauFane03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFaom03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -911,7 +911,7 @@ lux_iauFaom03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFapa03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -929,7 +929,7 @@ lux_iauFapa03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFasa03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -947,7 +947,7 @@ lux_iauFasa03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFaur03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -965,7 +965,7 @@ lux_iauFaur03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauFave03(double)
 /// suitable for use as a LUX subroutine or function.
@@ -983,7 +983,7 @@ lux_iauFave03_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauFk52h(double, double, double, double, double, double, double*, double*, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1001,7 +1001,7 @@ lux_iauFk52h_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauFk5hip(double[3][3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -1019,7 +1019,7 @@ lux_iauFk5hip_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauFk5hz(double, double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1037,7 +1037,7 @@ lux_iauFk5hz_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauFw2m(double, double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1055,7 +1055,7 @@ lux_iauFw2m_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauFw2xy(double, double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1073,7 +1073,7 @@ lux_iauFw2xy_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauGc2gd(int32_t, double[3], double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1091,7 +1091,7 @@ lux_iauGc2gd_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauGc2gde(double, double, double[3], double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1109,7 +1109,7 @@ lux_iauGc2gde_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauGd2gc(int32_t, double, double, double, double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -1127,7 +1127,7 @@ lux_iauGd2gc_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauGd2gce(double, double, double, double, double, double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -1145,7 +1145,7 @@ lux_iauGd2gce_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGmst00(double, double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1163,7 +1163,7 @@ lux_iauGmst00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGmst06(double, double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1181,7 +1181,7 @@ lux_iauGmst06_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGmst82(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1199,7 +1199,7 @@ lux_iauGmst82_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGst00a(double, double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1217,7 +1217,7 @@ lux_iauGst00a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGst00b(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1235,7 +1235,7 @@ lux_iauGst00b_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGst06(double, double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1253,7 +1253,7 @@ lux_iauGst06_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGst06a(double, double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1271,7 +1271,7 @@ lux_iauGst06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauGst94(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1289,7 +1289,7 @@ lux_iauGst94_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauH2fk5(double, double, double, double, double, double, double*, double*, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1307,7 +1307,7 @@ lux_iauH2fk5_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauHfk5z(double, double, double, double, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1325,7 +1325,7 @@ lux_iauHfk5z_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauIr(double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1343,7 +1343,7 @@ lux_iauIr_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauJd2cal(double, double, int32_t*, int32_t*, int32_t*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1361,7 +1361,7 @@ lux_iauJd2cal_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNum00a(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1379,7 +1379,7 @@ lux_iauNum00a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNum00b(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1397,7 +1397,7 @@ lux_iauNum00b_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNum06a(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1415,7 +1415,7 @@ lux_iauNum06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNumat(double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1433,7 +1433,7 @@ lux_iauNumat_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNut00a(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1451,7 +1451,7 @@ lux_iauNut00a_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNut00b(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1469,7 +1469,7 @@ lux_iauNut00b_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNut06a(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1487,7 +1487,7 @@ lux_iauNut06a_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNut80(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1505,7 +1505,7 @@ lux_iauNut80_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauNutm80(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1523,7 +1523,7 @@ lux_iauNutm80_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauObl06(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1541,7 +1541,7 @@ lux_iauObl06_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauObl80(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1559,7 +1559,7 @@ lux_iauObl80_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauP06e(double, double, double*, double*, double*, double*, double*, double*, double*, double*, double*, double*, double*, double*, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1577,7 +1577,7 @@ lux_iauP06e_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauP2s(double[3], double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1595,7 +1595,7 @@ lux_iauP2s_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauPap(double[3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -1613,7 +1613,7 @@ lux_iauPap_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauPas(double, double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -1631,7 +1631,7 @@ lux_iauPas_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPb06(double, double, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1649,7 +1649,7 @@ lux_iauPb06_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauPdp(double[3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -1667,7 +1667,7 @@ lux_iauPdp_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPfw06(double, double, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1685,7 +1685,7 @@ lux_iauPfw06_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauPlan94(double, double, int32_t, double[2][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1703,7 +1703,7 @@ lux_iauPlan94_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauPm(double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -1721,7 +1721,7 @@ lux_iauPm_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPmat00(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1739,7 +1739,7 @@ lux_iauPmat00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPmat06(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1757,7 +1757,7 @@ lux_iauPmat06_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPmat76(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1775,7 +1775,7 @@ lux_iauPmat76_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPn(double[3], double*, double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -1793,7 +1793,7 @@ lux_iauPn_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPn00(double, double, double, double, double*, double[3][3], double[3][3], double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1811,7 +1811,7 @@ lux_iauPn00_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPn00a(double, double, double*, double*, double*, double[3][3], double[3][3], double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1829,7 +1829,7 @@ lux_iauPn00a_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPn00b(double, double, double*, double*, double*, double[3][3], double[3][3], double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1847,7 +1847,7 @@ lux_iauPn00b_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPn06(double, double, double, double, double*, double[3][3], double[3][3], double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1865,7 +1865,7 @@ lux_iauPn06_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPn06a(double, double, double*, double*, double*, double[3][3], double[3][3], double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1883,7 +1883,7 @@ lux_iauPn06a_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPnm00a(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1901,7 +1901,7 @@ lux_iauPnm00a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPnm00b(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1919,7 +1919,7 @@ lux_iauPnm00b_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPnm06a(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1937,7 +1937,7 @@ lux_iauPnm06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPnm80(double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1955,7 +1955,7 @@ lux_iauPnm80_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPom00(double, double, double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -1973,7 +1973,7 @@ lux_iauPom00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPr00(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -1991,7 +1991,7 @@ lux_iauPr00_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPrec76(double, double, double, double, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2009,7 +2009,7 @@ lux_iauPrec76_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPv2s(double[2][3], double*, double*, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2027,7 +2027,7 @@ lux_iauPv2s_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPvdpv(double[2][3], double[2][3], double[2])
 /// suitable for use as a LUX subroutine or function.
@@ -2045,7 +2045,7 @@ lux_iauPvdpv_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPvm(double[2][3], double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2063,7 +2063,7 @@ lux_iauPvm_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauPvstar(double[2][3], double*, double*, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2081,7 +2081,7 @@ lux_iauPvstar_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPvxpv(double[2][3], double[2][3], double[2][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2099,7 +2099,7 @@ lux_iauPvxpv_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauPxp(double[3], double[3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -2117,7 +2117,7 @@ lux_iauPxp_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRm2v(double[3][3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -2135,7 +2135,7 @@ lux_iauRm2v_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRxp(double[3][3], double[3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -2153,7 +2153,7 @@ lux_iauRxp_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRxr(double[3][3], double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2171,7 +2171,7 @@ lux_iauRxr_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRv2m(double[3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2189,7 +2189,7 @@ lux_iauRv2m_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRx(double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2207,7 +2207,7 @@ lux_iauRx_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRxpv(double[3][3], double[2][3], double[2][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2225,7 +2225,7 @@ lux_iauRxpv_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRy(double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2243,7 +2243,7 @@ lux_iauRy_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauRz(double, double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2261,7 +2261,7 @@ lux_iauRz_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double do_iauS00(double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -2279,7 +2279,7 @@ lux_do_iauS00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauS00a(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -2297,7 +2297,7 @@ lux_iauS00a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauS00b(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -2315,7 +2315,7 @@ lux_iauS00b_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double do_iauS06(double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -2333,7 +2333,7 @@ lux_do_iauS06_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauS06a(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -2351,7 +2351,7 @@ lux_iauS06a_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauS2c(double, double, double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -2369,7 +2369,7 @@ lux_iauS2c_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauS2p(double, double, double, double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -2387,7 +2387,7 @@ lux_iauS2p_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauS2pv(double, double, double, double, double, double, double[2][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2405,7 +2405,7 @@ lux_iauS2pv_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauSepp(double[3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -2423,7 +2423,7 @@ lux_iauSepp_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauSeps(double, double, double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -2441,7 +2441,7 @@ lux_iauSeps_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     double iauSp00(double, double)
 /// suitable for use as a LUX subroutine or function.
@@ -2459,7 +2459,7 @@ lux_iauSp00_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauStarpm(double, double, double, double, double, double, double, double, double, double, double*, double*, double*, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2477,7 +2477,7 @@ lux_iauStarpm_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauStarpv(double, double, double, double, double, double, double[2][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2495,7 +2495,7 @@ lux_iauStarpv_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTaitt(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2513,7 +2513,7 @@ lux_iauTaitt_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTaiut1(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2531,7 +2531,7 @@ lux_iauTaiut1_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTaiutc(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2549,7 +2549,7 @@ lux_iauTaiutc_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTcbtdb(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2567,7 +2567,7 @@ lux_iauTcbtdb_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTcgtt(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2585,7 +2585,7 @@ lux_iauTcgtt_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTdbtcb(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2603,7 +2603,7 @@ lux_iauTdbtcb_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTdbtt(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2621,7 +2621,7 @@ lux_iauTdbtt_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauTr(double[3][3], double[3][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2639,7 +2639,7 @@ lux_iauTr_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauTrxp(double[3][3], double[3], double[3])
 /// suitable for use as a LUX subroutine or function.
@@ -2657,7 +2657,7 @@ lux_iauTrxp_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauTrxpv(double[3][3], double[2][3], double[2][3])
 /// suitable for use as a LUX subroutine or function.
@@ -2675,7 +2675,7 @@ lux_iauTrxpv_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTttai(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2693,7 +2693,7 @@ lux_iauTttai_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTttcg(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2711,7 +2711,7 @@ lux_iauTttcg_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTttdb(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2729,7 +2729,7 @@ lux_iauTttdb_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauTtut1(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2747,7 +2747,7 @@ lux_iauTtut1_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauUt1tai(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2765,7 +2765,7 @@ lux_iauUt1tai_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauUt1tt(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2783,7 +2783,7 @@ lux_iauUt1tt_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauUt1utc(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2801,7 +2801,7 @@ lux_iauUt1utc_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauUtctai(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2819,7 +2819,7 @@ lux_iauUtctai_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     int32_t iauUtcut1(double, double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2837,7 +2837,7 @@ lux_iauUtcut1_f(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauXy06(double, double, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2855,7 +2855,7 @@ lux_iauXy06_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauXys00a(double, double, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2873,7 +2873,7 @@ lux_iauXys00a_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauXys00b(double, double, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -2891,7 +2891,7 @@ lux_iauXys00b_s(int32_t narg, int32_t ps[])
 }
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 /// A function that wraps
 ///     void iauXys06a(double, double, double*, double*, double*)
 /// suitable for use as a LUX subroutine or function.
@@ -3076,7 +3076,7 @@ void register_the_bindings()
   register_lux_f(lux_hist, "hist", 1, 2, "1first:2ignorelimit:4increaselimit:8silent" );
 
 #line 4925 "fun3.cc"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   int32_t lux_welch(int32_t, int32_t []);
   register_lux_f(lux_welch, "welch", 2, 3, "1window:2fast");
 #endif
@@ -3161,639 +3161,639 @@ void register_the_bindings()
   register_lux_f(lux_write_jpeg6b_f, "write_jpeg", 2, 4, 0);
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauBi00_f, "bi00", 0, 0, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauBp00_s, "bp00", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauBp06_s, "bp06", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauBpn2xy_s, "bpn2xy", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2i00a_f, "c2i00a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2i00b_f, "c2i00b", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2i06a_f, "c2i06a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2ibpn_f, "c2ibpn", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2ixy_f, "c2ixy", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2ixys_f, "c2ixys", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2s_f, "c2s", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2t00a_f, "c2t00a", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2t00b_f, "c2t00b", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2t06a_f, "c2t06a", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2tcio_f, "c2tcio", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2teqx_f, "c2teqx", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2tpe_f, "c2tpe", 5, 5, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauC2txy_f, "c2txy", 5, 5, 0);
 
 #endif
 #line 263 "luxsofa.cc"
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   int32_t lux_iauCal2jd(int32_t, int32_t []);
   register_lux_f(lux_iauCal2jd, "cal2jd", 1, 1, 0);
 #endif
 
 #line 342 "luxsofa.cc"
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   int32_t lux_iauDat(int32_t, int32_t []);
   register_lux_f(lux_iauDat, "dat", 0, 1, "1valid");
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauDtdb_f, "dtdb", 5, 5, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_do_iauEe00_f, "ee00", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEe00a_f, "ee00a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEe00b_f, "ee00b", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEe06a_f, "ee06a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEect00_f, "eect00", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEform_f, "eform", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEo06a_f, "eo06a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEors_f, "eors", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEpb_f, "epb", 1, 1, 0);
 
 #endif
 #line 434 "luxsofa.cc"
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   int32_t lux_iauEpb2jd(int32_t, int32_t []);
   register_lux_f(lux_iauEpb2jd, "epb2jd", 1, 1, 0);
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEpj_f, "epj", 1, 1, 0);
 
 #endif
 #line 461 "luxsofa.cc"
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   int32_t lux_iauEpj2jd(int32_t, int32_t []);
   register_lux_f(lux_iauEpj2jd, "epj2jd", 1, 1, 0);
 #endif
 
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauEpv00_s, "epv00", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEqeq94_f, "eqeq94", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauEra00_f, "era00", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFad03_f, "fad03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFae03_f, "fae03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaf03_f, "faf03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaju03_f, "faju03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFal03_f, "fal03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFalp03_f, "falp03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFama03_f, "fama03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFame03_f, "fame03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFane03_f, "fane03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaom03_f, "faom03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFapa03_f, "fapa03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFasa03_f, "fasa03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFaur03_f, "faur03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFave03_f, "fave03", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFk52h_s, "fk52h", 12, 12, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFk5hip_s, "fk5hip", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFk5hz_s, "fk5hz", 5, 5, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauFw2m_f, "fw2m", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauFw2xy_s, "fw2xy", 6, 6, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGc2gd_f, "gc2gd", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGc2gde_f, "gc2gde", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGd2gc_f, "gd2gc", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGd2gce_f, "gd2gce", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGmst00_f, "gmst00", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGmst06_f, "gmst06", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGmst82_f, "gmst82", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst00a_f, "gst00a", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst00b_f, "gst00b", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst06_f, "gst06", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst06a_f, "gst06a", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauGst94_f, "gst94", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauH2fk5_s, "h2fk5", 12, 12, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauHfk5z_s, "hfk5z", 7, 7, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauIr_f, "ir", 0, 0, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauJd2cal_f, "jd2cal", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNum00a_f, "num00a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNum00b_f, "num00b", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNum06a_f, "num06a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNumat_f, "numat", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut00a_s, "nut00a", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut00b_s, "nut00b", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut06a_s, "nut06a", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauNut80_s, "nut80", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauNutm80_f, "nutm80", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauObl06_f, "obl06", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauObl80_f, "obl80", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauP06e_s, "p06e", 17, 17, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauP2s_f, "p2s", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPap_f, "pap", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPas_f, "pas", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPb06_s, "pb06", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPdp_f, "pdp", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPfw06_s, "pfw06", 5, 5, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPlan94_f, "plan94", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPm_f, "pm", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPmat00_f, "pmat00", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPmat06_f, "pmat06", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPmat76_f, "pmat76", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn_s, "pn", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn00_s, "pn00", 9, 9, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn00a_s, "pn00a", 9, 9, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn00b_s, "pn00b", 9, 9, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn06_s, "pn06", 9, 9, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPn06a_s, "pn06a", 9, 9, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm00a_f, "pnm00a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm00b_f, "pnm00b", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm06a_f, "pnm06a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPnm80_f, "pnm80", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPom00_f, "pom00", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPr00_s, "pr00", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPrec76_s, "prec76", 5, 5, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPv2s_s, "pv25", 7, 7, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPvdpv_f, "pvdpv", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPvm_s, "pvm", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauPvstar_s, "pvstar", 7, 7, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPvxpv_f, "pvxpv", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauPxp_f, "pxp", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRm2v_f, "rm2v", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRxp_f, "rxp", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRxr_f, "rxr", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRv2m_f, "rv2m", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauRx_s, "rx", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauRxpv_f, "rxpv", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauRy_s, "ry", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauRz_s, "rz", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_do_iauS00_f, "s00", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS00a_f, "s00a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS00b_f, "s00b", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_do_iauS06_f, "s06", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS06a_f, "s06a", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS2c_f, "S2C", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS2p_f, "s2p", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauS2pv_f, "s2pv", 6, 6, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauSepp_f, "sepp", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauSeps_f, "seps", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauSp00_f, "sp00", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauStarpm_s, "starpm", 14, 14, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauStarpv_f, "starpv", 6, 6, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTaitt_f, "taitt", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTaiut1_f, "taiut1", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTaiutc_f, "taiutc", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTcbtdb_f, "tcbtdb", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTcgtt_f, "tcgtt", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTdbtcb_f, "tdbtcb", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTdbtt_f, "tdbtt", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTr_f, "tr", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTrxp_f, "trxp", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTrxpv_f, "trxpv", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTttai_f, "tttai", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTttcg_f, "tttcg", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTttdb_f, "tttdb", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauTtut1_f, "ttut1", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUt1tai_f, "ut1tai", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUt1tt_f, "ut1tt", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUt1utc_f, "ut1utc", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUtctai_f, "utctai", 1, 1, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_f(lux_iauUtcut1_f, "utcut1", 2, 2, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXy06_s, "xy06", 3, 3, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXys00a_s, "xys00a", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXys00b_s, "xys00b", 4, 4, 0);
 
 #endif
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
   register_lux_s(lux_iauXys06a_s, "xys06a", 4, 4, 0);
 
 #endif
@@ -3906,31 +3906,31 @@ void register_the_bindings()
   register_lux_s(lux_commonfactors, "commonfactors", 3, 4, NULL);
 
 #line 4128 "strous3.cc"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   int32_t lux_planetpermutationchanges(int32_t, int32_t []);
   register_lux_f(lux_planetpermutationchanges, "planetpermutationchanges", 3, 3, "1verbose");
 #endif
 
 #line 4321 "strous3.cc"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   int32_t lux_permutationnumber(int32_t, int32_t []);
   register_lux_f(lux_permutationnumber, "permutationnumber", 1, 2, "0rank:1index:0linear:2circular");
 #endif
 
 #line 4362 "strous3.cc"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   int32_t lux_permutation(int32_t, int32_t []);
   register_lux_f(lux_permutation, "permutation", 2, 2, "0rank:1index:0linear:2circular");
 #endif
 
 #line 4499 "strous3.cc"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   int32_t lux_permutationdistance(int32_t, int32_t []);
   register_lux_f(lux_permutationdistance, "permutationdistance", 2, 2, "0rank:1index:0linear:2circular");
 #endif
 
 #line 4567 "strous3.cc"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   int32_t lux_factorial(int32_t, int32_t []);
   register_lux_f(lux_factorial, "factorial", 1, 1, NULL);
 #endif

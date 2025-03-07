@@ -24,7 +24,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // END HEADERS
 #include "config.h"
 #include "action.hh"
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
 # include <gsl/gsl_poly.h>
 #endif
 
@@ -98,7 +98,7 @@ void init_XYZ_eclipticPrecession(double fromequinox, double toequinox)
    for cartesian coordinates, for precession from <fromequinox> to
    <toequinox> (both measured in JDE) */
 {
-#if GSL_INCLUDE
+#if HAVE_LIBGSL
   int32_t is_new = (toequinox != a_toJ2000[9] || fromequinox != a_fromJ2000[9]);
   if (!is_new)
     return;

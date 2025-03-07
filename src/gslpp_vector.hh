@@ -1,7 +1,7 @@
 #ifndef INCLUDED_GSLPP_VECTOR_HH
 #define INCLUDED_GSLPP_VECTOR_HH
-#include "config.hh"
-#if GSL_INCLUDE
+#include "config.h"
+#if HAVE_LIBGSL
 # include <gsl/gsl_vector.h>
 
 /// \file

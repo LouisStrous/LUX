@@ -21,7 +21,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /* jreadw.c, interface with jpeg libraries based on example.c in JPEG
    distribution */
 #include "action.hh"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
 # include "jpeglib.h"
 # include "jerror.h"
 # include <setjmp.h>

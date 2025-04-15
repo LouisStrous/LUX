@@ -1,6 +1,6 @@
 #include "config.h"
 
-#ifdef HAVE_LIBSOFA_C
+#if HAVE_LIBSOFA_C
 # include <algorithm>
 # include <cmath>
 # include <calceph.h>

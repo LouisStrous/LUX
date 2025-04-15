@@ -22,7 +22,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // compression/decompression software, version 6b.
 
 #include "config.h"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
 
 #include <stdio.h>              // for FILE, fopen(), fclose(), printf()
 #include <ctype.h>              // for isprint()
@@ -180,15 +180,15 @@ int32_t lux_read_jpeg6b(ArgumentCount narg, Symbol ps[])
 {
   return read_jpeg6b(narg, ps, 0);
 }
-REGISTER(read_jpeg6b, s, jpegread, 2, 4, ":::shrink:1greyscale", JPEG_INCLUDE);
-REGISTER(read_jpeg6b, s, read_jpeg, 2, 4, ":::shrink:1greyscale", JPEG_INCLUDE);
+REGISTER(read_jpeg6b, s, jpegread, 2, 4, ":::shrink:1greyscale", HAVE_LIBJPEG);
+REGISTER(read_jpeg6b, s, read_jpeg, 2, 4, ":::shrink:1greyscale", HAVE_LIBJPEG);
 //--------------------------------------------------------------------------
 int32_t lux_read_jpeg6b_f(ArgumentCount narg, Symbol ps[])
 {
   return (read_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
 }
-REGISTER(read_jpeg6b_f, f, jpegread, 2, 4, ":::shrink:1greyscale", JPEG_INCLUDE);
-REGISTER(read_jpeg6b_f, f, read_jpeg, 2, 4, ":::shrink:1greyscale", JPEG_INCLUDE);
+REGISTER(read_jpeg6b_f, f, jpegread, 2, 4, ":::shrink:1greyscale", HAVE_LIBJPEG);
+REGISTER(read_jpeg6b_f, f, read_jpeg, 2, 4, ":::shrink:1greyscale", HAVE_LIBJPEG);
 //--------------------------------------------------------------------------
 int32_t write_jpeg6b(ArgumentCount narg, Symbol ps[], int32_t isFunc)
 // JWRITE,<x>,<file>[,<header>,<quality>]
@@ -294,14 +294,14 @@ int32_t lux_write_jpeg6b(ArgumentCount narg, Symbol ps[])
 {
   return write_jpeg6b(narg, ps, 0);
 }
-REGISTER(write_jpeg6b, s, jpegwrite, 2, 4, 0, JPEG_INCLUDE);
-REGISTER(write_jpeg6b, s, write_jpeg, 2, 4, 0, JPEG_INCLUDE);
+REGISTER(write_jpeg6b, s, jpegwrite, 2, 4, 0, HAVE_LIBJPEG);
+REGISTER(write_jpeg6b, s, write_jpeg, 2, 4, 0, HAVE_LIBJPEG);
 //--------------------------------------------------------------------------
 int32_t lux_write_jpeg6b_f(ArgumentCount narg, Symbol ps[])
 {
   return (write_jpeg6b(narg, ps, 1) == LUX_OK)? LUX_ONE: LUX_ZERO;
 }
-REGISTER(write_jpeg6b_f, f, jpegwrite, 2, 4, 0, JPEG_INCLUDE);
-REGISTER(write_jpeg6b_f, f, write_jpeg, 2, 4, 0, JPEG_INCLUDE);
+REGISTER(write_jpeg6b_f, f, jpegwrite, 2, 4, 0, HAVE_LIBJPEG);
+REGISTER(write_jpeg6b_f, f, write_jpeg, 2, 4, 0, HAVE_LIBJPEG);
 //--------------------------------------------------------------------------
 #endif

@@ -46,7 +46,7 @@ print $ofh <<EOD;
 #include "config.h"
 #include "bindings.hh"
 #include "install.hh"              // for MAX_DIMS
-#if SOFA_INCLUDE
+#if HAVE_LIBSOFA_C
 # include "sofa.h"
 #endif
 

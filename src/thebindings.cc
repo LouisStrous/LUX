@@ -2994,7 +2994,7 @@ void register_the_bindings()
   register_lux_f(lux_kepler_v_f, "kepler", 2, 2, "0meananomaly:1perifocalanomaly:0trueanomaly:2eccentricanomaly:4tau:8itercount");
 
 #line 349 "astron2.cc"
-#if CALCEPH_INCLUDE
+#if HAVE_LIBCALCEPH
   int32_t lux_astron2(int32_t, int32_t []);
   register_lux_f(lux_astron2, "astron2", 2, 4, ":::equinox:1keepdims:~6ecliptical:2equatorial:4bare:~8polar:8xyz:16date:32conjspread");
 #endif
@@ -3114,49 +3114,49 @@ void register_the_bindings()
   register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
 
 #line 183 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_read_jpeg6b(int32_t, int32_t []);
   register_lux_s(lux_read_jpeg6b, "jpegread", 2, 4, ":::shrink:1greyscale");
 #endif
 
 #line 184 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_read_jpeg6b(int32_t, int32_t []);
   register_lux_s(lux_read_jpeg6b, "read_jpeg", 2, 4, ":::shrink:1greyscale");
 #endif
 
 #line 190 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_read_jpeg6b_f(int32_t, int32_t []);
   register_lux_f(lux_read_jpeg6b_f, "jpegread", 2, 4, ":::shrink:1greyscale");
 #endif
 
 #line 191 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_read_jpeg6b_f(int32_t, int32_t []);
   register_lux_f(lux_read_jpeg6b_f, "read_jpeg", 2, 4, ":::shrink:1greyscale");
 #endif
 
 #line 297 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_write_jpeg6b(int32_t, int32_t []);
   register_lux_s(lux_write_jpeg6b, "jpegwrite", 2, 4, 0);
 #endif
 
 #line 298 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_write_jpeg6b(int32_t, int32_t []);
   register_lux_s(lux_write_jpeg6b, "write_jpeg", 2, 4, 0);
 #endif
 
 #line 304 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_write_jpeg6b_f(int32_t, int32_t []);
   register_lux_f(lux_write_jpeg6b_f, "jpegwrite", 2, 4, 0);
 #endif
 
 #line 305 "jpeg.cc"
-#if JPEG_INCLUDE
+#if HAVE_LIBJPEG
   int32_t lux_write_jpeg6b_f(int32_t, int32_t []);
   register_lux_f(lux_write_jpeg6b_f, "write_jpeg", 2, 4, 0);
 #endif
@@ -3822,7 +3822,7 @@ void register_the_bindings()
   register_lux_f(lux_diagonal_matrix, "mdiagonal", 1, 3, NULL);
 
 #line 64 "oiio.cc"
-#if OIIO_INCLUDE
+#if HAVE_LIBOPENIMAGEIO
   int32_t lux_read_image_oiio(int32_t, int32_t []);
   register_lux_f(lux_read_image_oiio, "readimage", 1, 1, NULL);
 #endif

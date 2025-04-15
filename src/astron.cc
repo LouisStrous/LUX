@@ -4536,10 +4536,10 @@ int32_t lux_astropos(ArgumentCount narg, Symbol ps[])
 
     double pos_sun_obs[3], r_sun_obs;
     // calculate the position of the observer's planet
-    // bool applied_observer_planetocentric_offset
-    //   = heliocentricXYZr_obs(jd, object0, equinox, geocentric_latitude_rad,
-    //                          Tsid, height, pos_sun_obs, &r_sun_obs, tolerance,
-    //                          vocal, internalMode & S_VSOP);
+    bool applied_observer_planetocentric_offset
+      = heliocentricXYZr_obs(jd, object0, equinox, geocentric_latitude_rad,
+                             Tsid, height, pos_sun_obs, &r_sun_obs, tolerance,
+                             vocal, internalMode & S_VSOP);
     /* cartesian ecliptic heliocentric coordinates of the observer's
        planet at target time */
     // pos_sun_obs[0] = X, pos_sun_obs[1] = Y, pos_sun_obs[2] = Z,

@@ -20,23 +20,174 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef INTMATH_H
 #define INTMATH_H
 
-#include <stdlib.h>
+#include <cmath>
+#include <concepts>
+#include <cstdlib>
 #include "action.hh"
 
-/// A struct with fields for the quotient and remainder of a division of
-/// `int32_t` values.  The standard std::div_t-like types are defined in terms
-/// of standard integer types of which the width is not necessarily the same on
-/// all systems.
-struct Div_t {
-  int32_t quot;                 //!< The quotient.
-  int32_t rem;                  //!< The remainder.
+/// Signum function.
+///
+/// \tparam T is the data type.
+///
+/// \param x is the data value.
+///
+/// \returns `int` +1 if the argument is positive, 0 if the argument
+/// is 0, -1 if the argument is negative.
+template<typename T>
+constexpr int
+sgn(T x) noexcept
+{
+  return (x > 0)? 1: (x < 0)? -1: 0;
+}
+
+/// Floored quotient, from floored division, which rounds the result
+/// down to the nearest integer toward minus infinity.
+///
+/// The standard / operator does truncated division instead, which
+/// rounds the result toward zero.
+///
+/// \param numerator is the numerator of the fraction.
+///
+/// \param denominator is the denominator of the fraction.
+///
+/// \returns the floored quotient.
+constexpr auto
+fquotient(std::floating_point auto numerator,
+          std::floating_point auto denominator) noexcept
+{
+  return std::floor(numerator/denominator);
+}
+
+/// Floored quotient, from floored division, which rounds the result
+/// down to the nearest integer toward minus infinity.
+///
+/// The standard / operator does truncated division instead, which
+/// rounds the result toward zero.
+///
+/// \param numerator is the numerator of the fraction.
+///
+/// \param denominator is the denominator of the fraction.
+///
+/// \returns the floored quotient.
+constexpr auto
+fquotient(std::integral auto numerator, std::integral auto denominator) noexcept
+{
+  return (numerator/denominator)
+    - (sgn(numerator)*sgn(denominator) < 0);
+}
+
+constexpr auto
+fquotient(std::floating_point auto numerator,
+          std::integral auto denominator) noexcept
+{
+  return (numerator/denominator)
+    - (sgn(numerator)*sgn(denominator) < 0);
+}
+
+constexpr auto
+fquotient(std::integral auto numerator,
+          std::floating_point auto denominator) noexcept
+{
+  return (numerator/denominator)
+    - (sgn(numerator)*sgn(denominator) < 0);
+}
+
+/// Floored remainder, from floored division, which rounds the
+/// quotient down to the nearest integer toward minus infinity.
+///
+/// std::fmod() does truncated division instead, which rounds the
+/// quotient toward zero.
+///
+/// \param numerator is the numerator of the fraction.
+///
+/// \param denominator is the denominator of the fraction.
+///
+/// \returns the floored remainder.
+constexpr auto
+fremainder(std::floating_point auto numerator,
+           std::floating_point auto denominator) noexcept
+{
+  return std::fmod(numerator, denominator)
+    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+}
+
+constexpr auto
+fremainder(std::floating_point auto numerator,
+           std::integral auto denominator) noexcept
+{
+  return std::fmod(numerator, denominator)
+    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+}
+
+constexpr auto
+fremainder(std::integral auto numerator,
+           std::floating_point auto denominator) noexcept
+{
+  return std::fmod(numerator, denominator)
+    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+}
+
+/// Floored remainder, from floored division, which rounds the
+/// quotient down to the nearest integer toward minus infinity.
+///
+/// std::fmod() does truncated division instead, which rounds the
+/// quotient toward zero.
+///
+/// \param numerator is the numerator of the fraction.
+///
+/// \param denominator is the denominator of the fraction.
+///
+/// \returns the floored remainder.
+constexpr auto
+fremainder(std::integral auto numerator,
+           std::integral auto denominator) noexcept
+{
+  return (numerator%denominator)
+    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+}
+
+/// A template type that represents the quotient and remainder of a
+/// division of arbitrary type.
+///
+/// \tparam T is the data type of the quotient and remainder.
+template<typename T>
+struct Div {
+  T quot;                       /// The quotient
+  T rem;                        /// The remainder
 };
 
-Div_t adiv(int32_t numerator, int32_t denominator);
-int32_t iaquot(int32_t numerator, int32_t denominator);
-int32_t iamod(int32_t numerator, int32_t denominator);
-Div_t alinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
-int32_t alinequot(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
-int32_t alinemod(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator);
+/// Floored division, which rounds the quotient down to the nearest
+/// integer toward minus infinity.
+///
+/// std::div() does truncated division instead, which rounds the
+/// quotient toward zero.
+///
+/// \tparam T is the data type of numerator, denominator, quotient,
+/// and remainder.
+///
+/// \param numerator is the numerator.
+///
+/// \param denominator is the denominator.
+///
+/// \returns the quotient and remainder wrapped in a #Div.
+template<typename T>
+constexpr auto
+fdivide(T numerator, T denominator) noexcept
+{
+  return Div{fquotient(numerator, denominator),
+             fremainder(numerator, denominator)};
+}
+
+Div<int32_t>
+alinediv(int32_t numerator, int32_t factor, int32_t addend,
+         int32_t denominator);
+
+int32_t
+alinequot(int32_t numerator, int32_t factor, int32_t addend,
+          int32_t denominator);
+
+int32_t
+alinemod(int32_t numerator, int32_t factor, int32_t addend,
+         int32_t denominator);
 
 #endif

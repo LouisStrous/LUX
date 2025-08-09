@@ -26,6 +26,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include "action.hh"
 #include "install.hh"
+#include "intmath.hh"
 
 char const* binOpName[] = { // name of binary operators, for messages
   "addition", "subtraction", "multiplication", "division",
@@ -6316,783 +6317,862 @@ void lux_div_sa(void)
     cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
-//----------------------------------------------------------
-void lux_idiv(void)
-/* division with array operands; returns integer part of result,
-   rounded toward minus infinity */
-// NOTE: no checking for division by zero!
+
+/// Floored integer division with array operands.  Returns the integer
+/// part of the quotient, rounded in the direction that makes the
+/// remainder have the same sign as the denominator.  In other words,
+/// if the denominator is positive then rounds down toward negative
+/// infinity, and if the denominator is negative then rounds up toward
+/// positive infinity.
+///
+/// (Standard integer division in C++, with `/`, `%`, and std::div(),
+/// is _truncated_ rather than floored.  It rounds the quotient toward
+/// zero, so that, for the same denominator, nonzero remainders have
+/// the same sign as the numerator.)
+///
+/// \note No checking for integer division by zero!
+void
+lux_idiv(void)
+{
+  /*
+    integers:
+
+    | / | <r> | <r> |    <r> |   |            <r> |
+    |   |   n |   d |    div |   |                |
+    |---+-----+-----+--------+---+----------------|
+    | # |  12 |   7 |   1, 5 | ✓ |   12 = 1×7 + 5 |
+    | # | −12 |   7 | −1, −5 |   | −12 = −2×7 + 2 |
+    | # | −12 |  −7 |  1, −5 | ✓ | −12 = 1×−7 − 5 |
+    | # |  12 |  −7 |  −1, 5 |   | 12 = −2×−7 − 2 |
+    | # |   3 |   7 |   0, 3 | ✓ |    3 = 0×7 + 3 |
+    | # |  −3 |   7 |  0, −3 |   |  −3 = −1×7 + 4 |
+    | # |  −3 |  −7 |  0, −3 | ✓ |  −3 = 0×−7 − 3 |
+    | # |   3 |  −7 |   0, 3 |   |  3 = −1×−7 − 4 |
+    | # |   0 |   7 |   0, 0 | ✓ |    0 = 0×7 + 0 |
+    | # |   0 |  -7 |   0, 0 | ✓ |    0 = 0×7 − 0 |
+
+    if sgn(n)*sgn(d) >= 0 then div result is usable as is
+    otherwise subtract 1 from quotient, add denominator to remainder
+
+    floats:
+
+    | / | <r> | <r> |         <r> |   <r> |   |            <r> |
+    |   |   n |   d |         n/d | ⌊n/d⌋ |   |                |
+    |---+-----+-----+-------------+-------+---+----------------|
+    | # |  12 |   7 |   1.7142857 |     1 | ✓ |   12 = 1×7 + 5 |
+    | # | −12 |   7 |  -1.7142857 |    -2 | ✓ | −12 = −2×7 + 2 |
+    | # | −12 |  −7 |   1.7142857 |     1 | ✓ | −12 = 1×−7 − 5 |
+    | # |  12 |  −7 |  -1.7142857 |    -2 | ✓ | 12 = −2×−7 − 2 |
+    | # |   3 |   7 |  0.42857143 |     0 | ✓ |    3 = 0×7 + 3 |
+    | # |  −3 |   7 | -0.42857143 |    -1 | ✓ |  −3 = −1×7 + 4 |
+    | # |  −3 |  −7 |  0.42857143 |     0 | ✓ |  −3 = 0×−7 − 3 |
+    | # |   3 |  −7 | -0.42857143 |    -1 | ✓ |  3 = −1×−7 − 4 |
+    | # |   0 |   7 |           0 |     0 | ✓ |    0 = 0×7 + 0 |
+    | # |   0 |  -7 |           0 |     0 | ✓ |    0 = 0×7 − 0 |
+    #+TBLFM: $4=($2/$3)::$5=floor($4)
+  */
+  div_t qr;
+  lldiv_t iqr;
+
+  switch (lhsType)
+  {
+    case LUX_INT8:
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.ui8++ = fquotient(*lp.ui8++, *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.i16++ = fquotient(*lp.ui8++, *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.i32++ = fquotient(*lp.ui8++, *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.i64++ = fquotient(*lp.ui8++, *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.ui8++, *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.ui8++, *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
+      break;
+    case LUX_INT16:
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.i16++ = fquotient(*lp.i16++, *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.i16++ = fquotient(*lp.i16++, *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.i32++ = fquotient(*lp.i16++, *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.i64++ = fquotient(*lp.i16++, *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.i16++, *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.i16++, *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
+      break;
+    case LUX_INT32:
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.i32++ = fquotient(*lp.i32++, *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.i32++ = fquotient(*lp.i32++, *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.i32++ = fquotient(*lp.i32++, *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.i64++ = fquotient(*lp.i32++, *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.i32++, *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.i32++, *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
+      break;
+    case LUX_INT64:
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.i64++ = fquotient(*lp.i64++, *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.i64++ = fquotient(*lp.i64++, *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.i64++ = fquotient(*lp.i64++, *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.i64++ = fquotient(*lp.i64++, *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.i64++, *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.i64++, *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
+      break;
+    case LUX_FLOAT:
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.f++, *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.f++, *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.f++, *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.f++, *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = fquotient(*lp.f++, *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.f++, *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
+      break;
+    case LUX_DOUBLE:
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.d++, *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.d++, *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.d++, *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.d++, *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.d++, *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = fquotient(*lp.d++, *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
+      break;
+    default:
+      cerror(ILL_TYPE, lhs, typeName(lhsType));
+  }
+}
+
+/// Integer division with array LHS and scalar RHS.  Returns the
+/// integer part of the quotient, rounded in the direction that makes
+/// the remainder have the same sign as the denominator.  In other
+/// words, if the denominator is positive then rounds down toward
+/// negative infinity, and if the denominator is negative then rounds
+/// up toward positive infinity.
+///
+/// \note No checking for integer division by zero!
+void
+lux_idiv_as(void)
 {
   div_t qr;
   lldiv_t iqr;
 
-  switch (lhsType) {
-  case LUX_INT8:
-    switch (rhsType) {
+  switch (lhsType)
+  {
     case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.ui8++, *rp.ui8++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.ui8++ = qr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            // both arguments are nonnegative by definition
+            qr = div(*lp.ui8++, *rp.ui8);
+            *tp.ui8++ = qr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.ui8)*sgn(*rp.i16);
+            qr = div(*lp.ui8++, *rp.i16);
+            if (s < 0)
+              --qr.quot;
+            *tp.i16++ = qr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.ui8)*sgn(*rp.i32);
+            qr = div(*lp.ui8++, *rp.i32);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.ui8)*sgn(*rp.i64);
+            iqr = lldiv(*lp.ui8++, *rp.i64);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.ui8++ / *rp.f);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.ui8++ / *rp.d);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.ui8++, *rp.i16++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.ui8);
+            qr = div(*lp.i16++, *rp.ui8);
+            if (s < 0)
+              qr.quot--;
+            *tp.i16++ = qr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.i16);
+            qr = div(*lp.i16++, *rp.i16);
+            if (s < 0)
+              --qr.quot;
+            *tp.i16++ = qr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.i32);
+            qr = div(*lp.i16++, *rp.i32);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.i64);
+            iqr = lldiv(*lp.i16++, *rp.i64);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.i16++ / *rp.f);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.i16++ / *rp.d);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.ui8++, *rp.i32++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.ui8);
+            qr = div(*lp.i32++, *rp.ui8);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.i16);
+            qr = div(*lp.i32++, *rp.i16);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.i32);
+            qr = div(*lp.i32++, *rp.i32);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.i64);
+            iqr = lldiv(*lp.i32++, *rp.i64);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.i32++ / *rp.f);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.i32++ / *rp.d);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.ui8++, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.ui8);
+            iqr = lldiv(*lp.i64++, *rp.ui8);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.i16);
+            iqr = lldiv(*lp.i64++, *rp.i16);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.i32);
+            iqr = lldiv(*lp.i64++, *rp.i32);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.i64);
+            iqr = lldiv(*lp.i64++, *rp.i64);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.d++ = floor((double) *lp.i64++ / *rp.f);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.i64++ / *rp.d);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.ui8++ / *rp.f++);
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f++ / *rp.ui8);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f++ / *rp.i16);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f++ / *rp.i32);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.f++ / (double) *rp.i64);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f++ / *rp.f);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.f++ / *rp.d);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
       break;
     case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.ui8++ / *rp.d++);
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d++ / *rp.ui8);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d++ / *rp.i16);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d++ / *rp.i32);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d++ / *rp.i64);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d++ / *rp.f);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d++ / *rp.d);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
       break;
     default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT16:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.i16++, *rp.ui8++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.i16++, *rp.i16++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.i16++, *rp.i32++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i16++, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.i16++ / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i16++ / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT32:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.i32++, *rp.ui8++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.i32++, *rp.i16++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.i32++, *rp.i32++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i32++, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.i32++ / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i32++ / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT64:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.ui8++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.i16++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.i32++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.d++ = floor((double) *lp.i64++ / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i64++ / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_FLOAT:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.ui8++);
-      break;
-    case LUX_INT16:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.i16++);
-      break;
-    case LUX_INT32:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.i32++);
-      break;
-    case LUX_INT64:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.f++ / (double) *rp.i64++);
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.f++ / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_DOUBLE:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.ui8++);
-      break;
-    case LUX_INT16:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.i16++);
-      break;
-    case LUX_INT32:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.i32++);
-      break;
-    case LUX_INT64:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.i64++);
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  default:
-    cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
-//----------------------------------------------------------
-void lux_idiv_as(void)
-/* division with array LHS and scalar RHS; returns integer part of result,
-   rounded toward minus infinity */
-// NOTE: no checking for division by zero!
-{
-  div_t qr;
-  lldiv_t iqr;
 
-  switch (lhsType) {
-  case LUX_INT8:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.ui8++, *rp.ui8);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.ui8++ = qr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.ui8++, *rp.i16);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.ui8++, *rp.i32);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.ui8++, *rp.i64);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.ui8++ / *rp.f);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.ui8++ / *rp.d);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT16:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.i16++, *rp.ui8);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.i16++, *rp.i16);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.i16++, *rp.i32);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i16++, *rp.i64);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.i16++ / *rp.f);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i16++ / *rp.d);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT32:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.i32++, *rp.ui8);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.i32++, *rp.i16);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.i32++, *rp.i32);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i32++, *rp.i64);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.i32++ / *rp.f);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i32++ / *rp.d);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT64:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.ui8);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.i16);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.i32);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64++, *rp.i64);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.d++ = floor((double) *lp.i64++ / *rp.f);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i64++ / *rp.d);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_FLOAT:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.ui8);
-      break;
-    case LUX_INT16:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.i16);
-      break;
-    case LUX_INT32:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.i32);
-      break;
-    case LUX_INT64:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.f++ / (double) *rp.i64);
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f++ / *rp.f);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.f++ / *rp.d);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_DOUBLE:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.ui8);
-      break;
-    case LUX_INT16:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.i16);
-      break;
-    case LUX_INT32:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.i32);
-      break;
-    case LUX_INT64:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.i64);
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.f);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d++ / *rp.d);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  default:
-    cerror(ILL_TYPE, lhs, typeName(lhsType));
-  }
-}
-//----------------------------------------------------------
+/// Integer division with scalar LHS and array RHS.  Returns the
+/// integer part of the quotient, rounded in the direction that makes
+/// the remainder have the same sign as the denominator.  In other
+/// words, if the denominator is positive then rounds down toward
+/// negative infinity, and if the denominator is negative then rounds
+/// up toward positive infinity.
+///
+/// \note No checking for integer division by zero!
 void lux_idiv_sa(void)
-/* division with scalar LHS and array RHS; returns integer part of result,
-   rounded toward minus infinity */
-// NOTE: no checking for division by zero!
 {
   div_t qr;
   lldiv_t iqr;
 
-  switch (lhsType) {
-  case LUX_INT8:
-    switch (rhsType) {
+  switch (lhsType)
+  {
     case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.ui8, *rp.ui8++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.ui8++ = qr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.ui8)*sgn(*rp.ui8);
+            qr = div(*lp.ui8, *rp.ui8++);
+            if (s < 0)
+              --qr.quot;
+            *tp.ui8++ = qr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.ui8)*sgn(*rp.i16);
+            qr = div(*lp.ui8, *rp.i16++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i16++ = qr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.ui8)*sgn(*rp.i32);
+            qr = div(*lp.ui8, *rp.i32++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.ui8)*sgn(*rp.i64);
+            iqr = lldiv(*lp.ui8, *rp.i64++);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.ui8 / *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.ui8 / *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.ui8, *rp.i16++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.ui8);
+            qr = div(*lp.i16, *rp.ui8++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i16++ = qr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.i16);
+            qr = div(*lp.i16, *rp.i16++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i16++ = qr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.i32);
+            qr = div(*lp.i16, *rp.i32++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i16)*sgn(*rp.i64);
+            iqr = lldiv(*lp.i16, *rp.i64++);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.i16 / *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.i16 / *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.ui8, *rp.i32++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.ui8);
+            qr = div(*lp.i32, *rp.ui8++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.i16);
+            qr = div(*lp.i32, *rp.i16++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.i32);
+            qr = div(*lp.i32, *rp.i32++);
+            if (s < 0)
+              --qr.quot;
+            *tp.i32++ = qr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i32)*sgn(*rp.i64);
+            iqr = lldiv(*lp.i32, *rp.i64++);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.i32 / *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.i32 / *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.ui8, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.ui8);
+            iqr = lldiv(*lp.i64, *rp.ui8++);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.i16);
+            iqr = lldiv(*lp.i64, *rp.i16++);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.i32);
+            iqr = lldiv(*lp.i64, *rp.i32++);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+          {
+            auto s = sgn(*lp.i64)*sgn(*rp.i64);
+            iqr = lldiv(*lp.i64, *rp.i64++);
+            if (s < 0)
+              --iqr.quot;
+            *tp.i64++ = iqr.quot;
+          }
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.d++ = floor((double) *lp.i64 / *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.i64 / *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
       }
       break;
     case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.ui8 / *rp.f++);
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f / *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f / *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f / *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.f / (double) *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.f++ = floor(*lp.f / *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.f / *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
       break;
     case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.ui8 / *rp.d++);
+      switch (rhsType)
+      {
+        case LUX_INT8:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d / *rp.ui8++);
+          break;
+        case LUX_INT16:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d / *rp.i16++);
+          break;
+        case LUX_INT32:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d / *rp.i32++);
+          break;
+        case LUX_INT64:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d / *rp.i64++);
+          break;
+        case LUX_FLOAT:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d / *rp.f++);
+          break;
+        case LUX_DOUBLE:
+          while (nRepeat--)
+            *tp.d++ = floor(*lp.d / *rp.d++);
+          break;
+        default:
+          cerror(ILL_TYPE, rhs, typeName(rhsType));
+      }
       break;
     default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT16:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.i16, *rp.ui8++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.i16, *rp.i16++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i16++ = qr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.i16, *rp.i32++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i16, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.i16 / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i16 / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT32:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        qr = div(*lp.i32, *rp.ui8++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        qr = div(*lp.i32, *rp.i16++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        qr = div(*lp.i32, *rp.i32++);
-        if (qr.rem < 0)
-          qr.quot--;
-        *tp.i32++ = qr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i32, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.i32 / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i32 / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_INT64:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64, *rp.ui8++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT16:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64, *rp.i16++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT32:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64, *rp.i32++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_INT64:
-      while (nRepeat--) {
-        iqr = lldiv(*lp.i64, *rp.i64++);
-        if (iqr.rem < 0)
-          iqr.quot--;
-        *tp.i64++ = iqr.quot;
-      }
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.d++ = floor((double) *lp.i64 / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.i64 / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_FLOAT:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f / *rp.ui8++);
-      break;
-    case LUX_INT16:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f / *rp.i16++);
-      break;
-    case LUX_INT32:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f / *rp.i32++);
-      break;
-    case LUX_INT64:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.f / (double) *rp.i64++);
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.f++ = floor(*lp.f / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.f / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  case LUX_DOUBLE:
-    switch (rhsType) {
-    case LUX_INT8:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d / *rp.ui8++);
-      break;
-    case LUX_INT16:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d / *rp.i16++);
-      break;
-    case LUX_INT32:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d / *rp.i32++);
-      break;
-    case LUX_INT64:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d / *rp.i64++);
-      break;
-    case LUX_FLOAT:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d / *rp.f++);
-      break;
-    case LUX_DOUBLE:
-      while (nRepeat--)
-        *tp.d++ = floor(*lp.d / *rp.d++);
-      break;
-    default:
-      cerror(ILL_TYPE, rhs, typeName(rhsType));
-    }
-    break;
-  default:
-    cerror(ILL_TYPE, lhs, typeName(lhsType));
+      cerror(ILL_TYPE, lhs, typeName(lhsType));
   }
 }
-//----------------------------------------------------------
-// returns z = x mod y such that -|y|/2 < z <= |y|/2
-int32_t iasmod(int32_t x, int32_t y)
+
+/// returns z = x mod y such that -|y|/2 < z <= |y|/2
+int32_t
+iasmod(int32_t x, int32_t y)
 {
   int32_t v;
 
@@ -7108,7 +7188,8 @@ int32_t iasmod(int32_t x, int32_t y)
   return v;
 }
 //----------------------------------------------------------
-int64_t i64asmod(int64_t x, int64_t y)
+int64_t
+i64asmod(int64_t x, int64_t y)
 {
   int32_t v;
 
@@ -7121,35 +7202,6 @@ int64_t i64asmod(int64_t x, int64_t y)
     v += y;
   if (2*v > y)
     v -= y;
-  return v;
-}
-//----------------------------------------------------------
-int64_t i64amod(int64_t x, int64_t y)
-{
-  int32_t v;
-
-  if (!y)
-    return 0;
-  if (y < 0)
-    y = -y;
-  v = x % y;
-  if (v < 0)
-    v += y;
-  return v;
-}
-//----------------------------------------------------------
-// returns z = x mod y such that 0 <= z < |y|
-double famod(double x, double y)
-{
-  double v;
-
-  if (!y)
-    return 0;
-  if (y < 0)
-    y = -y;
-  v = fmod(x, y);
-  if (v < 0)
-    v += y;
   return v;
 }
 //----------------------------------------------------------
@@ -8834,27 +8886,27 @@ void lux_mod(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.ui8++ = iamod(*lp.ui8++, *rp.ui8++);
+        *tp.ui8++ = fremainder(*lp.ui8++, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.ui8++, *rp.i16++);
+        *tp.i16++ = fremainder(*lp.ui8++, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.ui8++, *rp.i32++);
+        *tp.i32++ = fremainder(*lp.ui8++, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.ui8++, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.ui8++, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.ui8++, *rp.f++);
+        *tp.f++ = fremainder(*lp.ui8++, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.ui8++, *rp.d++);
+        *tp.d++ = fremainder(*lp.ui8++, *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
@@ -8888,27 +8940,27 @@ void lux_mod(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.i16++, *rp.ui8++);
+        *tp.i16++ = fremainder(*lp.i16++, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.i16++, *rp.i16++);
+        *tp.i16++ = fremainder(*lp.i16++, *rp.i16++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i16++, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.i16++, *rp.i64++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i16++, *rp.i32++);
+        *tp.i32++ = fremainder(*lp.i16++, *rp.i32++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.i16++, *rp.f++);
+        *tp.f++ = fremainder(*lp.i16++, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i16++, *rp.d++);
+        *tp.d++ = fremainder(*lp.i16++, *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
@@ -8942,27 +8994,27 @@ void lux_mod(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32++, *rp.ui8++);
+        *tp.i32++ = fremainder(*lp.i32++, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32++, *rp.i16++);
+        *tp.i32++ = fremainder(*lp.i32++, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32++, *rp.i32++);
+        *tp.i32++ = fremainder(*lp.i32++, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i32++, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.i32++, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.i32++, *rp.f++);
+        *tp.f++ = fremainder(*lp.i32++, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i32++, *rp.d++);
+        *tp.d++ = fremainder(*lp.i32++, *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
@@ -8996,27 +9048,27 @@ void lux_mod(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.ui8++);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.i16++);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.i32++);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i64++, *rp.f++);
+        *tp.d++ = fremainder(*lp.i64++, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i64++, *rp.d++);
+        *tp.d++ = fremainder(*lp.i64++, *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
@@ -9050,27 +9102,27 @@ void lux_mod(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.ui8++);
+        *tp.f++ = fremainder(*lp.f++, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.i16++);
+        *tp.f++ = fremainder(*lp.f++, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.i32++);
+        *tp.f++ = fremainder(*lp.f++, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.f++, *rp.i64++);
+        *tp.d++ = fremainder(*lp.f++, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.f++);
+        *tp.f++ = fremainder(*lp.f++, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.f++, *rp.d++);
+        *tp.d++ = fremainder(*lp.f++, *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
@@ -9104,27 +9156,27 @@ void lux_mod(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.ui8++);
+        *tp.d++ = fremainder(*lp.d++, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.i16++);
+        *tp.d++ = fremainder(*lp.d++, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.i32++);
+        *tp.d++ = fremainder(*lp.d++, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.i64++);
+        *tp.d++ = fremainder(*lp.d++, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.f++);
+        *tp.d++ = fremainder(*lp.d++, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.d++);
+        *tp.d++ = fremainder(*lp.d++, *rp.d++);
       break;
     case LUX_CFLOAT:
       while (nRepeat--) {
@@ -9373,27 +9425,27 @@ void lux_mod_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.ui8++ = iamod(*lp.ui8++, *rp.ui8);
+        *tp.ui8++ = fremainder(*lp.ui8++, *rp.ui8);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.ui8++, *rp.i16);
+        *tp.i16++ = fremainder(*lp.ui8++, *rp.i16);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.ui8++, *rp.i32);
+        *tp.i32++ = fremainder(*lp.ui8++, *rp.i32);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.ui8++, *rp.i64);
+        *tp.i64++ = fremainder(*lp.ui8++, *rp.i64);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.ui8++, *rp.f);
+        *tp.f++ = fremainder(*lp.ui8++, *rp.f);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.ui8++, *rp.d);
+        *tp.d++ = fremainder(*lp.ui8++, *rp.d);
       break;
     case LUX_CFLOAT:
       r.real = rp.cf->real;
@@ -9427,27 +9479,27 @@ void lux_mod_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.i16++, *rp.ui8);
+        *tp.i16++ = fremainder(*lp.i16++, *rp.ui8);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.i16++, *rp.i16);
+        *tp.i16++ = fremainder(*lp.i16++, *rp.i16);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i16++, *rp.i32);
+        *tp.i32++ = fremainder(*lp.i16++, *rp.i32);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i16++, *rp.i64);
+        *tp.i64++ = fremainder(*lp.i16++, *rp.i64);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.i16++, *rp.f);
+        *tp.f++ = fremainder(*lp.i16++, *rp.f);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i16++, *rp.d);
+        *tp.d++ = fremainder(*lp.i16++, *rp.d);
       break;
     case LUX_CFLOAT:
       r.real = rp.cf->real;
@@ -9481,27 +9533,27 @@ void lux_mod_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32++, *rp.ui8);
+        *tp.i32++ = fremainder(*lp.i32++, *rp.ui8);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32++, *rp.i16);
+        *tp.i32++ = fremainder(*lp.i32++, *rp.i16);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32++, *rp.i32);
+        *tp.i32++ = fremainder(*lp.i32++, *rp.i32);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i32++, *rp.i64);
+        *tp.i64++ = fremainder(*lp.i32++, *rp.i64);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.i32++, *rp.f);
+        *tp.f++ = fremainder(*lp.i32++, *rp.f);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i32++, *rp.d);
+        *tp.d++ = fremainder(*lp.i32++, *rp.d);
       break;
     case LUX_CFLOAT:
       r.real = rp.cf->real;
@@ -9535,27 +9587,27 @@ void lux_mod_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.ui8);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.ui8);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.i16);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.i16);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.i32);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.i32);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64++, *rp.i64);
+        *tp.i64++ = fremainder(*lp.i64++, *rp.i64);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i64++, *rp.f);
+        *tp.d++ = fremainder(*lp.i64++, *rp.f);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i64++, *rp.d);
+        *tp.d++ = fremainder(*lp.i64++, *rp.d);
       break;
     case LUX_CFLOAT:
       r.real = rp.cf->real;
@@ -9589,27 +9641,27 @@ void lux_mod_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.ui8);
+        *tp.f++ = fremainder(*lp.f++, *rp.ui8);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.i16);
+        *tp.f++ = fremainder(*lp.f++, *rp.i16);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.i32);
+        *tp.f++ = fremainder(*lp.f++, *rp.i32);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.f++, *rp.i64);
+        *tp.d++ = fremainder(*lp.f++, *rp.i64);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f++, *rp.f);
+        *tp.f++ = fremainder(*lp.f++, *rp.f);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.f++, *rp.d);
+        *tp.d++ = fremainder(*lp.f++, *rp.d);
       break;
     case LUX_CFLOAT:
       r.real = rp.cf->real;
@@ -9643,27 +9695,27 @@ void lux_mod_as(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.ui8);
+        *tp.d++ = fremainder(*lp.d++, *rp.ui8);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.i16);
+        *tp.d++ = fremainder(*lp.d++, *rp.i16);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.i32);
+        *tp.d++ = fremainder(*lp.d++, *rp.i32);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.i64);
+        *tp.d++ = fremainder(*lp.d++, *rp.i64);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.f);
+        *tp.d++ = fremainder(*lp.d++, *rp.f);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d++, *rp.d);
+        *tp.d++ = fremainder(*lp.d++, *rp.d);
       break;
     case LUX_CFLOAT:
       r.real = rp.cf->real;
@@ -9912,27 +9964,27 @@ void lux_mod_sa(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.ui8++ = iamod(*lp.ui8, *rp.ui8++);
+        *tp.ui8++ = fremainder(*lp.ui8, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.ui8, *rp.i16++);
+        *tp.i16++ = fremainder(*lp.ui8, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.ui8, *rp.i32++);
+        *tp.i32++ = fremainder(*lp.ui8, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.ui8, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.ui8, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.ui8, *rp.f++);
+        *tp.f++ = fremainder(*lp.ui8, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.ui8, *rp.d++);
+        *tp.d++ = fremainder(*lp.ui8, *rp.d++);
       break;
     case LUX_CFLOAT:
       l.real = *lp.ui8;
@@ -9966,27 +10018,27 @@ void lux_mod_sa(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.i16, *rp.ui8++);
+        *tp.i16++ = fremainder(*lp.i16, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i16++ = iamod(*lp.i16, *rp.i16++);
+        *tp.i16++ = fremainder(*lp.i16, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i16, *rp.i32++);
+        *tp.i32++ = fremainder(*lp.i16, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i16, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.i16, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.i16, *rp.f++);
+        *tp.f++ = fremainder(*lp.i16, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i16, *rp.d++);
+        *tp.d++ = fremainder(*lp.i16, *rp.d++);
       break;
     case LUX_CFLOAT:
       l.real = *lp.i16;
@@ -10020,27 +10072,27 @@ void lux_mod_sa(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32, *rp.ui8++);
+        *tp.i32++ = fremainder(*lp.i32, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32, *rp.i16++);
+        *tp.i32++ = fremainder(*lp.i32, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i32++ = iamod(*lp.i32, *rp.i32++);
+        *tp.i32++ = fremainder(*lp.i32, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i32, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.i32, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.i32, *rp.f++);
+        *tp.f++ = fremainder(*lp.i32, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i32, *rp.d++);
+        *tp.d++ = fremainder(*lp.i32, *rp.d++);
       break;
     case LUX_CFLOAT:
       l.real = *lp.i32;
@@ -10074,27 +10126,27 @@ void lux_mod_sa(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64, *rp.ui8++);
+        *tp.i64++ = fremainder(*lp.i64, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64, *rp.i16++);
+        *tp.i64++ = fremainder(*lp.i64, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64, *rp.i32++);
+        *tp.i64++ = fremainder(*lp.i64, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.i64++ = i64amod(*lp.i64, *rp.i64++);
+        *tp.i64++ = fremainder(*lp.i64, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i64, *rp.f++);
+        *tp.d++ = fremainder(*lp.i64, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.i64, *rp.d++);
+        *tp.d++ = fremainder(*lp.i64, *rp.d++);
       break;
     case LUX_CFLOAT:
       l.real = *lp.i64;
@@ -10128,27 +10180,27 @@ void lux_mod_sa(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f, *rp.ui8++);
+        *tp.f++ = fremainder(*lp.f, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f, *rp.i16++);
+        *tp.f++ = fremainder(*lp.f, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f, *rp.i32++);
+        *tp.f++ = fremainder(*lp.f, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.f, *rp.i64++);
+        *tp.d++ = fremainder(*lp.f, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.f++ = famod(*lp.f, *rp.f++);
+        *tp.f++ = fremainder(*lp.f, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.f, *rp.d++);
+        *tp.d++ = fremainder(*lp.f, *rp.d++);
       break;
     case LUX_CFLOAT:
       l.real = *lp.f;
@@ -10182,27 +10234,27 @@ void lux_mod_sa(void)
     switch (rhsType) {
     case LUX_INT8:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d, *rp.ui8++);
+        *tp.d++ = fremainder(*lp.d, *rp.ui8++);
       break;
     case LUX_INT16:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d, *rp.i16++);
+        *tp.d++ = fremainder(*lp.d, *rp.i16++);
       break;
     case LUX_INT32:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d, *rp.i32++);
+        *tp.d++ = fremainder(*lp.d, *rp.i32++);
       break;
     case LUX_INT64:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d, *rp.i64++);
+        *tp.d++ = fremainder(*lp.d, *rp.i64++);
       break;
     case LUX_FLOAT:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d, *rp.f++);
+        *tp.d++ = fremainder(*lp.d, *rp.f++);
       break;
     case LUX_DOUBLE:
       while (nRepeat--)
-        *tp.d++ = famod(*lp.d, *rp.d++);
+        *tp.d++ = fremainder(*lp.d, *rp.d++);
       break;
     case LUX_CFLOAT:
       l.real = *lp.d;

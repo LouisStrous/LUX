@@ -449,13 +449,13 @@ void CJDNtoGregorian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day)
   int32_t x3 = alinequot(y3, 4, 3, 146097);
   int32_t y2 = alinequot(x3, 146097, 0, 4);
   y2 = y3 - y2;
-  int32_t x2 = iaquot(y2*100 + 99, 36525);
-  int32_t y1 = y2 - iaquot(36525*x2, 100);
-  int32_t x1 = iaquot(5*y1 + 2, 153);
-  int32_t c0 = iaquot(x1 + 2, 12);
+  int32_t x2 = fquotient(y2*100 + 99, 36525);
+  int32_t y1 = y2 - fquotient(36525*x2, 100);
+  int32_t x1 = fquotient(5*y1 + 2, 153);
+  int32_t c0 = fquotient(x1 + 2, 12);
   *year = 100*x3 + x2 + c0;
   *month = x1 - 12*c0 + 3;
-  *day = y1 - iaquot(153*x1 - 3, 5);
+  *day = y1 - fquotient(153*x1 - 3, 5);
 }
 //--------------------------------------------------------------------------
 void CJDNtoGregorianA(int32_t const *CJDN, int32_t *date)
@@ -501,13 +501,13 @@ int32_t GregoriantoCJDN(int32_t year, int32_t month, int32_t day)
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   int32_t x1;
-  int32_t c0 = iaquot(month - 3, 12);
+  int32_t c0 = fquotient(month - 3, 12);
   int32_t x4 = year + c0;
-  Div_t d = adiv(x4, 100);
+  Div<int32_t> d = fdivide(x4, (int32_t) 100);
   x1 = month - 12*c0 - 3;
   int32_t J1 = alinequot(d.quot, 146097, 0, 4);
-  int32_t J2 = iaquot(d.rem*36525, 100);
-  int32_t J3 = iaquot(x1*153 + 2, 5);
+  int32_t J2 = fquotient(d.rem*36525, 100);
+  int32_t J3 = fquotient(x1*153 + 2, 5);
   return GREGORIAN_EPOCH - 1 + J1 + J2 + J3 + day;
 }
 //--------------------------------------------------------------------------
@@ -567,11 +567,11 @@ void CJDNtoJulian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day)
   int32_t y2 = CJDN - JULIAN_EPOCH;
   int32_t x2 = alinequot(y2, 4, 3, 1461);
   int32_t z2 = y2 - alinequot(x2, 1461, 0, 4);
-  int32_t x1 = iaquot(5*z2 + 2, 153);
-  int32_t c0 = iaquot(x1 + 2, 12);
+  int32_t x1 = fquotient(5*z2 + 2, 153);
+  int32_t c0 = fquotient(x1 + 2, 12);
   *year = x2 + c0;
   *month = x1 - 12*c0 + 3;
-  *day = z2 - iaquot(153*x1 - 3, 5);
+  *day = z2 - fquotient(153*x1 - 3, 5);
 }
 //--------------------------------------------------------------------------
 void CJDNtoJulianA(int32_t const *CJDN, int32_t *date)
@@ -616,9 +616,9 @@ int32_t JuliantoCJDN(int32_t year, int32_t month, int32_t day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
-  int32_t c0 = iaquot(month - 3, 12);
+  int32_t c0 = fquotient(month - 3, 12);
   int32_t J1 = alinequot(year + c0, 1461, 0, 4);
-  int32_t J2 = iaquot(month*153 - 1836*c0 - 457, 5);
+  int32_t J2 = fquotient(month*153 - 1836*c0 - 457, 5);
   return J1 + J2 + day + JULIAN_EPOCH - 1;
 }
 //--------------------------------------------------------------------------
@@ -805,7 +805,7 @@ void CJDNtoHebrew(int32_t CJDN, int32_t *year, int32_t *month, int *day)
      226 years, so we must use a roundabout calculation to get a
      bigger range.  See
      http://http://aa.quae.nl/en/reken/juliaansedag.html */
-  Div_t d1 = adiv(y4, 1447);
+  auto d1 = fdivide(y4, 1447);
   int32_t y1 = 49*d1.quot + (23*d1.quot + 25920*d1.rem + 13835)/765433;
   /* -2147135826 ≤ CJDN ≤ 2147483647
      -2147483647 ≤ y₄ ≤ 2147135826
@@ -814,9 +814,10 @@ void CJDNtoHebrew(int32_t CJDN, int32_t *year, int32_t *month, int *day)
   /* The provisional running calculation month number might be correct
      or one too small or one too great. */
 
-  int32_t x1 = iaquot(19*y1 + 17, 235); // provisional calculation year number
+  // provisional calculation year number
+  int32_t x1 = fquotient(19*y1 + 17, 235);
   // -5879541 ≤ x₁ ≤ 5878588
-  int32_t x3 = y1 - iaquot(235*x1 + 1, 19); /* provisional calculation
+  int32_t x3 = y1 - fquotient(235*x1 + 1, 19); /* provisional calculation
                                            month number */
   /* calculate the running day number of the beginning of calculation
      month x3 of calculation year x1 */
@@ -827,17 +828,17 @@ void CJDNtoHebrew(int32_t CJDN, int32_t *year, int32_t *month, int *day)
   if (z4 < 0 || z4 > 28) {        // the month number may be wrong
     if (z4 < 0) {         // the provisional month was one too great
       --y1;
-      x1 = iaquot(19*y1 + 17, 235);
-      x3 = y1 - iaquot(235*x1 + 1, 19);
+      x1 = fquotient(19*y1 + 17, 235);
+      x3 = y1 - fquotient(235*x1 + 1, 19);
       c4 = Hebrew_cycm2rd(x1, x3);
       z4 = y4 - c4;
-    } else {                        // the provisional month may be one too small
+    } else {             // the provisional month may be one too small
       int32_t y1b = y1 + 1;
-      int32_t x1b = iaquot(19*y1b + 17, 235);
-      int32_t x3b = y1b - iaquot(235*x1b + 1, 19);
+      int32_t x1b = fquotient(19*y1b + 17, 235);
+      int32_t x3b = y1b - fquotient(235*x1b + 1, 19);
       int32_t c4b = Hebrew_cycm2rd(x1b, x3b);
       int32_t z4b = y4 - c4b;
-      if (z4b == 0) {                // provisional month y1 was indeed one too small
+      if (z4b == 0) { // provisional month y1 was indeed one too small
         x1 = x1b;
         x3 = x3b;
         z4 = z4b;
@@ -902,7 +903,7 @@ int32_t tishri2(int32_t x1)
      calculation month 0 of calculation year 0 and calculation month 0
      of calculation year x₁ */
   // -2147483647 ≤ x₁ ≤ 2147483647
-  int32_t c1 = iaquot(235*x1 + 1, 19);
+  int32_t c1 = fquotient(235*x1 + 1, 19);
   /* -173626337 ≤ c₁ ≤ 173626337
      -2147483642 ≤ x₁ ≤ 2147483641 */
 
@@ -917,8 +918,9 @@ int32_t tishri2(int32_t x1)
      is 8527680 months = 689472 years.  We use a roundabout
      calculation to get a bigger range.  See
      http://http://aa.quae.nl/en/reken/juliaansedag.html */
-  Div_t d = adiv(c1, 1095);
-  int32_t nu1 = 32336*d.quot + iaquot(15*d.quot + 765433*d.rem + 12084, 25920);
+  auto d = fdivide(c1, 1095);
+  int32_t nu1 = 32336*d.quot
+    + fquotient(15*d.quot + 765433*d.rem + 12084, 25920);
   /* -2147483321 ≤ υ₁ ≤ 2147483646
      -72720627 ≤ c₁ ≤ 72720638
      -5879540 ≤ x₁ ≤ 5879541 */
@@ -926,7 +928,7 @@ int32_t tishri2(int32_t x1)
   /* calculate the number of days between 1 Tishri A.M. 1 and the
      first day of running month c₁, taking into account the first
      and second delays. */
-  int32_t nu2 = nu1 + iaquot(6*iamod(nu1, 7), 7)%2;
+  int32_t nu2 = nu1 + fquotient(6*fremainder(nu1, 7), 7)%2;
   /* -2147483321 ≤ υ₂ ≤ 2147483647
      -2147483321 ≤ υ₁ ≤ 2147483646
      -72720627 ≤ c₁ ≤ 72720638
@@ -1081,8 +1083,8 @@ void CJDNtoIslamic(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day)
   int32_t y2 = CJDN - ISLAMIC_EPOCH;
   *year = alinequot(y2, 30, 10646, 10631);
   int32_t z2 = y2 - alinequot(*year, 10631, -10617, 30);
-  *month = iaquot(11*z2 + 330, 325);
-  *day = z2 - iaquot(325**month - 331, 11);
+  *month = fquotient(11*z2 + 330, 325);
+  *day = z2 - fquotient(325**month - 331, 11);
 }
 //--------------------------------------------------------------------------
 void CJDNtoIslamicA(int32_t const *CJDN, int32_t *date)
@@ -1128,7 +1130,7 @@ int32_t IslamictoCJDN(int32_t year, int32_t month, int32_t day)
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   return alinequot(year, 10631, -10617, 30)
-    + iaquot(325*month - 320, 11) + day + ISLAMIC_EPOCH - 1;
+    + fquotient(325*month - 320, 11) + day + ISLAMIC_EPOCH - 1;
 }
 //--------------------------------------------------------------------------
 void IslamictoCJDNA(int32_t const *date, int32_t *CJDN)
@@ -1192,9 +1194,9 @@ void CJDNtoEgyptian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day)
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   // era of Nabonassar
   int32_t y2 = CJDN - EGYPTIAN_EPOCH;
-  Div_t d = adiv(y2, 365);
+  auto d = fdivide(y2, 365);
   *year = d.quot + 1;
-  d = adiv(d.rem, 30);
+  d = fdivide(d.rem, 30);
   *month = d.quot + 1;
   *day = d.rem + 1;
 }
@@ -1378,13 +1380,13 @@ void CJDNtoMayan(int32_t CJDN, int32_t *trecena, int32_t *venteina,
                  int32_t *haab_day, int32_t *haab_month,
                  int32_t *year_trecena, int32_t *year_venteina)
 {
-  *trecena = iamod(CJDN + 5, 13) + 1;
-  *venteina = iamod(CJDN + 16, 20) + 1;
-  Div_t d = adiv(CJDN + 65, 365);
-  *haab_day = iamod(d.rem, 20);
+  *trecena = fremainder(CJDN + 5, 13) + 1;
+  *venteina = fremainder(CJDN + 16, 20) + 1;
+  auto d = fdivide(CJDN + 65, 365);
+  *haab_day = fremainder(d.rem, 20);
   *haab_month = d.rem/20 + 1;
-  *year_trecena = iamod(d.quot + 5, 13) + 1;
-  *year_venteina = iamod(5*d.quot + 11, 20) + 1;
+  *year_trecena = fremainder(d.quot + 5, 13) + 1;
+  *year_venteina = fremainder(5*d.quot + 11, 20) + 1;
 }
 //--------------------------------------------------------------------------
 void CJDNtoMayanA(int32_t const *CJDN, int32_t *date)
@@ -1481,18 +1483,18 @@ int32_t MayantoCJDN(int32_t trecena, int32_t venteina, int32_t haab_day, int32_t
   int32_t haab, tzolkin, year, haab_year;
 
   if (do_tzolkin) {
-    trecena = iamod(trecena - 6, 13);
-    venteina = iamod(venteina - 17, 20);
-    tzolkin = iamod(40*trecena - 39*venteina, 260);
+    trecena = fremainder(trecena - 6, 13);
+    venteina = fremainder(venteina - 17, 20);
+    tzolkin = fremainder(40*trecena - 39*venteina, 260);
   }
   if (do_haab)
-    haab = iamod((haab_month - 4)*20 + haab_day - 5, 365);
+    haab = fremainder((haab_month - 4)*20 + haab_day - 5, 365);
   if (do_year) {
     if ((year_venteina - 12) % 5)
       return 0;                 // impossible year venteina
-    year_trecena = iamod(year_trecena - 6, 13);
-    year_venteina = iamod(iaquot(year_venteina - 12, 5), 4);
-    year = iamod(40*year_trecena + 13*year_venteina, 52);
+    year_trecena = fremainder(year_trecena - 6, 13);
+    year_venteina = fremainder(fquotient(year_venteina - 12, 5), 4);
+    year = fremainder(40*year_trecena + 13*year_venteina, 52);
     haab_year = 365*year - 65;
     // CJDN = haab_year + 18980*year + haab
     // CJDN_firstofyear = haab_year (mod 18980)
@@ -1502,38 +1504,43 @@ int32_t MayantoCJDN(int32_t trecena, int32_t venteina, int32_t haab_day, int32_t
   case 0:
     return 0;
   case 1:                       // tzolkin
-    return CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
+    return CJDN_upper - fremainder(CJDN_upper - tzolkin, 260);
   case 2:                       // haab
-    return CJDN_upper - iamod(CJDN_upper - haab, 365);
+    return CJDN_upper - fremainder(CJDN_upper - haab, 365);
   case 3:                       // tzolkin & haab
     {
-      int32_t tzolkin_haab = iamod(365*tzolkin - 364*haab, 18980);
-      return CJDN_upper - iamod(CJDN_upper - tzolkin_haab, 18980);
+      int32_t tzolkin_haab = fremainder(365*tzolkin - 364*haab, 18980);
+      return CJDN_upper - fremainder(CJDN_upper - tzolkin_haab, 18980);
     }
   case 4:                       // year
-    return CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+    return CJDN_upper - fremainder(CJDN_upper - haab_year, 18980);
   case 5:                       // tzolkin & year
     {
-      int32_t CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
-      int32_t CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
+      int32_t CJDN_tzolkin = CJDN_upper - fremainder(CJDN_upper - tzolkin, 260);
+      int32_t CJDN_haab_year = CJDN_upper
+        - fremainder(CJDN_upper - haab_year, 18980);
       /* now CJDN_tzolkin is the last matching tzolkin on/before
          CJDN_upper, and CJDN_haab_year is the last matching beginning of
          the haab year on/before CJDN_upper, but CJDN_tzolkin may
          still be before CJDN_haab_year */
-      return CJDN_tzolkin + (18980-260)*iaquot(CJDN_tzolkin - CJDN_haab_year, 260);
+      return CJDN_tzolkin
+        + (18980-260)*fquotient(CJDN_tzolkin - CJDN_haab_year, 260);
     }
   case 6:                       // haab & year
     {
-      int32_t CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
-      int32_t CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
-      return CJDN_haab + (18980-365)*iaquot(CJDN_haab - CJDN_haab_year, 365);
+      int32_t CJDN_haab = CJDN_upper - fremainder(CJDN_upper - haab, 365);
+      int32_t CJDN_haab_year = CJDN_upper
+        - fremainder(CJDN_upper - haab_year, 18980);
+      return CJDN_haab + (18980-365)*fquotient(CJDN_haab - CJDN_haab_year, 365);
     }
   case 7:                       // tzolkin & haab & year
     {
-      int32_t CJDN_tzolkin = CJDN_upper - iamod(CJDN_upper - tzolkin, 260);
-      int32_t CJDN_haab_year = CJDN_upper - iamod(CJDN_upper - haab_year, 18980);
-      int32_t CJDN = CJDN_tzolkin + (18980-260)*iaquot(CJDN_tzolkin - CJDN_haab_year, 260);
-      int32_t CJDN_haab = CJDN_upper - iamod(CJDN_upper - haab, 365);
+      int32_t CJDN_tzolkin = CJDN_upper - fremainder(CJDN_upper - tzolkin, 260);
+      int32_t CJDN_haab_year = CJDN_upper
+        - fremainder(CJDN_upper - haab_year, 18980);
+      int32_t CJDN = CJDN_tzolkin
+        + (18980-260)*fquotient(CJDN_tzolkin - CJDN_haab_year, 260);
+      int32_t CJDN_haab = CJDN_upper - fremainder(CJDN_upper - haab, 365);
       return CJDN == CJDN_haab? CJDN: 0;
     }
     break;
@@ -1668,8 +1675,10 @@ void MayanStoCJDNA(char * const *date, int32_t *CJDN)
   MayanSto(*date, CJDN, NULL);
 }
 //--------------------------------------------------------------------------
-double MayantoCJD(int32_t trecena, int32_t venteina, double haab_day, int32_t haab_month,
-                  int32_t year_trecena, int32_t year_venteina, int32_t CJDN_upper)
+double
+MayantoCJD(int32_t trecena, int32_t venteina, double haab_day,
+           int32_t haab_month, int32_t year_trecena,
+           int32_t year_venteina, int32_t CJDN_upper)
 {
   int32_t ihaab_day = floor(haab_day);
   double frac = haab_day - ihaab_day;
@@ -1703,19 +1712,20 @@ void MayanStoCJDA(char * const *date, double *CJD)
 #define LONGCOUNT_EPOCH (584283)
 static int32_t longcount_periods[] = { 20, 20, 18, 20 };
 
-void CJDNtoLongCount(int32_t CJDN, int32_t *baktun, int32_t *katun, int32_t *tun, int32_t *uinal,
-                     int32_t *kin)
+void
+CJDNtoLongCount(int32_t CJDN, int32_t *baktun, int32_t *katun,
+                int32_t *tun, int32_t *uinal, int32_t *kin)
 {
   int32_t d;
 
   d = CJDN - LONGCOUNT_EPOCH;
-  Div_t x = adiv(d, longcount_periods[3]);
+  auto x = fdivide(d, longcount_periods[3]);
   *kin = x.rem;
-  x = adiv(x.quot, longcount_periods[2]);
+  x = fdivide(x.quot, longcount_periods[2]);
   *uinal = x.rem;
-  x = adiv(x.quot, longcount_periods[1]);
+  x = fdivide(x.quot, longcount_periods[1]);
   *tun = x.rem;
-  x = adiv(x.quot, longcount_periods[0]);
+  x = fdivide(x.quot, longcount_periods[0]);
   *baktun = x.quot;
   *katun = x.rem;
 }
@@ -1723,11 +1733,11 @@ void CJDNtoLongCount(int32_t CJDN, int32_t *baktun, int32_t *katun, int32_t *tun
 void CJDNtoLongCountA(int32_t const *CJDN, int32_t *longcount)
 {
   int32_t i;
-  Div_t x;
+  Div<int32_t> x;
 
   x.quot = *CJDN - LONGCOUNT_EPOCH;
   for (i = arraysize(longcount_periods) - 1; i >= 0; i--) {
-    x = adiv(x.quot, longcount_periods[i]);
+    x = fdivide(x.quot, longcount_periods[i]);
     longcount[i + 1] = x.rem;
   }
   longcount[0] = x.quot;
@@ -1753,23 +1763,24 @@ void CJDNtoLongCountSA(int32_t const *CJDN, char **date)
     *date = NULL;
 }
 //--------------------------------------------------------------------------
-void CJDtoLongCount(double CJD, int32_t *baktun, int32_t *katun, int32_t *tun, int32_t *uinal,
-                    double *kin)
+void
+CJDtoLongCount(double CJD, int32_t *baktun, int32_t *katun,
+               int32_t *tun, int32_t *uinal, double *kin)
 {
   int32_t d;
   double frac;
-  Div_t x;
+  Div<int32_t> x;
 
   d = floor(CJD);
   frac = CJD - d;
   d -= LONGCOUNT_EPOCH;
-  x = adiv(d, longcount_periods[3]);
+  x = fdivide(d, longcount_periods[3]);
   *kin = x.rem + frac;
-  x = adiv(x.quot, longcount_periods[2]);
+  x = fdivide(x.quot, longcount_periods[2]);
   *uinal = x.rem;
-  x = adiv(d, longcount_periods[1]);
+  x = fdivide(d, longcount_periods[1]);
   *tun = x.rem;
-  x = adiv(d, longcount_periods[0]);
+  x = fdivide(d, longcount_periods[0]);
   *baktun = x.quot;
   *katun = x.rem;
 }
@@ -1781,7 +1792,7 @@ void CJDtoLongCountA(double const *CJD, double *longcount)
   double frac = *CJD - d;
   d -= LONGCOUNT_EPOCH;
   for (i = arraysize(longcount_periods) - 1; i >= 0; i--) {
-    Div_t x = adiv(d, longcount_periods[i]);
+    auto x = fdivide(d, longcount_periods[i]);
     d = x.quot;
     longcount[i + 1] = x.rem;
   }
@@ -1799,7 +1810,9 @@ void CJDtoLongCountSA(double const *CJD, char **date)
   CJDNtoLongCountSA(&CJDN, date);
 }
 //--------------------------------------------------------------------------
-int32_t LongCounttoCJDN(int32_t baktun, int32_t katun, int32_t tun, int32_t uinal, int32_t kin)
+int32_t
+LongCounttoCJDN(int32_t baktun, int32_t katun, int32_t tun,
+                int32_t uinal, int32_t kin)
 {
   int32_t d;
 
@@ -1842,7 +1855,9 @@ void LongCountStoCJDNA(char * const *date, int32_t *CJDN)
   *CJDN = LongCountStoCJDN(*date);
 }
 //--------------------------------------------------------------------------
-double LongCounttoCJD(int32_t baktun, int32_t katun, int32_t tun, int32_t uinal, double kin)
+double
+LongCounttoCJD(int32_t baktun, int32_t katun, int32_t tun,
+               int32_t uinal, double kin)
 {
   int32_t ikin = floor(kin);
   double frac = kin - ikin;

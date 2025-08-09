@@ -21,7 +21,7 @@ SUBDIRS = fonts
 
 #AM_CPPFLAGS = -Werror -include everywhere.hh \
 #  -I$(top_srcdir)/historicephemerides
-AM_CPPFLAGS = -Werror
+AM_CPPFLAGS = -Werror -std=c++20
 
 AM_YFLAGS = -d -Wno-yacc
 ACLOCAL_AMFLAGS = -I m4

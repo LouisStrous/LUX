@@ -4008,16 +4008,16 @@ whitespace surrounding @code{#} is required.  See @ref{mproduct}.
 @item Division
 @code{x / y} divides the value of @code{x} by the value of @code{y}.
 If @code{x} and @code{y} are both integer, then only the integer part
-of the division is returned.
+of the division is returned, rounded down toward minus infinity.
 
 @item Power-taking
 @code{x ^ y} raises @code{x} to the power @code{y}.  The result is
 always of a floating-point data type.
 
 @item Modulus
-@code{x mod y} and @code{x % y} return @code{x} modulus @code{y},
-i.e., the nonnegative remainder of the division of @code{x} by
-@code{y}.
+@code{x mod y} and @code{x % y} return the remainder of dividing
+@code{x} by @code{y} using floor division.  The sign of the remainder,
+if it is nonzero, is equal to the sign of @code{y}.
 
 @item Signed Modulus
 @code{x smod y} return the signed remainder of the division of
@@ -19598,7 +19598,9 @@ See also: @ref{min}, @ref{!lastmin}, @ref{!lastminloc}
 @code{x mod y}
 
 Binary modulus operator.  @code{@var{x} mod @var{y}} yields the
-remainder of the division of @code{@var{x}} by @code{@var{y}}.
+remainder of the floor division of @code{@var{x}} by @code{@var{y}}.
+The sign of the remainder, if nonzero, is equal to the sign of
+@code{@var{y}}.
 
 Alias: @code{%}
 

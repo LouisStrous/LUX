@@ -93,6 +93,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "astrodat3.hh"
 #include "astron.hh"
 #include "calendar.hh"
+#include "intmath.hh"
 #include "vsop.hh"
 
 #define extractbits(value, base, bits) (((value) >> (base)) & ((1 << (bits)) - 1))
@@ -1894,11 +1895,11 @@ int32_t lux_calendar_OLD(ArgumentCount narg, Symbol ps[])
         d = floor(JDtoCJD(JD.d[i]));
       else
         d = JD.i32[i];
-      t = iamod(d + 5, 13) + 1;
-      v = iamod(d + 16, 20);
-      d = iamod(d + 65, 365);
+      t = fremainder(d + 5, 13) + 1;
+      v = fremainder(d + 16, 20);
+      d = fremainder(d + 65, 365);
       m = d/20;
-      d = iamod(d, 20);
+      d = fremainder(d, 20);
       sprintf(line, "%1d %s %1d %s", t, tikalVenteina[v], d, tikalMonth[m]);
       *data.sp++ = strsave(line);
     }
@@ -2485,7 +2486,7 @@ int32_t constellation(double alpha, double delta)
     delta = -90;
   else if (delta > 90)
     delta = +90;
-  alpha = famod(alpha, 360.0);  // reduce to interval 0 - 360 degrees
+  alpha = fremainder(alpha, 360.0);  // reduce to interval 0 - 360 degrees
   alpha /= 15;                  // from degrees to hours
 
   for (i = 0; i < nb && (delta < cb[i].delta || alpha >= cb[i].alpha2
@@ -3519,7 +3520,7 @@ double interpolate_angle(double a1, double a2, double f)
         assumes the smallest possible absolute difference between the
         angles. */
 {
-  a1 = famod(a1, TWOPI);
+  a1 = fremainder(a1, TWOPI);
   a2 = fasmod(a2 - a1, TWOPI);
   a2 += a1;
   a2 = a1*(1 - f) + a2*f;
@@ -3581,8 +3582,8 @@ int32_t extraHeliocentric(double JDE, int32_t object, double *equinox,
     qq = pp->orbits + high;
     d1 = (JDE - qq->JDE)/(qq[1].JDE - qq->JDE);
     d2 = 1 - d1;
-    m = interpolate_angle(famod(qq[0].M + (JDE - qq[0].JDE)*qq[0].n, TWOPI),
-                          famod(qq[1].M + (JDE - qq[1].JDE)*qq[1].n, TWOPI),
+    m = interpolate_angle(fremainder(qq[0].M + (JDE - qq[0].JDE)*qq[0].n, TWOPI),
+                          fremainder(qq[1].M + (JDE - qq[1].JDE)*qq[1].n, TWOPI),
                           d1);
     e = qq->e*d2 + qq[1].e*d1;
     k = qq->v_factor*d2 + qq[1].v_factor*d1;
@@ -3802,11 +3803,11 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
       nodedist = mpol4(93.2720993, 483202.0175273, -0.0034029,
                        -1.0/3526000, 1.0/863310000, Tc, 360);
       nodedist *= DEG;
-      a1 = famod(119.75 + 131.849*Tc,360);
+      a1 = fremainder(119.75 + 131.849*Tc, 360.);
       a1 *= DEG;
-      a2 = famod(53.09 + 479264.290*Tc,360);
+      a2 = fremainder(53.09 + 479264.290*Tc, 360.);
       a2 *= DEG;
-      a3 = famod(313.45 + 481266.484*Tc,360);
+      a3 = fremainder(313.45 + 481266.484*Tc, 360.);
       a3 *= DEG;
       suml = sumr = sumb = 0.0;
       mlrt = moonlr;
@@ -3834,7 +3835,7 @@ void heliocentricXYZr(double JDE, int32_t object, double equinox,
       sumb += -2235*sin(lmoon) + 382*sin(a3) + 175*sin(a1 - nodedist)
         + 175*sin(a1 + nodedist) + 127*sin(lmoon - mmoon)
         - 115*sin(lmoon + mmoon);
-      pos[0] = famod(lmoon + suml*DEG/1000000,TWOPI); // geocentric longitude referred
+      pos[0] = fremainder(lmoon + suml*DEG/1000000,TWOPI); // geocentric longitude referred
                                           // to the mean equinox of the date
       pos[1] = sumb*DEG/1000000;        // geocentric latitude
       pos[2] = (385000.56 + sumr/1000)/149597870; // AU (center-center)
@@ -4027,7 +4028,7 @@ void galtoeq(double *pos, double equinox, char forward)
     pos[0] = pos[0] - A;
     x = 12.25*DEG + atan2(sin(pos[0]), cos(pos[0])*sin(B) - tan(pos[1])*cos(B));
     pos[1] = asin(sin(pos[1])*sin(B) + cos(pos[1])*cos(B)*cos(pos[0]));
-    pos[0] = famod(x, TWOPI);
+    pos[0] = fremainder(x, TWOPI);
     precessEquatorial(pos, pos + 1, B1950, equinox);
   } else {                      // from equatorial to galactic
     double A = 192.25*DEG;
@@ -4038,7 +4039,7 @@ void galtoeq(double *pos, double equinox, char forward)
     pos[1] = pos[1];
     x = 303*DEG - atan2(sin(pos[0]), cos(pos[0])*sin(B) - tan(pos[1])*cos(B));
     pos[1] = asin(sin(pos[1])*sin(B) + cos(pos[1])*cos(B)*cos(pos[0]));
-    pos[0] = famod(x, TWOPI);
+    pos[0] = fremainder(x, TWOPI);
   }
 }
 //--------------------------------------------------------------------------
@@ -4773,7 +4774,7 @@ int32_t lux_astropos(ArgumentCount narg, Symbol ps[])
             }
           }
         }
-        final[0] = famod(final[0], TWOPI);
+        final[0] = fremainder(final[0], TWOPI);
         if ((internalMode & S_XYZ) != 0) {
           // back to cartesian coordinates
           double pos[3];

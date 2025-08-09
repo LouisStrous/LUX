@@ -446,8 +446,8 @@ void CJDNtoGregorian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day)
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   int32_t y3 = CJDN - GREGORIAN_EPOCH;
-  int32_t x3 = alinequot(y3, 4, 3, 146097);
-  int32_t y2 = alinequot(x3, 146097, 0, 4);
+  int32_t x3 = flinequot(y3, 4, 3, 146097);
+  int32_t y2 = flinequot(x3, 146097, 0, 4);
   y2 = y3 - y2;
   int32_t x2 = fquotient(y2*100 + 99, 36525);
   int32_t y1 = y2 - fquotient(36525*x2, 100);
@@ -505,7 +505,7 @@ int32_t GregoriantoCJDN(int32_t year, int32_t month, int32_t day)
   int32_t x4 = year + c0;
   Div<int32_t> d = fdivide(x4, (int32_t) 100);
   x1 = month - 12*c0 - 3;
-  int32_t J1 = alinequot(d.quot, 146097, 0, 4);
+  int32_t J1 = flinequot(d.quot, 146097, 0, 4);
   int32_t J2 = fquotient(d.rem*36525, 100);
   int32_t J3 = fquotient(x1*153 + 2, 5);
   return GREGORIAN_EPOCH - 1 + J1 + J2 + J3 + day;
@@ -565,8 +565,8 @@ void CJDNtoJulian(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day)
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   int32_t y2 = CJDN - JULIAN_EPOCH;
-  int32_t x2 = alinequot(y2, 4, 3, 1461);
-  int32_t z2 = y2 - alinequot(x2, 1461, 0, 4);
+  int32_t x2 = flinequot(y2, 4, 3, 1461);
+  int32_t z2 = y2 - flinequot(x2, 1461, 0, 4);
   int32_t x1 = fquotient(5*z2 + 2, 153);
   int32_t c0 = fquotient(x1 + 2, 12);
   *year = x2 + c0;
@@ -617,7 +617,7 @@ int32_t JuliantoCJDN(int32_t year, int32_t month, int32_t day)
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   int32_t c0 = fquotient(month - 3, 12);
-  int32_t J1 = alinequot(year + c0, 1461, 0, 4);
+  int32_t J1 = flinequot(year + c0, 1461, 0, 4);
   int32_t J2 = fquotient(month*153 - 1836*c0 - 457, 5);
   return J1 + J2 + day + JULIAN_EPOCH - 1;
 }
@@ -1081,8 +1081,8 @@ void CJDNtoIslamic(int32_t CJDN, int32_t *year, int32_t *month, int32_t *day)
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
   // "Alfonsine tables", s = 14, J₀ = 1948440
   int32_t y2 = CJDN - ISLAMIC_EPOCH;
-  *year = alinequot(y2, 30, 10646, 10631);
-  int32_t z2 = y2 - alinequot(*year, 10631, -10617, 30);
+  *year = flinequot(y2, 30, 10646, 10631);
+  int32_t z2 = y2 - flinequot(*year, 10631, -10617, 30);
   *month = fquotient(11*z2 + 330, 325);
   *day = z2 - fquotient(325**month - 331, 11);
 }
@@ -1129,7 +1129,7 @@ int32_t IslamictoCJDN(int32_t year, int32_t month, int32_t day)
 {
   /* This algorithm by Louis Strous
      (http://aa.quae.nl/en/reken/juliaansedag.html) */
-  return alinequot(year, 10631, -10617, 30)
+  return flinequot(year, 10631, -10617, 30)
     + fquotient(325*month - 320, 11) + day + ISLAMIC_EPOCH - 1;
 }
 //--------------------------------------------------------------------------

@@ -40,7 +40,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 /// f⌊x/d⌋ + ⌊(f*(x mod d) + t)/d⌋, which has its intermediate result
 /// no greater than fd.
 Div<int32_t>
-alinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
+flinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
 {
   Div<int32_t> d1, d2, d;
 
@@ -52,16 +52,16 @@ alinediv(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
 }
 
 int32_t
-alinequot(int32_t numerator, int32_t factor, int32_t addend,
+flinequot(int32_t numerator, int32_t factor, int32_t addend,
           int32_t denominator)
 {
-  auto d = alinediv(numerator, factor, addend, denominator);
+  auto d = flinediv(numerator, factor, addend, denominator);
   return d.quot;
 }
 
 int32_t
-alinemod(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
+flinemod(int32_t numerator, int32_t factor, int32_t addend, int32_t denominator)
 {
-  auto d = alinediv(numerator, factor, addend, denominator);
+  auto d = flinediv(numerator, factor, addend, denominator);
   return d.rem;
 }

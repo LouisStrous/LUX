@@ -3407,7 +3407,7 @@ double kepler_v(double M, double e)
                                  // true anomaly)
       return tan(M/2);
     else                        // output is true or eccentric anomaly
-      return fasmod(M, TWOPI);
+      return rremainder(M, TWOPI);
   } else if (e == 1) {          // parabolic orbit
     // for parabolic orbits, mean anomaly and eccentric anomaly are
     // not defined.
@@ -3443,7 +3443,7 @@ double kepler_v(double M, double e)
   }                             // otherwise the input is mean anomaly
   if (e < 1                     // elliptical orbit
       && fabs(M) > M_PI) {      // only modify if needed
-    M = fasmod(M, TWOPI);       // move between -π and +π
+    M = rremainder(M, TWOPI);       // move between -π and +π
     if (internalMode & 1)
       Mq = M*isrd3;
   }
@@ -3521,7 +3521,7 @@ double interpolate_angle(double a1, double a2, double f)
         angles. */
 {
   a1 = fremainder(a1, TWOPI);
-  a2 = fasmod(a2 - a1, TWOPI);
+  a2 = rremainder(a2 - a1, TWOPI);
   a2 += a1;
   a2 = a1*(1 - f) + a2*f;
   return a2;

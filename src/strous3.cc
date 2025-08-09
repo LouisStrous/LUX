@@ -69,6 +69,7 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 #include "action.hh"
 #include "cdiv.hh"
 #include "permutations.hh"
+#include "intmath.hh"
 
 /// \ingroup luxroutines
 ///
@@ -3621,12 +3622,12 @@ struct Getdeviation_two_gaps
     else
     {
       auto v = m_f(t);
-      auto gap1 = std::abs(fasmod(v[m_psr1.index_after_greatest_gap()]
-                                  - v[m_psr1.index_before_greatest_gap()],
-                                  m_period));
-      auto gap2 = std::abs(fasmod(v[m_psr2.index_after_greatest_gap()]
-                                  - v[m_psr2.index_before_greatest_gap()],
-                                  m_period));
+      auto gap1 = std::abs(rremainder(v[m_psr1.index_after_greatest_gap()]
+                                      - v[m_psr1.index_before_greatest_gap()],
+                                      m_period));
+      auto gap2 = std::abs(rremainder(v[m_psr2.index_after_greatest_gap()]
+                                      - v[m_psr2.index_before_greatest_gap()],
+                                      m_period));
       d = gap2 - gap1;
     }
     if (m_verbose)
@@ -3727,8 +3728,8 @@ struct Getdeviation_two_items
       d = std::nan("");
     else
     {
-      d = fasmod(v[m_it->item1_atbegintime]
-                 - v[m_it->item2_atbegintime], m_period);
+      d = rremainder(v[m_it->item1_atbegintime]
+                     - v[m_it->item2_atbegintime], m_period);
     }
     if (m_verbose)
       printf(": %.20g => %g [%lu] 2i\n", t, d,

@@ -29,21 +29,6 @@ along with LUX.  If not, see <http://www.gnu.org/licenses/>.
 // i64asmod → rremainder
 // fasmod → rremainder
 
-/// Signum function.
-///
-/// \tparam T is the data type.
-///
-/// \param x is the data value.
-///
-/// \returns `int` +1 if the argument is positive, 0 if the argument
-/// is 0, -1 if the argument is negative.
-template<typename T>
-constexpr int
-sgn(T x) noexcept
-{
-  return (x > 0)? 1: (x < 0)? -1: 0;
-}
-
 /// Floored quotient, from floored division, which rounds the result
 /// down to the nearest integer toward minus infinity.
 ///
@@ -85,16 +70,14 @@ constexpr auto
 fquotient(std::floating_point auto numerator,
           std::integral auto denominator) noexcept
 {
-  return (numerator/denominator)
-    - (sgn(numerator)*sgn(denominator) < 0);
+  return std::floor(numerator/denominator);
 }
 
 constexpr auto
 fquotient(std::integral auto numerator,
           std::floating_point auto denominator) noexcept
 {
-  return (numerator/denominator)
-    - (sgn(numerator)*sgn(denominator) < 0);
+  return std::floor(numerator/denominator);
 }
 
 /// Floored remainder, from floored division, which rounds the
@@ -113,7 +96,7 @@ fremainder(std::floating_point auto numerator,
            std::floating_point auto denominator) noexcept
 {
   return std::fmod(numerator, denominator)
-    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+    + ((sgn(numerator)*sgn(denominator) < 0)? denominator: 0);
 }
 
 constexpr auto
@@ -121,7 +104,7 @@ fremainder(std::floating_point auto numerator,
            std::integral auto denominator) noexcept
 {
   return std::fmod(numerator, denominator)
-    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+    + ((sgn(numerator)*sgn(denominator) < 0)? denominator: 0);
 }
 
 constexpr auto
@@ -129,7 +112,7 @@ fremainder(std::integral auto numerator,
            std::floating_point auto denominator) noexcept
 {
   return std::fmod(numerator, denominator)
-    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+    + ((sgn(numerator)*sgn(denominator) < 0)? denominator: 0);
 }
 
 /// Floored remainder, from floored division, which rounds the
@@ -148,7 +131,7 @@ fremainder(std::integral auto numerator,
            std::integral auto denominator) noexcept
 {
   return (numerator%denominator)
-    + (sgn(numerator)*sgn(denominator) < 0)? denominator: 0;
+    + ((sgn(numerator)*sgn(denominator) < 0)? denominator: 0);
 }
 
 /// A template type that represents the quotient and remainder of a
@@ -238,8 +221,8 @@ rquotient(std::integral auto numerator,
     otherwise increase q by 1 with the sign of n*d
   */
   return numerator/denominator
-    + (2*abs(numerator%denominator) >= abs(denominator))?
-    sgn(numerator)*sgn(denominator): 0;
+    + ((2*abs(numerator%denominator) >= abs(denominator))?
+       sgn(numerator)*sgn(denominator): 0);
 }
 
 constexpr auto

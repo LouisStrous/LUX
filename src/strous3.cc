@@ -492,7 +492,8 @@ static int32_t cmp0(const void *a, const void *b)
 /// \param[in,out] points at the LUX symbol number of the first argument.
 ///
 /// \returns the LUX symbol number of the result.
-int32_t lux_cspline_find(ArgumentCount narg, Symbol ps[])
+int32_t
+lux_cspline_find(ArgumentCount narg, Symbol ps[])
 // z = CSPLINE_FIND(y, levels [, AXIS=axis, INDEX=index])
 /* locates positions where a certain value gets attained, using cubic
    splines
@@ -5006,13 +5007,13 @@ lux_div_action(LoopInfo* infos, T* num, T* denom, T* tgt)
 
 /// Implements LUX function `div`.
 int32_t
-lux_div(ArgumentCount narg, Symbol ps[])
+lux_div2(ArgumentCount narg, Symbol ps[])
 {
   StandardArguments sa;
   int32_t iq;
   Pointer* ptrs;
   LoopInfo* infos;
-  if ((iq = sa.set(narg, ps, "i^*;i^#;r^+2&", &ptrs, &infos)) < 0)
+  if ((iq = sa.set(narg, ps, "i^*;i^#;r^@+2&", &ptrs, &infos)) < 0)
     return LUX_ERROR;
 
   if (infos[1].nelem == 1) {
@@ -5053,4 +5054,4 @@ lux_div(ArgumentCount narg, Symbol ps[])
 
   return iq;
 }
-REGISTER(div, f, div, 2, 2, NULL);
+REGISTER(div2, f, div, 2, 2, NULL);

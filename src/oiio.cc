@@ -23,44 +23,73 @@ lux_read_image_oiio(ArgumentCount narg, Symbol ps[])
   Symboltype luxtype;
   {
     int dims[3];
-    dims[0] = spec.nchannels;
-    dims[1] = spec.width;
-    dims[2] = spec.height;
-    if (!oiiotype.is_floating_point()) {
-      switch (oiiotype.elementsize()) {
-      case 1:
-        luxtype = LUX_INT8;
-        oiiotype = OIIO::TypeDesc::UINT8;
-      break;
-      case 2:
-        luxtype = LUX_INT16;
-        oiiotype = OIIO::TypeDesc::INT16;
-        break;
-      case 4:
-        luxtype = LUX_INT32;
-        oiiotype = OIIO::TypeDesc::INT32;
-        break;
-      default:
-        luxtype = LUX_FLOAT;
-        oiiotype = OIIO::TypeDesc::FLOAT;
-        break;
-      }
+    int ndim;
+    if (spec.nchannels > 1)
+    {
+      dims[0] = spec.nchannels;
+      dims[1] = spec.width;
+      dims[2] = spec.height;
+      ndim = 3;
     } else {
-      luxtype = LUX_FLOAT;
-      oiiotype = OIIO::TypeDesc::FLOAT;
+      dims[0] = spec.width;
+      dims[1] = spec.height;
+      ndim = 2;
     }
-    result = array_scratch(luxtype, sizeof(dims)/sizeof(*dims), dims);
+    result = array_scratch(LUX_FLOAT, ndim, dims);
   }
-  auto scanlinesize = spec.width*spec.nchannels*lux_type_size[luxtype];
-  in->read_image(0, 0, 0, -1,
-                 oiiotype, ((char*) array_data(result))
-                 + (spec.height - 1)*scanlinesize,
-                 OIIO::AutoStride,  // default x stride
-                 -scanlinesize,     // special y stride
-                 OIIO::AutoStride); // default z stride
+  in->read_image(0, 0, 0, -1, OIIO::TypeDesc::FLOAT, array_data(result));
   in->close();
   return result;
 }
 REGISTER(read_image_oiio, f, readimage, 1, 1, NULL, HAVE_LIBOPENIMAGEIO);
+
+Symbol
+lux_write_image_oiio(ArgumentCount narg, Symbol ps[])
+{
+  if (!symbolIsNumericalArray(ps[0]))
+    return cerror(NEED_NUM_ARR, ps[0]);
+  if (array_num_dims(ps[0]) != 2 && array_num_dims(ps[0]) != 3)
+    return luxerror("Need 2D or 3D array", ps[0]);
+
+  if (!symbolIsScalar(ps[1]))
+    return cerror(NEED_SCAL, ps[1]);
+  int type = int_arg(ps[1]);
+
+  if (!symbolIsStringScalar(ps[2]))
+    return cerror(NEED_STR, ps[2]);
+  auto filename = string_value(ps[2]);
+
+  OIIO::TypeDesc oiiotype;
+  switch (type) {
+  case 1:
+    oiiotype = OIIO::TypeDesc::UINT8;
+    break;
+  case 2:
+    oiiotype = OIIO::TypeDesc::UINT16;
+    break;
+  case 4:
+    oiiotype = OIIO::TypeDesc::UINT32;
+    break;
+  default:
+    oiiotype = OIIO::TypeDesc::FLOAT;
+    break;
+  }
+
+  auto out = OIIO::ImageOutput::create(filename);
+  if (!out)
+    return luxerror("Cannot write file %s", ps[2], filename);
+
+  auto ndim = array_num_dims(ps[0]);
+  auto dims = array_dims(ps[0]);
+  OIIO::ImageSpec spec(ndim >= 3? dims[1]: dims[0], // width
+                       ndim >= 3? dims[2]: dims[1], // height
+                       ndim >= 3? dims[0]: 1);      // channels
+  spec.format = oiiotype;
+  out->open(filename, spec);
+  out->write_image(OIIO::TypeDesc::FLOAT, array_data(ps[0]));
+  out->close();
+  return LUX_OK;
+}
+REGISTER(write_image_oiio, s, writeimage, 3, 3, NULL, HAVE_LIBOPENIMAGEIO);
 
 #endif

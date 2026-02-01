@@ -48,11 +48,13 @@ double F(double, double, double), bessel_i0(double), bessel_i1(double),
   beta(double, double), chi_square(double, double), gamma(double),
   incomplete_beta(double, double, double), incomplete_gamma(double, double),
   logbeta(double, double), loggamma(double),
-  non_central_chi_square(double, double, double), sgn(double),
+  non_central_chi_square(double, double, double),
   student(double, double), voigt(double, double);
-int32_t         math_funcs(int32_t, int32_t), math_funcs_2f(int32_t, int32_t, int32_t),
-        math_funcs_i_f(int32_t, int32_t, int32_t), math_funcs_3f(int32_t, int32_t, int32_t, int32_t);
-int32_t         lux_zerof(int32_t, int32_t []);
+Symbol math_funcs(Symbol, Symbol);
+Symbol math_funcs_2f(Symbol, Symbol, Symbol);
+Symbol math_funcs_i_f(Symbol, Symbol, Symbol);
+Symbol math_funcs_3f(Symbol, Symbol, Symbol, Symbol);
+Symbol lux_zerof(int32_t, Symbol []);
 
 enum fd {
   F_SIN, F_COS, F_TAN, F_ASIN, F_ACOS, F_ATAN, F_SINH, F_COSH, F_TANH, F_SQRT,
@@ -81,10 +83,15 @@ enum fddd {
   F_NCCHI2, F_IBETA, F_FRATIO
 };
 
-double (*func_d[])(double) = {
+double dsgn(double x)
+{
+  return sgn(x);
+}
+
+std::vector<double (*)(double)> func_d = {
   sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, exp, expm1,
   log, log10, log2, log1p, erf, erfc, j0, j1, y0, y1, gamma, loggamma,
-  bessel_i0, bessel_i1, bessel_k0, bessel_k1, sgn, asinh, acosh, atanh
+  bessel_i0, bessel_i1, bessel_k0, bessel_k1, dsgn, asinh, acosh, atanh
 };
 
 double (*func_id[])(int32_t, double) = {
@@ -5734,11 +5741,49 @@ int32_t lux_bessel_kn(ArgumentCount narg, Symbol ps[])
   return math_funcs_i_f(ps[0], ps[1], F_KN);
 }
 //-------------------------------------------------------------------------
-int32_t lux_sgn(ArgumentCount narg, Symbol ps[])
+Symbol
+lux_sgn(ArgumentCount narg, Symbol ps[])
 // the signum function: returns +1 if the argument is positive, -1 if
-// negative, and 0 if zero.  LS 19may98
+// negative, and 0 if zero.  LS 19may98, 2025-08-11
 {
-  return math_funcs(ps[0], F_SGN);
+  LoopInfo *infos;
+  Pointer *ptrs;
+  StandardArguments sa;
+  Symbol iq;
+
+  if ((iq = sa.set(narg, ps, "i;r&", &ptrs, &infos)) < 0)
+    return iq;
+
+  switch (infos[0].type)
+  {
+    case LUX_INT8:
+      while (infos[0].nelem--)
+        *ptrs[1].ui8++ = sgn(*ptrs[0].ui8++);
+      break;
+    case LUX_INT16:
+      while (infos[0].nelem--)
+        *ptrs[1].i16++ = sgn(*ptrs[0].i16++);
+      break;
+    case LUX_INT32:
+      while (infos[0].nelem--)
+        *ptrs[1].i32++ = sgn(*ptrs[0].i32++);
+      break;
+    case LUX_INT64:
+      while (infos[0].nelem--)
+        *ptrs[1].i64++ = sgn(*ptrs[0].i64++);
+      break;
+    case LUX_FLOAT:
+      while (infos[0].nelem--)
+        *ptrs[1].f++ = sgn(*ptrs[0].f++);
+      break;
+    case LUX_DOUBLE:
+      while (infos[0].nelem--)
+        *ptrs[1].d++ = sgn(*ptrs[0].d++);
+      break;
+    default:
+      return cerror(ILL_TYPE, ps[0]);
+  }
+  return iq;
 }
 //-------------------------------------------------------------------------
 int32_t lux_incomplete_beta(ArgumentCount narg, Symbol ps[])
@@ -7252,15 +7297,4 @@ double bessel_kn(int32_t n, double x)
     z = 2.0/x;
     b2 = b0 + i*b1*z; }
   return b2;
-}
-//-------------------------------------------------------------------------
-double sgn(double x)
-// returns the sign of x: +1 if x > 0, -1 if x < 0, and 0 if x == 0.
-// LS 19may98
-{
-  if (x > 0)
-    return 1.0;
-  if (x < 0)
-    return -1.0;
-  return 0.0;
 }

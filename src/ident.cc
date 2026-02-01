@@ -1315,13 +1315,13 @@ char *symbolIdent(int32_t symbol, int32_t mode)
     curScrat += strlen(curScrat);
     switch (static_cast<binaryOp>(bin_op_type(symbol))) {
     case LUX_ADD: case LUX_SUB: case LUX_MUL: case LUX_DIV:
-    case LUX_POW: case LUX_MOD: case LUX_MAX: case LUX_MIN:
-    case LUX_IDIV:
+    case LUX_POW: case LUX_FMOD: case LUX_MAX: case LUX_MIN:
+    case LUX_FDIV:
       strcpy(curScrat, binOpSign[bin_op_type(symbol)]);
       break;
     case LUX_EQ: case LUX_LE: case LUX_LT: case LUX_GT:
     case LUX_NE: case LUX_AND: case LUX_OR: case LUX_XOR:
-    case LUX_ANDIF: case LUX_ORIF: case LUX_GE: case LUX_SMOD:
+    case LUX_ANDIF: case LUX_ORIF: case LUX_GE: case LUX_RMOD:
       sprintf(curScrat, " %s ", binOpSign[bin_op_type(symbol)]);
       break;
     }

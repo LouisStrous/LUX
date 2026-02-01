@@ -704,8 +704,9 @@ LoopInfo::dimensionLoopResult1(int32_t tmode, Symboltype ttype,
    element of tinfo. */
 
   // fill loop structure for output symbol
-  tinfo->setupDimensionLoop(dims.size(), &dims[0], ttype, axes.size(), &axes[0],
-                            tptr, tmode);
+  tinfo->setupDimensionLoop(dims.size(),
+                            dims.size()? &dims[0]: nullptr, ttype, axes.size(),
+                            axes.size()? &axes[0]: nullptr, tptr, tmode);
   return target;
 }
 //-----------------------------------------------------------------------

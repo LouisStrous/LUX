@@ -77,7 +77,7 @@ int32_t installString(char const* string);
                                  new routine we encounter while we're already
                                  compiling something else */
 
-%expect 38
+%expect 39
 
 /* list of tokens that are returned by yylex and have no */
 /* associativity */
@@ -97,7 +97,7 @@ int32_t installString(char const* string);
 %left TOK_GE TOK_LE TOK_GT TOK_LT TOK_EQ TOK_NE
 %left '<' '>'
 %left '+' '-'
-%left '*' '/' '\\' '%' '#' TOK_SMOD
+%left '*' '/' '\\' '%' '#' TOK_SMOD TOK_SDIV
 %left TOK_UMINUS    // "dummy" to give unitary minus proper precedence
 %right '^'
 %left '('
@@ -388,13 +388,16 @@ expr:                           /* a general expression */
   $$ = newSymbol(LUX_BIN_OP, LUX_DIV, $1, $3);
 }
 | expr '\\' expr {
-  $$ = newSymbol(LUX_BIN_OP, LUX_IDIV, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_FDIV, $1, $3);
 }
 | expr '%' expr {
-  $$ = newSymbol(LUX_BIN_OP, LUX_MOD, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_FMOD, $1, $3);
 }
 | expr TOK_SMOD expr {
-  $$ = newSymbol(LUX_BIN_OP, LUX_SMOD, $1, $3);
+  $$ = newSymbol(LUX_BIN_OP, LUX_RMOD, $1, $3);
+}
+| expr TOK_SDIV expr {
+  $$ = newSymbol(LUX_BIN_OP, LUX_RDIV, $1, $3);
 }
 | expr '^' expr {
   $$ = newSymbol(LUX_BIN_OP, LUX_POW, $1, $3);
@@ -1154,10 +1157,11 @@ int32_t isKeyWord(void)
 {
  static char const* keyWords[] = {
    "and", "andif", "begin", "block", "break", "case", "continue",
-   "do", "else", "end", "endblock", "endcase", "endfunc",
-   "endsubr", "eq", "for", "func", "function", "ge", "gt", "if", "le", "lt",
+   "do", "else", "end", "endblock", "endcase", "endfunc", "endsubr",
+   "eq", "for", "func", "function", "ge", "gt", "if", "le", "lt",
    "mod", "ncase", "ne", "or", "orif", "repeat", "retall", "return",
-   "run", "smod", "subr", "subroutine", "then", "until", "while", "xor"
+   "run", "sdiv", "smod", "subr", "subroutine", "then", "until",
+   "while", "xor"
  };
  static int32_t keyCodes[] = {
    TOK_AND, TOK_ANDIF, TOK_BEGIN, TOK_BLOCK, TOK_BREAK, TOK_CASE,
@@ -1165,8 +1169,8 @@ int32_t isKeyWord(void)
    TOK_ENDFUNC, TOK_ENDSUBR, TOK_EQ, TOK_FOR, TOK_FUNC, TOK_FUNC,
    TOK_GE, TOK_GT, TOK_IF, TOK_LE, TOK_LT, '%', TOK_NCASE, TOK_NE,
    TOK_OR, TOK_ORIF, TOK_REPEAT, TOK_RETALL, TOK_RETURN, TOK_RUN,
-   TOK_SMOD, TOK_SUBR, TOK_SUBR, TOK_THEN, TOK_UNTIL, TOK_WHILE,
-   TOK_XOR
+   TOK_SDIV, TOK_SMOD, TOK_SUBR, TOK_SUBR, TOK_THEN, TOK_UNTIL,
+   TOK_WHILE, TOK_XOR
  };
  char const** ptr;
 

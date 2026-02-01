@@ -481,7 +481,7 @@ int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, Symbol ps[])
       using_oss << " " << type_text;
 
     if (color)
-      using_oss << " linecolor " << color;
+      using_oss << " linecolor rgb \"" << color << "\"";
 
     using_oss << " title \"" << (legend? legend: "") << "\"";
 

@@ -213,30 +213,31 @@ enum fmtType
 /// LUX binary operations
 enum binaryOp
   {
-    LUX_ADD,                    //!< (0) +
-    LUX_SUB,                    //!< (1) -
-    LUX_MUL,                    //!< (2) *
-    LUX_DIV,                    //!< (3) /
-    LUX_IDIV,                   //!< (4) \ .
-    LUX_MOD,                    //!< (5) %, MOD
-    LUX_SMOD,                   //!< (6) SMOD
-    LUX_MAX,                    //!< (7) >
-    LUX_MIN,                    //!< (8) <
-    LUX_EQ,                     //!< (9) EQ
-    LUX_GT,                     //!< (10) GT
-    LUX_GE,                     //!< (11) GE
-    LUX_LT,                     //!< (12) LT
-    LUX_LE,                     //!< (13) LE
-    LUX_NE,                     //!< (14) NE
-    LUX_OR,                     //!< (15) OR
-    LUX_AND,                    //!< (16) AND
-    LUX_XOR,                    //!< (17) XOR
-    LUX_POW,                    //!< (18) ^
-    LUX_ANDIF,                  //!< (19) ANDIF
-    LUX_ORIF                    //!< (20) ORIF
+    LUX_ADD,                    ///< (0) +
+    LUX_SUB,                    ///< (1) -
+    LUX_MUL,                    ///< (2) *
+    LUX_DIV,                    ///< (3) /
+    LUX_FDIV,                   ///< (4) \ .
+    LUX_FMOD,                    ///< (5) %, MOD
+    LUX_RDIV,                   ///< (6) SDIV
+    LUX_RMOD,                   ///< (7) SMOD
+    LUX_MAX,                    ///< (8) >
+    LUX_MIN,                    ///< (9) <
+    LUX_EQ,                     ///< (10) EQ
+    LUX_GT,                     ///< (11) GT
+    LUX_GE,                     ///< (12) GE
+    LUX_LT,                     ///< (13) LT
+    LUX_LE,                     ///< (14) LE
+    LUX_NE,                     ///< (15) NE
+    LUX_OR,                     ///< (16) OR
+    LUX_AND,                    ///< (17) AND
+    LUX_XOR,                    ///< (18) XOR
+    LUX_POW,                    ///< (19) ^
+    LUX_ANDIF,                  ///< (20) ANDIF
+    LUX_ORIF                    ///< (21) ORIF
   };
 
-#define NUM_BIN_OP      19      // note that this number does not
+#define NUM_BIN_OP LUX_ANDIF    // note that this number does not
                                 // count LUX_ANDIF and LUX_ORIF
 
  // boundingBoxType (PLOT,BOUNDINGBOX=) stuff
@@ -312,15 +313,15 @@ enum binaryOp
 /// Trace Mode bit flags
 enum TraceMode
   {
-    T_FILE = (1 << 0),          //!< Trace @files.
-    T_LOOP = (1 << 1),          //!< Trace any kind of loop.
-    T_BLOCK = (1 << 2),         //!< Trace {} blocks.
+    T_FILE = (1 << 0),          ///< Trace @files.
+    T_LOOP = (1 << 1),          ///< Trace any kind of loop.
+    T_BLOCK = (1 << 2),         ///< Trace {} blocks.
 
     /// Trace user-defined subroutines, functions, and block routines.
     T_ROUTINE = (1 << 3),
 
-    T_SHOWSTATS = (1 << 4),       //!< Show execution statistics.
-    T_CPUTIME = (1 << 5),         //!< Show CPU time.
+    T_SHOWSTATS = (1 << 4),       ///< Show execution statistics.
+    T_CPUTIME = (1 << 5),         ///< Show CPU time.
     T_SHOWEXEC = (1 << 6),
     T_ROUTINEIO = (1 << 7)
   };
@@ -357,26 +358,26 @@ const double RAD = 180/PI;
 #define GN_EXACT        4       // output exactly <minType>
 
 // startStandardLoop() stuff
-#define SL_SAMEDIMS     0 //!< 0x0 output needs same dimensions as input */
-#define SL_COMPRESS     1 //!< 0x1 output lacks first dimension from axis */
-#define SL_COMPRESSALL  2 //!< 0x2 output lacks all dimensions from axis */
+#define SL_SAMEDIMS     0 ///< 0x0 output needs same dimensions as input */
+#define SL_COMPRESS     1 ///< 0x1 output lacks first dimension from axis */
+#define SL_COMPRESSALL  2 ///< 0x2 output lacks all dimensions from axis */
 
-#define SL_EXACT        0*(1<<2) //!< 0x0 output type is exactly as specified */
-#define SL_UPGRADE      1*(1<<2) //!< 0x4 output type is upgraded if necessary */
-#define SL_KEEPTYPE     2*(1<<2) //!< 0x8 output type equal to input type */
+#define SL_EXACT        0*(1<<2) ///< 0x0 output type is exactly as specified */
+#define SL_UPGRADE      1*(1<<2) ///< 0x4 output type is upgraded if necessary */
+#define SL_KEEPTYPE     2*(1<<2) ///< 0x8 output type equal to input type */
 
-#define SL_EACHCOORD    0*(1<<4) //!< 0x0 need all coordinates */
-#define SL_AXISCOORD    (1<<4) //!< 0x10 need only coordinate along specified axis */
-#define SL_EACHROW      (1<<5) //!< 0x20 treat row by row */
-#define SL_UNIQUEAXES   (1<<6) //!< 0x40 all axes must be unique */
-#define SL_ONEAXIS      (1<<7) //!< 0x80 at most one axis */
-#define SL_AXESBLOCK    ((1<<8) | SL_UNIQUEAXES) //!< 0x140 treat selected axes as a block, includes SL_UNIQUEAXES */
-#define SL_ONEDIMS      (1<<9) //!< 0x200 "compressed" dimensions replaced by 1s */
-#define SL_SRCUPGRADE   (1<<10) //!< 0x400 upgrade source data type if necessary */
-#define SL_NEGONED      (1<<11) //!< 0x800 negative axis argument -> treat as 1D */
-#define SL_EACHBLOCK    ((1<<12) | SL_AXESBLOCK) //!< 0x1140 treat all axes at once */
-#define SL_ALLAXES      (1<<13) //!< 0x2000 select all axes for treatment */
-#define SL_TAKEONED     (1<<14) //!< 0x4000 treat ax 1D array */
+#define SL_EACHCOORD    0*(1<<4) ///< 0x0 need all coordinates */
+#define SL_AXISCOORD    (1<<4) ///< 0x10 need only coordinate along specified axis */
+#define SL_EACHROW      (1<<5) ///< 0x20 treat row by row */
+#define SL_UNIQUEAXES   (1<<6) ///< 0x40 all axes must be unique */
+#define SL_ONEAXIS      (1<<7) ///< 0x80 at most one axis */
+#define SL_AXESBLOCK    ((1<<8) | SL_UNIQUEAXES) ///< 0x140 treat selected axes as a block, includes SL_UNIQUEAXES */
+#define SL_ONEDIMS      (1<<9) ///< 0x200 "compressed" dimensions replaced by 1s */
+#define SL_SRCUPGRADE   (1<<10) ///< 0x400 upgrade source data type if necessary */
+#define SL_NEGONED      (1<<11) ///< 0x800 negative axis argument -> treat as 1D */
+#define SL_EACHBLOCK    ((1<<12) | SL_AXESBLOCK) ///< 0x1140 treat all axes at once */
+#define SL_ALLAXES      (1<<13) ///< 0x2000 select all axes for treatment */
+#define SL_TAKEONED     (1<<14) ///< 0x4000 treat ax 1D array */
 
 // stringpointer() stuff
 #define SP_VAR          1
@@ -422,17 +423,17 @@ union Scalar
 /// A union of pointers to all data types that LUX arrays can hold.
 union Pointer
 {
-  uint8_t* ui8;             //!< Pointer to 8-bit unsigned array
-  int16_t *i16;             //!< Pointer to 16-bit signed array
-  int32_t *i32;             //!< Pointer to 32-bit signed array
-  int64_t *i64;             //!< Pointer to 64-bit signed array
-  float *f;                 //!< Pointer to single precision float array
-  double *d;                //!< Pointer to double precision float array
-  char *s;                  //!< Pointer to text string
-  char **sp;                //!< Pointer to array of text strings
-  void *v;                  //!< Generic pointer
-  FloatComplex *cf;         //!< Pointer to single precision float complex array
-  DoubleComplex *cd;        //!< Pointer to double precision float complex array
+  uint8_t* ui8;             ///< Pointer to 8-bit unsigned array
+  int16_t *i16;             ///< Pointer to 16-bit signed array
+  int32_t *i32;             ///< Pointer to 32-bit signed array
+  int64_t *i64;             ///< Pointer to 64-bit signed array
+  float *f;                 ///< Pointer to single precision float array
+  double *d;                ///< Pointer to double precision float array
+  char *s;                  ///< Pointer to text string
+  char **sp;                ///< Pointer to array of text strings
+  void *v;                  ///< Generic pointer
+  FloatComplex *cf;         ///< Pointer to single precision float complex array
+  DoubleComplex *cd;        ///< Pointer to double precision float complex array
 };
 
 struct ListElem
@@ -470,8 +471,8 @@ struct BoundsStruct {
     float f;
     double d;
   };
-  T min;     //!< the least values that the LUX numerical data types can hold
-  T max;     //!< the greatest values that the LUX numerical data types can hold
+  T min;     ///< the least values that the LUX numerical data types can hold
+  T max;     ///< the greatest values that the LUX numerical data types can hold
 };
 
 struct StructElem
@@ -515,30 +516,30 @@ struct ExtractSec {
 
 struct StructPtrMember
 {
-  uint8_t type;                 //!< subscript type: scalar, range, index
+  uint8_t type;                 ///< subscript type: scalar, range, index
   union
   {
     struct
     {
-      int32_t value;            //!< the single integer subscript
+      int32_t value;            ///< the single integer subscript
     } scalar;
     struct
     {
-      int32_t start;            //!< the integer range start
-      int32_t end;              //!< the integer range end
+      int32_t start;            ///< the integer range start
+      int32_t end;              ///< the integer range end
     } range;
     struct
     {
-      int32_t n_elem;           //!< the number of index array elements
-      int32_t* ptr;             //!< pointer to the index array elements
+      int32_t n_elem;           ///< the number of index array elements
+      int32_t* ptr;             ///< pointer to the index array elements
     } array;
   } data;
 };
 
 struct StructPtr
 {
-  int32_t desc;                 //!< index of structure descriptor
-  int32_t n_subsc;              //!< number of subscripts
+  int32_t desc;                 ///< index of structure descriptor
+  int32_t n_subsc;              ///< number of subscripts
   StructPtrMember* member;
 };
 
@@ -705,25 +706,25 @@ struct ExecutionLevelInfo
 
 struct FormatInfo
 {
-  char* format;               //!< whole format string
-  char* current;              //!< the currently selected format entry
-  char* start;                //!< initial % of current format entry
-  char* spec_char;            //!< current specification character
-  char* repeat;               //!< start of repeat count
-  char* plain;                //!< start of plain text?
-  char* end;                  //!< end of current format entry
-  char* next;                 //!< start of next format entry
-  fmtType type;               //!< format type
-  int32_t width;              //!< format width
-  int32_t precision;          //!< format precision
-  int32_t flags;              //!< format modification flags
-  int32_t count;              //!< format repetition count
-  int32_t active_group;       //!< number of currently active groups
-  int32_t group_count[MAXFMT];  //!< current group counts
-  char* group_start[MAXFMT];    //!< current group starts
-  char save1;                   //!< for temporary storage
-  char save2;                   //!< for temporary storage
-  char only_whitespace;         //!< whitespace only?
+  char* format;               ///< whole format string
+  char* current;              ///< the currently selected format entry
+  char* start;                ///< initial % of current format entry
+  char* spec_char;            ///< current specification character
+  char* repeat;               ///< start of repeat count
+  char* plain;                ///< start of plain text?
+  char* end;                  ///< end of current format entry
+  char* next;                 ///< start of next format entry
+  fmtType type;               ///< format type
+  int32_t width;              ///< format width
+  int32_t precision;          ///< format precision
+  int32_t flags;              ///< format modification flags
+  int32_t count;              ///< format repetition count
+  int32_t active_group;       ///< number of currently active groups
+  int32_t group_count[MAXFMT];  ///< current group counts
+  char* group_start[MAXFMT];    ///< current group starts
+  char save1;                   ///< for temporary storage
+  char save2;                   ///< for temporary storage
+  char only_whitespace;         ///< whitespace only?
 };
 
 /// A LUX breakpoint

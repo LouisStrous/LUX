@@ -394,4 +394,19 @@ make_iota(size_t n, T start = T{})
   return result;
 }
 
+/// Signum function.
+///
+/// \tparam T is the data type.
+///
+/// \param x is the data value.
+///
+/// \returns `int` +1 if the argument is positive, 0 if the argument
+/// is 0, -1 if the argument is negative.
+template<typename T>
+constexpr int
+sgn(T x) noexcept
+{
+  return (x > 0)? 1: (x < 0)? -1: 0;
+}
+
 #endif

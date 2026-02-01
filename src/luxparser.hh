@@ -105,7 +105,8 @@ extern int yydebug;
     TOK_EQ = 1048,                 /* TOK_EQ  */
     TOK_NE = 1049,                 /* TOK_NE  */
     TOK_SMOD = 1050,               /* TOK_SMOD  */
-    TOK_UMINUS = 1051              /* TOK_UMINUS  */
+    TOK_SDIV = 1051,               /* TOK_SDIV  */
+    TOK_UMINUS = 1052              /* TOK_UMINUS  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -165,7 +166,8 @@ extern int yydebug;
 #define TOK_EQ 1048
 #define TOK_NE 1049
 #define TOK_SMOD 1050
-#define TOK_UMINUS 1051
+#define TOK_SDIV 1051
+#define TOK_UMINUS 1052
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

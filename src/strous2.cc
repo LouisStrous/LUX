@@ -774,7 +774,8 @@ int32_t lux_medfilter(ArgumentCount narg, Symbol ps[])
   return lux_orderfilter(narg, ps);
 }
 //---------------------------------------------------------
-int32_t lux_quantile(ArgumentCount narg, Symbol ps[])
+Symbol
+lux_quantile(ArgumentCount narg, Symbol ps[])
 // QUANTILE([<order> ,] <data> [, <axes>])
 {
   int32_t       output, t, nelem, i;
@@ -795,9 +796,14 @@ int32_t lux_quantile(ArgumentCount narg, Symbol ps[])
     order = -1;                         // flag that we didn't have one
 
   if (standardLoop(ps[1], (narg > 2)? ps[2]: 0,
-                   (narg <= 2? SL_ALLAXES: 0) | SL_UNIQUEAXES | SL_AXESBLOCK
-                   | SL_KEEPTYPE | SL_COMPRESSALL, LUX_INT8, &srcinfo,
-                   &src, &output, &trgtinfo, &trgt) == LUX_ERROR)
+                   (narg <= 2? SL_ALLAXES: 0)
+                   | SL_UNIQUEAXES
+                   | SL_AXESBLOCK
+                   | SL_KEEPTYPE
+                   | SL_COMPRESSALL
+                   | ((internalMode & 4)? SL_ONEDIMS: 0),
+                   LUX_INT8, &srcinfo, &src, &output, &trgtinfo,
+                   &trgt) == LUX_ERROR)
     return LUX_ERROR;
 
   // we calculate the number of elements that go into each sorting
@@ -805,7 +811,7 @@ int32_t lux_quantile(ArgumentCount narg, Symbol ps[])
   for (i = 0; i < srcinfo.naxes; i++)
     nelem *= srcinfo.rdims[i];
   if (order == -1) {
-    switch (internalMode) {
+    switch (internalMode & 3) {
     case 0: case 1:             // /MEDIAN or default
       order = 0.5;
       break;
@@ -889,13 +895,15 @@ int32_t lux_quantile(ArgumentCount narg, Symbol ps[])
   free(tmp0.ui8);
   return output;
 }
+REGISTER(quantile, f, quantile, 2, 3, "4keepdims");
 //---------------------------------------------------------
 int32_t lux_median(ArgumentCount narg, Symbol ps[])
      // median filter
 {
-  internalMode = 1;
+  internalMode |= 1;
   return lux_quantile(narg, ps);
 }
+REGISTER(median, f, median, 1, 3, "%1%4keepdims");
 //---------------------------------------------------------
 int32_t lux_minfilter(ArgumentCount narg, Symbol ps[])
      // minimum filter

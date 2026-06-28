@@ -766,7 +766,6 @@ InternalRoutine function_table[] = {
   { "mean",     1, 4, lux_mean,                  // fun1.cc
     "::power:weights:1double:2keepdims:4float:8omitnans" },
   { "medfilter", 1, 4, lux_medfilter, "%1%" },        // strous2.cc
-  { "median",   1, 3, lux_median, "%1%" },            // strous2.cc
   { "memory",   0, 0, lux_memory, 0 },                // memck.cc
   { "min",      1, 2, lux_minf, "1keepdims" },        // fun3.cc
   { "minfilter", 1, 3, lux_minfilter, 0 },            // strous2.cc
@@ -796,7 +795,6 @@ InternalRoutine function_table[] = {
   { "psum",     2, 4, lux_psum, // strous2.cc
     "1onedim:2vnormalize:4cnormalize:8single" },
   { "ptoc",     1, 5, lux_polar_to_cartesian, 0 }, // fun4.cc
-  { "quantile", 2, 3, lux_quantile, 0 },           // strous2.cc
   { "random",   1, MAX_DIMS, lux_random,           // random.cc
     "%2%seed:period:1uniform:2normal:3sample:4shuffle:5bits" },
   { "randomb",  3, MAX_DIMS, lux_randomb, "%2%seed:1long" },        // random.cc

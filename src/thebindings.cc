@@ -3857,27 +3857,35 @@ void register_the_bindings()
   int32_t lux_tolookup(int32_t, int32_t []);
   register_lux_s(lux_tolookup, "tolookup", 2, 4, "1one");
 
-#line 2548 "strous2.cc"
+#line 898 "strous2.cc"
+  int32_t lux_quantile(int32_t, int32_t []);
+  register_lux_f(lux_quantile, "quantile", 2, 3, "4keepdims");
+
+#line 906 "strous2.cc"
+  int32_t lux_median(int32_t, int32_t []);
+  register_lux_f(lux_median, "median", 1, 3, "%1%4keepdims");
+
+#line 2556 "strous2.cc"
   int32_t lux_find_maxloc(int32_t, int32_t []);
   register_lux_f(lux_find_maxloc, "find_maxloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
 
-#line 2555 "strous2.cc"
+#line 2563 "strous2.cc"
   int32_t lux_find_minloc(int32_t, int32_t []);
   register_lux_f(lux_find_minloc, "find_minloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
 
-#line 2562 "strous2.cc"
+#line 2570 "strous2.cc"
   int32_t lux_find_extremeloc(int32_t, int32_t []);
   register_lux_f(lux_find_extremeloc, "find_extremeloc", 1, 3, "::diagonal:1degree:2subgrid:4coords:8old");
 
-#line 2569 "strous2.cc"
+#line 2577 "strous2.cc"
   int32_t lux_find_max(int32_t, int32_t []);
   register_lux_f(lux_find_max, "find_max", 1, 3, "::diagonal:1degree:2subgrid");
 
-#line 2576 "strous2.cc"
+#line 2584 "strous2.cc"
   int32_t lux_find_min(int32_t, int32_t []);
   register_lux_f(lux_find_min, "find_min", 1, 3, "::diagonal:1degree:2subgrid");
 
-#line 2583 "strous2.cc"
+#line 2591 "strous2.cc"
   int32_t lux_find_extreme(int32_t, int32_t []);
   register_lux_f(lux_find_extreme, "find_extreme", 1, 3, "::diagonal:1degree:2subgrid");
 

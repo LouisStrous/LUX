@@ -3353,7 +3353,6 @@ yyreturnlab:
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include <termio.h>     /* for unbuffered input */
 #include <unistd.h>     /* for unbuffered input */
 /*#include "editor_once.h"*/
 #include <setjmp.h>

@@ -208,7 +208,7 @@ int32_t lux_gplot_backend(GplotStatus status, ArgumentCount narg, Symbol ps[])
     ++eps;
   }
 
-  gp.sendf("set xtics; set ytics;\n");
+  gp.sendf("set xtics; set ytics; set grid;\n");
 
   bool done = false;
   if (status == GplotStatus::gplot || first_gaplot) {
@@ -622,15 +622,20 @@ REGISTER(gnutv, s, gtv, 1, 1, NULL);
 ///
 /// Display a 3D plot of height values <z>, using gnuplot.
 ///
-/// <z> must have two dimensions.
+/// <z> must have at least two dimensions.
 ///
-/// If <x> and <y> are also specified, then they indicate the x and y
-/// coordinates.  <x> and <y> must then be one-dimensional arrays.
-/// <x> contains the x coordinate of every column, and <y> contains
-/// the y coordinate of every row.  Then the number of elements of <x>
-/// must be equal to the number of columns of <z> (dimen(z,0)), and
-/// the number of elements of <y> must be equal to the number of rows
-/// of <z> (dimen(z,1)).
+/// If <x>, <y>, and <z> are specified and have the same number of
+/// elements, then they provide (x,y,z) coordinates of successive
+/// points.  The first dimension of <z> corresponds to the width of
+/// the surface, and the combination of the remaining dimensions
+/// correspond to the length.
+///
+/// If <z> has two dimensions and <x> and <y> have one dimension each,
+/// and the first dimension of <z> has the same element count as <x>,
+/// and the second dimension of <z> has the same element count as <y>,
+/// then <x> indicates the x coordinates of the grid, and <y>
+/// indicates the y coordinates of the grid, and <z> indicates the z
+/// coordinate of the points on the grid.
 ///
 /// <xtitle> is the title for the x axis.
 ///
@@ -826,12 +831,12 @@ int32_t lux_gnuplot3d(ArgumentCount narg, Symbol ps[])
       break;
 
   switch (ndata) {
-  case 1:
+  case 1:                       // z
     return lux_gnuplot_with_image
       (ndata, ps,
        "splot '-' binary array=(%d,%d) format=\"%s\" "
        "notitle with pm3d;");
-  case 3:
+  case 3:                       // x, y, z
     {
       Pointer *data;
       LoopInfo *info;
@@ -845,87 +850,106 @@ int32_t lux_gnuplot3d(ArgumentCount narg, Symbol ps[])
       if (sa.result()< 0)
         return LUX_ERROR;
 
-      if (info[0].ndim < 1 || info[0].ndim > 2)
-        return luxerror("Expected 1 or 2 dimensions, found %d", ps[0],
-                        info[0].ndim);
-
-      if (info[1].ndim != info[0].ndim)
-        return luxerror("Expected same dimension count as for X", ps[1]);
-
-      switch (info[0].ndim) {
-      case 1:
-        {
-          if (info[0].dims[0] != info[2].dims[0])
-            return luxerror("Size should be equal to 1st dimension of Z",
-                            ps[0]);
-
-          if (info[1].dims[0] != info[2].dims[1])
-            return luxerror("Size should be equal to 2nd dimension of Z",
-                            ps[1]);
-
-          // We cannot send a nonuniform matrix to gnuplot through a
-          // pipe, because gnuplot 5.0 uses fseek and ftell on the
-          // data, and those don't work on pipes (at least on
-          // GNU/Linux).  So we send the data as text to a temporary
-          // file, then tell gnuplot to read the file.
-          //
-          // We want to clean up after ourselves and remove that file
-          // when we don't need it anymore, However, our communication
-          // with gnuplot is one-way; We don't get a signal when
-          // gnuplot is done creating the plot and doesn't need the
-          // file anymore.  So, we must not delete the file
-          // immediately after sending the command to gnuplot, because
-          // gnuplot may not have finished creating the plot yet.
-          //
-          // Our current solution is to delete the file at the
-          // beginning of the next command that needs such a file.
-          // This fails if the next such command is issued before the
-          // previous one has been completed by gnuplot (e.g., in
-          // batch mode).
-
-          gp.data_remove();     // previous data file, if any
-          std::ofstream& tmp = gp.data_ofstream();
-          if (tmp.is_open()) {
-            // std::cout << "Writing to " << gp.data_file_name() << std::endl;
-            // write the number of columns
-            float n = info[2].dims[0];
-            tmp.write((char*) &n, sizeof(n));
-            // write the x coordinates
-            tmp.write((char*) &data[0].f[0], info[2].dims[0]*sizeof(data[0].f[0]));
-
-            // treat all rows
-            char* z = (char*) &data[2].f[0];
-            size_t size = info[2].dims[0]*sizeof(data[2].f[0]);
-            for (int i = 0; i < info[2].dims[1]; ++i) {
-              // write the y coordinate
-              tmp.write((char*) &data[1].f[i], sizeof(data[1].f[i]));
-              // write the row of z coordinates
-              tmp.write(z, size);
-              z += size;
-            }
-            tmp.close();
-
-            if (have_contour_labels)
-              gp.sendf("splot '%s' binary nonuniform matrix using 1:2:3 notitle with lines;\n",
-                     gp.data_file_name().c_str())
-              .flush();
-            else
-              gp.sendf("splot '%s' binary nonuniform matrix using 1:2:3 notitle with pm3d;\n",
-                     gp.data_file_name().c_str())
-              .flush();
-          } else
-            return luxerror("Could not open temp file for transferring data to gnuplot", 0);
-        }
-        break;
-      case 2:
-        for (int i = 0; i < 2; ++i) {
-          for (int j = 0; j < 2; ++j) {
-            if (info[i].dims[j] != info[2].dims[j])
-              return luxerror("Dimensions should be equal to that of Z",
-                              ps[i]);
+      if (info[0].nelem == info[1].nelem
+          && info[0].nelem == info[2].nelem
+          && info[0].nelem > 0) {
+        // x, y, z have the same element count: they provide x, y, z
+        // coordinates for successive points
+        gp.data_remove();     // previous data file, if any
+        std::ofstream& tmp = gp.data_ofstream();
+        if (tmp.is_open()) {
+          auto n = info[0].nelem;
+          auto s = sizeof(*data[0].f);
+          while (n--) {
+            tmp.write((char*) data[0].f, s);
+            tmp.write((char*) data[1].f, s);
+            tmp.write((char*) data[2].f, s);
+            ++data[0].f;
+            ++data[1].f;
+            ++data[2].f;
           }
-        }
-        break;
+          tmp.close();
+
+          auto w = info[2].dims[0]; // "width" of the surface
+          auto l = info[2].nelem/info[2].dims[0]; // "length"
+
+          if (have_contour_labels)
+            gp.sendf("splot '%s' binary record=(%d,%d) "
+                     "using 1:2:3 notitle with lines;\n",
+                     gp.data_file_name().c_str(), w, l)
+              .flush();
+          else
+            gp.sendf("splot '%s' binary record=(%d,%d) "
+                     "using 1:2:3 notitle with pm3d;\n",
+                     gp.data_file_name().c_str(), w, l)
+              .flush();
+        } else
+          return luxerror("Could not open temp file for "
+                          "transferring data to gnuplot", 0);
+      } else if (info[0].ndim == 1
+                 && info[1].ndim == 1
+                 && info[2].ndim == 2
+                 && info[0].dims[0] == info[2].dims[0]
+                 && info[1].dims[0] == info[2].dims[1]) {
+        // x provides the x coordinates of the grid, y provides the y
+        // coordinates of the grid, and z provides the z coordinates
+        // of all points on the grid
+
+        // We cannot send a nonuniform matrix to gnuplot through a
+        // pipe, because gnuplot 5.0 uses fseek and ftell on the
+        // data, and those don't work on pipes (at least on
+        // GNU/Linux).  So we send the data as text to a temporary
+        // file, then tell gnuplot to read the file.
+        //
+        // We want to clean up after ourselves and remove that file
+        // when we don't need it anymore, However, our communication
+        // with gnuplot is one-way; We don't get a signal when
+        // gnuplot is done creating the plot and doesn't need the
+        // file anymore.  So, we must not delete the file
+        // immediately after sending the command to gnuplot, because
+        // gnuplot may not have finished creating the plot yet.
+        //
+        // Our current solution is to delete the file at the
+        // beginning of the next command that needs such a file.
+        // This fails if the next such command is issued before the
+        // previous one has been completed by gnuplot (e.g., in
+        // batch mode).
+
+        gp.data_remove();     // previous data file, if any
+        std::ofstream& tmp = gp.data_ofstream();
+        if (tmp.is_open()) {
+          // std::cout << "Writing to " << gp.data_file_name() << std::endl;
+          // write the number of columns
+          float n = info[2].dims[0];
+          tmp.write((char*) &n, sizeof(n));
+          // write the x coordinates
+          tmp.write((char*) &data[0].f[0],
+                    info[2].dims[0]*sizeof(data[0].f[0]));
+          // treat all rows
+          char* z = (char*) &data[2].f[0];
+          size_t size = info[2].dims[0]*sizeof(data[2].f[0]);
+          for (int i = 0; i < info[2].dims[1]; ++i) {
+            // write the y coordinate
+            tmp.write((char*) &data[1].f[i], sizeof(data[1].f[i]));
+            // write the row of z coordinates
+            tmp.write(z, size);
+            z += size;
+          }
+          tmp.close();
+
+          if (have_contour_labels)
+            gp.sendf("splot '%s' binary nonuniform matrix "
+                     "using 1:2:3 notitle with lines;\n",
+                     gp.data_file_name().c_str())
+              .flush();
+          else
+            gp.sendf("splot '%s' binary nonuniform matrix "
+                     "using 1:2:3 notitle with pm3d;\n",
+                     gp.data_file_name().c_str())
+              .flush();
+        } else
+          return luxerror("Could not open temp file for "
+                          "transferring data to gnuplot", 0);
       }
     }
     break;

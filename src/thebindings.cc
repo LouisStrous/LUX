@@ -3105,11 +3105,11 @@ void register_the_bindings()
   int32_t lux_gnutv(int32_t, int32_t []);
   register_lux_s(lux_gnutv, "gtv", 1, 1, NULL);
 
-#line 937 "gnuplot_interface.cc"
+#line 961 "gnuplot_interface.cc"
   int32_t lux_gnuplot3d(int32_t, int32_t []);
   register_lux_s(lux_gnuplot3d, "gplot3d", 1, 10, ":::xtitle:ytitle:ztitle:title:rotx:rotz:contours:1flat:0lii:2loi:4lio:6loo:0liii:2loii:4lioi:6looi:8liio:10loio:12lioo:14looo");
 
-#line 971 "gnuplot_interface.cc"
+#line 995 "gnuplot_interface.cc"
   int32_t lux_gnucontour(int32_t, int32_t []);
   register_lux_s(lux_gnucontour, "gcontour", 1, 1, ":1equalxy:2image");
 

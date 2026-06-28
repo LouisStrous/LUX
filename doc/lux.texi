@@ -17630,11 +17630,21 @@ similarly specify for the x, y, and z axes.
 Displays a 3D plot of 2D data set @code{@var{z}} via the gnuplot
 program.
 
-If @code{@var{x}} and @code{@var{y}} are specified, then they provide
-the x and y coordinates for the columns and rows of @code{@var{z}}.
-They must be 1D data sets, with @code{@var{x}} having as many elements
-as the first dimension of @code{@var{z}}, and @code{@var{y}} having as
-many elements as the second dimension of @code{@var{z}}.
+@code{@var{z}} must have at least two dimensions.
+
+If @code{@var{x}}, @code{@var{y}}, and @code{@var{z}} are specified
+and have the same number of elements, then they provide (x, y, z)
+coordinates of successive points.  The first dimension of
+@code{@var{z}} corresponds to the ``width'' of the surface, and the
+combination of remaining dimensions corresponds to the ``length''.
+
+If @code{@var{z}} has two dimensions and @code{@var{x}} and
+@code{@var{y}} have one dimension each, and the first dimension of
+@code{@var{z}} has the same element count as @code{@var{x}}, and the
+second dimension of @code{@var{z}} has the same element count as
+@code{@var{y}}, then @code{@var{x}} contains the x coordinates of the
+grid and @code{@var{y}} contains the y coordinates of the grid, and
+@code{@var{z}} contains the z coordinate of the points on the grid.
 
 @code{@var{xtitle}} is the title for the x axis.
 
@@ -19468,10 +19478,14 @@ See also: @ref{ordfilter}, @ref{minfilter}, @ref{maxfilter}
 @subsection median
 @findex median
 
-@code{median(@var{x} [, @var{axes}]}
+@code{median(@var{x} [, @var{axes}, /keepdims]}
 
 Calculates the median of numerical @code{@var{x}} along the indicated
-@code{@var{axes}}.
+@code{@var{axes}}.  If also @code{/keepdims} is specified, then the
+dimension(s) along which the medians are calculated are set to 1 in
+the result.  If @code{/keepdims} is not set, then such dimensions are
+omitted from the result, and if only a single number is returned, then
+it is returned as a scalar.
 
 See also: @ref{medfilter}, @ref{quantile}
 
@@ -21453,7 +21467,7 @@ The result has the same dimensions as the parameters.
 @subsection quantile
 @findex quantile
 
-@code{quantile(@var{quantile}, @var{data} [, @var{axes}])}
+@code{quantile(@var{quantile}, @var{data} [, @var{axes}, /keepdims])}
 
 Returns a particular @code{@var{quantile}} of the @code{@var{data}}
 along the indicated @code{@var{axes}}, i.e., that data value that
@@ -21467,6 +21481,12 @@ However, use of @code{quantile} to calculate minima or maxima is not
 recommended, because @code{quantile} always sorts the data while
 looking for the desired quantile, whereas @code{min} and @code{max} do
 not do that and are therefore faster.
+
+If also @code{/keepdims} is specified, then the dimension(s) along
+which the quantiles are calculated are set to 1 in the result.  If
+@code{/keepdims} is not set, then such dimensions are omitted from the
+result, and if only a single number is returned, then it is returned
+as a scalar.
 
 See also: @ref{median}, @ref{ordfilter}, @ref{min}, @ref{max}
 

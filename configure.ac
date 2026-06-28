@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([lux], [1.5.0], [lux@quae.nl])
+AC_INIT([lux], [1.5.1], [lux@quae.nl])
 AM_EXTRA_RECURSIVE_TARGETS([debug])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_LANG([C++])
